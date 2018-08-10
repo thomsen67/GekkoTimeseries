@@ -3013,13 +3013,15 @@ namespace Gekko.Parser.Gek
 
                                     }
 
+                                    bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
+
                                     if (internalName != null)
                                     {
                                         if (child[0].Text == "ASTPLUS")
                                         {
                                             string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", false)";
                                             indexes += s;
-                                            if (reportInterior)
+                                            if (reportInterior && !xxx)
                                             {
                                                 //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
@@ -3029,7 +3031,7 @@ namespace Gekko.Parser.Gek
                                         {
                                             string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", true)";
                                             indexes += s;
-                                            if (reportInterior)
+                                            if (reportInterior && !xxx)
                                             {
                                                 //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
@@ -3040,7 +3042,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         string s = node[1][i].Code.ToString();
                                         indexes += s;
-                                        if (reportInterior)
+                                        if (reportInterior && !xxx)
                                         {
                                             //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                             indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
@@ -3049,7 +3051,7 @@ namespace Gekko.Parser.Gek
                                     if (i < node[1].ChildrenCount() - 1)
                                     {
                                         indexes += ", ";
-                                        if (reportInterior)
+                                        if (reportInterior && !xxx)
                                         {
                                             indexesReport += ", ";
                                         }
@@ -3070,6 +3072,7 @@ namespace Gekko.Parser.Gek
                                             internalFunction = two.s2;
                                         }
                                     }
+
 
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
