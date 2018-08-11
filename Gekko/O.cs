@@ -7666,7 +7666,7 @@ namespace Gekko
                     int jj = -1;
                     for (int i = 0; i < 2; i++)
                     {
-
+                        //IVariable variable = element.variable[i];
                         if (element.variable[i] != null)
                         {
                             counter++;
@@ -7675,29 +7675,43 @@ namespace Gekko
                             {
                                 if (counter == 1) jj++;
                                 if (((Series)element.variable[i]).type == ESeriesType.ArraySuper)
-                                {
-                                    //counter++;
+                                {                                    
                                     List unfold = new List();
-                                    List<string> labels = new List<string>();
-
-                                    //EXPLODE EXPLODE EXPLODE
-                                    //EXPLODE EXPLODE EXPLODE
-                                    //EXPLODE EXPLODE EXPLODE
-                                    //EXPLODE EXPLODE EXPLODE
-                                    //EXPLODE EXPLODE EXPLODE
-
-                                    ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);                                                                       
-
+                                    List<string> labels = new List<string>();                                    
+                                    ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);
                                     element.variable[i] = unfold;
                                     if (counter == 1)
-                                    {
-                                        //element.labelOLD = labels;
+                                    {                                    
                                         element.labelGiven = labels; //overriding                           
                                     }
                                 }
                             }
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
+                                if (false)
+                                {
+
+                                    for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
+                                    {
+
+                                        if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
+                                        {
+                                            if (counter == 1) jj++;
+                                            if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
+                                            {
+                                                List unfold = new List();
+                                                List<string> labels = new List<string>();
+                                                ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);
+                                                element.variable[i] = unfold;
+                                                if (counter == 1)
+                                                {
+                                                    element.labelGiven = labels; //overriding                           
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
 
                                 //for now, just do nothing
 
@@ -7767,13 +7781,13 @@ namespace Gekko
                                 // -----------------------------------
                                 //   inside a list start
                                 // -----------------------------------
-                                
+
 
 
                                 //List<IVariable> newList = new List<IVariable>();
                                 //for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
                                 //{
-                                    
+
                                 //    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
                                 //    {
                                 //        if (counter == 1) jj++;

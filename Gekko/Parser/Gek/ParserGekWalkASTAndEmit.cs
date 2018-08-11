@@ -1260,7 +1260,7 @@ namespace Gekko.Parser.Gek
 
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
-                                bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
+                                bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
 
                                 //only for PRT-type or DISP, and only if the {} is not inside [] or {}.
                                 if (node.specialExpressionAndLabelInfo != null && !xxx)
@@ -1465,7 +1465,7 @@ namespace Gekko.Parser.Gek
                                 indexes += node[1].Code.ToString();
                             }
 
-                            bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
+                            bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
 
                             if (((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent)) && (!xxx))
                             {
@@ -3013,7 +3013,8 @@ namespace Gekko.Parser.Gek
 
                                     }
 
-                                    bool xxx = ReportHelper2(internalName, internalFunction); //a controlled #x, bounded by sum
+                                    bool xxx = ReportHelperIsSum(internalName, internalFunction); //a controlled #x, bounded by sum
+                                    //xxx = false;
 
                                     if (internalName != null)
                                     {
@@ -3081,7 +3082,7 @@ namespace Gekko.Parser.Gek
                                                                   
                                     if (reportInterior)
                                     {
-                                        bool xxx = ReportHelper2(internalName, internalFunction);
+                                        bool xxx = ReportHelperIsSum(internalName, internalFunction);
                                         if (xxx)
                                         {
                                             indexesReport += s;
@@ -5365,7 +5366,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static bool ReportHelper2(string internalName, string internalFunction)
+        private static bool ReportHelperIsSum(string internalName, string internalFunction)
         {
             return internalName != null && G.Equal(internalFunction, "sum");
         }
