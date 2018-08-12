@@ -1159,6 +1159,45 @@ namespace UnitTests
         public void _Test_SumUnfoldDollarPrint()
         {
 
+            Table table = null;
+
+            I("reset; time 2010 2012;");
+            I("#n = ('n',); #a = ('a',); %n = 'n'; %a = 'a';");
+            I("a = series(1);");
+            I("a[x] = 200;");
+            I("a[y] = 300;");
+            I("n = 100;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<n> a, a, n, 1;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<n> {#a}, {#a}, {#n}, 1;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            if (false)
+            {
+                Globals.lastPrtOrMulprtTable = null;
+                I("p<n> {#{%a + ''}}, {#{%a + ''}}, {#{%n + ''}}, 1;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+                Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+                Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            }
+
             I("reset;");
             I("time 2001 2003;");
             I("xx = series(2);");
@@ -1195,7 +1234,7 @@ namespace UnitTests
              */
             Globals.lastPrtOrMulprtTable = null;
             I("p <n> xx[a, x];");
-            Table table = Globals.lastPrtOrMulprtTable;
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
@@ -1925,11 +1964,15 @@ namespace UnitTests
             I("qc = series(1);");
             I("qc[a] = 1;");
             I("qc[b] = 2;");
+            Globals.lastPrtOrMulprtTable = null;
             I("TELL plotx('qC');");
             string[] ss = Directory.GetFiles(Globals.ttPath2 + @"\regres\Databanks\temp\analysis\graphs");
             Assert.AreEqual(ss.Length, 2);
             Assert.IsTrue(ss[0].EndsWith("qC1.svg"));
             Assert.IsTrue(ss[1].EndsWith("qC2.svg"));
+
+           
+
 
 
         }

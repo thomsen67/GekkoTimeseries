@@ -7637,6 +7637,8 @@ namespace Gekko
                 //      c[i3]
                                 
                 Explode();  //unfolds any lists in the prtElements
+
+                List<string> labelOriginal = new List<string>();
                 
 
                 // ---------------------------------------------------------------------------------------------
@@ -7646,15 +7648,7 @@ namespace Gekko
                 bool allSeries = true;
                 foreach (O.Prt.Element element in this.prtElements)
                 {
-                    //List<string> label2Temp = new List<string>();
-                    //if (element.labelOLD != null)
-                    //{
-                    //    foreach (string s in element.labelOLD)
-                    //    {
-                    //        label2Temp.Add(s);
-                    //    }
-                    //}
-
+                    labelOriginal.Add(element.labelGiven[0]);
                     List<List<MapMultidimItem>> check = new List<List<MapMultidimItem>>();
                     check.Add(new List<MapMultidimItem>());
                     check.Add(new List<MapMultidimItem>());
@@ -7679,7 +7673,14 @@ namespace Gekko
                                 {
                                     List unfold = new List();
                                     List<string> labels = new List<string>();
-                                    List<string> lbl = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, 1, bankNumber);                                    
+
+                                    List<string> lbl = new List<string>();
+                                    try
+                                    {
+                                        lbl = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, 1, bankNumber);
+                                    }
+                                    catch { lbl = new List<string>(); }
+
                                     ExplodeArraySeriesHelper(element.variable[bankNumber] as Series, check, lbl[0], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
                                     element.variable[bankNumber] = unfold;
                                     if (firstVariableFoundInFirstOrRef == 1) element.labelGiven = labels;                                    
@@ -7691,7 +7692,11 @@ namespace Gekko
                                 List<string> labelsUnfolded = null;
                                 if (firstVariableFoundInFirstOrRef == 1)
                                 {
-                                    labelsUnfolded = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, n, bankNumber);
+                                    try
+                                    {
+                                        labelsUnfolded = Program.OPrintLabels(element.labelGiven, element.labelRecordedPieces, n, bankNumber);
+                                    }
+                                    catch { labelsUnfolded = new List<string>(); }
                                 }
                                 for (int k = 0; k < n; k++)
                                 {
@@ -7734,7 +7739,7 @@ namespace Gekko
                 if (Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
                     //All vars are series or val (series may be x[#i] or x[%i]).
-                    Program.OPrint(this, null);
+                    Program.OPrint(this, null, labelOriginal);
                 }
                 else
                 {
@@ -7749,7 +7754,7 @@ namespace Gekko
 
                         if (Program.AllSeriesCheck(this, EPrintTypes.Print))  //note that here, this.prtElements contains only 1 element (the current)!
                         {
-                            Program.OPrint(this, null);
+                            Program.OPrint(this, null, labelOriginal);
                         }
                         else
                         {

@@ -25351,7 +25351,7 @@ namespace Gekko
             return b;
         }
 
-        public static void OPrint(O.Prt o, List<string> labelsHandmade)
+        public static void OPrint(O.Prt o, List<string> labelsHandmade, List<string> labelOriginal)
         {
             //Note: it is ok for a prtElement in o to be a List containg Series
             
@@ -25400,8 +25400,11 @@ namespace Gekko
             int numberOfGekkoNullVariables = 0;
             int numberOfOtherVariables = 0;
 
+            int k = -1;
+
             foreach (O.Prt.Element element in o.prtElements) //for each comma in the prt statement
             {
+                k++;
                 List xx0 = element.variable[0] as List;
                 List xx1 = element.variable[1] as List;
                 int n = 1;
@@ -25414,9 +25417,7 @@ namespace Gekko
                     }
                 }
                 if (xx0 != null) n = xx0.list.Count;
-                else if (xx1 != null) n = xx1.list.Count;
-
-                
+                else if (xx1 != null) n = xx1.list.Count;                
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -25569,21 +25570,23 @@ namespace Gekko
                         // Labels start
                         // ----------------------------------------------------
 
-                         List<string> lbl = new List<string>();  //count = 0!
+                        List<string> lbl = new List<string>();  //count = 0!
 
                         try
                         {
                             lbl = OPrintLabels(element.labelGiven,element.labelRecordedPieces, n, i);
                         }
-                        catch
-                        {
-
-                        }
+                        catch { lbl = new List<string>(); }
 
                         if (lbl.Count != n)
                         {
-                            G.Writeln2("*** ERROR: Mismatch");
-                            throw new GekkoException();
+                            if (Globals.runningOnTTComputer) MessageBox.Show("*** ERROR: Mismatch");                            
+                            string l = G.ReplaceGlueNew(RemoveSplitter(labelOriginal[k]).Split('|')[0]);                            
+                            lbl = new List<string>();
+                            for (int ii = 0; ii < n; ii++)
+                            {
+                                lbl.Add(l);
+                            }                         
                         }
 
                         // ----------------------------------------------------
@@ -26641,6 +26644,15 @@ namespace Gekko
                 {
                     //just skip it
                     //TODO: what about multiline PRT expressions??
+                    skip = true;
+                }
+
+                if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
+                {
+                    //good
+                }
+                else
+                {
                     skip = true;
                 }
 
