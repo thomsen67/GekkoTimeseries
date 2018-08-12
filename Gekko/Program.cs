@@ -25573,7 +25573,7 @@ namespace Gekko
 
                         try
                         {
-                            lbl = OPrintLabels(element, n, i);
+                            lbl = OPrintLabels(element.labelGiven,element.labelRecordedPieces, n, i);
                         }
                         catch
                         {
@@ -26576,12 +26576,12 @@ namespace Gekko
             }
         }
 
-        private static List<string> OPrintLabels(O.Prt.Element element, int n, int i)
+        public static List<string> OPrintLabels(List<string> labelGiven, List<O.RecordedPieces> labelRecordedPieces, int n, int i)
         {
-            if (element.labelGiven.Count > 1)
+            if (labelGiven.Count > 1)
             {
                 //this is the case for an array-series that has been unfolded
-                return element.labelGiven;
+                return labelGiven;
             }
 
             List<string> lbl = new List<string>();  //this must end up with as many strings as the element has subelements (sublist)
@@ -26590,15 +26590,15 @@ namespace Gekko
 
             //n is the number of subelements for the prtElement (for example if the item is a list like {#m}).
 
-            string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
+            string[] w = RemoveSplitter(labelGiven[0]).Split('|');  //raw label   
 
-            if (element.labelRecordedPieces.Count == 0)
+            if (labelRecordedPieces.Count == 0)
             {
                 lbl.Add(G.ReplaceGlueNew(w[0]));
                 return lbl;
             }
 
-            int nn = element.labelRecordedPieces.Count / n;  //how many inserts per column
+            int nn = labelRecordedPieces.Count / n;  //how many inserts per column
 
             string[] result = new string[w[0].Length];
             int ci = 0;
@@ -26621,7 +26621,7 @@ namespace Gekko
 
             //foreach recorded call of {} or [], via RecordLabel()
             int counter = -1;
-            foreach (O.RecordedPieces y in element.labelRecordedPieces)  //foreach RecordLabel()
+            foreach (O.RecordedPieces y in labelRecordedPieces)  //foreach RecordLabel()
             {
                 counter++;
                 string[] ss = y.s.Split('|');

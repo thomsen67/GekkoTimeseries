@@ -7678,7 +7678,7 @@ namespace Gekko
                                 {                                    
                                     List unfold = new List();
                                     List<string> labels = new List<string>();                                    
-                                    ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);
+                                    ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, element.labelRecordedPieces, counter, i, unfold, labels);
                                     element.variable[i] = unfold;
                                     if (counter == 1)
                                     {                                    
@@ -7688,20 +7688,24 @@ namespace Gekko
                             }
                             else if (element.variable[i].Type() == EVariableType.List)
                             {
-                                if (false)
+                                if (true)
                                 {
 
                                     for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
                                     {
 
-                                        if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
+                                        IVariable subElement = (((List)element.variable[i]).list[k]);
+
+                                        if (subElement.Type() == EVariableType.Series)
                                         {
+                                            Series subElement_series = (Series)subElement;
                                             if (counter == 1) jj++;
-                                            if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
+
+                                            if (subElement_series.type == ESeriesType.ArraySuper)
                                             {
                                                 List unfold = new List();
                                                 List<string> labels = new List<string>();
-                                                ExplodeArraySeriesHelper(element.variable[i] as Series, check, element.labelGiven, counter, i, unfold, labels);
+                                                ExplodeArraySeriesHelper(subElement_series, check, element.labelGiven, element.labelRecordedPieces, counter, i, unfold, labels);
                                                 element.variable[i] = unfold;
                                                 if (counter == 1)
                                                 {
@@ -7715,128 +7719,7 @@ namespace Gekko
 
                                 //for now, just do nothing
 
-                                //G.Writeln2("+++ WARNING: List print not implemented");
-                                //return;
-
-                                //List<IVariable> newList = new List<IVariable>();
-                                //List<string> newLabels = new List<string>();
-                                //for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
-                                //{
-
-                                //    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
-                                //    {
-                                //        if (counter == 1) jj++;
-                                //        if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
-                                //        {
-                                //            //counter++;
-                                //            List unfold = new List();
-                                //            List<string> labels = new List<string>();
-
-                                //            bool labelProblem = jj < 0 || jj >= element.label2.Count;
-                                //            string s = "";
-                                //            if (!labelProblem) s = element.label2[jj];
-
-                                //            ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, s, counter, i, unfold, labels);
-
-                                //            newList.AddRange(unfold.list);
-
-                                //            //((List)element.variable[i]).list[k] = unfold;
-                                //            if (counter == 1)
-                                //            {
-                                //                if (labelProblem)
-                                //                {
-                                //                    for (int m = 0; m < labels.Count; m++)
-                                //                    {
-                                //                        newLabels.Add(element.label);
-                                //                    }
-                                //                }
-                                //                else
-                                //                {
-                                //                    newLabels.AddRange(labels);
-                                //                }
-                                //                //element.label2 = labels;
-                                //            }
-                                //        }
-                                //        else
-                                //        {
-                                //            newList.Add(((List)element.variable[i]).list[k]);
-                                //        }
-                                //    }
-                                //    else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
-                                //    {
-                                //        throw new GekkoException();  //should not be possible
-                                //    }
-                                //    else
-                                //    {
-                                //        if (counter == 1) jj++;
-                                //        allSeries = false;
-                                //        newList.Add(((List)element.variable[i]).list[k]);
-                                //    }
-
-                                //}
-                                //element.variable[i] = new List(newList);
-                                //element.label2 = newLabels;
-
-
-                                // -----------------------------------
-                                //   inside a list start
-                                // -----------------------------------
-
-
-
-                                //List<IVariable> newList = new List<IVariable>();
-                                //for (int k = 0; k < ((List)element.variable[i]).list.Count(); k++)
-                                //{
-
-                                //    if ((((List)element.variable[i]).list[k]).Type() == EVariableType.Series)
-                                //    {
-                                //        if (counter == 1) jj++;
-                                //        if (((Series)(((List)element.variable[i]).list[k])).type == ESeriesType.ArraySuper)
-                                //        {
-                                //            //counter++;
-                                //            List unfold = new List();
-                                //            List<string> labels = new List<string>();
-
-                                //            //EXPLODE EXPLODE EXPLODE
-                                //            //EXPLODE EXPLODE EXPLODE
-                                //            //EXPLODE EXPLODE EXPLODE
-                                //            //EXPLODE EXPLODE EXPLODE
-                                //            //EXPLODE EXPLODE EXPLODE
-
-                                //            //ExplodeArraySeriesHelper((((List)element.variable[i]).list[k]) as Series, check, label2Temp[jj], counter, i, unfold, labels);
-
-                                //            newList.AddRange(unfold.list);
-
-                                //            //((List)element.variable[i]).list[k] = unfold;
-                                //            if (counter == 1)
-                                //            {
-                                //                element.labelOLD = labels;
-                                //            }
-                                //        }
-                                //        else
-                                //        {
-                                //            newList.Add(((List)element.variable[i]).list[k]);
-                                //        }
-                                //    }
-                                //    else if ((((List)element.variable[i]).list[k]).Type() == EVariableType.List)
-                                //    {
-                                //        throw new GekkoException();  //should not be possible
-                                //    }
-                                //    else
-                                //    {
-                                //        if (counter == 1) jj++;
-                                //        allSeries = false;
-                                //        newList.Add(((List)element.variable[i]).list[k]);
-                                //    }
-
-                                //}
-                                //element.variable[i] = new List(newList);
-
-
-                                // -----------------------------------
-                                //   inside a list end
-                                // -----------------------------------
-
+                                
 
 
 
@@ -7997,7 +7880,7 @@ namespace Gekko
             //    }
             //}
 
-            private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, List<string> label, int counter, int i, List unfold, List<string> labels)
+            private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, List<string> label, List<O.RecordedPieces> recordedPieces, int counter, int i, List unfold, List<string> labels)
             {
 
                 List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
@@ -8019,7 +7902,13 @@ namespace Gekko
                     string bankName = null;
 
                     bool isSimple = true;
-                    string label2 = label[0].Split('|')[0];
+
+                    int n = 1;
+                    List<string> lbl = Program.OPrintLabels(label,recordedPieces, n, i);
+
+                    //string label2 = G.ReplaceGlueNew(Program.RemoveSplitter(label[0]).Split('|')[0]);
+                    string label2 = lbl[0];
+
                     foreach (char c in label2)
                     {
                         if (G.IsLetterOrDigitOrUnderscore(c) || c == ':' || c == '@' || c == Globals.freqIndicator)
