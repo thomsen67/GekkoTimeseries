@@ -2485,7 +2485,7 @@ help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} name?);
 // IF
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical ^(ASTPLACEHOLDER functionStatements) ^(ASTPLACEHOLDER functionStatements2?));
+if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INDEX

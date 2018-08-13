@@ -438,9 +438,9 @@ namespace Gekko.Parser.Gek
                 }
                 node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
             }
-            
-            //See also #890752345
-            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFORSTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+
+            //HACK #438543
+            if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
             {
                 relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
             }
@@ -5333,9 +5333,17 @@ namespace Gekko.Parser.Gek
                 //#982375: if it is 0, walk the sub-tree to see...                  
                 if (!w.wh.isGotoOrTarget)
                 {
-                    //string target = "Target" + ++Globals.counter;
-                    //node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + target + ":" + G.NL + node.Code + G.NL + "if (smpl.HasError()) { O.TryNewSmpl(smpl); goto " + target + ";}"); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
-                    node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncs?.ToString() + G.NL + node.Code);
+                    //HACK #438543
+                    if (node.Text == "ASTFOR" || node.Text == "ASTIF" || node.Text == "ASTFUNCTIONDEF2" || node.Text == "ASTPROCEDUREDEF")
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        //string target = "Target" + ++Globals.counter;
+                        //node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + target + ":" + G.NL + node.Code + G.NL + "if (smpl.HasError()) { O.TryNewSmpl(smpl); goto " + target + ";}"); //so errors get line numbers. Hmm with A() instead of CA() we get the command run 2 times...  //init the smpl for every command (this excludes IF, FOR, etc.? never mind).                    
+                        node.Code.CA("p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncs?.ToString() + G.NL + node.Code);
+                    }
 
                 }
 

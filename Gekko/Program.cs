@@ -26647,7 +26647,8 @@ namespace Gekko
                     skip = true;
                 }
 
-                if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
+                //if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
+                if (y.iv.Type() == EVariableType.String)
                 {
                     //good
                 }
