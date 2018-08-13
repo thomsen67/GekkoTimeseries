@@ -2528,10 +2528,11 @@ namespace Gekko
                 double x2_val = ((ScalarVal)x2).val;
                 bool x2IsInteger = false;
                 int i2 = 0;
-                if (int.TryParse(x1_string, out i2))
-                {
-                    x2IsInteger = true;
-                }
+                                
+                if (G.ConvertToInt(out i2, x2_val))
+                {                    
+                    x2IsInteger = true;                    
+                }                
 
                 if (x1IsInteger && x2IsInteger)
                 {

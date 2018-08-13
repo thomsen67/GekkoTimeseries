@@ -1161,42 +1161,45 @@ namespace UnitTests
 
             Table table = null;
 
-            I("reset; time 2010 2012;");
-            I("#n = ('n',); #a = ('a',); %n = 'n'; %a = 'a';");
-            I("a = series(1);");
-            I("a[x] = 200;");
-            I("a[y] = 300;");
-            I("n = 100;");
-            Globals.lastPrtOrMulprtTable = null;
-            I("p<n> a, a, n, 1;");
+            //Test lag and lead of age, x[#a-1] and x[#a+1]
+            I("reset; time 2001 2002;");
+            I("x = series(1);");
+            I("x['18'] = 100;");
+            I("x['19'] = 200;");
+            I("x['20'] = 300;");
+            I("#a = ('19', '20');");
+            Globals.lastPrtOrMulprtTable = null;            
+            I("p <n> x[#a], x[#a-1];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[20]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[18]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[19]");            
+            Assert.AreEqual(table.Get(2, 2).number, 200d);
+            Assert.AreEqual(table.Get(2, 3).number, 300d);
+            Assert.AreEqual(table.Get(2, 4).number, 100d);
+            Assert.AreEqual(table.Get(2, 5).number, 200d);
+            I("reset; time 2001 2002;");
+            I("x = series(1);");
+            I("x['18'] = 100;");
+            I("x['19'] = 200;");
+            I("x['20'] = 300;");
+            I("#a = ('18', '19');");
             Globals.lastPrtOrMulprtTable = null;
-            I("p<n> {#a}, {#a}, {#n}, 1;");
+            I("p <n> x[#a], x[#a+1];");
             table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
-            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
-            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
-            if (false)
-            {
-                Globals.lastPrtOrMulprtTable = null;
-                I("p<n> {#{%a + ''}}, {#{%a + ''}}, {#{%n + ''}}, 1;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
-                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
-                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
-                Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
-                Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
-            }
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[18]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[20]");
+            Assert.AreEqual(table.Get(2, 2).number, 100d);
+            Assert.AreEqual(table.Get(2, 3).number, 200d);
+            Assert.AreEqual(table.Get(2, 4).number, 200d);
+            Assert.AreEqual(table.Get(2, 5).number, 300d);
+
+            // setting up the tests
+            // setting up the tests
+            // setting up the tests
 
             I("reset;");
             I("time 2001 2003;");
@@ -1971,7 +1974,86 @@ namespace UnitTests
             Assert.IsTrue(ss[0].EndsWith("qC1.svg"));
             Assert.IsTrue(ss[1].EndsWith("qC2.svg"));
 
-           
+            // --------------------------------------------------------------
+
+            //test print of indexers [-1], [2011], [2011a1]
+            I("reset; time 2010 2012;");
+            I("x = (1, 2, 3);");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p <n> x, x[-1], x[2011], x[2011a1];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[-1]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[2011]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[2011a1]");
+            Assert.AreEqual(table.Get(2, 2).number, 1);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.AreEqual(table.Get(2, 4).number, 2);
+            Assert.AreEqual(table.Get(2, 5).number, 2);
+            Assert.AreEqual(table.Get(3, 2).number, 2);
+            Assert.AreEqual(table.Get(3, 3).number, 1);
+            Assert.AreEqual(table.Get(3, 4).number, 2);
+            Assert.AreEqual(table.Get(3, 5).number, 2);
+            Assert.AreEqual(table.Get(4, 2).number, 3);
+            Assert.AreEqual(table.Get(4, 3).number, 2);
+            Assert.AreEqual(table.Get(4, 4).number, 2);
+            Assert.AreEqual(table.Get(4, 5).number, 2);
+
+            //test print of list of array-series
+            I("reset; time 2010 2012;");
+            I("#n = ('n',); #a = ('a',); %n = 'n'; %a = 'a';");
+            I("a = series(1);");
+            I("a[x] = 200;");
+            I("a[y] = 300;");
+            I("n = 100;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<n> a, a, n, 1;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<n> {#a}, {#a}, {#n}, 1;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                Globals.lastPrtOrMulprtTable = null;
+                I("p<n> {#{%a + ''}}, {#{%a + ''}}, {#{%n + ''}}, 1;");
+                table = Globals.lastPrtOrMulprtTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a[x]");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a[y]");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a[x]");
+                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "a[y]");
+                Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "n");
+                Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "1");
+            }
+
+            //testing {}-name indexed with #m: {...}[#m]
+            I("reset; time 2001 2002;");
+            I("a = series(1);");
+            I("b = series(1);");
+            I("#s = ('s1', 's2');");
+            I("a[#s] = 1;");
+            I("b[#s] = 2;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("FOR %var_name = ('a', 'b'); P <n> {%var_name}[#s]; END;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "b[s1]");  //table only records the last of %var_name
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "b[s2]");
+            Assert.AreEqual(table.Get(2, 2).number, 2);
+            Assert.AreEqual(table.Get(2, 3).number, 2);
+            Assert.AreEqual(table.Get(3, 2).number, 2);
+            Assert.AreEqual(table.Get(3, 3).number, 2);
+
 
 
 
