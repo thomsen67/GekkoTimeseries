@@ -4011,7 +4011,7 @@ ident3: 					Ident |
   CAPS|
   CELL|
   CHANGE|
-  CLEAR2|
+  //CLEAR2|
   CLIPBOARD|
   CLOSEALL|
   CLOSEBANKS|
@@ -4058,14 +4058,14 @@ ident3: 					Ident |
   DISPLAY|
   DOTS|
   DP|
-  DUMOFF|
-  DUMOF|
-  DUMON|
-  DUMP|
+  //DUMOFF|
+  //DUMOF|
+  //DUMON|
+  //DUMP|
   D|
   EFTER|
   ELEMENTS|
-  ELSE|
+  //ELSE|
   ENGLISH|
   ERROR|
   EXCEL|
@@ -4105,7 +4105,7 @@ ident3: 					Ident |
   GEKKO18|
   GENR|
   GMS|
-  GMULPRT|
+  //GMULPRT|
   GNUPLOT|
   GOAL|
   GRAPH|
@@ -4247,10 +4247,10 @@ ident3: 					Ident |
   SECONDCOLWIDTH|
   SEC|
   SEPARATE|
-  SER2|
-  SER3|
-  SERIES2|
-  SERIES3|
+  //SER2|
+  //SER3|
+  //SERIES2|
+  //SERIES3|
   SETBORDER|
   SETBOTTOMBORDER|
   SETDATES|

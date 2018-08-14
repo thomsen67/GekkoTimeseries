@@ -1577,18 +1577,18 @@ namespace Gekko.Parser.Gek
                             //AddSplitMarkers(node);                        
                         }
                         break;
-                    case "ASTIFSTATEMENTS":
-                        {
-                            GetCodeFromAllChildren(node[0]);
-                            GetCodeFromAllChildren(node);
-                        }
-                        break;
-                    case "ASTELSESTATEMENTS":
-                        {
-                            GetCodeFromAllChildren(node[0]);
-                            GetCodeFromAllChildren(node);
-                        }
-                        break;
+                    //case "ASTIFSTATEMENTS":
+                    //    {
+                    //        GetCodeFromAllChildren(node[0]);
+                    //        GetCodeFromAllChildren(node);
+                    //    }
+                    //    break;
+                    //case "ASTELSESTATEMENTS":
+                    //    {
+                    //        GetCodeFromAllChildren(node[0]);
+                    //        GetCodeFromAllChildren(node);
+                    //    }
+                    //    break;
                     //case "ASTFUNCTIONDEFCODE":
                     //    {
                     //        GetCodeFromAllChildren(node);
@@ -6325,6 +6325,10 @@ namespace Gekko.Parser.Gek
 
         private static void GetCodeFromAllChildren(ASTNode node)
         {
+            if (node == null)
+            {
+                return;
+            }
             foreach (ASTNode child in node.ChildrenIterator())
             {
                 node.Code.A(child.Code + G.NL);
