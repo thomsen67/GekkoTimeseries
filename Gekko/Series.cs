@@ -369,7 +369,7 @@ namespace Gekko
         public void Truncate(GekkoTime start, GekkoTime end)
         {
             if (this.type == ESeriesType.Timeless) return;
-            if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
             int indexEnd = this.GetArrayIndex(end);
 
@@ -541,7 +541,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #100");
                 throw new GekkoException();
             }
-            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
             if (this.data.dataArray == null)
             {
@@ -580,7 +580,7 @@ namespace Gekko
                 this.data.dataArray[0] = value;
             }
            
-            if (this.type != ESeriesType.Light && this.meta != null && this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.type != ESeriesType.Light && this.meta != null && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             
             if (this.freq != t.freq)
             {
@@ -766,7 +766,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #3");
                 throw new GekkoException();
             }
-            if (this.meta.parentDatabank != null && this.meta.parentDatabank.protect) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change observations in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
             if (this.freq != gt1.freq)
             {

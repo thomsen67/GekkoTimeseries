@@ -238,7 +238,7 @@ namespace Gekko
                     //this.storage[0].protect = false;  //this is set elsewhere
                     if (openType == EOpenType.Edit)
                     {
-                        if (databank.protect == false)
+                        if (databank.editable)
                         {
                             G.Writeln2("Databank '" + databank.name + "' is already editable in first position.");
                         }                        
@@ -270,7 +270,7 @@ namespace Gekko
 
                 if (openType == EOpenType.Edit)
                 {
-                    if (openType == EOpenType.Edit) databank.protect = false;
+                    if (openType == EOpenType.Edit) databank.editable = true;
                     G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
                 }
                 else G.Writeln2("Databank '" + name + "' put in first position.");

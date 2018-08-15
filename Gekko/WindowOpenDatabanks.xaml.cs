@@ -133,7 +133,7 @@ namespace Gekko
 
                 if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
                 string prot = null;
-                if (!databank.protect) prot = Globals.protectSymbol;
+                if (databank.editable) prot = Globals.protectSymbol;
                 else prot = "";
                 list.Add(new Task(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
 
@@ -212,9 +212,9 @@ namespace Gekko
                 //remember that higher is at lowerIdx and vice versa!
                 if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
                 {
-                    if (!higher.protect)
+                    if (higher.editable)
                     {
-                        higher.protect = true;
+                        higher.editable = false;
                         s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
                         list[lowerIdx].Prot = Globals.protectSymbol;
                     }
@@ -223,9 +223,9 @@ namespace Gekko
                 //remember that higher is at lowerIdx and vice versa!
                 if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
                 {
-                    if (!lower.protect)
+                    if (lower.editable)
                     {
-                        lower.protect = true;
+                        lower.editable = false;
                         s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
                         list[higherIdx].Prot = Globals.protectSymbol;
                     }                    

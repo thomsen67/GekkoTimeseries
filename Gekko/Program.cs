@@ -2160,7 +2160,7 @@ namespace Gekko
                     return;  //from READ * cancelling
                 }
 
-                if (open && createNewOpenFile && oRead.protect)
+                if (open && createNewOpenFile && !oRead.editable)
                 {
                     G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                     throw new GekkoException();
@@ -2329,7 +2329,7 @@ namespace Gekko
                     }
 
                     HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty
-                    if (open && oRead.protect) databank.protect = true;
+                    if (open && !oRead.editable) databank.editable = false;
 
                     if (Program.options.solve_data_create_auto == true)
                     {
@@ -2391,12 +2391,12 @@ namespace Gekko
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
 
-                    if (open && !isGbk && !oRead.protect)
+                    if (open && !isGbk && oRead.editable)
                     {
-                        if (readInfo.databank.protect != true)
+                        if (readInfo.databank.editable == true)
                         {
                             G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
-                            readInfo.databank.protect = true;
+                            readInfo.databank.editable = false;
                         }
                     }
                     readInfos.Add(readInfo);
@@ -19384,7 +19384,7 @@ namespace Gekko
             //      instead of this looping. Maybe even a list of pointers to x[]-arrays pre-done.
             //      But still, reading in and out of a[] is not that costly.
             //      HMM, is the loop also writing back exogenous vars?
-            if (work.protect)
+            if (!work.editable)
             {
                 //NB: This check is here, to avoid having to do it for each timeseries later on.
                 //    The data is written in a special (fast) way that does not get checked automatically regarding
@@ -22342,7 +22342,7 @@ namespace Gekko
                 {
                     G.Writeln2("Databank '" + removed.name + "' closed, changes not written to file");
                 }
-                else if (removed.protect)
+                else if (!removed.editable)
                 {
                     G.Writeln2("*** ERROR: Internal error #872543: a non-editable bank should not be possible to alter.");
                     throw new GekkoException();
@@ -37841,7 +37841,7 @@ namespace Gekko
         private string orientation = null;  //rows or cols
         public EOpenType openType = EOpenType.Normal;
         public int openTypePosition = -12345;
-        public bool protect = true;
+        public bool editable = false;
         public string gdxopt = null;
         public string array = null;      
 

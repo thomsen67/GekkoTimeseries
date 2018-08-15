@@ -74,7 +74,7 @@ namespace Gekko
         public string info1 = null; //must be taken from DatabankInfo.xml, don't use protobuffer        
         public string date = null; //must be taken from DatabankInfo.xml, don't use protobuffer
         public bool isDirty = false;  //used to see if en OPEN databank must be re-written. Don't use protobuffer on this field.
-        public bool protect = false;  //used to set an OPEN databank as protected. Don't use protobuffer on this field.        
+        public bool editable = true;  //used to set an OPEN databank as editable. Don't use protobuffer on this field.        
         public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
         public string fileHash = null; //do not store this in protobuf
 
@@ -92,7 +92,7 @@ namespace Gekko
         }
 
         public void Clear() {
-            if (this.protect) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
+            if (!this.editable) Program.ProtectError("You cannot clear a non-editable databank, see OPEN<edit> or UNLOCK");            
             yearStart = -12345;
             yearEnd = -12345;
             info1 = null;
@@ -117,7 +117,7 @@ namespace Gekko
 
         public void RemoveVariable(EFreq eFreq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -129,7 +129,7 @@ namespace Gekko
 
         public void RemoveVariable(bool freqAddToName, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -142,7 +142,7 @@ namespace Gekko
         //Generic method, not for outside use!
         private void RemoveVariable(bool freqAddToName, string freq, string variable)
         {
-            if (this.protect) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
             if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
             if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
             {
@@ -186,7 +186,7 @@ namespace Gekko
 
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
-            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
             if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
             {
                 throw new GekkoException(); //only intended for non-series
@@ -200,7 +200,7 @@ namespace Gekko
 
         public void AddIVariableWithOverwrite(IVariable x)
         {
-            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
             Series x_series = x as Series;
             if (x_series != null)
             {
@@ -220,7 +220,7 @@ namespace Gekko
 
         public void AddIVariable(string name, IVariable x, bool isSimpleName)
         {
-            if (this.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
             if (!isSimpleName) G.CheckIVariableNameAndType(x, G.CheckIVariableName(name));
 
@@ -279,7 +279,7 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: #743297324");
             throw new GekkoException();
-            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!this.editable) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
             string variable = ts.name;
             if (variableNameCheck && !G.IsSimpleToken(variable, true))  //also checks for null and "" and '¤'
             {

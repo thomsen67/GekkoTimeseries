@@ -7635,6 +7635,36 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DatabankLocalGlobal()
+        {
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+            I("RESET;");
+            I("MODE data;");
+
+            I("OPEN <edit> tmp;");
+            I("%s = 'tmp';");
+            I("CLOSE tmp;");
+            I("OPEN tmp;");            
+
+            I("%x1 = 1;");
+            I("ref:%y1 = %x1;");
+            _AssertScalarVal(Ref(), "%y1", 1d);
+
+            I("local:%x2 = 2;");
+            I("ref:%y2 = %x2;");
+            _AssertScalarVal(Ref(), "%y2", 2d);
+
+            I("tmp:%x3 = 3;");
+            I("ref:%y3 = %x3;");
+            _AssertScalarVal(Ref(), "%y3", 3d);
+
+
+
+
+        }
+
+        [TestMethod]
         public void _Test__Clear()
         {
             //do a better test where banks are OPENed

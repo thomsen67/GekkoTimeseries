@@ -1224,7 +1224,7 @@ namespace Gekko
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
 
-            if (bank.protect) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!bank.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
             if (G.Chop_HasSigil(nameWithFreq))
             {
@@ -1434,7 +1434,7 @@ namespace Gekko
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
 
-            if (bank.protect) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!bank.editable) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
             
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
@@ -1842,13 +1842,24 @@ namespace Gekko
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
 
+            if (ib.BankType() == EBankType.Normal)
+            {
+                Databank ib_databank = ib as Databank;
+                if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank, see OPEN<edit> or UNLOCK");
+                ib_databank.isDirty = true;
+            }
+
             bool isArraySubSeries = false;
             if (arraySubSeries != null) isArraySubSeries = true;
 
             varnameWithFreq = G.AddSigil(varnameWithFreq, type);
 
             IVariable lhs = null;
-            if (ib != null) lhs = ib.GetIVariable(varnameWithFreq); //may return null
+            if (ib != null)
+            {
+                //how can ib be == null??
+                lhs = ib.GetIVariable(varnameWithFreq); //may return null
+            }
 
             if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
             {
@@ -4992,7 +5003,7 @@ namespace Gekko
                     {
                         if (hlp.openType == EOpenType.First)
                         {
-                            if (Program.databanks.GetFirst().protect)
+                            if (!Program.databanks.GetFirst().editable)
                             {
                                 G.Writeln2("*** ERROR: Cannot READ<first>, since first-position databank is non-editable");
                                 throw new GekkoException();
@@ -5000,7 +5011,7 @@ namespace Gekko
                         }
                         else if (hlp.openType == EOpenType.Ref)
                         {
-                            if (Program.databanks.GetRef().protect)
+                            if (!Program.databanks.GetRef().editable)
                             {
                                 G.Writeln2("*** ERROR: Cannot READ<ref>, since ref databank is non-editable");
                                 throw new GekkoException();
@@ -5008,12 +5019,12 @@ namespace Gekko
                         }
                         else
                         {
-                            if (Program.databanks.GetFirst().protect)
+                            if (!Program.databanks.GetFirst().editable)
                             {
                                 G.Writeln2("*** ERROR: Cannot READ, since first-position databank is non-editable");
                                 throw new GekkoException();
                             }
-                            if (Program.databanks.GetRef().protect)
+                            if (!Program.databanks.GetRef().editable)
                             {
                                 G.Writeln2("*** ERROR: Cannot READ, since ref databank is non-editable");
                                 throw new GekkoException();
@@ -5023,7 +5034,7 @@ namespace Gekko
                     else
                     {
                         //IMPORT
-                        if (Program.databanks.GetFirst().protect)
+                        if (!Program.databanks.GetFirst().editable)
                         {
                             G.Writeln2("*** ERROR: Cannot IMPORT, since first-position databank is non-editable");
                             throw new GekkoException();
@@ -5054,7 +5065,7 @@ namespace Gekko
                     //is in reality an OPEN                    
                     open = true;
                     hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
-                    hlp.protect = true;  //superfluous but for safety
+                    hlp.editable = false;  //superfluous but for safety
                     hlp.openType = EOpenType.Normal;
                     if (readTo == "*")
                     {
@@ -5925,13 +5936,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Databank '" + this.bank + "' is not open, cf. OPEN command");
                     throw new GekkoException();
                 }
-                if (db.protect == true)
+                if (db.editable == false)
                 {
                     G.Writeln2("Databank '" + this.bank + "' is already non-editable");
                 }
                 else
                 {
-                    db.protect = true;
+                    db.editable = false;
                     G.Writeln2("Databank '" + this.bank + "' set non-editable");
                 }
             }
@@ -5948,13 +5959,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Databank '" + this.bank + "' is not open, cf. OPEN command");
                     throw new GekkoException();
                 }
-                if (db.protect == false)
+                if (db.editable == true)
                 {
                     G.Writeln2("Databank '" + this.bank + "' is already editable");
                 }
                 else
                 {
-                    db.protect = false;
+                    db.editable = true;
                     G.Writeln2("Databank '" + this.bank + "' set editable");
                 }
             }
@@ -6162,7 +6173,7 @@ namespace Gekko
                 if (G.Equal(opt_edit, "yes"))
                 {
                     hlp.openType = EOpenType.Edit;
-                    hlp.protect = false;  //will override the born true value of the field
+                    hlp.editable = true;  //will override the born false value of the field
                 }
                 if (G.Equal(opt_ref, "yes"))
                 {
@@ -7260,7 +7271,7 @@ namespace Gekko
                     //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems[i], opt_bank);
                     //foreach (Series ts in tss)
 
-                    if (ts.meta.parentDatabank.protect) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
+                    if (!ts.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
 
                     GekkoTime ddate1 = date1;
                     GekkoTime ddate2 = date2;
