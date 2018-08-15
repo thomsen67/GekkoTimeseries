@@ -1161,41 +1161,7 @@ namespace UnitTests
 
             Table table = null;
 
-            //Test lag and lead of age, x[#a-1] and x[#a+1]
-            I("reset; time 2001 2002;");
-            I("x = series(1);");
-            I("x['18'] = 100;");
-            I("x['19'] = 200;");
-            I("x['20'] = 300;");
-            I("#a = ('19', '20');");
-            Globals.lastPrtOrMulprtTable = null;            
-            I("p <n> x[#a], x[#a-1];");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[19]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[20]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[18]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[19]");            
-            Assert.AreEqual(table.Get(2, 2).number, 200d);
-            Assert.AreEqual(table.Get(2, 3).number, 300d);
-            Assert.AreEqual(table.Get(2, 4).number, 100d);
-            Assert.AreEqual(table.Get(2, 5).number, 200d);
-            I("reset; time 2001 2002;");
-            I("x = series(1);");
-            I("x['18'] = 100;");
-            I("x['19'] = 200;");
-            I("x['20'] = 300;");
-            I("#a = ('18', '19');");
-            Globals.lastPrtOrMulprtTable = null;
-            I("p <n> x[#a], x[#a+1];");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[18]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[19]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[19]");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[20]");
-            Assert.AreEqual(table.Get(2, 2).number, 100d);
-            Assert.AreEqual(table.Get(2, 3).number, 200d);
-            Assert.AreEqual(table.Get(2, 4).number, 200d);
-            Assert.AreEqual(table.Get(2, 5).number, 300d);
+            
 
             // setting up the tests
             // setting up the tests
@@ -2054,10 +2020,44 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 2);
             Assert.AreEqual(table.Get(3, 3).number, 2);
 
-
-
+            //Test lag and lead of age, x[#a-1] and x[#a+1]
+            I("reset; time 2001 2002;");
+            I("x = series(1);");
+            I("x['18'] = 100;");
+            I("x['19'] = 200;");
+            I("x['20'] = 300;");
+            I("#a = ('19', '20');");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p <n> x[#a], x[#a-1];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[20]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[18]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(2, 2).number, 200d);
+            Assert.AreEqual(table.Get(2, 3).number, 300d);
+            Assert.AreEqual(table.Get(2, 4).number, 100d);
+            Assert.AreEqual(table.Get(2, 5).number, 200d);
+            I("reset; time 2001 2002;");
+            I("x = series(1);");
+            I("x['18'] = 100;");
+            I("x['19'] = 200;");
+            I("x['20'] = 300;");
+            I("#a = ('18', '19');");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p <n> x[#a], x[#a+1];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[18]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[19]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "x[20]");
+            Assert.AreEqual(table.Get(2, 2).number, 100d);
+            Assert.AreEqual(table.Get(2, 3).number, 200d);
+            Assert.AreEqual(table.Get(2, 4).number, 200d);
+            Assert.AreEqual(table.Get(2, 5).number, 300d);
 
         }
+
         [TestMethod]
         public void _Test_EndoExo()
         {

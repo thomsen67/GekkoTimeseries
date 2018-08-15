@@ -152,9 +152,17 @@ namespace Gekko
         public static bool isGammaVersion = false; 
         public static bool isPreviewVersion = false; //for preview of 2.0        
         
-        public static string Work = "Work";
-        public static string Ref = "Ref";
-                
+        public const string Work = "Work";
+        public const string Ref = "Ref";
+        public const string First = "First";
+        public const string Local = "Local";
+        public const string Global = "Global";
+        public const string ref_name = "ref";
+        public const string first_name = "first";
+        public const string local_name = "local";
+        public const string global_name = "global";
+        public const string symbolBankName = "@";
+
         public const string printCode_n = "n";        
         public const string printCode_p = "p";
         public const string printCode_d = "d";
@@ -168,7 +176,7 @@ namespace Gekko
         public const string printCode_q = "q";
         public const string printCode_mp = "mp";
 
-        public const string symbolBankName = "@";
+        
 
         public List<Databank> bankOpen = new List<Databank>();
         
