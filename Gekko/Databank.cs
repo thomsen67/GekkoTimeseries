@@ -166,7 +166,10 @@ namespace Gekko
         public IVariable GetIVariable(string variable)
         {
             IVariable iv = null;
-            this.storage.TryGetValue(variable, out iv);
+            if (this.storage.Count > 0)
+            {
+                this.storage.TryGetValue(variable, out iv);
+            }
             return iv;
         }
 

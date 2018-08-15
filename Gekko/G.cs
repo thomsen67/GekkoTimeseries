@@ -262,6 +262,29 @@ namespace Gekko
             return allFreqsHelper;
         }
 
+        public static string AddFreq(string varname, string freq, EVariableType type, bool isLeftSideVariable)
+        {
+            //freq is added for all no-sigil rhs
+            //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
+
+            bool hasSigil = G.Chop_HasSigil(varname);
+
+            string varnameWithFreq = varname;
+
+            if ((!isLeftSideVariable && !hasSigil) || (isLeftSideVariable && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
+            {
+                //Series has '!' added
+                //In VAL v = 100, there will be no freq added.
+                if (!varname.Contains(Globals.freqIndicator.ToString()))
+                {
+                    if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
+                    else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                }
+            }
+
+            return varnameWithFreq;
+        }
+
         public static string AddFreqToName(string varName, string freq)
         {
             //Only used internally, when dealing with databanks. Not relevant for

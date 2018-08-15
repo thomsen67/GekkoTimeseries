@@ -56,7 +56,7 @@ Additionally, there are model, solve, equation options.
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
-        public string databank_logic = "default";  //default | aremos
+        //public string databank_logic = "default";  //default | aremos
         public bool databank_search = false;
         public bool folder = true;
         public string folder_bank = "";

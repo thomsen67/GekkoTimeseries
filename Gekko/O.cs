@@ -993,7 +993,7 @@ namespace Gekko
             //rhsExpression != null:   it is an assignment of the left-hand side
 
             //only adds freq if not there. No sigil is added for lhs vars here.
-            string varnameWithFreq = AddFreq(varname, freq, type, isLeftSideVariable);
+            string varnameWithFreq = G.AddFreq(varname, freq, type, isLeftSideVariable);
 
             if (isLeftSideVariable)
             {
@@ -1067,28 +1067,7 @@ namespace Gekko
         //    return LookupOnlyGetName(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true);
         //}
 
-        public static string AddFreq(string varname, string freq, EVariableType type, bool isLeftSideVariable)
-        {
-            //freq is added for all no-sigil rhs
-            //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
-
-            bool hasSigil = G.Chop_HasSigil(varname);
-
-            string varnameWithFreq = varname;
-
-            if ((!isLeftSideVariable && !hasSigil) || (isLeftSideVariable && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
-            {
-                //Series has '!' added
-                //In VAL v = 100, there will be no freq added.
-                if (!varname.Contains(Globals.freqIndicator.ToString()))
-                {
-                    if (freq != null) varnameWithFreq = varname + Globals.freqIndicator + freq;
-                    else varnameWithFreq = varname + Globals.freqIndicator + G.GetFreq(Program.options.freq);
-                }
-            }
-
-            return varnameWithFreq;
-        }        
+                
 
         private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq)
         {
@@ -1136,7 +1115,7 @@ namespace Gekko
                             }
                             else
                             {
-                                rv = GetVariableSearch(rv, varnameWithFreq);
+                                rv = GetVariableSearch(varnameWithFreq);
                                 if (rv == null && errorIfNotFound)
                                 {
                                     G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
@@ -2480,17 +2459,27 @@ namespace Gekko
             }
         }
 
-        private static IVariable GetVariableSearch(IVariable lhs, string varName)
+        private static IVariable GetVariableSearch(string varName)
         {
+            //check local bank
+            IVariable rv = Program.databanks.GetLocal().GetIVariable(varName);
+            if (rv != null) return rv;
+
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                 Databank db2 = Program.databanks.storage[i];
-                lhs = db2.GetIVariable(varName);
-                if (lhs != null) break;
+                rv = db2.GetIVariable(varName);
+                if (rv != null) break;
             }
 
-            return lhs;
+            if (rv == null)
+            {
+                //check global bank
+                rv = Program.databanks.GetGlobal().GetIVariable(varName);
+            }
+
+            return rv;
         }
 
         private static Databank GetDatabankNoSearch(string dbName)

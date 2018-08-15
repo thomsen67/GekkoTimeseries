@@ -214,15 +214,8 @@ namespace Gekko
             }
             else  //the databank name does not exist, so it is new and will be read from file later on
             {
-                readFromFile = true;
-                if (G.Equal(Program.options.databank_logic, "aremos"))
-                {
-                    DatabankLogicAREMOS(databank, openType, openPosition, name, m);
-                }
-                else
-                {
-                    DatabankLogicDefault(databank, openType, openPosition, name, m);
-                }
+                readFromFile = true;                
+                DatabankLogicDefault(databank, openType, openPosition, name, m);                
             }
             this.storage = m;
             return readFromFile;
@@ -383,84 +376,10 @@ namespace Gekko
 
             return;
         }
-
         
-        private void DatabankLogicAREMOS(Databank databank, EOpenType openType, int openPosition, string name, List<Databank> m)
-        {
-            //AREMOS logic            
-            if (openType == EOpenType.Normal || openType == EOpenType.Sec || (openType == EOpenType.Pos && openPosition == 2))
-            {
-                m.Add(this.storage[0]);  //first
-                m.Add(this.storage[1]);  //ref
-                m.Add(databank);
-                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Databank '" + name + "' opened");
-            }
-            else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
-            {
-                bool edit = false;
-                if (openType == EOpenType.Edit) edit = true;
-                m.Add(databank);         //first
-                m.Add(this.storage[1]);  //ref
-                m.Add(this.storage[0]);
-                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                if (openType == EOpenType.Edit) G.Writeln2("Databank '" + name + "' opened as editable in first position");
-                else G.Writeln2("Databank '" + name + "' opened in first position");
-            }
-            else if (openType == EOpenType.Ref)
-            {
-                m.Add(this.storage[0]);         //first
-                m.Add(databank);                //ref
-                m.Add(this.storage[1]);
-                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Databank '" + name + "' opened as ref");
-            }
-            else if (ShouldPutBankLastAREMOS(openType, openPosition))
-            {
-                m.Add(this.storage[0]);  //first
-                m.Add(this.storage[1]);  //ref                
-                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                m.Add(databank);
-                G.Writeln2("Databank '" + name + "' opened");
-            }
-            else if (openType == EOpenType.Pos)
-            {
-                //pos is not 1., 2. or count+1 ===> so 3, 4, ..., up to count.
-                if (openPosition < 1)
-                {
-                    G.Writeln2("*** ERROR: OPEN<pos=...> cannot be 0 or negative");
-                    throw new GekkoException();
-                }
-                m.Add(this.storage[0]);  //first
-                m.Add(this.storage[1]);  //ref
-                for (int i = 2; i < openPosition; i++)
-                {
-                    m.Add(this.storage[i]);
-                }
-                m.Add(databank);
-                for (int i = openPosition; i < this.storage.Count; i++)
-                {
-                    m.Add(this.storage[i]);
-                }
-                G.Writeln2("Databank '" + name + "' opened in position " + openPosition);
-            }
-            else
-            {
-                G.Writeln("*** ERROR: Internal error ¤89435734");
-                throw new GekkoException();
-            }
-
-            return;
-        }
-
         public bool ShouldPutBankLast(EOpenType openType, int openPosition)
         {
             return openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition == this.storage.Count + 1);
-        }
-
-        public bool ShouldPutBankLastAREMOS(EOpenType openType, int openPosition)
-        {
-            return openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition == this.storage.Count + 1);
         }
 
         private static void FindBanksI(string name, out int existI, out int WorkI, out int BaseI)
@@ -527,29 +446,17 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count - 1);
             if (existI == 0) //found as first
             {
-                if (G.Equal(Program.options.databank_logic, "aremos"))
+
+                //Default
+                //Closing a bank in first position (not Work)
+                m.Add(this.storage[2]);  //[0]: gets #2 that is, number 2 on the non-ref databank list. 
+                m.Add(this.storage[1]);  //[1]: ref is not touched
+                for (int i = 3; i < this.storage.Count; i++)
                 {
-                    //AREMOS jumping
-                    m.Add(this.storage[WorkI]);  //[0]: Work is put back
-                    m.Add(this.storage[1]);  //[1]: not touched
-                    for (int i = 2; i < this.storage.Count; i++)
-                    {
-                        if (i == WorkI) continue;
-                        m.Add(this.storage[i]);
-                    }
+                    //add the rest
+                    m.Add(this.storage[i]);
                 }
-                else
-                {
-                    //Default
-                    //Closing a bank in first position (not Work)
-                    m.Add(this.storage[2]);  //[0]: gets #2 that is, number 2 on the non-ref databank list. 
-                    m.Add(this.storage[1]);  //[1]: ref is not touched
-                    for (int i = 3; i < this.storage.Count; i++)
-                    {
-                        //add the rest
-                        m.Add(this.storage[i]);
-                    }
-                }
+
             }
             else if (existI == 1) //found as ref
             {

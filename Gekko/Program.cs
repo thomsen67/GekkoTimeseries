@@ -2046,7 +2046,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                if ((G.Equal(options.databank_logic, "aremos") && Program.databanks.ShouldPutBankLastAREMOS(oRead.openType, oRead.openTypePosition)) || (G.Equal(options.databank_logic, "default") && Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition)))
+                if (Program.databanks.ShouldPutBankLast(oRead.openType, oRead.openTypePosition))
                 {
                     for (int i = 0; i < n; i++)
                     {
