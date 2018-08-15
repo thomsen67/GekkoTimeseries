@@ -31,6 +31,8 @@ options {
 
 tokens {
 	ASTDOLLAR;
+	ASTLOCAL;
+	ASTGLOBAL;
 	ASTOBJECTFUNCTION;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
@@ -56,6 +58,7 @@ tokens {
 	ASTSTRINGINQUOTES;
 	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_SORT;
+	ASTOPT_STRING_ALL;
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -918,6 +921,8 @@ Y2                    = 'Y2'                       ;
     CONV2            = 'CONV2';
     COPY = 'COPY';
     COPYLOCAL        = 'COPYLOCAL'       ;
+	LOCAL        = 'LOCAL'       ;
+	GLOBAL        = 'GLOBAL'       ;
     COUNT = 'COUNT';
     CPLOT            = 'CPLOT'       ;
     CREATE           = 'CREATE'          ;
@@ -1477,7 +1482,9 @@ d.Add("Y" ,Y);
                                         d.Add("conv1"    , CONV1 );
                                         d.Add("conv2"    , CONV2 );
                                         d.Add("copy",COPY);
-                                        d.Add("copylocal"               , COPYLOCAL               );
+										d.Add("copylocal"               , COPYLOCAL               );
+										d.Add("local"               , LOCAL               );
+                                        d.Add("global"               , GLOBAL               );
                                         d.Add("COUNT", COUNT);
                                         d.Add("cplot"   , CPLOT               );
                                         d.Add("create"  , CREATE    );
@@ -2165,6 +2172,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | findmissingdata      SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
+						  | global               SEMICOLON!
 						  | goto2                SEMICOLON!
 						  | hdg                  SEMICOLON!
 					      | help                 SEMICOLON!
@@ -2172,6 +2180,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | index                SEMICOLON!
 						  | ini                  SEMICOLON!
 						  | interpolate          SEMICOLON!
+						  | local                SEMICOLON!
 						  | lock_                SEMICOLON!
 						  | mem                  SEMICOLON!
 						  | model                SEMICOLON!
@@ -2508,8 +2517,22 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
 // INTERPOLATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-interpolate:				    INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
-interpolateMethod:			    REPEAT | PRORATE;
+interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
+interpolateMethod:			REPEAT | PRORATE;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// LOCAL/GLOBAL
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+local:					    LOCAL localOpt1? seqOfBankvarnames? -> ^({token("ASTLOCAL", ASTLOCAL, $LOCAL.Line)} ^(ASTPLACEHOLDER localOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+localOpt1:				    ISNOTQUAL | leftAngle localOpt1h* RIGHTANGLE -> ^(ASTOPT1 localOpt1h*);
+localOpt1h:				    ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+						    ;	
+
+global:					    GLOBAL globalOpt1? seqOfBankvarnames? -> ^({token("ASTGLOBAL", ASTGLOBAL, $GLOBAL.Line)} ^(ASTPLACEHOLDER globalOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+globalOpt1:				    ISNOTQUAL | leftAngle globalOpt1h* RIGHTANGLE -> ^(ASTOPT1 globalOpt1h*);
+globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // LOCK, UNLOCK
@@ -3500,6 +3523,7 @@ ident2: 					Ident |
   FOR|
   FUNCTION|
   GOTO|
+  GLOBAL|
   HDG|
   HELP|
   IF|
@@ -3510,6 +3534,7 @@ ident2: 					Ident |
   ITERSHOW|
   LIST|
   LOCK_|
+  LOCAL|  
   MATRIX|
   MEM|
   MENU|
@@ -3622,7 +3647,7 @@ ident2: 					Ident |
   CONV1|
   CONV2|
   CONV|
-  COPYLOCAL|
+  COPYLOCAL|  
   CPLOT|
   CREATEVARS|
   CSV|

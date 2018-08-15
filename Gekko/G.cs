@@ -262,7 +262,15 @@ namespace Gekko
             return allFreqsHelper;
         }
 
-        
+        public static string AddFreqToName(string varName, string freq)
+        {
+            //Only used internally, when dealing with databanks. Not relevant for
+            //outside use.
+            if (freq == null) return G.Chop_FreqAdd(varName, Program.options.freq);
+            else return G.Chop_FreqAdd(varName, freq);
+        }
+
+
         public static EFreq GetFreq(string freq)
         {
             return GetFreq(freq, false);

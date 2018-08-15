@@ -1239,7 +1239,7 @@ namespace Gekko
 
         public static void AddIVariableWithOverwriteFromString(string dbName, string varName, string freq, string[] indexes, IVariable iv)
         {
-            string nameWithFreq = GetNameWithFreq(varName, freq);
+            string nameWithFreq = G.AddFreqToName(varName, freq);
 
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1308,7 +1308,7 @@ namespace Gekko
         {
             //type is only relevant for series, ignored for others
 
-            string nameWithFreq = GetNameWithFreq(varName, freq);
+            string nameWithFreq = G.AddFreqToName(varName, freq);
                         
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1449,7 +1449,7 @@ namespace Gekko
 
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {
-            string nameWithFreq = GetNameWithFreq(varName, freq);
+            string nameWithFreq = G.AddFreqToName(varName, freq);
             
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
@@ -1521,13 +1521,7 @@ namespace Gekko
             return iv;
         }
 
-        private static string GetNameWithFreq(string varName, string freq)
-        {
-            //Only used internally, when dealing with databanks. Not relevant for
-            //outside use.
-            if (freq == null) return G.Chop_FreqAdd(varName, Program.options.freq);
-            else return G.Chop_FreqAdd(varName, freq);
-        }
+        
 
         //See also Restrict()
         public static List Restrict2(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
@@ -8132,6 +8126,33 @@ namespace Gekko
                 {
                     G.Writeln2("+++ WARNING: MODEL is not intended for data-mode (cf. MODE).");
                 }
+            }
+        }
+
+        public class Local
+        {
+            public List names = null;
+            public string opt_all = null;
+            public P p = null;
+            public void Exe()
+            {
+                List<string> vars = Restrict(this.names, false, true, false, false);
+                //for (int i = 0; i < vars.Count; i++)
+                //{
+                //    vars[i] = G.AddFreqToName(vars[i], null);  //adds current freq if not freq there, skips non-series
+                //}
+
+            }
+        }
+
+        public class Global
+        {
+            public List names = null;
+            public string opt_all = null;
+            public P p = null;
+            public void Exe()
+            {
+
             }
         }
 
