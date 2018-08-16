@@ -989,7 +989,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Local o" + Num(node) + " = new O.Local();" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);  //options
-                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
@@ -5399,12 +5399,14 @@ namespace Gekko.Parser.Gek
 
         private static string LocalCode1(string num)
         {
-            return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`);" + G.NL + "try {" + G.NL;
+            LocalGlobal lg = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
+            return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();" + G.NL + "try {" + G.NL;
         }
 
         private static string LocalCode2(string num)
         {
-            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + ";" + G.NL + "}" + G.NL;
+            //
+            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + G.NL + "}" + G.NL;
         }
 
         private static bool ReportHelperIsSum(string internalName, string internalFunction)

@@ -22399,6 +22399,7 @@ namespace Gekko
             Program.databanks.storage.Add(b2);
             Program.databanks.local.Clear();
             Program.databanks.global.Clear();
+            Program.databanks.localGlobal = new LocalGlobal();     
             w2.FileNameWithPath = null;
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
@@ -37644,6 +37645,72 @@ namespace Gekko
             }
         }
     }
+
+    public class LocalGlobal
+    {
+        public enum ELocalGlobalType
+        {
+            Local,
+            Global,
+            None
+        }
+
+        private ELocalGlobalType all = ELocalGlobalType.None;
+        private GekkoDictionary<string, ELocalGlobalType> storage = null;
+
+        public void SetAllLocal()
+        {
+            if (this.Count() > 0 || all != ELocalGlobalType.None)
+            {
+                G.Writeln2("*** ERROR: LOCAL<all> must be the only LOCAL/GLOBAL statement");
+                throw new GekkoException();
+            }
+            this.all = ELocalGlobalType.Local;
+        }
+
+        public void SetAllGlobal()
+        {
+            if (this.Count() > 0 || all != ELocalGlobalType.None)
+            {
+                G.Writeln2("*** ERROR: GLOBAL<all> must be the only LOCAL/GLOBAL statement");
+                throw new GekkoException();
+            }
+            this.all = ELocalGlobalType.Global;
+        }
+
+        public int Count()
+        {
+            if (this.storage == null) return 0;
+            return this.storage.Count;
+        }
+
+        public ELocalGlobalType GetValue(string s)
+        {            
+            if (this.all != ELocalGlobalType.None) return this.all;
+            if (this.storage == null) return ELocalGlobalType.None;
+            ELocalGlobalType rv = ELocalGlobalType.None;
+            storage.TryGetValue(s, out rv);
+            return rv;
+        }
+               
+
+        public void Add(string s, ELocalGlobalType type)
+        {
+            if (this.all != ELocalGlobalType.None)
+            {
+                G.Writeln2("*** ERROR: Failed because " + this.all.ToString().ToUpper() + "<all> been set previously");
+                throw new GekkoException();
+            }
+            if (this.storage == null) this.storage = new GekkoDictionary<string, ELocalGlobalType>(StringComparer.OrdinalIgnoreCase);
+            if (this.storage.ContainsKey(s))
+            {
+                G.Writeln2("*** ERROR: The variable '" + s + "' is already set as " + this.storage[s].ToString().ToUpper());
+                throw new GekkoException();
+            }
+            this.storage.Add(s, type);
+        }
+    }
+
 
     public class LocalBanks
     {

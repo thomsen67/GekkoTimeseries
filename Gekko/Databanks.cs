@@ -29,6 +29,7 @@ namespace Gekko
         public List<Databank> storage;
         public Databank local = new Databank("Local");
         public Databank global = new Databank("Global");
+        public LocalGlobal localGlobal = new LocalGlobal();
 
         public bool swappingIsActive = false;        
         
@@ -36,6 +37,7 @@ namespace Gekko
         {
             this.storage = new List<Databank>();
         }
+               
 
         public Databank GetFirst()
         {
