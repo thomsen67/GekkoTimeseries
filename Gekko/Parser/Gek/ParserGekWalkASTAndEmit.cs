@@ -4903,11 +4903,21 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTRUN":
                         {
+                            string num = Num(node);
+                            node.Code.A("Databank local" + num + " = Program.databanks.local;" + G.NL);
+                            node.Code.A("Program.databanks.local = new Databank(`" + Globals.Local + "`);" + G.NL);
+
+                            node.Code.A("try {" + G.NL);
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
                             node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("}" + G.NL);  //end try
+                            node.Code.A("finally {" + G.NL);
+                            node.Code.A("Program.databanks.local = local" + num + ";" + G.NL);
+                            node.Code.A("}" + G.NL);  //end finally
+
                         }
                         break;
                     //case "ASTRUN":
