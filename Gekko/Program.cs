@@ -22397,6 +22397,8 @@ namespace Gekko
             Program.databanks.storage.Clear();
             Program.databanks.storage.Add(w2);
             Program.databanks.storage.Add(b2);
+            Program.databanks.local.Clear();
+            Program.databanks.global.Clear();
             w2.FileNameWithPath = null;
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
