@@ -7637,15 +7637,22 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DatabankLocalGlobal()
         {
+
+            // ===========================================================
+            // ================= test get/set of local and global databank
+            // ===========================================================
+
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
             I("RESET;");
             I("MODE data;");
 
-            I("OPEN <edit> tmp;");
+            I("OPEN <edit> tmp; CLEAR tmp;");
             I("%s = 'tmp';");
             I("CLOSE tmp;");
-            I("OPEN tmp;");            
+            I("OPEN tmp;");     
+            
+            //--------- test of assignments       
 
             I("%x1 = 1;");
             I("ref:%y1 = %x1;");
@@ -7654,12 +7661,49 @@ namespace UnitTests
             I("local:%x2 = 2;");
             I("ref:%y2 = %x2;");
             _AssertScalarVal(Ref(), "%y2", 2d);
-
+            
+            FAIL("tmp:%x3 = 3;");
+            I("UNLOCK tmp;");
             I("tmp:%x3 = 3;");
             I("ref:%y3 = %x3;");
             _AssertScalarVal(Ref(), "%y3", 3d);
 
+            I("global:%x4 = 4;");
+            I("ref:%y4 = %x4;");
+            _AssertScalarVal(Ref(), "%y4", 4d);
 
+            // ----------- test of shadowing -------------
+
+            I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+            I("RESET;");
+            I("MODE data;");
+            I("OPEN tmp;");  //has %s = 'tmp'
+
+            I("first:%s = 'first';");            
+            I("local:%s = 'local';");
+            I("global:%s = 'global';");
+            I("ref:%s = %s;");
+            _AssertScalarString(Ref(), "%s", "local");
+
+            I("CLEAR local;");
+            I("ref:%s = %s;");
+            _AssertScalarString(Ref(), "%s", "first");
+
+            I("CLEAR <first>;");
+            I("ref:%s = %s;");
+            _AssertScalarString(Ref(), "%s", "tmp");
+
+            FAIL("CLEAR tmp;");
+            I("UNLOCK tmp;");
+            I("CLEAR tmp;");
+            I("ref:%s = %s;");
+            _AssertScalarString(Ref(), "%s", "global");
+
+            I("CLEAR global;");
+            FAIL("ref:%s = %s;");            
+
+            
 
 
         }

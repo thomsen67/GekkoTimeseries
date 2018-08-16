@@ -106,24 +106,36 @@ namespace Gekko
 
         private void RefreshList()
         {
-            list.Clear();
-            List<string> banks2 = new List<string>();            
+            list.Clear();            
+            List<string> banks2 = new List<string>();
+            banks2.Add("Local");
             foreach (Databank db in Program.databanks.storage)
             {                
                 banks2.Add(db.name);            
             }
+            banks2.Add("Global");
 
-            for (int i = 0; i < banks2.Count; i++)
+            for (int ii = 0; ii < banks2.Count; ii++)
             {
-                string s = banks2[i];
+                string s = banks2[ii];
+                int i = ii - 1;                
                 Databank databank = Program.databanks.GetDatabank(s);
-                if (i == 1)
+
+                if (databank.storage.Count == 0)
                 {
-                    if (G.Equal(databank.name, Globals.Ref))
+                    if (G.Equal(s, Globals.Local))
                     {
-                        if (databank.storage.Count == 0) continue; //skip it, so that Ref is not shown in the list when it is empty
+                        i = -12345;
+                        continue;
                     }
+                    else if (G.Equal(s, Globals.Global))
+                    {
+                        i = -12345;
+                        continue;
+                    }
+                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;
                 }
+
                 string c = "";
 
                 string i1, i2; Program.GetYearPeriod(databank.yearStart, databank.yearEnd, out i1, out i2);

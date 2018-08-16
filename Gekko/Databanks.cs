@@ -345,7 +345,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref                
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 m.Add(databank);
-                G.Writeln2("Opening databank '" + name + "'");
+                G.Writeln2("Opening databank '" + name + "'");                
             }
             else if (openType == EOpenType.Pos)
             {
@@ -366,7 +366,7 @@ namespace Gekko
                 {
                     m.Add(this.storage[i]);
                 }
-                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);
+                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);                
             }
             else
             {

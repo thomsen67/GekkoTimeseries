@@ -2328,8 +2328,7 @@ namespace Gekko
                         databank.FileNameWithPath = databankTemp.FileNameWithPath;
                     }
 
-                    HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty
-                    if (open && !oRead.editable) databank.editable = false;
+                    HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
 
                     if (Program.options.solve_data_create_auto == true)
                     {
@@ -2391,12 +2390,22 @@ namespace Gekko
                     readInfo.databank.date = readInfo.date;
                     readInfo.databank.FileNameWithPath = readInfo.fileName;
 
-                    if (open && !isGbk && oRead.editable)
+                    if (open)
                     {
-                        if (readInfo.databank.editable == true)
+                        if (!oRead.editable)
                         {
-                            G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
                             readInfo.databank.editable = false;
+                        }
+                        else
+                        {
+                            if (!isGbk)
+                            {
+                                if (readInfo.databank.editable == true)
+                                {
+                                    G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
+                                    readInfo.databank.editable = false;
+                                }
+                            }
                         }
                     }
                     readInfos.Add(readInfo);

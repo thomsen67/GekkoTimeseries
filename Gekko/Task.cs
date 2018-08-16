@@ -39,12 +39,15 @@ namespace Gekko
             this.date = Date;
             this.rowColor = RowColor;
             this.originalAliasName = AliasName;
-            if (i == 1) this.lineColor = "Black";
-            else this.lineColor = "LightGray";
+            //if (i == 1) this.lineColor = "Black";
+            //else this.lineColor = "LightGray";
+            this.lineColor = "LightGray";
             this.number = "";
             if (i == 0) this.number = "1";
             else if (i == 1) this.number = "REF";
-            else if (i > 1) this.number = (i + 0).ToString();
+            else if (i > 1) this.number = i.ToString();
+            if (G.Equal(this.aliasName, "Local")) this.number = "";
+            if (G.Equal(this.aliasName, "Global")) this.number = "";
             this.prot = prot;
         }
         

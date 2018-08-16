@@ -1012,7 +1012,7 @@ namespace Gekko
                 {
                     Databank db = null;
                     if (dbName == null) db = Program.databanks.GetFirst();  //on the LHS, we can only look in the first databank, if databank is not stated
-                    else db = Program.databanks.GetDatabank(dbName);
+                    else db = Program.databanks.GetDatabank(dbName, true);
                     ib = db;
                 }
 
@@ -1842,8 +1842,9 @@ namespace Gekko
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
             //Assignment is the hardest part of Lookup()
 
-            if (ib.BankType() == EBankType.Normal)
+            if (ib != null && ib.BankType() == EBankType.Normal)
             {
+                //ib can be == null with an indexer on the lhs, like #m.#n.%s
                 Databank ib_databank = ib as Databank;
                 if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank, see OPEN<edit> or UNLOCK");
                 ib_databank.isDirty = true;
@@ -1857,7 +1858,7 @@ namespace Gekko
             IVariable lhs = null;
             if (ib != null)
             {
-                //how can ib be == null??
+                //ib can be == null with an indexer on the lhs, like #m.#n.%s
                 lhs = ib.GetIVariable(varnameWithFreq); //may return null
             }
 
