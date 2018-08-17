@@ -498,6 +498,18 @@ namespace Gekko
             }
         }
 
+        public static void HandleOptionBankRef1(string opt_bank, string opt_ref)
+        {
+            if (opt_bank != null) Program.databanks.optionBank = GetDatabankNoSearch(opt_bank, true);
+            if (opt_ref != null) Program.databanks.optionRef = GetDatabankNoSearch(opt_ref, true);
+        }
+
+        public static void HandleOptionBankRef2()
+        {
+            Program.databanks.optionBank = null;
+            Program.databanks.optionRef = null;
+        }
+
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
         {
             //Returns the IVariable it finds here (or creates)
@@ -1129,83 +1141,45 @@ namespace Gekko
                     //It must be a databank then
                     if (dbName == null)
                     {
-                        //LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
-
-                        //if (lg != LocalGlobal.ELocalGlobalType.None)
-                        //{
-                        //    Databank db = HandleLocalGlobalBank(lg);
-                        //    rv = db.GetIVariable(varnameWithFreq);
-                        //}
-                        //else
-                        //{
-                        //    //databank name not given, for instance "PRT x"
-                        //    if (Program.options.databank_search)
-                        //    {
-                        //        //DATA mode
-                        //        //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                        //        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
-                        //        {
-                        //            //we only do this for timeseries!
-                        //            rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
-                        //            if (rv == null && errorIfNotFound)
-                        //            {
-                        //                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
-                        //                throw new GekkoException();
-                        //            }
-                        //        }
-                        //        else
-                        //        {
-                        //            rv = GetVariableSearch(varnameWithFreq);
-                        //            if (rv == null && errorIfNotFound)
-                        //            {
-                        //                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
-                        //                throw new GekkoException();
-                        //            }
-                        //        }
-                        //    }
-                        //    else
-                        //    {
-                        //        //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
-                        //        if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
-                        //        {
-                        //            rv = Program.databanks.GetRef().GetIVariable(varnameWithFreq);
-                        //            if (rv == null && errorIfNotFound)
-                        //            {
-                        //                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank 'Ref'");
-                        //                throw new GekkoException();
-                        //            }
-                        //        }
-                        //        else
-                        //        {
-                        //            rv = Program.databanks.GetFirst().GetIVariable(varnameWithFreq);
-                        //            if (rv == null && errorIfNotFound)
-                        //            {
-                        //                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in the first-position databank ('" + Program.databanks.GetFirst().name + "')");
-                        //                throw new GekkoException();
-                        //            }
-                        //        }
-                        //    }
-                        //}
+                        
 
                         LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
                         
                         //databank name not given, for instance "PRT x"
-                        if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
+                        if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None && Program.databanks.optionBank == null)
                         {
                             //No searching if the naked variable is local or global
                             //options.databank_search is DATA mode
                             //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
-                            {                                
-                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, Program.databanks.GetRef());
+                            {
+                                //Ref lookup
+                                Databank db = null;
+                                if (Program.databanks.optionRef == null)
+                                {
+                                    db = Program.databanks.GetRef();
+                                }
+                                else
+                                {
+                                    db = Program.databanks.optionRef;
+                                }
+                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
                             {
-                                rv = GetVariableSearch(varnameWithFreq);
-                                if (rv == null && errorIfNotFound)
+                                //non-Ref lookup
+                                if (Program.databanks.optionBank == null)
                                 {
-                                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
-                                    throw new GekkoException();
+                                    rv = GetVariableSearch(varnameWithFreq);
+                                    if (rv == null && errorIfNotFound)
+                                    {
+                                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
+                                        throw new GekkoException();
+                                    }
+                                }
+                                else
+                                {
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, Program.databanks.optionBank);
                                 }
                             }
                         }
@@ -1214,16 +1188,36 @@ namespace Gekko
                             //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
-                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, Program.databanks.GetRef());
+                                //Ref lookup
+                                Databank db = null;
+                                if (Program.databanks.optionRef == null)
+                                {
+                                    db = Program.databanks.GetRef();
+                                }
+                                else
+                                {
+                                    db = Program.databanks.optionRef;
+                                }
+                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
                             {
+                                //non-Ref lookup
                                 Databank db = null;
-                                if (lg != LocalGlobal.ELocalGlobalType.None) db = HandleLocalGlobalBank(lg);
-                                else db = Program.databanks.GetFirst();
+                                if (lg != LocalGlobal.ELocalGlobalType.None)
+                                {
+                                    db = HandleLocalGlobalBank(lg);
+                                }
+                                else if (Program.databanks.optionBank != null)
+                                {
+                                    db = Program.databanks.optionBank;
+                                }
+                                else
+                                {
+                                    db = Program.databanks.GetFirst();
+                                }
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
-
                         }
                     }
                     else
@@ -1239,13 +1233,8 @@ namespace Gekko
                         else
                         {
                             //databank name is given explicitly, and we are not doing bankNumber stuff
-                            //We use the IBank interface here (map==null)
-                            rv = LookupHelperRightside2(map, dbName, varnameWithFreq);
-                            if (rv == null && errorIfNotFound)
-                            {
-                                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + dbName + "'");
-                                throw new GekkoException();
-                            }
+                            Databank db = GetDatabankNoSearch(dbName, true); //we know that dbName is not null
+                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);                            
                         }
                     }
                 }
@@ -1668,9 +1657,7 @@ namespace Gekko
 
                 G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ib.Message());
                 throw new GekkoException();
-
             }
-
             return rv;
         }
 
@@ -2582,9 +2569,19 @@ namespace Gekko
 
         private static Databank GetDatabankNoSearch(string dbName)
         {
+            return GetDatabankNoSearch(dbName, false);
+        }
+
+        private static Databank GetDatabankNoSearch(string dbName, bool reportError)
+        {
             Databank db = null;
             if (dbName == null) db = Program.databanks.GetFirst();
             else db = Program.databanks.GetDatabank(dbName);
+            if (db == null && reportError)
+            {
+                G.Writeln2("*** ERROR: Databank '" + dbName + "' does not seem to be open");
+                throw new GekkoException();
+            }
             return db;
         }
 
@@ -7685,10 +7682,18 @@ namespace Gekko
             public string opt_pointtype = null;
             public double opt_pointsize = double.NaN;
             public string opt_fillstyle = null;
-            
+
+            public string opt_bank = null;
+            public string opt_ref = null;
+
             public long counter = -12345;
 
             public void Exe()
+            {                
+                OprintStart();                
+            }
+
+            private void OprintStart()
             {
                 //series or vals can be printed in one table. This includes array-series without indexers (these are unfolded).
                 //if all (including contents in lists) are series or vals (at least one series),
@@ -7717,11 +7722,11 @@ namespace Gekko
                 //      c[i1]
                 //      c[i2]
                 //      c[i3]
-                                
+
                 Explode();  //unfolds any lists in the prtElements
 
                 List<string> labelOriginal = new List<string>();
-                
+
 
                 // ---------------------------------------------------------------------------------------------
                 // ----- Unfolding of array-series start -------------------------------------------------------             
@@ -7765,7 +7770,7 @@ namespace Gekko
 
                                     ExplodeArraySeriesHelper(element.variable[bankNumber] as Series, check, lbl[0], element.labelRecordedPieces, firstVariableFoundInFirstOrRef, bankNumber, unfold, labels);
                                     element.variable[bankNumber] = unfold;
-                                    if (firstVariableFoundInFirstOrRef == 1) element.labelGiven = labels;                                    
+                                    if (firstVariableFoundInFirstOrRef == 1) element.labelGiven = labels;
                                 }
                             }
                             else if (element.variable[bankNumber].Type() == EVariableType.List)
@@ -7796,7 +7801,7 @@ namespace Gekko
                                             tempVariables.list.AddRange(unfold.list);
                                             if (firstVariableFoundInFirstOrRef == 1)
                                             {
-                                                if (tempLabels == null) tempLabels = new List<string>();                                                
+                                                if (tempLabels == null) tempLabels = new List<string>();
                                                 tempLabels.AddRange(labels);
                                             }
                                         }
@@ -7863,7 +7868,6 @@ namespace Gekko
                 {
                     G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                 }
-
             }
 
             private void Explode()

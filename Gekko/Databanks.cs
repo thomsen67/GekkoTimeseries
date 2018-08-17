@@ -30,6 +30,8 @@ namespace Gekko
         public Databank local = new Databank("Local");
         public Databank global = new Databank("Global");
         public LocalGlobal localGlobal = new LocalGlobal();  //see also LocalCode1() and LocalCode2()
+        public Databank optionBank = null;
+        public Databank optionRef = null;
 
         public bool swappingIsActive = false;        
         

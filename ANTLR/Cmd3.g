@@ -2664,7 +2664,7 @@ procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 //print:					prtHelper expression -> ^(ASTPRINT expression);
-print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) prtOpt1? prtOpt2? prtElements);
+print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) ^(ASTPLACEHOLDER prtOpt1?) ^(ASTPLACEHOLDER prtOpt2?) prtElements);
 prtHelper:				    P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
 prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS prtElement+);
 prtElement:                 expression
@@ -2762,7 +2762,9 @@ prtOpt1Helper:              filter
 						  | LINECOLOR '=' expression -> ^(ASTOPT_STRING_LINECOLOR expression)
 						  | POINTTYPE '=' expression -> ^(ASTOPT_STRING_POINTTYPE expression)
 						  | POINTSIZE '=' expression -> ^(ASTOPT_VAL_POINTSIZE expression)
-						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)						  						
+						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)	
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)						  
+						  | REF EQUAL name -> ^(ASTOPT_STRING_REF name)
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES

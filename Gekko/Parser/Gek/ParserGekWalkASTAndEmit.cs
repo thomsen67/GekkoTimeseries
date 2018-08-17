@@ -2925,8 +2925,14 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
+                                                                
+                                node.Code.A(node[0].Code);                                
+                                GetCodeFromAllChildren(node, node[1]);
+                                GetCodeFromAllChildren(node, node[2]);
+
                                 
-                                GetCodeFromAllChildren(node);
+
+                                    node.Code.A(node[3].Code);                                
 
                                 if (node.Text == "ASTPRT")
                                 {
