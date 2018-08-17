@@ -37685,12 +37685,15 @@ namespace Gekko
         }
 
         public ELocalGlobalType GetValue(string s)
-        {            
+        {
             if (this.all != ELocalGlobalType.None) return this.all;
-            if (this.storage == null) return ELocalGlobalType.None;
-            ELocalGlobalType rv = ELocalGlobalType.None;
-            storage.TryGetValue(s, out rv);
-            return rv;
+            if (this.storage == null) return ELocalGlobalType.None;            
+            ELocalGlobalType rv;
+            if (storage.TryGetValue(s, out rv))  //cannot be out rv, because if TryGetValue() fails, it returns the default value of the enum, and that is brittle
+            {
+                return rv;
+            }
+            return ELocalGlobalType.None;
         }
                
 

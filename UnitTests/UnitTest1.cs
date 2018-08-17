@@ -7638,8 +7638,11 @@ namespace UnitTests
         public void _Test_DatabankLocalGlobal()
         {
 
+            
+
             // ===========================================================
             // ================= test get/set of local and global databank
+            // ================= tests shadowing, no use of LOCAL/GLOBAL keyword
             // ===========================================================
 
             I("reset; time 2000 2002; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
@@ -7701,9 +7704,90 @@ namespace UnitTests
             _AssertScalarString(Ref(), "%s", "global");
 
             I("CLEAR global;");
-            FAIL("ref:%s = %s;");            
+            FAIL("ref:%s = %s;");
+                        
+            // ----------- test of LOCAL/GLOBAL commands -------------
 
-            
+            I("RESET;");
+            I("LOCAL %s1;");
+            I("%s1 = 'local';");
+            I("%s2 = %s1;");  //also works in sim-mode without searching!
+            I("first:%s1 = 'first';");
+            I("%s3 = first:%s1;");
+            Assert.AreEqual(Local().storage.Count, 1);
+            _AssertScalarString(Local(), "%s1", "local");
+            Assert.AreEqual(First().storage.Count, 3);
+            _AssertScalarString(First(), "%s1", "first");
+            _AssertScalarString(First(), "%s2", "local");
+            _AssertScalarString(First(), "%s3", "first");
+
+            I("RESET;");
+            I("GLOBAL %s1;");
+            I("%s1 = 'global';");
+            I("%s2 = %s1;");  //also works in sim-mode without searching!
+            I("first:%s1 = 'first';");
+            I("%s3 = first:%s1;");
+            Assert.AreEqual(Global().storage.Count, 1);
+            _AssertScalarString(Global(), "%s1", "global");
+            Assert.AreEqual(First().storage.Count, 3);
+            _AssertScalarString(First(), "%s1", "first");
+            _AssertScalarString(First(), "%s2", "global");
+            _AssertScalarString(First(), "%s3", "first");
+
+
+            I("RESET;");
+            I("LOCAL<all>;");
+            I("%s1 = 'local';");
+            I("%s2 = %s1;");  //also works in sim-mode without searching!
+            I("first:%s1 = 'first';");
+            I("first:%s3 = 'first';");
+            I("%s4 = first:%s1;");
+            Assert.AreEqual(Local().storage.Count, 3);
+            _AssertScalarString(Local(), "%s1", "local");
+            _AssertScalarString(Local(), "%s2", "local");
+            _AssertScalarString(Local(), "%s4", "first");
+            Assert.AreEqual(First().storage.Count, 2);
+            _AssertScalarString(First(), "%s1", "first");
+            _AssertScalarString(First(), "%s3", "first");
+
+            I("RESET;");
+            I("GLOBAL<all>;");
+            I("%s1 = 'global';");
+            I("%s2 = %s1;");  //also works in sim-mode without searching!            
+            I("first:%s1 = 'first';");
+            I("first:%s3 = 'first';");
+            I("%s4 = first:%s1;");
+            Assert.AreEqual(Global().storage.Count, 3);
+            _AssertScalarString(Global(), "%s1", "global");
+            _AssertScalarString(Global(), "%s2", "global");
+            _AssertScalarString(Global(), "%s4", "first");
+            Assert.AreEqual(First().storage.Count, 2);
+            _AssertScalarString(First(), "%s1", "first");
+            _AssertScalarString(First(), "%s3", "first");
+
+
+            // -------------- testing nested gcm, functions, procedures combined with local/global
+
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Local_Global';");
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN t1;"); //nested gcm
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("t1--> t1 t2--> t2 t3--> t3 t2--> t2 t1--> t1 "));
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN t4;"); //function
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("777 102 777 "));
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN t5;"); //procedure
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("777 102 777 "));
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN s1;"); //nested gcm
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("t1--> t1 t2--> t2 t3--> t3 t2--> t2 t1--> t1 "));
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN s4;"); //function
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("777 102 666 777 "));
+            Globals.unitTestScreenOutput.Clear();
+            I("RUN s5;"); //procedure
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("777 102 666 777 "));
+
 
 
         }
@@ -15209,6 +15293,16 @@ namespace UnitTests
         private static Databank Ref()
         {
             return Program.databanks.GetRef();
+        }
+
+        private static Databank Local()
+        {
+            return Program.databanks.GetLocal();
+        }
+
+        private static Databank Global()
+        {
+            return Program.databanks.GetGlobal();
         }
 
         private static void CheckFullDatabank(double deltaAbs, double deltaRel, int t1, int t2, List<string> ignore)

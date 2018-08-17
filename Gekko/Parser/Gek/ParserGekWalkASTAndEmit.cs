@@ -999,7 +999,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Global o" + Num(node) + " = new O.Global();" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);  //options
-                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            if(node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;

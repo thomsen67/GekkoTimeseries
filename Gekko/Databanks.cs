@@ -29,7 +29,7 @@ namespace Gekko
         public List<Databank> storage;
         public Databank local = new Databank("Local");
         public Databank global = new Databank("Global");
-        public LocalGlobal localGlobal = new LocalGlobal();
+        public LocalGlobal localGlobal = new LocalGlobal();  //see also LocalCode1() and LocalCode2()
 
         public bool swappingIsActive = false;        
         
