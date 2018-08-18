@@ -2093,6 +2093,31 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void _Test_Print()
+        {
+            //bank/ref
+            I("reset;");
+            I("time 2001 2001;");
+            I("open <edit> b1;");
+            I("x = 2.2;");
+            I("close b1;");
+            I("open <edit> b2;");
+            I("x = 1.8;");
+            I("close b2;");
+            I("reset; time 2001 2001;");
+            I("open b1, b2;");
+            I("x = 200;");
+            I("ref:x = 100;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("prt <m> x;");
+            Table table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
+            Globals.lastPrtOrMulprtTable = null;
+            I("prt <bank=b1 ref=b2 m> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, 0.4d, sharedDelta);
+        }
 
         [TestMethod]
         public void _Test_PrintMixedFrequencies()

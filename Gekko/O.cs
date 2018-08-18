@@ -1061,6 +1061,20 @@ namespace Gekko
                     //in this case, the x variable must exist
                     //NOTE: no databank search is allowed!
                     //NOTE: sigils cannot be omitted here. VAL x['v'] = 100 or VAL x.v = 100 will not access a %v variable.
+
+                    //Not necessary, only used in assign and assign has no <bank=..>
+                    //if (ib.BankType() == EBankType.Normal)
+                    //{
+                    //    LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
+                    //    if (lg != LocalGlobal.ELocalGlobalType.None)
+                    //    {
+                    //    }
+                    //    else if (Program.databanks.optionBank != null)
+                    //    {
+                    //        ib = Program.databanks.optionBank;
+                    //    }
+                    //}
+
                     IVariable ivar2 = ib.GetIVariable(varnameWithFreq);
                     if (ivar2 == null)
                     {
@@ -1141,8 +1155,6 @@ namespace Gekko
                     //It must be a databank then
                     if (dbName == null)
                     {
-                        
-
                         LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
                         
                         //databank name not given, for instance "PRT x"

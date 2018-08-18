@@ -2926,13 +2926,15 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
                                                                 
-                                node.Code.A(node[0].Code);                                
-                                GetCodeFromAllChildren(node, node[1]);
-                                GetCodeFromAllChildren(node, node[2]);
+                                node.Code.A(node[0].Code);  //type (prt, plot, ...)                          
+                                GetCodeFromAllChildren(node, node[1]);  //options
+                                GetCodeFromAllChildren(node, node[2]);  //option         
 
+                                node.Code.A(LocalCode3(Num(node)));
                                 
+                                node.Code.A(node[3].Code);
 
-                                    node.Code.A(node[3].Code);                                
+                                node.Code.A(LocalCode4(Num(node)));
 
                                 if (node.Text == "ASTPRT")
                                 {
@@ -5404,15 +5406,24 @@ namespace Gekko.Parser.Gek
         }               
 
         private static string LocalCode1(string num)
-        {
-            LocalGlobal lg = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
+        {            
             return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();" + G.NL + "try {" + G.NL;
         }
 
         private static string LocalCode2(string num)
-        {
-            //
+        {            
             return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + G.NL + "}" + G.NL;
+        }
+
+        private static string LocalCode3(string num)
+        {
+            return "try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref);" + G.NL;
+        }
+
+        private static string LocalCode4(string num)
+        {
+            //num not used
+            return "}" + G.NL + "finally {" + G.NL + "O.HandleOptionBankRef2();" + G.NL + "}" + G.NL;           
         }
 
         private static bool ReportHelperIsSum(string internalName, string internalFunction)
