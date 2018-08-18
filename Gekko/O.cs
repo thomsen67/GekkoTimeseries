@@ -1167,14 +1167,14 @@ namespace Gekko
                             {
                                 //Ref lookup
                                 Databank db = null;
-                                if (Program.databanks.optionRef == null)
-                                {
+                                //if (Program.databanks.optionRef == null)
+                                //{
                                     db = Program.databanks.GetRef();
-                                }
-                                else
-                                {
-                                    db = Program.databanks.optionRef;
-                                }
+                                //}
+                                //else
+                                //{
+                                //    db = Program.databanks.optionRef;
+                                //}
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
@@ -1202,14 +1202,14 @@ namespace Gekko
                             {
                                 //Ref lookup
                                 Databank db = null;
-                                if (Program.databanks.optionRef == null)
-                                {
+                                //if (Program.databanks.optionRef == null)
+                                //{
                                     db = Program.databanks.GetRef();
-                                }
-                                else
-                                {
-                                    db = Program.databanks.optionRef;
-                                }
+                                //}
+                                //else
+                                //{
+                                //    db = Program.databanks.optionRef;
+                                //}
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
@@ -1220,10 +1220,10 @@ namespace Gekko
                                 {
                                     db = HandleLocalGlobalBank(lg);
                                 }
-                                else if (Program.databanks.optionBank != null)
-                                {
-                                    db = Program.databanks.optionBank;
-                                }
+                                //else if (Program.databanks.optionBank != null)
+                                //{
+                                //    db = Program.databanks.optionBank;
+                                //}
                                 else
                                 {
                                     db = Program.databanks.GetFirst();
@@ -2562,21 +2562,27 @@ namespace Gekko
             IVariable rv = Program.databanks.GetLocal().GetIVariable(varName);
             if (rv != null) return rv;
 
+            if (Program.databanks.optionBank != null)
+            {
+                rv = Program.databanks.optionBank.GetIVariable(varName);
+                return rv;
+            }
+
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                 Databank db2 = Program.databanks.storage[i];
                 rv = db2.GetIVariable(varName);
-                if (rv != null) break;
+                if (rv != null) return rv;
             }
 
-            if (rv == null)
-            {
-                //check global bank
-                rv = Program.databanks.GetGlobal().GetIVariable(varName);
-            }
+            //if (rv == null)
+            //{
+            //    //check global bank
+               return Program.databanks.GetGlobal().GetIVariable(varName);
+            //}
 
-            return rv;
+            //return rv;
         }
 
         private static Databank GetDatabankNoSearch(string dbName)

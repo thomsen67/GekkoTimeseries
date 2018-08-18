@@ -43,11 +43,13 @@ namespace Gekko
 
         public Databank GetFirst()
         {
+            if (Program.databanks.optionBank != null) return Program.databanks.optionBank;
             return this.storage[0];
         }
 
         public Databank GetRef()
         {
+            if (Program.databanks.optionRef != null) return Program.databanks.optionRef;
             return this.storage[1];
         }
 
