@@ -1166,15 +1166,8 @@ namespace Gekko
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
                                 //Ref lookup
-                                Databank db = null;
-                                //if (Program.databanks.optionRef == null)
-                                //{
-                                    db = Program.databanks.GetRef();
-                                //}
-                                //else
-                                //{
-                                //    db = Program.databanks.optionRef;
-                                //}
+                                Databank db = null;                                
+                                db = Program.databanks.GetRef();                                
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
@@ -1201,15 +1194,8 @@ namespace Gekko
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
                                 //Ref lookup
-                                Databank db = null;
-                                //if (Program.databanks.optionRef == null)
-                                //{
-                                    db = Program.databanks.GetRef();
-                                //}
-                                //else
-                                //{
-                                //    db = Program.databanks.optionRef;
-                                //}
+                                Databank db = null;                                
+                                db = Program.databanks.GetRef();                                
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
@@ -1220,10 +1206,6 @@ namespace Gekko
                                 {
                                     db = HandleLocalGlobalBank(lg);
                                 }
-                                //else if (Program.databanks.optionBank != null)
-                                //{
-                                //    db = Program.databanks.optionBank;
-                                //}
                                 else
                                 {
                                     db = Program.databanks.GetFirst();
@@ -2574,15 +2556,8 @@ namespace Gekko
                 Databank db2 = Program.databanks.storage[i];
                 rv = db2.GetIVariable(varName);
                 if (rv != null) return rv;
-            }
-
-            //if (rv == null)
-            //{
-            //    //check global bank
-               return Program.databanks.GetGlobal().GetIVariable(varName);
-            //}
-
-            //return rv;
+            }            
+            return Program.databanks.GetGlobal().GetIVariable(varName);            
         }
 
         private static Databank GetDatabankNoSearch(string dbName)
