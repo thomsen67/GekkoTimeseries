@@ -1158,7 +1158,7 @@ namespace Gekko
                         LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
                         
                         //databank name not given, for instance "PRT x"
-                        if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None && Program.databanks.optionBank == null)
+                        if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
                         {
                             //No searching if the naked variable is local or global
                             //options.databank_search is DATA mode
@@ -1173,19 +1173,14 @@ namespace Gekko
                             else
                             {
                                 //non-Ref lookup
-                                if (Program.databanks.optionBank == null)
-                                {
+                                
                                     rv = GetVariableSearch(varnameWithFreq);
                                     if (rv == null && errorIfNotFound)
                                     {
                                         G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
                                         throw new GekkoException();
                                     }
-                                }
-                                else
-                                {
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, Program.databanks.optionBank);
-                                }
+                                                                
                             }
                         }
                         else
