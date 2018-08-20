@@ -500,8 +500,14 @@ namespace Gekko
 
         public static void HandleOptionBankRef1(string opt_bank, string opt_ref)
         {
-            if (opt_bank != null) Program.databanks.optionBank = GetDatabankNoSearch(opt_bank, true);
-            if (opt_ref != null) Program.databanks.optionRef = GetDatabankNoSearch(opt_ref, true);
+            if (opt_bank != null)
+            {
+                Program.databanks.optionBank = Program.databanks.GetDatabank(opt_bank, true);
+            }
+            if (opt_ref != null)
+            {
+                Program.databanks.optionRef = Program.databanks.GetDatabank(opt_ref, true);
+            }
         }
 
         public static void HandleOptionBankRef2()
@@ -1174,7 +1180,7 @@ namespace Gekko
                             {
                                 //non-Ref lookup
                                 
-                                    rv = GetVariableSearch(varnameWithFreq);
+                                    rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
                                     if (rv == null && errorIfNotFound)
                                     {
                                         G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
@@ -1222,7 +1228,7 @@ namespace Gekko
                         else
                         {
                             //databank name is given explicitly, and we are not doing bankNumber stuff
-                            Databank db = GetDatabankNoSearch(dbName, true); //we know that dbName is not null
+                            Databank db = Program.databanks.GetDatabank(dbName, true); //we know that dbName is not null
                             rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);                            
                         }
                     }
@@ -1634,12 +1640,7 @@ namespace Gekko
             IVariable rv;
             IBank ib = null;
             if (map != null) ib = map;
-            else ib = GetDatabankNoSearch(dbName);
-            if (ib == null)
-            {
-                G.Writeln2("*** ERROR: Databank '" + dbName + "' does not seem to be open.");
-                throw new GekkoException();
-            }
+            else ib = Program.databanks.GetDatabank(dbName, true);            
             rv = ib.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
@@ -2531,47 +2532,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-        }
-
-        private static IVariable GetVariableSearch(string varName)
-        {
-            //check local bank
-            IVariable rv = Program.databanks.GetLocal().GetIVariable(varName);
-            if (rv != null) return rv;
-
-            if (Program.databanks.optionBank != null)
-            {
-                rv = Program.databanks.optionBank.GetIVariable(varName);
-                return rv;
-            }
-
-            for (int i = 0; i < Program.databanks.storage.Count; i++)
-            {
-                if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
-                Databank db2 = Program.databanks.storage[i];
-                rv = db2.GetIVariable(varName);
-                if (rv != null) return rv;
-            }            
-            return Program.databanks.GetGlobal().GetIVariable(varName);            
-        }
-
-        private static Databank GetDatabankNoSearch(string dbName)
-        {
-            return GetDatabankNoSearch(dbName, false);
-        }
-
-        private static Databank GetDatabankNoSearch(string dbName, bool reportError)
-        {
-            Databank db = null;
-            if (dbName == null) db = Program.databanks.GetFirst();
-            else db = Program.databanks.GetDatabank(dbName);
-            if (db == null && reportError)
-            {
-                G.Writeln2("*** ERROR: Databank '" + dbName + "' does not seem to be open");
-                throw new GekkoException();
-            }
-            return db;
-        }
+        }        
 
         public static void Print(GekkoSmpl smpl, IVariable x)
         {

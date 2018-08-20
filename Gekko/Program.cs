@@ -8273,6 +8273,7 @@ namespace Gekko
             G.Writeln2("TIME: " + time / 1000d);
         }
 
+        /*
         /// <summary>
         /// Returns a filename based on the sourcefile and the targetMask, as used in the second argument in rename/copy operations.
         /// targetMask may contain wildcards (* and ?).
@@ -8282,7 +8283,7 @@ namespace Gekko
         /// <param name="sourcefile">filename to change to target without wildcards</param>
         /// <param name="targetMask">mask with wildcards</param>
         /// <returns>a valid target filename given sourcefile and targetMask</returns>
-        public static string GetTargetFileName(string sourcefile, string targetMask)
+        public static string CopyTargetHelper(string sourcefile, string targetMask)
         {
             if (string.IsNullOrEmpty(sourcefile))
                 throw new ArgumentNullException("sourcefile");
@@ -8300,7 +8301,6 @@ namespace Gekko
             var maskReader = new StringReader(targetMask);
             var sourceReader = new StringReader(sourcefile);
             var targetBuilder = new StringBuilder();
-
 
             while (maskReader.Peek() != -1)
             {
@@ -8375,6 +8375,8 @@ namespace Gekko
             maskReader.Dispose();
             return targetBuilder.ToString().TrimEnd('.', ' ');
         }
+        */
+
 
         public static Table Dream(string options)
         {
@@ -15389,8 +15391,154 @@ namespace Gekko
 
         public static void Tell(string text, bool nocr)
         {
+            if (Globals.runningOnTTComputer)
+            {
+                
+                string[] xx = text.Split('+');
+                string wild1 = xx[0].Trim();
+                string wild2 = xx[1].Trim();
+                List<string> names = new List<string>();
+                names.Add("xa");
+                names.Add("xb");
+                names.Add("xc");
+                names.Add("b:ya");
+                names.Add("yb");
+                names.Add("yc");
 
-            
+                //first match banks, and loop over these
+                //then match names, 
+                //  if no-sigil and no !, add current !a,
+                //  else loop over freqs
+                //then match indexes
+
+                //so worst case *:*!*[*,*]
+                //there is a triple loop before the indexes-loop.
+
+                //in "to" stars can be used for prefix and suffix and placeholders
+                
+                //COPY *.x to bank:*           
+
+                List<string> inputs = new List<string>();
+                List<string> outputs = new List<string>();
+
+                Wildcard wc = new Wildcard(wild1, RegexOptions.IgnoreCase);                                
+                foreach (string n2 in names)
+                {                    
+                    if (wc.IsMatch(n2)) inputs.Add(n2);
+                }
+
+                string bank2, name2, freq2; string[] index2;
+                O.Chop(wild2, out bank2, out name2, out freq2, out index2);                                            
+
+                if (freq2 != null)
+                {
+                    G.Writeln2("*** ERROR: Freq not allowed in TO part of COPY");
+                    throw new GekkoException();
+                }
+
+                if (index2 != null)
+                {
+                    G.Writeln2("*** ERROR: Indexes not yes implemented in TO part of COPY");
+                    throw new GekkoException();
+                }
+
+                string[] name2split = name2.Split('*');
+                if (name2split.Length - 1 > 1)
+                {
+                    G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO part of COPY");
+                    throw new GekkoException();
+                }
+
+                if (name2.Contains("?"))
+                {
+                    G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
+                    throw new GekkoException();
+                }
+
+                foreach (string input in inputs)
+                {
+
+                    string bank1, name1, freq1; string[] index1;
+                    O.Chop(input, out bank1, out name1, out freq1, out index1);
+
+                    if (bank2 == null)
+                    {
+                        //COPY...to   * --> first, same names
+                        //COPY...to   x*y --> first, prefix suffix
+                        //COPY...to   x --> first, fixed name
+
+                        //no bank given in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(O.UnChop(null, name2, null, null));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(O.UnChop(null, name2split[0] + name1 + name2split[1], null, null));
+                        }
+                    }
+                    else if (!bank2.Contains("*"))
+                    {
+                        //COPY...to b:* --> b bank, same names
+                        //COPY...to b:x*y --> b bank, prefix suffix
+                        //COPY...to b:* --> b bank, same names
+
+                        if (!G.IsSimpleToken(bank2))
+                        {
+                            G.Writeln2("*** ERROR: Illegal bankname in TO part of COPY");
+                            throw new GekkoException();
+                        }
+
+                        //fixed bank given in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(O.UnChop(bank2, name2, null, null));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(O.UnChop(bank2, name2split[0] + name1 + name2split[1], null, null));
+                        }
+                    }
+                    else
+                    {
+                        //COPY...to *:*--> fail: copies to itself                
+                        //COPY...to *:x*y -- > same bank, prefix suffix
+                        //COPY...to *:b  --> same bank, fixed name
+
+                        if (bank2 != "*")
+                        {
+                            G.Writeln2("*** ERROR: Only simple '*' allowed in TO part of COPY");
+                            throw new GekkoException();
+                        }
+
+                        //original bank stated in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(O.UnChop(bank1, name2, null, null));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(O.UnChop(bank1, name2split[0] + name1 + name2split[1], null, null));
+                        }
+                    }
+                }
+
+                //COPY...to b:x[*,*] --> indexers pending
+
+                G.Writeln();
+                foreach (string s in outputs)
+                {
+                    G.Writeln(s);
+                }
+                
+                return;
+            }
 
             if (nocr) G.Write(text);
             else G.Writeln(text);

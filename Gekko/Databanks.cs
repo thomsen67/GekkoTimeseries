@@ -39,7 +39,28 @@ namespace Gekko
         {
             this.storage = new List<Databank>();
         }
-               
+
+        public IVariable GetVariableWithSearch(string varName)
+        {
+            //check local bank
+            IVariable rv = this.GetLocal().GetIVariable(varName);
+            if (rv != null) return rv;
+
+            if (this.optionBank != null)
+            {
+                return this.optionBank.GetIVariable(varName);
+            }
+
+            for (int i = 0; i < this.storage.Count; i++)
+            {
+                if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+                Databank db2 = this.storage[i];
+                rv = db2.GetIVariable(varName);
+                if (rv != null) return rv;
+            }
+            return this.GetGlobal().GetIVariable(varName);
+        }
+
 
         public Databank GetFirst()
         {
@@ -115,6 +136,8 @@ namespace Gekko
                 return null;
             }
         }
+
+
 
         public bool OpenDatabank(ref Databank databank, EOpenType openType, int openPosition)
         {
