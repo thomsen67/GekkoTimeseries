@@ -15450,7 +15450,7 @@ namespace Gekko
                 //string wild2 = O.ConvertToString(o.names1.list[0]).Trim();
 
                 List<string> lhs = O.Restrict(o.names0, true, true, true, true);
-                List<string> rhs = O.Restrict(o.names0, true, true, true, true);
+                List<string> rhs = O.Restrict(o.names1, true, true, true, true);
 
                 //if (beforeTo.Count != AfterTo.Count)
                 //{
@@ -15471,8 +15471,10 @@ namespace Gekko
                     string bank3, name3, freq3; string[] index3;
                     O.Chop(wild1, out bank3, out name3, out freq3, out index3);
 
-                    if (bank3 != null && bank3.Contains("*") || bank3.Contains("?")) lhsHasStarOrQuestion = true;
-                    if (name3.Contains("*") || name3.Contains("?")) lhsHasStarOrQuestion = true;
+                    bool lhsHasStarOrQuestionLocal = false;
+                    if (bank3 != null && (bank3.Contains("*") || bank3.Contains("?"))) lhsHasStarOrQuestionLocal = true;
+                    if (name3.Contains("*") || name3.Contains("?")) lhsHasStarOrQuestionLocal = true;
+                    if (lhsHasStarOrQuestionLocal) lhsHasStarOrQuestion = true;
 
                     if (index3 != null)
                     {
@@ -15480,26 +15482,34 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    List<string> db_banks = new List<string>();
-                    if (bank3 == null)
+                    if (lhsHasStarOrQuestionLocal)
                     {
-                        db_banks.Add("First");
+
+                        List<string> db_banks = new List<string>();
+                        if (bank3 == null)
+                        {
+                            db_banks.Add("First");
+                        }
+                        else
+                        {
+                            List<string> temp = new List<string>();
+                            temp.Add("Local");
+                            foreach (Databank databank in Program.databanks.storage)
+                            {
+                                temp.Add(databank.name);
+                            }
+                            temp.Add("Global");
+                            db_banks = Match(bank3, temp);
+                        }
+
+                        foreach (string db_bank in db_banks)
+                        {
+                            lhsUnfolded.AddRange(MatchInBank(name3, freq3, db_bank));
+                        }
                     }
                     else
                     {
-                        List<string> temp = new List<string>();
-                        temp.Add("Local");
-                        foreach (Databank databank in Program.databanks.storage)
-                        {
-                            temp.Add(databank.name);
-                        }
-                        temp.Add("Global");
-                        db_banks = Match(bank3, temp);
-                    }
-                    
-                    foreach (string db_bank in db_banks)
-                    {
-                        lhsUnfolded.AddRange(MatchInBank(name3, freq3, db_bank));
+                        lhsUnfolded.Add(wild1);
                     }
 
                     //List<TwoStrings> outputs = new List<TwoStrings>();
@@ -15576,7 +15586,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    if (bank2.Contains("?") || name2.Contains("?"))
+                    if ((bank2 != null && bank2.Contains("?")) || name2.Contains("?"))
                     {
                         G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
                         throw new GekkoException();
