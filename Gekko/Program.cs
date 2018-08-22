@@ -510,6 +510,19 @@ namespace Gekko
             this.s1 = s1;
             this.s2 = s2;
         }
+        public TwoStrings(string s1, string s2, bool noblanks)
+        {
+            if (noblanks)
+            {
+                this.s1 = s1.Replace(" ", "");
+                this.s2 = s2.Replace(" ", "");
+            }
+            else
+            {
+                this.s1 = s1;
+                this.s2 = s2;
+            }
+        }
     }
 
     public class StackHelper
@@ -15509,7 +15522,11 @@ namespace Gekko
                     }
                     else
                     {
-                        lhsUnfolded.Add(wild1);
+                        string bank = bank3;
+                        if (bank3 == null) bank = "First";
+                        string freq = freq3;
+                        if (freq3 == null) freq = G.GetFreq(Program.options.freq);
+                        lhsUnfolded.Add(O.UnChop(bank, name3, freq, index3));
                     }
 
                     //List<TwoStrings> outputs = new List<TwoStrings>();
@@ -15566,7 +15583,7 @@ namespace Gekko
                 for (int i = 0; i < lhsUnfolded.Count; i++)
                 {
                     string lhsElement = lhsUnfolded[i];
-
+                    
                     string rhsElement = null;
                     if (rhs.Count > 1) rhsElement = rhs[i];
                     else rhsElement = rhs[0];
@@ -15602,12 +15619,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2, freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2, freq1, index1), true));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2split[0] + name1 + name2split[1], freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2split[0] + name1 + name2split[1], freq1, index1), true));
                         }
                     }
                     else if (!bank2.Contains("*"))
@@ -15626,12 +15643,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2, freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2, freq1, index1), true));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2split[0] + name1 + name2split[1], freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2split[0] + name1 + name2split[1], freq1, index1), true));
                         }
                     }
                     else
@@ -15650,15 +15667,14 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2, freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2, freq1, index1), true));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2split[0] + name1 + name2split[1], freq1, index1)));
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2split[0] + name1 + name2split[1], freq1, index1), true));
                         }
                     }
-
                 }
 
 
@@ -15768,10 +15784,41 @@ namespace Gekko
 
                 ////COPY...to b:x[*,*] --> indexers pending
 
+                Dictionary<string, int> lhsCheck = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                Dictionary<string, int> rhsCheck = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
                 int counter = 0;
                 G.Writeln();
                 foreach (TwoStrings two in outputs)
                 {
+                    if (lhsCheck.ContainsKey(two.s1))
+                    {
+                        G.Writeln2("*** ERROR: Dublet: element '" + two.s1 + "' appears several times before TO");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        lhsCheck.Add(two.s1, 0);
+                    }
+                    if (rhsCheck.ContainsKey(two.s2))
+                    {
+                        List<string> temp = new List<string>();
+                        foreach (TwoStrings two2 in outputs)
+                        {
+                            
+                            if (G.Equal(two2.s2, two.s2))
+                            {
+                                temp.Add(two2.s1);
+                            }
+                        }
+                        G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all copied to " + two.s2);
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        rhsCheck.Add(two.s2, 0);
+                    }
+
                     //must have both bank colon
                     //THIS IF CAN BE REMOVED AFTER SOME TESTING
                     if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
@@ -15789,14 +15836,12 @@ namespace Gekko
                     if (counter > 20) break;
                 }
 
-                //if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
-                //{
-                //    Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
-                //    return;
-                //}
-
-
-
+                if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+                {
+                    Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
+                    return;
+                }
+                
 
             }
 

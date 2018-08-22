@@ -2388,7 +2388,7 @@ namespace UnitTests
             I("close b1; open b1; unlock b1;");
             //hmmm seems the only way to create a fresh bank not in first position
             I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
-            
+
             //Testing copy with these cases before TO
             //
             // a: no bank
@@ -2398,20 +2398,26 @@ namespace UnitTests
             // names:
             //            
             // 01: list of given names
-            // 03: wildcard name (can be complicated)
+            // 02: wildcard name (can be complicated)
             //
             // After TO:
             //
             // A: no bank
             // B: given bank
-            // C: wildcard bank
+            // C: wildcard bank (only '*')
             //            
             // 11: list of given names
-            // 12: wildcard name (must be simple: '*' or 'a*' or '*a' or 'a*b')        
+            // 12: wildcard name (must single-star)        
 
+            //---------------------------------------
+                        
+            // =====================================================================
+            // =========== No bank on LHS ==========================================
+            // =====================================================================
+            
+            //a-01-A-11
             try
-            {
-                //a-01-A-11
+            {                
                 Globals.unitTestCopyHelper2 = true;
                 I("copy {'x1'} to {'y1'};");
             }
@@ -2423,10 +2429,57 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
 
+            //---------------------------------------
+            //a-01-A-12
+            try
+            {                
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
+            
+            //---------------------------------------
+            //a-01-B-11
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'y1'};");
+                I("copy {'x1'} to {'b:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            //---------------------------------------
+            //a-01-B-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'b:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax1b!a");
+
+            //---------------------------------------
+            //a-01-C-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'*:y1'};");
             }
             finally
             {
@@ -2435,6 +2488,309 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            //---------------------------------------
+            //a-01-C-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'*:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
+
+
+            // ========================================================
+            // ========================================================
+
+            //a-02-A-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            //---------------------------------------
+            //a-02-A-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax2b!a");
+
+            //---------------------------------------
+            //a-02-B-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'b:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            //---------------------------------------
+            //a-01-B-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'b:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax2b!a");
+
+            //---------------------------------------
+            //a-01-C-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'*:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            //---------------------------------------
+            //a-01-C-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x2*'} to {'*:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax2b!a");
+
+
+
+
+
+
+
+
+
+            // =====================================================================
+            // =========== Given bank on LHS =======================================
+            // =====================================================================
+
+            //b-01-A-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            //---------------------------------------
+            //b-01-A-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+
+            //---------------------------------------
+            //b-01-B-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'b:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            //---------------------------------------
+            //b-01-B-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'b:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax3b!a");
+
+            //---------------------------------------
+            //b-01-C-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'*:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:y1!a");
+
+            //---------------------------------------
+            //b-01-C-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x3'} to {'*:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:ax3b!a");
+            
+            // ========================================================
+            // ========================================================
+
+            //b-02-A-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            //---------------------------------------
+            //b-02-A-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+
+            //---------------------------------------
+            //b-02-B-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'b:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            //---------------------------------------
+            //b-01-B-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'b:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax3b!a");
+
+            //---------------------------------------
+            //b-01-C-11
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'*:y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:y1!a");
+
+            //---------------------------------------
+            //b-01-C-12
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'b1:x?'} to {'*:a*b'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:ax3b!a");
+
+
         }
 
 
