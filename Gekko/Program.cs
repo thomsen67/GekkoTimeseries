@@ -15447,10 +15447,10 @@ namespace Gekko
                 // =============================================
 
                 //string wild1 = O.ConvertToString(o.names0.list[0]).Trim();
-                string wild2 = O.ConvertToString(o.names1.list[0]).Trim();
+                //string wild2 = O.ConvertToString(o.names1.list[0]).Trim();
 
-                List<string> beforeTo = O.Restrict(o.names0, true, true, true, true);
-                List<string> AfterTo = O.Restrict(o.names0, true, true, true, true);
+                List<string> lhs = O.Restrict(o.names0, true, true, true, true);
+                List<string> rhs = O.Restrict(o.names0, true, true, true, true);
 
                 //if (beforeTo.Count != AfterTo.Count)
                 //{
@@ -15462,11 +15462,11 @@ namespace Gekko
                 //           LHS
                 // --------------------------------------------
 
-                List<string> inputs = new List<string>();
+                List<string> lhsUnfolded = new List<string>();
 
                 bool lhsHasStarOrQuestion = false;  //true for LHS, for 'a*', '*:x', 'b?:x?', etc.
 
-                foreach (string wild1 in beforeTo)
+                foreach (string wild1 in lhs)
                 {
                     string bank3, name3, freq3; string[] index3;
                     O.Chop(wild1, out bank3, out name3, out freq3, out index3);
@@ -15499,10 +15499,10 @@ namespace Gekko
                     
                     foreach (string db_bank in db_banks)
                     {
-                        inputs.AddRange(MatchInBank(name3, freq3, db_bank));
+                        lhsUnfolded.AddRange(MatchInBank(name3, freq3, db_bank));
                     }
 
-                    List<TwoStrings> outputs = new List<TwoStrings>();
+                    //List<TwoStrings> outputs = new List<TwoStrings>();
 
                     //string bank2, name2, freq2; string[] index2;
                     //O.Chop(wild2, out bank2, out name2, out freq2, out index2);
@@ -15533,26 +15533,148 @@ namespace Gekko
                     //}
                 }
 
-                if (lhsHasStarOrQuestion)
+                if (rhs.Count > 1)
                 {
-                    if (AfterTo.Count != 1)
+                    if (lhsHasStarOrQuestion)
                     {
+                        //Such assignment is too error-prone, like "COPY x* TO a, b, c;"
                         G.Writeln2("*** ERROR: Using wildcards before TO, you must state a single wildcard element after TO");
                         throw new GekkoException();
                     }
+                    else
+                    {
+                        if (lhs.Count != rhs.Count)
+                        {
+                            G.Writeln2("*** ERROR: Mismatch: there are " + lhs.Count + " elements before TO, and " + rhs.Count + " elements after TO");
+                            throw new GekkoException();
+                        }
+                    }
                 }
 
-                if(!lhsHasStarOrQuestion)
+                List<TwoStrings> outputs = new List<TwoStrings>();
+
+                for (int i = 0; i < lhsUnfolded.Count; i++)
                 {
-                    //match the items one by one
+                    string lhsElement = lhsUnfolded[i];
+
+                    string rhsElement = null;
+                    if (rhs.Count > 1) rhsElement = rhs[i];
+                    else rhsElement = rhs[0];
+
+                    string bank1, name1, freq1; string[] index1;
+                    O.Chop(lhsElement, out bank1, out name1, out freq1, out index1);
+
+                    //TODO: some superfluous repetitive chopping here, if rhs has only 1 element
+                    string bank2, name2, freq2; string[] index2;
+                    O.Chop(rhsElement, out bank2, out name2, out freq2, out index2);
+
+                    string[] name2split = name2.Split('*');
+
+                    if (name2split.Length - 1 > 1)
+                    {
+                        G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO part of COPY");
+                        throw new GekkoException();
+                    }
+
+                    if (bank2.Contains("?") || name2.Contains("?"))
+                    {
+                        G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
+                        throw new GekkoException();
+                    }
                     
-                }
-                else
-                {
+                    if (bank2 == null)
+                    {
+                        //COPY...to   * --> first, same names
+                        //COPY...to   x*y --> first, prefix suffix
+                        //COPY...to   x --> first, fixed name
+
+                        //no bank given in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2, freq1, index1)));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop("First", name2split[0] + name1 + name2split[1], freq1, index1)));
+                        }
+                    }
+                    else if (!bank2.Contains("*"))
+                    {
+                        //COPY...to b:* --> b bank, same names
+                        //COPY...to b:x*y --> b bank, prefix suffix
+                        //COPY...to b:* --> b bank, same names
+
+                        if (!G.IsSimpleToken(bank2))
+                        {
+                            G.Writeln2("*** ERROR: Illegal bankname in TO part of COPY");
+                            throw new GekkoException();
+                        }
+
+                        //fixed bank given in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2, freq1, index1)));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank2, name2split[0] + name1 + name2split[1], freq1, index1)));
+                        }
+                    }
+                    else
+                    {
+                        //COPY...to *:*--> fail: copies to itself                
+                        //COPY...to *:x*y -- > same bank, prefix suffix
+                        //COPY...to *:b  --> same bank, fixed name
+
+                        if (bank2 != "*")
+                        {
+                            G.Writeln2("*** ERROR: Only simple '*' allowed in TO part of COPY");
+                            throw new GekkoException();
+                        }
+
+                        //original bank stated in second part
+                        if (name2split.Length == 1)
+                        {
+                            //no stars
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2, freq1, index1)));
+                        }
+                        else
+                        {
+                            //one star
+                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bank1, name2split[0] + name1 + name2split[1], freq1, index1)));
+                        }
+                    }
 
                 }
 
-                //Now we are certain that c or 02 or both only combine with 12, not 11.
+
+                //So now, if RHS has > 1 element, LHS has no '*' or '?'
+                //And if RHS has > 1 element, LHS has the same number.                
+
+                //if (lhsHasStarOrQuestion)
+                //{
+                //    //This means that there is an unknown number of items
+                //    //stuff like "COPY b:x* TO y*;" or "COPY *:y TO b:*_v2";
+
+                //    if (rhs.Count != 1)
+                //    {
+
+                //    }
+                //    //Now we are certain that c or 02 or both only combine with 12, not 11.
+                //    //That means: "COPY b:* TO a, b, c;" is not possible.
+                //}
+                //else
+                //{
+                //    //match the items one by one
+                //    //stuff like "COPY b:x, c:y, d, e TO a, b, c;"
+                //    //or "COPY b:x, c:y, d, e TO b2:*;"
+                //}
+
+
 
                 //Now the list 'inputs' contains all the found bank+names.
 
@@ -15636,26 +15758,26 @@ namespace Gekko
 
                 ////COPY...to b:x[*,*] --> indexers pending
 
-                //int counter = 0;
-                //G.Writeln();
-                //foreach (TwoStrings two in outputs)
-                //{
-                //    //must have both bank colon
-                //    //THIS IF CAN BE REMOVED AFTER SOME TESTING
-                //    if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
-                //    {
-                //        G.Writeln2("*** ERROR: Internal error #08745765398475");
-                //        throw new GekkoException();
-                //    }
-                //    if ((!G.Chop_HasSigil(two.s1) && !two.s1.Contains(Globals.freqIndicator)) || (!G.Chop_HasSigil(two.s2) && !two.s2.Contains(Globals.freqIndicator)))
-                //    {
-                //        G.Writeln2("*** ERROR: Internal error #08745765398475");
-                //        throw new GekkoException();
-                //    }
-                //    G.Writeln(two.s1 + " --> " + two.s2);
-                //    counter++;
-                //    if (counter > 20) break;
-                //}
+                int counter = 0;
+                G.Writeln();
+                foreach (TwoStrings two in outputs)
+                {
+                    //must have both bank colon
+                    //THIS IF CAN BE REMOVED AFTER SOME TESTING
+                    if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
+                    {
+                        G.Writeln2("*** ERROR: Internal error #08745765398475");
+                        throw new GekkoException();
+                    }
+                    if ((!G.Chop_HasSigil(two.s1) && !two.s1.Contains(Globals.freqIndicator)) || (!G.Chop_HasSigil(two.s2) && !two.s2.Contains(Globals.freqIndicator)))
+                    {
+                        G.Writeln2("*** ERROR: Internal error #08745765398475");
+                        throw new GekkoException();
+                    }
+                    G.Writeln(two.s1 + " --> " + two.s2);
+                    counter++;
+                    if (counter > 20) break;
+                }
 
                 //if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
                 //{
@@ -15663,7 +15785,7 @@ namespace Gekko
                 //    return;
                 //}
 
-                
+
 
 
             }
