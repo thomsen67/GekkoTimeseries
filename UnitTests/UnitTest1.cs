@@ -2372,6 +2372,74 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Copy()
+        {
+
+            I("reset; time 2001 2003;");            
+            I("x1 = 11;");
+            I("%x1 = 12;");
+            I("#x1 = (13,);");
+            I("clone;");  //copies to Ref
+            I("x2 = 21;");  //special for Work
+            I("open<edit>b1; clear b1;");
+            I("x3 = 31;");
+            I("%x3 = 32;");
+            I("#x3 = (33,);");
+            I("close b1; open b1; unlock b1;");
+            //hmmm seems the only way to create a fresh bank not in first position
+            I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
+            
+            //Testing copy with these cases before TO
+            //
+            // a: no bank
+            // b: given bank
+            // c: wildcard bank
+            //
+            // names:
+            //            
+            // 01: list of given names
+            // 03: wildcard name (can be complicated)
+            //
+            // After TO:
+            //
+            // A: no bank
+            // B: given bank
+            // C: wildcard bank
+            //            
+            // 11: list of given names
+            // 12: wildcard name (must be simple: '*' or 'a*' or '*a' or 'a*b')        
+
+            try
+            {
+                //a-01-A-11
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy {'x1'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+        }
+
+
+
+        [TestMethod]
         public void _Test_For()
         {
             //parallel for loop

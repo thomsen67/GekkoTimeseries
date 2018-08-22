@@ -246,6 +246,8 @@ namespace Gekko
         public static bool unitTestIntegration = false;
         public static SimpleUnitTestWindow unitTestWindow = null;
         public static string unitTestIntegrationMessage = "Set Globals.unitTestIntegration = true to run integration tests";
+        public static List<TwoStrings> unitTestCopyHelper = null;
+        public static bool unitTestCopyHelper2 = false;
                 
         public static Table unitTestTablePointer = null;  //used to see if table generated in PRT etc looks ok (regardless of how it actually prints)
 

@@ -15390,156 +15390,7 @@ namespace Gekko
         }
 
         public static void Tell(string text, bool nocr)
-        {
-            if (Globals.runningOnTTComputer)
-            {
-                
-                string[] xx = text.Split('+');
-                string wild1 = xx[0].Trim();
-                string wild2 = xx[1].Trim();
-                List<string> names = new List<string>();
-                names.Add("xa");
-                names.Add("xb");
-                names.Add("xc");
-                names.Add("b:ya");
-                names.Add("yb");
-                names.Add("yc");
-
-                //first match banks, and loop over these
-                //then match names, 
-                //  if no-sigil and no !, add current !a,
-                //  else loop over freqs
-                //then match indexes
-
-                //so worst case *:*!*[*,*]
-                //there is a triple loop before the indexes-loop.
-
-                //in "to" stars can be used for prefix and suffix and placeholders
-                
-                //COPY *.x to bank:*           
-
-                List<string> inputs = new List<string>();
-                List<string> outputs = new List<string>();
-
-                Wildcard wc = new Wildcard(wild1, RegexOptions.IgnoreCase);                                
-                foreach (string n2 in names)
-                {                    
-                    if (wc.IsMatch(n2)) inputs.Add(n2);
-                }
-
-                string bank2, name2, freq2; string[] index2;
-                O.Chop(wild2, out bank2, out name2, out freq2, out index2);                                            
-
-                if (freq2 != null)
-                {
-                    G.Writeln2("*** ERROR: Freq not allowed in TO part of COPY");
-                    throw new GekkoException();
-                }
-
-                if (index2 != null)
-                {
-                    G.Writeln2("*** ERROR: Indexes not yes implemented in TO part of COPY");
-                    throw new GekkoException();
-                }
-
-                string[] name2split = name2.Split('*');
-                if (name2split.Length - 1 > 1)
-                {
-                    G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO part of COPY");
-                    throw new GekkoException();
-                }
-
-                if (name2.Contains("?"))
-                {
-                    G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
-                    throw new GekkoException();
-                }
-
-                foreach (string input in inputs)
-                {
-
-                    string bank1, name1, freq1; string[] index1;
-                    O.Chop(input, out bank1, out name1, out freq1, out index1);
-
-                    if (bank2 == null)
-                    {
-                        //COPY...to   * --> first, same names
-                        //COPY...to   x*y --> first, prefix suffix
-                        //COPY...to   x --> first, fixed name
-
-                        //no bank given in second part
-                        if (name2split.Length == 1)
-                        {
-                            //no stars
-                            outputs.Add(O.UnChop(null, name2, null, null));
-                        }
-                        else
-                        {
-                            //one star
-                            outputs.Add(O.UnChop(null, name2split[0] + name1 + name2split[1], null, null));
-                        }
-                    }
-                    else if (!bank2.Contains("*"))
-                    {
-                        //COPY...to b:* --> b bank, same names
-                        //COPY...to b:x*y --> b bank, prefix suffix
-                        //COPY...to b:* --> b bank, same names
-
-                        if (!G.IsSimpleToken(bank2))
-                        {
-                            G.Writeln2("*** ERROR: Illegal bankname in TO part of COPY");
-                            throw new GekkoException();
-                        }
-
-                        //fixed bank given in second part
-                        if (name2split.Length == 1)
-                        {
-                            //no stars
-                            outputs.Add(O.UnChop(bank2, name2, null, null));
-                        }
-                        else
-                        {
-                            //one star
-                            outputs.Add(O.UnChop(bank2, name2split[0] + name1 + name2split[1], null, null));
-                        }
-                    }
-                    else
-                    {
-                        //COPY...to *:*--> fail: copies to itself                
-                        //COPY...to *:x*y -- > same bank, prefix suffix
-                        //COPY...to *:b  --> same bank, fixed name
-
-                        if (bank2 != "*")
-                        {
-                            G.Writeln2("*** ERROR: Only simple '*' allowed in TO part of COPY");
-                            throw new GekkoException();
-                        }
-
-                        //original bank stated in second part
-                        if (name2split.Length == 1)
-                        {
-                            //no stars
-                            outputs.Add(O.UnChop(bank1, name2, null, null));
-                        }
-                        else
-                        {
-                            //one star
-                            outputs.Add(O.UnChop(bank1, name2split[0] + name1 + name2split[1], null, null));
-                        }
-                    }
-                }
-
-                //COPY...to b:x[*,*] --> indexers pending
-
-                G.Writeln();
-                foreach (string s in outputs)
-                {
-                    G.Writeln(s);
-                }
-                
-                return;
-            }
-
+        {            
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
@@ -15555,6 +15406,613 @@ namespace Gekko
             if (text.EndsWith(";")) text = text.Substring(0, text.Length - 1);  //Should be HDG 'text'; fixing it here
             Program.databanks.GetFirst().info1 = text;
             G.Writeln2("Databank heading for '" + Program.databanks.GetFirst().name + "' databank set to: '" + text + "'");
+        }
+
+        public static void Copy(O.Copy o)
+        {
+            if (true)
+            {
+                //Use of wildcards:
+                //
+                //
+                // === Before TO (lhs): ==============================
+                //
+                // --- bank ---
+                // a: no bank
+                // b: given bank
+                // c: wildcard bank (can be complicated)
+                //
+                // --- names ---
+                // 01: list of given names
+                // 02: wildcard name (can be complicated)
+                //
+                // === After TO (rhs): ===============================
+                //
+                // --- bank ---
+                // A: no bank (all vars will get 'First:')
+                // B: given bank (replaces bank)
+                // C: star bank (not really a wildcard, can only be '*', will get same bank as lhs)
+                //         
+                // --- names ---   
+                // 11: list of given names
+                // 12: wildcard name (must be simple one-star like 'a*b')
+                //  
+                // ---------------------------------------------
+                //
+                // NOTE: If lhs contains an element with a wildcards ('*' or '?' in bank or name), the rhs MUST be a 1-element
+                //       list (in practice this item is a wildcard, but collisions are checked anyway)
+                //       This is to avoid that names obtained from wildcards are randomly put into a list
+                //       of fixed names.
+                //
+                // =============================================
+
+                //string wild1 = O.ConvertToString(o.names0.list[0]).Trim();
+                string wild2 = O.ConvertToString(o.names1.list[0]).Trim();
+
+                List<string> beforeTo = O.Restrict(o.names0, true, true, true, true);
+                List<string> AfterTo = O.Restrict(o.names0, true, true, true, true);
+
+                //if (beforeTo.Count != AfterTo.Count)
+                //{
+                //    G.Writeln2("*** ERROR: Different number of commas before and after TO (" + beforeTo.Count + " versus " + AfterTo.Count + ")");
+                //    throw new GekkoException();
+                //}
+
+                // --------------------------------------------
+                //           LHS
+                // --------------------------------------------
+
+                List<string> inputs = new List<string>();
+
+                bool lhsHasStarOrQuestion = false;  //true for LHS, for 'a*', '*:x', 'b?:x?', etc.
+
+                foreach (string wild1 in beforeTo)
+                {
+                    string bank3, name3, freq3; string[] index3;
+                    O.Chop(wild1, out bank3, out name3, out freq3, out index3);
+
+                    if (bank3 != null && bank3.Contains("*") || bank3.Contains("?")) lhsHasStarOrQuestion = true;
+                    if (name3.Contains("*") || name3.Contains("?")) lhsHasStarOrQuestion = true;
+
+                    if (index3 != null)
+                    {
+                        G.Writeln2("*** ERROR: COPY with indexes before TO not yet implemented");
+                        throw new GekkoException();
+                    }
+
+                    List<string> db_banks = new List<string>();
+                    if (bank3 == null)
+                    {
+                        db_banks.Add("First");
+                    }
+                    else
+                    {
+                        List<string> temp = new List<string>();
+                        temp.Add("Local");
+                        foreach (Databank databank in Program.databanks.storage)
+                        {
+                            temp.Add(databank.name);
+                        }
+                        temp.Add("Global");
+                        db_banks = Match(bank3, temp);
+                    }
+                    
+                    foreach (string db_bank in db_banks)
+                    {
+                        inputs.AddRange(MatchInBank(name3, freq3, db_bank));
+                    }
+
+                    List<TwoStrings> outputs = new List<TwoStrings>();
+
+                    //string bank2, name2, freq2; string[] index2;
+                    //O.Chop(wild2, out bank2, out name2, out freq2, out index2);
+
+                    //if (freq2 != null)
+                    //{
+                    //    G.Writeln2("*** ERROR: Freq not allowed in TO part of COPY");
+                    //    throw new GekkoException();
+                    //}
+
+                    //if (index2 != null)
+                    //{
+                    //    G.Writeln2("*** ERROR: Indexes not yet implemented in TO part of COPY");
+                    //    throw new GekkoException();
+                    //}
+
+                    //string[] name2split = name2.Split('*');
+                    //if (name2split.Length - 1 > 1)
+                    //{
+                    //    G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO part of COPY");
+                    //    throw new GekkoException();
+                    //}
+
+                    //if (name2.Contains("?"))
+                    //{
+                    //    G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
+                    //    throw new GekkoException();
+                    //}
+                }
+
+                if (lhsHasStarOrQuestion)
+                {
+                    if (AfterTo.Count != 1)
+                    {
+                        G.Writeln2("*** ERROR: Using wildcards before TO, you must state a single wildcard element after TO");
+                        throw new GekkoException();
+                    }
+                }
+
+                if(!lhsHasStarOrQuestion)
+                {
+                    //match the items one by one
+                    
+                }
+                else
+                {
+
+                }
+
+                //Now we are certain that c or 02 or both only combine with 12, not 11.
+
+                //Now the list 'inputs' contains all the found bank+names.
+
+                // --------------------------------------------
+                //           RHS
+                // --------------------------------------------
+
+                //foreach (string input in inputs)
+                //{
+
+                //    string bank1, name1, freq1; string[] index1;
+                //    O.Chop(input, out bank1, out name1, out freq1, out index1);
+
+                //    if (bank2 == null)
+                //    {
+                //        //COPY...to   * --> first, same names
+                //        //COPY...to   x*y --> first, prefix suffix
+                //        //COPY...to   x --> first, fixed name
+
+                //        //no bank given in second part
+                //        if (name2split.Length == 1)
+                //        {
+                //            //no stars
+                //            outputs.Add(new TwoStrings(input, O.UnChop("First", name2, freq1, index1)));
+                //        }
+                //        else
+                //        {
+                //            //one star
+                //            outputs.Add(new TwoStrings(input, O.UnChop("First", name2split[0] + name1 + name2split[1], freq1, index1)));
+                //        }
+                //    }
+                //    else if (!bank2.Contains("*"))
+                //    {
+                //        //COPY...to b:* --> b bank, same names
+                //        //COPY...to b:x*y --> b bank, prefix suffix
+                //        //COPY...to b:* --> b bank, same names
+
+                //        if (!G.IsSimpleToken(bank2))
+                //        {
+                //            G.Writeln2("*** ERROR: Illegal bankname in TO part of COPY");
+                //            throw new GekkoException();
+                //        }
+
+                //        //fixed bank given in second part
+                //        if (name2split.Length == 1)
+                //        {
+                //            //no stars
+                //            outputs.Add(new TwoStrings(input, O.UnChop(bank2, name2, freq1, index1)));
+                //        }
+                //        else
+                //        {
+                //            //one star
+                //            outputs.Add(new TwoStrings(input, O.UnChop(bank2, name2split[0] + name1 + name2split[1], freq1, index1)));
+                //        }
+                //    }
+                //    else
+                //    {
+                //        //COPY...to *:*--> fail: copies to itself                
+                //        //COPY...to *:x*y -- > same bank, prefix suffix
+                //        //COPY...to *:b  --> same bank, fixed name
+
+                //        if (bank2 != "*")
+                //        {
+                //            G.Writeln2("*** ERROR: Only simple '*' allowed in TO part of COPY");
+                //            throw new GekkoException();
+                //        }
+
+                //        //original bank stated in second part
+                //        if (name2split.Length == 1)
+                //        {
+                //            //no stars
+                //            outputs.Add(new TwoStrings(input, O.UnChop(bank1, name2, freq1, index1)));
+                //        }
+                //        else
+                //        {
+                //            //one star
+                //            outputs.Add(new TwoStrings(input, O.UnChop(bank1, name2split[0] + name1 + name2split[1], freq1, index1)));
+                //        }
+                //    }
+                //}
+
+                ////COPY...to b:x[*,*] --> indexers pending
+
+                //int counter = 0;
+                //G.Writeln();
+                //foreach (TwoStrings two in outputs)
+                //{
+                //    //must have both bank colon
+                //    //THIS IF CAN BE REMOVED AFTER SOME TESTING
+                //    if (!two.s1.Contains(Globals.symbolBankColon) || !two.s2.Contains(Globals.symbolBankColon))
+                //    {
+                //        G.Writeln2("*** ERROR: Internal error #08745765398475");
+                //        throw new GekkoException();
+                //    }
+                //    if ((!G.Chop_HasSigil(two.s1) && !two.s1.Contains(Globals.freqIndicator)) || (!G.Chop_HasSigil(two.s2) && !two.s2.Contains(Globals.freqIndicator)))
+                //    {
+                //        G.Writeln2("*** ERROR: Internal error #08745765398475");
+                //        throw new GekkoException();
+                //    }
+                //    G.Writeln(two.s1 + " --> " + two.s2);
+                //    counter++;
+                //    if (counter > 20) break;
+                //}
+
+                //if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+                //{
+                //    Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
+                //    return;
+                //}
+
+                
+
+
+            }
+
+            else
+            {
+
+
+                //------------ Types -----------------------------------------------------------------------------------------------
+                //1. if RESPECT keyword and timeseries exists beforehand            -> inject data inside [t1, t2] in existing series
+                //2. if RESPECT keyword and timeseries does not exist beforehand    -> clone, truncate to [t1, t2], and add to databank
+                //3. if no RESPECT keyword and timeseries exists beforehand         -> delete existing timeseries, clone, and add the new one to databank
+                //4. if no RESPECT keyword and timeseries does not exist beforehand -> clone and add to databank                
+                //------------------------------------------------------------------------------------------------------------------
+
+                //COPY ...;           short for COPY ... TO work:*;
+                //COPY ... TO x:*;    redirects to x bank instead of work
+                //COPY ... TO y*z;    copies with prefix/suffix
+                //COPY ... TO x:y*z;  redirects to x bank with prefix/suffix
+                //--> note you cannot use these in combinations with strings!
+                //--> and COPY *.fy would not make sense (would give name collisions. So
+                //    no wildcards for banks, not even *. (But PRT *:fy would be ok, and later on *.sol)
+
+                //These <FROM = ...> and <TO = ...> can be overridden by individual bank names like "COPY <FROM = adbk> a, b, simbk:c, d;". In that case, 'c' is taken from simbk.
+                //Note that <FROM/TO = @> is legal!
+
+                //TODO: Implement for array-series
+
+                List<string> listItems0 = O.Restrict(o.names0, true, true, true, false);
+                List<string> listItems1 = O.Restrict(o.names1, true, true, true, false);
+
+                Databank localOptionFromBank = null; //is != null if <FROM = ...>
+                Databank localOptionToBank = null; //is != null if <TO  = ...>
+                O.GetFromAndToDatabanks(o.opt_from, o.opt_to, ref localOptionFromBank, ref localOptionToBank);
+
+                if (o.opt_from != null || o.opt_to != null)
+                {
+                    G.Writeln2("*** ERROR: <from> and <to> not yet implemented");
+                    throw new GekkoException();
+                }
+
+                int errorCounter = 0;
+
+                bool wild0 = false;
+                foreach (string s in listItems0)
+                {
+                    if (s.Contains("*") || s.Contains("?") || s.Contains("..")) wild0 = true;
+                }
+
+                bool isUsingPlaceholder = false;
+                string placeholderPrefix = null;
+                string placeholderSuffix = null;
+                if (listItems1 != null)
+                {
+                    foreach (string s in listItems1)
+                    {
+                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
+                        string name = h.name;
+
+                        if (name.Contains(".."))
+                        {
+                            G.Writeln2("*** ERROR: In COPY, you can only use '..' on the left side of TO (the right side is not a wildcard)");
+                            throw new GekkoException();
+                        }
+
+                        if (name.Contains("?"))
+                        {
+                            G.Writeln2("*** ERROR: In COPY, you can only use '?' on the left side of TO (the right side is not a wildcard)");
+                            throw new GekkoException();
+                        }
+
+                        if (name.Contains("*"))
+                        {
+                            if (listItems1.Count > 1)
+                            {
+                                G.Writeln2("*** ERROR: In COPY, if you use '*' on the right side of TO, you can only use one list element (there are " + listItems1.Count + ")");
+                                throw new GekkoException();
+                            }
+
+                            if (G.CountCharsInString(name, "*") > 1)
+                            {
+                                G.Writeln2("*** ERROR: In COPY, you cannot use more than one '*' in a list item on the right side of TO");
+                                throw new GekkoException();
+                            }
+                            string[] split = name.Split('*');
+                            isUsingPlaceholder = true;
+                            placeholderPrefix = split[0];
+                            placeholderSuffix = split[1];
+                        }
+                    }
+
+                    if (wild0 && !isUsingPlaceholder)
+                    {
+                        G.Writeln2("*** ERROR: When using '*', '?' or '..' on the left side of TO, the right side of TO must contain a '*'");
+                        throw new GekkoException();
+                    }
+
+                    if (!wild0 && !isUsingPlaceholder)
+                    {
+                        if (listItems0.Count != listItems1.Count)
+                        {
+                            G.Writeln2("*** ERROR: Difference between number of list items to the left and right of TO (" + listItems0.Count + " versus " + listItems1.Count + ")");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+
+                //When we get here, if there are wildcards or ranges on the left of TO, the right of TO is either empty or a single list item containing one and only one '*'
+                //If there are no wildcards on left and right of TO, the lists have same size.
+
+                int type1 = 0;
+                int type2 = 0;
+                int type3 = 0;
+                int type4 = 0;
+
+                for (int i = 0; i < listItems0.Count; i++)  //regarding this list, #-lists like "COPY #m;" are unfolded, but any wildcards or ranges are not.
+                {
+                    //Databank fromBank = null;
+                    Databank toBank = O.Copy.SetPossibleToBank(localOptionToBank);
+
+                    if (listItems1 == null)
+                    {
+                        //Stuff like "COPY adbk:fx*;"  (copies to first)
+                        //Hmmm: gets run for each item to the left of TO, but the following line runs fast anyway.
+                        if (toBank == null) toBank = Program.databanks.GetFirst();
+                    }
+                    else
+                    {
+                        string ss = null;
+                        if (isUsingPlaceholder)
+                        {
+                            //Stuff like "COPY bank1:#m TO bank2:a*;"
+                            //here we use item #0 (there can only be 1 such item)
+                            ss = listItems1[0];
+                        }
+                        else
+                        {
+                            //Stuff like "COPY bank1:#m TO bank2:#m;"
+                            ss = listItems1[i];
+                        }
+                        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(ss, EExtrackBankAndRest.GetDatabank);
+
+                        string bankName2 = null;
+                        if (localOptionToBank != null) bankName2 = localOptionToBank.name;
+                        string toBankName = Program.PerhapsOverrideWithDefaultBankName(bankName2, h.hasColon, h.bank);
+                        toBank = Program.databanks.GetDatabank(toBankName);
+                        if (toBank == null)
+                        {
+                            G.Writeln2("Databank " + toBankName + " is not open");
+                            throw new GekkoException();
+                        }
+                    }
+
+                    //listItems0[i] may be with or without wildcards ('*' or '?') or ranges ('..'), and with or without bank (bank:varname)
+                    //but lists are unfolded to names here.
+                    //We use the .aliasName here. Actually could use h.bank from above
+
+                    string bankName = null;
+                    if (localOptionFromBank != null) bankName = localOptionFromBank.name;
+
+                    bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
+
+                    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName, ignoreErrors);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
+
+                    if (tss.Count == 0 || (tss.Count == 1 && tss[0] == null))  //the first one is if a wildcard does not match at all, and the second is a normal timeseries name is not found, and COPY<error=no> is used.
+                    {
+                        string s = listItems0[i].Replace(Globals.firstCheatString, "");
+                        if (ignoreErrors)
+                        {
+                            errorCounter++;
+                            G.Writeln2("+++ NOTE: COPY: Could not find this timeseries: " + s + "");
+                            continue;
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: COPY: Could not find this timeseries: " + s + "");
+                            throw new GekkoException();
+                        }
+                    }
+
+                    foreach (Series ts in tss)
+                    {
+                        if (ts == null) continue;  //for safety, this should not be possible since there is a continue above.
+
+                        //If a wildcard like "COPY a*;" is used, tss may have > 1 elements
+                        string newName = null;
+                        if (listItems1 == null)
+                        {
+                            //Stuff like "COPY adbk:fx*;"  (copies to first)                            
+                            newName = ts.name;  //same name is used
+                        }
+                        else
+                        {
+                            if (isUsingPlaceholder)
+                            {
+                                //Stuff like "COPY #m TO simbk:a_*;"
+                                //here we use item #0 (there can only be 1 such item)
+                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[0], EExtrackBankAndRest.GetDatabank);
+                                newName = placeholderPrefix + ts.name + placeholderSuffix;
+                            }
+                            else
+                            {
+                                //Stuff like "COPY bank1:#m1 TO bank2:#m2;"
+                                //new names are provided with TO keyword (in a list with same number of items)                                
+                                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[i], EExtrackBankAndRest.GetDatabank);
+                                newName = h.name;
+                            }
+                        }
+
+                        // ----------------------------------------------------------------------------
+                        // Now follows the actual copying
+                        // ----------------------------------------------------------------------------
+
+                        if (true)
+                        {
+                            //TODO: do the actual copying as a block AFTER this is checked! (do some recording of what is to be copied, deleted, etc., and execute that at the end)
+                            //Testing that we are not copying timeseries to themselves
+                            Series ts2 = toBank.GetVariable(newName);
+                            if (ts2 != null)
+                            {
+                                if (G.Equal(ts.meta.parentDatabank.name, ts2.meta.parentDatabank.name))
+                                {
+                                    if (G.Equal(ts.name, ts2.name))
+                                    {
+                                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.name + "' to itself");
+                                        throw new GekkoException();
+                                    }
+                                }
+                            }
+                        }
+
+                        if (G.Equal(o.opt_respect, "yes"))
+                        {
+                            //Truncate time period
+                            Series ts2 = toBank.GetVariable(newName);
+                            if (ts2 != null)
+                            {
+                                //Type 1
+                                //inject into existing
+                                //this is the fastest way, in reality via arraycopy. But beware to check carefully if you
+                                //  change anything here.
+                                type1++;
+                                int index1, index2;
+                                double[] values_beware_do_not_alter = ts.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, o.t1, o.t2);
+                                ts2.SetDataSequence(o.t1, o.t2, values_beware_do_not_alter, index1);
+                                ts2.Stamp();  //will get a new date stamp, since it is not cloning here
+                            }
+                            else
+                            {
+                                //Type 2
+                                type2++;
+                                ts2 = ts.DeepClone() as Series;
+                                ts2.name = newName;
+                                ts2.Truncate(o.t1, o.t2);
+                                toBank.AddVariable(ts2);
+                            }
+                        }
+                        else
+                        {
+                            //No truncate of time period
+                            Series ts2 = ts.DeepClone() as Series;  //will inherit the date stamp                          
+                            if (listItems1 != null)
+                            {
+                                ts2.name = newName;
+                            }
+                            if (toBank.ContainsVariable(newName))
+                            {
+                                //Type 3
+                                //wipe out any existing Series completely, and put in the clone instead
+                                type3++;
+                                toBank.RemoveVariable(newName);
+                            }
+                            else
+                            {
+                                type4++;
+                                //Type 4
+                            }
+                            toBank.AddVariable(ts2);
+                        }
+                    }
+                }
+
+                //1. if RESPECT keyword and timeseries exists beforehand            -> inject data inside [t1, t2] in existing series
+                //2. if RESPECT keyword and timeseries does not exist beforehand    -> clone, truncate to [t1, t2], and add to databank
+                //3. if no RESPECT keyword and timeseries exists beforehand         -> delete existing timeseries, clone, and add the new one to databank
+                //4. if no RESPECT keyword and timeseries does not exist beforehand -> clone and add to databank                
+
+                G.Writeln();
+                if (type1 > 0)
+                {
+                    G.Writeln("Put data for " + o.t1 + "-" + o.t2 + " into " + type1 + " existing timeseries");
+                }
+                if (type2 > 0)
+                {
+                    G.Writeln("Put data for " + o.t1 + "-" + o.t2 + " into " + type2 + " new timeseries");
+                }
+                if (type3 > 0)
+                {
+                    G.Writeln("Replaced data for all periods in " + type3 + " existing timeseries");
+                }
+                if (type4 > 0)
+                {
+                    G.Writeln("Put data for all periods into " + type4 + " new timeseries");
+                }
+                if (errorCounter > 0)
+                {
+                    G.Writeln("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
+                }
+            }
+        }
+
+        private static List<string> MatchInBank(string wildcardName, string wildcardFreq, string db_bank)
+        {
+            //For each matching databank
+            List<string> varsMatched = new List<string>();
+            List<string> temp = new List<string>();
+            Databank db = Program.databanks.GetDatabank(db_bank, true);
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                temp.Add(kvp.Key);
+            }
+            string name3a = wildcardName;
+            if (wildcardFreq == null)
+            {
+                if (!G.Chop_HasSigil(wildcardName)) name3a += Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            }
+            else
+            {
+                name3a += Globals.freqIndicator + wildcardFreq;
+            }
+            List<string> matched = Match(name3a, temp);
+            foreach (string match in matched)
+            {
+                varsMatched.Add(db_bank + Globals.symbolBankColon + match);
+            }
+            return varsMatched;
+        }
+
+        public static List<string> Match(string wild1, List<string> names)
+        {
+            //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
+            //Note: no sorting
+            List<string> inputs = new List<string>();
+            Wildcard wc = new Wildcard(wild1, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            foreach (string n2 in names)
+            {
+                if (wc.IsMatch(n2)) inputs.Add(n2);
+            }
+            return inputs;
         }
 
         public static void Checkoff(List<string> vars2, string type)
