@@ -4563,8 +4563,8 @@ namespace Gekko.Parser.Gek
                             //similar to ASTCOPY
                             node.Code.A("O.Rename o" + Num(node) + " = new O.Rename();" + G.NL);
 
-                            node.Code.A("o" + Num(node) + ".names1 = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".names2 = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
 
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
                             //node.Code.A(node[0].Code);  //list1

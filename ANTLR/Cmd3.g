@@ -56,6 +56,9 @@ tokens {
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
+    ASTOPT_STRING_PRINT;
+	ASTOPT_STRING_TOBANK;
+	ASTOPT_STRING_FROMBANK;
 	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_SORT;
 	ASTOPT_STRING_ALL;
@@ -1020,6 +1023,9 @@ Y2                    = 'Y2'                       ;
     HPFILTER         = 'HPFILTER';
     HTML             = 'HTML';
     IF               = 'IF'              ;
+	ASBANK = 'ASBANK';
+	TOBANK = 'TOBANK';
+	FROMBANK = 'FROMBANK';
     IGNOREMISSING    = 'IGNOREMISSING'   ;
     IGNOREMISSINGVARS = 'IGNOREMISSINGVARS';
     IGNOREVARS       = 'IGNOREVARS'      ;
@@ -1583,6 +1589,11 @@ d.Add("Y" ,Y);
                                         d.Add("hpfilter"    , HPFILTER      );
                                         d.Add("html"    , HTML      );
                                         d.Add("if"      , IF      );
+
+										d.Add("asbank"      , ASBANK      );
+										d.Add("tobank"      , TOBANK      );
+										d.Add("frombank"      , FROMBANK      );
+
                                         d.Add("ignoremissing"           , IGNOREMISSING             );
                                         d.Add("IGNOREMISSINGVARS"           , IGNOREMISSINGVARS              );
                                         d.Add("ignorevars"              , IGNOREVARS             );
@@ -2365,19 +2376,18 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? seqOfBankvarnames (TO seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
+copy:                       COPY copyOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
 						  ;
 copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
 						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
-						  | FROM EQUAL name -> ^(ASTOPT_STRING_FROM name)
-						  | FROM EQUAL AT GLUE? -> ^(ASTOPT_STRING_FROM ASTAT)
-						  | TO EQUAL name -> ^(ASTOPT_STRING_TO name)
-						  | TO EQUAL AT GLUE? -> ^(ASTOPT_STRING_TO ASTAT)
+						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)						  
+						  | asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)
+						  | PRINT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRINT yesNo?)
 						  ;
-
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CREATE
@@ -2864,9 +2874,16 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //nam
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rename:                     RENAME renameOpt1? seqOfBankvarnames AS seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} seqOfBankvarnames seqOfBankvarnames renameOpt1?);
+rename:                     RENAME renameOpt1? seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} seqOfBankvarnames seqOfBankvarnames renameOpt1?);
 renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
-renameOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name);  //name can be without quotes
+renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
+						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)
+						  | PRINT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRINT yesNo?)
+							;
+
+asOrTo:						AS | TO;
+asOrToBank:					ASBANK | TOBANK;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // READ and IMPORT
@@ -3738,6 +3755,9 @@ ident2: 					Ident |
   HORIZON|
   HPFILTER|
   HTML|
+  ASBANK|
+  TOBANK|
+  FROMBANK|
   IGNOREMISSINGVARS|
   IGNOREMISSING|
   IGNOREVARS|
@@ -3999,6 +4019,9 @@ ident3: 					Ident |
 					        // --- tokens4 start ---		
 						
   
+  ASBANK|
+  TOBANK|
+  FROMBANK|
   ABS|
   ADDBANK|
   ADD|

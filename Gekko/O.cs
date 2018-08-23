@@ -6383,17 +6383,17 @@ namespace Gekko
 
         public class Copy
         {
-            public string opt_respect = null;
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
-            //public List<string> listItems = null;  //only temporary storage, use namesList1+2
-
+            public string opt_respect = null;
             public List names0 = null;
             public List names1 = null;
-
-            public string opt_from = null;
-            public string opt_to = null;
+            public string opt_bank = null;
+            public string opt_frombank = null;
+            public string opt_tobank = null;
             public string opt_error = null;
+            public string opt_print = null;
+
             public void Exe()
             {
                 Program.Copy(this);
@@ -6460,60 +6460,74 @@ namespace Gekko
         public class Rename
         {
             
+            public List names0 = null;
             public List names1 = null;
-            public List names2 = null;
 
             public string opt_bank = null;
+            public string opt_frombank = null;
+            public string opt_tobank = null;
+            public string opt_print = null;
+
             public void Exe()
             {
                 //actually also allows "rename" from one bank to another
 
-                if (opt_bank != null)
+                if (true)
                 {
-                    G.Writeln2("*** ERROR: <bank> not yet implemented");
-                    throw new GekkoException();
+
+                    Program.Rename(this);
+
                 }
-
-                List<string> listItems0 = Restrict(this.names1, true, true, true, false);
-                List<string> listItems1 = Restrict(this.names2, true, true, true, false);
-
-
-                if (listItems0.Count != listItems1.Count)
+                else
                 {
-                    G.Writeln2("*** ERROR: unequal number of items before and after AS");
-                    throw new GekkoException();
+
+                    //if (opt_bank != null)
+                    //{
+                    //    G.Writeln2("*** ERROR: <bank> not yet implemented");
+                    //    throw new GekkoException();
+                    //}
+
+                    //List<string> listItems0 = Restrict(this.names0, true, true, true, false);
+                    //List<string> listItems1 = Restrict(this.names1, true, true, true, false);
+
+
+                    //if (listItems0.Count != listItems1.Count)
+                    //{
+                    //    G.Writeln2("*** ERROR: unequal number of items before and after AS");
+                    //    throw new GekkoException();
+                    //}
+                    //for (int i = 0; i < listItems0.Count; i++)
+                    //{
+                    //    if (listItems0[i].Contains("*") || listItems0[i].Contains("?") || listItems1[i].Contains("*") || listItems1[i].Contains("?"))
+                    //    {
+                    //        G.Writeln2("*** ERROR: RENAME: Wildcards not allowed");
+                    //        throw new GekkoException();
+                    //    }
+                    //}
+
+                    ////we are now sure lists are of same length and have no wildcards.                                
+
+                    //int counter = 0;
+                    //for (int i = 0; i < listItems0.Count; i++)
+                    //{
+                    //    string s1 = listItems0[i];
+                    //    string s2 = listItems1[i];
+
+                    //    IVariable iv1 = O.GetIVariableFromString(s1, ECreatePossibilities.NoneReportError);
+                    //    IVariable iv2 = O.GetIVariableFromString(s2, ECreatePossibilities.NoneReturnNull);
+
+                    //    if (iv2 != null)
+                    //    {
+                    //        G.Writeln2("*** ERROR: Cannot rename " + s1 + " into " + s2 + " because the latter exists already");
+                    //        throw new GekkoException();
+                    //    }
+
+                    //    O.RemoveIVariableFromString(s1);
+                    //    O.AddIVariableWithOverwriteFromString(s2, iv1);
+                    //    counter++;
+                    //}
+                    //G.Writeln2("Renamed " + counter + " timeseries");
                 }
-                for (int i = 0; i < listItems0.Count; i++)
-                {
-                    if (listItems0[i].Contains("*") || listItems0[i].Contains("?") || listItems1[i].Contains("*") || listItems1[i].Contains("?"))
-                    {
-                        G.Writeln2("*** ERROR: RENAME: Wildcards not allowed");
-                        throw new GekkoException();
-                    }
-                }
-
-                //we are now sure lists are of same length and have no wildcards.                                
-
-                int counter = 0;
-                for (int i = 0; i < listItems0.Count; i++)
-                {
-                    string s1 = listItems0[i];
-                    string s2 = listItems1[i];
-
-                    IVariable iv1 = O.GetIVariableFromString(s1, ECreatePossibilities.NoneReportError);
-                    IVariable iv2 = O.GetIVariableFromString(s2, ECreatePossibilities.NoneReturnNull);
-
-                    if (iv2 != null)
-                    {
-                        G.Writeln2("*** ERROR: Cannot rename " + s1 + " into " + s2 + " because the latter exists already");
-                        throw new GekkoException();
-                    }
-
-                    O.RemoveIVariableFromString(s1);
-                    O.AddIVariableWithOverwriteFromString(s2, iv1);  
-                    counter++;
-                }
-                G.Writeln2("Renamed " + counter + " timeseries");
             }
         }
 
