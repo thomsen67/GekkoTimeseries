@@ -3587,16 +3587,23 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.AlternativeCode == null)
+                                if (child.Text == "ASTWILDCARDWITHBANK")
                                 {
-                                    G.Writeln2("*** ERROR #64537346");
-                                    throw new GekkoException();
+                                    name = child.Code.ToString();
                                 }
-                                name = child.AlternativeCode.ToString();
-                                if (name == null || name == "")
-                                {
-                                    G.Writeln2("*** ERROR #64537346");
-                                    throw new GekkoException();
+                                else
+                                {                                    
+                                    if (child.AlternativeCode == null)
+                                    {
+                                        G.Writeln2("*** ERROR #64537346");
+                                        throw new GekkoException();
+                                    }
+                                    name = child.AlternativeCode.ToString();
+                                    if (name == null || name == "")
+                                    {
+                                        G.Writeln2("*** ERROR #64537346");
+                                        throw new GekkoException();
+                                    }                                    
                                 }
                                 code += name + ", ";
                             }
@@ -5283,6 +5290,8 @@ namespace Gekko.Parser.Gek
                             }
                             //node.Code.CA("O.IndexerAlone(" + s + ")";
                             node.Code.CA(s);
+                            node.AlternativeCode = new GekkoSB();
+                            node.AlternativeCode.A(s);
                         }
                         break;
                     case "ASTWILDSTAR":

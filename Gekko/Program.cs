@@ -15423,7 +15423,7 @@ namespace Gekko
 
         public static void Rename(O.Rename o)
         {
-            List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank);
+            List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, true);
 
             if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
             {
@@ -15446,7 +15446,7 @@ namespace Gekko
         {
             if (true)
             {
-                List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank);
+                List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, false);
 
                 if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
                 {
@@ -15773,7 +15773,7 @@ namespace Gekko
             }
         }
 
-        private static List<TwoStrings> CopyRenameHelper(List names0, List names1, string frombank, string tobank)
+        private static List<TwoStrings> CopyRenameHelper(List names0, List names1, string frombank, string tobank, bool isRename)
         {
             //Used in both COPY ... TO ... and RENAME ... AS ...
             //All the following combinations are tested in unit tests
@@ -15813,6 +15813,16 @@ namespace Gekko
             //
             // =============================================
 
+            string command = "COPY";
+            string command2 = "copy";
+            string command3 = "copied";
+            if (isRename)
+            {
+                command = "RENAME";
+                command2 = "rename";
+                command2 = "renamed";
+            }
+            
             List<TwoStrings> outputs = new List<TwoStrings>();
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
@@ -15840,7 +15850,7 @@ namespace Gekko
 
                 if (index3 != null)
                 {
-                    G.Writeln2("*** ERROR: COPY with indexes before TO not yet implemented");
+                    G.Writeln2("*** ERROR: " + command + " with indexes before TO/AS not yet implemented");
                     throw new GekkoException();
                 }
 
@@ -15884,14 +15894,14 @@ namespace Gekko
                 if (lhsHasStarOrQuestion)
                 {
                     //Such assignment is too error-prone, like "COPY x* TO a, b, c;"
-                    G.Writeln2("*** ERROR: Using wildcards before TO, you must state a single wildcard element after TO");
+                    G.Writeln2("*** ERROR: Using wildcards before TO/AS, you must state a single wildcard element after TO/AS");
                     throw new GekkoException();
                 }
                 else
                 {
                     if (lhs.Count != rhs.Count)
                     {
-                        G.Writeln2("*** ERROR: Mismatch: there are " + lhs.Count + " elements before TO, and " + rhs.Count + " elements after TO");
+                        G.Writeln2("*** ERROR: Mismatch: there are " + lhs.Count + " elements before TO/AS, and " + rhs.Count + " elements after TO/AS");
                         throw new GekkoException();
                     }
                 }
@@ -15918,13 +15928,13 @@ namespace Gekko
 
                 if (name2split.Length - 1 > 1)
                 {
-                    G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO part of COPY");
+                    G.Writeln2("*** ERROR: More than one '*' not allowed in name in TO/AS part of " + command + "");
                     throw new GekkoException();
                 }
 
                 if ((bank2 != null && bank2.Contains("?")) || name2.Contains("?"))
                 {
-                    G.Writeln2("*** ERROR: '?' not not allowed in TO part of COPY");
+                    G.Writeln2("*** ERROR: '?' not not allowed in TO/AS part of " + command + "");
                     throw new GekkoException();
                 }
 
@@ -15954,7 +15964,7 @@ namespace Gekko
 
                     if (!G.IsSimpleToken(bank2))
                     {
-                        G.Writeln2("*** ERROR: Illegal bankname in TO part of COPY");
+                        G.Writeln2("*** ERROR: Illegal bankname in TO/AS part of " + command + "");
                         throw new GekkoException();
                     }
 
@@ -15978,7 +15988,7 @@ namespace Gekko
 
                     if (bank2 != "*")
                     {
-                        G.Writeln2("*** ERROR: Only simple '*' allowed in TO part of COPY");
+                        G.Writeln2("*** ERROR: Only simple '*' allowed in TO/AS part of " + command + "");
                         throw new GekkoException();
                     }
 
@@ -16007,9 +16017,14 @@ namespace Gekko
             G.Writeln();
             foreach (TwoStrings two in outputs)
             {
+                if (G.Equal(two.s1, two.s2)) //blanks are removed in two list, so indexes should compare fine, too.
+                {
+                    G.Writeln2("*** ERROR: You cannot " + command2 + " element '" + two.s1 + "' to itself");
+                    throw new GekkoException();
+                }
                 if (lhsCheck.ContainsKey(two.s1))
                 {
-                    G.Writeln2("*** ERROR: Dublet: element '" + two.s1 + "' appears several times before TO");
+                    G.Writeln2("*** ERROR: Dublet: element '" + two.s1 + "' appears several times before TO/AS");
                     throw new GekkoException();
                 }
                 else
@@ -16027,7 +16042,7 @@ namespace Gekko
                             temp.Add(two2.s1);
                         }
                     }
-                    G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all copied to " + two.s2);
+                    G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + two.s2);
                     throw new GekkoException();
                 }
                 else

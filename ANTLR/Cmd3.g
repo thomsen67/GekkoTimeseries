@@ -2031,7 +2031,7 @@ listItemWildRange         : wildcardWithBank ->                        wildcardW
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 
-wildcardWithBank          : name COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK name) ^(ASTWILDCARD wildcard))
+wildcardWithBank          : wildcard COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTWILDCARD wildcard) ^(ASTWILDCARD wildcard))
 						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
 						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
 						  ;
