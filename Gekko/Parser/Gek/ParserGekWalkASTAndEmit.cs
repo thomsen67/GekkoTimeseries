@@ -3279,7 +3279,7 @@ namespace Gekko.Parser.Gek
                             if (node.ChildrenCount() == 2)
                             {
                                 //wildcard   
-                                if (bankCs == null)
+                                if (bankCs == null || bankCs == "")
                                 {
                                     node.Code.CA(node[1].Code);
                                 }
@@ -3287,7 +3287,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.Code.CA("(" + bankCs + ").Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + ")");
                                 }
-                             
+
                             }
                             else
                             {
@@ -5290,8 +5290,8 @@ namespace Gekko.Parser.Gek
                             }
                             //node.Code.CA("O.IndexerAlone(" + s + ")";
                             node.Code.CA(s);
-                            node.AlternativeCode = new GekkoSB();
-                            node.AlternativeCode.A(s);
+                            //node.AlternativeCode = new GekkoSB();
+                            //node.AlternativeCode.A(s);
                         }
                         break;
                     case "ASTWILDSTAR":

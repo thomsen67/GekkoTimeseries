@@ -2031,24 +2031,25 @@ listItemWildRange         : wildcardWithBank ->                        wildcardW
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 
-wildcardWithBank          : wildcard COLON wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTWILDCARD wildcard) ^(ASTWILDCARD wildcard))
-						  | AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) ^(ASTWILDCARD wildcard))
-						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTBANK) ^(ASTWILDCARD wildcard))
+wildcardWithBank          : wildcard COLON wildcard -> ^(ASTWILDCARDWITHBANK wildcard wildcard)
+						  //| AT GLUE wildcard ->  ^(ASTWILDCARDWITHBANK ^(ASTBANK ASTAT) wildcard)
+						  | wildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) wildcard)
 						  ;
 
 rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
-						  | AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
+						  //| AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
 						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
 						  ;
 
 range                     : name doubleDot name -> name name;
 
-wildcard:                 //
-						   identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-						   |  identDigit wildSymbolEnd  //a?						  	
+wildcard:                   wildcard2 -> ^(ASTWILDCARD wildcard2);
+
+wildcard2:         		    identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | identDigit wildSymbolEnd  //a?						  	
 						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
 						  | wildSymbolFree //?
-						  ;
+						    ;
 
 wildSymbolFree            : star -> ASTWILDSTAR
 						  | question -> ASTWILDQUESTION
