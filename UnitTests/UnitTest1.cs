@@ -2375,6 +2375,7 @@ namespace UnitTests
         public void _Test_Copy()
         {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
+            //Here, objects are actually copied
 
             //  Work     Ref      b1       b10
             //-------------------------------------
@@ -2383,9 +2384,26 @@ namespace UnitTests
             //  #x1      #x1      #x3
             //  x2
 
-            TestCopyHelper();
-            I("COPY x1 to b10:x1;");
+            // Work:x1 = 11 from 2001-2003
 
+            TestCopyHelper();
+            I("COPY x1 to b10:x2;");
+            _AssertSeries(First(), "x1", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "x1", 2002, 11d, sharedDelta);
+            _AssertSeries(First(), "x1", 2003, 11d, sharedDelta);
+            _AssertSeries(First(), "x1", 2004, double.NaN, sharedDelta);            
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
+                       
+            I("COPY <2002 2003 respect> x1 to b10:x2;");
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, double.NaN, sharedDelta);            
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
 
         }
 
@@ -2404,6 +2422,7 @@ namespace UnitTests
             //  #x1      #x1      #x3
             //  x2
             //
+            
 
             // copy <from:b1 to:b10> x3, work:x2 to ref:y1, y2;   b1:x3 -> ref:y1, work:x2 -> b10:y2
             // copy <from:b1 to:b10> * to *;

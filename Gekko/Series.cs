@@ -1972,6 +1972,13 @@ namespace Gekko
                 tsCopy.data.anchorPeriod = this.data.anchorPeriod;
                 tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
 
+                tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
+                tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
+                tsCopy.meta.label = this.meta.label;
+                tsCopy.meta.source = this.meta.source;
+                tsCopy.meta.stamp = this.meta.stamp;
+                tsCopy.meta.units = this.meta.units;
+
                 if (truncate != null)
                 {
                     tsCopy.Truncate(truncate.t1, truncate.t2);  //somewhat slack, since truncation is AFTER a deep clone...

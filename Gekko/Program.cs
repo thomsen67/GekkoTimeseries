@@ -15478,7 +15478,11 @@ namespace Gekko
                 GekkoSmplSimple truncate = null;
                 if (G.Equal(o.opt_respect, "yes"))
                 {
-                    truncate = new GekkoSmplSimple(o.t1, o.t2);                    
+                    truncate = new GekkoSmplSimple(o.t1, o.t2);
+                }
+                else
+                {
+                    //COPY<2010 2020> is just ignored regarding time period, <respect> must be used.
                 }
 
                 foreach (TwoStrings output in outputs)
