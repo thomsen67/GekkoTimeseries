@@ -2374,9 +2374,28 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Copy()
         {
+            //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
 
+            //  Work     Ref      b1       b10
+            //-------------------------------------
+            //  x1       x1       x3       <empty>
+            //  %x1      %x1      %x3
+            //  #x1      #x1      #x3
+            //  x2
+
+            TestCopyHelper();
+            I("COPY x1 to b10:x1;");
+
+
+        }
+
+        [TestMethod]
+        public void _Test_CopyLogic()
+        {
             //This also implicitly tests a lot of RENAME functionality,
             //since COPY and RENAME share a lot of code.
+
+            TestCopyHelper();
 
             //  Work     Ref      b1       b10
             //-------------------------------------
@@ -2389,19 +2408,6 @@ namespace UnitTests
             // copy <from:b1 to:b10> x3, work:x2 to ref:y1, y2;   b1:x3 -> ref:y1, work:x2 -> b10:y2
             // copy <from:b1 to:b10> * to *;
 
-            I("reset; time 2001 2003;");            
-            I("x1 = 11;");
-            I("%x1 = 12;");
-            I("#x1 = (13,);");
-            I("clone;");  //copies to Ref
-            I("x2 = 21;");  //special for Work
-            I("open<edit>b1; clear b1;");
-            I("x3 = 31;");
-            I("%x3 = 32;");
-            I("#x3 = (33,);");
-            I("close b1; open b1; unlock b1;");
-            //hmmm seems the only way to create a fresh bank not in first position
-            I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
 
             //Testing copy with these cases before TO
             //
@@ -2424,16 +2430,30 @@ namespace UnitTests
             // 12: wildcard name (must single-star)        
 
             //---------------------------------------
-                        
+
             // =====================================================================
             // =========== No bank on LHS ==========================================
             // =====================================================================
-            
+
             //a-01-A-11
             try
-            {                
+            {
                 Globals.unitTestCopyHelper2 = true;
+                //trying {...}-names, only here
                 I("copy {'x1'} to {'y1'};");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                I("copy x1 to y1;");
             }
             finally
             {
@@ -2446,9 +2466,9 @@ namespace UnitTests
             //---------------------------------------
             //a-01-A-12
             try
-            {                
+            {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'a*b'};");
+                I("copy x1 to a*b;");
             }
             finally
             {
@@ -2457,13 +2477,13 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
-            
+
             //---------------------------------------
             //a-01-B-11
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'b:y1'};");
+                I("copy x1 to b:y1;");
             }
             finally
             {
@@ -2478,7 +2498,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'b:a*b'};");
+                I("copy x1 to b:a*b;");
             }
             finally
             {
@@ -2493,7 +2513,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'*:y1'};");
+                I("copy x1 to *:y1;");
             }
             finally
             {
@@ -2508,7 +2528,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x1'} to {'*:a*b'};");
+                I("copy x1 to *:a*b;");
             }
             finally
             {
@@ -2526,7 +2546,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'y1'};");
+                I("copy x2* to y1;");
             }
             finally
             {
@@ -2541,7 +2561,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'a*b'};");
+                I("copy x2* to a*b;");
             }
             finally
             {
@@ -2556,7 +2576,21 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'b:y1'};");
+                I("copy x2* to b:y1;");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                //Test that tobank can be overwritten
+                I("copy <tobank = x> x2* to b:y1;");
             }
             finally
             {
@@ -2571,7 +2605,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'b:a*b'};");
+                I("copy x2* to b:a*b;");
             }
             finally
             {
@@ -2586,7 +2620,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'*:y1'};");
+                I("copy x2* to *:y1;");
             }
             finally
             {
@@ -2601,7 +2635,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'x2*'} to {'*:a*b'};");
+                I("copy x2* to *:a*b;");
             }
             finally
             {
@@ -2611,14 +2645,6 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax2b!a");
 
-
-
-
-
-
-
-
-
             // =====================================================================
             // =========== Given bank on LHS =======================================
             // =====================================================================
@@ -2627,7 +2653,21 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'y1'};");
+                I("copy b1:x3 to y1;");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                //Test that frombank can be overwritten
+                I("copy <frombank = x> b1:x3 to y1;");
             }
             finally
             {
@@ -2642,7 +2682,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'a*b'};");
+                I("copy b1:x3 to a*b;");
             }
             finally
             {
@@ -2657,7 +2697,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'b:y1'};");
+                I("copy b1:x3 to b:y1;");
             }
             finally
             {
@@ -2667,12 +2707,41 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
 
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                //Test frombank/tobank
+                I("copy <frombank = b1 tobank = b> x3 to y1;");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+            try
+            {
+                Globals.unitTestCopyHelper2 = true;
+                //more test frombank/tobank
+                I("copy <frombank = x1 tobank = x2> b1:x3 to b:y1;");
+            }
+            finally
+            {
+                Globals.unitTestCopyHelper2 = false;
+            }
+            Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
+
+
             //---------------------------------------
             //b-01-B-12
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'b:a*b'};");
+                I("copy b1:x3 to b:a*b;");
             }
             finally
             {
@@ -2687,7 +2756,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'*:y1'};");
+                I("copy b1:x3 to *:y1;");
             }
             finally
             {
@@ -2702,7 +2771,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x3'} to {'*:a*b'};");
+                I("copy b1:x3 to *:a*b;");
             }
             finally
             {
@@ -2711,7 +2780,7 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:ax3b!a");
-            
+
             // ========================================================
             // ========================================================
 
@@ -2719,7 +2788,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'y1'};");
+                I("copy b1:x? to y1;");
             }
             finally
             {
@@ -2734,7 +2803,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'a*b'};");
+                I("copy b1:x? to a*b;");
             }
             finally
             {
@@ -2749,7 +2818,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'b:y1'};");
+                I("copy b1:x? to b:y1;");
             }
             finally
             {
@@ -2764,7 +2833,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'b:a*b'};");
+                I("copy b1:x? to b:a*b;");
             }
             finally
             {
@@ -2779,7 +2848,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'*:y1'};");
+                I("copy b1:x? to *:y1;");
             }
             finally
             {
@@ -2794,7 +2863,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b1:x?'} to {'*:a*b'};");
+                I("copy b1:x? to *:a*b;");
             }
             finally
             {
@@ -2814,7 +2883,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'y1'};");
+                I("copy *:x3 to y1;");
             }
             finally
             {
@@ -2829,7 +2898,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'a*b'};");
+                I("copy *:x3 to a*b;");
             }
             finally
             {
@@ -2844,7 +2913,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'b:y1'};");
+                I("copy *:x3 to b:y1;");
             }
             finally
             {
@@ -2859,7 +2928,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'b:a*b'};");
+                I("copy *:x3 to b:a*b;");
             }
             finally
             {
@@ -2874,7 +2943,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'*:y1'};");
+                I("copy *:x3 to *:y1;");
             }
             finally
             {
@@ -2889,7 +2958,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x3'} to {'*:a*b'};");
+                I("copy *:x3 to *:a*b;");
             }
             finally
             {
@@ -2906,7 +2975,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b*:x?'} to {'y1'};");
+                I("copy b*:x? to y1;");
             }
             finally
             {
@@ -2921,7 +2990,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b*:x?'} to {'a*b'};");
+                I("copy b*:x? to a*b;");
             }
             finally
             {
@@ -2936,7 +3005,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b*:x?'} to {'b:y1'};");
+                I("copy b*:x? to b:y1;");
             }
             finally
             {
@@ -2951,7 +3020,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b*:x?'} to {'b:a*b'};");
+                I("copy b*:x? to b:a*b;");
             }
             finally
             {
@@ -2966,7 +3035,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'b*:x?'} to {'*:y1'};");
+                I("copy b*:x? to *:y1;");
             }
             finally
             {
@@ -2981,7 +3050,7 @@ namespace UnitTests
             try
             {
                 Globals.unitTestCopyHelper2 = true;
-                I("copy {'*:x?'} to {'*:a*b'};");
+                I("copy *:x? to *:a*b;");
             }
             finally
             {
@@ -3000,6 +3069,22 @@ namespace UnitTests
 
         }
 
+        private static void TestCopyHelper()
+        {
+            I("reset; time 2001 2003;");
+            I("x1 = 11;");
+            I("%x1 = 12;");
+            I("#x1 = (13,);");
+            I("clone;");  //copies to Ref
+            I("x2 = 21;");  //special for Work
+            I("open<edit>b1; clear b1;");
+            I("x3 = 31;");
+            I("%x3 = 32;");
+            I("#x3 = (33,);");
+            I("close b1; open b1; unlock b1;");
+            //hmmm seems the only way to create a fresh bank not in first position
+            I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
+        }
 
 
         [TestMethod]

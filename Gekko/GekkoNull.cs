@@ -102,7 +102,7 @@ namespace Gekko
             return; //the "this" object stays untouched (that is, GekkoNull)
         }
 
-        public IVariable DeepClone()
+        public IVariable DeepClone(GekkoSmplSimple truncate)
         {
             throw new GekkoException();
         }

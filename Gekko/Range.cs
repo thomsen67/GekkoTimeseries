@@ -161,7 +161,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable DeepClone()
+        public IVariable DeepClone(GekkoSmplSimple truncate)
         {
             G.Writeln2("*** ERROR: Clone error");
             throw new GekkoException();

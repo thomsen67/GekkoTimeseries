@@ -103,8 +103,8 @@ namespace Gekko
         List<IVariable> ConvertToList();
 
         EVariableType Type();
-
-        IVariable DeepClone();
+        
+        IVariable DeepClone(GekkoSmplSimple truncate);
 
         void DeepTrim();
 

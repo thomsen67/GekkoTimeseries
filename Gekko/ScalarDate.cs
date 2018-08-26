@@ -180,7 +180,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable DeepClone()
+        public IVariable DeepClone(GekkoSmplSimple truncate)
         {
             return new ScalarDate(this.date);
         }

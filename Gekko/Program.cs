@@ -91,6 +91,17 @@ namespace Gekko
         public string Lag { get; set; }
     }
 
+    public class GekkoSmplSimple
+    {
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
+        public GekkoSmplSimple(GekkoTime t1, GekkoTime t2)
+        {
+            this.t1 = t1;
+            this.t2 = t2;
+        }
+    }
+
     public class GekkoSmpl2
     {
         public GekkoTime t0 = GekkoTime.tNull;
@@ -15464,6 +15475,18 @@ namespace Gekko
                     }
                 }
 
+                GekkoSmplSimple truncate = null;
+                if (G.Equal(o.opt_respect, "yes"))
+                {
+                    truncate = new GekkoSmplSimple(o.t1, o.t2);                    
+                }
+
+                foreach (TwoStrings output in outputs)
+                {
+                    IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv_clone = iv.DeepClone(truncate);
+                    O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
+                }
             }
 
             else
@@ -15713,7 +15736,7 @@ namespace Gekko
                             {
                                 //Type 2
                                 type2++;
-                                ts2 = ts.DeepClone() as Series;
+                                ts2 = ts.DeepClone(null) as Series;
                                 ts2.name = newName;
                                 ts2.Truncate(o.t1, o.t2);
                                 toBank.AddVariable(ts2);
@@ -15722,7 +15745,7 @@ namespace Gekko
                         else
                         {
                             //No truncate of time period
-                            Series ts2 = ts.DeepClone() as Series;  //will inherit the date stamp                          
+                            Series ts2 = ts.DeepClone(null) as Series;  //will inherit the date stamp                          
                             if (listItems1 != null)
                             {
                                 ts2.name = newName;
@@ -15915,14 +15938,15 @@ namespace Gekko
                 if (rhs.Count > 1) rhsElement = rhs[i];
                 else rhsElement = rhs[0];
 
+                //This is (re)chopping of a LHS variable that has already had bankname etc. added
                 string bank1, name1, freq1; string[] index1;
                 O.Chop(lhsElement, out bank1, out name1, out freq1, out index1);
-
-                if (bank1 == null && tobank != null) bank1 = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
-
+                
                 //TODO: some superfluous repetitive chopping here, if rhs has only 1 element
                 string bank2, name2, freq2; string[] index2;
                 O.Chop(rhsElement, out bank2, out name2, out freq2, out index2);
+
+                if (bank2 == null && tobank != null) bank2 = tobank;  //overwrites "naked" vars, so "COPY <tobank=b> a, b to c, d;" is same as "COPY a, b to b:c, b:d;"
 
                 string[] name2split = name2.Split('*');
 
@@ -21375,7 +21399,7 @@ namespace Gekko
                 Series tsOld = null;
                 if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
                 {
-                    tsOld = ts.DeepClone() as Series;  //make a copy for use in # or $ or <mp> operator
+                    tsOld = ts.DeepClone(null) as Series;  //make a copy for use in # or $ or <mp> operator
                 }
 
                 if (o.data.Length > expectedNumberOfObservations)
@@ -21964,7 +21988,7 @@ namespace Gekko
                         Series ts = kvp.Value as Series;
                         if (ts != null)
                         {
-                            Series tsClone = ts.DeepClone() as Series;
+                            Series tsClone = ts.DeepClone(null) as Series;
                             tsClone.Truncate(yr1, yr2);
                             databankWithFewerPeriods.Add(kvp.Key, tsClone);
                         }

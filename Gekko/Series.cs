@@ -368,6 +368,16 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
+            if (start.freq != end.freq)
+            {
+                G.Writeln2("*** ERROR: Truncate start and end have different frequencies");
+                throw new GekkoException();
+            }
+            if (this.freq != start.freq)
+            {
+                G.Writeln2("*** ERROR: Series is freq: " + G.GetFreqString(this.freq) + ", which is different from truncate freq: " + G.GetFreqString(start.freq));
+                throw new GekkoException();
+            }
             if (this.type == ESeriesType.Timeless) return;
             if (this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot truncate a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
             int indexStart = this.GetArrayIndex(start);
@@ -1941,7 +1951,7 @@ namespace Gekko
         /// Creates a clone of the Series, copying all fields. Used for copying databanks in RAM.
         /// </summary>
         /// <returns>The cloned Series object.</returns>
-        public IVariable DeepClone()
+        public IVariable DeepClone(GekkoSmplSimple truncate)
         {            
             //Always make sure new fields are remembered in the DeepClone() method
             Series tsCopy = new Series(this.freq, this.name);
@@ -1961,6 +1971,11 @@ namespace Gekko
                 }
                 tsCopy.data.anchorPeriod = this.data.anchorPeriod;
                 tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
+
+                if (truncate != null)
+                {
+                    tsCopy.Truncate(truncate.t1, truncate.t2);  //somewhat slack, since truncation is AFTER a deep clone...
+                }
             }
             
 
@@ -1971,7 +1986,7 @@ namespace Gekko
                 tsCopy.dimensionsStorage = new MapMultidim();                
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
-                    tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone());
+                    tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate));
                 }
             }
 

@@ -765,7 +765,7 @@ namespace Gekko
             }
         }
 
-        public IVariable DeepClone()
+        public IVariable DeepClone(GekkoSmplSimple truncate)
         {
             Matrix m = new Gekko.Matrix();
             if (this.colnames != null)

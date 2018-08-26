@@ -1582,7 +1582,7 @@ namespace Gekko
                 //don't use the string, just test it
             }
             return m;
-        }
+        }        
 
         //See also Restrict2()
         public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
@@ -1773,12 +1773,12 @@ namespace Gekko
                 if (varnameWithFreq[0] == Globals.symbolScalar)
                 {
                     //VAL, STRING, DATE                                                
-                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone(null));
                 }
                 else if (varnameWithFreq[0] == Globals.symbolCollection)
                 {
                     //LIST, DICT, MATRIX                                                
-                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone(null));
                 }
                 else
                 {
@@ -1811,7 +1811,7 @@ namespace Gekko
                     else
                     {
                         ib.RemoveIVariable(varnameWithFreq);
-                        ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
+                        ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone(null));
                     }
                 }
                 else if (varnameWithFreq[0] == Globals.symbolCollection)
@@ -1824,7 +1824,7 @@ namespace Gekko
                     }
                     //this is safe, but a little slow in some cases --> see above
                     ib.RemoveIVariable(varnameWithFreq);
-                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone());
+                    ib.AddIVariable(varnameWithFreq, rhsExpression.DeepClone(null));
                 }
                 else
                 {
@@ -1857,7 +1857,7 @@ namespace Gekko
                         {
                             //types are differnet (array and non-array), or both are array (not likely...). In these cases, we wipe out the existing timeseries
                             ib.RemoveIVariable(varnameWithFreq);
-                            Series tsTmp = (Series)rhsExpression.DeepClone();
+                            Series tsTmp = (Series)rhsExpression.DeepClone(null);
                             tsTmp.name = varnameWithFreq;
                             if (ib.GetType() == typeof(Databank))
                             {
@@ -2201,7 +2201,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = LIST
                             //---------------------------------------------------------                                                        
-                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
                             G.ServiceMessage("LIST " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
@@ -2210,7 +2210,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = MAP
                             //---------------------------------------------------------
-                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
                             G.ServiceMessage("MAP " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
@@ -2219,7 +2219,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = MATRIX
                             //---------------------------------------------------------
-                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone());
+                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
                             G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                         }
                         break;
@@ -2319,7 +2319,7 @@ namespace Gekko
                                             G.Writeln2("*** ERROR: You cannot put an array-series inside an array-series");
                                             throw new GekkoException();
                                         }
-                                        IVariable clone = rhs.DeepClone();
+                                        IVariable clone = rhs.DeepClone(null);
                                         ((Series)clone).name = varnameWithFreq;
                                         AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
                                         G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
@@ -5677,7 +5677,7 @@ namespace Gekko
                 Series oldSeries = O.ConvertToSeries(ivOld) as Series;
                 Series lhs = O.ConvertToSeries(ivLhs) as Series;
                                 
-                Series newSeriesTemp = oldSeries.DeepClone() as Series;  //brand new object, not present in Work (yet)                
+                Series newSeriesTemp = oldSeries.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??
                 if (G.Equal(opt_geometric, "yes")) type = ESmoothTypes.Geometric;
@@ -7073,7 +7073,7 @@ namespace Gekko
                     Series tsNew = null;
                     if (opt_prefix != null)
                     {
-                        tsNew = ts.DeepClone() as Series;
+                        tsNew = ts.DeepClone(null) as Series;
                         tsNew.name = opt_prefix + ts.name;
                         if (ts.meta.parentDatabank == null)
                         {
