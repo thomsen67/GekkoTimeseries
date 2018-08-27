@@ -2372,6 +2372,40 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Rename()
+        {
+            //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
+            //Here, objects are actually renamed
+
+            //NOTE: rename between banks works kind of like a MOVE-command.
+
+            //  Work     Ref      b1       b10
+            //-------------------------------------
+            //  x1       x1       x3       <empty>
+            //  %x1      %x1      %x3
+            //  #x1      #x1      #x3
+            //  x2
+
+            // Work:x1 = 11 from 2001-2003
+
+            TestCopyHelper();
+            I("RENAME x1 to b10:x2;");
+            Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("x1!a"));
+            Assert.IsTrue(Program.databanks.GetDatabank("b10").ContainsIVariable("x2!a"));
+                        
+            I("RENAME ref:#x1 as *:#x20;");
+            Assert.IsFalse(Program.databanks.GetRef().ContainsIVariable("#x1"));
+            Assert.IsTrue(Program.databanks.GetRef().ContainsIVariable("#x20"));
+
+            I("RENAME x2, %x1 as x2000, %x1000;");
+            Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("x2"));
+            Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("%x1"));
+            Assert.IsTrue(Program.databanks.GetFirst().ContainsIVariable("x2000!a"));
+            Assert.IsTrue(Program.databanks.GetFirst().ContainsIVariable("%x1000"));
+
+        }
+
+        [TestMethod]
         public void _Test_Copy()
         {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested

@@ -15451,6 +15451,13 @@ namespace Gekko
                     G.Writeln(two.s1 + " ---> " + two.s2);
                 }
             }
+
+            foreach (TwoStrings output in outputs)
+            {
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+                O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
+                O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
+            }
         }
 
         public static void Copy(O.Copy o)
