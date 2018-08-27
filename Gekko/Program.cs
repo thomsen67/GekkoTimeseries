@@ -15938,7 +15938,8 @@ namespace Gekko
             List<TwoStrings> outputs = new List<TwoStrings>();
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
-            List<string> rhs = O.Restrict(names1, false, true, true, true);
+            bool allowBankRhs = true; if (type == EWildcardSearchType.Write) allowBankRhs = false;
+            List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
             
             // --------------------------------------------
             //           LHS
