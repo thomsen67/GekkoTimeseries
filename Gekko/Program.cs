@@ -21626,21 +21626,13 @@ namespace Gekko
                         
             List<TwoStrings> outputs = CopyRenameHelper(o.list1, o.list2,o.opt_frombank, null, EWildcardSearchType.Write);
             
-            foreach (TwoStrings output in outputs)
-            {
-                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
-                O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
-                O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
-            }
-
-
-
-
-
-
-
-
-
+            //foreach (TwoStrings output in outputs)
+            //{
+            //    IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+            //    O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
+            //    O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
+            //}
+            
             //if (o.list != null) o.listItems = Program.UnfoldFlexibleListIntoListOfStrings(o.list);
 
             if (writeType == EWriteType.Tsdx)
