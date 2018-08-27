@@ -3046,8 +3046,8 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? seqOfBankvarnames FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames))
-						  | EXPORT writeOpt1? seqOfBankvarnames FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames))
+write:					    WRITE  writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
+						  | EXPORT writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
 						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
 						    ;
@@ -3057,6 +3057,7 @@ writeOpt1:                  ISNOTQUAL
 						    ;
 writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
+						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)	
 						  | GBK (EQUAL yesNo)? -> ^(ASTOPT_STRING_GBK yesNo?)
 						  | GDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_GDX yesNo?)
 						  | GDXOPT EQUAL expression -> ^(ASTOPT_STRING_GDXOPT expression)

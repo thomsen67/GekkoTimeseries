@@ -4820,7 +4820,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                             GetCodeFromAllChildren(node, node[1]);  //options
                             node.Code.A("o" + Num(node) + ".fileName = " + node[2].Code + ";" + G.NL);
-                            if(!node[3].Code.IsNull()) node.Code.A("o" + Num(node) + ".list = " + node[3].Code + ";" + G.NL);                            
+                            if(!node[3].Code.IsNull()) node.Code.A("o" + Num(node) + ".list1 = " + node[3].Code + ";" + G.NL);
+                            if (!node[4].Code.IsNull()) node.Code.A("o" + Num(node) + ".list2 = " + node[4].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

@@ -267,6 +267,14 @@ namespace Gekko
         Plot        
     }
 
+    public enum EWildcardSearchType
+    {
+        Copy,
+        Rename,
+        Write,
+        Search
+    }
+
     public enum GekkoSmplCommand
     {
         Unfold,
@@ -2356,13 +2364,14 @@ namespace Gekko
 
                     if (Program.options.solve_data_create_auto == true)
                     {
-                        if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
-                        {
-                            IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
-                            if (all2 == null) all2 = new List(new List<string>());
-                            List<string> all = O.GetStringList(O.GetList(all2));
-                            readInfo.createdVars = Program.CreateVariables(all, false);
-                        }
+                        //#i5432542345iou
+                        //if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
+                        //{
+                        //    IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
+                        //    if (all2 == null) all2 = new List(new List<string>());
+                        //    List<string> all = O.GetStringList(O.GetList(all2));
+                        //    readInfo.createdVars = Program.CreateVariables(all, false);
+                        //}
                     }
 
                     //Cleanup of local files
@@ -7374,123 +7383,123 @@ namespace Gekko
             return temp;
         }
 
-        public static List<Series> GetTimeSeriesFromStringWildcard(string s)
-        {
-            return GetTimeSeriesFromStringWildcard(s, null);
-        }
+        //public static List<Series> GetTimeSeriesFromStringWildcard(string s)
+        //{
+        //    return GetTimeSeriesFromStringWildcard(s, null);
+        //}
 
-        public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
-        {
-            return GetTimeSeriesFromStringWildcard(s, defaultBank, false);  //no ignore per default
-        }
+        //public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank)
+        //{
+        //    return GetTimeSeriesFromStringWildcard(s, defaultBank, false);  //no ignore per default
+        //}
 
         //Can be "adambk:fX*2"
         //May return 0 items if wildcard does not exist
         //May be used without wildcard: "adambk:fy", then it is similar to GetTimeSeriesFromString() -> will return empty list if variable does not exist.
-        public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank, bool ignoreNonExistingSeries)
-        {
-            List<Series> listTs = new List<Series>();
-            List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
-            //See #89052349875, maybe merge it
-            foreach (BankNameVersion bnv in list)
-            {
-                Databank db = null;
-                if (bnv.bank == null) db = Program.databanks.GetFirst();
-                else
-                {
-                    db = Program.databanks.GetDatabank(bnv.bank);
-                    if (db == null)
-                    {
-                        G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
-                        throw new GekkoException();
-                    }
-                }
-                Series ts = db.GetVariable(bnv.name);  //#getvar
-                if (ts == null && !ignoreNonExistingSeries)
-                {
-                    G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
-                    throw new GekkoException();
-                }
-                listTs.Add(ts);
-            }
-            return listTs;
-        }
+        //public static List<Series> GetTimeSeriesFromStringWildcard(string s, string defaultBank, bool ignoreNonExistingSeries)
+        //{
+        //    List<Series> listTs = new List<Series>();
+        //    List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
+        //    //See #89052349875, maybe merge it
+        //    foreach (BankNameVersion bnv in list)
+        //    {
+        //        Databank db = null;
+        //        if (bnv.bank == null) db = Program.databanks.GetFirst();
+        //        else
+        //        {
+        //            db = Program.databanks.GetDatabank(bnv.bank);
+        //            if (db == null)
+        //            {
+        //                G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //        Series ts = db.GetVariable(bnv.name);  //#getvar
+        //        if (ts == null && !ignoreNonExistingSeries)
+        //        {
+        //            G.Writeln2("*** ERROR: Could not find timeseries '" + bnv.name + "' in databank '" + bnv.bank + "'");
+        //            throw new GekkoException();
+        //        }
+        //        listTs.Add(ts);
+        //    }
+        //    return listTs;
+        //}
 
-        public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank)
-        {
-            return GetInfoFromStringWildcard(s, defaultBank, true);
-        }
+        //public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank)
+        //{
+        //    return GetInfoFromStringWildcard(s, defaultBank, true);
+        //}
 
-        public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank, bool decorateWithFirstDatabankName)
-        {
-            string dbName, varName, freq; char firstChar; string[] indexes; O.Chop(s, out dbName, out varName, out freq, out indexes); firstChar = varName[0];
+        //public static List<BankNameVersion> GetInfoFromStringWildcard(string s, string defaultBank, bool decorateWithFirstDatabankName)
+        //{
+        //    string dbName, varName, freq; char firstChar; string[] indexes; O.Chop(s, out dbName, out varName, out freq, out indexes); firstChar = varName[0];
 
-            if (dbName == null) dbName = defaultBank;
-            if (dbName == null && decorateWithFirstDatabankName) dbName = Program.databanks.GetFirst().name;            
+        //    if (dbName == null) dbName = defaultBank;
+        //    if (dbName == null && decorateWithFirstDatabankName) dbName = Program.databanks.GetFirst().name;            
 
-            List<BankNameVersion> list = new List<Gekko.BankNameVersion>();
+        //    List<BankNameVersion> list = new List<Gekko.BankNameVersion>();
 
-            if (varName.Contains("*") || varName.Contains("?"))
-            {
-                G.Writeln2("*** ERROR: Search is defunct in 3.0, will be fixed");
-                throw new GekkoException();
-                string bank = null;
-                Databank db = Program.databanks.GetDatabank(bank);
-                if (db == null)
-                {
-                    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
-                    throw new GekkoException();
-                }
-                //This could be sped up if we returned List<Series> from MatchWildcardInDatabank().
-                //We do too many lookups here, but never mind...
-                List<string> names = Program.MatchWildcardInDatabank(varName, db);
-                foreach (string s2 in names)
-                {
-                    BankNameVersion bnv = new BankNameVersion();
-                    bnv.bank = bank;
-                    bnv.name = s2;
-                    if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
-                    if (bnv.name != null && bnv.name != "") list.Add(bnv);
-                }
-            }
-            else if (varName.Contains(".."))
-            {
-                G.Writeln2("*** ERROR: Range is defunct in 3.0, will be fixed");
-                throw new GekkoException();
-                string bank = null;
-                string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
-                ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
-                IVariable xx = ss.Indexer(null, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
-                Databank db = Program.databanks.GetDatabank(bank);
-                if (db == null)
-                {
-                    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
-                    throw new GekkoException();
-                }
-                List<IVariable> names = xx.ConvertToList();
-                foreach (IVariable iv in names)
-                {
-                    string s2 = O.ConvertToString(iv);
-                    BankNameVersion bnv = new BankNameVersion();
-                    bnv.bank = bank;
-                    bnv.name = s2;
-                    if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
-                    if (bnv.name != null && bnv.name != "") list.Add(bnv);
-                }
-            }
-            else
-            {
-                BankNameVersion bnv = new BankNameVersion();
-                bnv.bank = dbName;
-                bnv.name = varName;
-                bnv.freq = freq;
-                if (bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
-                if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
-                if (bnv.name != null && bnv.name != "") list.Add(bnv);
-            }
+        //    if (varName.Contains("*") || varName.Contains("?"))
+        //    {
+        //        G.Writeln2("*** ERROR: Search is defunct in 3.0, will be fixed");
+        //        throw new GekkoException();
+        //        string bank = null;
+        //        Databank db = Program.databanks.GetDatabank(bank);
+        //        if (db == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+        //            throw new GekkoException();
+        //        }
+        //        //This could be sped up if we returned List<Series> from MatchWildcardInDatabank().
+        //        //We do too many lookups here, but never mind...
+        //        List<string> names = Program.MatchWildcardInDatabank(varName, db);
+        //        foreach (string s2 in names)
+        //        {
+        //            BankNameVersion bnv = new BankNameVersion();
+        //            bnv.bank = bank;
+        //            bnv.name = s2;
+        //            if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
+        //            if (bnv.name != null && bnv.name != "") list.Add(bnv);
+        //        }
+        //    }
+        //    else if (varName.Contains(".."))
+        //    {
+        //        G.Writeln2("*** ERROR: Range is defunct in 3.0, will be fixed");
+        //        throw new GekkoException();
+        //        string bank = null;
+        //        string[] ss2 = varName.Split(new string[] { ".." }, StringSplitOptions.None);
+        //        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);
+        //        IVariable xx = ss.Indexer(null, new Range(new ScalarString(bank + ":" + ss2[0]), new ScalarString(ss2[1])));
+        //        Databank db = Program.databanks.GetDatabank(bank);
+        //        if (db == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found");
+        //            throw new GekkoException();
+        //        }
+        //        List<IVariable> names = xx.ConvertToList();
+        //        foreach (IVariable iv in names)
+        //        {
+        //            string s2 = O.ConvertToString(iv);
+        //            BankNameVersion bnv = new BankNameVersion();
+        //            bnv.bank = bank;
+        //            bnv.name = s2;
+        //            if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
+        //            if (bnv.name != null && bnv.name != "") list.Add(bnv);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        BankNameVersion bnv = new BankNameVersion();
+        //        bnv.bank = dbName;
+        //        bnv.name = varName;
+        //        bnv.freq = freq;
+        //        if (bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
+        //        if (G.IsLetterOrUnderscore(firstChar) && bnv.freq == null) bnv.freq = G.GetFreq(Program.options.freq);
+        //        if (bnv.name != null && bnv.name != "") list.Add(bnv);
+        //    }
             
-            return list;
-        }
+        //    return list;
+        //}
 
         public static string PerhapsOverrideWithDefaultBankName(string defaultBank, bool hasColon, string bank)
         {
@@ -7705,22 +7714,22 @@ namespace Gekko
             return found;
         }
 
-        public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
-        {
-            List<IVariable> input = new List<IVariable>();
+        //public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
+        //{
+        //    List<IVariable> input = new List<IVariable>();
 
-            //input.AddRange(db.storage.Keys);
-            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
-            {
-                //Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
-                input.Add(new ScalarString(kvp.Key));
-            }
+        //    input.AddRange(db.storage.Keys);
+        //    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+        //    {
+        //        Series xx = kvp.Value as Series; if (xx != null && xx.type == ESeriesType.ArraySuper) continue;  //ignore ghosts
+        //        input.Add(new ScalarString(kvp.Key));
+        //    }
 
-            //string endsWith = null;
-            string endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
-            List<string> output = Program.MatchWildcard(wildcard, input, endsWith);
-            return output;
-        }
+        //    string endsWith = null;
+        //    string endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
+        //    List<string> output = Program.MatchWildcard(wildcard, input, endsWith);
+        //    return output;
+        //}
 
         public static void MaybePlaySound(P p)
         {
@@ -15434,7 +15443,7 @@ namespace Gekko
 
         public static void Rename(O.Rename o)
         {
-            List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, true);
+            List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename);
 
             if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
             {
@@ -15470,7 +15479,7 @@ namespace Gekko
                     o.names1.Add(new ScalarString("First:*"));
                 }
 
-                List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, false);
+                List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
 
                 bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
                 int nIgnores = 0;
@@ -15862,7 +15871,7 @@ namespace Gekko
             }
         }
 
-        private static List<TwoStrings> CopyRenameHelper(List names0, List names1, string frombank, string tobank, bool isRename)
+        public static List<TwoStrings> CopyRenameHelper(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
         {
             //Used in both COPY ... TO ... and RENAME ... AS ...
             //All the following combinations are tested in unit tests
@@ -15907,17 +15916,29 @@ namespace Gekko
             string command = "COPY";
             string command2 = "copy";
             string command3 = "copied";
-            if (isRename)
+            if (type == EWildcardSearchType.Rename)
             {
                 command = "RENAME";
                 command2 = "rename";
                 command2 = "renamed";
             }
-            
+            else if (type == EWildcardSearchType.Search)
+            {
+                command = "Search";
+                command2 = "search";
+                command2 = "searched";
+            }
+            else if (type == EWildcardSearchType.Write)
+            {
+                command = "WRITE";
+                command2 = "write";
+                command2 = "wrote";
+            }
+
             List<TwoStrings> outputs = new List<TwoStrings>();
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
-            List<string> rhs = O.Restrict(names1, true, true, true, true);
+            List<string> rhs = O.Restrict(names1, false, true, true, true);
             
             // --------------------------------------------
             //           LHS
@@ -15982,6 +16003,15 @@ namespace Gekko
                     if (freq3 == null) freq = G.GetFreq(Program.options.freq);
                     lhsUnfolded.Add(O.UnChop(bankTemp, name3, freq, index3));
                 }
+            }
+
+            if (type == EWildcardSearchType.Search)
+            {
+                foreach (string s in lhsUnfolded)
+                {
+                    outputs.Add(new TwoStrings(s, null));
+                }
+                return outputs;
             }
 
             if (rhs.Count > 1)
@@ -16115,8 +16145,9 @@ namespace Gekko
             G.Writeln();
             foreach (TwoStrings two in outputs)
             {
-                if (G.Equal(two.s1, two.s2)) //blanks are removed in two list, so indexes should compare fine, too.
+                if (type != EWildcardSearchType.Write && G.Equal(two.s1, two.s2)) //blanks are removed in two list, so indexes should compare fine, too.
                 {
+                    //Copying to "itself" (that is, the databank) is fine for WRITE
                     G.Writeln2("*** ERROR: You cannot " + command2 + " element '" + two.s1 + "' to itself");
                     throw new GekkoException();
                 }
@@ -16134,13 +16165,18 @@ namespace Gekko
                     List<string> temp = new List<string>();
                     foreach (TwoStrings two2 in outputs)
                     {
-
                         if (G.Equal(two2.s2, two.s2))
                         {
                             temp.Add(two2.s1);
                         }
                     }
-                    G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + two.s2);
+                    string ss = two.s2;
+                    if (type == EWildcardSearchType.Write)
+                    {
+                        //Remove bank, which is always "First:" anyway
+                        ss = G.Chop_BankRemove(ss);
+                    }
+                    G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
                     throw new GekkoException();
                 }
                 else
@@ -16163,6 +16199,15 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Internal error #08745765398475");
                         throw new GekkoException();
                     }
+                    if (type == EWildcardSearchType.Write)
+                    {
+                        if (!G.Equal(G.Chop_BankPart(two.s2), "First"))
+                        {
+                            G.Writeln2("*** ERROR: Internal error #08745765398475");
+                            throw new GekkoException();
+                        }
+                    }
+
                     //G.Writeln(two.s1 + " --> " + two.s2);
                     //counter++;
                     //if (counter > 20) break;
@@ -21574,9 +21619,28 @@ namespace Gekko
 
         public static int Write(O.Write o)
         {
-            EWriteType writeType = GetWriteType(o);
+            //TODO: introduce frombank
 
-            if (o.list != null) o.listItems = Program.UnfoldFlexibleListIntoListOfStrings(o.list);
+            EWriteType writeType = GetWriteType(o);
+                        
+            List<TwoStrings> outputs = CopyRenameHelper(o.list1, o.list2,o.opt_frombank, null, EWildcardSearchType.Write);
+            
+            foreach (TwoStrings output in outputs)
+            {
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+                O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
+                O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
+            }
+
+
+
+
+
+
+
+
+
+            //if (o.list != null) o.listItems = Program.UnfoldFlexibleListIntoListOfStrings(o.list);
 
             if (writeType == EWriteType.Tsdx)
             {
@@ -21599,7 +21663,7 @@ namespace Gekko
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
 
-            List<BankNameVersion> list = GetInfoFromListOfWildcards(o.listItems);
+            List<BankNameVersion> list = null; //#0938432095 GetInfoFromListOfWildcards(o.listItems);
 
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
@@ -21815,16 +21879,16 @@ namespace Gekko
             G.Writeln2("R export of " + o.listItems.Count() + " matrices, " + fullFileName);
         }
 
-        private static List<BankNameVersion> GetInfoFromListOfWildcards(List<string> list)
-        {
-            if (list == null) return null;
-            List<BankNameVersion> list2 = new List<BankNameVersion>();
-            foreach (string s in list)
-            {
-                list2.AddRange(Program.GetInfoFromStringWildcard(s, null)); //could use .from or .bank here!!!!
-            }
-            return list2;
-        }
+        //private static List<BankNameVersion> GetInfoFromListOfWildcards(List<string> list)
+        //{
+        //    if (list == null) return null;
+        //    List<BankNameVersion> list2 = new List<BankNameVersion>();
+        //    foreach (string s in list)
+        //    {
+        //        list2.AddRange(Program.GetInfoFromStringWildcard(s, null)); //could use .from or .bank here!!!!
+        //    }
+        //    return list2;
+        //}
 
         private static void CheckSomethingToWrite(List<BankNameVersion> listFilteredForCurrentFreq)
         {
@@ -24954,69 +25018,69 @@ namespace Gekko
             }
         }
 
-        public static int CreateVariables(List<string> vars, bool usedInCreateCommand)
-        {
-            int counter = 0;
-            foreach (string s in vars)
-            {
-                string defaultBank = null;
-                List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
+        //public static int CreateVariables(List<string> vars, bool usedInCreateCommand)
+        //{
+        //    int counter = 0;
+        //    foreach (string s in vars)
+        //    {
+        //        string defaultBank = null;
+        //        List<BankNameVersion> list = GetInfoFromStringWildcard(s, defaultBank);
                 
-                foreach(BankNameVersion bnv in list)
-                {
-                    //See //#89052349875, maybe merge it
-                    Databank db = null;
-                    if (bnv.bank == null) db = Program.databanks.GetFirst();
-                    else
-                    {
-                        db = Program.databanks.GetDatabank(bnv.bank);
-                        if (db == null)
-                        {
-                            G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
-                            throw new GekkoException();
-                        }
-                    }
-                    Series ts = db.GetVariable(bnv.name); //#getvar
-                    if (ts == null)
-                    {
-                        //#642842749283
-                        ts = new Series(Program.options.freq, bnv.name);
-                        if (!Globals.globalPeriodStart.IsNull())
-                        {
-                            //WHY is this done. For efficiency afterwards??
-                            //TO get start/end date??
-                            foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
-                            {
-                                ts.SetData(gt, double.NaN);
-                            }
-                        }
+        //        foreach(BankNameVersion bnv in list)
+        //        {
+        //            //See //#89052349875, maybe merge it
+        //            Databank db = null;
+        //            if (bnv.bank == null) db = Program.databanks.GetFirst();
+        //            else
+        //            {
+        //                db = Program.databanks.GetDatabank(bnv.bank);
+        //                if (db == null)
+        //                {
+        //                    G.Writeln2("*** ERROR: Could not find databank '" + bnv.bank + "'");
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            Series ts = db.GetVariable(bnv.name); //#getvar
+        //            if (ts == null)
+        //            {
+        //                //#642842749283
+        //                ts = new Series(Program.options.freq, bnv.name);
+        //                if (!Globals.globalPeriodStart.IsNull())
+        //                {
+        //                    //WHY is this done. For efficiency afterwards??
+        //                    //TO get start/end date??
+        //                    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+        //                    {
+        //                        ts.SetData(gt, double.NaN);
+        //                    }
+        //                }
 
-                        //We know the timeseries does not already exist
-                        //database will throw a protecterror if it is non-editable
-                        db.AddVariable(ts);
+        //                //We know the timeseries does not already exist
+        //                //database will throw a protecterror if it is non-editable
+        //                db.AddVariable(ts);
 
-                        if (usedInCreateCommand == true)
-                        {
-                            //normally it shouldn't exist, but we check for safety
-                            if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.name)))
-                            {
-                                Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.name), "");
-                            }
-                        }
-                        counter++;
-                    }
-                    else
-                    {
-                        if (usedInCreateCommand && Program.options.databank_create_message)
-                        {
-                            G.Writeln2("+++ WARNING: CREATE: variable " + db.name + ":" + ts.name + " already exists");
-                        }
-                    }
-                }
-            }
+        //                if (usedInCreateCommand == true)
+        //                {
+        //                    //normally it shouldn't exist, but we check for safety
+        //                    if (!Globals.createdVariables.ContainsKey(AddFreqAtEndOfVariableName(ts.name)))
+        //                    {
+        //                        Globals.createdVariables.Add(AddFreqAtEndOfVariableName(ts.name), "");
+        //                    }
+        //                }
+        //                counter++;
+        //            }
+        //            else
+        //            {
+        //                if (usedInCreateCommand && Program.options.databank_create_message)
+        //                {
+        //                    G.Writeln2("+++ WARNING: CREATE: variable " + db.name + ":" + ts.name + " already exists");
+        //                }
+        //            }
+        //        }
+        //    }
                         
-            return counter;
-        }
+        //    return counter;
+        //}
 
         public static void Collapse(List lhs, List rhs, string method)
         {           

@@ -1261,14 +1261,23 @@ namespace Gekko
 
         public static List HandleWildcards(string varnameWithFreq, bool strings)
         {
-            List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, Program.databanks.GetFirst());
-            if (strings) return new List(output);
-            List<IVariable> output2 = new List<IVariable>();
-            foreach (string s in output)
+            List<TwoStrings> matches = Program.CopyRenameHelper(new List(new List<string>() { varnameWithFreq }), null, null, null, EWildcardSearchType.Search);
+            List rv = new List();
+            foreach (TwoStrings two in matches)
             {
-                output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.NoneReturnNull));
+                ScalarString ss = new ScalarString(two.s1);
+                rv.Add(ss);
             }
-            return new List(output2);
+            return rv;
+
+            //List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, Program.databanks.GetFirst());
+            //if (strings) return new List(output);
+            //List<IVariable> output2 = new List<IVariable>();
+            //foreach (string s in output)
+            //{
+            //    output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.NoneReturnNull));
+            //}
+            //return new List(output2);
         }
 
         public static IVariable RemoveIVariableFromString(string fullname)
@@ -6922,56 +6931,64 @@ namespace Gekko
             public string listFile = null;
             public void Exe()
             {
-                bool addbank = false; if (G.Equal(this.opt_addbank, "yes")) addbank = true;
-                List<string> names = new List<string>();
+                if (true)
+                {
 
-                if (G.Equal(this.opt_bank, "yes"))
-                {
-                    //For safety, remove in Gekko 2.4 or 2.6
-                    G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");
-                    throw new GekkoException();
-                }                
-
-                foreach (string s in this.listItems)
-                {
-                    List<BankNameVersion> xx = Program.GetInfoFromStringWildcard(s, this.opt_bank);
-                    foreach (BankNameVersion bnv in xx)
-                    {                        
-                        if (addbank)
-                        {
-                            names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);
-                        }
-                        else
-                        {
-                            names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
-                        }
-                    }
-                }
-
-                if (!G.Equal(this.opt_mute, "yes"))
-                {
-                    G.Writeln();
-                    if (names.Count > 0)
-                    {
-                        G.Writeln(G.GetListWithCommas(names));
-                    }
-                }
-
-                if (name != null)
-                {
-                    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                    G.Writeln2("Put " + names.Count + " matching items into list #" + name);
-                }
-                else if (listFile != null)
-                {
-                    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
                 }
                 else
                 {
-                    G.Writeln2("Found " + names.Count + " matching items");
-                }              
-                
+
+                    bool addbank = false; if (G.Equal(this.opt_addbank, "yes")) addbank = true;
+                    List<string> names = new List<string>();
+
+                    if (G.Equal(this.opt_bank, "yes"))
+                    {
+                        //For safety, remove in Gekko 2.4 or 2.6
+                        G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");
+                        throw new GekkoException();
+                    }
+
+                    foreach (string s in this.listItems)
+                    {
+                        List<BankNameVersion> xx = null; // Program.GetInfoFromStringWildcard(s, this.opt_bank);
+                        foreach (BankNameVersion bnv in xx)
+                        {
+                            if (addbank)
+                            {
+                                names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);
+                            }
+                            else
+                            {
+                                names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
+                            }
+                        }
+                    }
+
+                    if (!G.Equal(this.opt_mute, "yes"))
+                    {
+                        G.Writeln();
+                        if (names.Count > 0)
+                        {
+                            G.Writeln(G.GetListWithCommas(names));
+                        }
+                    }
+
+                    if (name != null)
+                    {
+                        Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                        G.Writeln2("Put " + names.Count + " matching items into list #" + name);
+                    }
+                    else if (listFile != null)
+                    {
+                        Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                        G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
+                    }
+                    else
+                    {
+                        G.Writeln2("Found " + names.Count + " matching items");
+                    }
+
+                }
             }
         }
 
@@ -8215,13 +8232,15 @@ namespace Gekko
             public GekkoTime t1 = GekkoTime.tNull; //default, if not explicitely set
             public GekkoTime t2 = GekkoTime.tNull; //default, if not explicitely set
             public string fileName = null;
-            public IVariable list = null;
+            public List list1 = null;
+            public List list2 = null;
             public List<string> listItems = null;
             
             public string opt_tsd = null;
             public string opt_tsdx = null;
             public string opt_gbk = null;
             public string opt_csv = null;
+            public string opt_frombank = null;
             public string opt_prn = null;
             public string opt_r = null;
             public string opt_tsp = null;
