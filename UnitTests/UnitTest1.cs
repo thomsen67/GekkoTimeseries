@@ -2398,12 +2398,32 @@ namespace UnitTests
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 11d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 11d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
-                       
-            I("COPY <2002 2003 respect> x1 to b10:x2;");
-            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, double.NaN, sharedDelta);            
-            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 11d, sharedDelta);
-            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 11d, sharedDelta);
+
+            I("SERIES<2000 2005> x4 = 12;");
+            I("COPY <2002 2003 respect> x4 to b10:x2;");
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 12d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 12d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
+
+            I("SERIES<2000 2005> x5 = 13;");            
+            I("TIME 2002 2002;");
+            I("COPY <respect> x5 to b10:x2;");
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, 11d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 13d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 12d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
+
+            I("LIST #m = ('x1',);");
+            I("COPY <2002 2003 respect> #m to #m2;");
+            //TODO: test that the copied series is truncated
+            //TODO: also test array-series.
+
+            FAIL("COPY x100 to x101;");
+            I("COPY <error = no> x100 to x101;");
+
 
         }
 
@@ -3076,10 +3096,10 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 4);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax1b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "Work:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "Work:ax2b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "First:ax2b!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[2].s1, "Ref:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[2].s2, "Ref:ax1b!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[3].s1, "b1:x3!a");

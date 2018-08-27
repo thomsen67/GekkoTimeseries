@@ -93,6 +93,12 @@ namespace Gekko
         {
             string databank_lower = databank.ToLower();
 
+            if (!G.IsSimpleToken(databank))
+            {
+                G.Writeln2("*** ERROR: Databank name '" + databank + "' is not a simple name");
+                throw new GekkoException();
+            }
+
             switch (databank_lower)
             {
                 case "@":                

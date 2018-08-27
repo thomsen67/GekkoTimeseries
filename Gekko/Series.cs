@@ -483,6 +483,7 @@ namespace Gekko
         /// <param name="t">The period.</param>
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
+        //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
             double rv = double.NaN;

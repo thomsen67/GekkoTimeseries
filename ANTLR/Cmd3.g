@@ -2031,10 +2031,10 @@ listItemWildRange         : wildcardWithBank ->                        wildcardW
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 
-nameOrWildcard:           wildcard | name	;
+varnameOrWildcard:           wildcard | varname	;
 
-wildcardWithBank          : nameOrWildcard COLON nameOrWildcard -> ^(ASTWILDCARDWITHBANK nameOrWildcard nameOrWildcard)						  
-						  | nameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) nameOrWildcard)
+wildcardWithBank:           varnameOrWildcard COLON varnameOrWildcard -> ^(ASTWILDCARDWITHBANK varnameOrWildcard varnameOrWildcard)						  
+						  | varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) varnameOrWildcard)
 						  ;
 
 rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)

@@ -2680,6 +2680,12 @@ namespace Gekko
             }
             //firstChar = varName[0];
 
+            //if (dbName != null && (dbName.StartsWith(Globals.symbolScalar.ToString()) || dbName.StartsWith(Globals.symbolCollection.ToString())))
+            //{
+            //    G.Writeln2("*** ERROR: Bankname '" + dbName + "' should not contain symbols '%' or '#'");
+            //    throw new GekkoException();
+            //}
+
             freq = null;
             O.ChopFreq(varName, ref freq, ref varName);
             //varName = DecorateWithTilde(varName, freq);
