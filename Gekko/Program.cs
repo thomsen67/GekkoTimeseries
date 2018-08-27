@@ -21624,7 +21624,7 @@ namespace Gekko
 
             EWriteType writeType = GetWriteType(o);
                         
-            List<TwoStrings> outputs = CopyRenameHelper(o.list1, o.list2,o.opt_frombank, null, EWildcardSearchType.Write);
+            List<TwoStrings> list = CopyRenameHelper(o.list1, o.list2,o.opt_frombank, null, EWildcardSearchType.Write);
             
             //foreach (TwoStrings output in outputs)
             //{
@@ -21656,7 +21656,7 @@ namespace Gekko
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
 
-            List<BankNameVersion> list = null; //#0938432095 GetInfoFromListOfWildcards(o.listItems);
+            //List<BankNameVersion> list = null; //#0938432095 GetInfoFromListOfWildcards(o.listItems);
 
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
@@ -21669,24 +21669,40 @@ namespace Gekko
             }
             else if (writeAllVariables)  //writing the whole first databank
             {
-                list = GetAllVariablesFromBank(Program.databanks.GetFirst());
+                //list = GetAllVariablesFromBank(Program.databanks.GetFirst());
+
+                //List<BankNameVersion> list = new List<BankNameVersion>();
+                list = new List<TwoStrings>();
+                foreach (string s in Program.databanks.GetFirst().storage.Keys)
+                {
+                    if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
+                    {
+                        continue;  //probably some artefact creeping in from PCIM?
+                    }
+                    list.Add(new TwoStrings("First:" + s, "First:" + s));
+                    //BankNameVersion bnv = new Gekko.BankNameVersion();
+                    //bnv.name = s;
+                    //list.Add(bnv);
+                }
+                //list.Sort(StringComparer.InvariantCulture);
+                //list = list.OrderBy(o => o.s1).ToList();                
             }
-            else
-            {
-                //decorate list items with freq type
-                if (Program.options.freq == EFreq.Quarterly)
-                {
-                    for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "q";
-                }
-                else if (Program.options.freq == EFreq.Monthly)
-                {
-                    for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "m";
-                }
-                else if (Program.options.freq == EFreq.Undated)
-                {
-                    for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "u";
-                }
-            }
+            //else
+            //{
+            //    //decorate list items with freq type
+            //    if (Program.options.freq == EFreq.Quarterly)
+            //    {
+            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "q";
+            //    }
+            //    else if (Program.options.freq == EFreq.Monthly)
+            //    {
+            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "m";
+            //    }
+            //    else if (Program.options.freq == EFreq.Undated)
+            //    {
+            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "u";
+            //    }
+            //}
 
             bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes");
 
@@ -21696,7 +21712,7 @@ namespace Gekko
             //TODO TODO TODO
             //TODO TODO TODO
 
-            List<BankNameVersion> listFilteredForCurrentFreq = null;
+            List<TwoStrings> listFilteredForCurrentFreq = null;
             if (isRecordsFormat)
             {
                 //can handle multiple frequencies
@@ -21705,7 +21721,16 @@ namespace Gekko
             else
             {
                 //2D format, only 1 frequency
-                listFilteredForCurrentFreq = FilterListForFrequency(list);
+                //listFilteredForCurrentFreq = FilterListForFrequency(list);
+
+                foreach (TwoStrings two in list)
+                {
+                    if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_FreqPart(two.s1)))
+                    {
+                        //good
+                        listFilteredForCurrentFreq.Add(two);
+                    }
+                }
             }
 
             if (tStart.IsNull() && tEnd.IsNull())
@@ -21883,7 +21908,7 @@ namespace Gekko
         //    return list2;
         //}
 
-        private static void CheckSomethingToWrite(List<BankNameVersion> listFilteredForCurrentFreq)
+        private static void CheckSomethingToWrite(List<TwoStrings> listFilteredForCurrentFreq)
         {
             if (listFilteredForCurrentFreq.Count == 0)
             {
@@ -22898,27 +22923,31 @@ namespace Gekko
             return counter;
         }
 
-        private static void GetDatabankPeriodFilteredForFreq(List<BankNameVersion> vars, ref GekkoTime per1, ref GekkoTime per2)
+        private static void GetDatabankPeriodFilteredForFreq(List<TwoStrings> vars, ref GekkoTime per1, ref GekkoTime per2)
         {
             //Databank first = Program.databanks.GetFirst();
             //vars: annual is fy, quarterly is fy%q, monthly is fy%m, undated is fy%u
             int start = -12345;
             int end = -12345;
-            foreach (BankNameVersion s in vars)
+            foreach (TwoStrings s in vars)
             {
-                if (G.StartsWithSigil(s.name)) continue;  //ignore % and #
-                Databank db = GetBankFromBankNameVersion(s.bank);
-                IVariable iv = null;
-                string name2 = s.name;
-                if (s.freq != null && !name2.Contains(Globals.freqIndicator.ToString()))
-                {
-                    name2 = name2 + Globals.freqIndicator + s.freq;
-                }
-                iv = db.GetIVariableWithAddedFreq(name2);
-                if (iv == null)
-                {
-                    G.Writeln2("*** ERROR: Could not find variable '" + name2 + "' in databank '" + s.bank + "'");
-                }
+                IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError);
+
+                //if (G.Chop_HasSigil(s.s1)) continue;
+                ////if (G.StartsWithSigil(s.name)) continue;  //ignore % and #
+                ////Databank db = GetBankFromBankNameVersion(s.bank);
+                //Databank db = Program.databanks.GetDatabank(G.Chop_BankPart(s.s1), true);
+                //IVariable iv = null;
+                //string name2 = s.name;
+                //if (s.freq != null && !name2.Contains(Globals.freqIndicator.ToString()))
+                //{
+                //    name2 = name2 + Globals.freqIndicator + s.freq;
+                //}
+                //iv = db.GetIVariableWithAddedFreq(name2);
+                //if (iv == null)
+                //{
+                //    G.Writeln2("*** ERROR: Could not find variable '" + name2 + "' in databank '" + s.bank + "'");
+                //}
                 if (iv.Type() != EVariableType.Series) continue;  //should never happen
                 Series ts = (Series)iv;
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
