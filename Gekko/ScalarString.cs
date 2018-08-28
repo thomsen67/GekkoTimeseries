@@ -332,7 +332,7 @@ namespace Gekko
                         {
                             s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
                         }
-                        rv = O.HandleWildcards(s, true);
+                        rv = O.HandleWildcards(s, null);
                     }
                     else
                     {

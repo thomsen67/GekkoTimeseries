@@ -947,8 +947,8 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);
-                            node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
-                            if (node[2] != null) node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
+                            if (node[2] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -2902,10 +2902,16 @@ namespace Gekko.Parser.Gek
                     case "ASTINDEX":  //the INDEX command
                         {                                               
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
-                            string nodeCode = "";
-                            if (node[1][0] != null) nodeCode = HandleListFile(node[1], nodeCode);
-                            node.Code.A(nodeCode);                            
-                            node.Code.A(node[0].Code);
+                            //string nodeCode = "";
+                            //if (node[1][0] != null) nodeCode = HandleListFile(node[1], nodeCode);
+                            //node.Code.A(nodeCode);
+
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[0].Code + ";" + G.NL);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);
+
+                            //node.Code.A(node[0].Code);
+
+
                             if (node[2] != null) node.Code.A(node[2].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }

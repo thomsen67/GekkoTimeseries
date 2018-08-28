@@ -7323,27 +7323,29 @@ namespace Gekko
             Program.options.Write(path);
         }
 
-        public static List<string> CreateNewList(List<string> listItems2, string name2)
-        {
-            List<string> newList = null;
+        //public static List<string> CreateNewList(List<string> listItems2, string name2)
+        //{
+        //    List<string> newList = null;
 
-            IVariable temp2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + name2, out temp2);
+            
 
-            if (temp2 == null)
-            {
-                Program.scalars.Add(Globals.symbolCollection + name2, new List(listItems2));
-                newList = listItems2;
-            }
-            else
-            {
-                //keeps the same list object.
-                List<string> temp = O.GetStringList(temp2);
-                temp.Clear();
-                temp.AddRange(listItems2);
-                newList = temp;
-            }
-            return newList;  //this is used if the list inside needs to be tampered with afterwards
-        }
+        //    IVariable temp2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + name2, out temp2);
+
+        //    if (temp2 == null)
+        //    {
+        //        Program.scalars.Add(Globals.symbolCollection + name2, new List(listItems2));
+        //        newList = listItems2;
+        //    }
+        //    else
+        //    {
+        //        //keeps the same list object.
+        //        List<string> temp = O.GetStringList(temp2);
+        //        temp.Clear();
+        //        temp.AddRange(listItems2);
+        //        newList = temp;
+        //    }
+        //    return newList;  //this is used if the list inside needs to be tampered with afterwards
+        //}
 
 
 
@@ -12437,7 +12439,9 @@ namespace Gekko
 
             if (name != null && listFile == null)
             {
-                newList = Program.CreateNewList(listItems, name);
+                //newList = Program.CreateNewList(listItems, name);
+                List xxx = new List(listItems);
+                O.AddIVariableWithOverwriteFromString(name, xxx);
             }
             else if (name == null && listFile != null)
             {
@@ -15480,13 +15484,13 @@ namespace Gekko
         {
             if (true)
             {
-                if (o.names1 == null)
+                if (o.names2 == null)
                 {
-                    o.names1 = new Gekko.List();
-                    o.names1.Add(new ScalarString("First:*"));
+                    o.names2 = new Gekko.List();
+                    o.names2.Add(new ScalarString("First:*"));
                 }
 
-                List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
+                List<TwoStrings> outputs = CopyRenameHelper(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
 
                 bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
                 int nIgnores = 0;
@@ -21986,65 +21990,65 @@ namespace Gekko
             G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.", Color.Red);
         }
         
-        private static List<BankNameVersion> GetAllVariablesFromBank(Databank work)
-        {
-            List<BankNameVersion> list = new List<BankNameVersion>();
-            foreach (string s in work.storage.Keys)
-            {
-                if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
-                {
-                    continue;  //probably some artefact creeping in from PCIM?
-                }
-                BankNameVersion bnv = new Gekko.BankNameVersion();
-                bnv.name = s;
-                list.Add(bnv);
-            }
-            //list.Sort(StringComparer.InvariantCulture);
-            list = list.OrderBy(o => o.name).ToList();
-            return list;
-        }
+        //private static List<BankNameVersion> GetAllVariablesFromBank(Databank work)
+        //{
+        //    List<BankNameVersion> list = new List<BankNameVersion>();
+        //    foreach (string s in work.storage.Keys)
+        //    {
+        //        if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
+        //        {
+        //            continue;  //probably some artefact creeping in from PCIM?
+        //        }
+        //        BankNameVersion bnv = new Gekko.BankNameVersion();
+        //        bnv.name = s;
+        //        list.Add(bnv);
+        //    }
+        //    //list.Sort(StringComparer.InvariantCulture);
+        //    list = list.OrderBy(o => o.name).ToList();
+        //    return list;
+        //}
 
-        private static List<BankNameVersion> FilterListForFrequency(List<BankNameVersion> list)
-        {
-            //Returns a list where !q, !m at the end of each item is removed
-            List<BankNameVersion> newList = new List<BankNameVersion>();
-            Dictionary<string, double> skipped = new Dictionary<string, double>();
-            skipped.Add("u", 0d);
-            skipped.Add("a", 0d);
-            skipped.Add("q", 0d);
-            skipped.Add("m", 0d);
-            foreach (BankNameVersion var in list)
-            {
-                if (G.StartsWithSigil(var.name)) continue;  //ignore these % and #
-                string freq = G.GetFreq(Program.options.freq);
-                string s2 = var.name;
-                //if (!s2.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a"; //because annual data does not have this indicator
-                string[] temp = s2.Split(new string[] { Globals.freqIndicator.ToString() }, StringSplitOptions.None);
-                if (temp.Length == 1) temp = new string[2] { temp[0], freq };
-                if (!G.Equal(freq, temp[1]))
-                {
-                    skipped[temp[1]]++;
-                    continue;
-                }
-                string s3 = temp[0];
-                BankNameVersion bnv = new BankNameVersion();
-                bnv.name = s3;
-                bnv.bank = var.bank;
-                newList.Add(bnv);
-            }
+        //private static List<BankNameVersion> FilterListForFrequency(List<BankNameVersion> list)
+        //{
+        //    //Returns a list where !q, !m at the end of each item is removed
+        //    List<BankNameVersion> newList = new List<BankNameVersion>();
+        //    Dictionary<string, double> skipped = new Dictionary<string, double>();
+        //    skipped.Add("u", 0d);
+        //    skipped.Add("a", 0d);
+        //    skipped.Add("q", 0d);
+        //    skipped.Add("m", 0d);
+        //    foreach (BankNameVersion var in list)
+        //    {
+        //        if (G.StartsWithSigil(var.name)) continue;  //ignore these % and #
+        //        string freq = G.GetFreq(Program.options.freq);
+        //        string s2 = var.name;
+        //        //if (!s2.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a"; //because annual data does not have this indicator
+        //        string[] temp = s2.Split(new string[] { Globals.freqIndicator.ToString() }, StringSplitOptions.None);
+        //        if (temp.Length == 1) temp = new string[2] { temp[0], freq };
+        //        if (!G.Equal(freq, temp[1]))
+        //        {
+        //            skipped[temp[1]]++;
+        //            continue;
+        //        }
+        //        string s3 = temp[0];
+        //        BankNameVersion bnv = new BankNameVersion();
+        //        bnv.name = s3;
+        //        bnv.bank = var.bank;
+        //        newList.Add(bnv);
+        //    }
 
-            bool skipped2 = false;
-            foreach (string s in skipped.Keys)
-            {
-                if (skipped[s] > 0d)
-                {
-                    skipped2 = true;
-                    G.Writeln("+++ WARNING: ignored " + skipped[s] + " variables with frequency '" + s + "'");
-                }
-            }
-            if (skipped2) G.Writeln("You may change frequency (OPTION freq) to write these variables");
-            return newList;
-        }
+        //    bool skipped2 = false;
+        //    foreach (string s in skipped.Keys)
+        //    {
+        //        if (skipped[s] > 0d)
+        //        {
+        //            skipped2 = true;
+        //            G.Writeln("+++ WARNING: ignored " + skipped[s] + " variables with frequency '" + s + "'");
+        //        }
+        //    }
+        //    if (skipped2) G.Writeln("You may change frequency (OPTION freq) to write these variables");
+        //    return newList;
+        //}
 
         public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<TwoStrings> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {

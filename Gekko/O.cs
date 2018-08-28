@@ -1152,7 +1152,7 @@ namespace Gekko
             if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
-                rv = HandleWildcards(varnameWithFreq, false);                
+                rv = HandleWildcards(varnameWithFreq, null);                
             }
             else
             {
@@ -1259,9 +1259,9 @@ namespace Gekko
             return rv;
         }
 
-        public static List HandleWildcards(string varnameWithFreq, bool strings)
+        public static List HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.CopyRenameHelper(new List(new List<string>() { varnameWithFreq }), null, null, null, EWildcardSearchType.Search);
+            List<TwoStrings> matches = Program.CopyRenameHelper(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
             List rv = new List();
             foreach (TwoStrings two in matches)
             {
@@ -1269,15 +1269,7 @@ namespace Gekko
                 rv.Add(ss);
             }
             return rv;
-
-            //List<string> output = Program.MatchWildcardInDatabank(varnameWithFreq, Program.databanks.GetFirst());
-            //if (strings) return new List(output);
-            //List<IVariable> output2 = new List<IVariable>();
-            //foreach (string s in output)
-            //{
-            //    output2.Add(O.GetIVariableFromString(s, ECreatePossibilities.NoneReturnNull));
-            //}
-            //return new List(output2);
+            
         }
 
         public static IVariable RemoveIVariableFromString(string fullname)
@@ -1303,7 +1295,10 @@ namespace Gekko
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
 
-            if (!bank.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            if (!bank.editable)
+            {
+                Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+            }
 
             if (G.Chop_HasSigil(nameWithFreq))
             {
@@ -6401,8 +6396,8 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             public string opt_respect = null;
-            public List names0 = null;
             public List names1 = null;
+            public List names2 = null;
             public string opt_bank = null;
             public string opt_frombank = null;
             public string opt_tobank = null;
@@ -6922,26 +6917,74 @@ namespace Gekko
         {
             public string name = null;
             public string opt_mute = null;
-            public string opt_addbank = null;
-            public string opt_bank = null;
+            //public string opt_addbank = null;
+            public string opt_frombank = null;
             //public string listFile = null; //make it work
             public string wildCard1 = null; //--> delete??
             public string wildCard2 = null;  //only active if range   //--> delete??
             public List<string> listItems = null;
+            public List names1 = null; //the wildcard(s)
+            public List names2 = null; //destination list
             public string listFile = null;
             public void Exe()
             {
                 if (true)
                 {
 
+                    List<TwoStrings> matches = Program.CopyRenameHelper(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
+                    //List rv = new List();
+                    List<string> names = new List<string>();
+                    foreach (TwoStrings two in matches)
+                    {
+                        //ScalarString ss = new ScalarString(two.s1);
+                        //rv.Add(ss);
+                        names.Add(two.s1);
+                    }
+                    //return rv;
+                    
+
+                    //List m = O.HandleWildcards(this.wildCard1, this.opt_frombank);
+                    //List<string> names = new List<string>(Program.GetListOfStringsFromListOfIvariables(m.list.ToArray()));
+
+                    if (!G.Equal(this.opt_mute, "yes"))
+                    {
+                        G.Writeln();
+                        if (names.Count > 0)
+                        {
+                            G.Writeln(G.GetListWithCommas(names));
+                        }
+                    }
+
+                    if (this.names2 != null)
+                    {
+                        //Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                        List<string> dest = O.Restrict(this.names2, true, true, false, false);
+                        if (dest.Count > 1)
+                        {
+                            G.Writeln2("*** ERROR: Expected 1 item as destination list");
+                            throw new GekkoException();
+                        }
+                        O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
+
+                        G.Writeln2("Put " + names.Count + " matching items into list " + dest[0]);
+                    }
+                    //else if (listFile != null)
+                    //{
+                    //    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                    //    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
+                    //}
+                    //else
+                    //{
+                    //    G.Writeln2("Found " + names.Count + " matching items");
+                    //}
                 }
                 else
                 {
 
-                    bool addbank = false; if (G.Equal(this.opt_addbank, "yes")) addbank = true;
+                    bool addbank = false; //if (G.Equal(this.opt_addbank, "yes")) addbank = true;
                     List<string> names = new List<string>();
 
-                    if (G.Equal(this.opt_bank, "yes"))
+                    if (G.Equal(this.opt_frombank, "yes"))
                     {
                         //For safety, remove in Gekko 2.4 or 2.6
                         G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");

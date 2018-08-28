@@ -2512,11 +2512,11 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 // INDEX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-index:                      INDEX indexOpt1? SERIES? listItemsWildRange bankvarname? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} listItemsWildRange ^(ASTPLACEHOLDER bankvarname?) indexOpt1?);
+index:                      INDEX indexOpt1? SERIES? seqOfBankvarnames seqOfBankvarnames? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} seqOfBankvarnames ^(ASTPLACEHOLDER seqOfBankvarnames?) indexOpt1?);
 indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
-						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
-						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes
+						//  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
+						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
