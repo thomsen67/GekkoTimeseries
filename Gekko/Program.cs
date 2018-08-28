@@ -5102,7 +5102,7 @@ namespace Gekko
         //    gdx.gdxDataWriteStr(Indx, Values);
         //}
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<TwoStrings> list, string writeOption, bool isCloseCommand)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -5249,29 +5249,34 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     //int counter = 0;
-                    foreach (BankNameVersion bnv in list)
+                    foreach (TwoStrings bnv in list)
                     {
-                        
-                        string name = bnv.name;
 
-                        if (!G.StartsWithSigil(bnv.name))
-                        {
-                            name = G.Chop_FreqAdd(name, Program.options.freq);
-                        }
-                        string nameWithoutFreq = G.Chop_FreqRemove(name);
+                        //string name = bnv.s1;
 
-                        Databank gdb = GetBankFromBankNameVersion(bnv.bank);
-                        IVariable iv = gdb.GetIVariable(name);
+                        ////if (!G.StartsWithSigil(bnv.name))
+                        ////{
+                        ////    name = G.Chop_FreqAdd(name, Program.options.freq);
+                        ////}
+                        //string nameWithoutFreq = G.Chop_FreqRemove(name);
 
-                        if (iv == null)
-                        {
-                            G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
-                        }
+                        //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
+                        //IVariable iv = gdb.GetIVariable(name);
+
+                        IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError);
+
+                        string name = bnv.s2;
+                        string nameWithoutFreq = G.Chop_NamePart(name);
+
+                        //if (iv == null)
+                        //{
+                        //    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
+                        //}
 
                         if (iv.Type() == EVariableType.Series)
                         {
 
-                            Series ts = iv as Series;
+                            Series ts = iv as Series;                            
 
                             string label = ""; if (ts.meta?.label != null) label = ts.meta.label;  //label = null will fail with weird error later on
 
@@ -5448,7 +5453,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<BankNameVersion> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<TwoStrings> list, string writeOption, bool isCloseCommand)
         {
             //TODO: try-catch if writing fails    
 
@@ -5482,23 +5487,25 @@ namespace Gekko
 
             GAMSDatabase db = ws.AddDatabase();
 
-            foreach (BankNameVersion bnv in list)
+            foreach (TwoStrings bnv in list)
             {
-                string name = bnv.name;
+                string name = bnv.s2;  // bnv.name;
                 
-                if (!G.StartsWithSigil(bnv.name))
-                {
-                    name = G.Chop_FreqAdd(name, Program.options.freq);
-                }
+                //if (!G.StartsWithSigil(bnv.name))
+                //{
+                //    name = G.Chop_FreqAdd(name, Program.options.freq);
+                //}
                 string nameWithoutFreq = G.Chop_FreqRemove(name);
 
-                Databank gdb = GetBankFromBankNameVersion(bnv.bank);
-                IVariable iv = gdb.GetIVariable(name);
+                //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
+                //IVariable iv = gdb.GetIVariable(name);
 
-                if (iv == null)
-                {
-                    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
-                }
+                IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError);
+
+                //if (iv == null)
+                //{
+                //    G.Writeln2("*** ERROR: Cannot find variable '" + name + "' in databank '" + bnv.bank + "'");
+                //}
                 Series ts = iv as Series;
                 if (ts == null) continue;  //only write timeseries at the moment
 
@@ -5534,7 +5541,7 @@ namespace Gekko
 
                 GAMSVariable gvar = db.AddVariable(nameWithoutFreq, VarType.Free, label, domains);
 
-                counterVariables = WriteGdxHelperSlow(t1, t2, usePrefix, counterVariables, gdb, ts, gvar);
+                counterVariables = WriteGdxHelperSlow(t1, t2, usePrefix, counterVariables, ts, gvar);
 
             }
 
@@ -5544,7 +5551,7 @@ namespace Gekko
             if (timelessCounter > 0) G.Writeln("+++ NOTE: " + timelessCounter + " timeless timeseries skipped");
         }
 
-        private static int WriteGdxHelperSlow(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Databank gdb, Series ts, GAMSVariable gvar)
+        private static int WriteGdxHelperSlow(GekkoTime t1, GekkoTime t2, bool usePrefix, int counterVariables, Series ts, GAMSVariable gvar)
         {
 
             if (ts.type == ESeriesType.ArraySuper)
@@ -5822,7 +5829,7 @@ namespace Gekko
         }
 
 
-        private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, bool isCaps, bool isTsdx)
+        private static void WriteTsdRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps, bool isTsdx)
         {
             int index1 = -12345;
             int index2 = -12345;
@@ -5978,7 +5985,7 @@ namespace Gekko
         }
 
 
-        private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, bool isCaps)
+        private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps)
         {
             int index1 = -12345;
             int index2 = -12345;
@@ -6003,7 +6010,7 @@ namespace Gekko
 
             int count2 = 0;
             string s = "";
-            string varName = ts.name;
+            string varName = G.Chop_NamePart(name); // ts.name;
             if (isCaps) varName = varName.ToUpper();
 
             if (ts.freq == EFreq.Annual)
@@ -21079,7 +21086,7 @@ namespace Gekko
             }
         }
 
-        public static void Updprt(List<BankNameVersion> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
+        public static void Updprt(List<TwoStrings> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
         {
             if (op == "#")
             {
@@ -21116,37 +21123,39 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter sw = G.GekkoStreamWriter(fs))
             {
-                string var;
+                //string var;
                 for (int j = 0; j < vars.Count; j++)
-                {                    
-                    var = vars[j].name;
+                {
+                    string var = G.Chop_NamePart(vars[j].s1);
 
-                    Databank db = GetBankFromBankNameVersion(vars[j].bank);
+                    string baseVar = G.Chop_BankSet(vars[j].s1, "Ref");
+
+                    //Databank db = GetBankFromBankNameVersion(vars[j].bank);
 
                     var = G.GetUpperLowerCase(var);
 
-                    if (!db.ContainsVariable(var))
-                    {
-                        G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.name + "' databank");
-                        throw new GekkoException();
-                    }
+                    //if (!db.ContainsVariable(var))
+                    //{
+                    //    G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.name + "' databank");
+                    //    throw new GekkoException();
+                    //}
 
-                    if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
-                    {
-                        if (!base2.ContainsVariable(var))
-                        {
-                            G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in reference databank -- necessary for operator '" + op + "'");
-                            throw new GekkoException();
-                        }
-                    }
-
-                    Series ts = db.GetVariable(var);
-
+                    IVariable ivBase = null;
                     Series tsBase = null;
+
                     if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
-                        tsBase = base2.GetVariable(var);
+                        ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);
                     }
+
+                    IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError);
+                    Series ts = iv as Series;
+
+                    //Series tsBase = null;
+                    //if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
+                    //{
+                    //    tsBase = base2.GetVariable(var);
+                    //}
 
                     string var2 = var;
                     //for instance fy%q for fy in quarter freq
@@ -21623,8 +21632,12 @@ namespace Gekko
             //TODO: introduce frombank
 
             EWriteType writeType = GetWriteType(o);
-                        
-            List<TwoStrings> list = CopyRenameHelper(o.list1, o.list2,o.opt_frombank, null, EWildcardSearchType.Write);
+
+            List<TwoStrings> list = null;
+            if (o.list1 != null)
+            {
+                list = CopyRenameHelper(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write);
+            }
             
             //foreach (TwoStrings output in outputs)
             //{
@@ -21917,7 +21930,7 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<BankNameVersion> newList)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<TwoStrings> newList)
         {
             G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
             //TODO: variables and time                
@@ -21932,18 +21945,22 @@ namespace Gekko
 
             for (int i = 0; i < newList.Count; i++)
             {
-                Databank db = GetBankFromBankNameVersion(newList[i].bank);
-                string var = (string)newList[i].name;
-                string varLabel = (string)newList[i].name;
+                // db = GetBankFromBankNameVersion(newList[i].bank);
+                //string var = (string)newList[i].name;
+                //string varLabel = (string)newList[i].name;                
+
+                //Series ts = db.GetIVariableWithAddedFreq(var) as Series;
+
+                IVariable iv = O.GetIVariableFromString(newList[i].s1, O.ECreatePossibilities.NoneReportError);
+                Series ts = iv as Series;
+                string varLabel = G.Chop_NamePart(newList[i].s2);
                 eo.excelRowLabels[i, 0] = varLabel;
 
-                Series ts = db.GetIVariableWithAddedFreq(var) as Series;
-                
                 //Series tsGrund = base2.GetVariable(var);
                 if (ts == null)
                 {
                     //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                    G.Writeln("+++ WARNING: variable '" + var + "' does not exist -- skipped");
+                    //G.Writeln("+++ WARNING: variable '" + newList[i] + "' is of wrong type, skipped");
                     continue;
                 }
                 counter++;
@@ -22029,7 +22046,7 @@ namespace Gekko
             return newList;
         }
 
-        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<TwoStrings> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             if (databank.storage.Count == 0)
             {
@@ -22114,18 +22131,21 @@ namespace Gekko
                     // here, databank variable is not used (this is actually only used for CLOSEing a bank)
                     //-----------------------
                     databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-                    foreach (BankNameVersion var in list)
+                    foreach (TwoStrings var in list)
                     {
-                        Databank db = GetBankFromBankNameVersion(var.bank);
-                        IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
+                        //Databank db = GetBankFromBankNameVersion(var.bank);
+                        //IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
-                        string varnameWithFreq = var.name;
-                        if (xx.Type() == EVariableType.Series)
-                        {
-                            //string freq = var.freq;
-                            //if (freq == null) freq = G.GetFreq(Program.options.freq);
-                            varnameWithFreq = var.name + Globals.freqIndicator + var.freq;
-                        }
+                        IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+
+                        //string varnameWithFreq = var.name;
+                        string varnameWithFreq = G.Chop_NameAndFreqPart(var.s2);
+                        //if (xx.Type() == EVariableType.Series)
+                        //{
+                        //    //string freq = var.freq;
+                        //    //if (freq == null) freq = G.GetFreq(Program.options.freq);
+                        //    varnameWithFreq = var.name + Globals.freqIndicator + var.freq;
+                        //}
 
                         if (databankWithFewerVariables.ContainsKey(varnameWithFreq))
                         {
@@ -22203,7 +22223,7 @@ namespace Gekko
             return count;
         }
 
-        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<BankNameVersion> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<TwoStrings> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {            
             if (databank.storage.Count == 0)
             {
@@ -22256,32 +22276,25 @@ namespace Gekko
             return count;
         }
 
-        private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<BankNameVersion> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
+        private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<TwoStrings> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
         {
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
-            {                
-                foreach (BankNameVersion var in list)
+            {
+                foreach (TwoStrings var in list)
                 {
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //IVariable iv = db.GetIVariable(var.name);
 
-                    IVariable iv = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
 
-                    if (iv == null)
+                    //IVariable iv = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
+
+                    Series ts = iv as Series;
                     {
-                        G.Writeln();
-                        G.Writeln("*** ERROR: Could not find variable '" + var.bank + Globals.symbolBankColon + var.name + "' while writing tsd records");
-                        throw new GekkoException();
-                    }
-                    else
-                    {
-                        Series ts = iv as Series;
-                        {
-                            if (ts == null) continue;  //skip                            
-                            count++;
-                            WriteTsdRecord(yr1, yr2, res, ts, isCaps, isTsdx);
-                        }
+                        if (ts == null) continue;  //skip                            
+                        count++;
+                        WriteTsdRecord(yr1, yr2, res, ts, G.Chop_NamePart(var.s2), isCaps, isTsdx);
                     }
                 }
                 res.Flush();
@@ -22817,7 +22830,7 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<BankNameVersion> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
+        private static int CsvPrnWrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
         {
             int prnWidth = 18;
             //Databank first = Program.databanks.GetFirst();
@@ -22848,15 +22861,17 @@ namespace Gekko
                 }
                 file.WriteLine();
 
-                foreach (BankNameVersion var in vars)
+                foreach (TwoStrings var in vars)
                 {
-                    string s3 = var.name;
-                    Databank db = GetBankFromBankNameVersion(var.bank);
-                    Series ts = db.GetVariable(s3);  //#getvar
+                    //string s3 = var.name;
+                    //Databank db = GetBankFromBankNameVersion(var.bank);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    //Series ts = db.GetVariable(s3);  //#getvar
+                    Series ts = iv as Series;
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        G.Writeln2("*** ERROR: Writing csv file: variable " + s3 + " in bank '" + db.name + "' with freq '" + Program.options.freq + "' does not exist");
+                        G.Writeln2("*** ERROR: Variable " + var.s1 + " of wrong type");
                         throw new GekkoException();
                     }
 
@@ -22864,8 +22879,9 @@ namespace Gekko
                     GekkoTime tsEnd = ts.GetPeriodLast();
 
                     counter++;
-                    if (format == EdataFormat.Csv) file.Write(s3);
-                    else file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
+                    string temp = G.Chop_NamePart(var.s2);
+                    if (format == EdataFormat.Csv) file.Write(temp);
+                    else file.Write(G.varFormat(temp, prnWidth));  //prn and gnuplot
                     foreach (GekkoTime t in new GekkoTimeIterator( per1, per2))
                     {
                         if (format == EdataFormat.Csv) file.Write(";");
@@ -22989,7 +23005,7 @@ namespace Gekko
             }
         }
 
-        private static int GnuplotWrite(List<BankNameVersion> vars, string filename, GekkoTime per1, GekkoTime per2)
+        private static int GnuplotWrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2)
         {
             int prnWidth = 18;
             //Databank first = Program.databanks.GetFirst();
@@ -23005,32 +23021,38 @@ namespace Gekko
                 //Writing to csv/prn file
 
                 file.Write("# " + G.Blanks(prnWidth));  //comment
-                foreach (BankNameVersion var in vars)
+                foreach (TwoStrings var in vars)
                 {
-                    string s3 = var.name;
-                    Databank db = GetBankFromBankNameVersion(var.bank);
-                    Series ts = db.GetVariable(s3); //#getvar
+                    //string s3 = var.name;
+                    //Databank db = GetBankFromBankNameVersion(var.bank);
+                    //Series ts = db.GetVariable(s3); //#getvar
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    Series ts= iv as Series;
                     if (ts == null)
                     {
-                        G.Writeln2("*** ERROR: Writing gnuplot file: variable " + s3 + " in '" + db.name + "' with freq '" + Program.options.freq + "' does not exist");
+                        G.Writeln2("*** ERROR: Variable '" + var.s1 + "' is of wrong type");
                         throw new GekkoException();
                     }
-                    file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
+                    file.Write(G.varFormat(G.Chop_NamePart(var.s2), prnWidth));  //prn and gnuplot
                 }
                 file.WriteLine();
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
                     file.Write(GetDateStringSuitableForGnuplot(t.ToString()) + " ");
-                    foreach (BankNameVersion var in vars)
+                    foreach (TwoStrings var in vars)
                     {
-                        string s3 = var.name;
-                        Databank db = GetBankFromBankNameVersion(var.bank);
-                        Series ts = db.GetVariable(s3);  //existence has been checked //#getvar
+                        //string s3 = var.name;
+                        //Databank db = GetBankFromBankNameVersion(var.bank);
+                        //Series ts = db.GetVariable(s3);  //existence has been checked //#getvar
+
+                        IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                        Series ts = iv as Series;
+
                         double data = ts.GetData(null, t);
                         if (G.isNumericalError(data))
                         {
-                            s3 = "NaN";
+                            file.Write("NaN");
                         }
                         else
                         {
@@ -23070,7 +23092,7 @@ namespace Gekko
             return s;
         }
 
-        private static int Tspwrite(List<BankNameVersion> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
+        private static int Tspwrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
@@ -23099,17 +23121,21 @@ namespace Gekko
                 file.WriteLine();
                 file.WriteLine("freq a;");
                 file.WriteLine();
-                foreach (BankNameVersion var in vars)
+                foreach (TwoStrings var in vars)
                 {
-                    Databank db = GetBankFromBankNameVersion(var.bank);                    
-                    Series ts = db.GetVariable(var.name);  //#getvar
+                    //Databank db = GetBankFromBankNameVersion(var.bank);                    
+                    //Series ts = db.GetVariable(var.name);  //#getvar
+
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    Series ts = iv as Series;
+
                     if (ts == null)
                     {
                         //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                        G.Writeln2("*** ERROR: Writing tsp file: variable " + var + " does not exist");
+                        G.Writeln2("*** ERROR: Writing tsp file: variable " + var.s1 + " does not exist");
                         throw new GekkoException();
                     }
-                    WriteTspRecord(per1, per2, file, ts, isCaps);
+                    WriteTspRecord(per1, per2, file, ts, var.s2, isCaps);
                     counter++;
                 }
                 file.Flush();

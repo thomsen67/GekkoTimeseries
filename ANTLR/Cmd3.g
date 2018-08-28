@@ -3048,8 +3048,8 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 						    //!!!2x2 identical lines ONLY because of token stuff
 write:					    WRITE  writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
 						  | EXPORT writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
-						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
-						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST))
+						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))
+						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))
 						    ;
 writeOpt1:                  ISNOTQUAL
 						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
