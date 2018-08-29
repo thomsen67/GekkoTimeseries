@@ -40,7 +40,9 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "d33"; 
+        public static string versionInternal = "d33";
+
+        public static bool autoSigils = true; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."
 
         public static bool version30 = true;
 

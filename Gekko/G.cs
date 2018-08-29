@@ -1447,6 +1447,8 @@ namespace Gekko
 
         public static string AddSigil(string varnameWithFreq, EVariableType type)
         {
+            if (Globals.autoSigils == false) return varnameWithFreq;
+
             //just adds a % or # if it is not there, depending on type
             //no other checks are performed, so the adding is quite simple. A more rigorous name check
             //is performed when variables are added to a databank or map.

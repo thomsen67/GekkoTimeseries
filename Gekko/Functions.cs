@@ -1061,6 +1061,18 @@ namespace Gekko
             return SumHelper(smpl, x, ESumDim.Rows, ESumType.Max);
         }
 
+        public static IVariable m(GekkoSmpl smpl)
+        {
+            //alias
+            return miss(smpl);
+        }
+
+        public static IVariable m(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            //alias
+            return miss(smpl, x1, x2);
+        }
+
         //missing value
         public static IVariable miss(GekkoSmpl smpl)
         {
