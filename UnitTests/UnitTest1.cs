@@ -1887,7 +1887,7 @@ namespace UnitTests
 
             I("reset;");
             I("time 2001 2003;");
-            I("function series f(series x, string s); return x[%s]; end;");
+            I("function series f(series x, string %s); return x[%s]; end;");
             I("#a = a1, a2;");
             I("%s = 'a';");
             I("%i2 = 3;");
@@ -1912,7 +1912,7 @@ namespace UnitTests
             I("series qc = series(1);");
             I("qc[a] = 1;");
             I("qc[b] = 2;");
-            I("list c = a, b;");
+            I("list #c = a, b;");
             Globals.lastPrtOrMulprtTable = null;
             I("TELL print_with_set(#c); ");
             table = Globals.lastPrtOrMulprtTable;
@@ -1929,7 +1929,7 @@ namespace UnitTests
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp\analysis\graphs");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
             I("%output_path = 'Analysis\\Graphs\\';");  //remember \\ is really \
-            I("FUNCTION string plotx(string x); %fp1 = %output_path + %x + '1' + '.svg'; %fp2 = %output_path + %x + '2' + '.svg'; PLOT <title=%x> {%x} file = %fp1; PLOT <title=%x> {%x} file = {%fp2}; RETURN ''; END;");
+            I("FUNCTION string plotx(string %x); %fp1 = %output_path + %x + '1' + '.svg'; %fp2 = %output_path + %x + '2' + '.svg'; PLOT <title=%x> {%x} file = %fp1; PLOT <title=%x> {%x} file = {%fp2}; RETURN ''; END;");
             I("qc = series(1);");
             I("qc[a] = 1;");
             I("qc[b] = 2;");
@@ -2063,7 +2063,7 @@ namespace UnitTests
         {
             I("reset;");
             I("%s1 = 'a';");
-            I("string s2 = 'x';");
+            I("string %s2 = 'x';");
 
             I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
             I("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
@@ -10086,11 +10086,11 @@ namespace UnitTests
         public void _Test__Random()
         {            
             I("RESET;");
-            I("MATRIX mean = [10 || 11];");
-            I("MATRIX covar = [10, 3 || 3, 2];");
-            I("MATRIX norm = rnorm(#mean, #covar);");
+            I("MATRIX #mean = [10 || 11];");
+            I("MATRIX #covar = [10, 3 || 3, 2];");
+            I("MATRIX #norm = rnorm(#mean, #covar);");
 
-            I("VAL norm = rnorm(1, 2);");
+            I("VAL %norm = rnorm(1, 2);");
 
             //hard to test random numbers.......               
         }
