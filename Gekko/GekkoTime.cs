@@ -106,10 +106,11 @@ namespace Gekko
 
         public static int Observations(GekkoTime t1, GekkoTime t2)
         {
-            //BEWARE: Can return a negative number!
+            //BEWARE: Can return 0 or a negative number!
+            //Also checks that freqs are the same
             if (t1.freq != t2.freq)
             {
-                G.Writeln2("*** ERROR: Freq mismatch");
+                G.Writeln2("*** ERROR: Frequency mismatch: " + G.GetFreqString(t1.freq) + " vs. " + G.GetFreqString(t2.freq));
                 throw new GekkoException();
             }
             EFreq efreq = t1.freq;

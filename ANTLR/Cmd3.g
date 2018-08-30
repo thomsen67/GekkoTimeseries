@@ -1620,6 +1620,7 @@ d.Add("Y" ,Y);
                                         d.Add("LINEAR",LINEAR);
                                         d.Add("lines"    , LINES   );
                                         d.Add("list"    , LIST      );
+										d.Add("map"    , MAP      );
                                         d.Add("listfile",LISTFILE);
                                         d.Add("log"  , LOG      );
 										d.Add("lock"  , LOCK_      );
@@ -3777,6 +3778,7 @@ ident2: 					Ident |
   ITERMIN|
   ITER|
   KEEP|
+  MAP|
   KEY|
   LABELS|
   LABEL|

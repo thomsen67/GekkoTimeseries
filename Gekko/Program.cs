@@ -20586,10 +20586,11 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: Using DATE with freq " + t2.freq.ToString() + " in a " + Program.options.freq.ToString() + " setting");
                 throw new GekkoException();
-            }
+            }            
+
             Globals.globalPeriodStart = t1;
             Globals.globalPeriodEnd = t2;
-            G.Writeln2("Global time set: " + G.FromDateToString(t1) + " to " + G.FromDateToString(t2));
+            G.Writeln2("Global time set: " + G.FromDateToString(t1) + " to " + G.FromDateToString(t2) + " (" + GekkoTime.Observations(t1, t2) + " periods)");
 
             //if (Globals.runningOnTTComputer)
             //{
@@ -20598,7 +20599,7 @@ namespace Gekko
             //    Try1(oo);
             //    Try2(oo);
             //}
-        }
+        }        
 
         private static void Try1(object[] oo)
         {

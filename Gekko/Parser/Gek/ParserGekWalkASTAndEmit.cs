@@ -2984,11 +2984,11 @@ namespace Gekko.Parser.Gek
 
                             if (node[1][0] != null)
                             {
-                                node.Code.A("o" + Num(node) + ".date1 = O.ConvertToDate(" + node[1][0].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A("o" + Num(node) + ".t1 = O.ConvertToDate(" + node[1][0].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             }
                             if (node[1][1] != null)
                             {
-                                node.Code.A("o" + Num(node) + ".date2 = O.ConvertToDate(" + node[1][1].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A("o" + Num(node) + ".t2 = O.ConvertToDate(" + node[1][1].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             }
                             if (node[2] != null) node.Code.A(node[2].Code);  //options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -3546,9 +3546,12 @@ namespace Gekko.Parser.Gek
 
                             string temp = node[1].Code.ToString();
 
+                            //#098743589437
                             //if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
-                            if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.TypeCheck_" + type.ToLower() + "(").A(temp).A(", -1)").End(); //-1 means assignment
-                            else node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                            //if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.TypeCheck_" + type.ToLower() + "(").A(temp).A(", -1)").End(); //-1 means assignment
+                            //else node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+
+                            node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
                             node.Code.A(node[0].Code).End();
 
@@ -5560,7 +5563,7 @@ namespace Gekko.Parser.Gek
             if (type == "ASTPLACEHOLDER") type = "var";
             string s = type.Substring(0, 1).ToUpper() + type.Substring(1).ToLower();
             if (s == "Ser") s = "Series";
-            if (s == "Series") s = "Var";  //This is done because we otherwise get errors if rhs if for instance a list.
+            //if (s == "Series") s = "Var";  //This is done because we otherwise get errors if rhs if for instance a list.
             return s;
         }
 

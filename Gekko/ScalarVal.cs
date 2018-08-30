@@ -69,7 +69,7 @@ namespace Gekko
                 }
                 else
                 {
-                    int year = G.findYear(intValue);  //error is the year is crazy
+                    int year = G.findYear(intValue);  //error if the year is crazy
                     gt = new GekkoTime(EFreq.Annual, year, 1);  //for a, q, m
                     //so date d = 2000 in freq=m will not turn this into 2000m1 or 2000m12
                 }

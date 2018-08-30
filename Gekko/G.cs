@@ -1960,6 +1960,16 @@ namespace Gekko
             return f;
         }
 
+        public static void CheckLegalPeriod(GekkoTime t1, GekkoTime t2)
+        {
+            int n = GekkoTime.Observations(t1, t2);
+            if (n < 1)
+            {
+                G.Writeln2("*** ERROR: Start date (" + t1.ToString() + ") should be same as or before end date (" + t2.ToString() + ")");
+                throw new GekkoException();
+            }
+        }
+
         public static string GetTypeString(IVariable input)
         {
             return input.Type().ToString().ToUpper();
