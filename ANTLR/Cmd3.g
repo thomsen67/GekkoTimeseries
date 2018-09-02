@@ -150,6 +150,7 @@ ASTCOMPARE2;
 	ASTOPT_VAL_REL;
 	ASTOPT_VAL_PCH;
 	ASTOPT_STRING_FILE;
+	ASTOPT_STRING_TYPE;
 	ASTOPT_STRING_ARRAY;
 	ASTXLINE;
 	ASTYLINE;
@@ -2003,6 +2004,7 @@ expressionOrNothing:        expression -> expression
 seqItem:                    listItemWildRange | bankvarnameIndexer;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
+seqOfBankvarnames2:         seqOfBankvarnames;  //alias
 
 seqOfBankvarnamesAtLeast2:  seqItem (COMMA2 seqItem)+ ->  ^(ASTBANKVARNAMELIST seqItem+);
 
@@ -2379,7 +2381,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
+copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
@@ -2390,6 +2392,7 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 						  | asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)
 						  | PRINT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRINT yesNo?)
+					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
 						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2409,7 +2412,7 @@ delete:					    DELETE seqOfBankvarnames -> ^({token("ASTDELETE", ASTDELETE, $DE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) seqOfBankvarnames) //varnameslist				
+						  | DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2513,11 +2516,12 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 // INDEX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-index:                      INDEX indexOpt1? SERIES? seqOfBankvarnames seqOfBankvarnames? -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} seqOfBankvarnames ^(ASTPLACEHOLDER seqOfBankvarnames?) indexOpt1?);
+index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
 indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
 						//  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
 						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
+					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2877,12 +2881,13 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //nam
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rename:                     RENAME renameOpt1? seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} seqOfBankvarnames seqOfBankvarnames renameOpt1?);
+rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames renameOpt1?);
 renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
 renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
 						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)
 						  | PRINT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRINT yesNo?)
+					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
 							;
 
 asOrTo:						AS | TO;

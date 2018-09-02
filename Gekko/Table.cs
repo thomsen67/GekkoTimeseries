@@ -297,6 +297,11 @@ namespace Gekko
 
         public void Set(Coord xy, string text, double number, CellType type, string format)
         {
+            //if (xy.Row == 2 && xy.Col == 2)
+            //{
+
+            //}
+
             if (writeOnce && _data.ContainsKey(xy))  //slows it down a tiny bit since Dictionary will be queried 2 times, but not much lost
             {
                 Cell c = _data[xy];

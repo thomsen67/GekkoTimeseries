@@ -65,7 +65,7 @@ namespace Gekko
 
         public class HandleEndoHelper2
         {
-            public GekkoTimes global = null;            
+            public GekkoTimes global = null;
             public List<HandleEndoHelper> helper = null;
         }
 
@@ -359,7 +359,7 @@ namespace Gekko
 
         public static void HandleEndoExo(GekkoTimes global, List<HandleEndoHelper> helper, bool type)
         {
-            
+
             if (type)
             {
                 Globals.endo = new HandleEndoHelper2();
@@ -409,12 +409,12 @@ namespace Gekko
                 global = Globals.endo.global;
                 helper = Globals.endo.helper;
             }
-            else 
+            else
             {
                 global = Globals.exo.global;
                 helper = Globals.exo.helper;
-            }                       
-            
+            }
+
 
             foreach (HandleEndoHelper h in helper)
             {
@@ -438,10 +438,10 @@ namespace Gekko
                         ss.Add(iv.ConvertToString());
                     }
                 }
-                                                
+
                 string varNameWithoutFreq = name + "_" + s;
                 string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
-                
+
                 GekkoTimes gts = global;
                 if (h.local != null) gts = h.local;
 
@@ -593,7 +593,7 @@ namespace Gekko
             {
                 ScalarVal step_val = null;
                 if (step == null) step_val = Globals.scalarVal1;
-                else step_val = step as ScalarVal;                
+                else step_val = step as ScalarVal;
                 ScalarDate x_date = x as ScalarDate;
                 x_date.date = x_date.date.Add(G.ConvertToInt(step_val.val));
             }
@@ -719,11 +719,11 @@ namespace Gekko
                 if (step_val.val > 0)
                 {
                     return x_date.date.SmallerThanOrEqual(max_date.date);
-                }    
+                }
                 else
-                {                    
+                {
                     return x_date.date.LargerThanOrEqual(max_date.date);
-                }            
+                }
             }
             else if (x.Type() == EVariableType.String)
             {
@@ -752,7 +752,7 @@ namespace Gekko
             return rv;
         }
 
-       
+
 
         public static bool ContinueIterating(double i, double max, double step) {
             if (step > 0)
@@ -1018,7 +1018,7 @@ namespace Gekko
             // =============================================================================================
             // =============================================================================================
             // =============================================================================================
-            
+
             //map != null:             the variable is found in the MAP, otherwise, the variable is found in a databank
             //rhsExpression != null:   it is an assignment of the left-hand side
 
@@ -1132,10 +1132,10 @@ namespace Gekko
 
         //Also see #8093275432098
         public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound)
-        {            
-            return varname;            
+        {
+            return varname;
         }
-        
+
 
         private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname)
         {
@@ -1146,13 +1146,13 @@ namespace Gekko
         {
             //varname is used for local/global stuff, faster than chopping up varnameWithFreq up now
             //Can either look up stuff in a Map, or in a databank
-                        
+
             IVariable rv = null;
 
             if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
-                rv = HandleWildcards(varnameWithFreq, null);                
+                rv = HandleWildcards(varnameWithFreq, null);
             }
             else
             {
@@ -1162,7 +1162,7 @@ namespace Gekko
                     if (dbName == null)
                     {
                         LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
-                        
+
                         //databank name not given, for instance "PRT x"
                         if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
                         {
@@ -1172,21 +1172,21 @@ namespace Gekko
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
                                 //Ref lookup
-                                Databank db = null;                                
-                                db = Program.databanks.GetRef();                                
+                                Databank db = null;
+                                db = Program.databanks.GetRef();
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
                             {
                                 //non-Ref lookup
-                                
-                                    rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
-                                    if (rv == null && errorIfNotFound)
-                                    {
-                                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
-                                        throw new GekkoException();
-                                    }
-                                                                
+
+                                rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
+                                if (rv == null && errorIfNotFound)
+                                {
+                                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
+                                    throw new GekkoException();
+                                }
+
                             }
                         }
                         else
@@ -1195,8 +1195,8 @@ namespace Gekko
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
                                 //Ref lookup
-                                Databank db = null;                                
-                                db = Program.databanks.GetRef();                                
+                                Databank db = null;
+                                db = Program.databanks.GetRef();
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                             }
                             else
@@ -1229,7 +1229,7 @@ namespace Gekko
                         {
                             //databank name is given explicitly, and we are not doing bankNumber stuff
                             Databank db = Program.databanks.GetDatabank(dbName, true); //we know that dbName is not null
-                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);                            
+                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                         }
                     }
                 }
@@ -1261,7 +1261,7 @@ namespace Gekko
 
         public static List HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.CopyRenameHelper(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
+            List<TwoStrings> matches = Program.WildcardHelper(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
             List rv = new List();
             foreach (TwoStrings two in matches)
             {
@@ -1269,7 +1269,7 @@ namespace Gekko
                 rv.Add(ss);
             }
             return rv;
-            
+
         }
 
         public static IVariable RemoveIVariableFromString(string fullname)
@@ -1335,7 +1335,7 @@ namespace Gekko
                     }
 
                     iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, iv);
-                    
+
                 }
                 else
                 {
@@ -1352,7 +1352,7 @@ namespace Gekko
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
             string dbName, varName, freq; string[] indexes;
-            O.Chop(fullname, out dbName, out varName, out freq, out indexes);            
+            O.Chop(fullname, out dbName, out varName, out freq, out indexes);
             IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
             return iv;
         }
@@ -1362,11 +1362,11 @@ namespace Gekko
             //type is only relevant for series, ignored for others
 
             string nameWithFreq = G.AddFreqToName(varName, freq);
-                        
+
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
-            
+
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
             if (G.Chop_HasSigil(nameWithFreq))
@@ -1407,7 +1407,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
                         throw new GekkoException();
                     }
-                                        
+
                     IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
 
                     if (iv2 == null)
@@ -1496,20 +1496,20 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
                 throw new GekkoException();
             }
-            
+
             return iv;
         }
 
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
-            
+
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
 
             if (!bank.editable) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
-            
+
             IVariable iv = bank.GetIVariable(nameWithFreq);
 
             if (iv == null)
@@ -1541,7 +1541,7 @@ namespace Gekko
                     //array-series
 
                     MapMultidimItem mmi = new MapMultidimItem(indexes);
-                    
+
                     //now we know that the series exists
 
                     Series iv_series = iv as Series;
@@ -1570,11 +1570,11 @@ namespace Gekko
                     //normal series, not array-series
                     bank.RemoveIVariable(nameWithFreq);
                 }
-            }    
+            }
             return iv;
         }
 
-        
+
 
         //See also Restrict()
         public static List Restrict2(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
@@ -1586,12 +1586,12 @@ namespace Gekko
                 //don't use the string, just test it
             }
             return m;
-        }        
+        }
 
         //See also Restrict2()
         public static List<string> Restrict(List m, bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes)
         {
-            if (m == null) return null;            
+            if (m == null) return null;
             List<string> rv = new List<string>();
             foreach (IVariable iv in m.list)
             {
@@ -1644,7 +1644,7 @@ namespace Gekko
             IVariable rv;
             IBank ib = null;
             if (map != null) ib = map;
-            else ib = Program.databanks.GetDatabank(dbName, true);            
+            else ib = Program.databanks.GetDatabank(dbName, true);
             rv = ib.GetIVariable(varnameWithFreq);
             if (rv == null)
             {
@@ -1677,7 +1677,7 @@ namespace Gekko
             }
         }
 
-        
+
 
         //how relates to ConvertToSeries()??
         public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
@@ -1727,7 +1727,7 @@ namespace Gekko
                     }
                     return new ScalarVal(mi_val.val);
                 }
-                else if(m.list.Count() == n)
+                else if (m.list.Count() == n)
                 {
                     Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                     int counter = -1;
@@ -1760,7 +1760,7 @@ namespace Gekko
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
 
             IVariable lhs = ib.GetIVariable(varnameWithFreq);
-                        
+
             if (varnameWithFreq[0] != Globals.symbolScalar && varnameWithFreq[0] != Globals.symbolCollection)
             {
                 //first, if it is a SERIES on lhs (no sigil), we try to convert the RHS directly (so x = ... will work, not necessary with SERIES x = ...)
@@ -1768,7 +1768,7 @@ namespace Gekko
             }
 
             LookupTypeCheck(rhsExpression, varnameWithFreq);
-            
+
             if (lhs == null)
             {
                 //LEFT-HAND SIDE DOES NOT EXIST
@@ -1793,7 +1793,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Cannot create timeseries '" + varnameWithFreq);
                         G.Writeln("    You may use CREATE " + varnameWithFreq + ", or use MODE data, or use a name starting with 'xx'", Color.Red);
                         throw new GekkoException();
-                    }                    
+                    }
                 }
             }
 
@@ -1895,7 +1895,7 @@ namespace Gekko
         public static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, EVariableType type)
         {
             //normal use
-            LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhs, null, type);        
+            LookupHelperLeftside(smpl, ib, varnameWithFreq, freq, rhs, null, type);
         }
 
         public static void LookupHelperLeftside(GekkoSmpl smpl, Series arraySubSeries, IVariable rhs, EVariableType type)
@@ -1955,7 +1955,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
                     throw new GekkoException();
-                }                
+                }
 
                 switch (rhs.Type())
                 {
@@ -1983,7 +1983,7 @@ namespace Gekko
                                             ReportTypeError(varnameWithFreq, rhs, type);
                                         }
                                     }
-                                    break;                                
+                                    break;
                                 default:
                                     {
                                         //---------------------------------------------------------
@@ -2009,7 +2009,7 @@ namespace Gekko
                                 G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                             }
                             else if (type == EVariableType.Date)
-                            {                                
+                            {
                                 //IVariable lhsNew = new ScalarDate(new GekkoTime(EFreq.Annual, G.ConvertToInt(((ScalarVal)rhs).val), 1));
                                 IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
@@ -2019,7 +2019,7 @@ namespace Gekko
                             {
                                 //STRING command will fail
                                 ReportTypeError(varnameWithFreq, rhs, type);
-                            }                            
+                            }
                         }
                         break;
                     case EVariableType.String:
@@ -2027,7 +2027,7 @@ namespace Gekko
                             //---------------------------------------------------------
                             // %x = STRING
                             //---------------------------------------------------------                            
-                            
+
                             if (type == EVariableType.String || type == EVariableType.Var)
                             {
                                 IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
@@ -2057,7 +2057,7 @@ namespace Gekko
                             else
                             {
                                 //STRING and VAL commands will fail
-                                ReportTypeError(varnameWithFreq, rhs, type);                                
+                                ReportTypeError(varnameWithFreq, rhs, type);
                             }
 
                         }
@@ -2267,9 +2267,9 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = STRING
                             //---------------------------------------------------------
-                            
+
                             ReportTypeError(varnameWithFreq, rhs, type);
-                            
+
                         }
                         break;
                     case EVariableType.Date:
@@ -2277,9 +2277,9 @@ namespace Gekko
                             //---------------------------------------------------------
                             // #x = DATE
                             //---------------------------------------------------------
-                            
+
                             ReportTypeError(varnameWithFreq, rhs, type);
-                            
+
                         }
                         break;
                     case EVariableType.List:
@@ -2358,8 +2358,8 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
                     throw new GekkoException();
-                }       
-                
+                }
+
                 //Now we know that it is either SERIES x = ...  or VAR x = ...  or x = ...         
 
                 Series lhs_series = null;
@@ -2379,7 +2379,7 @@ namespace Gekko
                             }
                             switch (rhs_series.type)
                             {
-                                
+
                                 case ESeriesType.Normal:
                                 case ESeriesType.Light:
                                     {
@@ -2611,17 +2611,17 @@ namespace Gekko
         }
 
         private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
-        {            
+        {
             bool create = false;
             if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
             {
                 //do nothing, use it
             }
             else
-            {                
+            {
                 //create it
                 create = true;
-                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq,true), varnameWithFreq);
+                lhs_series = new Series(ESeriesType.Normal, G.GetFreq(freq, true), varnameWithFreq);
             }
 
             return create;
@@ -2662,7 +2662,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-        }        
+        }
 
         public static void Print(GekkoSmpl smpl, IVariable x)
         {
@@ -2685,11 +2685,11 @@ namespace Gekko
                 double x2_val = ((ScalarVal)x2).val;
                 bool x2IsInteger = false;
                 int i2 = 0;
-                                
+
                 if (G.ConvertToInt(out i2, x2_val))
-                {                    
-                    x2IsInteger = true;                    
-                }                
+                {
+                    x2IsInteger = true;
+                }
 
                 if (x1IsInteger && x2IsInteger)
                 {
@@ -2709,7 +2709,7 @@ namespace Gekko
 
         }
 
-        
+
         public static void ChopIndexer(string s, out string name, out string rest)
         {
             name = s.Trim();
@@ -2726,7 +2726,7 @@ namespace Gekko
         {
             if (input2 == null) return;
             string input = input2.Trim();
-            
+
             string[] ss2 = input.Split(Globals.freqIndicator);
             if (ss2.Length > 2)
             {
@@ -2776,7 +2776,7 @@ namespace Gekko
             ChopIndexer(input2, out input, out rest);
 
             if (rest != null)
-            {                
+            {
                 if (!(rest.StartsWith("[") && rest.EndsWith("]")))
                 {
                     G.Writeln2("*** ERROR: Expected indexer to start with '[' and end with ']'");
@@ -2819,14 +2819,14 @@ namespace Gekko
             freq = null;
             O.ChopFreq(varName, ref freq, ref varName);
             //varName = DecorateWithTilde(varName, freq);
-        }        
+        }
 
         public static void HandleIndexerHelper(int depth, IVariable y, params IVariable[] x)
         {
             if (depth >= x.Length)
             {
                 //HandleIndexerHelper2()
-            }          
+            }
             List m = (List)x[depth];
             foreach (IVariable iv in m.list)
             {
@@ -2967,7 +2967,7 @@ namespace Gekko
 
             IVariable rv = x.Indexer(smpl, indexes);
             return rv;
-        }        
+        }
 
         //public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
         //{
@@ -2983,7 +2983,7 @@ namespace Gekko
             smpl.labelRecordedPieces.Add(new RecordedPieces(s, x));
             return x;
         }
-        
+
         public static List<List<LabelHelperIVariable>> AddLabelHelper2(GekkoSmpl smpl)
         {
             List<List<LabelHelperIVariable>> rv = null;
@@ -2997,8 +2997,8 @@ namespace Gekko
             //    //rv.Add(smpl.labelHelper);
             //}
             rv = new List<List<LabelHelperIVariable>>();
-            return rv;            
-        }        
+            return rv;
+        }
 
         public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
         {
@@ -3016,7 +3016,7 @@ namespace Gekko
             }
         }
 
-        
+
         //========================================
         //======================================== Z() variants start
         //========================================
@@ -3026,10 +3026,10 @@ namespace Gekko
             IVariable a = null;
             if (Program.scalars.TryGetValue(name, out a))
             {
-                
-                    //VAL y = %x; <-- %x is a VAL
-                    //expected to be of VAL or DATE type (dates can have periods added/subtracted)
-            }            
+
+                //VAL y = %x; <-- %x is a VAL
+                //expected to be of VAL or DATE type (dates can have periods added/subtracted)
+            }
             else
             {
                 G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
@@ -3037,9 +3037,9 @@ namespace Gekko
             }
             return a;
         }
-        
+
         public static IVariable ZListFile(string fileName)
-        {            
+        {
             fileName = Program.AddExtension(fileName, "." + "lst");
             List<string> folders = new List<string>();
             string fileNameTemp = Program.SearchForFile(fileName, folders);
@@ -3050,7 +3050,7 @@ namespace Gekko
             }
             string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
             List<string> input = G.ExtractLinesFromText(listFile);
-            
+
             List<string> rhs = new List<string>();
             List<string> result = new List<string>();
 
@@ -3075,7 +3075,7 @@ namespace Gekko
                 counter++;
                 string s = ss.Trim();  //will also remove any newline characters!
 
-                bool quotes = false;     
+                bool quotes = false;
                 string s2 = G.StripQuotes(s);
                 if (s2.Length != s.Length)
                 {
@@ -3098,7 +3098,7 @@ namespace Gekko
                     s = s.Substring(0, idx);
                     s = s.Trim();
                 }
-                
+
                 if (s == null || s == "")
                 {
                     if (fileName == null)
@@ -3210,7 +3210,7 @@ namespace Gekko
             if (Globals.useCache && a != null)
             {
                 //fast pointer is available (scalar with that name should always point to the same object).
-                x = a;                
+                x = a;
             }
             else
             {
@@ -3363,7 +3363,7 @@ namespace Gekko
                 }
             }
             else
-            {                
+            {
                 //we do not have a fast pointer to it: ask the dictionary
                 IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
                 if (x == null)
@@ -3384,8 +3384,8 @@ namespace Gekko
                         //does exist in the dictionary, but has wrong type
                         Program.scalars.Remove(originalName);
                         createNew = true;
-                    }            
-                }                
+                    }
+                }
             }
             if (createNew)
             {
@@ -3406,9 +3406,9 @@ namespace Gekko
         }
 
         //see also RemoveScalar()
-        public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed, bool stringify) 
+        public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed, bool stringify)
         {
-                       
+
             //stuff like ... + %x + ...
             if (Globals.useCache && a != null)
             {
@@ -3416,7 +3416,7 @@ namespace Gekko
                 return a;
             }
             else
-            {                
+            {
                 //we do not have a fast pointer to it
                 IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
                 if (x == null)
@@ -3442,7 +3442,7 @@ namespace Gekko
                 //if (didTransform) a = x; //fast pointer to that object              
                 //return x;
                 return x;
-            }            
+            }
         }
 
         //public static IVariable MaybeTransform(ref bool didTransform, IVariable x, bool transformationAllowed)
@@ -3495,7 +3495,7 @@ namespace Gekko
                 input[i] = bank + ":" + input[i];
             }
             return input;
-        }               
+        }
 
         public static int ForListMax(List<List<IVariable>> x)
         {
@@ -3515,7 +3515,7 @@ namespace Gekko
                         s = s.Substring(0, s.Length - 2);
                         G.Writeln2("*** ERROR: Parallel FOR loop with different number of items.");
                         G.Writeln("           Number of items: " + s + ".");
-                        throw new GekkoException();                        
+                        throw new GekkoException();
                     }
                 }
             }
@@ -3531,7 +3531,7 @@ namespace Gekko
                 Program.scalars.Remove(originalName);
             }
             //if (a != null) a = null;
-        }        
+        }
 
         public static List GetList(IVariable a)
         {
@@ -3547,7 +3547,7 @@ namespace Gekko
             }
             return (List)a;
         }
-        
+
         public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber)
         {
             return GetTimeSeriesFromCache(smpl, ref a, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
@@ -3583,7 +3583,7 @@ namespace Gekko
                     return ats;
                 }
             }
-        }        
+        }
 
         public static Series GetTimeSeriesFromList(GekkoSmpl smpl, IVariable list, IVariable index, int bankNumber)
         {
@@ -3597,7 +3597,7 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR #398754");
                 throw new GekkoException();
-            }            
+            }
         }
 
         //public static IVariable GetValFromStringIndexer(GekkoSmpl smpl, string name, IVariable index, int bank)
@@ -3624,7 +3624,7 @@ namespace Gekko
             //Series mts = new Series(smpl, ts);
             return ts;
         }
-        
+
 
         public static Series FindTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
         {
@@ -3793,7 +3793,7 @@ namespace Gekko
         //========================================
         //======================================== Z() variants end
         //========================================
-        
+
         //public static IVariable Z_OLD(string name)
         //{
         //    IVariable a = GetScalar(name);
@@ -3883,7 +3883,7 @@ namespace Gekko
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
-            IVariable rv = Globals.scalarVal0;            
+            IVariable rv = Globals.scalarVal0;
             if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
             {
                 //must return a VAL, not a SERIES
@@ -3938,7 +3938,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: You cannot logically compare two timeseries with freqs " + G.GetFreqString(((Series)x).freq) + " and " + G.GetFreqString(((Series)y).freq));
                     throw new GekkoException();
                 }
-            }            
+            }
         }
 
         public static bool LargerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
@@ -3980,7 +3980,7 @@ namespace Gekko
             }
             return rv;
         }
-                
+
 
         public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {
@@ -4083,7 +4083,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }        
+        }
 
         public static Func<GekkoSmpl, P, IVariable, IVariable> FunctionLookup1(string name)
         {
@@ -4241,7 +4241,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected " + n + " rows in matrix");
                 throw new GekkoException();
             }
-            Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);            
+            Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
             for (int i = 0; i < tsl.data.dataArray.Length; i++)
             {
                 tsl.data.dataArray[i] = m.data[i, 0];
@@ -4264,7 +4264,7 @@ namespace Gekko
             foreach (IVariable iv in ml.list)
             {
                 string s = O.ConvertToString(iv);
-                if(G.Equal(ss.string2,s))
+                if (G.Equal(ss.string2, s))
                 {
                     b = true;
                     break;
@@ -4281,7 +4281,7 @@ namespace Gekko
         {
             return label;
         }
-        
+
         //public static List<string> SearchWildcard(IVariable a)
         //{
         //    string s = O.ConvertToString(a);
@@ -4295,9 +4295,9 @@ namespace Gekko
             //In that case, we are inside a GENR/PRT implicit time loop                        
             //Code below implicitly calls Program.ExtractBankAndRest and Program.FindOrCreateTimeseries()
             //So stuff in banks down the list will be found in data mode
-            Series ats = O.GetTimeSeries(smpl, variable, 0);            
+            Series ats = O.GetTimeSeries(smpl, variable, 0);
             return ats;
-        }        
+        }
 
         public static IVariable GetScalar(string name)
         {
@@ -4339,8 +4339,8 @@ namespace Gekko
         // ------------------------------------------------------------------------------
 
         public static GekkoTime ConvertToDate(IVariable x, GetDateChoices c)
-        {            
-            return x.ConvertToDate(c);                        
+        {
+            return x.ConvertToDate(c);
         }
 
         public static GekkoTime ConvertToDate(IVariable x)
@@ -4350,7 +4350,7 @@ namespace Gekko
 
         public static string ConvertToString(IVariable a)
         {
-            return a.ConvertToString();            
+            return a.ConvertToString();
         }
 
         public static string ConvertToString(string s)
@@ -4496,7 +4496,7 @@ namespace Gekko
         }
 
         public static IVariable[] MatrixRow(params IVariable[] list)
-        {         
+        {
             return list;
         }
 
@@ -4504,8 +4504,8 @@ namespace Gekko
         {
             int[,] dimsR = null;
             int[,] dimsC = null;
-            int FirstDim=-12345;
-            int SecondDim=-12345;
+            int FirstDim = -12345;
+            int SecondDim = -12345;
 
             try
             {
@@ -4518,12 +4518,12 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: Matrix concatenation source is not rectangular");
                 throw new GekkoException();
-            }           
-            
+            }
+
             //loops over rows
             for (int i = 0; i < FirstDim; i++)
             {
-                IVariable[] irow = list[i];                
+                IVariable[] irow = list[i];
                 //loops inside row elements
                 for (int j = 0; j < SecondDim; j++)
                 {
@@ -4573,17 +4573,17 @@ namespace Gekko
             }
 
             double[,] m = new double[allRows, allCols];
-                        
+
             int rowCounter = 0;
             for (int i = 0; i < FirstDim; i++)
             {
                 int colCounter = 0;
                 for (int j = 0; j < SecondDim; j++)
-                {                    
-                    IVariable iv = list[i][j];                    
+                {
+                    IVariable iv = list[i][j];
                     if (iv.Type() == EVariableType.Val)
                     {
-                        m[rowCounter, colCounter] = ((ScalarVal)iv).val;                   
+                        m[rowCounter, colCounter] = ((ScalarVal)iv).val;
                     }
                     else if (iv.Type() == EVariableType.Matrix)
                     {
@@ -4594,7 +4594,7 @@ namespace Gekko
                             {
                                 m[rowCounter + ii, colCounter + jj] = data[ii, jj];
                             }
-                        }                    
+                        }
                     }
                     colCounter += dimsC[0, j];
                 }
@@ -4644,7 +4644,7 @@ namespace Gekko
         {
             //i1 and i2 are often not used
             double data = double.NaN;
-            switch(type)
+            switch (type)
             {
                 case "sum":  //this is the GAMS-like sum function, for instance sum(#i, x[#i]). It does not exist in an avg() version.
                 case "movavg":
@@ -4693,7 +4693,7 @@ namespace Gekko
                     }
                     break;
 
-            }            
+            }
             return new ScalarVal(data);
         }
 
@@ -4701,7 +4701,7 @@ namespace Gekko
         {
             return l;
         }
-       
+
         //public static IVariable IvConvertTo(EVariableType type, IVariable a)
         //{
         //    switch (type)
@@ -4769,7 +4769,7 @@ namespace Gekko
         //    }
         //}        
 
-        
+
 
         //public static void GetVal777(GekkoSmpl smpl, IVariable a, int bankNumber, O.Prt.Element e)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
         //{
@@ -4779,7 +4779,7 @@ namespace Gekko
         //    {
         //        List<string> items = O.GetStringList((List)a);
         //        double[] d = new double[items.Count];
-                
+
         //        if (e.subElements == null)
         //        {
         //            e.subElements = new List<O.Prt.SubElement>();
@@ -4817,7 +4817,7 @@ namespace Gekko
         //            O.Prt.SubElement opeSub0 = new O.Prt.SubElement();
         //            e.subElements.Add(opeSub0);                    
         //        }                                                
-                
+
         //        double dd = a.GetValOLD(smpl);                
 
         //        if (bankNumber == 1)
@@ -4837,8 +4837,8 @@ namespace Gekko
         //}
 
         public static double GetVal(GekkoSmpl smpl, IVariable a, int bankNumber)  //used in PRT and similar, can accept a list that will show itself as a being an integer with ._isName set.
-        {            
-            return a.GetValOLD(smpl);            
+        {
+            return a.GetValOLD(smpl);
         }
 
         public static Series GetTimeSeries(IVariable a)
@@ -4891,7 +4891,7 @@ namespace Gekko
                 {
                     if (position == -1) G.Writeln("*** ERROR: The right-hand side should be SERIES type");
                     else if (position == 0) G.Writeln("*** ERROR: The return type should be SERIES");
-                    else G.Writeln("*** ERROR: Argument #" + position + " should be SERIES type");                    
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be SERIES type");
                     throw;
                 }
             }
@@ -5085,7 +5085,7 @@ namespace Gekko
             public string opt_array = null;
             public string opt_ser = null;
             public string type = null;  //read or import
-            
+
             public P p = null;
             public void Exe()
             {
@@ -5093,7 +5093,7 @@ namespace Gekko
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 hlp.t1 = this.t1;
                 hlp.t2 = this.t2;
-                
+
                 bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
 
                 if (this.opt_prim != null)
@@ -5103,13 +5103,13 @@ namespace Gekko
                         G.Writeln2("*** ERROR: IMPORT<prim> is obsolete, use IMPORT.");
                         throw new GekkoException();
                     }
-                    else 
+                    else
                     {   //read
                         G.Writeln2("*** ERROR: READ<prim> is obsolete, use READ<first>.");
                         throw new GekkoException();
                     }
-                }                           
-                
+                }
+
                 if (isRead == false)  //import
                 {
                     if (this.opt_first != null)
@@ -5125,9 +5125,9 @@ namespace Gekko
                     hlp.Merge = true;               //this is so for IMPORT
                     hlp.openType = EOpenType.First;  //this is so for IMPORT                    
                 }
-                
-                bool isTo = false; if (this.readTo != null) isTo = true;                
-                hlp.FileName = this.fileName;                
+
+                bool isTo = false; if (this.readTo != null) isTo = true;
+                hlp.FileName = this.fileName;
                 if (G.Equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
                 if (G.Equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
                 if (G.Equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
@@ -5142,7 +5142,7 @@ namespace Gekko
                 if (G.Equal(this.opt_ser, "yes")) hlp.Type = EDataFormat.Ser;
                 if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
-                hlp.gdxopt = this.opt_gdxopt;                
+                hlp.gdxopt = this.opt_gdxopt;
 
                 bool isSimple = false;
 
@@ -5210,14 +5210,14 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                }                
+                }
 
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
                     if (isRead && isSimple)
                     {
                         G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);                        
+                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
                     }
                     if (isRead && !isTo && hlp.openType == EOpenType.Ref)
                     {
@@ -5225,12 +5225,12 @@ namespace Gekko
                         //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
                         //throw new GekkoException();
                     }
-                }                                                              
+                }
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
 
                 bool open = false;
-                if (isTo)                
+                if (isTo)
                 {
                     //is in reality an OPEN                    
                     open = true;
@@ -5242,12 +5242,12 @@ namespace Gekko
                         readTo = Path.GetFileNameWithoutExtension(hlp.FileName);
                     }
                     hlp.openFileNames = new List<List<string>>();
-                    hlp.openFileNames.Add(new List<string>() {hlp.FileName, readTo});                    
+                    hlp.openFileNames.Add(new List<string>() { hlp.FileName, readTo });
                 }
 
                 bool wipeDatabankBeforeInsertingData = false;
 
-                if(isRead && !hlp.Merge && !isTo)
+                if (isRead && !hlp.Merge && !isTo)
                 {
                     //See #987432529835
                     //READ, not IMPORT
@@ -5260,7 +5260,7 @@ namespace Gekko
 
                 Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
                 Program.ReadInfo readInfo = readInfos[0];
-                readInfo.shouldMerge = hlp.Merge;                
+                readInfo.shouldMerge = hlp.Merge;
 
                 if (readInfo.abortedStar) return;  //an aborted READ *
 
@@ -5271,7 +5271,7 @@ namespace Gekko
                 else
                 {
                     readInfo.dbName = Program.databanks.GetFirst().name;
-                }                
+                }
 
                 if (isTo)
                 {
@@ -5281,9 +5281,9 @@ namespace Gekko
                 }
 
                 G.Writeln();
-                readInfo.Print();                
+                readInfo.Print();
 
-                 if (isRead && isSimple)
+                if (isRead && isSimple)
                 {
                     //See #987432529835
                     //isSimple can never be true with READ ... TO ...
@@ -5294,7 +5294,7 @@ namespace Gekko
                         //only in sim or mixed mode, if a model is existing
                         CreateMissingModelVariables();
                     }
-                }                
+                }
 
                 try
                 {
@@ -5318,7 +5318,7 @@ namespace Gekko
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
                 foreach (string s in Program.model.varsAType.Keys)
-                {                    
+                {
                     if (!Program.databanks.GetFirst().ContainsVariable(s)) onlyModelNotDatabank.Add(s);
                 }
                 if (G.Equal(Program.options.interface_mode, "sim"))
@@ -5359,7 +5359,7 @@ namespace Gekko
             public string fileName2 = null;  //dump file (for instance px)            
             public string opt_array = null;  //not in use
             public void Exe()
-            {                
+            {
                 OnlineDatabanks.Download(this);
             }
         }
@@ -5369,7 +5369,7 @@ namespace Gekko
         //    // ====== OBSOLETE ============
         //    // ====== OBSOLETE ============
         //    // ====== OBSOLETE ============            
-            
+
         //    public string fileName = null;
         //    public string importTo = null;
         //    public string opt_tsd = null;
@@ -5386,7 +5386,7 @@ namespace Gekko
         //    public void Exe()
         //    {
         //        bool isImportOpen = false; if (this.importTo != null) isImportOpen = true;
-                
+
         //        ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
         //        hlp.FileName = this.fileName;
         //        if (G.equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
@@ -5405,9 +5405,9 @@ namespace Gekko
         //            hlp.openType = EOpenType.First;  //this is so for IMPORT
         //            if (G.equal(opt_ref, "yes")) hlp.openType = EOpenType.Ref;  // <sec> can override
         //        }
-                                                
+
         //        List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                
+
         //        bool open = false;
         //        if (isImportOpen)
         //        {
@@ -5426,7 +5426,7 @@ namespace Gekko
         //            hlp.Merge = false;
         //            hlp.protect = true;  //superfluous but for safety
         //            hlp.openType = EOpenType.Normal;
-                                        
+
         //            if (importTo == "ASTBANKISSTARCHEATCODE")
         //            {
         //                importTo = Path.GetFileNameWithoutExtension(hlp.FileName);
@@ -5435,7 +5435,7 @@ namespace Gekko
         //            hlp.openFileNames = new List<List<string>>();
         //            hlp.openFileNames.Add(new List<string>() { hlp.FileName, importTo });
         //        }
-                
+
         //        Program.OpenOrRead(hlp, open, readInfos);
         //        Program.ReadInfo readInfo = readInfos[0];
         //        readInfo.shouldMerge = hlp.Merge;
@@ -5448,7 +5448,7 @@ namespace Gekko
         //        {
         //            readInfo.dbName = Program.databanks.GetFirst().aliasName;
         //        }
-                
+
         //        if (isImportOpen)
         //        {
         //            readInfo.open = true;
@@ -5477,7 +5477,7 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public List<string> listItems = null;
             public string opt_sheet = null;
-            public string opt_cell = null;            
+            public string opt_cell = null;
             public string opt_rows = null;
             public string opt_cols = null;
             public string opt_matrix = null;
@@ -5486,7 +5486,7 @@ namespace Gekko
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 Program.SheetImport(this);
-            }                
+            }
         }
 
         public class Pipe
@@ -5507,7 +5507,7 @@ namespace Gekko
         public class Clone
         {
             public void Exe()
-            {                
+            {
                 Program.MulbkClone();
                 Databank first = Program.databanks.GetFirst();
                 int number = first.storage.Count;
@@ -5546,7 +5546,7 @@ namespace Gekko
         //        if (this.opt_xlsx == "yes") hlp.Type = EDataFormat.Xlsx;                
         //        if (this.opt_cols == "yes") hlp.Orientation = "cols";
         //        hlp.openType = EOpenType.Ref;
-                
+
         //        if (hlp.FileName == null)
         //        {
         //            Program.MulbkClone();
@@ -5586,9 +5586,9 @@ namespace Gekko
         }
 
         public class Val
-        {            
+        {
             public static void Q(string s)
-            {                
+            {
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.Val)
                 {
@@ -5597,7 +5597,7 @@ namespace Gekko
                 }
                 string ss = a.GetValOLD(null).ToString();
                 if (ss == "NaN") ss = "M";
-                G.Writeln2("VAL " + s + " = " + ss);                
+                G.Writeln2("VAL " + s + " = " + ss);
             }
             public static void Q()
             {
@@ -5608,11 +5608,11 @@ namespace Gekko
         public class String2
         {
             public static void Q(string s)
-            {                
+            {
                 IVariable a = null; Program.scalars.TryGetValue(s, out a);
                 if (a == null || a.Type() != EVariableType.String)
                 {
-                    G.Writeln2("*** ERROR: STRING "+ Globals.symbolScalar.ToString()  + s + " was not found");
+                    G.Writeln2("*** ERROR: STRING " + Globals.symbolScalar.ToString() + s + " was not found");
                     throw new GekkoException();
                 }
                 G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
@@ -5660,7 +5660,7 @@ namespace Gekko
                         else
                         {
                             //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object in the dictionary
-                            ((Matrix)lhs).data = value.data;                            
+                            ((Matrix)lhs).data = value.data;
                         }
                         if (opt_rownames != null) ((Matrix)lhs).rownames = opt_rownames;
                         if (opt_colnames != null) ((Matrix)lhs).colnames = opt_colnames;
@@ -5693,7 +5693,7 @@ namespace Gekko
             }
 
             public static void Q(string s)
-            {                
+            {
                 Show ss = new Show();
                 IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection.ToString() + s, out iv);
                 if (iv == null)
@@ -5719,7 +5719,7 @@ namespace Gekko
                         G.Writeln("MATRIX " + s + " with dimension " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
                         first = false;
                         count++;
-                    }                    
+                    }
                 }
                 if (count == 0) G.Writeln2("Did not find any matrices");
             }
@@ -5757,7 +5757,7 @@ namespace Gekko
             {
                 Program.Mem("date");
             }
-        }        
+        }
 
         public class Restart
         {
@@ -5782,7 +5782,7 @@ namespace Gekko
             //public IVariable rhs = null;
             //public IVariable lhs = null;
 
-            
+
 
             public List names0;
             public List names1;
@@ -5801,7 +5801,7 @@ namespace Gekko
                 //only done for missings enclosed by real numbers (no end-missings will be filled)  
 
                 List<string> listItems0 = Restrict(names0, true, false, true, true);
-                List<string> listItems1 = Restrict(names1, true, false, true, true);                
+                List<string> listItems1 = Restrict(names1, true, false, true, true);
 
                 if (listItems0.Count != 1 || listItems1.Count != 1)
                 {
@@ -5814,14 +5814,14 @@ namespace Gekko
 
                 Series oldSeries = O.ConvertToSeries(ivOld) as Series;
                 Series lhs = O.ConvertToSeries(ivLhs) as Series;
-                                
+
                 Series newSeriesTemp = oldSeries.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??
                 if (G.Equal(opt_geometric, "yes")) type = ESmoothTypes.Geometric;
                 if (G.Equal(opt_linear, "yes")) type = ESmoothTypes.Linear;
                 if (G.Equal(opt_spline, "yes")) type = ESmoothTypes.Spline;
-                if (G.Equal(opt_repeat, "yes")) type = ESmoothTypes.Repeat;                
+                if (G.Equal(opt_repeat, "yes")) type = ESmoothTypes.Repeat;
 
                 GekkoTime realStart = oldSeries.GetRealDataPeriodFirst();
                 GekkoTime realEnd = oldSeries.GetRealDataPeriodLast();
@@ -5937,14 +5937,14 @@ namespace Gekko
                 }
                 lhs.Stamp();
                 G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
-            }                 
-            
+            }
+
         }
 
         public class Splice
         {
-            
-            
+
+
 
             public List names0 = null;
             public List names1 = null;
@@ -5984,14 +5984,14 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: No data in first timeseries");
                     throw new GekkoException();
-                }                
+                }
                 GekkoTime t1b = ts1.GetRealDataPeriodLast();
                 GekkoTime t2a = ts2.GetRealDataPeriodFirst();
                 if (t2a.IsNull())
                 {
                     G.Writeln2("*** ERROR: No data in second timeseries");
                     throw new GekkoException();
-                }                
+                }
                 GekkoTime t2b = ts2.GetRealDataPeriodLast();
                 if (!date.IsNull())
                 {
@@ -6037,7 +6037,7 @@ namespace Gekko
 
                 if (useSecondPartLevels)
                 {
-                    
+
                     if (avg2 == 0d)
                     {
                         G.Writeln2("*** ERROR: Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
@@ -6060,7 +6060,7 @@ namespace Gekko
                 }
                 else
                 {
-                  
+
                     if (avg2 == 0d)
                     {
                         G.Writeln2("*** ERROR: Avg = 0 for second timeseries over common period " + t2a + "-" + t1b);
@@ -6079,7 +6079,7 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
                     {
                         ts3.SetData(gt, ts2.GetData(null, gt) * relative);
-                    }                    
+                    }
                 }
                 ts3.Stamp();
                 G.Writeln2("Spliced '" + ts3.name + "' by means of " + obs + " common observations");
@@ -6149,7 +6149,7 @@ namespace Gekko
             public string opt_save = null;
             public void Exe()
             {
-                
+
                 List<string> databanks = new List<string>();
                 if (this.listItems == null)
                 {
@@ -6174,7 +6174,7 @@ namespace Gekko
                 {
                     List<string> names = Restrict(this.listItems, false, false, false, false);
                     foreach (string dbName in names)
-                    {                        
+                    {
                         if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
                         {
                             G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
@@ -6207,7 +6207,7 @@ namespace Gekko
                         G.Writeln2("Closed databank '" + databanks[0] + "'");
                     }
                     else
-                    {                        
+                    {
                         G.Writeln2("Closed " + databanks.Count + " databanks: ");
                         G.PrintListWithCommas(databanks, false);
                     }
@@ -6222,7 +6222,7 @@ namespace Gekko
                 }
             }
 
-            
+
 
         }
 
@@ -6244,13 +6244,13 @@ namespace Gekko
             public string opt_pcim = null;
             public string opt_xls = null;
             public string opt_xlsx = null;
-            public string opt_px = null;        
+            public string opt_px = null;
             public string opt_cols = null;
             //public string as2 = null;
             public string opt_prim = null;  //obsolete but gives warning
             public string opt_first = null;
             public string opt_sec = null;
-            public string opt_last = null;  
+            public string opt_last = null;
             public string opt_ref = null;
             public string opt_prot = null;  //obsolete but gives warning
             public string opt_edit = null;
@@ -6263,7 +6263,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: OPEN<prot> is obsolete. In Gekko 2.1.1 and onwards, databanks");
                     G.Writeln("           are always opened as 'protected' by default, unless you use", Color.Red);
                     G.Writeln("           OPEN<edit>, or unless you afterwards use the UNLOCK command", Color.Red);
-                    G.Writeln("           to make the databank editable.", Color.Red);                    
+                    G.Writeln("           to make the databank editable.", Color.Red);
                     throw new GekkoException();
                 }
 
@@ -6271,7 +6271,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: OPEN<prim> is obsolete. In Gekko 2.1.1 and onwards, you should");
                     G.Writeln("           use OPEN<edit> instead of OPEN<prim>, if you intend to change", Color.Red);
-                    G.Writeln("           data in the databank.", Color.Red);                    
+                    G.Writeln("           data in the databank.", Color.Red);
                     throw new GekkoException();
                 }
 
@@ -6301,7 +6301,7 @@ namespace Gekko
                     }
                     hlp.openFileNames.Add(temp);
                 }
-                              
+
                 if (this.opt_csv == "yes") hlp.Type = EDataFormat.Csv;
                 if (this.opt_prn == "yes") hlp.Type = EDataFormat.Prn;
                 if (this.opt_pcim == "yes") hlp.Type = EDataFormat.Pcim;
@@ -6322,7 +6322,7 @@ namespace Gekko
                 if (G.Equal(opt_ref, "yes")) posCounter++;
                 if (G.Equal(opt_last, "yes")) posCounter++;
                 if (!G.isNumericalError(this.opt_pos)) posCounter++;
-                
+
                 if (posCounter > 1)
                 {
                     G.Writeln2("*** ERROR: You are using > 1 of first/last/pos/ref designations inside <>-field");
@@ -6356,26 +6356,26 @@ namespace Gekko
                 }
                 if (!G.isNumericalError(this.opt_pos))
                 {
-                    hlp.openType = EOpenType.Pos;                    
+                    hlp.openType = EOpenType.Pos;
                     if (G.ConvertToInt(out hlp.openTypePosition, opt_pos) == false)
                     {
                         G.Writeln2("*** ERROR: OPEN<pos=...> should be integer value");
                         throw new GekkoException();
                     }
-                }                                
-                
+                }
+
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(false, hlp, true, readInfos);                
+                Program.OpenOrRead(false, hlp, true, readInfos);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
-                {                    
+                {
                     readInfo.open = true;
                     if (readInfo.abortedStar) return;  //an aborted OPEN *
 
                     if (G.Equal(opt_save, "no"))
                     {
                         readInfo.databank.save = false;
-                    }                    
+                    }
 
                     readInfo.Print();
                 }
@@ -6385,7 +6385,7 @@ namespace Gekko
                     G.Writeln2("+++ WARNING: READ ... TO ... is recommended instead of OPEN in sim-mode (cf. MODE).");
                     G.Writeln("             For instance, 'READ databk TO *;' instead of 'OPEN databk;'", Globals.warningColor);
                 }
-            }            
+            }
         }
 
         public class Run
@@ -6421,7 +6421,7 @@ namespace Gekko
             public string opt_units = null;
             public string opt_stamp = null;
             public List names = null;
-                        
+
             public void Exe()
             {
                 List<string> vars = Restrict(this.names, true, false, true, false);
@@ -6440,7 +6440,7 @@ namespace Gekko
                     if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
                     iv_series.meta.SetDirty(true);
                 }
-            }         
+            }
         }
 
         public class Accept
@@ -6459,10 +6459,10 @@ namespace Gekko
                     varname = G.AddSigil(varname, this.type);  //see also #980753275
 
                     if (G.Equal(type, "val"))
-                    {                        
+                    {
                         try
                         {
-                            double v = double.Parse(value.Trim());                            
+                            double v = double.Parse(value.Trim());
                             Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarVal(v));
                             G.Writeln2("VAL " + varname + " = " + v);
                         }
@@ -6470,10 +6470,10 @@ namespace Gekko
                         {
                             G.Writeln2("*** ERROR: Could not convert '" + value + "' into a VAL");
                             throw new GekkoException();
-                        }                        
+                        }
                     }
                     else if (G.Equal(type, "string"))
-                    {                        
+                    {
                         try
                         {
                             string v = value.Trim();
@@ -6486,9 +6486,9 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Could not convert '" + value + "' into a STRING");
                             throw new GekkoException();
                         }
-                    }                    
+                    }
                     else if (G.Equal(type, "date"))
-                    {                        
+                    {
                         try
                         {
                             GekkoTime gt = G.FromStringToDate(value.Trim());
@@ -6500,14 +6500,14 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Could not convert '" + value + "' into a DATE");
                             throw new GekkoException();
                         }
-                    }                    
+                    }
                 }
             }
         }
 
         public class Analyze
         {
-                        
+
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
             public double lag = double.NaN;
@@ -6516,7 +6516,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Analyze(this);                
+                Program.Analyze(this);
             }
         }
 
@@ -6532,6 +6532,8 @@ namespace Gekko
             public string opt_tobank = null;
             public string opt_error = null;
             public string opt_print = null;
+            public string opt_type = null;
+            public string type = null;
 
             public void Exe()
             {
@@ -6550,7 +6552,7 @@ namespace Gekko
                 Databank toBank = null;
                 if (localOptionToBank != null) toBank = localOptionToBank;
                 return toBank;
-            }            
+            }
         }
 
         public class Compare
@@ -6590,9 +6592,9 @@ namespace Gekko
                     //Now we are sure all the series are from Work
                     //foreach (Series ts in tss)
                     //{
-                        ts.Truncate(this.t1, this.t2);
-                        counter++;
-                        ts.Stamp();
+                    ts.Truncate(this.t1, this.t2);
+                    counter++;
+                    ts.Stamp();
                     //}                    
                 }
                 G.Writeln2("Truncated " + counter + " series to " + t1 + "-" + t2 + "");
@@ -6601,7 +6603,7 @@ namespace Gekko
 
         public class Rename
         {
-            
+
             public List names0 = null;
             public List names1 = null;
 
@@ -6609,67 +6611,15 @@ namespace Gekko
             public string opt_frombank = null;
             public string opt_tobank = null;
             public string opt_print = null;
+            public string opt_type = null;
+
+            public string type = null;
 
             public void Exe()
             {
                 //actually also allows "rename" from one bank to another
 
-                if (true)
-                {
-
-                    Program.Rename(this);
-
-                }
-                else
-                {
-
-                    //if (opt_bank != null)
-                    //{
-                    //    G.Writeln2("*** ERROR: <bank> not yet implemented");
-                    //    throw new GekkoException();
-                    //}
-
-                    //List<string> listItems0 = Restrict(this.names0, true, true, true, false);
-                    //List<string> listItems1 = Restrict(this.names1, true, true, true, false);
-
-
-                    //if (listItems0.Count != listItems1.Count)
-                    //{
-                    //    G.Writeln2("*** ERROR: unequal number of items before and after AS");
-                    //    throw new GekkoException();
-                    //}
-                    //for (int i = 0; i < listItems0.Count; i++)
-                    //{
-                    //    if (listItems0[i].Contains("*") || listItems0[i].Contains("?") || listItems1[i].Contains("*") || listItems1[i].Contains("?"))
-                    //    {
-                    //        G.Writeln2("*** ERROR: RENAME: Wildcards not allowed");
-                    //        throw new GekkoException();
-                    //    }
-                    //}
-
-                    ////we are now sure lists are of same length and have no wildcards.                                
-
-                    //int counter = 0;
-                    //for (int i = 0; i < listItems0.Count; i++)
-                    //{
-                    //    string s1 = listItems0[i];
-                    //    string s2 = listItems1[i];
-
-                    //    IVariable iv1 = O.GetIVariableFromString(s1, ECreatePossibilities.NoneReportError);
-                    //    IVariable iv2 = O.GetIVariableFromString(s2, ECreatePossibilities.NoneReturnNull);
-
-                    //    if (iv2 != null)
-                    //    {
-                    //        G.Writeln2("*** ERROR: Cannot rename " + s1 + " into " + s2 + " because the latter exists already");
-                    //        throw new GekkoException();
-                    //    }
-
-                    //    O.RemoveIVariableFromString(s1);
-                    //    O.AddIVariableWithOverwriteFromString(s2, iv1);
-                    //    counter++;
-                    //}
-                    //G.Writeln2("Renamed " + counter + " timeseries");
-                }
+                Program.Rename(this);
             }
         }
 
@@ -6735,16 +6685,18 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public List<string> listItems = null;
-            public IVariable iv = null;          
+            public IVariable iv = null;
             public string searchName = null;
             public string opt_info = null;
+            public string type = null;
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (this.searchName == null)
                 {
                     //List<string> m = new List<string>();
-                    
+
                     //foreach (IVariable iv in iv.list)
                     //{
                     //    m.Add(iv.ConvertToString());
@@ -6791,8 +6743,8 @@ namespace Gekko
                 G.CheckLegalPeriod(this.t1, this.t2);
                 Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs);
             }
-        } 
-        
+        }
+
         public class Info
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
@@ -6833,14 +6785,14 @@ namespace Gekko
             public List<string> listItems = null;
             public string type = null;
             public void Exe()
-            {                
+            {
                 Program.Checkoff(this.listItems, type);
             }
         }
 
         public class Endo
         {
-            public List<string> listItems = null;            
+            public List<string> listItems = null;
             public GekkoTimes gts = null;
             public bool question = false;
             public void Exe()
@@ -6864,7 +6816,7 @@ namespace Gekko
         }
 
         public class Findmissingdata
-        {            
+        {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
             public List names = null;
@@ -6881,7 +6833,7 @@ namespace Gekko
         {
             public List<string> listItems = null;
         }
-             
+
 
         public class ListDef
         {
@@ -6933,7 +6885,7 @@ namespace Gekko
                         //Case-insensitive replacing
                         this.listItems[i] = G.ReplaceString(this.listItems[i], listStrip, "", false);
                     }
-                }                
+                }
 
                 if (G.Equal(listSort, "yes"))  //listSort = null is okay in G.equal()
                 {
@@ -6947,9 +6899,9 @@ namespace Gekko
                     //Todo: if it has just been sorted, trimming is easy. But we do it the general way here.
                     GekkoDictionary<string, bool> xx = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                     List<string> newList = new List<string>();
-                    foreach(string s in this.listItems)
+                    foreach (string s in this.listItems)
                     {
-                        if(xx.ContainsKey(s))
+                        if (xx.ContainsKey(s))
                         {
                             //ignore
                         }
@@ -6966,14 +6918,14 @@ namespace Gekko
 
             }
 
-            
+
 
             public static void Q(string s)
             {
                 Program.WriteListItems(s);
             }
         }
-            
+
         public class Genr
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
@@ -6985,14 +6937,14 @@ namespace Gekko
             public void Exe()
             {
                 if (this.meta != null)
-                {                    
+                {
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
-                    lhs.meta.source = s + this.meta;                    
+                    lhs.meta.source = s + this.meta;
                     lhs.SetDirty(true);
                 }
-                lhs.Stamp();                
-            }            
+                lhs.Stamp();
+            }
         }
 
 
@@ -7044,11 +6996,11 @@ namespace Gekko
                 {
                     //For instance, "SERIES y = 2 * x;" --> meta = "SERIES y = 2 * x" (without the semicolon)    
                     string s = ShowDatesAsString(this.t1, this.t2);
-                    lhs.meta.source = s + this.meta;                    
+                    lhs.meta.source = s + this.meta;
                     lhs.SetDirty(true);
                 }
                 lhs.Stamp();
-                
+
             }
         }
 
@@ -7059,119 +7011,72 @@ namespace Gekko
             //public string opt_addbank = null;
             public string opt_frombank = null;
             //public string listFile = null; //make it work
-            public string wildCard1 = null; //--> delete??
-            public string wildCard2 = null;  //only active if range   //--> delete??
+            //public string wildCard1 = null; //--> delete??
+            //public string wildCard2 = null;  //only active if range   //--> delete??
             public List<string> listItems = null;
             public List names1 = null; //the wildcard(s)
             public List names2 = null; //destination list
             public string listFile = null;
+
+            public string opt_type = null;
+            public string type = null;
+
             public void Exe()
             {
-                if (true)
-                {
+                if (this.type == "ASTPLACEHOLDER") this.type = null;
+                EVariableType type = EVariableType.Var;
+                if (this.type != null) type = G.GetVariableType(this.type);
 
-                    List<TwoStrings> matches = Program.CopyRenameHelper(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
-                    //List rv = new List();
-                    List<string> names = new List<string>();
-                    foreach (TwoStrings two in matches)
+                List<TwoStrings> matches = Program.WildcardHelper(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
+                //List rv = new List();
+                List<string> names = new List<string>();
+                foreach (TwoStrings two in matches)
+                {                    
+                    if (type != EVariableType.Var)
                     {
-                        //ScalarString ss = new ScalarString(two.s1);
-                        //rv.Add(ss);
-                        names.Add(two.s1);
+                        //a bit of double work here, but maybe it does not need to be super fast anyway
+                        IVariable iv = O.GetIVariableFromString(two.s1, ECreatePossibilities.NoneReportError);                        
+                        if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
                     }
-                    //return rv;
-                    
+                    names.Add(two.s1);
+                }
 
-                    //List m = O.HandleWildcards(this.wildCard1, this.opt_frombank);
-                    //List<string> names = new List<string>(Program.GetListOfStringsFromListOfIvariables(m.list.ToArray()));
-
-                    if (!G.Equal(this.opt_mute, "yes"))
+                if (!G.Equal(this.opt_mute, "yes"))
+                {                    
+                    if (names.Count > 0)
                     {
                         G.Writeln();
-                        if (names.Count > 0)
-                        {
-                            G.Writeln(G.GetListWithCommas(names));
-                        }
+                        G.Writeln(G.GetListWithCommas(names));
                     }
+                }
 
-                    if (this.names2 != null)
+                if (this.names2 != null)
+                {
+                    //Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                    List<string> dest = O.Restrict(this.names2, true, true, false, false);
+                    if (dest.Count > 1)
                     {
-                        //Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                        List<string> dest = O.Restrict(this.names2, true, true, false, false);
-                        if (dest.Count > 1)
-                        {
-                            G.Writeln2("*** ERROR: Expected 1 item as destination list");
-                            throw new GekkoException();
-                        }
-                        O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
-
-                        G.Writeln2("Put " + names.Count + " matching items into list " + dest[0]);
+                        G.Writeln2("*** ERROR: Expected 1 item as destination list");
+                        throw new GekkoException();
                     }
-                    //else if (listFile != null)
-                    //{
+                    O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
+
+                    G.Writeln2("Put " + names.Count + " matching items into list " + dest[0]);
+                }
+                else if (listFile != null)
+                {
+                    
                     //    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
                     //    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
-                    //}
-                    //else
-                    //{
-                    //    G.Writeln2("Found " + names.Count + " matching items");
-                    //}
+                    
                 }
                 else
                 {
-
-                    bool addbank = false; //if (G.Equal(this.opt_addbank, "yes")) addbank = true;
-                    List<string> names = new List<string>();
-
-                    if (G.Equal(this.opt_frombank, "yes"))
-                    {
-                        //For safety, remove in Gekko 2.4 or 2.6
-                        G.Writeln2("+++ ERROR: In Gekko 2.2, INDEX<bank=yes> is INDEX<addbank=yes>.");
-                        throw new GekkoException();
-                    }
-
-                    foreach (string s in this.listItems)
-                    {
-                        List<BankNameVersion> xx = null; // Program.GetInfoFromStringWildcard(s, this.opt_bank);
-                        foreach (BankNameVersion bnv in xx)
-                        {
-                            if (addbank)
-                            {
-                                names.Add(bnv.bank + Globals.symbolBankColon + bnv.name);
-                            }
-                            else
-                            {
-                                names.Add(bnv.name);  //probably would never be null. Culd have option to keep banknames!!!!!!
-                            }
-                        }
-                    }
-
-                    if (!G.Equal(this.opt_mute, "yes"))
-                    {
-                        G.Writeln();
-                        if (names.Count > 0)
-                        {
-                            G.Writeln(G.GetListWithCommas(names));
-                        }
-                    }
-
-                    if (name != null)
-                    {
-                        Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                        G.Writeln2("Put " + names.Count + " matching items into list #" + name);
-                    }
-                    else if (listFile != null)
-                    {
-                        Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                        G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
-                    }
-                    else
-                    {
-                        G.Writeln2("Found " + names.Count + " matching items");
-                    }
-
+                    G.Writeln2("Found " + names.Count + " matching items");
                 }
             }
+
+
         }
 
         public class Rebase
@@ -7312,7 +7217,8 @@ namespace Gekko
         }
 
         public class Count
-        {            
+        {
+            //Is this just an INDEX<mute>?
             public string wildCard1 = null;
             public string wildCard2 = null;  //only active if range
             public List<string> listItems = null;

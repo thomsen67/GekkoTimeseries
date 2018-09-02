@@ -10,8 +10,6 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static int labelCounter;
-        public static readonly ScalarVal i28 = new ScalarVal(2d);
-        public static readonly ScalarVal i29 = new ScalarVal(3d);
         public static void ClearTS(P p)
         {
         }
@@ -24,12 +22,11 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
             //[[splitSTART]]
-            p.SetText(@"¤0"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            //IVariable ivTmpvar27 = O.TypeCheck_series(O.ListDefHelper(i28, i29), -1);
-            IVariable ivTmpvar27 = O.ListDefHelper(i28, i29);
-            O.Lookup(smpl, null, null, "y", null, ivTmpvar27, true, EVariableType.Series)
-            ;
+            O.Index o0 = new O.Index();
+            o0.type = @"ASTPLACEHOLDER"; o0.names1 = new List(O.ExplodeIvariables(new List(new List<IVariable> { new ScalarString("*") })));
+            o0.Exe();
 
 
             //[[splitSTOP]]

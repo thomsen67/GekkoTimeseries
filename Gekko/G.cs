@@ -1424,6 +1424,7 @@ namespace Gekko
 
         public static EVariableType GetVariableType(string type)
         {
+            type = type.Trim();
             EVariableType etype = EVariableType.Var;
             if (G.Equal(type, "val")) etype = EVariableType.Val;
             else if (G.Equal(type, "string")) etype = EVariableType.String;
@@ -1433,6 +1434,13 @@ namespace Gekko
             else if (G.Equal(type, "list")) etype = EVariableType.List;
             else if (G.Equal(type, "matrix")) etype = EVariableType.Matrix;
             else if (G.Equal(type, "map")) etype = EVariableType.Map;
+            else if (G.Equal(type, "var")) etype = EVariableType.Var;
+            else if (type == null || type == "") etype = EVariableType.Var;
+            else
+            {
+                G.Writeln2("*** ERROR: Could not recognize variable type '" + type + "'");
+                throw new GekkoException();
+            }
             return etype;
         }
         public static bool NullOrEmpty(string x)

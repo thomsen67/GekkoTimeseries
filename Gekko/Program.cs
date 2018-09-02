@@ -116,7 +116,7 @@ namespace Gekko
         public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (>= t2) 
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
         public int gekkoErrorI = 0;
-        public int bankNumber = 0;  //0 is inactive, 1 is Ref databank
+        public int bankNumber = 0;  //0 is inactive, 1 is Ref databank, will only apply to series (vars without sigils)
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
         //public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
         //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
@@ -15454,7 +15454,12 @@ namespace Gekko
 
         public static void Rename(O.Rename o)
         {
-            List<TwoStrings> outputs = CopyRenameHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename);
+
+            if (o.type == "ASTPLACEHOLDER") o.type = null;
+            EVariableType type = EVariableType.Var;
+            if (o.type != null) type = G.GetVariableType(o.type);
+
+            List<TwoStrings> outputs = WildcardHelper(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename);
 
             if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
             {
@@ -15475,414 +15480,117 @@ namespace Gekko
             foreach (TwoStrings output in outputs)
             {
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+                if (type != EVariableType.Var && type !=  iv.Type()) continue; //skip it                
                 O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
             }
+
+            G.Writeln2("Renamed " + outputs.Count + " variables");
         }
 
         public static void Copy(O.Copy o)
         {
-            if (true)
+
+            if (o.type == "ASTPLACEHOLDER") o.type = null;
+            EVariableType type = EVariableType.Var;
+            if (o.type != null) type = G.GetVariableType(o.type);
+
+            if (o.names2 == null)
             {
-                if (o.names2 == null)
+                o.names2 = new Gekko.List();
+                o.names2.Add(new ScalarString("First:*"));
+            }
+
+            List<TwoStrings> outputs = WildcardHelper(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
+
+            bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
+            int nIgnores = 0;
+            int nOk = 0;
+
+            if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+            {
+                Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
+                return;
+            }
+
+            if (G.Equal(o.opt_print, "yes"))
+            {
+                G.Writeln2("Copying the following " + outputs.Count + " variables:");
+                G.Writeln();
+                foreach (TwoStrings two in outputs)
                 {
-                    o.names2 = new Gekko.List();
-                    o.names2.Add(new ScalarString("First:*"));
+                    G.Writeln(two.s1 + " ---> " + two.s2);
                 }
+            }
 
-                List<TwoStrings> outputs = CopyRenameHelper(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
+            GekkoSmplSimple truncate = null;
+            if (G.Equal(o.opt_respect, "yes"))
+            {
+                truncate = new GekkoSmplSimple(o.t1, o.t2);
+            }
+            else
+            {
+                //COPY<2010 2020> is just ignored regarding time period, <respect> must be used.
+            }
 
-                bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
-                int nIgnores = 0;
-                int nOk = 0;
+            foreach (TwoStrings output in outputs)
+            {
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);
 
-                if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
+                if (iv == null)
                 {
-                    Globals.unitTestCopyHelper = outputs;  //for simpler testing of this
-                    return;
-                }
-
-                if (G.Equal(o.opt_print, "yes"))
-                {
-                    G.Writeln2("Copying the following " + outputs.Count + " variables:");
-                    G.Writeln();
-                    foreach (TwoStrings two in outputs)
+                    if (ignoreErrors)
                     {
-                        G.Writeln(two.s1 + " ---> " + two.s2);
+                        G.Writeln2("+++ NOTE: Could not find variable '" + output.s1 + "' for copying");
+                        nIgnores++;
+                        continue;
                     }
-                }
-
-                GekkoSmplSimple truncate = null;
-                if (G.Equal(o.opt_respect, "yes"))
-                {
-                    truncate = new GekkoSmplSimple(o.t1, o.t2);
+                    else
+                    {
+                        O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //will emit the error message
+                    }
                 }
                 else
-                {
-                    //COPY<2010 2020> is just ignored regarding time period, <respect> must be used.
+                {                    
+                    if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
                 }
 
-                foreach (TwoStrings output in outputs)
+                nOk++;
+
+                IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNull);
+                bool injectingToExistingSeries = false;
+                if (truncate != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
                 {
-                    IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);
-
-                    if (iv == null)
+                    Series iv_series = iv as Series;
+                    Series existing_series = existing as Series;
+                    if (iv_series.dimensionsStorage == null)
                     {
-                        if (ignoreErrors)
+                        if (iv_series.freq == existing_series.freq)
                         {
-                            G.Writeln2("+++ NOTE: Could not find variable '" + output.s1 + "' for copying");
-                            nIgnores++;
-                            continue;
-                        }
-                        else
-                        {
-                            O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //will emit the error message
-                        }
-                    }
-
-                    nOk++;
-
-                    IVariable existing = O.GetIVariableFromString(output.s2, O.ECreatePossibilities.NoneReturnNull);
-                    bool injectingToExistingSeries = false;
-                    if (truncate != null && existing != null && iv.Type() == EVariableType.Series && existing.Type() == EVariableType.Series)
-                    {
-                        Series iv_series = iv as Series;
-                        Series existing_series = existing as Series;
-                        if (iv_series.dimensionsStorage == null)
-                        {
-                            if (iv_series.freq == existing_series.freq)
+                            injectingToExistingSeries = true;
+                            foreach (GekkoTime gt in new GekkoTimeIterator(truncate.t1, truncate.t2))
                             {
-                                injectingToExistingSeries = true;
-                                foreach (GekkoTime gt in new GekkoTimeIterator(truncate.t1, truncate.t2))
-                                {
-                                    existing_series.SetData(gt, iv_series.GetData(null, gt));
-                                }
+                                existing_series.SetData(gt, iv_series.GetData(null, gt));
                             }
                         }
                     }
-
-                    if (!injectingToExistingSeries)
-                    {
-                        IVariable iv_clone = iv.DeepClone(truncate);
-                        O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
-                    }
                 }
 
-                string si = null;
-                if (nIgnores > 0) si = " (ignored  " + nIgnores + ")";
-
-                if (nOk == 1) G.Writeln2("Copied data for " + nOk + " variable" + si);
-                else G.Writeln2("Copied data for " + nOk + " variables" + si);
+                if (!injectingToExistingSeries)
+                {
+                    IVariable iv_clone = iv.DeepClone(truncate);
+                    O.AddIVariableWithOverwriteFromString(output.s2, iv_clone);
+                }
             }
 
-            else
-            {
+            string si = null;
+            if (nIgnores > 0) si = " (ignored  " + nIgnores + ")";
 
+            G.Writeln2("Copied data for " + nOk + " variables" + si);
 
-                ////------------ Types -----------------------------------------------------------------------------------------------
-                ////1. if RESPECT keyword and timeseries exists beforehand            -> inject data inside [t1, t2] in existing series
-                ////2. if RESPECT keyword and timeseries does not exist beforehand    -> clone, truncate to [t1, t2], and add to databank
-                ////3. if no RESPECT keyword and timeseries exists beforehand         -> delete existing timeseries, clone, and add the new one to databank
-                ////4. if no RESPECT keyword and timeseries does not exist beforehand -> clone and add to databank                
-                ////------------------------------------------------------------------------------------------------------------------
-
-                ////COPY ...;           short for COPY ... TO work:*;
-                ////COPY ... TO x:*;    redirects to x bank instead of work
-                ////COPY ... TO y*z;    copies with prefix/suffix
-                ////COPY ... TO x:y*z;  redirects to x bank with prefix/suffix
-                ////--> note you cannot use these in combinations with strings!
-                ////--> and COPY *.fy would not make sense (would give name collisions. So
-                ////    no wildcards for banks, not even *. (But PRT *:fy would be ok, and later on *.sol)
-
-                ////These <FROM = ...> and <TO = ...> can be overridden by individual bank names like "COPY <FROM = adbk> a, b, simbk:c, d;". In that case, 'c' is taken from simbk.
-                ////Note that <FROM/TO = @> is legal!
-
-                ////TODO: Implement for array-series
-
-                //List<string> listItems0 = O.Restrict(o.names0, true, true, true, false);
-                //List<string> listItems1 = O.Restrict(o.names1, true, true, true, false);
-
-                //Databank localOptionFromBank = null; //is != null if <FROM = ...>
-                //Databank localOptionToBank = null; //is != null if <TO  = ...>
-                //O.GetFromAndToDatabanks(o.opt_frombank, o.opt_tobank, ref localOptionFromBank, ref localOptionToBank);
-
-                //if (o.opt_frombank != null || o.opt_tobank != null)
-                //{
-                //    G.Writeln2("*** ERROR: <from> and <to> not yet implemented");
-                //    throw new GekkoException();
-                //}
-
-                //int errorCounter = 0;
-
-                //bool wild0 = false;
-                //foreach (string s in listItems0)
-                //{
-                //    if (s.Contains("*") || s.Contains("?") || s.Contains("..")) wild0 = true;
-                //}
-
-                //bool isUsingPlaceholder = false;
-                //string placeholderPrefix = null;
-                //string placeholderSuffix = null;
-                //if (listItems1 != null)
-                //{
-                //    foreach (string s in listItems1)
-                //    {
-                //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
-                //        string name = h.name;
-
-                //        if (name.Contains(".."))
-                //        {
-                //            G.Writeln2("*** ERROR: In COPY, you can only use '..' on the left side of TO (the right side is not a wildcard)");
-                //            throw new GekkoException();
-                //        }
-
-                //        if (name.Contains("?"))
-                //        {
-                //            G.Writeln2("*** ERROR: In COPY, you can only use '?' on the left side of TO (the right side is not a wildcard)");
-                //            throw new GekkoException();
-                //        }
-
-                //        if (name.Contains("*"))
-                //        {
-                //            if (listItems1.Count > 1)
-                //            {
-                //                G.Writeln2("*** ERROR: In COPY, if you use '*' on the right side of TO, you can only use one list element (there are " + listItems1.Count + ")");
-                //                throw new GekkoException();
-                //            }
-
-                //            if (G.CountCharsInString(name, "*") > 1)
-                //            {
-                //                G.Writeln2("*** ERROR: In COPY, you cannot use more than one '*' in a list item on the right side of TO");
-                //                throw new GekkoException();
-                //            }
-                //            string[] split = name.Split('*');
-                //            isUsingPlaceholder = true;
-                //            placeholderPrefix = split[0];
-                //            placeholderSuffix = split[1];
-                //        }
-                //    }
-
-                //    if (wild0 && !isUsingPlaceholder)
-                //    {
-                //        G.Writeln2("*** ERROR: When using '*', '?' or '..' on the left side of TO, the right side of TO must contain a '*'");
-                //        throw new GekkoException();
-                //    }
-
-                //    if (!wild0 && !isUsingPlaceholder)
-                //    {
-                //        if (listItems0.Count != listItems1.Count)
-                //        {
-                //            G.Writeln2("*** ERROR: Difference between number of list items to the left and right of TO (" + listItems0.Count + " versus " + listItems1.Count + ")");
-                //            throw new GekkoException();
-                //        }
-                //    }
-                //}
-
-                ////When we get here, if there are wildcards or ranges on the left of TO, the right of TO is either empty or a single list item containing one and only one '*'
-                ////If there are no wildcards on left and right of TO, the lists have same size.
-
-                //int type1 = 0;
-                //int type2 = 0;
-                //int type3 = 0;
-                //int type4 = 0;
-
-                //for (int i = 0; i < listItems0.Count; i++)  //regarding this list, #-lists like "COPY #m;" are unfolded, but any wildcards or ranges are not.
-                //{
-                //    //Databank fromBank = null;
-                //    Databank toBank = O.Copy.SetPossibleToBank(localOptionToBank);
-
-                //    if (listItems1 == null)
-                //    {
-                //        //Stuff like "COPY adbk:fx*;"  (copies to first)
-                //        //Hmmm: gets run for each item to the left of TO, but the following line runs fast anyway.
-                //        if (toBank == null) toBank = Program.databanks.GetFirst();
-                //    }
-                //    else
-                //    {
-                //        string ss = null;
-                //        if (isUsingPlaceholder)
-                //        {
-                //            //Stuff like "COPY bank1:#m TO bank2:a*;"
-                //            //here we use item #0 (there can only be 1 such item)
-                //            ss = listItems1[0];
-                //        }
-                //        else
-                //        {
-                //            //Stuff like "COPY bank1:#m TO bank2:#m;"
-                //            ss = listItems1[i];
-                //        }
-                //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(ss, EExtrackBankAndRest.GetDatabank);
-
-                //        string bankName2 = null;
-                //        if (localOptionToBank != null) bankName2 = localOptionToBank.name;
-                //        string toBankName = Program.PerhapsOverrideWithDefaultBankName(bankName2, h.hasColon, h.bank);
-                //        toBank = Program.databanks.GetDatabank(toBankName);
-                //        if (toBank == null)
-                //        {
-                //            G.Writeln2("Databank " + toBankName + " is not open");
-                //            throw new GekkoException();
-                //        }
-                //    }
-
-                //    //listItems0[i] may be with or without wildcards ('*' or '?') or ranges ('..'), and with or without bank (bank:varname)
-                //    //but lists are unfolded to names here.
-                //    //We use the .aliasName here. Actually could use h.bank from above
-
-                //    string bankName = null;
-                //    if (localOptionFromBank != null) bankName = localOptionFromBank.name;
-
-                //    bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
-
-                //    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems0[i], bankName, ignoreErrors);  //gets these from the 'fromBank', so ExtractBankAndRest() gets called two times, but never mind
-
-                //    if (tss.Count == 0 || (tss.Count == 1 && tss[0] == null))  //the first one is if a wildcard does not match at all, and the second is a normal timeseries name is not found, and COPY<error=no> is used.
-                //    {
-                //        string s = listItems0[i].Replace(Globals.firstCheatString, "");
-                //        if (ignoreErrors)
-                //        {
-                //            errorCounter++;
-                //            G.Writeln2("+++ NOTE: COPY: Could not find this timeseries: " + s + "");
-                //            continue;
-                //        }
-                //        else
-                //        {
-                //            G.Writeln2("*** ERROR: COPY: Could not find this timeseries: " + s + "");
-                //            throw new GekkoException();
-                //        }
-                //    }
-
-                //    foreach (Series ts in tss)
-                //    {
-                //        if (ts == null) continue;  //for safety, this should not be possible since there is a continue above.
-
-                //        //If a wildcard like "COPY a*;" is used, tss may have > 1 elements
-                //        string newName = null;
-                //        if (listItems1 == null)
-                //        {
-                //            //Stuff like "COPY adbk:fx*;"  (copies to first)                            
-                //            newName = ts.name;  //same name is used
-                //        }
-                //        else
-                //        {
-                //            if (isUsingPlaceholder)
-                //            {
-                //                //Stuff like "COPY #m TO simbk:a_*;"
-                //                //here we use item #0 (there can only be 1 such item)
-                //                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[0], EExtrackBankAndRest.GetDatabank);
-                //                newName = placeholderPrefix + ts.name + placeholderSuffix;
-                //            }
-                //            else
-                //            {
-                //                //Stuff like "COPY bank1:#m1 TO bank2:#m2;"
-                //                //new names are provided with TO keyword (in a list with same number of items)                                
-                //                ExtractBankAndRestHelper h = Program.ExtractBankAndRest(listItems1[i], EExtrackBankAndRest.GetDatabank);
-                //                newName = h.name;
-                //            }
-                //        }
-
-                //        // ----------------------------------------------------------------------------
-                //        // Now follows the actual copying
-                //        // ----------------------------------------------------------------------------
-
-                //        if (true)
-                //        {
-                //            //TODO: do the actual copying as a block AFTER this is checked! (do some recording of what is to be copied, deleted, etc., and execute that at the end)
-                //            //Testing that we are not copying timeseries to themselves
-                //            Series ts2 = toBank.GetVariable(newName);
-                //            if (ts2 != null)
-                //            {
-                //                if (G.Equal(ts.meta.parentDatabank.name, ts2.meta.parentDatabank.name))
-                //                {
-                //                    if (G.Equal(ts.name, ts2.name))
-                //                    {
-                //                        G.Writeln2("*** ERROR: You are trying to copy the timeseries '" + ts.name + "' from databank '" + ts.meta.parentDatabank.name + "' to itself");
-                //                        throw new GekkoException();
-                //                    }
-                //                }
-                //            }
-                //        }
-
-                //        if (G.Equal(o.opt_respect, "yes"))
-                //        {
-                //            //Truncate time period
-                //            Series ts2 = toBank.GetVariable(newName);
-                //            if (ts2 != null)
-                //            {
-                //                //Type 1
-                //                //inject into existing
-                //                //this is the fastest way, in reality via arraycopy. But beware to check carefully if you
-                //                //  change anything here.
-                //                type1++;
-                //                int index1, index2;
-                //                double[] values_beware_do_not_alter = ts.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, o.t1, o.t2);
-                //                ts2.SetDataSequence(o.t1, o.t2, values_beware_do_not_alter, index1);
-                //                ts2.Stamp();  //will get a new date stamp, since it is not cloning here
-                //            }
-                //            else
-                //            {
-                //                //Type 2
-                //                type2++;
-                //                ts2 = ts.DeepClone(null) as Series;
-                //                ts2.name = newName;
-                //                ts2.Truncate(o.t1, o.t2);
-                //                toBank.AddVariable(ts2);
-                //            }
-                //        }
-                //        else
-                //        {
-                //            //No truncate of time period
-                //            Series ts2 = ts.DeepClone(null) as Series;  //will inherit the date stamp                          
-                //            if (listItems1 != null)
-                //            {
-                //                ts2.name = newName;
-                //            }
-                //            if (toBank.ContainsVariable(newName))
-                //            {
-                //                //Type 3
-                //                //wipe out any existing Series completely, and put in the clone instead
-                //                type3++;
-                //                toBank.RemoveVariable(newName);
-                //            }
-                //            else
-                //            {
-                //                type4++;
-                //                //Type 4
-                //            }
-                //            toBank.AddVariable(ts2);
-                //        }
-                //    }
-                //}
-
-                ////1. if RESPECT keyword and timeseries exists beforehand            -> inject data inside [t1, t2] in existing series
-                ////2. if RESPECT keyword and timeseries does not exist beforehand    -> clone, truncate to [t1, t2], and add to databank
-                ////3. if no RESPECT keyword and timeseries exists beforehand         -> delete existing timeseries, clone, and add the new one to databank
-                ////4. if no RESPECT keyword and timeseries does not exist beforehand -> clone and add to databank                
-
-                //G.Writeln();
-                //if (type1 > 0)
-                //{
-                //    G.Writeln("Put data for " + o.t1 + "-" + o.t2 + " into " + type1 + " existing timeseries");
-                //}
-                //if (type2 > 0)
-                //{
-                //    G.Writeln("Put data for " + o.t1 + "-" + o.t2 + " into " + type2 + " new timeseries");
-                //}
-                //if (type3 > 0)
-                //{
-                //    G.Writeln("Replaced data for all periods in " + type3 + " existing timeseries");
-                //}
-                //if (type4 > 0)
-                //{
-                //    G.Writeln("Put data for all periods into " + type4 + " new timeseries");
-                //}
-                //if (errorCounter > 0)
-                //{
-                //    G.Writeln("+++ WARNING: COPY: Note that " + errorCounter + " variables were not copied");
-                //}
-            }
         }
 
-        public static List<TwoStrings> CopyRenameHelper(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
+        public static List<TwoStrings> WildcardHelper(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
         {
             //Used in both COPY ... TO ... and RENAME ... AS ...
             //All the following combinations are tested in unit tests
@@ -16154,7 +15862,7 @@ namespace Gekko
             Dictionary<string, int> rhsCheck = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             int counter = 0;
-            G.Writeln();
+            //G.Writeln();
             foreach (TwoStrings two in outputs)
             {
                 if (type != EWildcardSearchType.Write && G.Equal(two.s1, two.s2)) //blanks are removed in two list, so indexes should compare fine, too.
@@ -16249,6 +15957,10 @@ namespace Gekko
             {
                 temp.Add(kvp.Key);
             }
+            
+            // 
+            //------------------------------------
+
             string name3a = wildcardName;
             if (wildcardFreq == null)
             {
@@ -21641,7 +21353,7 @@ namespace Gekko
             List<TwoStrings> list = null;
             if (o.list1 != null)
             {
-                list = CopyRenameHelper(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write);
+                list = WildcardHelper(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write);
             }
             
             //foreach (TwoStrings output in outputs)
@@ -26522,13 +26234,13 @@ namespace Gekko
 
                         if (lbl.Count != n)
                         {
-                            if (Globals.runningOnTTComputer) MessageBox.Show("*** ERROR: Mismatch");                            
-                            string l = G.ReplaceGlueNew(RemoveSplitter(labelOriginal[k]).Split('|')[0]);                            
+                            Mismatch();
+                            string l = G.ReplaceGlueNew(RemoveSplitter(labelOriginal[k]).Split('|')[0]);
                             lbl = new List<string>();
                             for (int ii = 0; ii < n; ii++)
                             {
                                 lbl.Add(l);
-                            }                         
+                            }
                         }
 
                         // ----------------------------------------------------
@@ -26818,7 +26530,10 @@ namespace Gekko
                             }
                             else
                             {
-                                if (j == 1) table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                if (j == 1)
+                                {
+                                    table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                }
                             }
                         }
 
@@ -27521,6 +27236,14 @@ namespace Gekko
             }
         }
 
+        private static void Mismatch()
+        {
+            if (Globals.runningOnTTComputer)
+            {
+                G.Writeln2("*** ERROR: Mismatch");
+            }
+        }
+
         public static List<string> OPrintLabels(List<string> labelGiven, List<O.RecordedPieces> labelRecordedPieces, int n, int i)
         {
             if (labelGiven.Count > 1)
@@ -27543,7 +27266,47 @@ namespace Gekko
                 return lbl;
             }
 
-            int nn = labelRecordedPieces.Count / n;  //how many inserts per column
+            // ===========================================================
+            
+            //n is the number of elements in the prtElements list
+            //For PRT x[#i], it would be the number of elements in #i.
+
+            //For each of these, there mayb be a <q m p> option
+
+            //label is only added if --> counter % nn == nn - 1
+
+            int nn = labelRecordedPieces.Count / n;  //how many inserts like <q m p> per column
+            if (labelRecordedPieces.Count % n != 0) Mismatch(); //only shown on TT computer
+            
+            //
+            // for instance PRT <n p> x[#i], #i = a, b, c.
+            // 
+            // here n = 3, and we expect 3 recorded pieces for simple x[#i], could be 6 if it was x[#i]/y[#i]
+            // the option <n p> does not produce more recorded pieces, <n p n p n p> would not require more
+            // calculations, just after-processiong. If there is a <m> or <q> only the first one (for First
+            // bank) will be run.
+            //
+            // hence nn will most likely count how many pieces are inserted for each printed variable (may
+            // be a array element), for instance 1 for x[#i], 2 for x[#i]/y[#i], etc.
+            //
+            // counter counts recordedPieces and runs from 0 ... 2 inclusive.
+            //
+            // 0  'a'      0 % 1 == 0
+            // 1  'b'      1 % 1 == 0
+            // 2  'c'      2 % 1 == 0
+
+            // 0  'a'      0 % 2 == 0
+            // 1  'b'      1 % 2 == 0
+            // 2  'c'      2 % 2 == 0
+            // 3  'a'      0 % 2 == 0
+            // 4  'b'      1 % 2 == 0
+            // 5  'c'      2 % 2 == 0
+
+            //
+            //
+
+            // ===========================================================
+
 
             string[] result = new string[w[0].Length];
             int ci = 0;
@@ -27565,11 +27328,13 @@ namespace Gekko
             //now we are going to insert items from RecordLabel() into this result string.
 
             //foreach recorded call of {} or [], via RecordLabel()
+                       
+
             int counter = -1;
-            foreach (O.RecordedPieces y in labelRecordedPieces)  //foreach RecordLabel()
+            foreach (O.RecordedPieces piece in labelRecordedPieces)  //foreach RecordLabel()
             {
                 counter++;
-                string[] ss = y.s.Split('|');
+                string[] ss = piece.s.Split('|');
                 int length = 0;
                 length = ss[0].Length;
 
@@ -27590,7 +27355,7 @@ namespace Gekko
                 }
 
                 //if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
-                if (y.iv.Type() == EVariableType.String)
+                if (piece.iv.Type() == EVariableType.String)
                 {
                     //good
                 }
@@ -27603,7 +27368,7 @@ namespace Gekko
                 {
 
                     int offset = ii2 - i2;
-                    string xx = y.iv.ConvertToString();
+                    string xx = piece.iv.ConvertToString();
 
                     result[offset] = xx;
                     for (int ii = offset + 1; ii < offset + length; ii++)
@@ -27628,7 +27393,18 @@ namespace Gekko
                 string result2 = G.ReplaceGlueNew(u);
                 //G.Writeln2("===> " + result2);
 
+                // ----------------------------------------------
+                // NOTE: The string[] result is outside the loop of recorded pieces
+                //       For each piece in the loop, something is put into the
+                //       result array. If there are 3 pieces for each label,
+                //       piece0, piece1 and piece2 should be put into the label
+                //       and after piece2 is done, it should be added to List<string> lbl.
+                //       That is the reason of counter % nn == nn - 1, in this case nn = 3,
+                //       so we need counter % 3 == 2, that is counter 
+                // ----------------------------------------------
+
                 if (counter % nn == nn - 1)
+                //if (counter % nn == 0)
                 {
                     lbl.Add(result2);
                 }

@@ -946,9 +946,12 @@ namespace Gekko.Parser.Gek
                     case "ASTCOPY":
                         {
                             node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL);
-                            GetCodeFromAllChildren(node, node[0]);
-                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
-                            if (node[2] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
+                            
+                            if (node[0][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[0][0].Text + "`;");
+
+                            GetCodeFromAllChildren(node, node[1]);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
+                            if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -2900,19 +2903,15 @@ namespace Gekko.Parser.Gek
                         }
                         break;                        
                     case "ASTINDEX":  //the INDEX command
-                        {                                               
+                        {
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
-                            //string nodeCode = "";
-                            //if (node[1][0] != null) nodeCode = HandleListFile(node[1], nodeCode);
-                            //node.Code.A(nodeCode);
 
-                            node.Code.A("o" + Num(node) + ".names1 = " + node[0].Code + ";" + G.NL);
+                            if (node[0][0] != null) node.Code.A(node[0][0].Code);  //options
                             if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);
-
-                            //node.Code.A(node[0].Code);
-
-
-                            if (node[2] != null) node.Code.A(node[2].Code);
+                            //if (node[2][0] != null) node.Code.A("o" + Num(node) + ".type = " + node[2][0].Code + ";" + G.NL);
+                            if (node[2][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[2][0].Text + "`;");
+                            if (node[3] != null) node.Code.A("o" + Num(node) + ".names1 = " + node[3].Code + ";" + G.NL);
+                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3545,12 +3544,7 @@ namespace Gekko.Parser.Gek
                             string convertTo = null;
 
                             string temp = node[1].Code.ToString();
-
-                            //#098743589437
-                            //if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.IvConvertTo(EVariableType." + type + ", ").A(temp).A(")").End();
-                            //if (type != null) node.Code.A("IVariable " + ivTempVar + " = O.TypeCheck_" + type.ToLower() + "(").A(temp).A(", -1)").End(); //-1 means assignment
-                            //else node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
-
+                            
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
                             node.Code.A(node[0].Code).End();
@@ -4556,8 +4550,8 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
                             
-                            //node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
-                            node.Code.A("O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
+                            node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
+                            //node.Code.A("O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
 
                             node.Code.A("}" + G.NL);  //end of bankNumbers
                             node.Code.A("smpl.bankNumber = 0;" + G.NL);  //resetting, probably superfluous
@@ -4579,16 +4573,12 @@ namespace Gekko.Parser.Gek
                             //similar to ASTCOPY
                             node.Code.A("O.Rename o" + Num(node) + " = new O.Rename();" + G.NL);
 
-                            node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
-
-                            //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            //node.Code.A(node[0].Code);  //list1
-                            //node.Code.A("o" + Num(node) + ".listItems1 = o" + Num(node) + ".listItems;" + G.NL;                            
-                            //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            //node.Code.A(node[1].Code);  //list2
-                            if (node[2] != null) node.Code.A(node[2].Code); //options
-                            //node.Code.A("o" + Num(node) + ".listItems2 = o" + Num(node) + ".listItems;" + G.NL;                            
+                            if (node[0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
+                            
+                            if (node[3] != null) node.Code.A(node[2].Code); //options
+                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;                    
@@ -5035,8 +5025,9 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
                             node.Code.A("" + Globals.labelCounter + " = 0;");
                             node.Code.A(node[0].Code);  //dates
-                                                        
-                            node.Code.A("o" + Num(node) + ".iv = " + node[1].Code + ";" + G.NL);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[1][0].Text + "`;");
+
+                            node.Code.A("o" + Num(node) + ".iv = " + node[2].Code + ";" + G.NL);
 
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
