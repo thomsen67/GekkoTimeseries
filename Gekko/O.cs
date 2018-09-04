@@ -6685,7 +6685,7 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public List<string> listItems = null;
-            public IVariable iv = null;
+            public List iv = null;
             public string searchName = null;
             public string opt_info = null;
             public string type = null;
@@ -6694,13 +6694,7 @@ namespace Gekko
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (this.searchName == null)
-                {
-                    //List<string> m = new List<string>();
-
-                    //foreach (IVariable iv in iv.list)
-                    //{
-                    //    m.Add(iv.ConvertToString());
-                    //}
+                {                    
                     Program.Disp(this.t1, this.t2, null, this);
                 }
                 else

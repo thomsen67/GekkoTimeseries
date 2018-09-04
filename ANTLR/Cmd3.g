@@ -2168,7 +2168,8 @@ start:                      statements EOF;  //EOF is necessary in order to forc
 statements:                 statements2*;
 
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
-                          | assignment           SEMICOLON!
+                          | series               SEMICOLON!  //before assignemt: must catch SERIES x = 1 -2 -3; etc.
+						  | assignment           SEMICOLON!
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
 			              | clear                SEMICOLON!		

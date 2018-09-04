@@ -2062,7 +2062,7 @@ namespace Gekko
             //int length = s.Length;
             //TODO:
             //what about error position if glue stuff is removed?? Do some logic...
-            
+            if (s == null) return s;
             s = s.Replace(Globals.symbolGlueChar2, "");
             s = s.Replace(Globals.symbolGlueChar3, "");
             s = s.Replace(Globals.symbolGlueChar4, "");

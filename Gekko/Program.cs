@@ -9755,11 +9755,12 @@ namespace Gekko
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
 
-            G.Writeln();
+            //G.Writeln();
 
             string label2 = G.ReplaceGlueNew(label);
             label2 = ScalarString.SubstituteScalarsInString(label2, false, true);
-            G.Writeln(label2);
+
+            PrintLabel(label2);
             foreach (string s in xx)
             {
                 G.Writeln(s);
@@ -14721,8 +14722,10 @@ namespace Gekko
 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
+            EVariableType type = EVariableType.Series;
             bool gamsStyle = true;
             bool gamsToGekko = true;
+            bool nonSeries = false;
 
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
             if (o != null && G.Equal(o.opt_info, "yes"))
@@ -14734,25 +14737,44 @@ namespace Gekko
             Globals.dispLastDispStart = tStart; //kept if user chooses to click a link -- in that case we want to use same time settings
             Globals.dispLastDispEnd = tEnd; //kept if user chooses to click a link
 
-            int varCounter = 0;
+            int seriesCounter = 0;
+
 
             List<IVariable> m = new List<IVariable>();
             if (list != null)
             {
+                //seems list is always null when called from command
                 foreach (string listItem in list)
                 {
-                    IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
+                    IVariable x = O.GetIVariableFromString(listItem, O.ECreatePossibilities.NoneReportError);
                     m.Add(x);
                 }
             }
             else
             {
-                UnfoldLists(o.iv, m);
+                List<TwoStrings> matches = Program.WildcardHelper(o.iv, null, null, null, EWildcardSearchType.Search);
+                //List rv = new List();
+                //List<string> names = new List<string>();
+                foreach (TwoStrings two in matches)
+                {
+                    if (type != EVariableType.Var)
+                    {
+                        //a bit of double work here, but maybe it does not need to be super fast anyway
+                        IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
+                        if (type != EVariableType.Var && type != iv.Type())
+                        {
+                            PrintNonSeries(iv, null);
+                            nonSeries = true;
+                            continue; //skip it
+                        }
+                    }
+                    m.Add(O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError));
+                }
             }
 
             foreach (IVariable x in m)
             {
-                varCounter++;
+                seriesCounter++;
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 
                 //IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
@@ -14983,9 +15005,9 @@ namespace Gekko
                     if (true)
                     {
                         EEndoOrExo type1 = VariableTypeEndoExo(var);
-                        string type = "";
-                        if (type1 == EEndoOrExo.Exo) type = "Exogenous, ";
-                        else if (type1 == EEndoOrExo.Endo) type = "Endogenous, ";
+                        string type3 = "";
+                        if (type1 == EEndoOrExo.Exo) type3 = "Exogenous, ";
+                        else if (type1 == EEndoOrExo.Endo) type3 = "Endogenous, ";
 
                         string freq = "[unknown frequency]";
 
@@ -14999,7 +15021,7 @@ namespace Gekko
                         GekkoTime first = ts.GetRealDataPeriodFirst();
                         GekkoTime last = ts.GetRealDataPeriodLast();
 
-                        G.Write(type);
+                        G.Write(type3);
                         string stamp = null;
                         if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
                         if (ts.freq == EFreq.Annual || ts.freq == EFreq.Undated)
@@ -15205,15 +15227,16 @@ namespace Gekko
                     }
                 }                
             }
-         
-            if (varCounter == 1)
+
+            if (seriesCounter == 0 && nonSeries)
             {
-                //G.Writeln2("Displayed " + varCounter + " variable");
+                //nomessage
             }
             else
             {
-                G.Writeln2("Displayed " + varCounter + " variables");
+                G.Writeln2("Displayed " + seriesCounter + " series");
             }
+            
         }
 
         private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs)
@@ -27555,79 +27578,92 @@ namespace Gekko
                 string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
                 string labelGiven = G.ReplaceGlueNew(w[0]);
 
-                IVariable var = element.variable[0];
-                List temp = var as List;
-                if (temp != null)
+                PrintNonSeries(element.variable[0], labelGiven);
+            }
+        }
+
+        private static void PrintNonSeries(IVariable var, string labelGiven)
+        {
+            string pling = "'";
+            
+            List temp = var as List;
+            if (temp != null)
+            {
+                string s = null;
+                foreach (IVariable iv in temp.list)
                 {
-                    string s = null;
-                    foreach (IVariable iv in temp.list)
+                    if (iv.Type() == EVariableType.String)
                     {
-                        if (iv.Type() == EVariableType.String)
-                        {
-                            s += pling + ((ScalarString)iv).string2 + pling + ", ";
-                        }
-                        else if (iv.Type() == EVariableType.Date)
-                        {
-                            s += ((ScalarDate)iv).date.ToString() + ", ";
-                        }
-                        else if (iv.Type() == EVariableType.Val)
-                        {
-                            s += ((ScalarVal)iv).val.ToString() + ", ";
-                        }
-                        else
-                        {
-                            s += "[" + iv.Type().ToString() + "]" + ", ";
-                        }
+                        s += pling + ((ScalarString)iv).string2 + pling + ", ";
                     }
-                    G.Writeln2(labelGiven);
-                    if (temp.list.Count > 0)
+                    else if (iv.Type() == EVariableType.Date)
                     {
-                        s = s.Substring(0, s.Length - ", ".Length);
-                        G.Writeln(s);
+                        s += ((ScalarDate)iv).date.ToString() + ", ";
+                    }
+                    else if (iv.Type() == EVariableType.Val)
+                    {
+                        s += ((ScalarVal)iv).val.ToString() + ", ";
                     }
                     else
                     {
-                        G.Writeln("[empty list]");
+                        s += "[" + iv.Type().ToString() + "]" + ", ";
                     }
+                }
+                PrintLabel(labelGiven);
+
+                if (temp.list.Count > 0)
+                {
+                    s = s.Substring(0, s.Length - ", ".Length);
+                    G.Writeln(s);
                 }
                 else
                 {
-                    if (var.Type() == EVariableType.Matrix)
+                    G.Writeln("[empty list]");
+                }
+            }
+            else
+            {
+                if (var.Type() == EVariableType.Matrix)
+                {
+                    Program.ShowMatrix((Matrix)var, labelGiven);
+                }
+                else if (var.Type() == EVariableType.String)
+                {
+                    PrintLabel(labelGiven);
+                    G.Writeln(pling + ((ScalarString)var).string2 + pling);
+                }
+                else if (var.Type() == EVariableType.Val)
+                {
+                    PrintLabel(labelGiven);
+                    G.Writeln(((ScalarVal)var).val.ToString());
+                }
+                else if (var.Type() == EVariableType.Date)
+                {
+                    PrintLabel(labelGiven);
+                    G.Writeln(((ScalarDate)var).date.ToString());
+                }
+                else if (var.Type() == EVariableType.Map)
+                {
+                    PrintLabel(labelGiven);
+                    Map map = var as Map;
+
+                    if (map.storage.Count == 0)
                     {
-                        Program.ShowMatrix((Matrix)var, labelGiven);
+                        G.Writeln("[empty map]");
                     }
-                    else if (var.Type() == EVariableType.String)
+                    else
                     {
-                        G.Writeln2(labelGiven);
-                        G.Writeln(pling + ((ScalarString)var).string2 + pling);
-                    }
-                    else if (var.Type() == EVariableType.Val)
-                    {
-                        G.Writeln2(labelGiven);
-                        G.Writeln(((ScalarVal)var).val.ToString());
-                    }
-                    else if (var.Type() == EVariableType.Date)
-                    {
-                        G.Writeln2(labelGiven);
-                        G.Writeln(((ScalarDate)var).date.ToString());
-                    }
-                    else if (var.Type() == EVariableType.Map)
-                    {
-                        G.Writeln2(labelGiven);
-                        Map map = var as Map;
-                                                
-                        if (map.storage.Count == 0)
-                        {
-                            G.Writeln("[empty map]");
-                        }
-                        else
-                        {
-                            G.Writeln("MAP printing not implemented yet. But individual elements can");
-                            G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
-                        }                        
+                        G.Writeln("MAP printing not implemented yet. But individual elements can");
+                        G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
                     }
                 }
             }
+        }
+
+        private static void PrintLabel(string labelGiven)
+        {
+            if (!G.NullOrEmpty(labelGiven)) G.Writeln2(labelGiven);
+            else G.Writeln();
         }
 
         public static bool HandleLabels(TokenList tokenList, int level, List<O.LabelHelperIVariable> iVariableList, string[] uncontrolledSimpleLists, ref int counter)
