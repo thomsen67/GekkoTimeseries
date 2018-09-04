@@ -26937,7 +26937,7 @@ namespace Gekko
                 Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
                 Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                
             }
-            Program.model.simulateResults[0] = iterCounter;
+            Program.model.simulateResults[0] = iterCounter; 
         }
 
         private static void RunOneGaussIterationWithDamping(List<int> isDampedPointers, Type assembly, Object[] args, double[] bOld)
