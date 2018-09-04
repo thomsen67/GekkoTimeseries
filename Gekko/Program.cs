@@ -17795,8 +17795,16 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
                                 SolveAfter();
-                                SolveRevertedAuto();
-                                SolveRevertedY();
+                                if (Globals.JOrderFix)
+                                {
+                                    SolveRevertedY();
+                                    SolveRevertedAuto();                                    
+                                }
+                                else
+                                {
+                                    SolveRevertedAuto();
+                                    SolveRevertedY();
+                                }
                             }
                             else if (modelType == ECompiledModelType.Res)
                             {
@@ -19266,8 +19274,16 @@ namespace Gekko
 
             Object[] args2 = new Object[1];
             args2[0] = Program.model.b;
-            Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
-            Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            if (Globals.JOrderFix)
+            {
+                Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+                Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);                
+            }
+            else
+            {
+                Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args2);
+                Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args2);
+            }
         }
 
         private static ECompiledModelType GetModelTypeFromOptions(SimOptions so)
@@ -30627,15 +30643,31 @@ namespace Gekko
                 }
             }
 
-            if (modelType == ECompiledModelType.GaussFailSafe)
+            if (Globals.JOrderFix)
             {
-                Program.model.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                Program.model.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                if (modelType == ECompiledModelType.GaussFailSafe)
+                {
+                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
+                }
+                else
+                {
+                    Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);                    
+                }
             }
             else
             {
-                Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
-                Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                if (modelType == ECompiledModelType.GaussFailSafe)
+                {
+                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.assemblyRevertedFailSafe.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                }
+                else
+                {
+                    Program.model.assemblyReverted.InvokeMember("revertedAuto", BindingFlags.InvokeMethod, null, null, args);
+                    Program.model.assemblyReverted.InvokeMember("revertedY", BindingFlags.InvokeMethod, null, null, args);
+                }
             }
             Program.model.simulateResults[0] = iterCounter;
         }

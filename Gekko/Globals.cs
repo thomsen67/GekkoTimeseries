@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "v14";  // "v14";
 
+        public static bool JOrderFix = true;
+
         //Newton starting values start ------------------------------------
         //public static bool newtonStartingValuesFix = true;
         public static int newtonRobustHelper1 = -12345;
