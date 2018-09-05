@@ -290,7 +290,7 @@ namespace Gekko
             //Only used internally, when dealing with databanks. Not relevant for
             //outside use.
             if (freq == null) return G.Chop_FreqAdd(varName, Program.options.freq);
-            else return G.Chop_FreqAdd(varName, freq);
+            else return G.Chop_AddFreq(varName, freq);
         }
 
 
@@ -357,7 +357,7 @@ namespace Gekko
 
         public static EFreq GetFreqFromName(string s)
         {
-            string f = G.Chop_FreqPart(s);
+            string f = G.Chop_GetFreq(s);
             if(f==null)
             {
                 G.Writeln2("*** ERROR: freq problem");
@@ -371,7 +371,7 @@ namespace Gekko
 
         public static bool Chop_HasFreq(string s)
         {
-            if (G.Chop_FreqPart(s) != null) return true;
+            if (G.Chop_GetFreq(s) != null) return true;
             return false;
         }
 
@@ -389,7 +389,7 @@ namespace Gekko
         // ===========================================================================================================================
         
         //See equivalent method in Functions.cs
-        public static string Chop_BankPart(string s1)
+        public static string Chop_GetBank(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -399,7 +399,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_NamePart(string s1)
+        public static string Chop_GetName(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -407,7 +407,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqPart(string s1)
+        public static string Chop_GetFreq(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -416,7 +416,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_NameAndFreqPart(string s1)
+        public static string Chop_GetNameAndFreq(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -425,7 +425,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static List<string> Chop_IndexPart(string s1)
+        public static List<string> Chop_GetIndex(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -434,14 +434,14 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FullName(string bank, string name, string freq, string[] index)
+        public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
             string s = O.UnChop(bank, name, freq, index);
             return s;
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_BankAdd(string s1, string s2)
+        public static string Chop_AddBank(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -456,7 +456,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_BankSet(string s1, string s2)
+        public static string Chop_SetBank(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -464,7 +464,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_BankRemove(string s1)
+        public static string Chop_RemoveBank(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -472,7 +472,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_BankRemove(string s1, string s2)
+        public static string Chop_RemoveBank(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -482,7 +482,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_BankReplace(string s1, string s2, string s3)
+        public static string Chop_ReplaceBank(string s1, string s2, string s3)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);            
@@ -491,7 +491,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqAdd(string s1, string s2)
+        public static string Chop_AddFreq(string s1, string s2)
         {
             //only adds a freq if there is no freq already
             string bank, name, freq; string[] index;
@@ -509,11 +509,11 @@ namespace Gekko
 
         public static string Chop_FreqAdd(string s1, EFreq freq)
         {
-            return Chop_FreqAdd(s1, G.GetFreq(freq));
+            return Chop_AddFreq(s1, G.GetFreq(freq));
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqSet(string s1, string s2)
+        public static string Chop_SetFreq(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -523,11 +523,11 @@ namespace Gekko
 
         public static string Chop_FreqSet(string s1, EFreq freq)
         {
-            return Chop_FreqSet(s1, G.GetFreq(freq));
+            return Chop_SetFreq(s1, G.GetFreq(freq));
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqRemove(string s1)
+        public static string Chop_RemoveFreq(string s1)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -536,7 +536,7 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqRemove(string s1, string s2)
+        public static string Chop_RemoveFreq(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -548,11 +548,11 @@ namespace Gekko
 
         public static string Chop_FreqRemove(string s1, EFreq freq)
         {
-            return Chop_FreqRemove(s1, G.GetFreq(freq));
+            return Chop_RemoveFreq(s1, G.GetFreq(freq));
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_FreqReplace(string s1, string s2, string s3)
+        public static string Chop_ReplaceFreq(string s1, string s2, string s3)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -563,11 +563,11 @@ namespace Gekko
 
         public static string Chop_FreqReplace(string s1, EFreq freq2, EFreq freq3)
         {
-            return Chop_FreqReplace(s1, G.GetFreq(freq2), G.GetFreq(freq3));
+            return Chop_ReplaceFreq(s1, G.GetFreq(freq2), G.GetFreq(freq3));
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_NameSet(string s1, string s2)
+        public static string Chop_SetName(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -575,7 +575,7 @@ namespace Gekko
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_NameSetPrefix(string s1, string s2)
+        public static string Chop_SetNamePrefix(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
@@ -583,7 +583,7 @@ namespace Gekko
             return O.UnChop(bank, name, freq, index);
         }
 
-        public static string Chop_NameSetSuffix(string s1, string s2)
+        public static string Chop_SetNameSuffix(string s1, string s2)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);

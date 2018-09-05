@@ -1414,7 +1414,7 @@ namespace Gekko
                     {
                         if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
                         {
-                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), null);
+                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
                             iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                             iv = ts;
                         }
@@ -1429,7 +1429,7 @@ namespace Gekko
                         if (type == ECreatePossibilities.Must)
                         {
                             //overwriting
-                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), null);
+                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
                             iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
                             iv = ts;
                         }
@@ -1448,7 +1448,7 @@ namespace Gekko
                     {
                         if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
                         {
-                            Series ts = new Series(G.GetFreq(G.Chop_FreqPart(nameWithFreq)), nameWithFreq);
+                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), nameWithFreq);
                             bank.AddIVariable(nameWithFreq, ts);
                         }
                         else
@@ -5314,7 +5314,7 @@ namespace Gekko
                 foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;
-                    string s2 = G.Chop_FreqRemove(s);
+                    string s2 = G.Chop_RemoveFreq(s);
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
                 }
                 foreach (string s in Program.model.varsAType.Keys)

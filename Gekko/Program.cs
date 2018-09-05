@@ -4387,7 +4387,7 @@ namespace Gekko
                 int dimensionsWithoutTime = codes.Count;
 
                 //put in the array-timeseries ghost
-                string varNameWithFreq = G.Chop_FreqAdd(tableName, freq);
+                string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
                 Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
                 Databank databank = Program.databanks.GetFirst();
@@ -4466,7 +4466,7 @@ namespace Gekko
                     if (true)
                     {
                         string name2 = codesCombi[j].Replace(Globals.pxInternalDelimiter, '_');
-                        string name3 = G.Chop_FreqAdd(name2, freq);
+                        string name3 = G.Chop_AddFreq(name2, freq);
                         ts = new Series(G.GetFreq(freq), name3);
                         ts.meta.label = valuesCombi[j];
                         ts.meta.source = source;
@@ -4516,7 +4516,7 @@ namespace Gekko
                     }
 
                     //put in the timeseries
-                    string varNameWithFreq = G.Chop_FreqAdd(tableName, freq);
+                    string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
                     Databank databank = Program.databanks.GetFirst();
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
@@ -5266,7 +5266,7 @@ namespace Gekko
                         IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError);
 
                         string name = bnv.s2;
-                        string nameWithoutFreq = G.Chop_NamePart(name);
+                        string nameWithoutFreq = G.Chop_GetName(name);
 
                         //if (iv == null)
                         //{
@@ -5495,7 +5495,7 @@ namespace Gekko
                 //{
                 //    name = G.Chop_FreqAdd(name, Program.options.freq);
                 //}
-                string nameWithoutFreq = G.Chop_FreqRemove(name);
+                string nameWithoutFreq = G.Chop_RemoveFreq(name);
 
                 //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
                 //IVariable iv = gdb.GetIVariable(name);
@@ -5892,7 +5892,7 @@ namespace Gekko
             }
 
 
-            string varName2 = G.Chop_FreqRemove(varName);
+            string varName2 = G.Chop_RemoveFreq(varName);
             if (varName.Length <= 16 && ts.meta.label != null && ts.meta.label.Length > 0)
             {
                 res.WriteLine(varName2 + G.Blanks(16 - varName2.Length) + ts.meta.label);
@@ -6010,7 +6010,7 @@ namespace Gekko
 
             int count2 = 0;
             string s = "";
-            string varName = G.Chop_NamePart(name); // ts.name;
+            string varName = G.Chop_GetName(name); // ts.name;
             if (isCaps) varName = varName.ToUpper();
 
             if (ts.freq == EFreq.Annual)
@@ -14609,7 +14609,7 @@ namespace Gekko
                             vars.Add(ts.name);
                             expl.Add(label);
                             both.Add(ts.name + "¤" + label); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
-                            both2.Add(G.Chop_FreqRemove(ts.name) + "¤" + label);
+                            both2.Add(G.Chop_RemoveFreq(ts.name) + "¤" + label);
                             if (Program.options.freq != ts.freq)
                                 differentFreq = true;                            
                         }
@@ -14805,7 +14805,7 @@ namespace Gekko
                 string var = ts.name;
                 string bank = ts.meta.parentDatabank.name;                                
 
-                string varnameWithoutFreq = G.Chop_FreqRemove(ts.name);
+                string varnameWithoutFreq = G.Chop_RemoveFreq(ts.name);
 
                 if (gamsStyle)
                 {                       
@@ -14915,7 +14915,7 @@ namespace Gekko
                         string first = keys[0].ToString();
                         string last = keys[keys.Count - 1].ToString();
 
-                        G.Writeln("First/last elements (alphabetically): " + G.Chop_FreqRemove(ts.name) + "[" + first + "]" + " ... " + G.Chop_FreqRemove(ts.name) + "[" + last + "]");
+                        G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
                         if (ts.dimensions > 1)
                         {
                             G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
@@ -15001,7 +15001,7 @@ namespace Gekko
 
                     G.Writeln();
                     G.Writeln("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + G.Chop_FreqRemove(ts.name));
+                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + G.Chop_RemoveFreq(ts.name));
                     if (true)
                     {
                         EEndoOrExo type1 = VariableTypeEndoExo(var);
@@ -15917,7 +15917,7 @@ namespace Gekko
                     if (type == EWildcardSearchType.Write)
                     {
                         //Remove bank, which is always "First:" anyway
-                        ss = G.Chop_BankRemove(ss);
+                        ss = G.Chop_RemoveBank(ss);
                     }
                     G.Writeln2("*** ERROR: The variables " + G.GetListWithCommas(temp) + " are all " + command3 + " to " + ss);
                     throw new GekkoException();
@@ -15944,7 +15944,7 @@ namespace Gekko
                     }
                     if (type == EWildcardSearchType.Write)
                     {
-                        if (!G.Equal(G.Chop_BankPart(two.s2), "First"))
+                        if (!G.Equal(G.Chop_GetBank(two.s2), "First"))
                         {
                             G.Writeln2("*** ERROR: Internal error #08745765398475");
                             throw new GekkoException();
@@ -17814,7 +17814,7 @@ namespace Gekko
                 foreach (string s in bank.storage.Keys)
                 {
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;  //filter out other freqs
-                    string s2 = G.Chop_FreqRemove(s);
+                    string s2 = G.Chop_RemoveFreq(s);
                     if (!Program.model.varsAType.ContainsKey(s2))
                     {
                         onlyDatabankNotModel.Add(s2);
@@ -17951,7 +17951,7 @@ namespace Gekko
                 if (kvp.Value.Type() != EVariableType.Series) continue;
                 string ss =  kvp.Key;                
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //we filter out other freqs
-                string s = G.Chop_FreqRemove(ss);
+                string s = G.Chop_RemoveFreq(ss);
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
@@ -20882,9 +20882,9 @@ namespace Gekko
                 //string var;
                 for (int j = 0; j < vars.Count; j++)
                 {
-                    string var = G.Chop_NamePart(vars[j].s1);
+                    string var = G.Chop_GetName(vars[j].s1);
 
-                    string baseVar = G.Chop_BankSet(vars[j].s1, "Ref");
+                    string baseVar = G.Chop_SetBank(vars[j].s1, "Ref");
 
                     //Databank db = GetBankFromBankNameVersion(vars[j].bank);
 
@@ -21494,7 +21494,7 @@ namespace Gekko
 
                 foreach (TwoStrings two in list)
                 {
-                    if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_FreqPart(two.s1)))
+                    if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))
                     {
                         //good
                         listFilteredForCurrentFreq.Add(two);
@@ -21709,7 +21709,7 @@ namespace Gekko
 
                 IVariable iv = O.GetIVariableFromString(newList[i].s1, O.ECreatePossibilities.NoneReportError);
                 Series ts = iv as Series;
-                string varLabel = G.Chop_NamePart(newList[i].s2);
+                string varLabel = G.Chop_GetName(newList[i].s2);
                 eo.excelRowLabels[i, 0] = varLabel;
 
                 //Series tsGrund = base2.GetVariable(var);
@@ -21895,7 +21895,7 @@ namespace Gekko
                         IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
 
                         //string varnameWithFreq = var.name;
-                        string varnameWithFreq = G.Chop_NameAndFreqPart(var.s2);
+                        string varnameWithFreq = G.Chop_GetNameAndFreq(var.s2);
                         //if (xx.Type() == EVariableType.Series)
                         //{
                         //    //string freq = var.freq;
@@ -22050,7 +22050,7 @@ namespace Gekko
                     {
                         if (ts == null) continue;  //skip                            
                         count++;
-                        WriteTsdRecord(yr1, yr2, res, ts, G.Chop_NamePart(var.s2), isCaps, isTsdx);
+                        WriteTsdRecord(yr1, yr2, res, ts, G.Chop_GetName(var.s2), isCaps, isTsdx);
                     }
                 }
                 res.Flush();
@@ -22635,7 +22635,7 @@ namespace Gekko
                     GekkoTime tsEnd = ts.GetPeriodLast();
 
                     counter++;
-                    string temp = G.Chop_NamePart(var.s2);
+                    string temp = G.Chop_GetName(var.s2);
                     if (format == EdataFormat.Csv) file.Write(temp);
                     else file.Write(G.varFormat(temp, prnWidth));  //prn and gnuplot
                     foreach (GekkoTime t in new GekkoTimeIterator( per1, per2))
@@ -22789,7 +22789,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Variable '" + var.s1 + "' is of wrong type");
                         throw new GekkoException();
                     }
-                    file.Write(G.varFormat(G.Chop_NamePart(var.s2), prnWidth));  //prn and gnuplot
+                    file.Write(G.varFormat(G.Chop_GetName(var.s2), prnWidth));  //prn and gnuplot
                 }
                 file.WriteLine();
 
@@ -26223,14 +26223,39 @@ namespace Gekko
 
                         int bankCombi = GetBankCombi(printCode);
 
-                        //if ((bankCombi == 0 &&  explodeElement.variable[0].Type() == EVariableType.GekkoNull) || (bankCombi == 1 && explodeElement.variable[1].Type() == EVariableType.GekkoNull || bankCombi == 2 && (explodeElement.variable[0].Type() == EVariableType.GekkoNull || explodeElement.variable[1].Type() == EVariableType.GekkoNull)))
+                        bool tjek1 = bankCombi == 0 && IsNullSubSeries(explodeElement.variable[0]);
+                        bool tjek2 = bankCombi == 1 && IsNullSubSeries(explodeElement.variable[1]);
+                        bool tjek3 = bankCombi == 2 && (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]));
 
-                        if ((bankCombi == 0 && IsNullSubSeries(explodeElement.variable[0])) || (bankCombi == 1 && IsNullSubSeries(explodeElement.variable[1])) || (bankCombi == 2 && (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]))))
+                        if (bankCombi == 0)
                         {
-                            //skip this column, probably a xx['something'] that is non-existing together with OPTION series array ignoremissing yes
-                            numberOfGekkoNullVariables++;
-                            continue;
+                            if (IsNullSubSeries(explodeElement.variable[0]))
+                            {
+                                numberOfGekkoNullVariables++;
+                                continue;
+                            }
                         }
+                        else if (bankCombi == 1)
+                        {
+                            if (IsNullSubSeries(explodeElement.variable[1]))
+                            {
+                                numberOfGekkoNullVariables++;
+                                continue;
+                            }
+                        }
+                        else if (bankCombi == 2)
+                        {
+                            if (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]))
+                            {
+                                numberOfGekkoNullVariables++;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            throw new GekkoException();
+                        }
+                                                
                         numberOfOtherVariables++;
 
                         Series temp0 = explodeElement.variable[0] as Series;
@@ -36566,7 +36591,7 @@ namespace Gekko
             foreach (string ss in Program.databanks.GetFirst().storage.Keys)
             {
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //filter other freqs
-                string s = G.Chop_FreqRemove(ss);
+                string s = G.Chop_RemoveFreq(ss);
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
                 if (Program.model.varsAType.ContainsKey(s))
                 {
@@ -37543,7 +37568,7 @@ namespace Gekko
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            
-            if (removeCurrentFreqFromNames) return G.Chop_FreqRemove(s1, G.GetFreq(Program.options.freq));
+            if (removeCurrentFreqFromNames) return G.Chop_RemoveFreq(s1, G.GetFreq(Program.options.freq));
             else return s1;
         }
 
