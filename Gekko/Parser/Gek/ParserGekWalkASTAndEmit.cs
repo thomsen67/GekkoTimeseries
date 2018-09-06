@@ -4117,19 +4117,21 @@ namespace Gekko.Parser.Gek
                                 //    node.Code.A("Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = true;");
                                 //}
                                 if (o == "timefilter_type")  //TODO: only issue if really avg
-                                {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
+                                {                                    
+                                    node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
                                 }                                
                                 if (o == "solve_forward_nfair_damp" || o == "solve_forward_fair_damp" || o == "solve_gauss_damp")
-                                {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
+                                {                                    
+                                    node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
                                 }
                                 if (o == "r_exe_path")
+                                {                                    
+                                    node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
+                                }
+                                if (o == "series_array_ignoremissing")
                                 {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
+                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
+                                    node.Code.A("throw new GekkoException();");
                                 }
                             }
                         }
@@ -6883,7 +6885,7 @@ namespace Gekko.Parser.Gek
             s.Append(s1);
             s.Append(" = ");
             s.Append(s1a);
-            s.AppendLine(";");            
+            s.AppendLine(";");                      
 
             StringBuilder s3 = new StringBuilder();
             s3.Append("option_");
@@ -6903,21 +6905,16 @@ namespace Gekko.Parser.Gek
 
             string sss = s1a.ToString();
             s1 = s1.Replace("_", " ");
+
             //#0934580980
             sss = sss.Replace("True", "`yes`");
             sss = sss.Replace("False", "`no`");
             sss = sss.Replace("true", "`yes`");
             sss = sss.Replace("false", "`no`");
-            //string ss = "IVariable iv = " + s1a + ";";
-            //if (type == "string")
-            //{
-                s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
-            //}
-            //else if (type == "val")
-            //{
-                //s.AppendLine("G.Writeln(" + s1.ToString() + "O.ConvertToVal(`" + s3.ToString() + "`));");
-            //    s.AppendLine("G.Writeln(" + s1.ToString() + "(`" + s1a.ToString() + "`));");
-            //}
+            sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
+            
+            s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
+            
         }
 
         private static void CreateOptionVariableOLD(ASTNode node, StringBuilder s, ref string o)
