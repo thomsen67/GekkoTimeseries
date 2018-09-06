@@ -133,6 +133,7 @@ Additionally, there are model, solve, equation options.
         public bool print_prt_pch = true;  //p
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
+        public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
 
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name

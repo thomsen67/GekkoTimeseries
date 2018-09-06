@@ -7444,6 +7444,9 @@ namespace Gekko
 
             public long counter = -12345;
 
+            public bool opt_split = false; //split "PRT x, y;" into "PRT x, PRT y;"
+            public string opt_missing = "error"; //set to "skip" to skip non-existing, and "nan" to show them.
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

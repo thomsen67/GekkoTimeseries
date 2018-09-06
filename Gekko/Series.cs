@@ -1539,7 +1539,7 @@ namespace Gekko
 
             if (this.type == ESeriesType.ArraySuper)
             {
-                rv = this.FindArraySeries(indexes, false);
+                rv = this.FindArraySeries(smpl, indexes, false);
             }
             else {
 
@@ -1604,7 +1604,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private IVariable FindArraySeries(IVariable[] indexes, bool isLhs)
+        private IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs)
         {
             if (indexes.Length == 0)
             {
@@ -1627,14 +1627,14 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            rv = FindArraySeriesHelper(isLhs, keys);
+            rv = FindArraySeriesHelper(smpl, isLhs, keys);
 
             return rv;
         }
 
-        private IVariable FindArraySeriesHelper(bool isLhs, string[] keys)
+        private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys)
         {
-            IVariable rv;
+            IVariable rv = null;
             if (true)
             {
 
@@ -1660,46 +1660,67 @@ namespace Gekko
                 {
                     if (!isLhs)
                     {
-                        if (Program.options.series_array_ignoremissing)
+
+                        //on the RHS
+
+
+                        //rv = new Series(ESeriesType.Timeless, this.freq, null);
+                        //(rv as Series).SetTimelessData(0d);
+                        //(rv as Series).isNotFoundArraySubSeries = true;
+
+
+                        if (smpl.command == GekkoSmplCommand.Unfold)
                         {
-                            rv = new Series(ESeriesType.Timeless, this.freq, null);
-                            (rv as Series).SetTimelessData(0d);
-                            (rv as Series).isNotFoundArraySubSeries = true;
-
-
-                            //if (command == GekkoSmplCommand.Unfold)
-                            //{
-                            //    rv = new GekkoNull();
-                            //}
-                            //else //GekkoSmplCommand.Sum but also others
-                            //{
-                            //    rv = new Series(ESeriesType.Timeless, this.freq, null);
-                            //    ((Series)rv).SetTimelessData(0d);
-                            //    ((Series)rv).isNotFoundArraySubSeries = true;
-                            //}
+                            //print
+                            if (Program.options.series_array_print_missing == ESeriesMissing.Error)
+                            {
+                                FindArraySeriesHelper2(keys);  //error
+                            }
+                            else if (Program.options.series_array_print_missing == ESeriesMissing.Nan)
+                            {
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(double.NaN);
+                            }
+                            else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
+                            {
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(0d);
+                            }
+                            else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
+                            {
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
+                                ((Series)rv).isNotFoundArraySubSeries = true;
+                            }
+                            else throw new GekkoException();
                         }
-                        else
+                        else //GekkoSmplCommand.Sum but also others
                         {
-                            List<string> warnings = new List<string>();
+                            //sum and others
 
-                            string txt = null;
-                            foreach (string ss in keys)
+                            //print
+                            if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
                             {
-                                if (ss.Length != ss.Trim().Length)
-                                {
-                                    warnings.Add("Please note that the element '" + ss + "' contains blanks at start or end of string");
-                                }
-                                txt += "'" + ss + "', ";
+                                FindArraySeriesHelper2(keys);  //error
                             }
-                            G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
-                            G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
-                            foreach (string warning in warnings)
+                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Nan)
                             {
-                                G.Writeln("+++ NOTE: " + warning);
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(double.NaN);
                             }
-                            G.Writeln("+++ NOTE: You may ignore such errors with 'OPTION series array ignoremissing = yes;'");
-                            throw new GekkoException();
+                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
+                            {
+                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                ((Series)rv).SetTimelessData(0d);
+                            }
+                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
+                            {
+                                G.Writeln2("*** ERROR: Please use 'OPTION series array calc missing = zero' instead of 'skip'");
+                                throw new GekkoException();
+                            }
+                            else throw new GekkoException();
                         }
+
                     }
                     else
                     {
@@ -1726,6 +1747,29 @@ namespace Gekko
             
 
             return rv;
+        }
+
+        private void FindArraySeriesHelper2(string[] keys)
+        {
+            List<string> warnings = new List<string>();
+
+            string txt = null;
+            foreach (string ss in keys)
+            {
+                if (ss.Length != ss.Trim().Length)
+                {
+                    warnings.Add("Please note that the element '" + ss + "' contains blanks at start or end of string");
+                }
+                txt += "'" + ss + "', ";
+            }
+            G.Writeln2("*** ERROR: The arrayseries " + G.GetNameAndFreqPretty(this.name) + " did not contain this element:");
+            G.Writeln("           [" + txt.Substring(0, txt.Length - 2) + "]", Color.Red);
+            foreach (string warning in warnings)
+            {
+                G.Writeln("+++ NOTE: " + warning);
+            }
+            G.Writeln("+++ NOTE: You may ignore such errors with 'OPTION series array print missing = ... ;' and 'OPTION series array calc missing = ... ;'");
+            throw new GekkoException();
         }
 
         public static bool IsLagOrLead(int i)
@@ -1870,7 +1914,7 @@ namespace Gekko
             else 
             {
                 //Will fail with an error if not all indexes are of STRING type                                
-                IVariable iv = this.FindArraySeries(indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                IVariable iv = this.FindArraySeries(smpl, indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 Series ts = iv as Series;
                 if (ts == null)
                 {

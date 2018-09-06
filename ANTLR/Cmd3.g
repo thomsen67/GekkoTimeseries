@@ -152,6 +152,7 @@ ASTCOMPARE2;
 	ASTOPT_STRING_FILE;
 	ASTOPT_STRING_TYPE;
 	ASTOPT_STRING_ARRAY;
+	ASTOPT_STRING_SPLIT;
 	ASTXLINE;
 	ASTYLINE;
 	ASTREBASE;
@@ -2787,6 +2788,8 @@ prtOpt1Helper:              filter
 						  | FILLSTYLE '=' expression -> ^(ASTOPT_STRING_FILLSTYLE expression)	
 						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)						  
 						  | REF EQUAL name -> ^(ASTOPT_STRING_REF name)
+						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
+						  | SPLIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLIT yesNo?)
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -3242,6 +3245,7 @@ optionType:
              | PRINT PRT ABS '='? yesNoSimple -> PRINT PRT ABS ^(ASTBOOL yesNoSimple)
              | PRINT PRT PCH '='? yesNoSimple -> PRINT PRT PCH ^(ASTBOOL yesNoSimple)
 			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
+			 | PRINT SPLIT '='? yesNoSimple -> PRINT SPLIT ^(ASTBOOL yesNoSimple)
 
 			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy

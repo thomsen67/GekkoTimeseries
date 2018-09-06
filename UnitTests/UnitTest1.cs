@@ -1187,7 +1187,8 @@ namespace UnitTests
             I("@x[a1] = 1.1;");
             I("@x[a3] = 3.3;");
             I("#i = a1, a2, a3;");
-            I("OPTION series array ignoremissing = yes;");
+            //I("OPTION series array ignoremissing = yes;");
+            I("OPTION series array print missing = skip;");
             Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             Table table = Globals.lastPrtOrMulprtTable;
@@ -1607,7 +1608,10 @@ namespace UnitTests
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
             FAIL("p <n> sum((#m1, #m2), xx[#m1, #m2]);");
-            I("option series array ignoremissing yes;");
+            
+            //I("option series array ignoremissing yes;");                        
+            I("option series array calc missing = zero;");
+
             Globals.lastPrtOrMulprtTable = null;
             I("p <n> sum((#m1, #m2), xx[#m1, #m2]);");
             table = Globals.lastPrtOrMulprtTable;
@@ -1621,12 +1625,16 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 2).number, 22.0000d, 0.0001);
             Assert.AreEqual(table.Get(6, 2).number, 25.0000d, 0.0001);
 
-            I("option series array ignoremissing no;");
+            //I("option series array ignoremissing no;");
+            I("option series array print missing = error;");
             FAIL("p <n> xx[#m1, #m2];");
-            I("option series array ignoremissing yes;");
+
+            //I("option series array ignoremissing yes;");
+            I("option series array print missing = skip;");
             Globals.lastPrtOrMulprtTable = null;
             I("p <n> xx[#m1, #m2];");
             table = Globals.lastPrtOrMulprtTable;
+
             Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?
