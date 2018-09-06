@@ -612,6 +612,14 @@ namespace Gekko
         //    return G.freqadd(name, freq);
         //}
 
+        public static ESeriesMissing GetMissing(string s)
+        {
+            if (G.Equal(s, "error")) return ESeriesMissing.Error;
+            else if (G.Equal(s, "nan")) return ESeriesMissing.Nan;
+            else if (G.Equal(s, "zero")) return ESeriesMissing.Zero;
+            else if (G.Equal(s, "skip")) return ESeriesMissing.Skip;
+            throw new GekkoException();
+        }
 
         public static string GetFreq(EFreq eFreq)
         {

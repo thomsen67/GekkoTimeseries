@@ -4082,7 +4082,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.Code.A(Globals.clearTsCsCode + G.NL);
                                     node.Code.A("Program.AdjustFreq();");
-                                }
+                                }                                
                                 if (o == "interface_sound_type")
                                 {
                                     if (!p.hasBeenCmdFile)
@@ -6858,6 +6858,10 @@ namespace Gekko.Parser.Gek
                         if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
                         {
                             s7 = "G.GetFreq(" + s7 + ")";
+                        }
+                        if (G.Equal(node[0].Text, "series") && G.Equal(node[3].Text, "missing"))  //OPTION series array print missing = ...
+                        {
+                            s7 = "G.GetMissing(" + s7 + ")";
                         }
                         if (resolvePath)
                         {

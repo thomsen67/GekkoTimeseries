@@ -1199,6 +1199,8 @@ Y2                    = 'Y2'                       ;
     SIM              = 'SIM'             ;
     SIMPLE = 'SIMPLE';
     SKIP            = 'SKIP';
+	NAN            = 'NAN';
+	NORMAL            = 'NORMAL';
     SMOOTH = 'SMOOTH';
     SOLVE            = 'SOLVE'           ;
     SOME            = 'SOME'           ;
@@ -1767,6 +1769,8 @@ d.Add("Y" ,Y);
                                         d.Add("sim"     , SIM       );
                                         d.Add("SIMPLE" ,SIMPLE);
                                         d.Add("skip"          , SKIP      );
+										d.Add("nan"          , NAN      );
+										d.Add("normal"          , NORMAL      );
                                         d.Add("smooth", SMOOTH);
                                         d.Add("solve"   , SOLVE     );
                                         d.Add("some"   , SOME     );
@@ -2168,7 +2172,7 @@ start:                      statements EOF;  //EOF is necessary in order to forc
 statements:                 statements2*;
 
 statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
-                          | series               SEMICOLON!  //before assignemt: must catch SERIES x = 1 -2 -3; etc.
+                     //     | series               SEMICOLON!  //before assignemt: must catch SERIES x = 1 -2 -3; etc.
 						  | assignment           SEMICOLON!
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
@@ -3241,6 +3245,17 @@ optionType:
 
 			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
+
+			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
+			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	
+
+			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+             | SERIES NORMAL CALC MISSING '=' optionSeriesMissing -> SERIES NORMAL CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+             | SERIES ARRAY PRINT MISSING '=' optionSeriesMissing -> SERIES ARRAY PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+             | SERIES ARRAY CALC MISSING '=' optionSeriesMissing -> SERIES ARRAY CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+			 
+               //public ESeriesMissing series_period_print_missing = ESeriesMissing.Nan;
+               //public ESeriesMissing series_period_calc_missing = ESeriesMissing.Nan;            //sumt(...), avgt(...)
 			 
 			 | SHEET question -> SHEET question
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
@@ -3255,10 +3270,7 @@ optionType:
 			 | SHEET PRT PCH '='? yesNoSimple -> SHEET PRT PCH ^(ASTBOOL yesNoSimple)
 			 | SHEET ROWS  '='? yesNoSimple -> SHEET ROWS ^(ASTBOOL yesNoSimple)
 			 | SHEET COLS  '='? yesNoSimple -> SHEET COLS ^(ASTBOOL yesNoSimple)		
-			 
-			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
-			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	
-
+			 			 
              | SOLVE question -> SOLVE question
              | SOLVE DATA CREATE AUTO '='? yesNoSimple -> SOLVE DATA CREATE AUTO ^(ASTBOOL yesNoSimple)
              | SOLVE DATA IGNOREMISSING '='? yesNoSimple -> SOLVE DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)
@@ -3357,9 +3369,7 @@ optionSolveNewtonInvert: LU | ITER;
 optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
 optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
 optionSolveForwardTerminalfeedOptions : INTERNAL | EXTERNAL;
-
-
-
+optionSeriesMissing : ERROR | NAN | ZERO | SKIP;
 
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -3915,6 +3925,8 @@ ident2: 					Ident |
   SIMPLE|
   SIZE|
   SKIP|
+  NAN|
+  NORMAL|
   SOLVE|
   SOME|
   SORT|
@@ -4326,6 +4338,8 @@ ident3: 					Ident |
   SIMPLE|
   SIZE|
   SKIP|
+  NAN|
+  NORMAL|
   SOLVE|
   SOME|
   SORT|

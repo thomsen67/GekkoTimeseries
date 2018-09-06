@@ -44,7 +44,7 @@ Additionally, there are model, solve, equation options.
 
 
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
-        
+
         //public bool bugfix_px = true;
         public bool bugfix_download = true;
 
@@ -68,7 +68,7 @@ Additionally, there are model, solve, equation options.
         public string folder_help = "";
         public string folder_menu = "";
         public string folder_model = "";
-        public string folder_pipe = "";        
+        public string folder_pipe = "";
         public string folder_table = "";
         public string folder_table1 = "";
         public string folder_table2 = "";
@@ -82,9 +82,9 @@ Additionally, there are model, solve, equation options.
         public string gams_time_set = "t";  //name of the time set in GAMS
         public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
-        
+
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
-        
+
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
@@ -115,7 +115,7 @@ Additionally, there are model, solve, equation options.
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
-        public int print_elements_max = 400; 
+        public int print_elements_max = 400;
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;
         public int print_fields_pdec = 2;
@@ -139,6 +139,13 @@ Additionally, there are model, solve, equation options.
 
         public bool series_array_ignoremissing = false;  //returns 0 (or skips) a non-existing array-series
         public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
+        
+        public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
+        public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
+        public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
+        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
+        //public ESeriesMissing series_period_print_missing = ESeriesMissing.Nan;
+        //public ESeriesMissing series_period_calc_missing = ESeriesMissing.Nan;            //sumt(...), avgt(...)
 
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
@@ -159,7 +166,7 @@ Additionally, there are model, solve, equation options.
         public double solve_data_init_growth_max = 0.06; //only has effect if solve_fast = true. Limit: it could be 0.05 without problems. But 0.04 hurts.
         public bool solve_failsafe = false;
         public bool solve_forward_dump = false;
-        public string solve_forward_fair_conv = "conv1";        
+        public string solve_forward_fair_conv = "conv1";
         public double solve_forward_fair_conv1_abs = 0.001d; //it checks abs OR rel, so abs is set really low (for instance, interest rates have low abs value)
         public double solve_forward_fair_conv1_rel = 0.001d;
         public double solve_forward_fair_conv2_tabs = 1.0d;
@@ -168,7 +175,7 @@ Additionally, there are model, solve, equation options.
         public int solve_forward_fair_itermax = 200;
         public int solve_forward_fair_itermin = 0;
         public string solve_forward_method = "fair";  //or "stacked" or "nfair" or "none"        
-        public string solve_forward_nfair_conv = "conv1";        
+        public string solve_forward_nfair_conv = "conv1";
         public double solve_forward_nfair_conv1_abs = 0.001d;
         public double solve_forward_nfair_conv1_rel = 0.001d;
         public double solve_forward_nfair_conv2_tabs = 1.0d;
@@ -177,7 +184,7 @@ Additionally, there are model, solve, equation options.
         public int solve_forward_nfair_itermax = 200;
         public int solve_forward_nfair_itermin = 0;
         public int solve_forward_nfair_updatefreq = 100; //Or 1        
-        public int solve_forward_stacked_horizon = 5;                
+        public int solve_forward_stacked_horizon = 5;
         public string solve_forward_terminal = "const";  //or exo or growth (growth does not work at the moment)
         public string solve_forward_terminal_feed = "internal";  //or external
         public string solve_gauss_conv = "conv1";
@@ -212,12 +219,12 @@ Additionally, there are model, solve, equation options.
         public string table_html_font = "Arial";
         public double table_html_fontsize = 72;  //in %                        
         public double table_html_secondcolwidth = 5.5;  //in 'em' units
-        public bool table_html_specialminus = false;        
-        public bool table_ignoremissingvars = true;        
+        public bool table_html_specialminus = false;
+        public bool table_ignoremissingvars = true;
         public string table_type = "html";  //txt or html
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
-        
+
         public void Write()
         {
             Write("Program.options");
@@ -274,7 +281,13 @@ Additionally, there are model, solve, equation options.
                     if (value == EFreq.Annual) s = "a";
                     else if (value == EFreq.Quarterly) s = "q";
                     else if (value == EFreq.Monthly) s = "m";
-                    else if (value == EFreq.Undated) s = "u";                    
+                    else if (value == EFreq.Undated) s = "u";
+                    line += name + " = " + s + ";";
+                }
+                else if (temp is ESeriesMissing) 
+                {
+                    ESeriesMissing value = (ESeriesMissing)temp;
+                    string s = value.ToString().ToLower();
                     line += name + " = " + s + ";";
                 }
                 else
@@ -335,7 +348,7 @@ Additionally, there are model, solve, equation options.
                     sb.AppendLine("showing the legal choices.");
                 }
                 Program.LinkContainer lc = new Program.LinkContainer(sb.ToString());
-                Globals.linkContainer.Add(lc.counter, lc);                
+                Globals.linkContainer.Add(lc.counter, lc);
                 G.Write("Advice on finding and setting options ");
                 G.WriteLink("here", "outputtab:" + lc.counter); G.Writeln(".");
             }
