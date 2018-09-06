@@ -313,7 +313,7 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: #743297323");
             throw new GekkoException();
-            if (eFreq != EFreq.Annual) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
+            if (eFreq != EFreq.A) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
             IVariable x = GetIVariable(variable);
             return (Series)x;
         }      

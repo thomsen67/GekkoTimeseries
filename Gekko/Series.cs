@@ -57,9 +57,9 @@ namespace Gekko
     /// <example>
     /// A stand-alone Series may be created and filled with data like this:
     /// <code>
-    /// Series ts = new Series(EFreq.Quarterly, "gdp");
-    /// GekkoTime t1 = new GekkoTime(EFreq.Quarterly, 2000, 1);
-    /// GekkoTime t2 = new GekkoTime(EFreq.Quarterly, 2002, 4);
+    /// Series ts = new Series(EFreq.Q, "gdp");
+    /// GekkoTime t1 = new GekkoTime(EFreq.Q, 2000, 1);
+    /// GekkoTime t2 = new GekkoTime(EFreq.Q, 2002, 4);
     /// ts.SetData(t1.Add(-1), 323490d);
     /// foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
     /// {
@@ -338,15 +338,15 @@ namespace Gekko
         {
             //Also see #345632473
             if (dates == null) return;
-            if (this.freq == EFreq.Annual)
+            if (this.freq == EFreq.A)
             {
                 this.Truncate(dates.t1Annual, dates.t2Annual);
             }
-            else if (this.freq == EFreq.Quarterly)
+            else if (this.freq == EFreq.Q)
             {
                 this.Truncate(dates.t1Quarterly, dates.t2Quarterly);
             }
-            else if (this.freq == EFreq.Monthly)
+            else if (this.freq == EFreq.M)
             {
                 this.Truncate(dates.t1Monthly, dates.t2Monthly);
             }
@@ -974,9 +974,9 @@ namespace Gekko
             //see also AddToPeriod()
             //DimensionCheck();
             int subPeriods = 1;
-            if (this.freq == EFreq.Quarterly) subPeriods = 4;
-            else if (this.freq == EFreq.Monthly) subPeriods = 12;
-            else if (this.freq == EFreq.Undated) subPeriods = 1;
+            if (this.freq == EFreq.Q) subPeriods = 4;
+            else if (this.freq == EFreq.M) subPeriods = 12;
+            else if (this.freq == EFreq.U) subPeriods = 1;
 
             //Calculates the period by means of using the anchor. Uses integer division, so there is an
             //implicit modulo calculation here.
@@ -1037,7 +1037,7 @@ namespace Gekko
             //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
             //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
             int rv = -12345;
-            if (anchorPeriod.freq == EFreq.Annual)
+            if (anchorPeriod.freq == EFreq.A)
             {
                 //Special treatment in order to make it fast.
                 //undated freq could return fast in the same way as this??
@@ -1047,9 +1047,9 @@ namespace Gekko
             {
                 //Non-annual                
                 int subPeriods = 1;
-                if (anchorPeriod.freq == EFreq.Quarterly) subPeriods = 4;
-                else if (anchorPeriod.freq == EFreq.Monthly) subPeriods = 12;
-                else if (anchorPeriod.freq == EFreq.Undated) subPeriods = 1;
+                if (anchorPeriod.freq == EFreq.Q) subPeriods = 4;
+                else if (anchorPeriod.freq == EFreq.M) subPeriods = 12;
+                else if (anchorPeriod.freq == EFreq.U) subPeriods = 1;
                 //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
                 int offset = subPeriods * (gt.super - anchorPeriod.super) + (gt.sub - anchorPeriod.sub);
                 int index = anchorPeriodPositionInArray + offset;
@@ -1069,33 +1069,7 @@ namespace Gekko
             return FromGekkoTimeToArrayIndex(gt, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
         }
 
-        //public static int FromGekkoTimeToArrayIndex(GekkoTime gt, EFreq freqEnum,int anchorPeriodPositionInArray, int anchorSuperPeriod, int anchorSubPeriod)
-        //{            
-        //    //this.anchorPeriod.sub is always 1 at the moment, and will always be 1 for Annual.
-        //    //but we cannot count on anchorSubPeriod being 1 forever (for instance for daily obs)   
-        //    int rv = -12345;
-        //    if (freqEnum == EFreq.Annual)
-        //    {
-        //        //Special treatment in order to make it fast.
-        //        //undated freq could return fast in the same way as this??
-        //        rv = anchorPeriodPositionInArray + gt.super - anchorSuperPeriod;
-        //    }
-        //    else
-        //    {
-        //        //Non-annual                
-        //        int subPeriods = 1;
-        //        if (freqEnum == EFreq.Quarterly) subPeriods = 4;
-        //        else if (freqEnum == EFreq.Monthly) subPeriods = 12;
-        //        else if (freqEnum == EFreq.Undated) subPeriods = 1;
-        //        //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
-        //        int offset = subPeriods * (gt.super - anchorSuperPeriod) + (gt.sub - anchorSubPeriod);
-        //        int index = anchorPeriodPositionInArray + offset;
-        //        rv = index;
-        //    }
-
-        //    return rv;
-        //}
-
+        
         private int ResizeDataArray(GekkoTime gt)
         {
             return ResizeDataArray(gt, true);
@@ -1597,7 +1571,7 @@ namespace Gekko
                     }
                     else
                     {
-                        if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
+                        if (this.freq == EFreq.A || this.freq == EFreq.U)
                         {
                             double d = this.GetData(smpl, new GekkoTime(this.freq, i, 1));
                             rv = new ScalarVal(d);
@@ -1875,7 +1849,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (this.freq == EFreq.Annual || this.freq == EFreq.Undated)
+                    if (this.freq == EFreq.A || this.freq == EFreq.U)
                     {
                         double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                         GekkoTime t = new GekkoTime(this.freq, i, 1);

@@ -1415,7 +1415,7 @@ namespace Gekko
                         date = date.Trim();  //removes blanks at start and end
                         date = date.ToLower();  //if q or m (or y)
 
-                        if ((freqHere == EFreq.Annual))
+                        if ((freqHere == EFreq.A))
                         {
                             if (date.EndsWith(annualIndicator1, true, null))
                             {
@@ -1434,7 +1434,7 @@ namespace Gekko
 
                         string perTemp = "";
                         string subPerTemp = "";
-                        if ((freqHere == EFreq.Annual) || (freqHere == EFreq.Undated))  //ttfreq
+                        if ((freqHere == EFreq.A) || (freqHere == EFreq.U))  //ttfreq
                         {
                             perTemp = date;
                             subPerTemp = "1";
@@ -1615,15 +1615,15 @@ namespace Gekko
                                 if (dates != null)
                                 {
                                     good = false;
-                                    if (gt2.freq == EFreq.Annual)
+                                    if (gt2.freq == EFreq.A)
                                     {
                                         if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;
                                     }
-                                    else if (gt2.freq == EFreq.Quarterly)
+                                    else if (gt2.freq == EFreq.Q)
                                     {
                                         if (gt2.LargerThanOrEqual(dates.t1Quarterly) && gt2.SmallerThanOrEqual(dates.t2Quarterly)) good = true;
                                     }
-                                    else if (gt2.freq == EFreq.Monthly)
+                                    else if (gt2.freq == EFreq.M)
                                     {
                                         if (gt2.LargerThanOrEqual(dates.t1Monthly) && gt2.SmallerThanOrEqual(dates.t2Monthly)) good = true;
                                     }
@@ -2259,7 +2259,7 @@ namespace Gekko
 
                     AllFreqsHelper dates = null;
 
-                    if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.Undated)
+                    if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                     {
                         G.Writeln2("*** ERROR: Sorry, date-truncation not yet implemented for undated frequency.");
                         throw new GekkoException();
@@ -3358,7 +3358,7 @@ namespace Gekko
             GekkoTime lastRv = last;
 
             int offset = 0;
-            if (first.freq == EFreq.Annual)
+            if (first.freq == EFreq.A)
             {
                 if (dates.t1Annual.StrictlyLargerThan(first))
                 {
@@ -3370,7 +3370,7 @@ namespace Gekko
                     lastRv = dates.t2Annual;
                 }
             }
-            else if (first.freq == EFreq.Quarterly)
+            else if (first.freq == EFreq.Q)
             {
                 if (dates.t1Quarterly.StrictlyLargerThan(first))
                 {
@@ -3382,7 +3382,7 @@ namespace Gekko
                     lastRv = dates.t2Quarterly;
                 }
             }
-            else if (first.freq == EFreq.Monthly)
+            else if (first.freq == EFreq.M)
             {
                 if (dates.t1Monthly.StrictlyLargerThan(first))
                 {
@@ -3418,7 +3418,7 @@ namespace Gekko
                 int nextState = 1;
                 string varName = null;
                 string frequency = null;
-                EFreq freq = EFreq.Annual;
+                EFreq freq = EFreq.A;
 
                 DateTime t0 = DateTime.Now;
                 DateTime t1 = DateTime.Now;
@@ -4010,7 +4010,7 @@ namespace Gekko
                             continue;
                         }
 
-                        Series ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.Annual);
+                        Series ts = FindOrCreateTimeSeriesInDataBank(databank, varName, EFreq.A);
 
                         if (oRead.t1.IsNull())
                         {
@@ -4021,8 +4021,8 @@ namespace Gekko
                                 float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
                                 tempArray[per] = ss;
                             }
-                            GekkoTime gt1 = new GekkoTime(EFreq.Annual, year1, 1);
-                            GekkoTime gt2 = new GekkoTime(EFreq.Annual, year2, 1);
+                            GekkoTime gt1 = new GekkoTime(EFreq.A, year1, 1);
+                            GekkoTime gt2 = new GekkoTime(EFreq.A, year2, 1);
                             ts.SetDataSequence(gt1, gt2, tempArray);
                             ts.Trim();  //to save RAM
                             variableCounter++;
@@ -4034,7 +4034,7 @@ namespace Gekko
                             for (int per = 0; per < antalper; per++)
                             {
                                 short year = fid[per];
-                                GekkoTime t = new GekkoTime(EFreq.Annual, year, 1);
+                                GekkoTime t = new GekkoTime(EFreq.A, year, 1);
                                 if (t.LargerThanOrEqual(dates.t1Annual) && t.SmallerThanOrEqual(dates.t2Annual))
                                 {
                                     float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
@@ -4658,10 +4658,10 @@ namespace Gekko
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
 
-            EFreq freq = EFreq.Annual;
-            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
-            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Quarterly;
-            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.Monthly;
+            EFreq freq = EFreq.A;
+            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.U;
+            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Q;
+            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.M;
 
             string gamsDir = null; GAMSWorkspace ws = null;
             GetGAMSWorkspace(ref gamsDir, ref ws);
@@ -5126,10 +5126,10 @@ namespace Gekko
             string gamsDir = null; GAMSWorkspace ws = null;
             GetGAMSWorkspace(ref gamsDir, ref ws);
 
-            EFreq freq = EFreq.Annual;
-            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.Undated;
-            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Quarterly;
-            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.Monthly;
+            EFreq freq = EFreq.A;
+            if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.U;
+            else if (G.Equal(Program.options.gams_time_freq, "q")) freq = EFreq.Q;
+            else if (G.Equal(Program.options.gams_time_freq, "m")) freq = EFreq.M;
 
             double[] d = new double[1];  //used for sets
 
@@ -5605,7 +5605,7 @@ namespace Gekko
                         string[] ss2 = new string[ss.Length + 1];
                         Array.Copy(ss, 0, ss2, 0, ss.Length);
                         string date = null;
-                        if (usePrefix && t.freq == EFreq.Annual)
+                        if (usePrefix && t.freq == EFreq.A)
                         {
                             date = Program.options.gams_time_prefix + (t.super - (int)Program.options.gams_time_offset).ToString();
                         }
@@ -5681,7 +5681,7 @@ namespace Gekko
                     {                        
                         Array.Copy(ss, 0, ss2, 0, ss.Length);
                         string date = null;
-                        if (usePrefix && t.freq == EFreq.Annual)
+                        if (usePrefix && t.freq == EFreq.A)
                         {
                             date = Program.options.gams_time_prefix + (t.super - (int)Program.options.gams_time_offset).ToString();
                         }
@@ -5865,7 +5865,7 @@ namespace Gekko
             string sub1 = "";
             string sub2 = "";
             string freq = "A";
-            if (ts.freq == EFreq.Annual)
+            if (ts.freq == EFreq.A)
             {
                 sub1 = "0101";
                 sub2 = "0101";
@@ -6013,7 +6013,7 @@ namespace Gekko
             string varName = G.Chop_GetName(name); // ts.name;
             if (isCaps) varName = varName.ToUpper();
 
-            if (ts.freq == EFreq.Annual)
+            if (ts.freq == EFreq.A)
             {
                 G.Writeln2("*** ERROR: WRITE <tsp> only implemented for annual data");
                 throw new GekkoException();
@@ -6045,7 +6045,7 @@ namespace Gekko
         public static void WriteTsdRecord2(int yr1, int yr2, StreamWriter res, int varNumber, double[] data, String var2)
         {
             //TODO: quarters
-            if (Program.options.freq != EFreq.Annual)
+            if (Program.options.freq != EFreq.A)
             {
                 G.Writeln2("*** ERROR: Tsp to tsd conversion only works on annual data");
                 throw new GekkoException();
@@ -7354,7 +7354,7 @@ namespace Gekko
             List<string> input = new List<string>();
             input.AddRange(db.storage.Keys);
             string endsWith = null;
-            if (Program.options.freq != EFreq.Annual) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
+            if (Program.options.freq != EFreq.A) endsWith = Globals.freqIndicator + G.GetFreq(Program.options.freq);
             List<IVariable> m = new List<IVariable>();
             foreach (string s in input) m.Add(new ScalarString(s));
             List<string> temp = Program.MatchRange(s1, s2, m, endsWith);
@@ -8280,11 +8280,11 @@ namespace Gekko
                     if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
                 }
 
-                if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar + Globals.symbolTurtle + hash);
 
                 if (ts2 == null)
                 {
-                    ts2 = new Series(EFreq.Annual, gvar + Globals.symbolTurtle + hash);
+                    ts2 = new Series(EFreq.A, gvar + Globals.symbolTurtle + hash);
                     Program.databanks.GetFirst().AddVariable(ts2);
                     if (timeIndex == -12345)
                     {
@@ -8298,15 +8298,15 @@ namespace Gekko
                 }
                 else
                 {
-                    ts2.SetData(new GekkoTime(EFreq.Annual, tt, 1), d);
+                    ts2.SetData(new GekkoTime(EFreq.A, tt, 1), d);
                 }
                 oldHash = hash;
             }
 
-            Series ts = Program.databanks.GetFirst().GetVariable(EFreq.Annual, gvar);
+            Series ts = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar);
             if (ts == null)
             {
-                ts = new Series(EFreq.Annual, gvar);
+                ts = new Series(EFreq.A, gvar);
                 //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
                 Program.databanks.GetFirst().AddVariable(ts);
             }
@@ -9666,21 +9666,21 @@ namespace Gekko
         private static string GetFreqNumbers(EFreq freq)
         {
             string per = "";
-            if (freq == EFreq.Annual)
+            if (freq == EFreq.A)
             {
                 G.Writeln2("*** ERROR: You cannot use X12A on an annual timeseries");
                 throw new GekkoException();
             }
-            else if (freq == EFreq.Undated)
+            else if (freq == EFreq.U)
             {
                 G.Writeln2("*** ERROR: You cannot use X12A on an undated timeseries");
                 throw new GekkoException();
             }
-            else if (freq == EFreq.Quarterly)
+            else if (freq == EFreq.Q)
             {
                 per = "4";
             }
-            else if (freq == EFreq.Monthly)
+            else if (freq == EFreq.M)
             {
                 per = "12";
             }
@@ -10985,7 +10985,7 @@ namespace Gekko
 
             for (int t = 2001; t <= 2002; t++)
             {
-                GekkoTime gt = new GekkoTime(EFreq.Annual, t, 1);
+                GekkoTime gt = new GekkoTime(EFreq.A, t, 1);
                 double d1 = 0;  //SUM FUNCTION1 +++++++++++++++++++++++++++
                 foreach (string i in ii)  //SUM FUNCTION1 ARG 1 ++++++++++++++++++++++++++++
                 {
@@ -14355,28 +14355,28 @@ namespace Gekko
         public static void AdjustFreq()
         {
             //hash #980432
-            if (Program.options.freq == EFreq.Annual)
+            if (Program.options.freq == EFreq.A)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, Globals.globalPeriodEnd.super, 1);
+                Globals.globalPeriodStart = new GekkoTime(EFreq.A, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.A, Globals.globalPeriodEnd.super, 1);
                 G.Writeln("Frequency changed to annual (A)");
             }
-            else if (Program.options.freq == EFreq.Quarterly)
+            else if (Program.options.freq == EFreq.Q)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.Quarterly, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.Quarterly, Globals.globalPeriodEnd.super, 4);
+                Globals.globalPeriodStart = new GekkoTime(EFreq.Q, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.Q, Globals.globalPeriodEnd.super, 4);
                 G.Writeln("Frequency changed to quarterly (Q) -- note that 'q1' is set for start year and 'q4' for end year");
             }
-            else if (Program.options.freq == EFreq.Monthly)
+            else if (Program.options.freq == EFreq.M)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.Monthly, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.Monthly, Globals.globalPeriodEnd.super, 12);
+                Globals.globalPeriodStart = new GekkoTime(EFreq.M, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.M, Globals.globalPeriodEnd.super, 12);
                 G.Writeln("Frequency changed to monthly (M) -- note that 'm1' is set for start year and 'm12' for end year");
             }
-            else if (Program.options.freq == EFreq.Undated)
+            else if (Program.options.freq == EFreq.U)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.Undated, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.Undated, Globals.globalPeriodEnd.super, 1);
+                Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);
                 G.Writeln("Frequency changed to undated (U)");
             }
         }
@@ -14961,7 +14961,7 @@ namespace Gekko
                                         }
                                     }
 
-                                    if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
+                                    if (Program.options.freq == EFreq.A) G.Write((gt.super) + " ");
                                     else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
 
                                     double n1 = ts.GetData(null, gt);
@@ -15024,7 +15024,7 @@ namespace Gekko
                         G.Write(type3);
                         string stamp = null;
                         if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
-                        if (ts.freq == EFreq.Annual || ts.freq == EFreq.Undated)
+                        if (ts.freq == EFreq.A || ts.freq == EFreq.U)
                         {
                             if (noData || first.super == -12345 || last.super == -12345)
                             {
@@ -15192,7 +15192,7 @@ namespace Gekko
                                     }
                                 }
 
-                                if (Program.options.freq == EFreq.Annual) G.Write((gt.super) + " ");
+                                if (Program.options.freq == EFreq.A) G.Write((gt.super) + " ");
                                 else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
 
                                 double n1 = ts.GetData(null, gt);
@@ -20984,7 +20984,7 @@ namespace Gekko
         {
             //ErrorIfDatabanksSwapped();
 
-            if (!(Program.options.freq == EFreq.Annual))
+            if (!(Program.options.freq == EFreq.A))
             {
                 G.Writeln();
                 G.Writeln2("*** ERROR: Index functions only work for annual frequency at the moment");
@@ -21092,8 +21092,8 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Series p = new Series(EFreq.Annual, null);  //all this should be deleted, but the code will run like this...
-            Series x = new Series(EFreq.Annual, null);
+            Series p = new Series(EFreq.A, null);  //all this should be deleted, but the code will run like this...
+            Series x = new Series(EFreq.A, null);
 
             //List<string> vars = new List<string>();
             //vars.Add(var1);
@@ -21456,22 +21456,7 @@ namespace Gekko
                 //list.Sort(StringComparer.InvariantCulture);
                 //list = list.OrderBy(o => o.s1).ToList();                
             }
-            //else
-            //{
-            //    //decorate list items with freq type
-            //    if (Program.options.freq == EFreq.Quarterly)
-            //    {
-            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "q";
-            //    }
-            //    else if (Program.options.freq == EFreq.Monthly)
-            //    {
-            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "m";
-            //    }
-            //    else if (Program.options.freq == EFreq.Undated)
-            //    {
-            //        for (int i = 0; i < list.Count; i++) list[i].name = list[i].name + Globals.freqIndicator + "u";
-            //    }
-            //}
+            
 
             bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes");
 
@@ -22744,17 +22729,17 @@ namespace Gekko
         private static void GetQuartersOrMonthsFromYears(ref GekkoTime per1, ref GekkoTime per2, int yearStart, int yearEnd)
         {
             //see also #980432
-            if ((Program.options.freq == EFreq.Annual))
+            if ((Program.options.freq == EFreq.A))
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
                 per2 = new GekkoTime((Program.options.freq), yearEnd, 1);
             }
-            else if ((Program.options.freq == EFreq.Quarterly))
+            else if ((Program.options.freq == EFreq.Q))
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
                 per2 = new GekkoTime((Program.options.freq), yearEnd, 4);
             }
-            else if ((Program.options.freq == EFreq.Monthly))
+            else if ((Program.options.freq == EFreq.M))
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
                 per2 = new GekkoTime((Program.options.freq), yearEnd, 12);
@@ -24923,7 +24908,7 @@ namespace Gekko
                 EFreq eFreq0 = ts_rhs.freq;
                 EFreq eFreq1 = ts_lhs.freq;
 
-                if (eFreq0 == EFreq.Undated || eFreq1 == EFreq.Undated)
+                if (eFreq0 == EFreq.U || eFreq1 == EFreq.U)
                 {
                     G.Writeln2("*** ERROR: COLLAPSE cannot involve undated timeseries");
                     throw new GekkoException();
@@ -24936,7 +24921,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(first, last))
                 {
                     double value = ts_rhs.GetData(null, t);
-                    if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Quarterly)
+                    if (eFreq1 == EFreq.A && eFreq0 == EFreq.Q)
                     {
                         //Conversion from Q to A
                         if (t.sub == 1) vsum = 0d;
@@ -24965,7 +24950,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (eFreq1 == EFreq.Annual && eFreq0 == EFreq.Monthly)
+                    else if (eFreq1 == EFreq.A && eFreq0 == EFreq.M)
                     {
                         //Conversion from M to A
                         if (t.sub == 1) vsum = 0d;
@@ -24994,7 +24979,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Monthly)
+                    else if (eFreq1 == EFreq.Q && eFreq0 == EFreq.M)
                     {
                         //Conversion from M to Q
                         int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
@@ -25075,14 +25060,14 @@ namespace Gekko
                 {
                     double value = ts_rhs.GetData(null, t);
                     if (value == double.NaN) continue;
-                    if (eFreq1 == EFreq.Quarterly && eFreq0 == EFreq.Annual)
+                    if (eFreq1 == EFreq.Q && eFreq0 == EFreq.A)
                     {
                         //Conversion from A to Q                                        
                         if (G.Equal(method, "repeat"))
                         {
                             for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Quarterly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
                                 ts_lhs.SetData(gt, value);
                             }
                         }
@@ -25090,7 +25075,7 @@ namespace Gekko
                         {
                             for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Quarterly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.Q, t.super, i);
                                 ts_lhs.SetData(gt, value / (double)Globals.freqQSubperiods);
                             }
                         }
@@ -25100,14 +25085,14 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (eFreq1 == EFreq.Monthly && eFreq0 == EFreq.Annual)
+                    else if (eFreq1 == EFreq.M && eFreq0 == EFreq.A)
                     {
                         //Conversion from A to M
                         if (G.Equal(method, "repeat"))
                         {
                             for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
                                 ts_lhs.SetData(gt, value);
                             }
                         }
@@ -25115,7 +25100,7 @@ namespace Gekko
                         {
                             for (int i = 1; i < Globals.freqMSubperiods + 1; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
                                 ts_lhs.SetData(gt, value / (double)Globals.freqMSubperiods);
                             }
                         }
@@ -25125,7 +25110,7 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    else if (eFreq1 == EFreq.Monthly && eFreq0 == EFreq.Quarterly)
+                    else if (eFreq1 == EFreq.M && eFreq0 == EFreq.Q)
                     {
                         //Conversion from Q to M
                         int mInQ = Globals.freqMSubperiods / Globals.freqQSubperiods; //3
@@ -25134,7 +25119,7 @@ namespace Gekko
                         {
                             for (int i = startSub; i < startSub + mInQ; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
                                 ts_lhs.SetData(gt, value);
                             }
                         }
@@ -25142,7 +25127,7 @@ namespace Gekko
                         {
                             for (int i = startSub; i < startSub + mInQ; i++)
                             {
-                                GekkoTime gt = new GekkoTime(EFreq.Monthly, t.super, i);
+                                GekkoTime gt = new GekkoTime(EFreq.M, t.super, i);
                                 ts_lhs.SetData(gt, value / (double)mInQ);
                             }
                         }
@@ -26262,18 +26247,18 @@ namespace Gekko
                         Series temp1 = explodeElement.variable[1] as Series;
                         if (temp0 != null)
                         {
-                            if (temp0.freq == EFreq.Undated) freqs[0] = true;
-                            else if (temp0.freq == EFreq.Annual) freqs[1] = true;
-                            else if (temp0.freq == EFreq.Quarterly) freqs[2] = true;
-                            else if (temp0.freq == EFreq.Monthly) freqs[3] = true;
+                            if (temp0.freq == EFreq.U) freqs[0] = true;
+                            else if (temp0.freq == EFreq.A) freqs[1] = true;
+                            else if (temp0.freq == EFreq.Q) freqs[2] = true;
+                            else if (temp0.freq == EFreq.M) freqs[3] = true;
 
                         }
                         else if (temp1 != null)
                         {
-                            if (temp1.freq == EFreq.Undated) freqs[0] = true;
-                            else if (temp1.freq == EFreq.Annual) freqs[1] = true;
-                            else if (temp1.freq == EFreq.Quarterly) freqs[2] = true;
-                            else if (temp1.freq == EFreq.Monthly) freqs[3] = true;
+                            if (temp1.freq == EFreq.U) freqs[0] = true;
+                            else if (temp1.freq == EFreq.A) freqs[1] = true;
+                            else if (temp1.freq == EFreq.Q) freqs[2] = true;
+                            else if (temp1.freq == EFreq.M) freqs[3] = true;
                         }
 
                         if (explodeElement.variable[0] != null && !G.IsValueType(explodeElement.variable[0]) || explodeElement.variable[1] != null && !G.IsValueType(explodeElement.variable[1]))
@@ -26361,20 +26346,20 @@ namespace Gekko
             }
 
             EFreq sameFreq = EFreq.None;
-            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.Undated;
-            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.Annual;
-            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3]) sameFreq = EFreq.Quarterly;
-            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3]) sameFreq = EFreq.Monthly;
+            if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.U;
+            else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3]) sameFreq = EFreq.A;
+            else if (!freqs[0] && !freqs[1] && freqs[2] && !freqs[3]) sameFreq = EFreq.Q;
+            else if (!freqs[0] && !freqs[1] && !freqs[2] && freqs[3]) sameFreq = EFreq.M;
             else sameFreq = EFreq.None;  //superflous, just to state the obvious
 
             if (!freqs[0] && !freqs[1] && !freqs[2] && !freqs[3])
             {
                 //for instance printing a scalar
                 sameFreq = Program.options.freq;
-                if (Program.options.freq == EFreq.Undated) freqs[0] = true;
-                else if (Program.options.freq == EFreq.Annual) freqs[1] = true;
-                else if (Program.options.freq == EFreq.Quarterly) freqs[2] = true;
-                else if (Program.options.freq == EFreq.Monthly) freqs[3] = true;
+                if (Program.options.freq == EFreq.U) freqs[0] = true;
+                else if (Program.options.freq == EFreq.A) freqs[1] = true;
+                else if (Program.options.freq == EFreq.Q) freqs[2] = true;
+                else if (Program.options.freq == EFreq.M) freqs[3] = true;
             }
 
             Table table = new Table();
@@ -26587,7 +26572,7 @@ namespace Gekko
                         {
                             // --------------------------                                
                             // --------------------------
-                            if ((sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.Undated && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Undated, year, 1))) || (Globals.globalPeriodTimeFilters2[0].freq == EFreq.Annual && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.Annual, year, 1)))))
+                            if ((sameFreq == EFreq.U || sameFreq == EFreq.A) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.U && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.U, year, 1))) || (Globals.globalPeriodTimeFilters2[0].freq == EFreq.A && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.A, year, 1)))))
                             {
                                 //kind of hack for annual to omit year if the year is filtered out
                                 i--;
@@ -26603,15 +26588,15 @@ namespace Gekko
 
 
 
-                        if (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual) i--; // #98075235874325
+                        if (sameFreq == EFreq.U || sameFreq == EFreq.A) i--; // #98075235874325
                     }
 
                     if (true)  // ------------------------------------------------------------- (2)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqInThisTableRow = EFreq.Monthly;
+                            EFreq freqInThisTableRow = EFreq.M;
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
@@ -26628,10 +26613,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (3)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 2;
                             i++;
                             int sumOver = 1;
@@ -26649,10 +26634,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (4)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 3;
                             i++;
                             int sumOver = 1;
@@ -26674,7 +26659,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 3;
                             i++;
                             int sumOver = 3;
@@ -26706,10 +26691,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (6)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Quarterly;
+                            EFreq freqHere = EFreq.Q;
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
@@ -26735,10 +26720,10 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (7)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 4;
                             i++;
                             int sumOver = 1;
@@ -26756,10 +26741,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (8)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 5;
                             i++;
                             int sumOver = 1;
@@ -26777,10 +26762,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (9)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 6;
                             i++;
                             int sumOver = 1;
@@ -26802,7 +26787,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 6;
                             i++;
                             int sumOver = 3;
@@ -26834,10 +26819,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (11)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Quarterly;
+                            EFreq freqHere = EFreq.Q;
                             int subHere = 2;
                             i++;
                             int sumOver = 1;
@@ -26877,10 +26862,10 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (12)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 7;
                             i++;
                             int sumOver = 1;
@@ -26898,10 +26883,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (13)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 8;
                             i++;
                             int sumOver = 1;
@@ -26919,10 +26904,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (14)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 9;
                             i++;
                             int sumOver = 1;
@@ -26944,7 +26929,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 9;
                             i++;
                             int sumOver = 3;
@@ -26977,10 +26962,10 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (16)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Quarterly;
+                            EFreq freqHere = EFreq.Q;
                             int subHere = 3;
                             i++;
                             int sumOver = 1;
@@ -27009,10 +26994,10 @@ namespace Gekko
 
                     if (true)  // ------------------------------------------------------------- (17)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 10;
                             i++;
                             int sumOver = 1;
@@ -27030,10 +27015,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (18)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 11;
                             i++;
                             int sumOver = 1;
@@ -27051,10 +27036,10 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (19)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Monthly))
+                        if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 12;
                             i++;
                             int sumOver = 1;
@@ -27076,7 +27061,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 12;
                             i++;
                             int sumOver = 3;
@@ -27113,7 +27098,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Monthly;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 12;
                             i++;
                             int sumOver = 12;
@@ -27145,9 +27130,9 @@ namespace Gekko
                     }
                     if (true)  // ------------------------------------------------------------- (22)
                     {
-                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Quarterly))
+                        if ((type != EPrintTypes.Plot && freqs[2]) || (type == EPrintTypes.Plot && freqColumn == EFreq.Q))
                         {// --------------------------
-                            EFreq freqHere = EFreq.Quarterly;
+                            EFreq freqHere = EFreq.Q;
                             int subHere = 4;
                             i++;
                             int sumOver = 1;
@@ -27169,7 +27154,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[2]))
                         {
                             // --------------------------
-                            EFreq freqHere = EFreq.Quarterly;
+                            EFreq freqHere = EFreq.Q;
                             int subHere = 4;
                             i++;
                             int sumOver = 4;
@@ -27205,8 +27190,8 @@ namespace Gekko
                         int isUndatedOrAnnual = -12345;
                         if (type == EPrintTypes.Plot)
                         {
-                            if (freqColumn == EFreq.Undated) isUndatedOrAnnual = 0;
-                            else if (freqColumn == EFreq.Annual) isUndatedOrAnnual = 1;
+                            if (freqColumn == EFreq.U) isUndatedOrAnnual = 0;
+                            else if (freqColumn == EFreq.A) isUndatedOrAnnual = 1;
                         }
                         else
                         {
@@ -27218,17 +27203,17 @@ namespace Gekko
                         {
                             // --------------------------
 
-                            EFreq freqHere = EFreq.Undated;
-                            if (isUndatedOrAnnual == 1) freqHere = EFreq.Annual;
+                            EFreq freqHere = EFreq.U;
+                            if (isUndatedOrAnnual == 1) freqHere = EFreq.A;
 
-                            //EFreq freqHere = EFreq.Annual;  //will also become "annual" if it is undated
+                            //EFreq freqHere = EFreq.A;  //will also become "annual" if it is undated
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
                             // --------------------------
                             if (j == 1)
                             {
-                                if (type != EPrintTypes.Plot && (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual))
+                                if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A))
                                 {
                                     // #98075235874325
                                 }
@@ -27242,7 +27227,7 @@ namespace Gekko
                             {
                                 PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
-                            if (type != EPrintTypes.Plot && (sameFreq == EFreq.Undated || sameFreq == EFreq.Annual)) i = i - 1; // #98075235874325
+                            if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                         }
                     }
                 }  //end of years
@@ -28038,10 +28023,10 @@ namespace Gekko
             {
                 if (t.freq == tFilter.freq && t.Equals(tFilter))
                 {
-                    if (t.freq == EFreq.Undated) skipCounter[0]++;
-                    else if (t.freq == EFreq.Annual) skipCounter[1]++;
-                    else if (t.freq == EFreq.Quarterly) skipCounter[2]++;
-                    else if (t.freq == EFreq.Monthly) skipCounter[3]++;
+                    if (t.freq == EFreq.U) skipCounter[0]++;
+                    else if (t.freq == EFreq.A) skipCounter[1]++;
+                    else if (t.freq == EFreq.Q) skipCounter[2]++;
+                    else if (t.freq == EFreq.M) skipCounter[3]++;
                     return;
                 }
             }
@@ -28063,7 +28048,7 @@ namespace Gekko
                 else
                 {
                     double tt = ((ScalarVal)Functions.time(t)).val;                    
-                    if (freqColumn == EFreq.Undated || freqColumn == EFreq.Annual) tt += 0.5;
+                    if (freqColumn == EFreq.U || freqColumn == EFreq.A) tt += 0.5;
                     //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
                     //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
                     table.SetNumber(i - 1, (j - 2) + 1, tt, format);                 //j=2 -> 1, j=3 -> 2
@@ -28072,10 +28057,10 @@ namespace Gekko
 
             }
 
-            if (t.freq == EFreq.Undated) skipCounter[0] = 0;
-            else if (t.freq == EFreq.Annual) skipCounter[1] = 0;
-            else if (t.freq == EFreq.Quarterly) skipCounter[2] = 0;
-            else if (t.freq == EFreq.Monthly) skipCounter[3] = 0;
+            if (t.freq == EFreq.U) skipCounter[0] = 0;
+            else if (t.freq == EFreq.A) skipCounter[1] = 0;
+            else if (t.freq == EFreq.Q) skipCounter[2] = 0;
+            else if (t.freq == EFreq.M) skipCounter[3] = 0;
 
         }
 
@@ -28092,10 +28077,10 @@ namespace Gekko
             else
             {
                 int filterSkip = 0;
-                if (t.freq == EFreq.Undated) filterSkip = skipCounter[0];
-                else if (t.freq == EFreq.Annual) filterSkip = skipCounter[1];
-                else if (t.freq == EFreq.Quarterly) filterSkip = skipCounter[2];
-                else if (t.freq == EFreq.Monthly) filterSkip = skipCounter[3];
+                if (t.freq == EFreq.U) filterSkip = skipCounter[0];
+                else if (t.freq == EFreq.A) filterSkip = skipCounter[1];
+                else if (t.freq == EFreq.Q) filterSkip = skipCounter[2];
+                else if (t.freq == EFreq.M) filterSkip = skipCounter[3];
 
                 double dWork = 0d;
                 double dRef = 0d;
@@ -28203,544 +28188,12 @@ namespace Gekko
 
         private static void PrintFreqHelper(bool[] freqs, IVariable iv)
         {
-            if (((Series)iv).freq == EFreq.Annual) freqs[0] = true;
-            else if (((Series)iv).freq == EFreq.Quarterly) freqs[1] = true;
-            else if (((Series)iv).freq == EFreq.Monthly) freqs[2] = true;
+            if (((Series)iv).freq == EFreq.A) freqs[0] = true;
+            else if (((Series)iv).freq == EFreq.Q) freqs[1] = true;
+            else if (((Series)iv).freq == EFreq.M) freqs[2] = true;
         }
 
-        //private static IVariable[] PrintHelperConvertToList(List inputList)
-        //{
-        //    IVariable[] ivs = new IVariable[2];
-        //    for (int i = 0; i < 2; i++)
-        //    {
-        //        ivs[i] = inputList.list[i];
-        //        if (ivs[i] == null) continue;
-        //        if (ivs[i].Type() != EVariableType.List)
-        //        {
-        //            //transform it into a list: much easier afterwards
-        //            List temp = new Gekko.List();
-        //            temp.list = new List<IVariable>();
-        //            temp.list.Add(ivs[i]);
-        //            ivs[i] = temp;
-        //        }
-        //    }
-        //    return ivs;
-        //}
-
-        //public static int PrtNew2(O.Prt o)
-        //{
-        //    //beware case of printcodes!
-        //    //check use of base bank etc.
-        //    //do timeseries with lags if <p> is present etc (two lags for mp etc.)
-        //    //List<string> endoExoIndicators = null;
-
-        //    //foreach(O.Prt.Element e in o.prtElements)
-        //    //{
-        //    //    e.originalLabel = e.label;
-        //    //    if(e.label.StartsWith(Globals.labelCheatString))
-        //    //    {
-        //    //        e.label = e.label.Substring(Globals.labelCheatString.Length);
-        //    //    }
-        //    //}
-
-        //    bool hasV = false;
-        //    foreach (OptString ts in o.printCodes)
-        //    {
-        //        if (G.Equal(ts.s1, "v") && G.Equal(ts.s2, "yes"))
-        //        {
-        //            hasV = true;  //could be more than one "v", so we keep looping to get the last one.
-        //        }
-        //    }
-        //    if (!IsMulprt(o) && hasV)
-        //    {
-        //        G.Writeln2("*** ERROR: Please use MULPRT<v> instead of PRT<v>");
-        //        throw new GekkoException();
-        //    }
-
-        //    bool isVerbose = false;
-        //    if (G.Equal(o.prtType, "gmulprt")) isVerbose = true;
-        //    if (IsMulprt(o) && hasV) isVerbose = true;
-        //    if (IsMulprt(o) && Program.options.print_mulprt_v) isVerbose = true;
-
-        //    if (IsMulprt(o))
-        //    {
-        //        foreach (OptString xx in o.printCodes)
-        //        {
-        //            if (IsPrintCodeShort(xx.s1))
-        //            {
-        //                G.Writeln2("*** ERROR: You cannot use 'short' printcodes with MULPRT, for instance MULPRT<p> etc.");
-        //                throw new GekkoException();
-        //            }
-        //        }
-        //    }
-
-        //    if (isVerbose)
-        //    {
-        //        if (IsMulprt(o))
-        //        {
-        //            isVerbose = true;  //GMULPRT or MULPRT<v> or MULPRT with option print_mulprt_v
-        //            o.printCodes.Clear();
-        //            o.printCodes.Add(new OptString("n", "yes"));
-        //            o.printCodes.Add(new OptString("p", "yes"));
-        //            o.printCodes.Add(new OptString(Globals.printCode_s, "yes"));
-        //            o.printCodes.Add(new OptString(Globals.printCode_sp, "yes"));
-        //            o.printCodes.Add(new OptString("m", "yes"));
-        //            o.printCodes.Add(new OptString("q", "yes"));
-        //        }
-        //        else
-        //        {
-        //            G.Writeln2("*** ERROR: Display code <v> (verbose) is only legal for MULPRT");
-        //            throw new GekkoException();
-        //        }
-        //    }
-
-        //    //bool hasDataDifferentFromNaN_Infinity = false;
-        //    Databank work = null;
-        //    Databank base2 = null;
-        //    {
-        //        work = databanks.GetFirst();
-        //        base2 = databanks.GetRef();
-        //    }
-
-        //    List<string> masterSpaceErrors = new List<string>();
-        //    List<string> nonExistenceErrors = new List<string>();
-
-        //    int max = Program.options.print_width;
-        //    if (Globals.pipe || Globals.pipe2) max = Program.options.print_filewidth;  //is printing to file
-
-        //    string timefilterType = Program.options.timefilter_type;  //avg or skip
-        //    bool timefilter = Program.options.timefilter;
-        //    if (o.timefilter != null)
-        //    {
-        //        if (G.Equal(o.timefilter, "yes"))
-        //        {
-        //            timefilter = true;
-        //        }
-        //        else if (G.Equal(o.timefilter, "no"))
-        //        {
-        //            timefilter = false;
-        //        }
-        //        else if (G.Equal(o.timefilter, "avg"))
-        //        {
-        //            timefilter = true;
-        //            timefilterType = o.timefilter;
-        //        }
-        //        else if (G.Equal(o.timefilter, "hide"))
-        //        {
-        //            timefilter = true;
-        //            timefilterType = o.timefilter;
-        //        }
-        //    }
-
-        //    int virtualCols = 0;
-
-        //    Table tab = new Table();            
-
-        //    Globals.lastPrtOrMulprtTable = tab;  //this remembers the last PRT or MULPRT table, for possible putting on clipboard.
-        //    CrossThreadStuff.CopyButtonEnabled(true);
-
-        //    tab.writeOnce = true;  //so we don't accidentally override cells without even knowing it.
-        //    int numberOfLabelsLinesMax = -12345;
-
-        //    bool isRows;
-        //    bool isCols;
-        //    HandleRowsCols(o, out isRows, out isCols);
-        //    bool transpose = isRows; //transpose=false -> timeseries running down in cols, transpose=true -> timeseries running out in rows
-        //    if (G.Equal(o.prtType, "sheet"))
-        //    {
-        //        //TODO: the Excel emitter transposes itself, so we never transpose here. #89073253245
-        //        transpose = false;
-        //    }
-
-        //    int maxLabelsLinesFound = 1;
-        //    if (transpose)
-        //    {
-        //        numberOfLabelsLinesMax = 1;
-        //    }
-        //    else
-        //    {
-        //        numberOfLabelsLinesMax = 5;
-        //    }
-
-        //    bool identicalCodes = HasIdenticalCodes(o);  //also checks that MULPRT and short codes are not mixed
-
-        //    int blocks = 0;  //0-based
-        //    int blocksWidthRest = max;
-        //    string onePrintCodeLabel = "";
-        //    int virtualRowsStart = 0;
-        //    int virtualRowsMaxSeen = 0;
-        //    virtualCols = 0;  //1-based
-
-        //    int elementCounter = -1;
-        //    int subElementCounterTotal = -1;  //total number of variables/expressions (with unfolded lists) in a print.
-
-        //    List<string> labelsNonBroken = new List<string>();
-        //    List<string> originalLabelsNonBroken = new List<string>();
-
-
-        //    foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-        //    {
-        //        elementCounter++;
-        //        int subElementCounter = -1;
-        //        foreach (O.Prt.SubElement subPe in pe.subElements)
-        //        {
-        //            subElementCounter++;
-        //            subElementCounterTotal++;
-
-        //            List<string> printCodes = GetElementPrintCodes(o, pe);
-
-        //            List<int> widths = new List<int>();
-        //            List<int> decs = new List<int>();
-        //            PrintGetWithAndDecimals(o, elementCounter, printCodes, widths, decs);
-
-        //            int widthSum = 0; foreach (int w in widths) widthSum += w + 2;  //2 chars padding
-        //            if (!(G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) && !transpose && blocksWidthRest - (widthSum + 6) < 0)  //these 6 chars represent the date column. The wrapping is only approximate, but that is probably ok (that was also the case in the old PRT command)
-        //            {
-        //                //new block
-        //                virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
-        //                blocks++;  //0-based
-        //                virtualCols = 0;  //1-based
-        //                virtualRowsStart = virtualRowsMaxSeen + 1;
-        //                virtualRowsMaxSeen = 0;
-        //                blocksWidthRest = max;
-        //                blocksWidthRest += -widthSum;
-        //            }
-        //            else
-        //            {
-        //                blocksWidthRest += -widthSum;
-        //            }
-
-        //            int printCodesCounter = -1;
-
-        //            bool isSimplePrtOrMulprt = false;
-        //            if (printCodes.Count == 2 && G.Equal(printCodes[0], "n") && G.Equal(printCodes[1], "p")) isSimplePrtOrMulprt = true;
-        //            if (printCodes.Count == 2 && G.Equal(printCodes[0], "m") && G.Equal(printCodes[1], "q")) isSimplePrtOrMulprt = true;
-
-        //            foreach (string printCode in printCodes)
-        //            {
-        //                virtualCols++;
-        //                printCodesCounter++;  //0-based
-        //                int width = widths[printCodesCounter];
-        //                int dec = decs[printCodesCounter];
-        //                int labelsWidth = -12345;
-        //                int maxLength = -12345;
-        //                if (transpose)
-        //                {
-        //                    labelsWidth = 20;
-        //                }
-        //                else
-        //                {
-        //                    labelsWidth = width;
-        //                }
-
-        //                maxLength = labelsWidth * numberOfLabelsLinesMax;
-
-        //                //--------------------------- putting in labels, and handling the width of those (for normal print they may be split into several rows)
-
-        //                string printCodeLabelLong = GetPrintCodeLabel(printCode, isVerbose, isSimplePrtOrMulprt, identicalCodes);
-
-        //                onePrintCodeLabel = printCodeLabelLong;  //for possible use later on
-
-        //                string[] labelsArray = new string[numberOfLabelsLinesMax];
-        //                for (int i = 0; i < labelsArray.Length; i++) labelsArray[i] = "[[]]";
-
-        //                if (printCodesCounter == 0)  //first item
-        //                {
-        //                    string label = GetLabelInPrt(pe, subElementCounter);
-        //                    label = G.PrettifyTimeseriesHash(label, true, false);
-        //                    string originalLabel = label;
-        //                    if (label.StartsWith(Globals.labelCheatString)) label = label.Substring(Globals.labelCheatString.Length);                            
-
-        //                    if (identicalCodes || printCode == "n" || printCode == Globals.printCode_sn || printCode == Globals.printCode_s || (IsMulprt(o) && printCode == "m"))
-        //                    {
-        //                        //do nothing
-        //                        //if identical codes, the number of print codes will always be 1 for each item, so printCodesCounter will be = 0 always
-        //                    }
-        //                    else
-        //                    {
-        //                        label += " " + printCodeLabelLong;
-        //                    }
-        //                    int width2 = width;
-        //                    if (G.Equal(o.prtType, "sheet") || G.Equal(o.prtType, "clip")) width2 = int.MaxValue;
-        //                    int numberOfLabelsLines = PrintCreateLabelsArrayNew(label, width2, numberOfLabelsLinesMax, maxLength, labelsArray);
-        //                    maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, numberOfLabelsLines);
-        //                    labelsNonBroken.Add(originalLabel);
-        //                }
-        //                else
-        //                {
-        //                    //second item and on
-        //                    if (isSimplePrtOrMulprt)
-        //                    {
-        //                        //we override "[%]" or "[m%]" with "%", this is understandable enough
-        //                        string s = null;
-
-        //                        string label = GetLabelInPrt(pe, subElementCounter);
-
-        //                        if (G.IsIdent(label.Trim()))
-        //                        {
-        //                            EEndoOrExo ee = Program.VariableTypeEndoExo(label.Trim());
-        //                            if (ee == EEndoOrExo.Endo) s = "E";
-        //                            else if (ee == EEndoOrExo.Exo) s = "X";
-        //                        }
-
-        //                        if (!transpose && s != null)
-        //                        {
-        //                            //for transposed (<rows>) we do not show indicators
-        //                            labelsArray[0] = "(" + s + ")" + "%";  //PCIM-style is E% or X%, but we do (E)% or (X)% to distinguish from real variables (pcp [%] etc.)
-        //                        }
-        //                        else
-        //                        {
-        //                            labelsArray[0] = "%";
-        //                        }
-
-        //                    }
-        //                    else
-        //                    {
-        //                        labelsArray[0] = printCodeLabelLong;
-        //                    }
-        //                    maxLabelsLinesFound = Math.Max(maxLabelsLinesFound, 1);  //this line just for symmetry
-        //                    labelsNonBroken.Add("");  //should never happen for GRAPH
-        //                }
-
-        //                for (int i = 0; i < labelsArray.Length; i++)
-        //                {
-        //                    if (labelsArray[i] == "[[]]") labelsArray[i] = "";
-        //                }
-
-        //                for (int i = 0; i < numberOfLabelsLinesMax; i++)
-        //                {
-        //                    string s = labelsArray[numberOfLabelsLinesMax - i - 1];
-        //                    int ii = i;
-        //                    int jj = virtualCols;
-        //                    if (transpose)
-        //                    {
-        //                        ii = virtualCols;
-        //                        jj = i;
-        //                    }
-
-        //                    int ii2 = ii + 1 + virtualRowsStart;
-        //                    tab.Set(ii2, jj + 1, s);  //virtualRowsStart=0 if transpose=true
-        //                    if (!transpose)
-        //                    {
-        //                        tab.SetAlign(ii2, jj + 1, Align.Right);
-        //                    }
-        //                }
-
-        //                List<double> filterMemoryValues = new List<double>();
-        //                List<string> filterMemoryDates = new List<string>();
-
-        //                List<double> collapseFreqsValues = new List<double>();
-
-        //                int virtualRows = virtualRowsStart;
-        //                foreach (GekkoTime gt in new GekkoTimeIterator(o.t1, o.t2))
-        //                {
-        //                    bool filter = timefilter && ShouldFilterPeriod(gt);
-
-        //                    Series ts = subPe.tsWork as Series;
-        //                    Series tsGrund = subPe.tsBase as Series;
-
-        //                    double var1;
-        //                    double varPch;
-        //                    ComputeValueForPrintPlotNew(out var1, out varPch, printCode, gt, ts, tsGrund, o.guiGraphIsLogTransform, false);
-
-        //                    collapseFreqsValues.Add(var1);
-
-        //                    string date = G.FromDateToString(gt);
-
-        //                    if (timefilter && G.Equal(timefilterType, "avg"))
-        //                    {
-        //                        if (filter)
-        //                        {
-        //                            //filterCounter++;
-        //                            filterMemoryValues.Add(var1);
-        //                            filterMemoryDates.Add(date);
-        //                        }
-        //                        else
-        //                        {
-        //                            //filterCounter = 0;
-        //                            if (filterMemoryValues.Count > 0)
-        //                            {
-        //                                filterMemoryValues.Add(var1);
-        //                                filterMemoryDates.Add(date);
-        //                                var1 = CalculateAveragesForPrint(printCode, filterMemoryValues, EPrtCollapseTypes.None, -12345);  //freq will not be used here
-        //                                date = filterMemoryDates[0] + "-" + filterMemoryDates[filterMemoryDates.Count - 1];
-        //                            }
-        //                            filterMemoryValues.Clear();
-        //                            filterMemoryDates.Clear();
-        //                        }
-        //                    }
-
-        //                    if (filter) continue;
-
-        //                    virtualRows++;
-
-        //                    //don't do pretty printing of Q and M if there is timefilter or if it is transposed
-        //                    bool doAremosStuff = false; if (Program.options.print_freq == "pretty" && !timefilter && !transpose && (gt.freq == EFreq.Quarterly || gt.freq == EFreq.Monthly)) doAremosStuff = true;
-        //                    if (G.Equal(o.prtType, "plot") || G.Equal(o.prtType, "clip") || G.Equal(o.prtType, "sheet")) doAremosStuff = false;
-        //                    //Note: the method below only puts stuff into table for virtualCols == 1. Else it is only used
-        //                    //      to correct virtualRows when pretty-printing frequencies Q and M.
-        //                    PrintInsertDate(doAremosStuff, virtualCols, date, gt, o.t1, tab, numberOfLabelsLinesMax, transpose, ref virtualRows, o);
-        //                    PrintInsertTimeseriesData(doAremosStuff, gt, virtualCols, tab, numberOfLabelsLinesMax, transpose, width, dec, ref virtualRows, var1, collapseFreqsValues, printCode, o);
-        //                    virtualRowsMaxSeen = Math.Max(virtualRowsMaxSeen, virtualRows + numberOfLabelsLinesMax);
-        //                } //foreach period
-        //            } //foreach printcode
-        //        }  //foreach item in variable (if it is a list)
-        //    } //foreach variable
-
-        //    if (subElementCounterTotal == -1)
-        //    {
-        //        G.Writeln2("Empty list -- nothing to print");
-        //    }
-
-        //    virtualRowsMaxSeen = PrintPrettify(o, tab, numberOfLabelsLinesMax, transpose, maxLabelsLinesFound, identicalCodes, onePrintCodeLabel, virtualRowsStart, virtualRowsMaxSeen);
-
-        //    if (masterSpaceErrors.Count > 0)
-        //    {
-        //        //only results in a warning ("MULPRT @fy" will always be 0)
-        //        G.Writeln();
-        //        foreach (string s in masterSpaceErrors) G.Writeln(s);
-        //    }
-
-        //    if (nonExistenceErrors.Count > 0)
-        //    {
-        //        G.Writeln();
-        //        foreach (string s in nonExistenceErrors) G.Writeln(s);
-        //        throw new GekkoException();
-        //    }
-        //    else
-        //    {
-        //        //----------------- actually printing the stuff start -------------------------------
-        //        //tab.PrintCellsForDebug();
-
-        //        if (G.Equal(o.prtType, "plot"))
-        //        {
-        //            //tab.PrintCellsForDebug();
-        //            if (Program.options.plot_new)
-        //            {
-        //                //CallGnuplotNew2(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)                            
-        //            }
-        //            else
-        //            {
-        //                //CallGnuplotNew(tab, o, subElementCounterTotal + 1, maxLabelsLinesFound, labelsNonBroken);  //make sure there are no percent shown for levels (use <n> option, not <n p>)
-        //            }
-
-        //            //Alternatively: store all transformations, maybe also for UDVALG
-        //            //TODO.......
-        //            //if (po.isCalledFromGraphWindow == false)  //PPLOT called from command prompt or command file
-        //            //{
-        //            //    CloneToLocalBank(graphVars, localBanks, work, base2);
-        //            //}
-
-        //            return 0;
-        //        }
-
-        //        if (G.IsUnitTesting())
-        //        {
-        //            Globals.unitTestTablePointer = tab;  //to be able to inspect it in unit tests
-        //        }
-
-        //        if (G.Equal(o.prtType, "sheet"))
-        //        {
-        //            //tab2 = tab.Transpose();
-        //            //TODO: we need a counter regarding the first rows/cols of the table, how many??
-
-        //            //TODO: fill with NaN!!!
-        //            //TODO: fill with NaN!!!
-        //            //TODO: fill with NaN!!!
-
-        //            //remember append
-        //            //always start in A1, no blank line
-        //            //labels.. what if they break -- should be infinitely long
-
-        //            Table tab2 = tab.Transpose();
-        //            int startRows = 1;
-        //            int startCols = 1;
-        //            ExcelOptions eo = new ExcelOptions();
-        //            eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
-        //            eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
-        //            eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
-
-        //            for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
-        //            {
-        //                for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
-        //                {
-        //                    Cell cell2 = tab2.Get(i, j);
-        //                    string s2 = "";
-        //                    if (cell2 == null)
-        //                    {
-        //                    }
-        //                    else
-        //                    {
-        //                        if (i == 1 && j == 1)
-        //                        {
-        //                            //do nothing
-        //                        }
-        //                        else if (j == 1)
-        //                        {
-        //                            //first row
-        //                            string s = cell2.CellText.TextData[0];
-        //                            if (s == null) s = "";
-        //                            eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
-        //                        }
-        //                        else if (i == 1)
-        //                        {
-        //                            string s = cell2.CellText.TextData[0];
-        //                            if (s == null) s = "";
-        //                            eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-        //                        }
-        //                        else
-        //                        {
-        //                            eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
-        //                            s2 = cell2.date;
-        //                        }
-        //                    }
-        //                }
-        //            }
-
-        //            CreateExcelWorkbook2(eo, o, IsMulprt(o));
-        //            return 0;
-        //        }
-        //        else if (G.Equal(o.prtType, "clip"))
-        //        {
-        //            //maybe better to "record" into tablelight from CreateExcelWorkbook2?
-        //            PrtClipboard(tab, false);
-        //            return 0;
-        //        }
-        //        else  //normal PRT
-        //        {
-        //            List<string> table = tab.Print();
-        //            int widthRemember = Program.options.print_width;
-        //            int fileWidthRemember = Program.options.print_filewidth;
-        //            Program.options.print_width = int.MaxValue;
-        //            Program.options.print_filewidth = int.MaxValue;
-        //            G.Writeln();
-        //            if (o.opt_title != null && o.opt_title != "")
-        //            {
-        //                G.Writeln(o.opt_title);
-        //            }
-        //            try
-        //            {
-
-        //                foreach (string s in table)
-        //                {
-        //                    G.Writeln(s);
-        //                }
-
-
-        //            }
-        //            finally
-        //            {
-        //                //resetting, also if there is an error
-        //                Program.options.print_width = widthRemember;
-        //                Program.options.print_filewidth = fileWidthRemember;
-        //            }
-        //            //----------------- actually printing the stuff end -------------------------------
-        //        }
-        //    }
-
-        //    return virtualCols;
-        //}
-
+        
         private static bool HasIdenticalCodes(O.Prt o)
         {
             //a bit costly method, and the loop here is looped again later on, but this is not speed critical.
@@ -28969,10 +28422,10 @@ namespace Gekko
             EPrtCollapseTypes collapse = GetCollapseType(o);
             if (doAremosStuff && collapse != EPrtCollapseTypes.None)
             {
-                if ((gt.freq == EFreq.Quarterly && gt.sub == 4) || (gt.freq == EFreq.Monthly && gt.sub == 12))
+                if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
                 {
                     int n = 4;
-                    if (gt.freq == EFreq.Monthly) n = 12;
+                    if (gt.freq == EFreq.M) n = 12;
                     double x = CalculateAveragesForPrint(printCode, collapseFreqsValues, collapse, n);
                     if (!G.isNumericalError(x))
                     {
@@ -29058,8 +28511,8 @@ namespace Gekko
             string line = "";
             if (doAremosStuff)
             {
-                if (gt.freq == EFreq.Quarterly) line += "  " + "q" + gt.sub;
-                else if (gt.freq == EFreq.Monthly) line += "  " + "m" + gt.sub;
+                if (gt.freq == EFreq.Q) line += "  " + "q" + gt.sub;
+                else if (gt.freq == EFreq.M) line += "  " + "m" + gt.sub;
                 else
                 {
                     G.Writeln2("*** ERROR: Internal error #7523943");
@@ -29085,7 +28538,7 @@ namespace Gekko
 
             if (doAremosStuff && GetCollapseType(o) != EPrtCollapseTypes.None)
             {
-                if ((gt.freq == EFreq.Quarterly && gt.sub == 4) || (gt.freq == EFreq.Monthly && gt.sub == 12))
+                if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
                 {
                     //virtualRows++;  //The row containing the collapsed value
                 }
@@ -30321,474 +29774,17 @@ namespace Gekko
             return numberOfLabelsRows;
         }
 
-        //private static void CallGnuplotNew(Table data, O.Prt o, int count, int maxLabelsLinesFound, List<string> labelsNonBroken)
-        //{
-        //    if (count == 0)
-        //    {
-        //        G.Writeln2("*** ERROR: PLOT called with 0 variables");
-        //        throw new GekkoException();
-        //    }
-
-        //    string pplotType = "emf";
-        //    if (o.opt_filename != null)
-        //    {
-        //        pplotType = Path.GetExtension(o.opt_filename);
-        //        if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-        //        if (pplotType == "")
-        //        {
-        //            o.opt_filename = AddExtension(o.opt_filename, ".emf");
-        //            pplotType = "emf";
-        //        }
-        //        if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-        //        {
-        //            G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-        //            throw new GekkoException();
-        //        }
-        //    }
-
-        //    int numberOfObs = GekkoTime.Observations(o.t1, o.t2);
-        //    int rr = Program.RandomInt();
-        //    string file1 = "temp" + rr + ".dat";
-        //    string file2 = "temp" + rr + "." + pplotType;
-        //    string file3 = "temp" + rr + ".gp";
-        //    string heading = "";
-            
-
-        //    if (o.opt_filename != null)
-        //    {
-        //        pplotType = Path.GetExtension(o.opt_filename);
-        //        if (pplotType.StartsWith(".")) pplotType = pplotType.Substring(1);
-        //        if (pplotType == "")
-        //        {
-        //            o.opt_filename = AddExtension(o.opt_filename, ".emf");
-        //            pplotType = "emf";
-        //        }
-        //        if (pplotType != "emf" && pplotType != "png" && pplotType != "svg")
-        //        {
-        //            G.Writeln2("*** ERROR: In PLOT, expected file type is emf, png or svg");
-        //            throw new GekkoException();
-        //        }
-        //    }
-        //    bool histo = false;
-        //    string currentDir = Directory.GetCurrentDirectory();  //remembered in order to switch back
-        //    string path = System.Windows.Forms.Application.LocalUserAppDataPath + "\\gnuplot\\tempfiles";
-
-        //    //tw.WriteLine("set terminal emf size 300 ,200");
-
-        //    // Determine whether the directory exists.
-        //    if (!Directory.Exists(path))
-        //    {
-        //        Directory.CreateDirectory(path);
-        //    }
-        //    Directory.SetCurrentDirectory(path); //so that gnuplot can access the files
-
-
-        //    //foreach (string s in data.Print()) { G.Writeln(s); };
-
-        //    List<string> labels1 = new List<string>();
-        //    List<string> labels2 = new List<string>();
-
-        //    using (FileStream fs = WaitForFileStream(path + "\\" + file1, GekkoFileReadOrWrite.Write))
-        //    using (StreamWriter tw = G.GekkoStreamWriter(fs))
-        //    {
-        //        for (int t = 0; t < numberOfObs; t++)
-        //        {
-        //            string s = null;
-        //            for (int i = 0; i <= count; i++)
-        //            {
-        //                Cell c = data.Get(t + 1 + maxLabelsLinesFound, i + 1);
-        //                if (i == 0 && c.cellType == CellType.Text)
-        //                {
-        //                    string d = c.CellText.TextData[0];
-        //                    string dOrig = d;
-        //                    d = GetDateStringSuitableForGnuplot(d);
-        //                    labels1.Add(dOrig);
-        //                    labels2.Add(d);
-        //                    s += d + " ";
-        //                }
-        //                else if (i > 0 && c.cellType == CellType.Number)
-        //                {
-        //                    double d = c.number;
-        //                    s += d + " ";
-        //                }
-        //                else
-        //                {
-        //                    G.Writeln2("*** ERROR: Graph error");
-        //                    throw new GekkoException();
-        //                }
-        //            }
-        //            tw.WriteLine(s);
-        //        }
-        //    }
-
-        //    using (FileStream fs = WaitForFileStream(path + "\\" + file3, GekkoFileReadOrWrite.Write))
-        //    using (StreamWriter tw = G.GekkoStreamWriter(fs))
-        //    {
-        //        if (o.opt_plotcode != null && o.opt_plotcode.Contains("[histo]"))
-        //        {
-        //            histo = true;
-        //            o.opt_plotcode = o.opt_plotcode.Replace("[histo]", "");
-        //        }
-
-        //        tw.WriteLine("set encoding iso_8859_1");
-
-        //        heading = EncodeDanish(heading);
-
-        //        tw.WriteLine("set title \"" + heading + "\"");
-        //        tw.WriteLine("set datafile missing \"NaN\"");
-        //        tw.WriteLine("set terminal " + pplotType);
-        //        tw.WriteLine("set output \"" + file2 + "\"");
-        //        //tw.WriteLine("set data style linespoints"); //probably superfluous
-        //        //tw.WriteLine("set title \"Graph\"");
-        //        //tw.WriteLine("set xlabel \"År\"");
-        //        //tw.WriteLine("set ylabel \"Var1\"");
-
-        //        if (!double.IsNaN(o.opt_ymin) && double.IsNaN(o.opt_ymax))
-        //        {
-        //            tw.WriteLine("set yrange [" + o.opt_ymin + ":]");
-        //        }
-        //        else if (double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-        //        {
-        //            tw.WriteLine("set yrange [:" + o.opt_ymax + "]");
-        //        }
-        //        else if (!double.IsNaN(o.opt_ymin) && !double.IsNaN(o.opt_ymax))
-        //        {
-        //            tw.WriteLine("set yrange [" + o.opt_ymin + ":" + o.opt_ymax + "]");
-        //        }
-
-        //        if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
-        //        {
-        //            tw.WriteLine("set xdata time");
-        //            tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-        //            tw.WriteLine(@"set format x ""%Y/%m""");
-        //        }
-        //        else
-        //        {
-        //            if (numberOfObs > 70)
-        //            {
-        //                tw.WriteLine("set xtics 10");
-        //                tw.WriteLine("set mxtics 10");
-        //            }
-        //            else
-        //            {
-        //                tw.WriteLine("set xtics 5");
-        //                tw.WriteLine("set mxtics 5");
-        //            }
-        //        }
-                
-        //        tw.WriteLine("set ticscale 1.4 0.7");
-        //        //tw.WriteLine("set key outside top");
-        //        //tw.WriteLine("set key 100, 100");
-        //        tw.WriteLine("set border 3");
-        //        tw.WriteLine("set xtics nomirror");
-        //        tw.WriteLine("set ytics nomirror");
-        //        tw.WriteLine("set xzeroaxis lt -1");
-        //        tw.WriteLine("set yzeroaxis");
-        //        //tw.WriteLine("set grid");
-        //        //tw.WriteLine("set size 0.5,0.5");
-        //        //tw.WriteLine("set size ratio 0.2"); does not work
-
-        //        int mxtics = -12345;
-
-        //        if (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)
-        //        {
-        //        }
-        //        else
-        //        {
-        //            List<int> subperiods = new List<int>();
-        //            int onlyYears = -12345;
-        //            if (Program.options.freq == EFreq.Quarterly)
-        //            {
-        //                if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
-        //                {
-        //                    subperiods.Add(1);  //q1
-        //                    subperiods.Add(4);  //q2
-        //                    subperiods.Add(7);  //q3
-        //                    subperiods.Add(10);  //q4
-        //                }
-        //                else if (labels1.Count <= 24)
-        //                {
-        //                    subperiods.Add(1);  //q1
-        //                    subperiods.Add(7);  //q3
-        //                    mxtics = 2;
-        //                }
-        //                else if (labels1.Count <= 48)
-        //                {
-        //                    subperiods.Add(1);  //q1
-        //                    mxtics = 4;
-        //                }
-        //                else if (labels1.Count <= 5 * 48)
-        //                {
-        //                    onlyYears = 5;
-        //                    subperiods.Add(1);  //q1
-        //                    mxtics = 5;
-        //                }
-        //                else if (labels1.Count <= 10 * 48)
-        //                {
-        //                    onlyYears = 10;
-        //                    subperiods.Add(1);  //q1
-        //                    mxtics = 10;
-        //                }
-        //                else
-        //                {
-        //                    onlyYears = 20;
-        //                    subperiods.Add(1);  //q1
-        //                }
-        //            }
-        //            else  //monthly
-        //            {
-        //                if (labels1.Count <= 12)  //for monthly, 12 corresponds to 1 year with 12 subpers
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                    subperiods.Add(2);  //m2
-        //                    subperiods.Add(3);  //m3
-        //                    subperiods.Add(4);  //m4
-        //                    subperiods.Add(5);  //m5
-        //                    subperiods.Add(6);  //m6
-        //                    subperiods.Add(7);  //m7
-        //                    subperiods.Add(8);  //m8
-        //                    subperiods.Add(9);  //m9
-        //                    subperiods.Add(10);  //m10
-        //                    subperiods.Add(11);  //m11
-        //                    subperiods.Add(12);  //m12
-        //                }
-        //                else if (labels1.Count <= 24)
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                    subperiods.Add(3);  //m3
-        //                    subperiods.Add(5);  //m5
-        //                    subperiods.Add(7);  //m7
-        //                    subperiods.Add(9);  //m9
-        //                    subperiods.Add(11);  //m11
-        //                    mxtics = 2;
-        //                }
-        //                else if (labels1.Count <= 36)
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                    subperiods.Add(4);  //m4
-        //                    subperiods.Add(7);  //m7
-        //                    subperiods.Add(10);  //m10
-        //                    mxtics = 3;
-        //                }
-        //                else if (labels1.Count <= 48)
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                    subperiods.Add(5);  //m5
-        //                    subperiods.Add(9);  //m9
-        //                    mxtics = 4;
-        //                }
-        //                else if (labels1.Count <= 72)
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                    subperiods.Add(7);  //m7
-        //                    mxtics = 6;
-        //                }
-        //                else if (labels1.Count <= 144)
-        //                {
-        //                    subperiods.Add(1);  //m1
-        //                }
-        //                else if (labels1.Count <= 15 * 48)
-        //                {
-        //                    onlyYears = 5;
-        //                    subperiods.Add(1);  //m1
-        //                    mxtics = 5;
-        //                }
-        //                else if (labels1.Count <= 30 * 48)
-        //                {
-        //                    onlyYears = 10;
-        //                    subperiods.Add(1);  //m1
-        //                    mxtics = 10;
-        //                }
-        //                else
-        //                {
-        //                    onlyYears = 20;
-        //                    subperiods.Add(1);  //m1
-        //                }
-        //            }
-
-        //            string s3 = null;
-        //            int c = -1;
-        //            for (int i = 0; i < labels1.Count; i++)
-        //            {
-        //                c++;
-        //                //int subper=labels2[i]
-        //                //if (labels1.Count > 20 && c %  != 0) continue;
-        //                string[] split = labels2[i].Split(new char[] { '/' });
-        //                if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
-        //                if (subperiods.Contains(int.Parse(split[1])))
-        //                {
-        //                    s3 += "\"" + labels1[i] + "\" \"" + labels2[i] + "\", ";
-        //                }
-        //            }
-        //            if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-        //            tw.WriteLine("set xtics (" + s3 + ")");
-        //        }
-
-        //        if (mxtics != -12345)
-        //        {
-        //            //for quarterly and monthly
-        //            if (false)
-        //            {
-        //                //TODO: why does this not work??
-        //                tw.WriteLine("set mxtics " + mxtics);
-        //            }
-        //        }
-
-        //        if (histo)
-        //        {
-        //            if (false)  //not really working (labels)
-        //            {
-        //                tw.WriteLine("set size ratio 0.5");
-        //                tw.WriteLine("set key outside top");
-        //            }
-
-        //            tw.WriteLine("set style fill solid 1.000000 border -1");
-        //            tw.WriteLine("set boxwidth 0.3");
-
-
-        //            //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
-        //            tw.WriteLine("set style line 1 lt 1 lw 4.0");
-        //            tw.WriteLine("set style line 2 lt 2 lw 2.0");
-        //            tw.WriteLine("set style line 3 lt 3 lw 2.0");
-
-        //        }
-
-        //        if (o.opt_plotcode != null)
-        //        {
-        //            tw.WriteLine("");
-        //            tw.WriteLine(o.opt_plotcode);  //user code
-        //            tw.WriteLine("");
-        //        }
-
-        //        tw.Write("plot ");
-        //        for (int i = 0; i < count; i++)
-        //        {
-        //            string label = EncodeDanish(labelsNonBroken[i]);
-
-        //            if (!histo)
-        //            {
-        //                string lineType = "with lines ";
-        //                if (Program.options.plot_lines_points)
-        //                {
-        //                    lineType = "with linespoints ";
-        //                }
-        //                tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " " + lineType + "lw 2.0 " + " title \"  " + label + "\" ");
-        //            }
-        //            else
-        //            {
-        //                if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
-        //                else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
-        //                else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
-        //                else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
-        //                else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
-        //            }
-
-
-
-        //            if (i < count - 1) tw.Write(",");
-        //        }
-        //        tw.WriteLine();
-        //        tw.Flush();
-        //        tw.Close();
-        //    }
-
-        //    string emfName = path + "\\" + file2;
-
-        //    Process p = new Process();
-        //    //p.MainWindowTitle = title;
-        //    p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
-        //    //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-        //    //NOTE: quotes added because this path may contain blanks
-        //    p.StartInfo.Arguments = Globals.QT + path + "\\" + file3 + Globals.QT;
-
-        //    bool exited = false;
-        //    try
-        //    {
-        //        p.Start();
-        //        exited = p.WaitForExit(5000);  //5 sec, should always be able to do it in < 1 sec
-        //        if (!exited)
-        //        {
-        //            MessageBox.Show("*** ERROR: The gnuplot call did not respond within 5 seconds, so the " + G.NL + "gnuplot call was aborted.");
-        //            throw new GekkoException();
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        if (exited)
-        //        {
-        //            MessageBox.Show("*** ERROR: There was a internal problem calling gnuplot." + G.NL + "ERROR: " + e.Message);
-        //        }
-        //        throw new GekkoException();
-        //    }
-
-        //    p.Close();
-        //    //resets current dir to previous location
-        //    Directory.SetCurrentDirectory(currentDir);
-
-        //    if (o.opt_filename != null && o.opt_filename != "")
-        //    {
-        //        string fileNameWithPath = CreateFullPathAndFileName(o.opt_filename);
-        //        WaitForFileCopy(emfName, fileNameWithPath);
-        //        G.Writeln2("PLOT created file " + fileNameWithPath);
-        //        return;
-        //    }
-
-        //    if (!o.guiGraphIsRefreshing)
-        //    {
-        //        PrtOptionsHelper po = new PrtOptionsHelper();
-        //        po.isLevel = true;
-        //        po.isLog = false;
-        //        po.isDiff = false;
-        //        po.isPch = false;
-        //        po.isDlog = false;
-        //        po.isMultiplier = false;
-
-        //        GraphOptions graphOptions = new GraphOptions();
-        //        graphOptions.counter = o.counter;
-        //        graphOptions.localBanks = null;
-        //        graphOptions.emfName = emfName;
-        //        graphOptions.po = po;
-        //        graphOptions.pph = null;
-        //        graphOptions.precedents = null;
-        //        graphOptions.tEnd = o.t2;
-        //        graphOptions.tStart = o.t1;
-        //        graphOptions.graphVars = null;
-        //        graphOptions.graphVarsNames = labelsNonBroken;
-        //        graphOptions.title = null;
-
-        //        Thread thread = new Thread(new ParameterizedThreadStart(GraphThreadFunction));
-        //        thread.SetApartmentState(ApartmentState.STA);
-        //        thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
-        //        thread.Start(graphOptions);
-
-        //        //Also see #9237532567
-        //        //This stuff makes sure we wait for the window to open, before we move on with the code.
-        //        for (int i = 0; i < 6000; i++)  //up to 60 s, then we move on anyway
-        //        {
-        //            System.Threading.Thread.Sleep(10);  //0.01s
-        //            if (graphOptions.windowIsShown)
-        //            {
-        //                break;
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        o.guiGraphRefreshingFilename = emfName;
-        //    }
-        //}
-
-
+        
         private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
 
-            EFreq highestFreq = EFreq.Annual;
-            if (freqs[0]) highestFreq = EFreq.Undated;
-            if (freqs[1]) highestFreq = EFreq.Annual;
-            if (freqs[2]) highestFreq = EFreq.Quarterly;
-            if (freqs[3]) highestFreq = EFreq.Monthly;
+            EFreq highestFreq = EFreq.A;
+            if (freqs[0]) highestFreq = EFreq.U;
+            if (freqs[1]) highestFreq = EFreq.A;
+            if (freqs[2]) highestFreq = EFreq.Q;
+            if (freqs[3]) highestFreq = EFreq.M;
                         
             string extension = "emf";
             if (o.opt_filename != null)
@@ -30813,7 +29809,7 @@ namespace Gekko
             bool firstXLabelFix = true;
 
             bool isInside = false;  //corresponds to at
-            if (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)
+            if (highestFreq == EFreq.A || highestFreq == EFreq.U)
             {
                 //annual
                 if (G.Equal(Program.options.plot_xlabels_annual, "between")) isInside = true;
@@ -30832,7 +29828,7 @@ namespace Gekko
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
 
             //int quarterFix = 0;
-            //if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly) quarterFix = 1;
+            //if (Program.options.freq == EFreq.Q || Program.options.freq == EFreq.M) quarterFix = 1;
 
             if (count == 0)
             {
@@ -31188,7 +30184,7 @@ namespace Gekko
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
 
             
-                if (!(highestFreq == EFreq.Annual || highestFreq == EFreq.Undated))  //ttfreq
+                if (!(highestFreq == EFreq.A || highestFreq == EFreq.U))  //ttfreq
                 {
                     //if (quarterFix == 0)
                     //{
@@ -31359,12 +30355,12 @@ namespace Gekko
                 int t2 = o.t2.super;
                 //txt.AppendLine("set xtics " + (t1 - 1) + ",1," + (t2 + 0) + "");
                 int sub = 1;
-                if (highestFreq == EFreq.Quarterly)
+                if (highestFreq == EFreq.Q)
                 {
                     sub = 4;
                     extra = (double)o.t2.sub / (double)sub;
                 }
-                else if (highestFreq == EFreq.Monthly)
+                else if (highestFreq == EFreq.M)
                 {
                     sub = 12;
                     extra = (double)o.t2.sub / (double)sub;
@@ -31416,7 +30412,7 @@ namespace Gekko
                     string tlabel = "\"" + tx + "\"";
                     
                     ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
-                    if ((highestFreq == EFreq.Monthly && years <= 25) || (highestFreq == EFreq.Quarterly && years <= 75))
+                    if ((highestFreq == EFreq.M && years <= 25) || (highestFreq == EFreq.Q && years <= 75))
                     {
                         for (int tt = 1; tt < sub; tt++)  //is skipped if sub = 1
                         {
@@ -31432,7 +30428,7 @@ namespace Gekko
                 txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
                 if (firstXLabelFix)
                 {
-                    if ((highestFreq == EFreq.Monthly && o.t1.freq == EFreq.Monthly && o.t1.sub <= 1) || (highestFreq == EFreq.Quarterly && o.t1.freq == EFreq.Quarterly && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
+                    if ((highestFreq == EFreq.M && o.t1.freq == EFreq.M && o.t1.sub <= 1) || (highestFreq == EFreq.Q && o.t1.freq == EFreq.Q && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
                     {
                         //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
                         double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
@@ -31458,11 +30454,11 @@ namespace Gekko
             //string plotline = null;
 
             double dx = 1d;
-            if (highestFreq == EFreq.Quarterly)
+            if (highestFreq == EFreq.Q)
             {
                 dx = 1d / 4d;
             }
-            else if (highestFreq == EFreq.Monthly)
+            else if (highestFreq == EFreq.M)
             {
                 dx = 1d / 12d;
             }
@@ -31933,12 +30929,12 @@ namespace Gekko
 
         private static double GetXAdjustmentForInsideTics(bool isInside, EFreq highestFreq)
         {
-            if (!isInside && (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)) return -0.5;
+            if (!isInside && (highestFreq == EFreq.A || highestFreq == EFreq.U)) return -0.5;
             else return 0d;
             //if (!isInside) return 0d;
             //int sub = 1;
-            //if (highestFreq == EFreq.Quarterly) sub = 4;
-            //else if (highestFreq == EFreq.Monthly) sub = 12;
+            //if (highestFreq == EFreq.Q) sub = 4;
+            //else if (highestFreq == EFreq.M) sub = 12;
             //double adj = 1d / sub / 2d;
             //return adj;
         }
@@ -32064,7 +31060,7 @@ namespace Gekko
 
         private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics, EFreq highestFreq)
         {
-            if (highestFreq == EFreq.Annual || highestFreq == EFreq.Undated)
+            if (highestFreq == EFreq.A || highestFreq == EFreq.U)
             {
                 //do nothing
                 ticsTxt = null;
@@ -32089,7 +31085,7 @@ namespace Gekko
                         string xx = labels2[i];
                         //if (quarterFix == 1)
                         //{
-                        //    if (Program.options.freq == EFreq.Quarterly || Program.options.freq == EFreq.Monthly)
+                        //    if (Program.options.freq == EFreq.Q || Program.options.freq == EFreq.M)
                         //    {
                         //        xx = FromGnuplotDateToFloatingValue(split);
                         //    }
@@ -32113,7 +31109,7 @@ namespace Gekko
         {
             subperiods = new List<int>();
             onlyYears = -12345;
-            if (Program.options.freq == EFreq.Quarterly)
+            if (Program.options.freq == EFreq.Q)
             {
                 if (labels1.Count <= 12)  //for quarterly, 12 corresponds to 3 years with 4 subpers each
                 {
@@ -32314,7 +31310,7 @@ namespace Gekko
 
         private static string GetDateStringSuitableForGnuplot(string d)
         {
-            if (Program.options.freq == EFreq.Quarterly)
+            if (Program.options.freq == EFreq.Q)
             {
                 if (d.EndsWith("q1")) d = d.Substring(0, d.Length - 2) + "/01/01" + "";
                 else if (d.EndsWith("q2")) d = d.Substring(0, d.Length - 2) + "/04/01" + "";
@@ -32322,7 +31318,7 @@ namespace Gekko
                 else if (d.EndsWith("q4")) d = d.Substring(0, d.Length - 2) + "/10/01" + "";
                 else throw new GekkoException();
             }
-            else if (Program.options.freq == EFreq.Monthly)
+            else if (Program.options.freq == EFreq.M)
             {
                 if (d.EndsWith("m1")) d = d.Substring(0, d.Length - 2) + "/01/01" + "";
                 else if (d.EndsWith("m2")) d = d.Substring(0, d.Length - 2) + "/02/01" + "";
@@ -32362,7 +31358,7 @@ namespace Gekko
             //tw.WriteLine("set xlabel \"År\"");
             //tw.WriteLine("set ylabel \"Var1\"");
 
-            if (!(Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated))  //ttfreq
+            if (!(Program.options.freq == EFreq.A || Program.options.freq == EFreq.U))  //ttfreq
             {
                 tw.WriteLine("set xdata time");
                 tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
@@ -35602,7 +34598,7 @@ namespace Gekko
                 int dataCols = eo.excelData.GetLength(1);
 
                 int[,] excelColumnLabelsAnnual = new int[1, dataCols];
-                if (options.freq == EFreq.Annual)
+                if (options.freq == EFreq.A)
                 {
                     for (int i = 0; i < eo.excelColumnLabels.Length; i++)
                     {
@@ -35677,7 +34673,7 @@ namespace Gekko
 
                     string[,] data2 = null;
 
-                    if (options.freq == EFreq.Annual)
+                    if (options.freq == EFreq.A)
                     {
                         //else the cells are left-justified and with a green triangle (warning)
 
@@ -37929,9 +36925,9 @@ namespace Gekko
 
         public static string AddFreqAtEndOfVariableName(string var, EFreq freq)
         {            
-            if (freq == EFreq.Annual) return var;
+            if (freq == EFreq.A) return var;
             string var2 = var;
-            if (freq == EFreq.Quarterly || freq == EFreq.Monthly || freq == EFreq.Undated)
+            if (freq == EFreq.Q || freq == EFreq.M || freq == EFreq.U)
             {
                 if (var2.EndsWith(Globals.freqIndicator + "q") || var2.EndsWith(Globals.freqIndicator + "m") || var2.EndsWith(Globals.freqIndicator + "u"))
                 {
@@ -37941,15 +36937,15 @@ namespace Gekko
                 }
                 else
                 {
-                    if (freq == EFreq.Quarterly)
+                    if (freq == EFreq.Q)
                     {
                         var2 = var + Globals.freqIndicator + "q";
                     }
-                    else if (freq == EFreq.Monthly)
+                    else if (freq == EFreq.M)
                     {
                         var2 = var + Globals.freqIndicator + "m";
                     }
-                    else if (freq == EFreq.Undated)
+                    else if (freq == EFreq.U)
                     {
                         var2 = var + Globals.freqIndicator + "u";
                     }

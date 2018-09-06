@@ -206,7 +206,7 @@ namespace Gekko
                         {
                             if (al[i] == ".")
                             {
-                                ts.SetData(new GekkoTime(EFreq.Annual, year, 1), double.NaN);
+                                ts.SetData(new GekkoTime(EFreq.A, year, 1), double.NaN);
                                 //data[end] = double.NaN;
                             }
                             else
@@ -219,7 +219,7 @@ namespace Gekko
                                 {
                                     double v = double.Parse(n1, System.Globalization.CultureInfo.InvariantCulture);
                                     if (minus) v = -v;
-                                    ts.SetData(new GekkoTime(EFreq.Annual, year, 1), v);
+                                    ts.SetData(new GekkoTime(EFreq.A, year, 1), v);
                                 }
                                 catch
                                 {

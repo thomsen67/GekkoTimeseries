@@ -8,10 +8,10 @@ namespace Gekko
 {
     public enum EFreq  //search for 'ttfreq' to see places with freq that should be enumerated
     {
-        Annual,
-        Quarterly,
-        Monthly,
-        Undated,      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
+        A,
+        Q,
+        M,
+        U,      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
         None          //used to signal non-freq variable, for instance a VAL   
     }  
 
@@ -43,7 +43,7 @@ namespace Gekko
         [ProtoMember(4)]
         public readonly EFreq freq;
 
-        public static GekkoTime tNull = new GekkoTime(EFreq.Annual, -12345, 1);  //think of it as a 'null' object (but it is a struct)
+        public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //think of it as a 'null' object (but it is a struct)
 
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
         //      though it is valid to do. Such a struct cannot have its fields changed anyway, so
@@ -60,7 +60,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: subperiod < 1");
                 throw new GekkoException();
             }
-            if (freq == EFreq.Annual)
+            if (freq == EFreq.A)
             {
                 if (sub > 1)
                 {
@@ -68,7 +68,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (freq == EFreq.Quarterly)
+            else if (freq == EFreq.Q)
             {
                 if (sub > 4)
                 {
@@ -76,7 +76,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (freq == EFreq.Monthly)
+            else if (freq == EFreq.M)
             {
                 if (sub > 12)
                 {
@@ -84,7 +84,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (freq == EFreq.Undated)
+            else if (freq == EFreq.U)
             {
                 if (sub > 1)
                 {
@@ -123,14 +123,14 @@ namespace Gekko
             }
             EFreq efreq = t1.freq;
             int subPeriods = 1;
-            if (efreq == EFreq.Annual)
+            if (efreq == EFreq.A)
             {
                 //fast return
                 return t2.super - t1.super + 1;  //Subpers are ignored. It is tacitly assumed that the subperiods are = 1 here, else this is nonsense
             }
-            else if (efreq == EFreq.Quarterly) subPeriods = 4;
-            else if (efreq == EFreq.Monthly) subPeriods = 12;
-            else if (efreq == EFreq.Undated) subPeriods = 1;  //ttfreq
+            else if (efreq == EFreq.Q) subPeriods = 4;
+            else if (efreq == EFreq.M) subPeriods = 12;
+            else if (efreq == EFreq.U) subPeriods = 1;  //ttfreq
             else
             {
                 G.Writeln2("*** ERROR: Error regarding frequency");
@@ -163,45 +163,45 @@ namespace Gekko
             else
             {
 
-                if (freq == EFreq.Annual)
+                if (freq == EFreq.A)
                 {
-                    if (t1.freq == EFreq.Quarterly)
+                    if (t1.freq == EFreq.Q)
                     {
-                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);  
-                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);  
+                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);  
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);  
                     }
-                    else if (t1.freq == EFreq.Monthly)
+                    else if (t1.freq == EFreq.M)
                     {
-                        tt1 = new GekkoTime(EFreq.Annual, t1.super, 1);  
-                        tt2 = new GekkoTime(EFreq.Annual, t2.super, 1);  
+                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);  
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);  
                     }
 
                 }
-                else if (freq == EFreq.Quarterly)
+                else if (freq == EFreq.Q)
                 {
-                    if (t1.freq == EFreq.Annual)
+                    if (t1.freq == EFreq.A)
                     {
-                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, 1);
-                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTimeStuff.numberOfQuarters);
+                        tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
 
-                    else if (t1.freq == EFreq.Monthly)
+                    else if (t1.freq == EFreq.M)
                     {
-                        tt1 = new GekkoTime(EFreq.Quarterly, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m
-                        tt2 = new GekkoTime(EFreq.Quarterly, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
+                        tt1 = new GekkoTime(EFreq.Q, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
                     }
                 }
-                else if (freq == EFreq.Monthly)
+                else if (freq == EFreq.M)
                 {
-                    if (t1.freq == EFreq.Annual)
+                    if (t1.freq == EFreq.A)
                     {
-                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, 1);
-                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTimeStuff.numberOfMonths);
+                        tt1 = new GekkoTime(EFreq.M, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
                     }                
-                    else if (t1.freq == EFreq.Quarterly)
+                    else if (t1.freq == EFreq.Q)
                     {
-                        tt1 = new GekkoTime(EFreq.Monthly, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
-                        tt2 = new GekkoTime(EFreq.Monthly, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
+                        tt1 = new GekkoTime(EFreq.M, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
                     }
                 }
             }
@@ -285,14 +285,14 @@ namespace Gekko
 
             int subPeriods = 1;
 
-            if (this.freq == EFreq.Annual)
+            if (this.freq == EFreq.A)
             {
                 //Simple: make it run fast!                
                 return new GekkoTime(this.freq, this.super + addedPeriods, this.sub, false);  //call the fast constructor
             }
-            else if (this.freq == EFreq.Quarterly) subPeriods = 4;
-            else if (this.freq == EFreq.Monthly) subPeriods = 12;
-            else if (this.freq == EFreq.Undated) subPeriods = 1;  //ttfreq
+            else if (this.freq == EFreq.Q) subPeriods = 4;
+            else if (this.freq == EFreq.M) subPeriods = 12;
+            else if (this.freq == EFreq.U) subPeriods = 1;  //ttfreq
             else throw new GekkoException("Error regarding frequencies");
 
             int subs = (this.sub - 1) + addedPeriods; //a lot easier if first converting from quarters 1,2,3,4 into 0,1,2,3
@@ -312,7 +312,7 @@ namespace Gekko
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
         {
             if (this.IsNull()) return "[unknown]";
-            if (this.freq == EFreq.Annual)
+            if (this.freq == EFreq.A)
             {
                 if (super >= Globals.timeStringsStart && super <= Globals.timeStringsEnd)
                 {
@@ -320,15 +320,15 @@ namespace Gekko
                 }
                 return super.ToString();
             }
-            else if (this.freq == EFreq.Quarterly)
+            else if (this.freq == EFreq.Q)
             {
                 return super + "q" + sub;
             }
-            else if (this.freq == EFreq.Monthly)
+            else if (this.freq == EFreq.M)
             {
                 return super + "m" + sub;
             }
-            else if (this.freq == EFreq.Undated)  //ttfreq
+            else if (this.freq == EFreq.U)  //ttfreq
             {
                 return "" + super;  //ttfreq
             }

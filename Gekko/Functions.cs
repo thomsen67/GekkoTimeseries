@@ -362,7 +362,7 @@ namespace Gekko
                 throw new GekkoException();
             }
            
-            Series tsRotated = new Series(EFreq.Undated, ts.name);
+            Series tsRotated = new Series(EFreq.U, ts.name);
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
 
@@ -402,14 +402,14 @@ namespace Gekko
                     IVariable iv2 = null; tsRotated.dimensionsStorage.TryGetValue(mapRotated, out iv2);                    
                     if (iv2 == null)
                     {
-                        tsRotatedSub = new Series(EFreq.Undated, null);
+                        tsRotatedSub = new Series(EFreq.U, null);
                         tsRotated.dimensionsStorage.AddIVariableWithOverwrite(mapRotated, tsRotatedSub);
                     }
                     else
                     {
                         tsRotatedSub = iv2 as Series;
                     }
-                    GekkoTime tu = new GekkoTime(EFreq.Undated, a, 1);
+                    GekkoTime tu = new GekkoTime(EFreq.U, a, 1);
                     tsRotatedSub.SetData(tu, tsSub.GetVal(t));                    
                 }
             }
@@ -1626,15 +1626,15 @@ namespace Gekko
 
         public static IVariable time(GekkoTime t)
         {
-            if (t.freq == EFreq.Annual || t.freq == EFreq.Undated)
+            if (t.freq == EFreq.A || t.freq == EFreq.U)
             {
                 return new ScalarVal(t.super);
             }
-            else if (t.freq == EFreq.Quarterly)
+            else if (t.freq == EFreq.Q)
             {
                 return new ScalarVal(t.super + 1d / 4d / 2d + 1d / 4d * (t.sub - 1));
             }
-            else if (t.freq == EFreq.Monthly)
+            else if (t.freq == EFreq.M)
             {
                 return new ScalarVal(t.super + 1d / 12d / 2d + 1d / 12d * (t.sub - 1));
             }
@@ -2247,7 +2247,7 @@ namespace Gekko
             else if (x1.Type() == EVariableType.Date)
             {
                 ScalarDate sd = (ScalarDate)x1;
-                if (sd.date.freq == EFreq.Annual || sd.date.freq == EFreq.Undated)
+                if (sd.date.freq == EFreq.A || sd.date.freq == EFreq.U)
                 {
                     v = sd.date.super;
                 }

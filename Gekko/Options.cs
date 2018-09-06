@@ -74,7 +74,7 @@ Additionally, there are model, solve, equation options.
         public string folder_table2 = "";
         public string folder_working = "";
 
-        public EFreq freq = EFreq.Annual;
+        public EFreq freq = EFreq.A;
 
         public bool gams_fast = true; //use low-level api
         public string gams_exe_folder = "";
@@ -278,10 +278,10 @@ Additionally, there are model, solve, equation options.
                 {
                     EFreq value = (EFreq)temp;
                     string s = "???";
-                    if (value == EFreq.Annual) s = "a";
-                    else if (value == EFreq.Quarterly) s = "q";
-                    else if (value == EFreq.Monthly) s = "m";
-                    else if (value == EFreq.Undated) s = "u";
+                    if (value == EFreq.A) s = "a";
+                    else if (value == EFreq.Q) s = "q";
+                    else if (value == EFreq.M) s = "m";
+                    else if (value == EFreq.U) s = "u";
                     line += name + " = " + s + ";";
                 }
                 else if (temp is ESeriesMissing) 

@@ -256,10 +256,10 @@ namespace Gekko
                 }
                 foreach (Series ts in bank.storage.Values)
                 {
-                    if (ts.freq == EFreq.Annual) a++;
-                    else if (ts.freq == EFreq.Quarterly) q++;
-                    else if (ts.freq == EFreq.Monthly) m++;
-                    else if (ts.freq == EFreq.Undated) u++;
+                    if (ts.freq == EFreq.A) a++;
+                    else if (ts.freq == EFreq.Q) q++;
+                    else if (ts.freq == EFreq.M) m++;
+                    else if (ts.freq == EFreq.U) u++;
                 }
                 G.Writeln2("Databank " + bank.name + ":");
                 if (a > 0) G.Writeln("  " + a + " annual timeseries");
@@ -2009,8 +2009,7 @@ namespace Gekko
                                 G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                             }
                             else if (type == EVariableType.Date)
-                            {
-                                //IVariable lhsNew = new ScalarDate(new GekkoTime(EFreq.Annual, G.ConvertToInt(((ScalarVal)rhs).val), 1));
+                            {                                
                                 IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                 G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
@@ -2911,8 +2910,8 @@ namespace Gekko
                 }
                 else
                 {
-                    smpl.t0 = new GekkoTime(EFreq.Annual, i, 1);
-                    smpl.t3 = new GekkoTime(EFreq.Annual, i, 1);
+                    smpl.t0 = new GekkoTime(EFreq.A, i, 1);
+                    smpl.t3 = new GekkoTime(EFreq.A, i, 1);
                 }
             }
             else if (!t.IsNull())
@@ -3928,7 +3927,7 @@ namespace Gekko
 
         private static void CheckFreqAndCreateSeries(IVariable x, IVariable y)
         {
-            EFreq freq = EFreq.Annual;
+            EFreq freq = EFreq.A;
             if (x.Type() == EVariableType.Series) freq = ((Series)x).freq;
             else freq = ((Series)y).freq;
             if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
@@ -4635,8 +4634,8 @@ namespace Gekko
         public static int CurrentSubperiods()
         {
             int lag = 1;
-            if (Program.options.freq == EFreq.Quarterly) lag = Globals.freqQSubperiods;
-            else if (Program.options.freq == EFreq.Monthly) lag = Globals.freqMSubperiods;
+            if (Program.options.freq == EFreq.Q) lag = Globals.freqQSubperiods;
+            else if (Program.options.freq == EFreq.M) lag = Globals.freqMSubperiods;
             return lag;
         }
 
@@ -6395,9 +6394,7 @@ namespace Gekko
             public void Exe()
             {
                 if (false && Globals.runningOnTTComputer)
-                {
-                    //Globals.globalPeriodStart = new GekkoTime(EFreq.Annual, 2007, 1);
-                    //Globals.globalPeriodEnd = new GekkoTime(EFreq.Annual, 2017, 1);
+                {                    
                     Program.Run("tt.gcm", this.p);
                 }
                 else Program.Run(this.fileName, this.p);
@@ -7129,16 +7126,16 @@ namespace Gekko
                     GekkoTime ddate1 = t1;
                     GekkoTime ddate2 = t2;
 
-                    if (t1.freq == EFreq.Annual && (ts.freq == EFreq.Quarterly || ts.freq == EFreq.Monthly))
+                    if (t1.freq == EFreq.A && (ts.freq == EFreq.Q || ts.freq == EFreq.M))
                     {
                         //if a year is used for a quarterly series, q1-q4 is used.
                         ddate1 = new GekkoTime(ts.freq, t1.super, 1);
                         int end = -12345;
-                        if (ts.freq == EFreq.Quarterly)
+                        if (ts.freq == EFreq.Q)
                         {
                             end = Globals.freqQSubperiods;
                         }
-                        else if (ts.freq == EFreq.Monthly)
+                        else if (ts.freq == EFreq.M)
                         {
                             end = Globals.freqMSubperiods;
                         }

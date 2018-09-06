@@ -243,7 +243,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (t1.freq == EFreq.Undated)
+            if (t1.freq == EFreq.U)
             {
                 G.Writeln2("*** ERROR: Undated frequency does not work for frequency conversion");
                 throw new GekkoException();
@@ -255,9 +255,9 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            GekkoTime.ConvertFreqs(EFreq.Annual, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
-            GekkoTime.ConvertFreqs(EFreq.Quarterly, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
-            GekkoTime.ConvertFreqs(EFreq.Monthly, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
+            GekkoTime.ConvertFreqs(EFreq.A, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
+            GekkoTime.ConvertFreqs(EFreq.Q, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
+            GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
 
             return allFreqsHelper;
         }
@@ -302,22 +302,22 @@ namespace Gekko
 
         public static EFreq GetFreq(string freq, bool nullIsCurrent)
         {
-            EFreq eFreq = EFreq.Annual;
+            EFreq eFreq = EFreq.A;
             if (G.Equal(freq, "a"))
             {
                 //do nothing
             }
             else if (G.Equal(freq, "q"))
             {
-                eFreq = EFreq.Quarterly;
+                eFreq = EFreq.Q;
             }
             else if (G.Equal(freq, "m"))
             {
-                eFreq = EFreq.Monthly;
+                eFreq = EFreq.M;
             }
             else if (G.Equal(freq, "u"))
             {
-                eFreq = EFreq.Undated;
+                eFreq = EFreq.U;
             }
             else
             {
@@ -624,19 +624,19 @@ namespace Gekko
         public static string GetFreq(EFreq eFreq)
         {
             string freq = "a";
-            if (eFreq == EFreq.Annual)
+            if (eFreq == EFreq.A)
             {
                 //do nothing
             }
-            else if (eFreq == EFreq.Quarterly)
+            else if (eFreq == EFreq.Q)
             {
                 freq = "q";
             }
-            else if (eFreq == EFreq.Monthly)
+            else if (eFreq == EFreq.M)
             {
                 freq = "m";
             }
-            else if (eFreq == EFreq.Undated)
+            else if (eFreq == EFreq.U)
             {
                 freq = "u";
             }
@@ -1490,15 +1490,15 @@ namespace Gekko
         public static double FromDateToFloating(GekkoTime gt)
         {
             double d = double.NaN;
-            if (gt.freq == EFreq.Annual || gt.freq == EFreq.Undated)
+            if (gt.freq == EFreq.A || gt.freq == EFreq.U)
             {
                 d = gt.super;
             }
-            else if (gt.freq == EFreq.Quarterly)
+            else if (gt.freq == EFreq.Q)
             {
                 d = (double)gt.super + ((double)gt.sub - 1d) / 4d;
             }
-            else if (gt.freq == EFreq.Monthly)
+            else if (gt.freq == EFreq.M)
             {
                 d = (double)gt.super + ((double)gt.sub - 1d) / 12d;
             }
@@ -1522,7 +1522,7 @@ namespace Gekko
                 if (b)
                 {
                     //happens often, so we do it fast
-                    return new GekkoTime(EFreq.Annual, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
                 }
             }
 
@@ -1532,7 +1532,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 2), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.Annual, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
                 }
                 else
                 {
@@ -1546,7 +1546,7 @@ namespace Gekko
                 bool b = int.TryParse(s.Substring(0, s.Length - 1), out i);
                 if (b)
                 {
-                    return new GekkoTime(EFreq.Annual, G.findYear(i), 1);
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
                 }
                 else
                 {
@@ -1567,7 +1567,7 @@ namespace Gekko
                         G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
                         throw new GekkoException();
                     }
-                    t = new GekkoTime(EFreq.Quarterly, y1, q1);
+                    t = new GekkoTime(EFreq.Q, y1, q1);
                 }
                 catch (Exception e)
                 {
@@ -1587,7 +1587,7 @@ namespace Gekko
                         G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
                         throw new GekkoException();
                     }
-                    t = new GekkoTime(EFreq.Quarterly, y1, q1);
+                    t = new GekkoTime(EFreq.Q, y1, q1);
                 }
                 catch (Exception e)
                 {
@@ -1607,7 +1607,7 @@ namespace Gekko
                         G.Writeln("*** ERROR: should have months from 1 to and including 12");
                         throw new GekkoException();
                     }
-                    t = new GekkoTime(EFreq.Monthly, y1, m1);
+                    t = new GekkoTime(EFreq.M, y1, m1);
                 }
                 catch (Exception e)
                 {
@@ -1629,7 +1629,7 @@ namespace Gekko
 
                 try
                 {
-                    t = new GekkoTime(EFreq.Undated, int.Parse(s2), 1);
+                    t = new GekkoTime(EFreq.U, int.Parse(s2), 1);
                 }
                 catch (Exception e)
                 {
@@ -1952,19 +1952,19 @@ namespace Gekko
         public static string GetFreqString(EFreq input)
         {
             string f = "";
-            if ((input == EFreq.Annual))
+            if ((input == EFreq.A))
             {
                 f = "Annual";
             }
-            else if ((input == EFreq.Quarterly))
+            else if ((input == EFreq.Q))
             {
                 f = "Quarterly";
             }
-            else if ((input == EFreq.Monthly))  //ttfreq
+            else if ((input == EFreq.M))  //ttfreq
             {
                 f = "Monthly";
             }
-            else if ((input == EFreq.Undated))
+            else if ((input == EFreq.U))
             {
                 f = "Undated";
             }
@@ -2024,18 +2024,18 @@ namespace Gekko
         public static string GetSubPeriodString(GekkoTime gt)
         {
             string subend = "";
-            if (gt.freq == EFreq.Annual)
+            if (gt.freq == EFreq.A)
             {
             }
-            else if (gt.freq == EFreq.Quarterly)
+            else if (gt.freq == EFreq.Q)
             {
                 subend = "q" + gt.sub;
             }
-            else if (gt.freq == EFreq.Monthly)
+            else if (gt.freq == EFreq.M)
             {
                 subend = "m" + gt.sub;
             }
-            else if (gt.freq == EFreq.Undated)  //ttfreq
+            else if (gt.freq == EFreq.U)  //ttfreq
             {
             }
             else throw new GekkoException();

@@ -61,16 +61,16 @@ namespace Gekko
         {
             GekkoTime gt = GekkoTime.tNull;
             int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer            
-            if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.Annual || Program.options.freq == EFreq.Undated)))
+            if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.A || Program.options.freq == EFreq.U)))
             {
-                if (Program.options.freq == EFreq.Undated)
+                if (Program.options.freq == EFreq.U)
                 {                    
-                    gt = new GekkoTime(EFreq.Undated, intValue, 1); //here, the context matters!
+                    gt = new GekkoTime(EFreq.U, intValue, 1); //here, the context matters!
                 }
                 else
                 {
                     int year = G.findYear(intValue);  //error if the year is crazy
-                    gt = new GekkoTime(EFreq.Annual, year, 1);  //for a, q, m
+                    gt = new GekkoTime(EFreq.A, year, 1);  //for a, q, m
                     //so date d = 2000 in freq=m will not turn this into 2000m1 or 2000m12
                 }
             }
@@ -81,19 +81,19 @@ namespace Gekko
                 //typically for TIME 2000 2010 or SERIES<2000 2010> which are turned into
                 //for instance 2000m1 to 2000m12.
                 int year = G.findYear(intValue);  //error is the year is crazy
-                if (Program.options.freq == EFreq.Quarterly)
+                if (Program.options.freq == EFreq.Q)
                 {                    
                     int sub = 1;
                     if (c == O.GetDateChoices.FlexibleStart) sub = 1;
                     else if (c == O.GetDateChoices.FlexibleEnd) sub = 4;
-                    gt = new GekkoTime(EFreq.Quarterly, year, sub);
+                    gt = new GekkoTime(EFreq.Q, year, sub);
                 }
-                else if (Program.options.freq == EFreq.Monthly)
+                else if (Program.options.freq == EFreq.M)
                 {                    
                     int sub = 1;
                     if (c == O.GetDateChoices.FlexibleStart) sub = 1;
                     else if (c == O.GetDateChoices.FlexibleEnd) sub = 12;
-                    gt = new GekkoTime(EFreq.Monthly, year, sub);
+                    gt = new GekkoTime(EFreq.M, year, sub);
                 }
             }            
             return gt;

@@ -163,7 +163,7 @@ namespace Gekko.Parser.Gek
     public class ParserGekWalkASTAndEmit
     {
 
-        public static readonly GekkoTime tNULL = new GekkoTime(EFreq.Annual, -12345, 1);
+        public static readonly GekkoTime tNULL = new GekkoTime(EFreq.A, -12345, 1);
 
 
 
