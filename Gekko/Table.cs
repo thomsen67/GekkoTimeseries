@@ -333,6 +333,11 @@ namespace Gekko
             {
                 cell.number = number;
                 if (format != null && format != "") cell.numberFormat = format;
+                if (G.IsMissingVariableArtificialNumber(cell.number))
+                {
+                    cell.number = double.NaN;
+                    cell.numberShouldShowAsN = true;
+                }
             }
             Set(xy, cell);
         }
@@ -698,7 +703,7 @@ namespace Gekko
             if (s.Length < maxLength)
                 s = new string(' ', maxLength - s.Length) + s;
 
-            if (G.IsMissingVariableArtificialNumber(cell.number))
+            if (double.IsNaN(cell.number) && cell.numberShouldShowAsN)
             {
                 s = new string(' ', s.Length - 1) + "N";  //non-existing
             }
@@ -733,14 +738,14 @@ namespace Gekko
             return PrintText();
         }
 
-        public string GetCellTitleForHtml(double d)
+        public string GetCellTitleForHtml(double d, bool asN)
         {
             string s = d.ToString();
-            if (G.IsMissingVariableArtificialNumber(d))
+            if (double.IsNaN(d) && asN)
             {
                 s = "Non-existing variable";  //non-existing
             }
-            else if(double.IsNaN(d))
+            else if (double.IsNaN(d))
             {
                 s = "Missing value";  //missing
             }
@@ -884,7 +889,7 @@ namespace Gekko
                             string number = s.Trim();
                             number = number.Replace(" ", "&nbsp;");
                             if (Program.options.table_html_specialminus) number = number.Replace("-", "&#8209;");
-                            line += "<td " + width2 + " " + borders + " align = \"right\"" + cols + rows + " title=\"" + GetCellTitleForHtml(cell2.number) + "\" >" + number + "</td>";
+                            line += "<td " + width2 + " " + borders + " align = \"right\"" + cols + rows + " title=\"" + GetCellTitleForHtml(cell2.number, cell2.numberShouldShowAsN) + "\" >" + number + "</td>";
                         }
                         else if (cell2.cellType == CellType.Date)
                         {
@@ -1596,6 +1601,7 @@ namespace Gekko
         public Text CellText { get; set; }
         public string date;  //FIXME: quarters etc. Really ought to be a GekkoTime object
         public double number;
+        public bool numberShouldShowAsN = false;
         public string numberFormat = "F15.4";  //default, way too wide and precise in most cases
 
         public string backgroundColor = "Transparent";
