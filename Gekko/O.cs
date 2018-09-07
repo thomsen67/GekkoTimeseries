@@ -508,12 +508,28 @@ namespace Gekko
             {
                 Program.databanks.optionRef = Program.databanks.GetDatabank(opt_ref, true);
             }
+        }        
+
+        public static void HandleMissing1(string s)
+        {
+            if (s != null)
+            {
+                ESeriesMissing missing = G.GetMissing(s);
+                Program.options.series_array_print_missing = missing;
+                Program.options.series_normal_print_missing = missing;
+            }
         }
 
         public static void HandleOptionBankRef2()
         {
             Program.databanks.optionBank = null;
             Program.databanks.optionRef = null;
+        }
+
+        public static void HandleMissing2(ESeriesMissing r1, ESeriesMissing r2)
+        {
+            Program.options.series_array_print_missing = r1;
+            Program.options.series_normal_print_missing = r2;
         }
 
         public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
@@ -7444,13 +7460,32 @@ namespace Gekko
 
             public long counter = -12345;
 
-            public bool opt_split = false; //split "PRT x, y;" into "PRT x, PRT y;"
-            public string opt_missing = "error"; //set to "skip" to skip non-existing, and "nan" to show them.
+            public string opt_split = "no";       //split "PRT x, y;" into "PRT x, PRT y;"
+            public string opt_missing = null;  //set to "skip" to skip non-existing, and "nan" to show them.
 
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                OprintStart();                
+
+                
+                //try
+                //{
+                //    if (this.opt_missing != null)
+                //    {
+                //        Program.options.series_array_print_missing = G.GetMissing(this.opt_missing);
+                //        Program.options.series_normal_print_missing = G.GetMissing(this.opt_missing);
+                //    }
+                    OprintStart();
+                //}
+                //finally
+                //{
+                //    if (this.opt_missing != null)
+                //    {
+                //        //revert
+                        
+                //    }
+                //}
+
             }
 
             private void OprintStart()
@@ -7492,7 +7527,7 @@ namespace Gekko
                 // ----- Unfolding of array-series start -------------------------------------------------------             
                 // ---------------------------------------------------------------------------------------------
 
-                bool allSeries = true;
+                //bool allSeries = true;
                 foreach (O.Prt.Element element in this.prtElements)
                 {
                     labelOriginal.Add(element.labelGiven[0]);
@@ -7571,7 +7606,7 @@ namespace Gekko
                             else
                             {
                                 //if (firstVariableFoundInFirstOrRef == 1) jj++;
-                                allSeries = false;
+                                //allSeries = false;
                             }
                         }
                         if (tempVariables != null) element.variable[bankNumber] = tempVariables;
@@ -7583,12 +7618,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (Program.AllSeriesCheck(this, EPrintTypes.Print))
-                {
-                    //All vars are series or val (series may be x[#i] or x[%i]).
-                    Program.OPrint(this, null, labelOriginal);
-                }
-                else
+                if (G.Equal(this.opt_split, "yes") || !Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
@@ -7623,6 +7653,11 @@ namespace Gekko
                         this.prtElements = prtElementsRemember;
                     }
                 }
+                else
+                {
+                    //All vars are series or val (series may be x[#i] or x[%i]).
+                    Program.OPrint(this, null, labelOriginal);
+                }                
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {

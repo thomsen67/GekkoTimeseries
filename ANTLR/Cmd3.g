@@ -3145,8 +3145,8 @@ optionType:
 			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
 
-             | CALC question -> CALC question
-             | CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR
+             //| CALC question -> CALC question
+             //| CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR
 			
 			 | DATABANK question -> DATABANK question
              | DATABANK COMPARE TABS '='? numberIntegerOrDouble -> DATABANK COMPARE TABS numberIntegerOrDouble
@@ -3253,14 +3253,18 @@ optionType:
 			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 
-			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+			 | SERIES NORMAL PRINT MISSING '=' optionSeriesMissing -> SERIES NORMAL PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)			 
              | SERIES NORMAL CALC MISSING '=' optionSeriesMissing -> SERIES NORMAL CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+			 | SERIES NORMAL TABLE MISSING '=' optionSeriesMissing -> SERIES NORMAL TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+
              | SERIES ARRAY PRINT MISSING '=' optionSeriesMissing -> SERIES ARRAY PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
              | SERIES ARRAY CALC MISSING '=' optionSeriesMissing -> SERIES ARRAY CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-			 
-               //public ESeriesMissing series_period_print_missing = ESeriesMissing.Nan;
-               //public ESeriesMissing series_period_calc_missing = ESeriesMissing.Nan;            //sumt(...), avgt(...)
-			 
+			 | SERIES ARRAY TABLE MISSING '=' optionSeriesMissing -> SERIES ARRAY TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+
+			 | SERIES DATA PRINT MISSING '=' optionSeriesMissing -> SERIES DATA PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+			 | SERIES DATA CALC MISSING '=' optionSeriesMissing -> SERIES DATA CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)     //sumt(...)
+			 | SERIES DATA TABLE MISSING '=' optionSeriesMissing -> SERIES DATA TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
+			 			 
 			 | SHEET question -> SHEET question
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
@@ -3373,7 +3377,7 @@ optionSolveNewtonInvert: LU | ITER;
 optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
 optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
 optionSolveForwardTerminalfeedOptions : INTERNAL | EXTERNAL;
-optionSeriesMissing : ERROR | NAN | ZERO | SKIP;
+optionSeriesMissing : ERROR | M | ZERO | SKIP;
 
 
 // ------------------------------------------------------------------------------------------------------------------

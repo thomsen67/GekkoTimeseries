@@ -7627,24 +7627,27 @@ namespace Gekko
         private static Series HandleMissingVariable(string bank, string variable)
         {
             //This is probably not used at all
-            Series ts;
-            if (Program.options.series_array_ignoremissing && variable.Contains(Globals.symbolTurtle))
-            {
-                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
-                ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used_array");
-            }
-            else if (Program.options.table_ignoremissingvars && O.isTableCall)
-            {
-                //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
-                ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used");
-            }
-            else
-            {
-                ReportTimeseriesNotFound(variable, bank);
-                throw new GekkoException();
-            }
+            G.Writeln2("*** ERROR: #09845243875");
+            throw new GekkoException();
 
-            return ts;
+            //Series ts;
+            //if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
+            //{
+            //    //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
+            //    ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used_array");
+            //}
+            //else if (Program.options.table_ignoremissingvars && O.isTableCall)
+            //{
+            //    //ignore if array-series does not exist (normal) and ignore if variable does not exist (table)
+            //    ts = new Series(Program.options.freq, "temp_timeseries_not_to_be_used");
+            //}
+            //else
+            //{
+            //    ReportTimeseriesNotFound(variable, bank);
+            //    throw new GekkoException();
+            //}
+
+            return null;
         }
 
         private static void ReportTimeseriesNotFound(string variable, string bank)
@@ -13895,7 +13898,7 @@ namespace Gekko
                         // Handle SERIES y = 1 -2 -2 -1 and SERIES y = 1 -2 -2 -1*2
                         // Problem is that the second is genr type, but the parser starts treating it like upd type.
                         // -------------------------------------------------------------
-                        if (true)
+                        if (false)
                         {
                             if (!G.IsEnglishLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
                             {
@@ -24354,7 +24357,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(db2);
             if (!db.ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24371,7 +24374,7 @@ namespace Gekko
         {
             if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24382,7 +24385,7 @@ namespace Gekko
             }
             if (!Program.databanks.GetRef().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24408,7 +24411,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(db2);
             if (!db.ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24425,7 +24428,7 @@ namespace Gekko
         {
             if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24436,7 +24439,7 @@ namespace Gekko
             }
             if (!Program.databanks.GetRef().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24702,7 +24705,7 @@ namespace Gekko
             Databank db = Program.databanks.GetDatabank(db2);
             if (!db.ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24719,7 +24722,7 @@ namespace Gekko
         {
             if (!Program.databanks.GetFirst().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -24730,7 +24733,7 @@ namespace Gekko
             }
             if (!Program.databanks.GetRef().ContainsVariable(s))
             {
-                if (Program.options.table_ignoremissingvars)
+                if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
                     return Globals.missingVariableArtificialNumber;
                 }
@@ -26208,38 +26211,15 @@ namespace Gekko
 
                         int bankCombi = GetBankCombi(printCode);
 
-                        bool tjek1 = bankCombi == 0 && IsNullSubSeries(explodeElement.variable[0]);
-                        bool tjek2 = bankCombi == 1 && IsNullSubSeries(explodeElement.variable[1]);
-                        bool tjek3 = bankCombi == 2 && (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]));
+                        bool tjek1 = bankCombi == 0 && SkipSubSeries(explodeElement.variable[0]);
+                        bool tjek2 = bankCombi == 1 && SkipSubSeries(explodeElement.variable[1]);
+                        bool tjek3 = bankCombi == 2 && (SkipSubSeries(explodeElement.variable[0]) || SkipSubSeries(explodeElement.variable[1]));
 
-                        if (bankCombi == 0)
+                        if (tjek1 || tjek2 || tjek3)
                         {
-                            if (IsNullSubSeries(explodeElement.variable[0]))
-                            {
-                                numberOfGekkoNullVariables++;
-                                continue;
-                            }
-                        }
-                        else if (bankCombi == 1)
-                        {
-                            if (IsNullSubSeries(explodeElement.variable[1]))
-                            {
-                                numberOfGekkoNullVariables++;
-                                continue;
-                            }
-                        }
-                        else if (bankCombi == 2)
-                        {
-                            if (IsNullSubSeries(explodeElement.variable[0]) || IsNullSubSeries(explodeElement.variable[1]))
-                            {
-                                numberOfGekkoNullVariables++;
-                                continue;
-                            }
-                        }
-                        else
-                        {
-                            throw new GekkoException();
-                        }
+                            numberOfGekkoNullVariables++;
+                            continue;
+                        }                        
                                                 
                         numberOfOtherVariables++;
 
@@ -27464,14 +27444,9 @@ namespace Gekko
             return lbl;
         }
 
-        public static bool IsNullSubSeries(IVariable x)
+        public static bool SkipSubSeries(IVariable x)
         {
-            bool isEmpty = false;
-            if (x.Type() == EVariableType.GekkoNull || (x.Type() == EVariableType.Series && ((Series)x).isNotFoundArraySubSeries) && ((Series)x).type == ESeriesType.Timeless && ((Series)x).data.dataArray[0] == 0d)
-            {
-                isEmpty = true;
-            }
-            return isEmpty;
+            return (x.Type() == EVariableType.Series && ((Series)x).isNotFoundArraySubSeries == ESeriesMissing.Skip);            
         }
 
         public static string RemoveSplitter(string s)
@@ -28015,6 +27990,7 @@ namespace Gekko
         
         private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
+            //få den til at returnere "n", måske skal 
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
 
             GekkoTime t = new GekkoTime(freqColumn, year, subHere);
@@ -28041,13 +28017,31 @@ namespace Gekko
                 if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, isLogTransform, sumOver, skipCounter);
             }
             if (d != null)
-            {
+            {                
                 cc.min = Math.Min(cc.min, (double)d);
                 cc.max = Math.Max(cc.max, (double)d);
-                if (type != EPrintTypes.Plot) table.SetNumber(i, j, (double)d, format);
+                if (type != EPrintTypes.Plot)
+                {
+                    double dd = dd = (double)d;
+                    if (double.IsNaN((double)d))
+                    {
+                        if ((tsWork != null && tsWork.isNotFoundArraySubSeries == ESeriesMissing.M) || (tsRef != null && tsRef.isNotFoundArraySubSeries == ESeriesMissing.M))
+                        {
+                            dd = Globals.missingVariableArtificialNumber;
+                        }                       
+                    }
+                    else if ((double)d == 0d)
+                    {
+                        if ((tsWork != null && tsWork.isNotFoundArraySubSeries == ESeriesMissing.Zero) || (tsRef != null && tsRef.isNotFoundArraySubSeries == ESeriesMissing.Zero))
+                        {
+                            dd = Globals.missingVariableZero;
+                        }
+                    }
+                    table.SetNumber(i, j, dd, format);
+                }
                 else
                 {
-                    double tt = ((ScalarVal)Functions.time(t)).val;                    
+                    double tt = ((ScalarVal)Functions.time(t)).val;
                     if (freqColumn == EFreq.U || freqColumn == EFreq.A) tt += 0.5;
                     //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
                     //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
@@ -28076,53 +28070,53 @@ namespace Gekko
             }
             else
             {
-                int filterSkip = 0;
-                if (t.freq == EFreq.U) filterSkip = skipCounter[0];
-                else if (t.freq == EFreq.A) filterSkip = skipCounter[1];
-                else if (t.freq == EFreq.Q) filterSkip = skipCounter[2];
-                else if (t.freq == EFreq.M) filterSkip = skipCounter[3];
+                //int filterSkip = 0;
+                //if (t.freq == EFreq.U) filterSkip = skipCounter[0];
+                //else if (t.freq == EFreq.A) filterSkip = skipCounter[1];
+                //else if (t.freq == EFreq.Q) filterSkip = skipCounter[2];
+                //else if (t.freq == EFreq.M) filterSkip = skipCounter[3];
 
-                double dWork = 0d;
-                double dRef = 0d;
-                double dWorkLag = 0d;
-                double dWorkLag2 = 0d;
-                double dRefLag = 0d;
-                double dRefLag2 = 0d;
-                for (int i = 0; i < sumOver + filterSkip; i++)
-                {
-                    if (tsWork != null)
-                    {
-                        dWork += tsWork.GetData(smpl, t.Add(-i));
-                        dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
-                        dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
-                    }
-                    if (tsRef != null)
-                    {
-                        dRef += tsRef.GetData(smpl, t.Add(-i));
-                        dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
-                        dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
-                    }
-                }
+                //double dWork = 0d;
+                //double dRef = 0d;
+                //double dWorkLag = 0d;
+                //double dWorkLag2 = 0d;
+                //double dRefLag = 0d;
+                //double dRefLag2 = 0d;
+                //for (int i = 0; i < sumOver + filterSkip; i++)
+                //{
+                //    if (tsWork != null)
+                //    {
+                //        dWork += tsWork.GetData(smpl, t.Add(-i));
+                //        dWorkLag += tsWork.GetData(smpl, t.Add(-i - 1));
+                //        dWorkLag2 += tsWork.GetData(smpl, t.Add(-i - 2));
+                //    }
+                //    if (tsRef != null)
+                //    {
+                //        dRef += tsRef.GetData(smpl, t.Add(-i));
+                //        dRefLag += tsRef.GetData(smpl, t.Add(-i - 1));
+                //        dRefLag2 += tsRef.GetData(smpl, t.Add(-i - 2));
+                //    }
+                //}
 
-                //double var1 = double.NaN;
-                //double varPch = double.NaN;
-                //Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
+                ////double var1 = double.NaN;
+                ////double varPch = double.NaN;
+                ////Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, false, false);
 
-                if (G.Equal(printcode, Globals.printCode_n)) return dWork;
-                else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
-                else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
-                else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
-                else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
-                else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
-                else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
-                else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
-                else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
-                else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
-                else
-                {
-                    G.Writeln2("*** ERROR: Transformation error");
-                    throw new GekkoException();
-                }
+                //if (G.Equal(printcode, Globals.printCode_n)) return dWork;
+                //else if (G.Equal(printcode, Globals.printCode_m)) return dWork - dRef;
+                //else if (G.Equal(printcode, Globals.printCode_q)) return (dWork / dRef - 1d) * 100d;
+                //else if (G.Equal(printcode, Globals.printCode_d)) return dWork - dWorkLag;
+                //else if (G.Equal(printcode, Globals.printCode_p)) return (dWork / dWorkLag - 1d) * 100d;
+                //else if (G.Equal(printcode, Globals.printCode_dp)) return (dWork / dWorkLag - 1d) * 100d - (dWorkLag / dWorkLag2 - 1d) * 100d;
+                //else if (G.Equal(printcode, Globals.printCode_r) || G.Equal(printcode, Globals.printCode_rn)) return dRef;
+                //else if (G.Equal(printcode, Globals.printCode_rd)) return dRef - dRefLag;
+                //else if (G.Equal(printcode, Globals.printCode_rp)) return (dRef / dRefLag - 1d) * 100d;
+                //else if (G.Equal(printcode, Globals.printCode_rdp)) return (dRef / dRefLag - 1d) * 100d - (dRefLag / dRefLag2 - 1d) * 100d;
+                //else
+                //{
+                //    G.Writeln2("*** ERROR: Transformation error");
+                //    throw new GekkoException();
+                //}
             }
         }
 
@@ -29494,7 +29488,7 @@ namespace Gekko
                                 problem.Add(varWithBaseBankIndicator, "");
                                 string ss = "";
                                 if (variablesLabelsForPrtCommand != null && !G.Equal(variableName, variablesLabelsForPrtCommand[i])) ss = " -- " + variablesLabelsForPrtCommand[i];
-                                if (isCalledFromTable && Program.options.table_ignoremissingvars)
+                                if (isCalledFromTable && Program.options.series_normal_table_missing != ESeriesMissing.Error)
                                 {
                                 }
                                 else
@@ -29510,7 +29504,7 @@ namespace Gekko
                     }
                 }
             }
-            if (isCalledFromTable && Program.options.table_ignoremissingvars)
+            if (isCalledFromTable && Program.options.series_normal_table_missing != ESeriesMissing.Error)
             {
                 if (problem.Count > 0)
                 {

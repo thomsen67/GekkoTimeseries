@@ -749,7 +749,8 @@ namespace Gekko
 
         public static System.Windows.Media.FontFamily decompFontFamily = new System.Windows.Media.FontFamily("Calibri");
         public static System.Windows.Media.SolidColorBrush decompSolidColorBrush = new System.Windows.Media.SolidColorBrush(Globals.GrayExcelLine);
-        
+
+        public static double missingVariableZero = 0d;
         public static double missingVariableArtificialNumber = 3e303d;  //max value for double is 1.7976931348623157E+308. GAMS uses e300, so we use e303
         public static double missingVariableArtificialNumberLow = 2.999e303d; 
         public static double missingVariableArtificialNumberHigh = 3.001e303d; 

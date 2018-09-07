@@ -122,7 +122,7 @@ namespace Gekko
 
         public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
         public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
-        public bool isNotFoundArraySubSeries = false;  //used when for instance x['a'] does not hit anything and returns a timeless series with value 0.
+        public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
 
         private Series()
         {
@@ -531,7 +531,7 @@ namespace Gekko
                 }
             }
             End:
-            if (Program.options.series_data_ignoremissing)
+            if (Program.options.series_data_calc_missing == ESeriesMissing.Zero)
             {
                 if (G.isNumericalError(rv)) rv = 0d;
             }
@@ -1676,21 +1676,23 @@ namespace Gekko
                             {
                                 FindArraySeriesHelper2(keys);  //error
                             }
-                            else if (Program.options.series_array_print_missing == ESeriesMissing.Nan)
+                            else if (Program.options.series_array_print_missing == ESeriesMissing.M)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, null);
                                 ((Series)rv).SetTimelessData(double.NaN);
+                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.M;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, null);
                                 ((Series)rv).SetTimelessData(0d);
+                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Zero;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, null);
                                 ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
-                                ((Series)rv).isNotFoundArraySubSeries = true;
+                                ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Skip;
                             }
                             else throw new GekkoException();
                         }
@@ -1703,7 +1705,7 @@ namespace Gekko
                             {
                                 FindArraySeriesHelper2(keys);  //error
                             }
-                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Nan)
+                            else if (Program.options.series_array_calc_missing == ESeriesMissing.M)
                             {
                                 rv = new Series(ESeriesType.Timeless, this.freq, null);
                                 ((Series)rv).SetTimelessData(double.NaN);

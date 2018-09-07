@@ -615,10 +615,15 @@ namespace Gekko
         public static ESeriesMissing GetMissing(string s)
         {
             if (G.Equal(s, "error")) return ESeriesMissing.Error;
-            else if (G.Equal(s, "nan")) return ESeriesMissing.Nan;
+            else if (G.Equal(s, "m")) return ESeriesMissing.M;
             else if (G.Equal(s, "zero")) return ESeriesMissing.Zero;
             else if (G.Equal(s, "skip")) return ESeriesMissing.Skip;
-            throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Expected missing = error, m, zero or skip");
+                throw new GekkoException();
+            }
+            
         }
 
         public static string GetFreq(EFreq eFreq)

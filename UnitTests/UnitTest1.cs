@@ -1187,15 +1187,41 @@ namespace UnitTests
             I("@x[a1] = 1.1;");
             I("@x[a3] = 3.3;");
             I("#i = a1, a2, a3;");
-            //I("OPTION series array ignoremissing = yes;");
-            I("OPTION series array print missing = skip;");
+
+            I("OPTION series array print missing = error;");
+            //FAIL("p<m> x[#i];");
+
+            I("OPTION series array print missing = m;");
             Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             Table table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = zero;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 0d, 0.0001);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = skip;");
+            Globals.lastPrtOrMulprtTable = null;
+            I("p<m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
-            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, 0.0001);
-            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, 0.0001);
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
+            
         }
 
                

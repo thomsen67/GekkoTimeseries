@@ -2935,8 +2935,8 @@ namespace Gekko.Parser.Gek
                                 GetCodeFromAllChildren(node, node[1]);  //options
                                 GetCodeFromAllChildren(node, node[2]);  //option         
 
-                                node.Code.A(LocalCode3(Num(node)));
-                                
+                                node.Code.A(LocalCode3(Num(node)));                                
+
                                 node.Code.A(node[3].Code);
 
                                 node.Code.A(LocalCode4(Num(node)));
@@ -4083,30 +4083,30 @@ namespace Gekko.Parser.Gek
                                     node.Code.A(Globals.clearTsCsCode + G.NL);
                                     node.Code.A("Program.AdjustFreq();");
                                 }                                
-                                if (o == "interface_sound_type")
+                                else if (o == "interface_sound_type")
                                 {
                                     if (!p.hasBeenCmdFile)
                                     {
                                         node.Code.A("Program.PlaySound();");
                                     }
                                 }
-                                if (o == "folder_menu" || o == "menu_startfile")
+                                else if (o == "folder_menu" || o == "menu_startfile")
                                 {
                                     node.Code.A("CrossThreadStuff.RestartMenuBrowser();");
                                 }
-                                if (o == "interface_zoom")
+                                else if (o == "interface_zoom")
                                 {
                                     node.Code.A("CrossThreadStuff.Zoom();");
                                 }
-                                if (o == "folder_working")
+                                else if (o == "folder_working")
                                 {                                    
                                     node.Code.A("CrossThreadStuff.WorkingFolder(``);");
                                 }
-                                if (o == "interface_remote")
+                                else if (o == "interface_remote")
                                 {
                                     node.Code.A("Program.RemoteInit();");
                                 }
-                                if (o == "solve_gauss_reorder")
+                                else if (o == "solve_gauss_reorder")
                                 {
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
@@ -4116,24 +4116,34 @@ namespace Gekko.Parser.Gek
                                 //{
                                 //    node.Code.A("Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = true;");
                                 //}
-                                if (o == "timefilter_type")  //TODO: only issue if really avg
+                                else if (o == "timefilter_type")  //TODO: only issue if really avg
                                 {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
-                                }                                
-                                if (o == "solve_forward_nfair_damp" || o == "solve_forward_fair_damp" || o == "solve_gauss_damp")
+                                }
+                                else if (o == "solve_forward_nfair_damp" || o == "solve_forward_fair_damp" || o == "solve_gauss_damp")
                                 {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
                                 }
-                                if (o == "r_exe_path")
+                                else if (o == "r_exe_path")
                                 {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
                                 }
-                                if (o == "series_array_ignoremissing")
+                                else if (o == "series_array_ignoremissing")
                                 {
                                     node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series array print missing = skip;' and 'OPTION series array calc missing = zero;' instead`);");
                                     node.Code.A("throw new GekkoException();");
                                 }
-                            }
+                                else if (o == "table_ignoremissingvars")
+                                {
+                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series normal table missing = m;' instead`);");
+                                    node.Code.A("throw new GekkoException();");
+                                }
+                                else if (o == "series_data_ignoremissing")
+                                {
+                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series data calc missing = zero;' instead`);");
+                                    node.Code.A("throw new GekkoException();");
+                                }
+    }
                         }
                         break;
                     case "ASTOPT1":  //PRT-type statement
@@ -5429,13 +5439,13 @@ namespace Gekko.Parser.Gek
 
         private static string LocalCode3(string num)
         {
-            return "try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref);" + G.NL;
-        }
+            return "ESeriesMissing r1_" + num + " = Program.options.series_array_print_missing; ESeriesMissing r2_" + num + " = Program.options.series_normal_print_missing; try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref); O.HandleMissing1(o" + num + ".opt_missing);" + G.NL;
+        }        
 
         private static string LocalCode4(string num)
         {
             //num not used
-            return "}" + G.NL + "finally {" + G.NL + "O.HandleOptionBankRef2();" + G.NL + "}" + G.NL;           
+            return "}" + G.NL + "finally {" + G.NL + "O.HandleOptionBankRef2(); O.HandleMissing2(r1_" + num + ", r2_" + num + ");" + G.NL + "}" + G.NL;
         }
 
         private static bool ReportHelperIsSum(string internalName, string internalFunction)

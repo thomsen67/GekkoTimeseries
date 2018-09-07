@@ -18,7 +18,7 @@ namespace Gekko
     public enum ESeriesMissing
     {
         Error,
-        Nan,
+        M,
         Zero,
         Skip
     }

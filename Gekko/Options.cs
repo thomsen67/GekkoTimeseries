@@ -138,15 +138,25 @@ Additionally, there are model, solve, equation options.
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name
 
+        //DEAD!!
         public bool series_array_ignoremissing = false;  //returns 0 (or skips) a non-existing array-series
+
+
+        // -------- new options regarding missings start ---------------------
+
         public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
         
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
+        public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
+
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
-        //public ESeriesMissing series_period_print_missing = ESeriesMissing.Nan;
-        //public ESeriesMissing series_period_calc_missing = ESeriesMissing.Nan;            //sumt(...), avgt(...)
+
+        public ESeriesMissing series_data_print_missing = ESeriesMissing.M;
+        public ESeriesMissing series_data_calc_missing = ESeriesMissing.M;            //sumt(...), avgt(...)
+
+        // -------- new options regarding missings end ---------------------
 
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
@@ -160,7 +170,10 @@ Additionally, there are model, solve, equation options.
         public bool sheet_cols = false;
         public bool sheet_rows = true;
         public bool solve_data_create_auto = true;
+
+        //for now, we keep it here...
         public bool solve_data_ignoremissing = false;
+
         public bool solve_data_init = true;
         public bool solve_data_init_growth = true; //only has effect if solve_fast = true
         public double solve_data_init_growth_min = -0.02; //only has effect if solve_fast = true. Limit: -0.01 hurts.
@@ -221,7 +234,10 @@ Additionally, there are model, solve, equation options.
         public double table_html_fontsize = 72;  //in %                        
         public double table_html_secondcolwidth = 5.5;  //in 'em' units
         public bool table_html_specialminus = false;
+
+        //DEAD!!
         public bool table_ignoremissingvars = true;
+
         public string table_type = "html";  //txt or html
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
