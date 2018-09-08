@@ -11,6 +11,7 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public double val;
+        public bool hasRepStar = false;  //to indicate for instance x = 1, 2 rep 2, 3 rep *; ---> 1, 2, 2, 3, where 3 has this flag set.
 
         private ScalarVal()
         {

@@ -1953,7 +1953,7 @@ dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)
 						    ;
 
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
-dotHelper:				    objectFunction | varname | Integer;
+dotHelper:				    objectFunction | varname | integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrix:                     matrixCol;

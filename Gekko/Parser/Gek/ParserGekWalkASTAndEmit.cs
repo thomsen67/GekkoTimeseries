@@ -3010,6 +3010,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
 
+
                             string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
