@@ -691,6 +691,11 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
+                    case "ASTREPSTAR":
+                        {
+                            node.Code.CA("Globals.scalarStringStar");
+                        }
+                        break;
                     case "ASTDIV":
                         {
                             node.Code.CA("O.Divide(smpl, " + node[0].Code + ", " + node[1].Code + ")");
@@ -3249,7 +3254,7 @@ namespace Gekko.Parser.Gek
                     case "ASTLISTDEF":
                         {
                             node.Code.A("O.ListDefHelper(");
-                            GetCommaCodeFromAllChildren(node);                            
+                            ListDefHelper(node);                            
                             node.Code.A(")");
                         }
                         break;
@@ -5618,11 +5623,19 @@ namespace Gekko.Parser.Gek
             return sigil;
         }
 
-        private static void GetCommaCodeFromAllChildren(ASTNode node)
+        private static void ListDefHelper(ASTNode node)
         {
+            //for instance (1 rep 2, 3, 4) becomes 1, 2, 3, null, 4, null --> always even number
+            //this is to keep it speedy for long lists.
             for (int i = 0; i < node.ChildrenCount(); i++)
             {
-                node.Code.A(node[i].Code);
+                ASTNode child = node[i];
+                string xx = "null";
+                if (child[1] != null)
+                {
+                    xx = child[1].Code.ToString();
+                }
+                node.Code.A(child[0].Code + ", " + xx);
                 if (i < node.ChildrenCount() - 1) node.Code.A(", ");
             }
         }

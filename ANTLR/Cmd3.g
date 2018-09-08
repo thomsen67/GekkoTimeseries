@@ -45,6 +45,7 @@ tokens {
     ASTINDEXERELEMENT;
     ASTINDEXERELEMENTBANK;
     ASTPOW;
+	ASTREPSTAR;
     ASTEMPTYRANGEELEMENT;
 	ASTINDEXERALONE;
 	ASTINDEXERELEMENTPLUS;
@@ -94,6 +95,7 @@ ASTIDENTDIGIT;
 	ASTFILENAMELIST;
 	ASTDOLLARCONDITIONAL;
 	ASTLISTDEF;
+	ASTLISTDEFITEM;
 	ASTOBJECTFUNCTIONNAKED;
 ASTOR;
 ASTAND;
@@ -1961,12 +1963,16 @@ matrixCol:                  leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMI
 matrixRow:                  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						    //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
-list:                       leftParenNoGlue expression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF expression listHelper)
-                          | leftParenNoGlue expression ',' RIGHTPAREN -> ^(ASTLISTDEF expression)
+list:                       leftParenNoGlue repExpression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF repExpression listHelper)
+                          | leftParenNoGlue repExpression ',' RIGHTPAREN -> ^(ASTLISTDEF repExpression)
 						    ;
 listHelper:                 listHelper1 | listHelper2;
-listHelper1:                (expression ',')* expression -> expression+;
-listHelper2:                (expression ',')+ -> expression+;
+listHelper1:                (repExpression ',')* repExpression -> repExpression+;
+listHelper2:                (repExpression ',')+ -> repExpression+;
+repExpression:              expression (REP repN)? -> ^(ASTLISTDEFITEM expression repN?);
+repN:						expression 
+						  | star -> ASTREPSTAR
+						    ;
 
 map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
                           | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.

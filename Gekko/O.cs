@@ -820,10 +820,47 @@ namespace Gekko
 
         public static List ListDefHelper(params IVariable[] x)
         {
+            //Note, these come in pairs:
+            //#m = (1 rep 2, 3, 4) --> 1, 2, 3, null, 4, null
             List<IVariable> m = new List<Gekko.IVariable>();
-            foreach (IVariable iv in x)
+
+            for (int i = 0; i < x.Length; i += 2)
             {
-                m.Add(iv);
+                IVariable iv = x[i];
+                if (x[i + 1] != null)
+                {
+                    ScalarString ss = x[i + 1] as ScalarString;
+                    if (ss != null && ss.ConvertToString() == "*")
+                    {
+                        if (i + 2 < x.Length)
+                        {
+                            G.Writeln2("*** ERROR: You can only use 'REP *' on the last element in a list");
+                            throw new GekkoException();
+                        }
+                        ScalarVal sv = iv as ScalarVal;
+                        if (sv == null)
+                        {
+                            G.Writeln2("*** ERROR: You can only use 'REP *' toghether with values");
+                            throw new GekkoException();
+                        }
+                        ScalarVal sv2 = new ScalarVal(sv.val);
+                        sv2.hasRepStar = true;
+                        m.Add(sv2);
+                    }
+                    else
+                    {
+                        int rep = O.ConvertToInt(x[i + 1], true);
+                        for (int ii = 0; ii < rep; ii++)
+                        {
+                            m.Add(iv);
+                        }
+                    }
+                }
+                else
+                {
+                    m.Add(iv);
+                }
+                
             }
             return new List(m);
         }
@@ -2528,19 +2565,49 @@ namespace Gekko
                             // x = LIST
                             //---------------------------------------------------------
                             // stuff below also handles array-timeseries just fine 
-
+                                                        
                             List rhs_list = rhs as List;
+
+                            bool lastElementStar = false;
+                            IVariable last = rhs_list.list[rhs_list.list.Count - 1];
+                            ScalarVal last_val = last as ScalarVal;
+                            if (last_val != null)
+                            {
+                                lastElementStar = last_val.hasRepStar;
+                            }
+
                             int n = smpl.Observations12();
-                            if (n != rhs_list.list.Count)
+
+                            if (rhs_list.list.Count < n)
+                            {
+                                //lacking elements
+                                if (!lastElementStar)
+                                {
+                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                                    throw new GekkoException();
+                                }
+                            }
+                            else if(rhs_list.list.Count > n)
                             {
                                 G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
                                 throw new GekkoException();
                             }
+                            
                             bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                             for (int i = 0; i < rhs_list.list.Count; i++)
                             {
                                 lhs_series.SetData(smpl.t1.Add(i), rhs_list.list[i].ConvertToVal());
                             }
+
+                            if (rhs_list.list.Count < n)
+                            {
+                                //then lastElementStar = true
+                                for (int i = rhs_list.list.Count; i < n; i++)
+                                {
+                                    lhs_series.SetData(smpl.t1.Add(i), rhs_list.list[rhs_list.list.Count - 1].ConvertToVal());
+                                }
+                            }
+
                             if (create)
                             {
                                 AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);

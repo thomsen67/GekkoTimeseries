@@ -285,6 +285,7 @@ namespace Gekko
 
         public static readonly ScalarVal scalarVal0 = new ScalarVal(0d);
         public static readonly ScalarVal scalarVal1 = new ScalarVal(1d);
+        public static readonly ScalarString scalarStringStar = new ScalarString("*");
 
         public static bool poolGenrLines = false;
 
