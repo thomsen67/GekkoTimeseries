@@ -1162,6 +1162,10 @@ namespace UnitTests
         [TestMethod]
         public void _Test_MissingValuesLogic()
         {
+            //Testing OPTION series array print missing = ..., and 
+            //also p <missing = ...>
+
+            Table table = null;
 
             // =============== missing in First
             // for each of these, 4 options are tried combined with <n>, <rn>, <m>
@@ -1182,16 +1186,6 @@ namespace UnitTests
 
             I("OPTION series array print missing = m;");
             //Globals.lastPrtOrMulprtTable = null;
-            I("p<m> x[#i];");
-            Table table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
-            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
-            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
-            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
-            //Globals.lastPrtOrMulprtTable = null;
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1209,17 +1203,17 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);            
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
-
-            I("OPTION series array print missing = zero;");
-            //Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 0d - 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = zero;");                        
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1236,15 +1230,16 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
-
-            I("OPTION series array print missing = skip;");
-            //Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 0d - 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = skip;");                       
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1259,7 +1254,93 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
 
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+
+            I("OPTION series array print missing = error;");
+                                  
+            I("p<n missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
+            Assert.AreEqual(table.Get(2, 4).number, 13d, sharedDelta);
+            I("p<rn missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+                        
+            I("p<n missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 0d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d, sharedDelta);
+            I("p<rn missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 0d - 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+                        
+            I("p<n missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d, sharedDelta);
+            I("p<rn missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
 
             // =============== missing in Ref
             // for each of these, 4 options are tried combined with <n>, <rn>, <m>
@@ -1278,17 +1359,7 @@ namespace UnitTests
             I("OPTION series array print missing = error;");
             FAIL("p<m> x[#i];");
 
-            I("OPTION series array print missing = m;");
-            //Globals.lastPrtOrMulprtTable = null;
-            I("p<m> x[#i];");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
-            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
-            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
-            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);            
+            I("OPTION series array print missing = m;");                                 
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1306,17 +1377,17 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 3).number, double.NaN);
             Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
-
-            I("OPTION series array print missing = zero;");
-            //Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 12d - 0d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = zero;");
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1333,15 +1404,16 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 0d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
-
-            I("OPTION series array print missing = skip;");
-            //Globals.lastPrtOrMulprtTable = null;
             I("p<m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 12d - 0d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            I("OPTION series array print missing = skip;");
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1356,10 +1428,99 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 3.3d, sharedDelta);
+            I("p<m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
+
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+            // <missing = ...>
+
+            //I("OPTION series array print missing = m;");
+            I("p<n missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 12d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d, sharedDelta);
+            I("p<rn missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
+            Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m missing = m> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, double.NaN);
+            Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            //I("OPTION series array print missing = zero;");
+            I("p<n missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 12d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d, sharedDelta);
+            I("p<rn missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 0d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
+            I("p<m missing = zero> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 12d - 0d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
+
+            //I("OPTION series array print missing = skip;");
+            I("p<n missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 12d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, 13d, sharedDelta);
+            I("p<rn missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 3.3d, sharedDelta);
+            I("p<m missing = skip> x[#i];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
+            Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
+            
 
         }
 
-               
+
 
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()

@@ -11190,6 +11190,34 @@ namespace Gekko
             return keys;
         }
 
+        public static IVariable GetListOfIVariablesFromListOfScalarStrings(IVariable rv)
+        {
+            List rv_list = rv as List;
+            List y = new List();
+            if (rv_list == null)
+            {
+                G.Writeln2("*** ERROR: #09874323987");
+                throw new GekkoException();
+            }
+            else
+            {
+                foreach (IVariable iv in rv_list.list)
+                {
+                    ScalarString iv_string = iv as ScalarString;
+                    if (iv_string == null)
+                    {
+                        G.Writeln2("*** ERROR: #09874323987");
+                        throw new GekkoException();
+                    }
+                    IVariable x = O.GetIVariableFromString(iv_string.string2, O.ECreatePossibilities.NoneReportError);  //should never return an error here
+                    y.Add(x);
+                }
+                rv = y;  //point to this instead, it is List<ScalarString> transformed into List<IVariable>
+            }
+
+            return rv;
+        }
+
         public static IVariable[] GetListOfIVariablesFromListOfStrings(string[] indexes)
         {
             IVariable[] keys = new IVariable[indexes.Length];

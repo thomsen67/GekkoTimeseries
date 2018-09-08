@@ -1169,6 +1169,7 @@ namespace Gekko
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
                 rv = HandleWildcards(varnameWithFreq, null);
+                rv = Program.GetListOfIVariablesFromListOfScalarStrings(rv);  //transforms til List<IVariable>
             }
             else
             {
@@ -1262,6 +1263,8 @@ namespace Gekko
             }
             return rv;
         }
+
+        
 
         private static IVariable LookupHelperFindVariableInSpecificBank(string varnameWithFreq, bool errorIfNotFound, Databank db)
         {
