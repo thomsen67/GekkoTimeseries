@@ -277,7 +277,8 @@ namespace Gekko.Parser.Gek
                                 {
                                     foreach (ASTNode node3 in node2[1].ChildrenIterator())
                                     {
-                                        string s2 = GetSimpleName(node3);
+                                        //string s2 = GetSimpleName(node3);
+                                        string s2 = GetSimpleName(node3[0]);  //ZXCVB
                                         if (G.Equal(s, s2))
                                         {
                                             //node2 = node2.Parent;
@@ -357,7 +358,7 @@ namespace Gekko.Parser.Gek
                         // 1      ASTFUNCTION    <----------- our insert begins here
                         // 2        ASTIDENT  
                         // 3          unfold
-                        // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF node is inserted here, and the ASTBANKVARNAME nodes are subnodes
+                        // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
                         // 5          ASTPLACEHOLDER
                         // 6          ASTVARNAME
                         // 7            ASTPLACEHOLDER
@@ -378,10 +379,11 @@ namespace Gekko.Parser.Gek
                         n1.Add(n2);
                         n2.Add(n3);
 
-                        ASTNode list = new ASTNode("ASTLISTDEF", true);
+                        ASTNode list = new ASTNode("ASTLISTDEF", true);                        
 
                         for (int i = 0; i < xx.Count; i++)
                         {
+                            ASTNode listDefItem = new ASTNode("LISTDEFITEM", true);  //ZXCVB
                             ASTNode n4 = new ASTNode("ASTBANKVARNAME", true);
                             ASTNode n5 = new ASTNode("ASTPLACEHOLDER", true);
                             ASTNode n6 = new ASTNode("ASTVARNAME", true);
@@ -392,6 +394,7 @@ namespace Gekko.Parser.Gek
                             ASTNode n11 = new ASTNode("ASTIDENT", true);
                             ASTNode n12 = new ASTNode(xx[i], true);
                             ASTNode n13 = new ASTNode("ASTPLACEHOLDER", true);
+                            listDefItem.Add(n4); //ZXCVB
                             n4.Add(n5);
                             n4.Add(n6);
                             n6.Add(n7);
@@ -403,11 +406,11 @@ namespace Gekko.Parser.Gek
                             n6.Add(n13);
                             if (xx.Count == 1)
                             {
-                                n1.Add(n4);
+                                n1.Add(n4);  //ZXCVB
                             }
                             else
                             {
-                                list.Add(n4);
+                                list.Add(listDefItem); //ZXCVB
                             }
                         }
 
@@ -5636,7 +5639,7 @@ namespace Gekko.Parser.Gek
                     xx = child[1].Code.ToString();
                 }
                 node.Code.A(child[0].Code + ", " + xx);
-                if (i < node.ChildrenCount() - 1) node.Code.A(", ");
+                if (i < node.ChildrenCount() - 1) node.Code.A(", ");                
             }
         }
 
@@ -5695,14 +5698,15 @@ namespace Gekko.Parser.Gek
             {
                 if (node.ChildrenCount() == 3)
                 {
-                    if (node[1].Text == "ASTLISTDEF")
+                    if (node[1].Text == "ASTLISTDEF")  //ZXCVB
                     {
                         //TODO: CHECK types of rv[i], are they all simple #i, #j, ...?
 
                         rv = new string[node[1].ChildrenCount()];
                         for (int i = 0; i < node[1].ChildrenCount(); i++)
                         {
-                            rv[i] = GetSimpleHashName(node[1][i]);
+                            //rv[i] = GetSimpleHashName(node[1][i]);
+                            rv[i] = GetSimpleHashName(node[1][i][0]);  //ZXCVB
                         }
                     }
                     else

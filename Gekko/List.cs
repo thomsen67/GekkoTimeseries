@@ -39,47 +39,25 @@ namespace Gekko
         }
 
         // ----------------------------------------------------
-        // --------------object functions start----------------
+        // --------------object methods start----------------
         // ----------------------------------------------------
 
         public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
         {
-            if (isLhs)
-            {                
-                this.Add(x);
-                return new GekkoNull();
-            }
-            else
-            {
-                List temp = this.DeepClone(null) as List;
-                temp.Add(x);
-                return temp;
-            }
+            return Functions.append(isLhs, this, x);
         }
+
+        
 
         public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
         {
-            List x_list = x as List;
-            if (x_list == null)
-            {
-                G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
-                throw new GekkoException();
-            }
-            if (isLhs)
-            {
-                this.list.AddRange(x_list.list);
-                return new GekkoNull();
-            }
-            else
-            {
-                List temp = this.DeepClone(null) as List;
-                temp.list.AddRange(x_list.list);
-                return temp;
-            }
+            return extend(isLhs, this, x);
         }
 
+        
+
         // ----------------------------------------------------
-        // --------------object functions end------------------
+        // --------------object methods end------------------
         // ----------------------------------------------------
 
         //!!!This has nothing to do #m1+#m2 etc., see Add(GekkoSmpl t, IVariable x) instead.

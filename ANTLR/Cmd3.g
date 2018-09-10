@@ -47,6 +47,7 @@ tokens {
     ASTPOW;
 	ASTREPSTAR;
     ASTEMPTYRANGEELEMENT;
+	ASTSTAR5;
 	ASTINDEXERALONE;
 	ASTINDEXERELEMENTPLUS;
 	ASTINTEGER;
@@ -2280,6 +2281,9 @@ assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAt
 						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+
+						  | assignmentType seriesOpt1? leftSide STAR expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR5 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+
 						    ;
 
 							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.

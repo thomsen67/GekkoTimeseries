@@ -2576,7 +2576,45 @@ namespace Gekko
         {
             return Math.Pow((1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))), (sigma / (1 - sigma))) * y / kappa * Math.Pow((Math.Pow((p1 / p2), (1 - sigma)) * Math.Pow((((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))) / (1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))))), sigma) + 1), (sigma / (1 - sigma)));
         }
-        
+
+        // ====================== object methods =======================================
+
+        public static IVariable append(bool isLhs, List ths, IVariable x)
+        {
+            if (isLhs)
+            {
+                ths.Add(x);
+                return new GekkoNull();
+            }
+            else
+            {
+                List temp = ths.DeepClone(null) as List;
+                temp.Add(x);                
+                return temp;
+            }
+        }
+
+        public static IVariable extend(bool isLhs, List ths, IVariable x)
+        {
+            List x_list = x as List;
+            if (x_list == null)
+            {
+                G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
+                throw new GekkoException();
+            }
+            if (isLhs)
+            {
+                ths.list.AddRange(x_list.list);
+                return new GekkoNull();
+            }
+            else
+            {
+                List temp = ths.DeepClone(null) as List;
+                temp.list.AddRange(x_list.list);
+                return temp;
+            }
+        }
+
     }
 }
 

@@ -8583,7 +8583,7 @@ namespace Gekko
 
             double[,,,] adjLmax = new double[5, 2, 85, 116];
             db.GetVariable("adjLmax").CopyToArray(adjLmax, 0);
-
+            
             GAMSParameter p2 = db.GetParameter("NInd");
             p2.AddRecord(new string[] { "IX", "m", "84", "t0" });
             p2.AddRecord(new string[] { "IX", "m", "84", "t1" });

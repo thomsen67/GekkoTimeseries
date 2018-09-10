@@ -6,64 +6,29 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static int labelCounter;
-public static readonly ScalarVal i24 = new ScalarVal(1d);
-public static void ClearTS(P p) {
-}
-public static void ClearScalar(P p) {
-}
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static int labelCounter;
+        public static void ClearTS(P p)
+        {
+        }
+        public static void ClearScalar(P p)
+        {
+        }
 
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-//[[splitSTART]]
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+            //[[splitSTART]]
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-Func<GraphHelper, string> print0 = (gh) =>
-{
-O.Prt o0 = new O.Prt();
-labelCounter = 0;o0.guiGraphIsRefreshing = gh.isRefreshing;
-o0.guiGraphPrintCode = gh.printCode;
-o0.guiGraphIsLogTransform = gh.isLogTransform;
-o0.prtType = "p";
-ESeriesMissing r1_0 = Program.options.series_array_print_missing; ESeriesMissing r2_0 = Program.options.series_normal_print_missing; try {
-O.HandleOptionBankRef1(o0.opt_bank, o0.opt_ref); O.HandleMissing1(o0.opt_missing);
-{
-List<int> bankNumbers = null;
-O.Prt.Element ope0 = new O.Prt.Element();
-ope0.labelGiven = new List<string>() { "x£.1|[@2,2:2='x',<729>,1:2]|[@5,5:5='1',<1168>,1:5]"};
-smpl = new GekkoSmpl(o0.t1.Add(-2), o0.t2);
-ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0);bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal);
-for(int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {
-int bankNumber = bankNumbers[bankNumberI];
-smpl.bankNumber = bankNumber;
-ope0.variable[bankNumber] = O.Indexer(O.Indexer2(smpl, i24), smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var), i24);
-if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
-}
-smpl.bankNumber = 0;
-o0.prtElements.Add(ope0);
-}
+            Program.Cls(""); Program.Cls("output");
 
-}
-finally {
-O.HandleOptionBankRef2(); O.HandleMissing2(r1_0, r2_0);
-}
-o0.counter = 2;
-o0.printCsCounter = Globals.printCs.Count - 1;
-o0.Exe();
-return o0.emfName;
-};
-Globals.printCs.Add(Globals.printCs.Count, print0); 
-print0(new GraphHelper());
+            //[[splitSTOP]]
 
 
-//[[splitSTOP]]
-
-
-}
-}
+        }
+    }
 }
