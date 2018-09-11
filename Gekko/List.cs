@@ -51,7 +51,7 @@ namespace Gekko
 
         public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
         {
-            return extend(isLhs, this, x);
+            return Functions.extend(isLhs, this, x);
         }
 
         
