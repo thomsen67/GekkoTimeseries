@@ -86,7 +86,7 @@ namespace Gekko
             return EVariableType.Date;
         }
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] index1)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] index1)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on DATE");
             throw new GekkoException();

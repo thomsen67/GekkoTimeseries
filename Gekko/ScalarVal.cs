@@ -100,7 +100,7 @@ namespace Gekko
             return gt;
         }        
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             G.Writeln2("*** ERROR: Cannot use []-indexer on VAL");
             throw new GekkoException();

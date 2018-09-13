@@ -73,7 +73,7 @@ namespace Gekko
             return this.list.Count;
         }
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {

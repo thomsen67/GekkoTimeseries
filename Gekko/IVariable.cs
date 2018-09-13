@@ -86,7 +86,7 @@ namespace Gekko
 
         IVariable Negate(GekkoSmpl smpl); //returns a new object!
         
-        IVariable Indexer(GekkoSmpl smpl, params IVariable[] index); //returns a new object! t needs to be 1. argument.
+        IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] index); //returns a new object! t needs to be 1. argument.
                 
         //void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
 

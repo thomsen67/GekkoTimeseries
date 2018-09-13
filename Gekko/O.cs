@@ -1010,7 +1010,7 @@ namespace Gekko
 
                 if (indexes != null)
                 {
-                    rv = iv.Indexer(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                    rv = iv.Indexer(smpl, O.EIndexerType.None, Program.GetListOfIVariablesFromListOfStrings(indexes));
                 }
                 else
                 {
@@ -2985,18 +2985,18 @@ namespace Gekko
         }
 
         //See Indexer() below
-        public static GekkoSmpl2 Indexer2(GekkoSmpl smpl, params IVariable[] indexes)
+        public static GekkoSmpl2 Indexer2(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             GekkoSmpl2 smplRemember = null;
             int i = -12345; GekkoTime t = GekkoTime.tNull;
-            Series.FindLagLeadFixed(ref i, ref t, indexes);
+            Series.FindLagLeadOrFixedPeriod(ref i, ref t, indexes);
             if (i != -12345)
             {
                 smplRemember = new GekkoSmpl2();
                 smplRemember.t0 = smpl.t0;
                 smplRemember.t3 = smpl.t3;
 
-                if (Series.IsLagOrLead(i))
+                if (indexerType == O.EIndexerType.Lag || indexerType == O.EIndexerType.Lead)
                 {
                     smpl.t0 = smpl.t0.Add(i);
                     smpl.t3 = smpl.t3.Add(i);
@@ -3029,7 +3029,7 @@ namespace Gekko
                     //[y]
                     //['q*']
                     ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                    return ss.Indexer(smpl, indexes);
+                    return ss.Indexer(smpl, indexerType, indexes);
                 }
                 else
                 {
@@ -3044,7 +3044,7 @@ namespace Gekko
             //x['nz', 'w']    
             //x[-1] or x[+1]
             
-            IVariable rv = x.Indexer(smpl, indexes);
+            IVariable rv = x.Indexer(smpl, indexerType, indexes);
             return rv;
         }
 
@@ -3078,23 +3078,7 @@ namespace Gekko
             rv = new List<List<LabelHelperIVariable>>();
             return rv;
         }
-
-        public static IVariable IndexerPlus(GekkoSmpl smpl, IVariable x, bool isLhs, IVariable y)
-        {
-            //isLhs will always be false
-            if (x == null)
-            {
-                G.Writeln2("*** ERROR: You cannot use '+' as first character inside a [] wildcard");
-                throw new GekkoException();
-            }
-            else
-            {
-                //x[+y], #a[+'q*'], hmmmmmmmmmmmmmmm
-                //a[+1] ok
-                return x.Indexer(smpl, new IVariable[] { y });
-            }
-        }
-
+        
 
         //========================================
         //======================================== Z() variants start
@@ -3668,7 +3652,7 @@ namespace Gekko
         {
             if (list.Type() == EVariableType.List)
             {
-                ScalarString x = (ScalarString)list.Indexer(smpl, new IVariable[] { index });  //will return ScalarString with .isName = true.
+                ScalarString x = (ScalarString)list.Indexer(smpl, O.EIndexerType.None, new IVariable[] { index });  //will return ScalarString with .isName = true.
                 Series mts = O.GetTimeSeries(smpl, x.string2, 1);  //always from work....
                 return mts;
             }

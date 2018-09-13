@@ -3134,7 +3134,10 @@ namespace Gekko.Parser.Gek
                                         {
                                             //only for PRT-type or DISP, and only if the [] is not inside [] or {}.
                                             //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
-                                            indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+
+                                            string temp = ReportLabelHelper(child);
+                                            if (temp != null) indexesReport += Globals.reportLabel1 + s + ", `" + temp + "`" + Globals.reportLabel2;
+                                            else indexesReport += s;
                                         }
                                     }
 
@@ -3182,8 +3185,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
-                                   
+                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");                                   
                                 }
                                 if (node[0].AlternativeCode != null)
                                 {
@@ -5487,7 +5489,7 @@ namespace Gekko.Parser.Gek
         {
             if(node.specialExpressionAndLabelInfo==null)
             {
-
+                return null;
             }
             return node.specialExpressionAndLabelInfo[1] + "|" + node.specialExpressionAndLabelInfo[2] + "|" + node.specialExpressionAndLabelInfo[3];
         }

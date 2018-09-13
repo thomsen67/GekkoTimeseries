@@ -104,7 +104,7 @@ namespace Gekko
         // --------------object functions end------------------
         // ----------------------------------------------------
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {

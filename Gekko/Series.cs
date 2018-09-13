@@ -1518,9 +1518,10 @@ namespace Gekko
             return ArithmeticsSeries(smpl, this, Globals.arithmentics1[0]); // (x1) => -x1;
         }
         
-        public static void FindLagLeadFixed(ref int i, ref GekkoTime t, params IVariable[] indexes)
+        public static void FindLagLeadOrFixedPeriod(ref int i, ref GekkoTime t, params IVariable[] indexes)
         {
-            if (indexes.Length == 1) {
+            if (indexes.Length == 1)
+            {
                 if (indexes[0].Type() == EVariableType.Val)
                 {
                     i = O.ConvertToInt(indexes[0]);
@@ -1533,45 +1534,66 @@ namespace Gekko
             return;
         }
 
-        public IVariable Indexer(GekkoSmpl smpl, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             IVariable rv = null;
 
             if (this.type == ESeriesType.ArraySuper)
             {
-                rv = this.FindArraySeries(smpl, indexes, false);
+                if (indexerType == O.EIndexerType.None)
+                {
+                    rv = this.FindArraySeries(smpl, indexes, false);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Direct lagging/leading of an arrayseries not yet possible");
+                    throw new GekkoException();
+                }
             }
             else {
 
+                //normal series
+
                 int i = -12345; GekkoTime t = GekkoTime.tNull;
+                Series.FindLagLeadOrFixedPeriod(ref i, ref t, indexes);  //issues error if for instance x[-2.4] or x[+3.1]
 
-                Series.FindLagLeadFixed(ref i, ref t, indexes);
-
-                if (i != -12345)
+                if (indexerType == O.EIndexerType.Lag || indexerType == O.EIndexerType.Lead)
                 {
-                    //This is a lag or lead, x[-2] or x[+1]
+                    //This is a lag or lead, [-...] or [+...]
                     //TODO: Broken lags!!
-                    if (IsLagOrLead(i))
+
+                    if (!IsLagOrLead(i))
                     {
-                        //!! this is done for both Normal and Light series
-                        //   regarding Normal series, there is a pointer to the real dataArray
-                        //   that lives in a databank. But in Lookup(), we always DeepClone() when
-                        //   putting stuff from the rhs into the lhs. So this should not be a problem. 
-                        if (this.type == ESeriesType.Timeless)
-                        {
-                            rv = this;  //no effect of lag/lead
-                        }
-                        else
-                        {
-                            Series temp = new Series(this.type, this.freq);  //This Series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
-                                                                             //The two below correspond to just moving pointers
-                            temp.data = this.data;
-                            temp.dataOffsetLag = this.dataOffsetLag + i;
-                            rv = temp;
-                        }
+                        G.Writeln2("*** ERROR: lags or leads should be in the interval [-99, 99].");
+                        throw new GekkoException();
+                    }
+
+                    if (this.type == ESeriesType.Timeless)
+                    {
+                        rv = this;  //no effect of lag/lead
                     }
                     else
                     {
+                        Series temp = new Series(this.type, this.freq);  //This series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
+                        //The two below correspond to just moving pointers
+                        temp.data = this.data;
+                        temp.dataOffsetLag = this.dataOffsetLag + i;
+                        rv = temp;
+                    }                    
+                }
+                else
+                {
+                    //not a lag or lead, [-...] or [+...]
+
+                    if (!t.IsNull())
+                    {
+                        //x[2020a], x[2020u], x[2020q2]
+                        double d = this.GetData(smpl, t);
+                        rv = new ScalarVal(d);
+                    }
+                    else if (i != -12345)
+                    {
+                        //x[2020]
                         if (this.freq == EFreq.A || this.freq == EFreq.U)
                         {
                             double d = this.GetData(smpl, new GekkoTime(this.freq, i, 1));
@@ -1583,17 +1605,21 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                }
-                else if (!t.IsNull())
-                {
-                    double d = this.GetData(smpl, t);
-                    rv = new ScalarVal(d);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Could not understand the []-index of series " + G.GetNameAndFreqPretty(this.name));
-                    throw new GekkoException();
-                }
+                    else
+                    {
+                        //not a single-dimensional time index (or lag/lead)
+                        var temp = Program.GetListOfStringsFromListOfIvariables(indexes);
+                        if (temp != null)
+                        {
+                            G.Writeln2("*** ERROR: Could not understand index " + this.name + "[" + G.GetListWithCommas(temp) + "]");
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Could not understand index " + this.name + "[...]");
+                        }
+                        throw new GekkoException();
+                    }                    
+                }                
             }  //end of non-arraysuper
             
             return rv;

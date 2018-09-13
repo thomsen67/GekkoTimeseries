@@ -52,7 +52,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             throw new GekkoException();
         }

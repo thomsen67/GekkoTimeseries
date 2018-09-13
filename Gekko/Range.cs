@@ -41,7 +41,7 @@ namespace Gekko
         // --------------object functions end------------------
         // ----------------------------------------------------
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             G.Writeln2("*** ERROR: Wrong use of Range class");
             throw new GekkoException();

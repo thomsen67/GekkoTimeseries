@@ -98,7 +98,7 @@ namespace Gekko
             if (this.storage.ContainsKey(name)) this.storage.Remove(name);
         }
 
-        public IVariable Indexer(GekkoSmpl t, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {

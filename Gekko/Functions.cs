@@ -535,7 +535,7 @@ namespace Gekko
 
         public static IVariable test(GekkoSmpl t, IVariable x1)
         {
-            return x1.Indexer(t, new ScalarVal(-2d));
+            return x1.Indexer(t, O.EIndexerType.Lag, new ScalarVal(-2d));
         }
 
         public static IVariable concat(GekkoSmpl smpl, IVariable x1, IVariable x2)
@@ -1969,7 +1969,7 @@ namespace Gekko
         {
             if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return O.Indexer(smpl2, smpl, isLagOrLead, x1, O.Negate(smpl, ilag));
+            return O.Indexer(smpl2, smpl, O.EIndexerType.Lag, x1, O.Negate(smpl, ilag));
         }
 
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
