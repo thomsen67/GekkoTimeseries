@@ -1922,7 +1922,7 @@ primaryExpression:          leftParen! expression RIGHTPAREN!
 value:                      function //must be before varname
 						  | bankvarname						
 						  | Integer -> ^(ASTINTEGER Integer)
-						  | indexerAlone
+					//	  | indexerAlone
 						  | double2 -> double2						
 						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
@@ -1930,7 +1930,7 @@ value:                      function //must be before varname
 						  | matrix
 						  | list
 						  | map
-						  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
+					//	  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						    ;
 
 wildRange:                  wildcardWithBank | rangeWithBank;					    
@@ -1949,7 +1949,7 @@ bankvarnameIndexer:  (bankvarname -> bankvarname)
 // ------------------- expression END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 	
-indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
+//indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
 						
 dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)			
 						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
@@ -2535,7 +2535,7 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
 indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
-						//  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
+						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
 						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
 					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
 						    ;

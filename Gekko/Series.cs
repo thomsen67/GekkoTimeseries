@@ -1544,6 +1544,7 @@ namespace Gekko
             else {
 
                 int i = -12345; GekkoTime t = GekkoTime.tNull;
+
                 Series.FindLagLeadFixed(ref i, ref t, indexes);
 
                 if (i != -12345)

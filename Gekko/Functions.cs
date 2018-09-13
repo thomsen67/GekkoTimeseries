@@ -1965,11 +1965,11 @@ namespace Gekko
         }
 
         [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
-        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilag)
+        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, bool isLagOrLead, IVariable x1, IVariable ilag)
         {
             if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
-            return O.Indexer(smpl2, smpl, x1, O.Negate(smpl, ilag));
+            return O.Indexer(smpl2, smpl, isLagOrLead, x1, O.Negate(smpl, ilag));
         }
 
         [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...

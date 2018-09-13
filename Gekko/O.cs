@@ -28,6 +28,13 @@ namespace Gekko
         public static ScalarString scalarStringTilde = new ScalarString(Globals.freqIndicator.ToString());
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
 
+        public enum EIndexerType
+        {
+            None,
+            Lag,
+            Lead
+        }
+
         public enum ECreateType
         {
             Find,        //error if not found
@@ -3009,12 +3016,14 @@ namespace Gekko
         }
 
         //See Indexer2() above. The first argument should be Indexer2(smpl, indexes)
-        public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, IVariable x, params IVariable[] indexes)
+        public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, O.EIndexerType indexerType, IVariable x, params IVariable[] indexes)
         {
             Program.RevertSmpl(smplRemember, smpl);
 
             if (x == null)
             {
+                //this should not be possible, [a*x] is not wildcard anymore
+
                 if (indexes.Length == 1)
                 {
                     //[y]
@@ -3033,23 +3042,8 @@ namespace Gekko
             //a[1] or #a['q*']
             //#x[1, 2]                 
             //x['nz', 'w']    
-
-            if (false)
-            {
-                string s = null;
-                foreach (IVariable iv in indexes)
-                {
-                    if (iv.Type() == EVariableType.String)
-                    {
-                        s += ((ScalarString)iv).string2 + " ";
-                    }
-                }
-                //if (Globals.runningOnTTComputer)
-                //{
-                //    G.Writeln2("---> LABELS(indexes) = " + s);
-                //}
-            }
-
+            //x[-1] or x[+1]
+            
             IVariable rv = x.Indexer(smpl, indexes);
             return rv;
         }

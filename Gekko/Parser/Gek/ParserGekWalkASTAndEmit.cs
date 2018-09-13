@@ -3008,13 +3008,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
-                    case "ASTINDEXERALONE":  //indexer with nothing at the left: [a*], not #z[a*]. For ASTINDEXER, see "["
-                        {
-                            //Only 1 dimension supported                        
-                            if (node.ChildrenCount() > 1) throw new GekkoException();
-                            node.Code.A("O.Indexer(O.Indexer2(smpl, " + node[0].Code + "), smpl, null, " + node[0].Code + ")"); //null signals that it has nothing on the left
-                        }
-                        break;
+                    //case "ASTINDEXERALONE":  //indexer with nothing at the left: [a*], not #z[a*]. For ASTINDEXER, see "["
+                    //    {
+                    //        //Only 1 dimension supported                        
+                    //        if (node.ChildrenCount() > 1) throw new GekkoException();
+                    //        node.Code.A("O.Indexer(O.Indexer2(smpl, " + node[0].Code + "), smpl, null, " + node[0].Code + ")"); //null signals that it has nothing on the left
+                    //    }
+                    //    break;
                     case "ASTDOTORINDEXER":
                         {
 
@@ -3038,7 +3038,7 @@ namespace Gekko.Parser.Gek
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
                                 ASTNode child = node[1][i];
-
+                                
                                 if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                                 {
                                     //See also #980752345
@@ -3148,6 +3148,26 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
                             }
+
+                            string indexerType = "O.EIndexerType.None";
+                            if (node[1].ChildrenCount() == 1)
+                            {
+                                //x[-1] or x[(-1)] or x[+1], but not x[1] x[0-1] or x[0+1].
+                                //so it tests + or - in first pos after [, not counting blanks and parentheses
+                                if (node[1][0].Text == "ASTINDEXERELEMENTPLUS")
+                                {
+                                    indexerType = "O.EIndexerType.Lead";
+                                }
+                                else if (node[1][0][0].Text == "ASTNEGATE")
+                                {
+                                    indexerType = "O.EIndexerType.Lag";
+                                }
+                                else
+                                {
+                                    //do nothing
+                                }                                
+                            }
+
                             if (ivTempVar == null)
                             {
                                 if (indexesReport == null) indexesReport = indexes;
@@ -3162,7 +3182,8 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + node[0].Code + ", " + indexesReport + ")");
+                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
+                                   
                                 }
                                 if (node[0].AlternativeCode != null)
                                 {
