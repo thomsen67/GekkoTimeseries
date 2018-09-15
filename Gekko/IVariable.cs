@@ -110,6 +110,6 @@ namespace Gekko
 
         void DeepCleanup();
 
-        void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims);
+        void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims);
     }
 }

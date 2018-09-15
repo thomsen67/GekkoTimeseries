@@ -97,7 +97,7 @@ namespace Gekko
             return this;
         }
 
-        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
             return; //the "this" object stays untouched (that is, GekkoNull)
         }

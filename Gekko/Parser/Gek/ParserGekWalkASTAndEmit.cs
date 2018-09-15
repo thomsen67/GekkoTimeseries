@@ -2372,7 +2372,7 @@ namespace Gekko.Parser.Gek
 
                                     if (s == null)
                                     {
-                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var)";  //false is regarding isLeftSide
+                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
                                     }
 
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
@@ -3217,7 +3217,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(indexes).A(")");
+                                node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A("o" + Num(node) + ", ").A(indexes).A(")");
 
                             }
 
@@ -3577,7 +3577,7 @@ namespace Gekko.Parser.Gek
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var))) {" + G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                 }
                             }                                                       
 
@@ -3596,7 +3596,7 @@ namespace Gekko.Parser.Gek
                             
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
-                            node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
+                            //node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
 
                             node.Code.A(node[0].Code).End();
 
@@ -3709,9 +3709,11 @@ namespace Gekko.Parser.Gek
 
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
-                                                        
-                            string ivTempVar = SearchUpwardsInTree4(node);
 
+                            string optionsString = "null";
+                            if (isLeftSideVariable) optionsString = "o" + Num(node);  //options like <p> or <keep> etc.
+
+                            string ivTempVar = SearchUpwardsInTree4(node);
 
                             string s = GetSimpleName(node);
                             string internalName = null;
@@ -3813,7 +3815,9 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText777 = Globals.QT+simpleFreq+ Globals.QT;
                                     if (simpleFreq == "") simpleFreqText777 = "null";
 
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777  + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")";
+                                    if (mapName != null) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion
+
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
                                     node.Code.CA(lookupCode);
 
                                     node.AlternativeCode = new GekkoSB();
@@ -3841,7 +3845,7 @@ namespace Gekko.Parser.Gek
                                         bankNameCs = node[0][0].Code.ToString();
                                         nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
                                     }
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ")");
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")");
                                     
                                     node.AlternativeCode = new GekkoSB();
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     

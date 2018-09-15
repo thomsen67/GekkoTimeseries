@@ -1910,7 +1910,7 @@ namespace Gekko
             return EVariableType.Series;
         }
 
-        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] indexes)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] indexes)
         {
             if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
             {
@@ -1951,7 +1951,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: indexer on LHS on a null object");
                     throw new GekkoException();
                 }
-                O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var);                
+                O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var, options);                
             }
         }
 

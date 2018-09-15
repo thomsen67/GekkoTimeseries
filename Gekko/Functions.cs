@@ -2373,7 +2373,7 @@ namespace Gekko
         public static IVariable exist(GekkoSmpl smpl, IVariable x1)
         {
             double d = 0d;
-            IVariable y = O.Lookup(smpl, null, x1, null, false, EVariableType.Var, false);  //will use search settings (data, sim mode) if not bank is given
+            IVariable y = O.Lookup(smpl, null, x1, null, false, EVariableType.Var, false, null);  //will use search settings (data, sim mode) if not bank is given
             if (y != null) d = 1d;            
             ScalarVal v = new ScalarVal(d);
             return v;
@@ -2384,7 +2384,7 @@ namespace Gekko
             //string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
                         
-            Series ts = O.Lookup(null, null, x1, null, false, EVariableType.Var) as Series;
+            Series ts = O.Lookup(null, null, x1, null, false, EVariableType.Var, null) as Series;
             if (ts == null)
             {
                 G.Writeln2("*** ERROR: Variable is not of series type");

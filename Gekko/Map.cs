@@ -217,7 +217,7 @@ namespace Gekko
             return "map";
         }
 
-        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
             if (dims.Length == 1 && dims[0].Type() == EVariableType.String)
             {
@@ -229,7 +229,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 string varnameWithFreq = G.AddFreq(varName, freq, EVariableType.Var, true);
-                O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var);
+                O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var, options);
                 
                 //IVariable iv = this.GetIVariable(s);
                 //if (iv != null) this.RemoveIVariable(s);

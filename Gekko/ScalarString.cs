@@ -102,7 +102,7 @@ namespace Gekko
                             if (G.IsSimpleToken(ss, false))
                             {
                                 //look up the scalar
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, false, EVariableType.Var);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, false, EVariableType.Var, null);
                                 string s2 = a.ConvertToString();
                                 sb.Append(s2);
                                 i = j;  //to jump forwards
@@ -182,7 +182,7 @@ namespace Gekko
                     {
                         try
                         {
-                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var);
+                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var, null);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -247,7 +247,7 @@ namespace Gekko
                         {
                             try
                             {
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var, null);
 
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {
@@ -502,7 +502,7 @@ namespace Gekko
             throw new GekkoException();            
         }
 
-        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, params IVariable[] dims)
+        public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
             G.Writeln2("*** ERROR: You cannot use an indexer [] on a STRING");
             throw new GekkoException();

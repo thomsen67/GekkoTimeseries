@@ -14818,7 +14818,7 @@ namespace Gekko
 
                     if (ss != null)
                     {
-                        IVariable iv2 = O.Lookup(smpl, null, ss, null, false, EVariableType.Var);
+                        IVariable iv2 = O.Lookup(smpl, null, ss, null, false, EVariableType.Var, null);
                         ts = iv2 as Series;
                         if (ts == null)
                         {
