@@ -184,6 +184,48 @@ namespace Gekko
             return x.Divide(smpl, y);
         }
 
+        public static IVariable Percent(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //G.Writeln2("%");
+            Series x_series = x as Series;
+            AssignmentError(x_series, "%= operator");
+            return x.Divide(smpl, y);
+        }
+
+        public static IVariable Hash(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //G.Writeln2("#");
+            Series x_series = x as Series;
+            AssignmentError(x_series, "#= operator");
+            return x.Divide(smpl, y);
+        }
+
+        public static IVariable Hat(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //G.Writeln2("^");
+            Series x_series = x as Series;            
+            AssignmentError(x_series, "^= operator");
+            foreach (GekkoTime t in smpl.Iterate03())
+            {
+                double x_lag = x_series.GetData(smpl, t.Add(-1));
+            }
+            return x.Divide(smpl, y);
+        }
+
+        private static void AssignmentError(Series x_series, string s)
+        {
+            if (x_series == null)
+            {
+                G.Writeln2("*** ERROR: You can only use " + s + " operator on series type");
+                throw new GekkoException();
+            }
+            if (x_series.type != ESeriesType.Normal)
+            {
+                G.Writeln2("*** ERROR: You can only use " + s + " operator on a normal series type");
+                throw new GekkoException();
+            }
+        }
+
         public static IVariable Power(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return x.Power(smpl, y);
@@ -246,6 +288,46 @@ namespace Gekko
             }
             else temp.Add(iv);
             return temp;
+        }
+
+        public static void AssignmentHelper(GekkoSmpl smpl, IVariable x, IVariable values, O.Assignment o0)
+        {            
+            ESeriesUpdTypes type = ESeriesUpdTypes.none;
+            if (G.Equal(o0.opt_d, "yes")) type = ESeriesUpdTypes.d;            
+            else if (G.Equal(o0.opt_p, "yes")) type = ESeriesUpdTypes.p;
+            else if (G.Equal(o0.opt_m, "yes")) type = ESeriesUpdTypes.m;
+            else if (G.Equal(o0.opt_q, "yes")) type = ESeriesUpdTypes.q;
+            else if (G.Equal(o0.opt_mp, "yes")) type = ESeriesUpdTypes.mp;
+
+            bool keep = false; if (G.Equal(o0.opt_keep, "yes")) keep = true;
+
+            if (type == ESeriesUpdTypes.none && keep == false) return;
+            
+            Series x_series = x as Series;
+            AssignmentError(x_series, "^ operator");
+
+            Series original = null;
+            if (keep || false)
+            {
+                original = (Series)x_series.DeepClone(null);
+            }
+
+            foreach (GekkoTime t in smpl.Iterate03())
+            {
+
+            }
+
+            if (keep)
+            {
+                GekkoTime tLast = x_series.GetRealDataPeriodLast();
+                foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))
+                {
+                    //runs after the <...> period or globals period until data ends
+                    //so the updates outside of sample.
+                    double rel = original.GetData(smpl, t)/ original.GetData(smpl, t.Add(-1));
+                    x_series.SetData(t, x_series.GetData(smpl, t.Add(-1)) * rel);
+                }
+            }
         }
 
         public static void SeriesQuestion()
@@ -6504,6 +6586,17 @@ namespace Gekko
             }
         }
 
+        public class Assignment
+        {
+            public string opt_d = null;
+            public string opt_p = null;
+            public string opt_m = null;
+            public string opt_q = null;
+            public string opt_mp = null;            
+            public string opt_keep = null;
+            
+        }
+
         public class Accept
         {
             public string type = null;
@@ -7666,7 +7759,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (G.Equal(this.opt_split, "yes") || !Program.AllSeriesCheck(this, EPrintTypes.Print))
+                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !Program.AllSeriesCheck(this, EPrintTypes.Print))
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)

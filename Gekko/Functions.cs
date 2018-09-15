@@ -1076,7 +1076,7 @@ namespace Gekko
         //missing value
         public static IVariable miss(GekkoSmpl smpl)
         {
-            return new ScalarVal(double.NaN);
+            return Globals.scalarValMissing;
         }                
 
         public static IVariable miss(GekkoSmpl smpl, IVariable x1, IVariable x2)

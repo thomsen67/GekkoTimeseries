@@ -37,6 +37,8 @@ tokens {
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
 	ASTCNAME;
+	ASTHASH2;
+	ASTPERCENT2;
 	ASTDOTORINDEXER;
 	ASTBANKVARNAME;
 	ASTHASH;
@@ -67,6 +69,7 @@ tokens {
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
+	ASTHAT;
 	ASTPRINT;
 	ASTIFSTATEMENTS;
 	ASTELSESTATEMENTS;
@@ -2258,19 +2261,6 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 
-//assignment:				    assignmentType seriesOpt1? leftSide EQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seriesnamesList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-//						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-//						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-//						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-//						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-//						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-//						  | assignmentType seriesOpt1? leftSide STAREQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-//						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-//						  | assignmentType seriesOpt1? leftSide DIVEQUAL seriesnamesList -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seriesnamesList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-//						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-//						    ;
-
-
 assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
@@ -2282,8 +2272,15 @@ assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAt
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 
-						  | assignmentType seriesOpt1? leftSide STAR expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR5 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPERCENT2 leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPERCENT2 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
 
+						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHAT leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHAT leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+
+						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHASH2 leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
+						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHASH2 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  
 						    ;
 
 							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
@@ -4575,10 +4572,17 @@ MINUS:                      '-';
 DIV:                        '/';
 STARS:                      '**';
 EQUAL:                      '=';
-PLUSEQUAL:                  '+=';
-MINUSEQUAL:                 '-=';
+MINUSEQUAL:                 '-='; 
 DIVEQUAL:                   '/=';
-STAREQUAL:                  '*=';
+
+PLUSEQUAL:                  '+='; //<m>
+STAREQUAL:                  '*='; //<q>
+PERCENTEQUAL:               '%='; //<p>
+GLUEPERCENTEQUAL:           '¨%='; //<p>
+HASHEQUAL:                  '#='; //<mp>
+GLUEHASHEQUAL:              '¨#='; //<mp>
+HATEQUAL:                   '^='; //<d>     
+
 BACKSLASH:                  '\\';
 QUESTION:                   '?';
 

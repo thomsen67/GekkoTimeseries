@@ -689,6 +689,21 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.Subtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
+                    case "ASTPERCENT2":
+                        {
+                            node.Code.CA("O.Percent(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTHASH2":
+                        {
+                            node.Code.CA("O.Hash(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
+                    case "ASTHAT":
+                        {
+                            node.Code.CA("O.Hat(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                        }
+                        break;
                     case "ASTSTAR":
                         {
                             node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
@@ -3556,6 +3571,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
+                            node.Code.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
+
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count>0)
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
@@ -3578,6 +3595,8 @@ namespace Gekko.Parser.Gek
                             string temp = node[1].Code.ToString();
                             
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+
+                            node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
 
                             node.Code.A(node[0].Code).End();
 
