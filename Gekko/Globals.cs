@@ -126,6 +126,8 @@ namespace Gekko
         public const string bankNumberiMax = "1";
 
         public static bool showTimings = false;  //use comand TIMINGS
+
+        public const int offset = 1;
         
         //public static int stackedTimePeriods = 5;
         public static string stackedTimeSeparator = "___";

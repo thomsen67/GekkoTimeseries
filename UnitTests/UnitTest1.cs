@@ -2651,6 +2651,36 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_AssignmentOperators()
+        {
+            I("RESET; TIME 2001 2004;");
+            I("y = 5;");
+            I("x1 = (m(), 1, 2, 3;");
+            I("<2002 2004 d> y = x1;");  //6, 8, 11
+            I("<2002 2004> y ^= x1;");  //6, 8, 11
+            I("<2002 2004 d> y ^= x1;");  //should fail
+            I("<2002 2004> y += x1;");  //7, 10, 14
+            I("<2002 2004 d> y += x1;");  //should fail
+
+            I("#m = (<2002 2004> y = x1);");  //1, 2, 3
+            I("#m = (<2002 2004 d> y = x1);");  //should fail
+            I("#m = (<2002 2004> y ^= x1);");  //should fail
+            I("#m = (<2002 2004> y += x1);");  //should fail
+
+            //probably also tests #m[2], #m['y'], #m[y]
+            I("<2002 2004 d> #m.y = x1;");  //6, 8, 11
+            I("<2002 2004> #m.y ^= x1;");  //6, 8, 11
+            I("<2002 2004 d> #m.y ^= x1;");  //should fail
+            I("<2002 2004> #m.y += x1;");  //7, 10, 14
+            I("<2002 2004 d> #m.y += x1;");  //should fail
+            
+            I("");
+            I("");
+            I("");
+
+        }
+
+        [TestMethod]
         public void _Test_UserDefinedFunctions()
         {
             I("RESET;");
@@ -3578,6 +3608,7 @@ namespace UnitTests
             I("xx = 100;");
             I("#m = (%i1 = 'a', #mm = (%i1 = 'b', %i2 = 'c', ts = xx, var<2010 2011> ts = (1, 2)), %v1 = 100);");
             I("#m.%v1 += 1;");
+            I("#m.%v1 = #m.%v1 + 1;");
             I("p #m.%i1;");
             I("p #m.#mm.%i1;");
             I("p #m.#mm.%i2;");
@@ -3587,7 +3618,7 @@ namespace UnitTests
             Map m2 = m1.GetIVariable("#mm") as Map;
 
             _AssertScalarString(m1, "%i1", "a");
-            _AssertScalarVal(m1, "%v1", 101d);
+            _AssertScalarVal(m1, "%v1", 102d);
             _AssertScalarString(m2, "%i1", "b");
             _AssertScalarString(m2, "%i2", "c");
             _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
