@@ -69,7 +69,7 @@ tokens {
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
-	ASTHAT;
+	ASTHAT2;
 	ASTPRINT;
 	ASTIFSTATEMENTS;
 	ASTELSESTATEMENTS;
@@ -2261,25 +2261,25 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS)
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS)
+						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR)
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV)
 
-						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPERCENT2 leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPERCENT2 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
+						  | assignmentType seriesOpt1? leftSide (PERCENTEQUAL|GLUEPERCENTEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
 
-						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHAT leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHAT leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
+						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
 
-						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHASH2 leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)   
-						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTHASH2 leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)
+						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
+						  | assignmentType seriesOpt1? leftSide (HASHEQUAL|GLUEHASHEQUAL) expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
 						  
 						    ;
 

@@ -689,21 +689,21 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.Subtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
-                    case "ASTPERCENT2":
-                        {
-                            node.Code.CA("O.Percent(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
-                    case "ASTHASH2":
-                        {
-                            node.Code.CA("O.Hash(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
-                    case "ASTHAT":
-                        {
-                            node.Code.CA("O.Hat(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
+                    //case "ASTPERCENT2":
+                    //    {
+                    //        node.Code.CA("O.Percent(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
+                    //case "ASTHASH2":
+                    //    {
+                    //        node.Code.CA("O.Hash(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
+                    //case "ASTHAT":
+                    //    {
+                    //        node.Code.CA("O.Hat(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
                     case "ASTSTAR":
                         {
                             node.Code.CA("O.Multiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
