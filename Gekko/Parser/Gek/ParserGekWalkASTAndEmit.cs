@@ -3571,7 +3571,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTASSIGNMENT":
                         {
-                            node.Code.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
+                            if (node.Parent.Text == null)
+                            {
+                                //only for the top-most node, that is, only 1 time
+                                //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
+                                node.Code.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
+                            }
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count>0)
                             {
@@ -3815,7 +3820,7 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText777 = Globals.QT+simpleFreq+ Globals.QT;
                                     if (simpleFreq == "") simpleFreqText777 = "null";
 
-                                    if (mapName != null) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion
+                                    if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
                                     node.Code.CA(lookupCode);
