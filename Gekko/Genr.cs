@@ -6,33 +6,32 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static int labelCounter;
-        public static void ClearTS(P p)
-        {
-        }
-        public static void ClearScalar(P p)
-        {
-        }
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static int labelCounter;
+public static readonly ScalarVal i10 = new ScalarVal(100d);
+public static void ClearTS(P p) {
+}
+public static void ClearScalar(P p) {
+}
 
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            //[[splitSTART]]
-            p.SetText(@"¤0"); O.InitSmpl(smpl, p);
+//[[splitSTART]]
+p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            O.Assignment o0 = new O.Assignment();
-            IVariable ivTmpvar53 = O.Hat(smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var, null), O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var, null));
-            O.Lookup(smpl, null, null, "x", null, ivTmpvar53, true, EVariableType.Var, null)
-            ;
-
-
-            //[[splitSTOP]]
+O.Assignment o0 = new O.Assignment();
+IVariable ivTmpvar9 = i10;
+O.Lookup(smpl, null, null, "xx", null, ivTmpvar9, true, EVariableType.Var, null)
+;
 
 
-        }
-    }
+//[[splitSTOP]]
+
+
+}
+}
 }

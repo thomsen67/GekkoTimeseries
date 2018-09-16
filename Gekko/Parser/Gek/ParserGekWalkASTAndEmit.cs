@@ -3570,7 +3570,10 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTASSIGNMENT":
-                        {
+                        {                            
+                            string operatorType = "ASTPLACEHOLDER";
+                            if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
+
                             if (node.Parent.Text == null)
                             {
                                 //only for the top-most node, that is, only 1 time
@@ -3598,7 +3601,20 @@ namespace Gekko.Parser.Gek
                             string convertTo = null;
 
                             string temp = node[1].Code.ToString();
-                            
+
+                            if (operatorType == "ASTHAT2")
+                            {
+                                node.Code.A("o" + Num(node) + ".opt_d = `yes`;" + G.NL);
+                            }
+                            else if (operatorType == "ASTPERCENT2")
+                            {
+                                node.Code.A("o" + Num(node) + ".opt_p = `yes`;" + G.NL);
+                            }
+                            else if (operatorType == "ASTHASH2")
+                            {
+                                node.Code.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
+                            }
+
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
 
                             //node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
@@ -3820,7 +3836,8 @@ namespace Gekko.Parser.Gek
                                     string simpleFreqText777 = Globals.QT+simpleFreq+ Globals.QT;
                                     if (simpleFreq == "") simpleFreqText777 = "null";
 
-                                    if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
+                                    //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
+                                    optionsString = "null";  //the above does not work
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
                                     node.Code.CA(lookupCode);
