@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "d33";
 
+        public static bool assignmentFix = true;
+
         public static bool JOrderFix = true;
 
         public static bool autoSigils = false; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."

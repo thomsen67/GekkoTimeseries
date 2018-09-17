@@ -3033,6 +3033,15 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
 
+                           
+ 
+
+
+
+                            
+                             
+                            
+
 
                             string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
@@ -3724,6 +3733,86 @@ namespace Gekko.Parser.Gek
                             //                 q               <--- freq indicator
 
 
+                            /*
+
+                           #m.#m2.#m3.z = 56
+                                       astleftside
+                                         / 
+                                        /                                         
+                                 astdotori   
+                                   /     \
+                                  /       \
+                             astdotori    astdot
+                               /   \         \
+                              /     \         \
+                        astdotori   astdot     z --------> this is the assign
+                         / \         \                 if it has 1 astdotorindexer above,
+                        /   \         \               and then a astleftside, we are ok.
+                       #m  astdot      #m3
+                             \
+                              \
+                               #m2
+
+
+  ASTASSIGNMENT [0]
+    ASTLEFTSIDE [0]
+      ASTDOTORINDEXER [0]
+        ASTDOTORINDEXER [0]
+          ASTDOTORINDEXER [0]
+            ASTBANKVARNAME [0]
+              ASTPLACEHOLDER [0]
+              ASTVARNAME [0]
+                ASTPLACEHOLDER [0]
+                  ASTHASH [0]
+                ASTPLACEHOLDER [1]
+                  ASTNAME [1]
+                    ASTIDENT [1]
+                      m [1]
+                ASTPLACEHOLDER [0]
+            ASTDOT [0]
+              ASTVARNAME [0]
+                ASTPLACEHOLDER [0]
+                  ASTHASH [0]
+                ASTPLACEHOLDER [1]
+                  ASTNAME [1]
+                    ASTIDENT [1]
+                      m2 [1]
+                ASTPLACEHOLDER [0]
+          ASTDOT [0]
+            ASTVARNAME [0]
+              ASTPLACEHOLDER [0]
+                ASTHASH [0]
+              ASTPLACEHOLDER [1]
+                ASTNAME [1]
+                  ASTIDENT [1]
+                    m3 [1]
+              ASTPLACEHOLDER [0]
+        ASTDOT [0]
+          ASTVARNAME [0]
+            ASTPLACEHOLDER [0]
+            ASTPLACEHOLDER [1]
+              ASTNAME [1]
+                ASTIDENT [1]
+                  z [1]
+            ASTPLACEHOLDER [0]
+    ASTINTEGER [1]
+      56 [1]
+    ASTPLACEHOLDER [0]
+    ASTPLACEHOLDER [0]
+    ASTPLACEHOLDER [0]
+   [0]
+   */
+
+                            int leftSideType = 0;  //(0): none, (1): simple x = ..., (2): #m1.#m2.x = ... or #m[2][3] = ...
+                            if (node?.Parent.Text == "ASTLEFTSIDE")
+                            {
+                                leftSideType = 1;
+                            }
+                            else if (node?.Parent?.Text == "ASTDOTORINDEXER" && node?.Parent?.Parent.Text == "ASTLEFTSIDE")
+                            {
+                                leftSideType = 2;
+                            }
+
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             bool isLeftSideVariable = tuple.Item1;
                             string type = tuple.Item2;
@@ -3838,6 +3927,7 @@ namespace Gekko.Parser.Gek
 
                                     //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
                                     optionsString = "null";  //the above does not work
+
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
                                     node.Code.CA(lookupCode);
