@@ -3033,16 +3033,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
 
-                           
  
-
-
-
-                            
-                             
-                            
-
-
                             string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
@@ -3225,8 +3216,9 @@ namespace Gekko.Parser.Gek
                                 }
                             }
                             else
-                            {
-                                node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A("o" + Num(node) + ", ").A(indexes).A(")");
+                            {                                
+                                //This only happens for x3 in x1.x2.x3.x4 = ..., the last indexer on the LHS
+                                node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(OperatorHelper(node, -12345) + ", ").A(indexes).A(")");
 
                             }
 
@@ -3623,8 +3615,10 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
                             }
-
+                            
+                            node.Code.A(OperatorHelper(null, -1)).End();
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                            node.Code.A(OperatorHelper(null, 1)).End();
 
                             //node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
 
@@ -3746,11 +3740,11 @@ namespace Gekko.Parser.Gek
                                /   \         \
                               /     \         \
                         astdotori   astdot     z --------> this is the assign
-                         / \         \                 if it has 1 astdotorindexer above,
-                        /   \         \               and then a astleftside, we are ok.
-                       #m  astdot      #m3
-                             \
-                              \
+                         / \         \                 if it has one astdotorindexer above,
+                        /   \         \                and then a astleftside, we are ok.
+                       #m  astdot      #m3 --------------> but this is where the IndexerSetData
+                             \                        is called, because it might be #m.#m2.x[2000],
+                              \                       where ivtempvar != null 
                                #m2
 
 
@@ -3803,15 +3797,24 @@ namespace Gekko.Parser.Gek
    [0]
    */
 
-                            int leftSideType = 0;  //(0): none, (1): simple x = ..., (2): #m1.#m2.x = ... or #m[2][3] = ...
-                            if (node?.Parent.Text == "ASTLEFTSIDE")
+                            //int leftSideType = 0;  //(0): none, (1): simple x = ..., (2): #m1.#m2.x = ... or #m[2][3] = ...
+                            //bool isMapItem = (node?.Parent?.Text == "ASTASSIGNMENT" && node?.Parent?.Parent?.Text == "ASTMAPITEM") || (node?.Parent?.Parent.Text == "ASTASSIGNMENT" && node?.Parent?.Parent?.Parent.Text == "ASTMAPITEM");
+                            bool isMapItem = SearchUpwardsInTree9(node);  //finds ASTMAPITEM and ASTFUNCTIONDEFCODE
+                            bool isLeftSide = node?.Parent.Text == "ASTLEFTSIDE";
+
+                            string optionsString = "null";
+                            if (!isMapItem && isLeftSide)
                             {
-                                leftSideType = 1;
+                                //four possibilities, y1 = x1 and #m = (y2 = x2)
+                                //here, x1 and x2 have !isLeftSide
+                                //for y2, isMapItem is true.
+                                //only one left is thus y1, for which printcodes work.                                                                                            
+                                optionsString = OperatorHelper(node, -12345);  //options like <p> or <keep> etc.
                             }
-                            else if (node?.Parent?.Text == "ASTDOTORINDEXER" && node?.Parent?.Parent.Text == "ASTLEFTSIDE")
-                            {
-                                leftSideType = 2;
-                            }
+                            //else if (node?.Parent?.Text == "ASTDOTORINDEXER" && node?.Parent?.Parent.Text == "ASTLEFTSIDE")
+                            //{
+                            //    leftSideType = 2;
+                            //}
 
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             bool isLeftSideVariable = tuple.Item1;
@@ -3820,8 +3823,8 @@ namespace Gekko.Parser.Gek
                             string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
 
-                            string optionsString = "null";
-                            if (isLeftSideVariable) optionsString = "o" + Num(node);  //options like <p> or <keep> etc.
+                            //string optionsString = "null";
+                            //if (isLeftSideVariable) optionsString = "o" + Num(node);  //options like <p> or <keep> etc.
 
                             string ivTempVar = SearchUpwardsInTree4(node);
 
@@ -3926,7 +3929,7 @@ namespace Gekko.Parser.Gek
                                     if (simpleFreq == "") simpleFreqText777 = "null";
 
                                     //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
-                                    optionsString = "null";  //the above does not work
+                                    //optionsString = "null";  //the above does not work
 
 
                                     string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
@@ -5592,7 +5595,16 @@ namespace Gekko.Parser.Gek
                 }
                 node.Code.A(Globals.splitSTOP);
             }
-        }               
+        }
+
+        private static string OperatorHelper(ASTNode node, int i)
+        {
+            //This helper is just to mark the two places it is used
+            if (node != null) return "o" + Num(node);
+            if (i == -1) return "smpl.t1 = smpl.t1.Add(-1)";
+            if (i == 1) return "smpl.t1 = smpl.t1.Add(1)";
+            throw new GekkoException();
+        }
 
         private static string LocalCode1(string num)
         {            
@@ -6028,6 +6040,7 @@ namespace Gekko.Parser.Gek
         {
             //finds out if the variable is a LHS (left-side) variable
             //returns null if RHS or (LHS and there is a ASTBANKVAR or ASTDOTORINDEXER above)
+            
             ASTNode tmp = node;            
             string rv = null;
             while (tmp != null)
@@ -6108,6 +6121,21 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
             return rv;
+        }
+
+        private static bool SearchUpwardsInTree9(ASTNode node)
+        {
+            //finds out if node has ASTMAPITEM above
+            ASTNode tmp = node;
+            string rv = null;
+            while (tmp != null)
+            {
+                //if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
+                
+                if (tmp.Text == "ASTMAPITEM" || tmp.Text == "ASTFUNCTIONDEFCODE" || tmp.Text == "ASTPROCEDUREDEFCODE") return true;
+                tmp = tmp.Parent;
+            }
+            return false;
         }
 
         private static void ResetUFunctionHelpers(W w)

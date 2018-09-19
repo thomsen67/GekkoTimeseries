@@ -115,11 +115,13 @@ namespace Gekko
         //private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
         [ProtoMember(8)]
         public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
+
         [ProtoMember(9)]
+        //dimensions = gdxdimensions + (type == Timeless) - 1
         public int dimensions = 0;  //non-time dimensions: default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
         [ProtoMember(10)]
         public ESeriesType type = ESeriesType.Normal;  //default
-
+        
         public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
         public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
@@ -2139,7 +2141,10 @@ namespace Gekko
         [ProtoMember(5)]
         public string stamp;                
         [ProtoMember(6)]        
-        public string units;             
+        public string units;
+
+        [ProtoMember(7)]
+        public string[] domains = null;
 
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        

@@ -1882,7 +1882,7 @@ namespace Gekko
         private static bool IsValOrTimeseries(IVariable x)
         {
             return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series || x.Type() == EVariableType.Series;
-        }
+        }        
 
         //same as power()
         public static IVariable pow(GekkoSmpl smpl, IVariable x1, IVariable x2)
@@ -1895,6 +1895,12 @@ namespace Gekko
         public static IVariable power(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             return pow(smpl, x1, x2);
+        }
+
+        public static IVariable nothing(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
+        {            
+            Program.RevertSmpl(smplOriginal, smpl);
+            return x1;
         }
 
         [MyCustom(Lag = "lag=1")]

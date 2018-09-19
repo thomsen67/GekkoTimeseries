@@ -4646,6 +4646,28 @@ namespace Gekko
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
+            // ---------------------------------------
+            // gdx              no t               has t
+            // dims
+            // ---------------------------------------
+            // 0                normal timeless    NA
+            //
+            //
+            // 1                gedim = 1          normal series
+            //                  timeless
+            //
+            // 2                gedim = 2          gdim = 1
+            //                  timeless
+            //
+            //3                 gedim = 3          gdim = 2
+            //                  timeless
+
+            // gdxdim = gekkodim + (1-istimeless)
+
+            // only complication is that Gekko may mix timeless and non-timeless
+            // subseries, maybe that should not be allowed?
+            // maybe the array-superseries should know if it is timeless or not?
+
             string prefix = Program.options.gams_time_prefix.Trim().ToLower();
             bool hasPrefix = prefix.Length > 0;
             string file = AddExtension(fileLocal, "." + "gdx");
@@ -4774,6 +4796,7 @@ namespace Gekko
                                     string s = null;
                                     s = uel[index[0]];
                                     setData.Add(s);
+                                    
                                 }
                                 gdx.gdxDataReadDone();
 
@@ -4809,10 +4832,13 @@ namespace Gekko
                                 //       parameters and variables
                                 //  ======================================
                                 //
-
+                                
                                 string varNameWithFreq = varName + Globals.freqIndicator + G.GetFreq(freq);
 
-                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, ref domainStrings, gdxDimensions, gdx, timeIndex, i);
+                                //always fetched, since we use it for domains
+                                gdx.gdxSymbolGetDomainX(i, ref domainStrings);                                
+                                int timeDimNr = GdxGetTimeDimNumber(ref domainSyNrs, domainStrings, gdxDimensions, gdx, timeIndex, i);
+                                
                                 if (gdx.gdxDataReadRawStart(i, ref nrRecs) == 0)
                                 {
                                     G.Writeln2("*** ERROR: gdx error");
@@ -4821,8 +4847,11 @@ namespace Gekko
 
                                 int hasTimeDimension = 0;
                                 if (timeDimNr != -12345) hasTimeDimension = 1;
+
+                                int gekkoDimensions = gdxDimensions - hasTimeDimension;
+
                                 bool isMultiDim = true;
-                                if (gdxDimensions - hasTimeDimension == 0)
+                                if (gekkoDimensions == 0)
                                 {
                                     isMultiDim = false;
                                 }
@@ -4831,10 +4860,20 @@ namespace Gekko
                                 if (isMultiDim)
                                 {
                                     //Multi-dim timeseries
+                                    string[] domains = new string[gekkoDimensions];
+                                    int counter = 0;
+                                    for (d = 0; d < gdxDimensions; d++)
+                                    {
+                                        if (d == timeDimNr) continue; //skipping time dimension
+                                        if (domainStrings[counter] == "*") domains[counter] = domainStrings[counter];
+                                        else domains[counter] = Globals.symbolCollection + domainStrings[counter];
+                                        counter++;
+                                    }
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(freq, varNameWithFreq);
                                     ts.meta.label = label;
-                                    //if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;  //not really relevant, since the timeseries is only a ghost
+                                    ts.meta.domains = domains;
+                                    if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
                                     ts.SetArrayTimeseries(gdxDimensions, hasTimeDimension == 1);
                                     databank.AddIVariable(ts.name, ts);
                                 }
@@ -4846,7 +4885,7 @@ namespace Gekko
                                     if (databank.ContainsIVariable(varNameWithFreq)) databank.RemoveIVariable(varNameWithFreq);  //should not be possible, since merging is not allowed...
                                     ts = new Series(freq, varNameWithFreq);
                                     ts.meta.label = label;
-                                    if (timeDimNr == -12345) ts.type = ESeriesType.Timeless;
+                                    if (hasTimeDimension == 0) ts.type = ESeriesType.Timeless;
                                     databank.AddIVariable(ts.name, ts);
                                 }
 
@@ -5705,7 +5744,7 @@ namespace Gekko
         }
 
 
-        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, ref string[] domainStrings, int dimensions, Gdxcs gdx, int timeIndex, int i)
+        private static int GdxGetTimeDimNumber(ref int[] domainSyNrs, string[] domainStrings, int dimensions, Gdxcs gdx, int timeIndex, int i)
         {
             int timeDimNr = -12345;
             gdx.gdxSymbolGetDomain(i, ref domainSyNrs);
@@ -5734,7 +5773,7 @@ namespace Gekko
             else
             {
                 //slower, but still not in the innermost loop
-                gdx.gdxSymbolGetDomainX(i, ref domainStrings);
+                //gdx.gdxSymbolGetDomainX(i, ref domainStrings);
                 for (int d2 = dimensions - 1; d2 >= 0; d2--)  //backwards is faster since t is typically there
                 {
                     if (G.Equal(domainStrings[d2], Program.options.gams_time_set))
@@ -14839,10 +14878,13 @@ namespace Gekko
                 string varnameWithoutFreq = G.Chop_RemoveFreq(ts.name);
 
                 if (gamsStyle)
-                {                       
+                {
+
+                    string s2 = "[" + G.GetListWithCommas(ts.meta.domains) + "]";
+                    if (s2 == "[]") s2 = null;                    
 
                     G.Writeln2("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + varnameWithoutFreq);
+                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
                     if (!G.NullOrEmpty(ts.meta.label)) G.Writeln(ts.meta.label);
                     
                     List<MapMultidimItem> keys = null;
@@ -14922,11 +14964,20 @@ namespace Gekko
                             period = " (period " + t1.ToString() + " - " + t2.ToString() + ")";
                         }
                         
-                        G.Writeln2(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
+                        G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
+                        
                         double dimCount2 = 1d;
                         string dimCount = null;
                         for (int i = 0; i < ts.dimensions; i++)
                         {
+                            string domain = null;
+                            try
+                            {
+                                domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
+                            }
+                            catch { };
+                            if (domain == "*") domain = null;
+                            if (domain != null) domain = domain + ", ";
                             temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             int ii = 0;
                             foreach (MapMultidimItem key in keys)
@@ -14938,7 +14989,7 @@ namespace Gekko
                             temp2.Sort(G.CompareNaturalIgnoreCase);
                             dimCount2 = dimCount2 * temp[i].Count;
                             dimCount += temp2.Count + " * ";
-                            G.Writeln("Dimension #" + (i + 1) + " (" + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                            G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
                         }
                         dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
@@ -15032,7 +15083,7 @@ namespace Gekko
 
                     G.Writeln();
                     G.Writeln("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + G.Chop_RemoveFreq(ts.name));
+                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + G.Chop_RemoveFreq(ts.name));
                     if (true)
                     {
                         EEndoOrExo type1 = VariableTypeEndoExo(var);

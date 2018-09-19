@@ -565,7 +565,7 @@ namespace Gekko
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
             G.Writeln2("*** ERROR: You cannot use power function with matrices");
-            throw new GekkoException();
+            throw new GekkoException();            
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)

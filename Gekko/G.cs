@@ -2253,6 +2253,7 @@ namespace Gekko
 
         public static string GetListWithCommas(List<string> list) 
         {
+            if (list == null) return null;
             StringBuilder sb = new StringBuilder();            
             for (int i = 0; i < list.Count; i++)
             {
@@ -2265,6 +2266,7 @@ namespace Gekko
 
         public static string GetListWithCommas(string[] list)
         {
+            if (list == null) return null;
             return GetListWithCommas(new List<string>(list));
         }
         
