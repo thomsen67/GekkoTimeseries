@@ -44,6 +44,8 @@ namespace Gekko
 
         public static bool JOrderFix = true;
 
+        public static bool overloadFix = true;
+
         //Newton starting values start ------------------------------------
         //public static bool newtonStartingValuesFix = true;
         public static int newtonRobustHelper1 = -12345;
@@ -151,7 +153,7 @@ namespace Gekko
         //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
 
-        public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
+        //public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
 
         //Must be near the top of Globals.cs
         public static GekkoTime tNull = new GekkoTime(EFreq.Annual, -12345, 1);  //think of it as a 'null' object (but it is a struct)

@@ -1529,7 +1529,15 @@ namespace Gekko.Parser.Gek
 
                             w.uHeaderCs.AppendLine(method);
 
-                            Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName, w.uHeaderCs.ToString());
+                            if (Globals.overloadFix)
+                            {
+                                // "xx#3 for function xx with 3 arguments
+                                Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName + "#" + w.uFunctionsHelper.storage.Count, w.uHeaderCs.ToString());
+                            }
+                            else
+                            {
+                                Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName, w.uHeaderCs.ToString());
+                            }
 
                             ResetUFunctionHelpers(w);
 
@@ -1938,7 +1946,14 @@ namespace Gekko.Parser.Gek
                                 {
                                     s = Globals.procedure + functionName;
                                 }
-                                if (Globals.uFunctionStorageCs.ContainsKey(s))  //case-insensitive anyway
+
+                                string s2 = s;
+                                if (Globals.overloadFix)
+                                {
+                                    s2 += "#" + (node.ChildrenCount() - 1);
+                                }
+
+                                if (Globals.uFunctionStorageCs.ContainsKey(s2))  //case-insensitive anyway
                                 {                                    
                                     node.Code.A(Globals.uProc).A(".").A(s).A("(").A(Globals.functionP1Cs).A(", ").A(Globals.functionT1Cs).A(", ");
                                 }
@@ -2891,7 +2906,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTOPEN":
                         {
-                            node.Code.A(Globals.clearTsCsCode + G.NL);
+                            //node.Code.A(Globals.clearTsCsCode + G.NL);
                             node.Code.A("O.Open o" + Num(node) + " = new O.Open();" + G.NL);
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
@@ -2926,7 +2941,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(s.ToString());
                                 if (o == "freq")
                                 {
-                                    node.Code.A(Globals.clearTsCsCode + G.NL);
+                                    //node.Code.A(Globals.clearTsCsCode + G.NL);
                                     node.Code.A("Program.AdjustFreq();");
                                 }
                                 if (o == "interface_sound_type")
@@ -3597,7 +3612,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTREAD":
                         {
-                            node.Code.A(Globals.clearTsCsCode + G.NL);
+                            //node.Code.A(Globals.clearTsCsCode + G.NL);
                             node.Code.A("O.Read o" + Num(node) + " = new O.Read();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");

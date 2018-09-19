@@ -151,13 +151,13 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = Globals.tNull;");
             s2.Append(wh2.headerCs);
 
-            s2.AppendLine("public static void ClearTS(P p) {");
-            s2.Append(wh2.headerMethodTsCs);
-            s2.AppendLine("}");
+            //s2.AppendLine("public static void ClearTS(P p) {");
+            //s2.Append(wh2.headerMethodTsCs);
+            //s2.AppendLine("}");
 
-            s2.AppendLine("public static void ClearScalar(P p) {");
-            s2.Append(wh2.headerMethodScalarCs);
-            s2.AppendLine("}");
+            //s2.AppendLine("public static void ClearScalar(P p) {");
+            //s2.Append(wh2.headerMethodScalarCs);
+            //s2.AppendLine("}");
 
             s2.AppendLine(csMethods);  //definitions of C1(), C2(), etc. -- may be empty
 
