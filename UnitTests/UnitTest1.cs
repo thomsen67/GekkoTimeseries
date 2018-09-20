@@ -833,31 +833,7 @@ namespace UnitTests
 
 
         }
-
-        [TestMethod]
-        public void _Test_AssignmentOperator()
-        {
-            I("RESET; TIME 2001 2001;");
-            I("xx = 5;");
-            I("xx += 2;");
-            _AssertSeries(First(), "xx", 2001, 7, sharedDelta);
-            I("xx -= 2;");
-            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
-            I("xx *= 2;");
-            _AssertSeries(First(), "xx", 2001, 10, sharedDelta);
-            I("xx /= 2;");
-            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
-
-            I("%xx = 5;");
-            I("%xx += 2;");
-            _AssertScalarVal(First(), "%xx", 7d);
-            I("%xx -= 2;");
-            _AssertScalarVal(First(), "%xx", 5d);
-            I("%xx *= 2;");
-            _AssertScalarVal(First(), "%xx", 10d);
-            I("%xx /= 2;");
-            _AssertScalarVal(First(), "%xx", 5d);
-        }
+        
 
         [TestMethod]
         public void _Test_SeriesLags()
@@ -2653,10 +2629,96 @@ namespace UnitTests
         [TestMethod]
         public void _Test_AssignmentOperators()
         {
-            I("RESET; TIME 2001 2004;");
-            I("y = 5;");
-            I("x1 = (m(), 1, 2, 3);");
-            I("<2002 2004 d> y = x1;");  //6, 8, 11
+
+            //OPERATOR d and ^=
+
+            for (int i = 0; i < 2; i++)
+            {
+                I("RESET; TIME 2001 2004;");
+                I("y = 5;");
+                I("x1 = (m(), 1, 2, 3);");
+                if (i == 0) I("<2002 2004 d> y = x1;");
+                else I("<2002 2004> y ^= x1;");
+                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 6d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 8d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 11d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                I("RESET; TIME 2001 2004;");
+                I("y = 5;");
+                if (i == 0) I("<2002 2004 d> y = 3;");
+                else I("<2002 2004> y ^= 3;");
+                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 8d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 11d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                I("RESET; TIME 2001 2004;");
+                I("y = 5;");
+                if (i == 0) I("<2002 2004 d> y = (4, 3, 2);");
+                else I("<2002 2004> y ^= (4, 3, 2);");
+                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 9d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 12d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                I("RESET; TIME 2001 2004;");
+                I("y = 5;");
+                if (i == 0) I("<2002 2004 d> y = [4; 3; 2];");
+                else I("<2002 2004> y ^= [4; 3; 2];");
+                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2002, 9d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2003, 12d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+            }
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            return;
+
             I("<2002 2004> y ^= x1;");  //6, 8, 11
             I("<2002 2004 d> y ^= x1;");  //should fail
             I("<2002 2004> y += x1;");  //7, 10, 14
@@ -2677,6 +2739,26 @@ namespace UnitTests
             I("");
             I("");
             I("");
+            I("RESET; TIME 2001 2001;");
+            I("xx = 5;");
+            I("xx += 2;");
+            _AssertSeries(First(), "xx", 2001, 7, sharedDelta);
+            I("xx -= 2;");
+            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
+            I("xx *= 2;");
+            _AssertSeries(First(), "xx", 2001, 10, sharedDelta);
+            I("xx /= 2;");
+            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
+
+            I("%xx = 5;");
+            I("%xx += 2;");
+            _AssertScalarVal(First(), "%xx", 7d);
+            I("%xx -= 2;");
+            _AssertScalarVal(First(), "%xx", 5d);
+            I("%xx *= 2;");
+            _AssertScalarVal(First(), "%xx", 10d);
+            I("%xx /= 2;");
+            _AssertScalarVal(First(), "%xx", 5d);
 
         }
 
