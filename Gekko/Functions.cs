@@ -2039,7 +2039,21 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
         {
-            string s1 = O.GetString(x1);
+            string s1 = "";
+            if (x1.Type() == EVariableType.TimeSeries)
+            {
+                //so that it also accepts a string
+                TimeSeries x1_ts = ((MetaTimeSeries)x1).ts;
+                string db2 = x1_ts.parentDatabank.aliasName;
+                string ts2 = x1_ts.variableName;
+                string temp = ts2;
+                if (db2 != null && db2.Trim() != "") temp = db2 + ":" + temp;
+                s1 = temp;
+            }
+            else
+            {
+                s1 = O.GetString(x1);
+            }
             string s2 = O.GetString(x2);
 
             //TODO TODO

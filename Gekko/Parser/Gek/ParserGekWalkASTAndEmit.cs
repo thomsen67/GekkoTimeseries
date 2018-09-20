@@ -1498,6 +1498,7 @@ namespace Gekko.Parser.Gek
 
                             method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionT2Cs + ", ";
 
+                            int countArguments = 0;
                             for (int i = 0; i < w.uFunctionsHelper.storage.Count; i++)
                             {
                                 FunctionArgumentsHelperElements fah = w.uFunctionsHelper.storage[i];
@@ -1511,10 +1512,12 @@ namespace Gekko.Parser.Gek
                                     //this is a tuple
                                     method += tupleClassName + " " + fah.tupleNameCode;
                                     i = i + (fah.tupleCount - 1);  //we skip the rest of these tuples here!
+                                    countArguments++;
                                 }
                                 else
                                 {
                                     method += "IVariable" + " " + fah.parameterCode;
+                                    countArguments++;
                                 }
                                 method += ", ";
                             }
@@ -1532,7 +1535,7 @@ namespace Gekko.Parser.Gek
                             if (Globals.overloadFix)
                             {
                                 // "xx#3 for function xx with 3 arguments
-                                Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName + "#" + w.uFunctionsHelper.storage.Count, w.uHeaderCs.ToString());
+                                Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName + "#" + countArguments, w.uHeaderCs.ToString());
                             }
                             else
                             {

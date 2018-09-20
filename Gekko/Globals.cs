@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "v14";  // "v14";
+        public static string versionInternal = "";  // "v14";
 
         public static bool JOrderFix = true;
 
