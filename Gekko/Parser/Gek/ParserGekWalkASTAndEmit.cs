@@ -3616,9 +3616,9 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
                             }
                             
-                            node.Code.A(OperatorHelper(null, -1)).End();
+                            node.Code.A(OperatorHelper(null, -Globals.smplOffset)).End();
                             node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                            node.Code.A(OperatorHelper(null, 1)).End();
+                            node.Code.A(OperatorHelper(null, Globals.smplOffset)).End();
 
                             //node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
 
@@ -5601,8 +5601,13 @@ namespace Gekko.Parser.Gek
         {
             //This helper is just to mark the two places it is used
             if (node != null) return "o" + Num(node);
-            if (i == -1) return "smpl.t1 = smpl.t1.Add(-1)";
-            if (i == 1) return "smpl.t1 = smpl.t1.Add(1)";
+            //if (i == -1) return "smpl.t1 = smpl.t1.Add(-1)";
+            //if (i == 1) return "smpl.t1 = smpl.t1.Add(1)";
+
+            //GOOD
+            if (i == -1) return "O.AdjustT0(smpl, -1)";
+            if (i == 1) return "O.AdjustT0(smpl, 1)";
+
             throw new GekkoException();
         }
 

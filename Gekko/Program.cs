@@ -26423,12 +26423,9 @@ namespace Gekko
 
             Table table = new Table();
             table.writeOnce = true;
-
-            GekkoTime t1 = smpl.t1;
-            GekkoTime t2 = smpl.t2;
-
-            int y1 = t1.super;
-            int y2 = t2.super;
+            
+            int y1 = smpl.t1.super;
+            int y2 = smpl.t2.super;
 
             if (numberOfOtherVariables == 0 && numberOfGekkoNullVariables > 0)
             {

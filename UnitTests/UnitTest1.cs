@@ -2629,136 +2629,969 @@ namespace UnitTests
         [TestMethod]
         public void _Test_AssignmentOperators()
         {
+            //First a simple check of <p> x[a] = 3, and <p> x[#i] = 3....
+            //After this, we can be pretty sure that operators work for array-series as for normal series.
+            I("RESET; TIME 2001 2004;");
+            I("x = series(1);");
+            I("x[a] = 5;");
+            I("<2002 2004 d> x[a] = 3;");
+            _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2002, 8d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2003, 11d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2004, 14d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
+            I("RESET; TIME 2001 2004;");
+            I("x = series(1);");
+            I("x[a] = 5;");
+            I("x[b] = 10;");
+            I("#i = a, b;");
+            I("<2002 2004 d> x[#i] = 3;");
+            _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2002, 8d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2003, 11d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2004, 14d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2002, 13d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2003, 16d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2004, 19d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b" }, 2005, double.NaN, sharedDelta);
 
-            //OPERATOR d and ^=
 
-            for (int i = 0; i < 2; i++)
+            // ----------------------------------------------------
+            // OPERATOR d and ^=
+            // 16 combinations:
+            //  - 2: raw series or from map
+            //  - 4: rhs is scalar, series, list or matrix
+            //  - 2: new or old style operator
+            // ----------------------------------------------------
+
+            int count = 0;
+            for (int k = 0; k < 2; k++)
             {
-                I("RESET; TIME 2001 2004;");
-                I("y = 5;");
-                I("x1 = (m(), 1, 2, 3);");
-                if (i == 0) I("<2002 2004 d> y = x1;");
-                else I("<2002 2004> y ^= x1;");
-                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2002, 6d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2003, 8d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2004, 11d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
-            }
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        I("RESET; TIME 2001 2004;");
+                        if (k == 0)
+                        {
+                            I("y = 5;");
+                        }
+                        else
+                        {
+                            I("#m = (y = 5, y2 = 6, %v = 2);"); //only y used, <2001 2004> could be removed when smpl bug is fixed
+                        }
+                        if (j == 0)
+                        {
+                            I("x1 = (m(), 1, 2, 3);");
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 d> y = x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 d> #m.y = x1;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y ^= x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y ^= x1;");
+                                }
+                            }
+                        }
+                        else if (j == 1)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 d> y = (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 d> #m.y = (1, 2, 3);");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y ^= (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y ^= (1, 2, 3);");
+                                }
+                            }
+                        }
+                        else if (j == 2)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 d> y = [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 d> #m.y = [1; 2; 3];");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y ^= [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y ^= [1; 2; 3];");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 d> y = 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 d> #m.y = 3;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y ^= 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y ^= 3;");
+                                }
+                            }
+                        }
 
-            for (int i = 0; i < 2; i++)
-            {
-                I("RESET; TIME 2001 2004;");
-                I("y = 5;");
-                if (i == 0) I("<2002 2004 d> y = 3;");
-                else I("<2002 2004> y ^= 3;");
-                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2002, 8d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2003, 11d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                        if (j == 3)
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 11d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 11d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 14d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 6d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 11d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 11d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                    }
+                }
             }
+            Assert.AreEqual(count, 16);  //safety
 
-            for (int i = 0; i < 2; i++)
-            {
-                I("RESET; TIME 2001 2004;");
-                I("y = 5;");
-                if (i == 0) I("<2002 2004 d> y = (4, 3, 2);");
-                else I("<2002 2004> y ^= (4, 3, 2);");
-                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2002, 9d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2003, 12d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
-            }
 
-            for (int i = 0; i < 2; i++)
+
+
+
+
+            // ----------------------------------------------------
+            // OPERATOR p and %=
+            // 16 combinations:
+            //  - 2: raw series or from map
+            //  - 4: rhs is scalar, series, list or matrix
+            //  - 2: new or old style operator
+            // ----------------------------------------------------
+
+            count = 0;
+            for (int k = 0; k < 2; k++)
             {
-                I("RESET; TIME 2001 2004;");
-                I("y = 5;");
-                if (i == 0) I("<2002 2004 d> y = [4; 3; 2];");
-                else I("<2002 2004> y ^= [4; 3; 2];");
-                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2002, 9d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2003, 12d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2004, 14d, sharedDelta);
-                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        I("RESET; TIME 2001 2004;");
+                        if (k == 0)
+                        {
+                            I("y = 5;");
+                        }
+                        else
+                        {
+                            I("#m = (y = 5, y2 = 6, %v = 2);"); //only y used, <2001 2004> could be removed when smpl bug is fixed
+                        }
+                        if (j == 0)
+                        {
+                            I("x1 = (m(), 1, 2, 3);");
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 p> y = x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 p> #m.y = x1;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y %= x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y %= x1;");
+                                }
+                            }
+                        }
+                        else if (j == 1)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 p> y = (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 p> #m.y = (1, 2, 3);");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y %= (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y %= (1, 2, 3);");
+                                }
+                            }
+                        }
+                        else if (j == 2)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 p> y = [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 p> #m.y = [1; 2; 3];");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y %= [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y %= [1; 2; 3];");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 p> y = 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 p> #m.y = 3;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y %= 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y %= 3;");
+                                }
+                            }
+                        }
+
+                        if (j == 3)
+                        {
+
+
+
+
+
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.03d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.03d * 1.03d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d * 1.03d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.01d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.01d * 1.02d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.01d * 1.02d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.01d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.01d * 1.02d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+
+
+                        }
+                    }
+                }
             }
+            Assert.AreEqual(count, 16);  //safety
 
             
+            // ----------------------------------------------------
+            // OPERATOR m and += (then -= is probably ok too)
+            // 16 combinations:
+            //  - 2: raw series or from map
+            //  - 4: rhs is scalar, series, list or matrix
+            //  - 2: new or old style operator
+            // ----------------------------------------------------
+
+            count = 0;
+            for (int k = 0; k < 2; k++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        I("RESET; TIME 2001 2004;");
+                        if (k == 0)
+                        {
+                            I("y = 5;");
+                        }
+                        else
+                        {
+                            I("#m = (y = 5, y2 = 6, %v = 2);"); //only y used, <2001 2004> could be removed when smpl bug is fixed
+                        }
+                        if (j == 0)
+                        {
+                            I("x1 = (m(), 1, 2, 3);");
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 m> y = x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 m> #m.y = x1;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y += x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y += x1;");
+                                }
+                            }
+                        }
+                        else if (j == 1)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 m> y = (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 m> #m.y = (1, 2, 3);");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y += (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y += (1, 2, 3);");
+                                }
+                            }
+                        }
+                        else if (j == 2)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 m> y = [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 m> #m.y = [1; 2; 3];");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y += [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y += [1; 2; 3];");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 m> y = 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 m> #m.y = 3;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y += 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y += 3;");
+                                }
+                            }
+                        }
+
+                        if (j == 3)
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 6d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 7d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 8d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 7d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            Assert.AreEqual(count, 16);  //safety
+
+
+
+
+            // ----------------------------------------------------
+            // OPERATOR q and *= (then /= is probably ok too)
+            // 16 combinations:
+            //  - 2: raw series or from map
+            //  - 4: rhs is scalar, series, list or matrix
+            //  - 2: new or old style operator
+            // ----------------------------------------------------
+
+            count = 0;
+            for (int k = 0; k < 2; k++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        I("RESET; TIME 2001 2004;");
+                        if (k == 0)
+                        {
+                            I("y = 5;");
+                        }
+                        else
+                        {
+                            I("#m = (y = 5, y2 = 6, %v = 2);"); //only y used, <2001 2004> could be removed when smpl bug is fixed
+                        }
+                        if (j == 0)
+                        {
+                            I("x1 = (m(), 1, 2, 3);");
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 q> y = x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 q> #m.y = x1;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y *= 1+x1/100;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y *= 1+x1/100;");
+                                }
+                            }
+                        }
+                        else if (j == 1)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 q> y = (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 q> #m.y = (1, 2, 3);");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y *= (1.01, 1.02, 1.03);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y *= (1.01, 1.02, 1.03);");
+                                }
+                            }
+                        }
+                        else if (j == 2)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 q> y = [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 q> #m.y = [1; 2; 3];");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y *= [1.01; 1.02; 1.03];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y *= [1.01; 1.02; 1.03];");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 q> y = 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 q> #m.y = 3;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y *= 1.03;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y *= 1.03;");
+                                }
+                            }
+                        }
+
+                        if (j == 3)
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.01d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.02d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            Assert.AreEqual(count, 16);  //safety
 
 
 
 
 
+            // ----------------------------------------------------
+            // OPERATOR mp and #=
+            // 16 combinations:
+            //  - 2: raw series or from map
+            //  - 4: rhs is scalar, series, list or matrix
+            //  - 2: new or old style operator
+            // ----------------------------------------------------
+
+            count = 0;
+            for (int k = 0; k < 2; k++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        I("RESET; TIME 2001 2004;");
+                        if (k == 0)
+                        {
+                            //growth: 1%
+                            I("y = (5, 5*1.01, 5*1.01*1.01, 5*1.01*1.01*1.01);");
+                        }
+                        else
+                        {
+                            //growth: 1%
+                            I("#m = (y = (5, 5*1.01, 5*1.01*1.01, 5*1.01*1.01*1.01), y2 = 6, %v = 2);"); //only y used, <2001 2004> could be removed when smpl bug is fixed
+                        }
+                        if (j == 0)
+                        {
+                            I("x1 = (m(), 1, 2, 3);");
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 mp> y = x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 mp> #m.y = x1;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y #= x1;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y #= x1;");
+                                }
+                            }
+                        }
+                        else if (j == 1)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 mp> y = (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 mp> #m.y = (1, 2, 3);");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y #= (1, 2, 3);");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y #= (1, 2, 3);");
+                                }
+                            }
+                        }
+                        else if (j == 2)
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 mp> y = [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 mp> #m.y = [1; 2; 3];");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y #= [1; 2; 3];");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y #= [1; 2; 3];");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004 mp> y = 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004 mp> #m.y = 3;");
+                                }
+                            }
+                            else
+                            {
+                                if (k == 0)
+                                {
+                                    I("<2002 2004> y #= 3;");
+                                }
+                                else
+                                {
+                                    I("<2002 2004> #m.y #= 3;");
+                                }
+                            }
+                        }
+
+                        if (j == 3)
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.04d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.04d * 1.04d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.04d * 1.04d * 1.04d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.04d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.04d * 1.04d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                        else
+                        {
+                            if (k == 0)
+                            {
+                                _AssertSeries(First(), "y!a", 2000, double.NaN, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2001, 5d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2002, 5d * 1.02d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2003, 5d * 1.02d * 1.03d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2004, 5d * 1.02d * 1.03d * 1.04d, sharedDelta);
+                                _AssertSeries(First(), "y!a", 2005, double.NaN, sharedDelta);
+                                count++;
+                            }
+                            else
+                            {
+                                Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
+                                Series y = m.GetIVariable("y!a") as Series;
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.02d * 1.03d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            Assert.AreEqual(count, 16);  //safety
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            return;
-
-            I("<2002 2004> y ^= x1;");  //6, 8, 11
-            I("<2002 2004 d> y ^= x1;");  //should fail
-            I("<2002 2004> y += x1;");  //7, 10, 14
-            I("<2002 2004 d> y += x1;");  //should fail
-
-            I("#m = (<2002 2004> y = x1);");  //1, 2, 3
-            I("#m = (<2002 2004 d> y = x1);");  //should fail
-            I("#m = (<2002 2004> y ^= x1);");  //should fail
-            I("#m = (<2002 2004> y += x1);");  //should fail
-
-            //probably also tests #m[2], #m['y'], #m[y]
-            I("<2002 2004 d> #m.y = x1;");  //6, 8, 11
-            I("<2002 2004> #m.y ^= x1;");  //6, 8, 11
-            I("<2002 2004 d> #m.y ^= x1;");  //should fail
-            I("<2002 2004> #m.y += x1;");  //7, 10, 14
-            I("<2002 2004 d> #m.y += x1;");  //should fail
-            
-            I("");
-            I("");
-            I("");
-            I("RESET; TIME 2001 2001;");
-            I("xx = 5;");
-            I("xx += 2;");
-            _AssertSeries(First(), "xx", 2001, 7, sharedDelta);
-            I("xx -= 2;");
-            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
-            I("xx *= 2;");
-            _AssertSeries(First(), "xx", 2001, 10, sharedDelta);
-            I("xx /= 2;");
-            _AssertSeries(First(), "xx", 2001, 5, sharedDelta);
-
-            I("%xx = 5;");
-            I("%xx += 2;");
-            _AssertScalarVal(First(), "%xx", 7d);
-            I("%xx -= 2;");
-            _AssertScalarVal(First(), "%xx", 5d);
-            I("%xx *= 2;");
-            _AssertScalarVal(First(), "%xx", 10d);
-            I("%xx /= 2;");
-            _AssertScalarVal(First(), "%xx", 5d);
 
         }
 

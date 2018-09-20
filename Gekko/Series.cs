@@ -1365,15 +1365,58 @@ namespace Gekko
             if (windowNew2.StrictlyLargerThan(window2)) window2 = windowNew2;
         }
 
-        private void PrepareInput(IVariable input, out Series x1, out Series x2_series, out double x2_val)
+        private void PrepareInput(GekkoSmpl smpl, IVariable input, out Series x1, out Series x2_series, out double x2_val)
         {
             x1 = this;
-            IVariable x2 = input;  //inknown type
+            IVariable x2 = input;  //unknown type
             x2_val = double.NaN;
             x2_series = input as Series;
             if (x2_series == null)
             {
-                x2_val = x2.ConvertToVal();  //VAL or 1x1 MATRIX is ok
+                if (x2.Type() == EVariableType.List)
+                {
+                    //For instance y = x + (1, 2, 3), returns a series light for (1, 2, 3), over local sample, and with same freq as sample
+                    List x2_list = x2 as List;
+                    if (x2_list.Count() != smpl.Observations12())
+                    {
+                        G.Writeln2("*** ERROR: List with " + x2_list.Count() + " elements, expected " + smpl.Observations12() + " elements corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
+                        throw new GekkoException();
+                    }
+                    Series ts = new Series(ESeriesType.Light, smpl.t1, smpl.t2);  //new series light
+                    int i = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        i++;
+                        double d = x2_list.list[i].ConvertToVal();
+                        ts.SetData(t, d);
+                    }
+                    x2_series = ts;
+                }
+                else if (x2.Type() == EVariableType.Matrix && ((Matrix)x2).data.Length > 1)
+                {
+                    //a matrix, not 1x1 (caught below)
+                    //For instance y = x + [1; 2; 3], returns a series light for [1; 2; 3], over local sample, and with same freq as sample
+                    Matrix x2_matrix = x2 as Matrix;
+                    if (x2_matrix.data.GetLength(0) != smpl.Observations12() || x2_matrix.data.GetLength(1) != 1)
+                    {
+                        G.Writeln2("*** ERROR: " + x2_matrix.DimensionsAsString() + " elements, expected a " + smpl.Observations12() + " x 1 matrix corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
+                        throw new GekkoException();
+                    }
+                    Series ts = new Series(ESeriesType.Light, smpl.t1, smpl.t2);  //new series light
+                    
+                    int i = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        i++;
+                        double d = x2_matrix.data[i, 0];
+                        ts.SetData(t, d);
+                    }
+                    x2_series = ts;
+                }
+                else
+                {
+                    x2_val = x2.ConvertToVal();  //VAL or 1x1 MATRIX is ok
+                }
             }
             else
             {
@@ -1426,7 +1469,7 @@ namespace Gekko
             //-------------------------------------
 
             Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+            PrepareInput(smpl, input, out x1_series, out x2_series, out x2_val);
 
             Func<double, double, double> a = Globals.arithmentics[0];  //(x1, x2) => x1 + x2;
 
@@ -1446,7 +1489,7 @@ namespace Gekko
             //-------------------------------------
 
             Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+            PrepareInput(smpl, input, out x1_series, out x2_series, out x2_val);
 
             Func<double, double, double> a = Globals.arithmentics[2]; //(x1, x2) => x1 - x2;
 
@@ -1466,7 +1509,7 @@ namespace Gekko
             //-------------------------------------
 
             Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+            PrepareInput(smpl, input, out x1_series, out x2_series, out x2_val);
 
             Func<double, double, double> a = Globals.arithmentics[4]; //(x1, x2) => x1 * x2;
 
@@ -1485,7 +1528,7 @@ namespace Gekko
             //-------------------------------------
 
             Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+            PrepareInput(smpl, input, out x1_series, out x2_series, out x2_val);
 
             Func<double, double, double> a = Globals.arithmentics[6]; //(x1, x2) => x1 / x2;
 
@@ -1505,7 +1548,7 @@ namespace Gekko
             //-------------------------------------
 
             Series x1_series, x2_series; double x2_val;
-            PrepareInput(input, out x1_series, out x2_series, out x2_val);
+            PrepareInput(smpl, input, out x1_series, out x2_series, out x2_val);
 
             Func<double, double, double> a = Globals.arithmentics[8]; //(x1, x2) => Math.Pow(x1, x2);
 

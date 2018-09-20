@@ -123,7 +123,7 @@ namespace Gekko
                 string s = null;
                 if (index.Type() == EVariableType.Val) s += "" + O.ConvertToInt(index);
                 else if (index.Type() == EVariableType.Range) s += "" + O.ConvertToInt(((Range)index).first) + ".." + O.ConvertToInt(((Range)index).first);
-                G.Writeln("*** ERROR: You are trying to use [" + s + "] on a " + d1 + "x" + d2 + " matrix");
+                G.Writeln("*** ERROR: You are trying to use [" + s + "] on a " + d1 + " x " + d2 + " matrix");
                 G.Writeln("           This notation can only be used regarding nx1 matrices (column vectors)");
                 throw new GekkoException();
             }
@@ -332,7 +332,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + "x" + this.data.GetLength(1) + " matrix.");
+                G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a VAL from a " + this.data.GetLength(0) + " x " + this.data.GetLength(1) + " matrix.");
                 throw new GekkoException();
             }
         }
@@ -341,6 +341,11 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: Type mismatch: you are trying to extract a STRING from a matrix.");
             throw new GekkoException();
+        }
+
+        public string DimensionsAsString()
+        {
+            return this.data.GetLength(0) + " x " + this.data.GetLength(1);
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
@@ -389,7 +394,7 @@ namespace Gekko
                         if (b.GetLength(0) != m || b.GetLength(1) != k)
                         {
                             G.Writeln2("*** ERROR: The two matrices are not compatible for addition");
-                            G.Writeln2("           " + m + "x" + k + " and " + b.GetLength(0) + "x" + b.GetLength(1) + " do not match");
+                            G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                             throw new GekkoException();
                         }
                         double[,] c = O.AddMatrixMatrix(a, b, m, k);
@@ -424,7 +429,7 @@ namespace Gekko
                 if (b.GetLength(0) != m || b.GetLength(1) != k)
                 {
                     G.Writeln2("*** ERROR: The two matrices are not compatible for subtraction");
-                    G.Writeln2("           " + m + "x" + k + " and " + b.GetLength(0) + "x" + b.GetLength(1) + " do not match");
+                    G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                     throw new GekkoException();
                 }
                 double[,] c = O.SubtractMatrixMatrix(a, b, m, k);
@@ -475,7 +480,7 @@ namespace Gekko
                     if (k != p)
                     {
                         G.Writeln2("*** ERROR: The two matrices are not compatible for multiplication");
-                        G.Writeln2("           " + m + "x" + k + " and " + b.GetLength(0) + "x" + b.GetLength(1) + " do not match");
+                        G.Writeln2("           " + m + " x " + k + " and " + b.GetLength(0) + " x " + b.GetLength(1) + " do not match");
                     }
                     double[,] c = null;
 
@@ -695,7 +700,7 @@ namespace Gekko
                 int dimJ = j2 - j1 + 1;
                 if (dimI != m.data.GetLength(0) || dimJ != m.data.GetLength(1))
                 {
-                    G.Writeln2("*** ERROR: Left-hand side selection is " + dimI + "x" + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + "x" + m.data.GetLength(1));
+                    G.Writeln2("*** ERROR: Left-hand side selection is " + dimI + " x " + dimJ + ", but right-hand matrix is " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
                     throw new GekkoException();
                 }
 

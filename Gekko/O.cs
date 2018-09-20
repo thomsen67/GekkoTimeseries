@@ -1829,7 +1829,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + "x" + m.data.GetLength(1) + " MATRIX to " + n + " obs SERIES");
+                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + " x " + m.data.GetLength(1) + " MATRIX to " + n + " obs SERIES");
                     throw new GekkoException();
                 }
             }
@@ -2717,12 +2717,12 @@ namespace Gekko
                             }
 
                             //int offset = 1;
-                            double[] rhs_data = new double[n + Globals.offset];
+                            double[] rhs_data = new double[n + Globals.smplOffset];
                             for (int i = 0; i < rhs_list.list.Count; i++)
                             {
-                                rhs_data[i + Globals.offset] = rhs_list.list[i].ConvertToVal();
+                                rhs_data[i + Globals.smplOffset] = rhs_list.list[i].ConvertToVal();
                             }
-                            for (int i = 0; i < Globals.offset; i++)
+                            for (int i = 0; i < Globals.smplOffset; i++)
                             {
                                 rhs_data[i] = double.NaN;
                             }
@@ -2732,7 +2732,7 @@ namespace Gekko
                                 //then lastElementStar = true
                                 for (int i = rhs_list.list.Count; i < n; i++)
                                 {
-                                    rhs_data[i + Globals.offset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
+                                    rhs_data[i + Globals.smplOffset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
                                 }
                             }
 
@@ -2740,7 +2740,7 @@ namespace Gekko
                             {
                                 for (int i = 0; i < n; i++)
                                 {
-                                    lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.offset]);
+                                    lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
                                 }
                             }
                             else
@@ -2803,7 +2803,7 @@ namespace Gekko
                                 int n = smpl.Observations12();
                                 if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
                                 {
-                                    G.Writeln2("*** ERROR: Expected " + n + "x1 matrix, got " + rhs_matrix.data.GetLength(0) + "x" + rhs_matrix.data.GetLength(1));
+                                    G.Writeln2("*** ERROR: Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
                                     throw new GekkoException();
                                 }
                                 if (operatorType == ESeriesUpdTypes.none)
@@ -2817,13 +2817,13 @@ namespace Gekko
                                 {
                                     //rhs_matrix.data[i, 0]
 
-                                    //int offset = 1;
-                                    double[] rhsData = new double[smpl.Observations12() + Globals.offset];
+                                    //int offset = 1;                                    
+                                    double[] rhsData = new double[smpl.Observations12() + Globals.smplOffset];
                                     for (int i = 0; i < n; i++)
                                     {
-                                        rhsData[i + Globals.offset] = rhs_matrix.data[i, 0];
+                                        rhsData[i + Globals.smplOffset] = rhs_matrix.data[i, 0];
                                     }
-                                    for (int i = 0; i < Globals.offset; i++)
+                                    for (int i = 0; i < Globals.smplOffset; i++)
                                     {
                                         //just safety, probably not necessary
                                         rhsData[i] = double.NaN;
@@ -2883,7 +2883,7 @@ namespace Gekko
             double[] rhsData, lhsData, lhsDataOriginal; //int offset = 1;
             OperatorHelper1(smpl, lhs_series, rhs_series, double.NaN, out lhsData, out lhsDataOriginal, out rhsData);
             OperatorHelper2(smpl, operatorType, lhsData, lhsDataOriginal, rhsData);
-            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.offset);
+            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.smplOffset);
         }
 
         private static void OperatorHelperSequence(GekkoSmpl smpl, Series lhs_series, double[] rhsData, ESeriesUpdTypes operatorType)
@@ -2893,7 +2893,7 @@ namespace Gekko
             double[] lhsData = null, lhsDataOriginal = null;
             OperatorHelper1a(smpl, lhs_series, out lhsData, out lhsDataOriginal);
             OperatorHelper2(smpl, operatorType, lhsData, lhsDataOriginal, rhsData);
-            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.offset);
+            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.smplOffset);
         }
 
         private static void OperatorHelperScalar(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, double d)
@@ -2901,18 +2901,18 @@ namespace Gekko
             double[] rhsData, lhsData, lhsDataOriginal; //int offset = 1;
             OperatorHelper1(smpl, lhs_series, null, d, out lhsData, out lhsDataOriginal, out rhsData);
             OperatorHelper2(smpl, operatorType, lhsData, lhsDataOriginal, rhsData);
-            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.offset);
+            lhs_series.SetDataSequence(smpl.t1, smpl.t2, lhsData, Globals.smplOffset);
         }
 
         private static void OperatorHelper1(GekkoSmpl smpl, Series lhs_series, Series rhs_series, double rhs_scalar, out double[] lhsData, out double[] lhsDataOriginal, out double[] rhsData)
         {
-            rhsData = new double[smpl.Observations12() + Globals.offset];
-            lhsDataOriginal = new double[smpl.Observations12() + Globals.offset];
-            lhsData = new double[smpl.Observations12() + Globals.offset];
+            rhsData = new double[smpl.Observations12() + Globals.smplOffset];
+            lhsDataOriginal = new double[smpl.Observations12() + Globals.smplOffset];
+            lhsData = new double[smpl.Observations12() + Globals.smplOffset];
             //for (i = 0; i < offset; i++) lhsDataNew[i] = double.NaN;
 
             int i = 0;
-            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1.Add(-Globals.offset), smpl.t2))
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1.Add(-Globals.smplOffset), smpl.t2))
             {
                 //slack: could be array-copy
                 if (rhs_series == null)
@@ -2932,12 +2932,12 @@ namespace Gekko
         private static void OperatorHelper1a(GekkoSmpl smpl, Series lhs_series, out double[] lhsData, out double[] lhsDataOriginal)
         {
             //rhsData = new double[smpl.Observations12() + offset];
-            lhsDataOriginal = new double[smpl.Observations12() + Globals.offset];
-            lhsData = new double[smpl.Observations12() + Globals.offset];
+            lhsDataOriginal = new double[smpl.Observations12() + Globals.smplOffset];
+            lhsData = new double[smpl.Observations12() + Globals.smplOffset];
             //for (i = 0; i < offset; i++) lhsDataNew[i] = double.NaN;
 
             int i = 0;
-            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1.Add(-Globals.offset), smpl.t2))
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1.Add(-Globals.smplOffset), smpl.t2))
             {
                 //slack: could be array-copy
                 //if (rhs_series == null)
@@ -2956,7 +2956,7 @@ namespace Gekko
 
         private static void OperatorHelper2(GekkoSmpl smpl, ESeriesUpdTypes operatorType, double[] lhsData, double[] lhsDataOriginal, double[] rhsData)
         {
-            int i = Globals.offset;  //offset = 2
+            int i = Globals.smplOffset;  //offset = 2
             foreach (GekkoTime t in smpl.Iterate12())
             {
                 double d = double.NaN;
@@ -2996,6 +2996,11 @@ namespace Gekko
             else if (G.Equal(options.opt_q, "yes")) operatorType = ESeriesUpdTypes.q;
             else if (G.Equal(options.opt_mp, "yes")) operatorType = ESeriesUpdTypes.mp;
             return operatorType;
+        }
+
+        public static void AdjustT0(GekkoSmpl smpl, int i)
+        {            
+            smpl.t0.Add(i);            
         }
 
         private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type)
