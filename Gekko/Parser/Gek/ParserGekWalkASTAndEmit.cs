@@ -1051,11 +1051,11 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 string a = node[1][0].AlternativeCode.ToString();
-                                if (Globals.runningOnTTComputer)
-                                {
-                                    //G.Writeln2("--> " + a);
-                                    node.Code.A("G.Writeln2(` ---> ` + O.ConvertToString(" + a + "));" + G.NL);
-                                }
+                                //if (Globals.runningOnTTComputer)
+                                //{
+                                //    //G.Writeln2("--> " + a);
+                                //    node.Code.A("G.Writeln2(` ---> ` + O.ConvertToString(" + a + "));" + G.NL);
+                                //}
                                 
                                 //node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
                                 //node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
@@ -1459,27 +1459,44 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTOR":
                         {                            
-                            node.Code.A("((");
+                            //node.Code.A("((");
+                            //node.Code.A(node[0].Code);
+                            //node.Code.A(") || (");
+                            //node.Code.A(node[1].Code);
+                            //node.Code.A("))");
+
+                            node.Code.A("O.LogicalOr(smpl, ");
                             node.Code.A(node[0].Code);
-                            node.Code.A(") || (");
+                            node.Code.A(", ");
                             node.Code.A(node[1].Code);
-                            node.Code.A("))");
+                            node.Code.A(")");
                         }
                         break;                    
                     case "ASTAND":                    
                         {
-                            node.Code.A("((");
+                            //node.Code.A("((");
+                            //node.Code.A(node[0].Code);
+                            //node.Code.A(") && (");
+                            //node.Code.A(node[1].Code);
+                            //node.Code.A("))");
+
+                            node.Code.A("O.LogicalAnd(smpl, ");
                             node.Code.A(node[0].Code);
-                            node.Code.A(") && (");
+                            node.Code.A(", ");
                             node.Code.A(node[1].Code);
-                            node.Code.A("))");
+                            node.Code.A(")");
+
                         }
                         break;                    
                     case "ASTNOT":
                         {
-                            node.Code.A("!(");
-                            node.Code.A(node[0].Code);                            
-                            node.Code.A(")");
+                            //node.Code.A("!(");
+                            //node.Code.A(node[0].Code);                            
+                            //node.Code.A(")");
+
+                            node.Code.A("O.LogicalNot(smpl, ");
+                            node.Code.A(node[0].Code);
+                            node.Code.A(")");                            
                         }
                         break;
                     case "ASTCOMPARE2":
@@ -1554,7 +1571,7 @@ namespace Gekko.Parser.Gek
                             }
                             else if (op == "ASTIFOPERATOR2") //"<>"
                             {
-                                node.Code.A("!O.Equals(smpl, " + code1 + "," + code2 + ")");
+                                node.Code.A("O.NonEquals(smpl, " + code1 + "," + code2 + ")");
                             }
                         }
                         break;
@@ -5600,14 +5617,8 @@ namespace Gekko.Parser.Gek
         private static string OperatorHelper(ASTNode node, int i)
         {
             //This helper is just to mark the two places it is used
-            if (node != null) return "o" + Num(node);
-            //if (i == -1) return "smpl.t1 = smpl.t1.Add(-1)";
-            //if (i == 1) return "smpl.t1 = smpl.t1.Add(1)";
-
-            //GOOD
-            if (i == -1) return "O.AdjustT0(smpl, -1)";
-            if (i == 1) return "O.AdjustT0(smpl, 1)";
-
+            if (node != null) return "o" + Num(node);                       
+            return "O.AdjustT0(smpl, " + i + ")";
             throw new GekkoException();
         }
 

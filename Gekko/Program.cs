@@ -25277,6 +25277,58 @@ namespace Gekko
             else G.Writeln("Deleted " + counter + " variables");
         }
 
+        public static void Combine(List<IVariable> input, List<List<string>> output, int depth, Stack<string> stack)
+        {
+            //could have cleaner interface, but never mind it works
+            
+            //input may be for instance a list: ('a', #i, 'x', #j), where we need to unfold
+            //the second element and last
+
+            if (depth == 0)  //use stack?
+            {
+                //first index                
+            }
+
+            if (depth == input.Count)
+            {
+                //we are beyond the length of input
+
+                List<string> temp = new List<string>(stack.Reverse());
+                output.Add(temp);
+                stack.Pop();
+                return;
+            }
+
+            IVariable iv = input[depth];
+
+            if (iv.Type() == EVariableType.String)
+            {
+                string s = iv.ConvertToString();
+                //output[output.Count - 1].Add(s);
+                stack.Push(s);
+                Combine(input, output, depth + 1, stack);
+
+            }
+            else if (iv.Type() == EVariableType.List)
+            {
+                foreach (IVariable iv2 in ((List)iv).list)
+                {
+                    string s = iv2.ConvertToString();
+                    //output[output.Count - 1].Add(s);
+                    stack.Push(s);
+                    Combine(input, output, depth + 1, stack);
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected indices to be of string or list type");
+                throw new GekkoException();
+            }
+            if(depth > 0) stack.Pop();
+            return;
+        }
+
+
         public static double[,] InvertMatrix(double[,] matrix)
         {
             int success = 0;

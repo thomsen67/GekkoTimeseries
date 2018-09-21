@@ -2411,35 +2411,75 @@ namespace UnitTests
         [TestMethod]
         public void _Test_EndoExo()
         {
-            I("reset;");
-            I("%s1 = 'a';");
-            I("string %s2 = 'x';");
+            //
+            //exo x1[a, b] <2002 2004>, y1 <2001 2002>;
+            //endo <2003 2005> x2[a, b] <2001 2001>, y2;
+            //time 2000 2010;
+            //p<n> exo_x1[a, b], exo_y1;
+            //p<n> endo_x2[a, b], endo_y2;
 
-            I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
-            I("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
+            for (int i = 0; i < 2; i++)
+            {
 
-            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2001, double.NaN, sharedDelta);
-            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2003, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2004, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2005, double.NaN, sharedDelta);
+                I("reset;");
+                I("%s1 = 'a';");
+                I("string %s2 = 'x';");
+                I("#a = ('a', 'b');");
+                I("#k1 = ('k1',);");
 
-            _AssertSeries(First(), "exo_y", 2003, double.NaN, sharedDelta);
-            _AssertSeries(First(), "exo_y", 2004, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_y", 2005, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_y", 2006, 1d, sharedDelta);
-            _AssertSeries(First(), "exo_y", 2007, double.NaN, sharedDelta);
+                if (i == 0)
+                {
+                    I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
+                    I("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
+                }
+                else
+                {
+                    I("exo {%s2}[#a, #k1] <2002 2004>, y<2004 2006>;");
+                    I("endo <2003 2005> x[#a, #k1]<2001 2002>, y;");
+                }
 
-            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2000, double.NaN, sharedDelta);
-            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2001, 1d, sharedDelta);
-            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
-            _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2003, double.NaN, sharedDelta);
+                _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2001, double.NaN, sharedDelta);
+                _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2003, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2004, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_x", new string[] { "a", "k1" }, 2005, double.NaN, sharedDelta);
 
-            _AssertSeries(First(), "endo_y", 2002, double.NaN, sharedDelta);
-            _AssertSeries(First(), "endo_y", 2003, 1d, sharedDelta);
-            _AssertSeries(First(), "endo_y", 2004, 1d, sharedDelta);
-            _AssertSeries(First(), "endo_y", 2005, 1d, sharedDelta);
-            _AssertSeries(First(), "endo_y", 2006, double.NaN, sharedDelta);
+                if (i == 1)
+                {
+                    _AssertSeries(First(), "exo_x", new string[] { "b", "k1" }, 2001, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "exo_x", new string[] { "b", "k1" }, 2002, 1d, sharedDelta);
+                    _AssertSeries(First(), "exo_x", new string[] { "b", "k1" }, 2003, 1d, sharedDelta);
+                    _AssertSeries(First(), "exo_x", new string[] { "b", "k1" }, 2004, 1d, sharedDelta);
+                    _AssertSeries(First(), "exo_x", new string[] { "b", "k1" }, 2005, double.NaN, sharedDelta);
+                }
+
+                _AssertSeries(First(), "exo_y", 2003, double.NaN, sharedDelta);
+                _AssertSeries(First(), "exo_y", 2004, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_y", 2005, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_y", 2006, 1d, sharedDelta);
+                _AssertSeries(First(), "exo_y", 2007, double.NaN, sharedDelta);
+
+                
+                _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2001, 1d, sharedDelta);
+                _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
+                _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2003, double.NaN, sharedDelta);
+
+                if (i == 1)
+                {
+                    _AssertSeries(First(), "endo_x", new string[] { "b", "k1" }, 2000, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "endo_x", new string[] { "b", "k1" }, 2001, 1d, sharedDelta);
+                    _AssertSeries(First(), "endo_x", new string[] { "b", "k1" }, 2002, 1d, sharedDelta);
+                    _AssertSeries(First(), "endo_x", new string[] { "b", "k1" }, 2003, double.NaN, sharedDelta);
+
+                }
+
+                _AssertSeries(First(), "endo_y", 2002, double.NaN, sharedDelta);
+                _AssertSeries(First(), "endo_y", 2003, 1d, sharedDelta);
+                _AssertSeries(First(), "endo_y", 2004, 1d, sharedDelta);
+                _AssertSeries(First(), "endo_y", 2005, 1d, sharedDelta);
+                _AssertSeries(First(), "endo_y", 2006, double.NaN, sharedDelta);
+            }
 
         }
 
@@ -2627,8 +2667,45 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Assignment()
+        {
+            //There were some problems with glue and percent/hash, checked here
+            I("RESET;");
+            I("@%a = 100;");
+            _AssertScalarVal(Ref(), "%a", 100d);
+            I("@#a = (100, 200);");
+            _AssertListVal(Ref(), "#a", 1, 100d, sharedDelta);
+            _AssertListVal(Ref(), "#a", 2, 200d, sharedDelta);
+            I("x=100;");
+            I("x%=2;"); //just testing syntax 
+            I("x#=2;"); //just testing syntax
+            I("@x=100;");
+            I("@x%=2;"); //just testing syntax 
+            I("@x#=2;"); //just testing syntax
+            I("@%a%=2;"); //just testing syntax, should fail afterwards 
+            I("@%a#=2;"); //just testing syntax, should fail afterwards
+
+
+
+        }
+
+        [TestMethod]
         public void _Test_AssignmentOperators()
         {
+            // test of <keep=p>
+            I("RESET; TIME 2001 2006;");
+            I("x = (0.5, 1.5, 1, 1.01, 1.01*1.03, 1.01*1.03*1.05);"); //1%, 3%, 5%            
+            I("<2001 2003 m keep=p> x = 2;");  //adds 2 in 2001-2003, then follow old growth
+            _AssertSeries(First(), "x", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", 2001, 2.5d, sharedDelta);
+            _AssertSeries(First(), "x", 2002, 3.5d, sharedDelta);
+            _AssertSeries(First(), "x", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "x", 2004, 3d * 1.01d, sharedDelta);
+            _AssertSeries(First(), "x", 2005, 3d * 1.01d * 1.03d, sharedDelta);
+            _AssertSeries(First(), "x", 2006, 3d * 1.01d * 1.03d * 1.05d, sharedDelta);            
+            _AssertSeries(First(), "x", 2007, double.NaN, sharedDelta);
+
+
             //First a simple check of <p> x[a] = 3, and <p> x[#i] = 3....
             //After this, we can be pretty sure that operators work for array-series as for normal series.
             I("RESET; TIME 2001 2004;");
@@ -3589,7 +3666,7 @@ namespace UnitTests
             Assert.AreEqual(count, 16);  //safety
 
 
-
+            
 
 
 
@@ -5241,136 +5318,151 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__ArrayTimeSeries()
+        public void _Test__ArrayTimeSeries()
         {
             Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
             Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
             I("RESET; MODE data; TIME 2000;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
-            I("ASER x['a', 'b', 'c'] = 3;");
-            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2001, double.NaN, sharedDelta);
-            //I("ASER x['a', 'b', 'd'] = 4;");
-            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 1999, double.NaN, sharedDelta);
-            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2000, 4, sharedDelta);
-            //AssertHelper(First(), "x", new string[] { "a", "b", "d" }, 2001, double.NaN, sharedDelta);
-            I("ASER y['d', 'e'] = x['a', 'b', 'c'];");
-            AssertHelper(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
-            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
-            AssertHelper(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
+            I("SER x = series(3);");
+            I("SER x['a', 'b', 'c'] = 3;");
+            _AssertSeries(First(), "x", new string[] { "a", "b", "c" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "b", "c" }, 2001, double.NaN, sharedDelta);
+
+            I("SER y = series(2);");
+            I("y['d', 'e'] = x['a', 'b', 'c'];");
+            _AssertSeries(First(), "y", new string[] { "d", "e" }, 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+            _AssertSeries(First(), "y", new string[] { "d", "e" }, 2001, double.NaN, sharedDelta);
 
             I("SERIES z = 100;"); //normal
 
             I("WRITE arrayts;");
 
+           
             // ------ test of read and write
 
             I("RESET; MODE data; TIME 2000;");
             I("READ arrayts;");
             //FIXME, should report 3
-            Assert.AreEqual(First().storage.Count, 5);
-            AssertHelper(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
-            AssertHelper(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
-            AssertHelper(First(), "z", 2000, 100, sharedDelta);
+            Assert.AreEqual(First().storage.Count, 3);
+            _AssertSeries(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
+            _AssertSeries(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
+            _AssertSeries(First(), "z", 2000, 100, sharedDelta);
+                       
 
             // --------------------------------
             // looping with lists
             // --------------------------------
 
             I("RESET; MODE data; TIME 2000;");
-            I("LIST i = a, b;");
-            I("LIST j = x, y;");
-            I("ASER y['a', 'x'] = 100;");
-            I("ASER y['a', 'y'] = 101;");
-            I("ASER y['b', 'x'] = 102;");
-            I("ASER y['b', 'y'] = 103;");
-            I("ASER z['x'] = 1000;");
-            I("ASER z['y'] = 1001;");
-            I("ASER x[#i, #j] = 1 + y[#i, #j] + z[#j];");
+            I("LIST #i = a, b;");
+            I("LIST #j = x, y;");
+            I("y = series(2);");            
+            I("y['a', 'x'] = 100;");
+            I("y['a', 'y'] = 101;");
+            I("y['b', 'x'] = 102;");
+            I("y['b', 'y'] = 103;");
+            I("z = series(1);");
+            I("z['x'] = 1000;");
+            I("z['y'] = 1001;");
+            I("x = series(2);");
+            I("x[#i, #j] = 1 + y[#i, #j] + z[#j];");
 
-            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
 
+            
 
             // --------------------------------
             // looping with lists and dollar
             // --------------------------------
 
             I("RESET; MODE data; TIME 2000;");
-            I("LIST i = a, b, c;");
-            I("LIST i0 = a, b;");
-            I("LIST j = x, y;");
-            I("ASER y['a', 'x'] = 100;");
-            I("ASER y['a', 'y'] = 101;");
-            I("ASER y['b', 'x'] = 102;");
-            I("ASER y['b', 'y'] = 103;");
-            I("ASER z['x'] = 1000;");
-            I("ASER z['y'] = 1001;");
-            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
-            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101d, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103d, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1103d, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1105d, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001d, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002d, sharedDelta);
+            I("option series array calc missing = m;");  //necessary, else it crashes, #784325345435
+            I("LIST #i = a, b, c;");
+            I("LIST #i0 = a, b;");
+            I("LIST #j = x, y;");
+            I("y = series(2); z = series(1); x = series(2);");
+            I("y['a', 'x'] = 100;");
+            I("y['a', 'y'] = 101;");
+            I("y['b', 'x'] = 102;");
+            I("y['b', 'y'] = 103;");
+            I("z['x'] = 1000;");
+            I("z['y'] = 1001;");
+            I("x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1101d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1103d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1103d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1105d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "x" }, 2000, 1001d, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002d, sharedDelta);
             I("SER sum = sum(#i0, sum(#j, y[#i0, #j]));");
-            AssertHelper(First(), "sum", EFreq.A, 2000, 1, 406d, sharedDelta);
+            _AssertSeries(First(), "sum", EFreq.A, 2000, 1, 406d, sharedDelta);
             //TODO: I("SER sum = sum(#i $ #i0[#i], sum(#j, y[#i0, #j]));");
             //TODO: I("ASER x2[#i $ #i[#i0]] = sum(#j, y[#i, #j]);");
-            I("ASER x2[#i0] = sum(#j, y[#i0, #j]);");
-            AssertHelper(First(), "x2", new string[] { "a" }, 2000, 201d, sharedDelta);
-            AssertHelper(First(), "x2", new string[] { "b" }, 2000, 205d, sharedDelta);
-            I("ASER x2[#i0] = sum(#j, y[#i0, #j]) + sum(#j, y[#i0, #j]) + 10;");
-            AssertHelper(First(), "x2", new string[] { "a" }, 2000, 2 * 201d + 10d, sharedDelta);
-            AssertHelper(First(), "x2", new string[] { "b" }, 2000, 2 * 205d + 10d, sharedDelta);
+            I("x2 = series(1);");
+            I("SER x2[#i0] = sum(#j, y[#i0, #j]);");
+            _AssertSeries(First(), "x2", new string[] { "a" }, 2000, 201d, sharedDelta);
+            _AssertSeries(First(), "x2", new string[] { "b" }, 2000, 205d, sharedDelta);
+            I("SER x2[#i0] = sum(#j, y[#i0, #j]) + sum(#j, y[#i0, #j]) + 10;");
+            _AssertSeries(First(), "x2", new string[] { "a" }, 2000, 2 * 201d + 10d, sharedDelta);
+            _AssertSeries(First(), "x2", new string[] { "b" }, 2000, 2 * 205d + 10d, sharedDelta);
             
-            I("LIST i0 = a;");
-            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
-            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
-
-            I("LIST i0 = null;");
-            I("ASER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
-            AssertHelper(First(), "x", new string[] { "a", "x" }, 2000, 1001, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "a", "y" }, 2000, 1002, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
-            AssertHelper(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
-
+            I("LIST #i0 = list('a');");
+            I("SER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+                   
+            I("LIST #i0 = list();");
+            I("SER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1001, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1002, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
+            _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
+            
             // ---------- ignore missing cells ------------------------
 
             I("RESET; MODE data; TIME 2000;");
-            I("LIST i = a, b, c, d;");
-            I("ASER y['a'] = 100;");
-            I("ASER y['b'] = 101;");
-            I("ASER y['c'] = 102;");
+            I("LIST #i = a, b, c, d;");
+            I("y = series(1);");
+            I("y['a'] = 100;");
+            I("y['b'] = 101;");
+            I("y['c'] = 102;");
             FAIL("SER z = sum(#i, y[#i]);");
             FAIL("SER z = y['d']);");            
-            I("OPTION series array ignoremissing = yes;");
-            I("ASER z['1'] = sum(#i, y[#i]);");
-            AssertHelper(First(), "z", new string[] { "1" }, 2000, 303d, sharedDelta);
-            I("ASER z['2'] = y['d'];");
-            AssertHelper(First(), "z", new string[] { "2" }, 2000, 0d, sharedDelta);
-                        
-            // --------------------------------
-            // fun with loop
-            // --------------------------------
-            I("RESET; MODE data; TIME 2000;");
-            I("LIST i = a, b, c;");
-            I("SER aa = 1; SER bb = 2; SER cc = 3;");
-            I("ASER xx[#i] = {#i + #i};");
-            AssertHelper(First(), "xx", new string[] { "a" }, 2000, 1, sharedDelta);
-            AssertHelper(First(), "xx", new string[] { "b" }, 2000, 2, sharedDelta);
-            AssertHelper(First(), "xx", new string[] { "c" }, 2000, 3, sharedDelta);
+            I("OPTION series array calc missing = zero; ");
+            I("z = series(1);");
+            I("SER z['1'] = sum(#i, y[#i]);");
+            _AssertSeries(First(), "z", new string[] { "1" }, 2000, 303d, sharedDelta);
+            I("SER z['2'] = y['d'];");
+            _AssertSeries(First(), "z", new string[] { "2" }, 2000, 0d, sharedDelta);
+
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                // --------------------------------
+                // fun with loop
+                // --------------------------------
+                I("RESET; MODE data; TIME 2000;");
+                I("LIST #i = a, b, c;");
+                I("SER aa = 1; SER bb = 2; SER cc = 3;");
+                I("xx = series(1);");
+                I("SER xx[#i] = {#i + #i};");  //#0875234598
+                _AssertSeries(First(), "xx", new string[] { "a" }, 2000, 1, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "b" }, 2000, 2, sharedDelta);
+                _AssertSeries(First(), "xx", new string[] { "c" }, 2000, 3, sharedDelta);
+            }
+                       
 
             // -----------------------------------------
             // DOLLAR CONDITIONAL TESTING
@@ -5379,13 +5471,14 @@ namespace UnitTests
             //Switch on timeseries
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
-            I("SERIES x = 10, 10, 11, 12, 10;");
+            I("SERIES x = (10, 10, 11, 12, 10);");
             I("SERIES y = (x + 100) $ (x + 10 == 20);");
-            AssertHelper(First(), "y", 2001, 110d, sharedDelta);
-            AssertHelper(First(), "y", 2002, 110d, sharedDelta);
-            AssertHelper(First(), "y", 2003, 0d, sharedDelta);
-            AssertHelper(First(), "y", 2004, 0d, sharedDelta);
-            AssertHelper(First(), "y", 2005, 110d, sharedDelta);
+            _AssertSeries(First(), "y", 2001, 110d, sharedDelta);
+            _AssertSeries(First(), "y", 2002, 110d, sharedDelta);
+            _AssertSeries(First(), "y", 2003, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2004, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2005, 110d, sharedDelta);
+                       
 
             //Switch on timeseries, testing of different types (VAL vs. SERIES)
             I("RESET; MODE data;");
@@ -5393,74 +5486,87 @@ namespace UnitTests
             I("SERIES x = 10;");
             I("SERIES x2 = 10;");
             I("SERIES y1 = (x + 100) $ (x < 10);");
-            AssertHelper(First(), "y1", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y1", 2000, 0d, sharedDelta);
             I("SERIES y2 = (x + 100) $ (x <= 10);");
-            AssertHelper(First(), "y2", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y2", 2000, 110d, sharedDelta);
             I("SERIES y3 = (x + 100) $ (x == 10);");
-            AssertHelper(First(), "y3", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y3", 2000, 110d, sharedDelta);
             I("SERIES y4 = (x + 100) $ (x >= 10);");
-            AssertHelper(First(), "y4", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y4", 2000, 110d, sharedDelta);
             I("SERIES y5 = (x + 100) $ (x > 10);");
-            AssertHelper(First(), "y5", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y5", 2000, 0d, sharedDelta);
             I("SERIES y11 = (x + 100) $ (10 > x);");
-            AssertHelper(First(), "y11", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y11", 2000, 0d, sharedDelta);
             I("SERIES y12 = (x + 100) $ (10 >= x);");
-            AssertHelper(First(), "y12", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y12", 2000, 110d, sharedDelta);
             I("SERIES y13 = (x + 100) $ (10 == x);");
-            AssertHelper(First(), "y13", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y13", 2000, 110d, sharedDelta);
             I("SERIES y14 = (x + 100) $ (10 <= x);");
-            AssertHelper(First(), "y14", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y14", 2000, 110d, sharedDelta);
             I("SERIES y15 = (x + 100) $ (10 < x);");
-            AssertHelper(First(), "y15", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y15", 2000, 0d, sharedDelta);
             I("SERIES y3 = (x + 100) $ (x == x2);");
-            AssertHelper(First(), "y3", 2000, 110d, sharedDelta);
+            _AssertSeries(First(), "y3", 2000, 110d, sharedDelta);
+            I("SERIES y3 = (x + 100) $ (x <> x2);");
+            _AssertSeries(First(), "y3", 2000, 0d, sharedDelta);
+
+            
 
             //Switching between two values depending upon same criterion 
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
-            I("SERIES x = 10, 10, 11, 12, 10;");
+            I("SERIES x = (10, 10, 11, 12, 10);");
             I("SERIES y1 = 110 $ (x + 10 == 20) + 111 $ (x + 10 <> 20);");
             //This is equivalent, using iif()
             I("SERIES y2 = iif(x + 10, '==', 20, 110, 111);");
-            AssertHelper(First(), "y1", 2001, 110d, sharedDelta);
-            AssertHelper(First(), "y1", 2002, 110d, sharedDelta);
-            AssertHelper(First(), "y1", 2003, 111d, sharedDelta);
-            AssertHelper(First(), "y1", 2004, 111d, sharedDelta);
-            AssertHelper(First(), "y1", 2005, 110d, sharedDelta);
-            AssertHelper(First(), "y2", 2001, 110d, sharedDelta);
-            AssertHelper(First(), "y2", 2002, 110d, sharedDelta);
-            AssertHelper(First(), "y2", 2003, 111d, sharedDelta);
-            AssertHelper(First(), "y2", 2004, 111d, sharedDelta);
-            AssertHelper(First(), "y2", 2005, 110d, sharedDelta);
+            _AssertSeries(First(), "y1", 2001, 110d, sharedDelta);
+            _AssertSeries(First(), "y1", 2002, 110d, sharedDelta);
+            _AssertSeries(First(), "y1", 2003, 111d, sharedDelta);
+            _AssertSeries(First(), "y1", 2004, 111d, sharedDelta);
+            _AssertSeries(First(), "y1", 2005, 110d, sharedDelta);
+            _AssertSeries(First(), "y2", 2001, 110d, sharedDelta);
+            _AssertSeries(First(), "y2", 2002, 110d, sharedDelta);
+            _AssertSeries(First(), "y2", 2003, 111d, sharedDelta);
+            _AssertSeries(First(), "y2", 2004, 111d, sharedDelta);
+            _AssertSeries(First(), "y2", 2005, 110d, sharedDelta);
+
+            
 
             I("RESET; MODE data;");
             I("TIME 2000 2000;");
-            I("VAL v = 10;");
-            I("LIST m = a, b;");
+            I("VAL %v = 10;");
+            I("LIST #m = a, b;");
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (%v == 9);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (%v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['c']);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['b']);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['b'] and %v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['b'] and %v == 9);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['c'] and %v == 10);");
-            AssertHelper(First(), "y", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
             I("SERIES y = 3 $ (#m['c'] or %v == 10);");
-            AssertHelper(First(), "y", 2000, 3d, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
+
+            //************************************************************
+            //************************************************************
+            return;
+            //************************************************************
+            //************************************************************
+
 
             //Without parenthesis (...) for lists
             I("SERIES y = 2;");

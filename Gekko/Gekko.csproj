@@ -447,6 +447,7 @@
     <EmbeddedResource Include="yellow.gif" />
     <Content Include="Gekko.ico" />
     <Content Include="Images\Gekko.ico" />
+    <Content Include="__syntax.txt" />
     <Content Include="__progress.txt" />
   </ItemGroup>
   <ItemGroup>

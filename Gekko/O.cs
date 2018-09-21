@@ -464,7 +464,6 @@ namespace Gekko
                 helper = Globals.exo.helper;
             }
 
-
             foreach (HandleEndoHelper h in helper)
             {
                 string s = h.varname.ConvertToString();
@@ -473,19 +472,15 @@ namespace Gekko
                     G.Writeln2("*** ERROR: The name '" + s + "' is not a simple series name");
                     throw new GekkoException();
                 }
-                List<string> ss = new List<string>();
+                
+                List<List<string>> ss = new List<List<string>>();
+
                 if (h.indices != null)
-                {
-                    foreach (IVariable iv in h.indices)
-                    {
-                        if (iv.Type() != EVariableType.String)
-                        {
-                            G.Writeln2("*** ERROR: Expected indices of '" + s + "' to be of string type");
-                            G.Writeln("           List type will be supported soon.");
-                            throw new GekkoException();
-                        }
-                        ss.Add(iv.ConvertToString());
-                    }
+                {                    
+                    int depth = 0;
+                    Stack<string> stack = new Stack<string>();
+                    // [a, #i, b, #j] is unfolded/combined into many items in ss
+                    Program.Combine(h.indices, ss, depth, stack);
                 }
 
                 string varNameWithoutFreq = name + "_" + s;
@@ -506,26 +501,34 @@ namespace Gekko
 
                 if (ss.Count > 0)
                 {
-                    //Multi-dim timeseries
-                    //What about timeless??                        
+                    foreach (List<string> ss2 in ss)
+                    {
 
-                    if (ts == null)
-                    {
-                        ts = new Series(Program.options.freq, varNameWithFreq);
-                        ts.SetArrayTimeseries(ss.Count + 1, true);
-                        databank.AddIVariable(ts.name, ts);
-                    }
+                        //Multi-dim timeseries
+                        //What about timeless??                        
 
-                    MapMultidimItem mmi = new MapMultidimItem(ss.ToArray(), ts);
-                    IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
-                    if (iv == null)
-                    {
-                        ts2 = new Series(Program.options.freq, null);
-                        ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
-                    }
-                    else
-                    {
-                        ts2 = iv as Series;
+                        if (ts == null)
+                        {
+                            ts = new Series(Program.options.freq, varNameWithFreq);
+                            ts.SetArrayTimeseries(ss2.Count + 1, true);
+                            databank.AddIVariable(ts.name, ts);
+                        }
+
+                        MapMultidimItem mmi = new MapMultidimItem(ss2.ToArray(), ts);
+                        IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
+                        if (iv == null)
+                        {
+                            ts2 = new Series(Program.options.freq, null);
+                            ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
+                        }
+                        else
+                        {
+                            ts2 = iv as Series;
+                        }
+                        foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
+                        {
+                            ts2.SetData(t, 1d);
+                        }
                     }
                 }
                 else
@@ -538,15 +541,15 @@ namespace Gekko
                         ts2 = new Series(Program.options.freq, varNameWithFreq);
                         databank.AddIVariable(ts2.name, ts2);
                     }
-                }
-
-                foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
-                {
-                    ts2.SetData(t, 1d);
-                }
+                    foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
+                    {
+                        ts2.SetData(t, 1d);
+                    }
+                }                
             }
         }
 
+        
         public static void HandleOptionBankRef1(string opt_bank, string opt_ref)
         {
             if (opt_bank != null)
@@ -912,6 +915,24 @@ namespace Gekko
                 
             }
             return new List(m);
+        }
+
+        public static IVariable LogicalAnd(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            if (O.ConvertToVal(x1) == 1d && O.ConvertToVal(x2) == 1d) return Globals.scalarVal1;
+            return Globals.scalarVal0;
+        }
+
+        public static IVariable LogicalOr(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            if (O.ConvertToVal(x1) == 1d || O.ConvertToVal(x2) == 1d) return Globals.scalarVal1;
+            return Globals.scalarVal0;
+        }
+
+        public static IVariable LogicalNot(GekkoSmpl smpl, IVariable x1)
+        {
+            if (O.ConvertToVal(x1) == 1d) return Globals.scalarVal0;
+            return Globals.scalarVal1;
         }
 
         public static IVariable Dollar(GekkoSmpl smpl, IVariable x, IVariable logical)
@@ -2489,7 +2510,7 @@ namespace Gekko
 
                 //TODO: error if more than 1 is set
                 ESeriesUpdTypes operatorType = GetOperatorType(options);
-                bool keep = false; if (options != null && G.Equal(options.opt_keep, "yes")) keep = true;
+                bool keep = false; if (options != null && G.Equal(options.opt_keep, "p")) keep = true;
 
                 Series original = null;
                 if (keep || false)
@@ -4173,83 +4194,6 @@ namespace Gekko
 
         // =================================== start comparisons ==================================
 
-        public static bool StrictlySmallerThan(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-            bool rv = false;
-            if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
-            {
-                if (O.ConvertToDate(x).StrictlySmallerThan(O.ConvertToDate(y))) rv = true;
-            }
-            else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
-            {
-                //if (x.GetValOLD(smpl) < y.GetValOLD(smpl)) rv = true; //#8097534320985
-            }
-            else
-            {
-                G.Writeln();
-                G.Writeln2("*** ERROR: Variable types do not match for '<' compare");
-                throw new GekkoException();
-            }
-            return rv;
-        }
-
-        public static bool SmallerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-            bool rv = false;
-            if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
-            {
-                if (O.ConvertToDate(x).SmallerThanOrEqual(O.ConvertToDate(y))) rv = true;
-            }
-            else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
-            {
-                //if (x.GetValOLD(smpl) <= y.GetValOLD(smpl)) rv = true;  // //#8097534320985
-            }
-            else
-            {
-                G.Writeln();
-                G.Writeln2("*** ERROR: Variable types do not match for '<=' compare");
-                throw new GekkoException();
-            }
-            return rv;
-        }
-
-        public static bool IsTrue(GekkoSmpl smpl, IVariable x)
-        {
-            if (x.Type() == EVariableType.Val)
-            {
-                if (IsTrue(((ScalarVal)x).val)) return true;
-            }
-            else if (x.Type() == EVariableType.Matrix)
-            {
-                //is this even possible??
-                Matrix m = x as Matrix;
-                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
-                {
-                    if (IsTrue(m.data[0, 0])) return true;
-                }
-            }
-            else if (x.Type() == EVariableType.Series)
-            {
-                Series ts = x as Series;
-                bool allOk = true;
-                foreach (GekkoTime t in smpl.Iterate12())
-                {
-                    if (IsTrue(ts.GetData(smpl, t)))
-                    {
-                        allOk = false;
-                        break;
-                    }
-                }
-                if (allOk) return true;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Wrong type " + G.GetTypeString(x) + " for IF(...)");
-                throw new GekkoException();
-            }
-            return false;
-        }
-
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
@@ -4296,6 +4240,235 @@ namespace Gekko
             return rv;
         }
 
+        public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, not a SERIES
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                if (G.isNumericalError(d1) && G.isNumericalError(d2))
+                {
+                    rv = Globals.scalarVal0;
+                }
+                else
+                {
+                    if (d1 != d2) rv = Globals.scalarVal1; ;
+                }
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) != y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {
+                if (!O.ConvertToDate(x).IsSamePeriod(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }
+            else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
+            {
+                if (!G.Equal(x.ConvertToString(), y.ConvertToString())) rv = Globals.scalarVal1;
+            }
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<>' compare");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static IVariable StrictlySmallerThan(GekkoSmpl smpl, IVariable x, IVariable y)
+        {            
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, not a SERIES
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;                
+                if (d1 < d2) rv = Globals.scalarVal1; ;                
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) < y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {                
+                if (O.ConvertToDate(x).StrictlySmallerThan(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }            
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<' compare");
+                throw new GekkoException();
+            }
+            return rv;                        
+        }
+
+        public static IVariable SmallerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, not a SERIES
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                if (d1 <= d2) rv = Globals.scalarVal1; ;
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) <= y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {
+                if (O.ConvertToDate(x).SmallerThanOrEqual(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<=' compare");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static IVariable LargerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, not a SERIES
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                if (d1 >= d2) rv = Globals.scalarVal1; ;
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) >= y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {
+                if (O.ConvertToDate(x).LargerThanOrEqual(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '>=' compare");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static IVariable StrictlyLargerThan(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, not a SERIES
+                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                if (d1 > d2) rv = Globals.scalarVal1; ;
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) > y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {
+                if (O.ConvertToDate(x).StrictlyLargerThan(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '>' compare");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+
+
+
+
+        public static bool IsTrue(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Val)
+            {
+                if (IsTrue(((ScalarVal)x).val)) return true;
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                //is this even possible??
+                Matrix m = x as Matrix;
+                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
+                {
+                    if (IsTrue(m.data[0, 0])) return true;
+                }
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                Series ts = x as Series;
+                bool allOk = true;
+                foreach (GekkoTime t in smpl.Iterate12())
+                {
+                    if (IsTrue(ts.GetData(smpl, t)))
+                    {
+                        allOk = false;
+                        break;
+                    }
+                }
+                if (allOk) return true;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Wrong type " + G.GetTypeString(x) + " for IF(...)");
+                throw new GekkoException();
+            }
+            return false;
+        }
+
+        
+
         private static void CheckFreqAndCreateSeries(IVariable x, IVariable y)
         {
             EFreq freq = EFreq.A;
@@ -4311,46 +4484,7 @@ namespace Gekko
             }
         }
 
-        public static bool LargerThanOrEqual(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-            bool rv = false;
-            if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
-            {
-                if (O.ConvertToDate(x).LargerThanOrEqual(O.ConvertToDate(y))) rv = true;
-            }
-            else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
-            {
-                //if (x.GetValOLD(smpl) >= y.GetValOLD(smpl)) rv = true;  // //#8097534320985
-            }
-            else
-            {
-                G.Writeln();
-                G.Writeln2("*** ERROR: Variable types do not match for '>=' compare");
-                throw new GekkoException();
-            }
-            return rv;
-        }
-
-        public static bool StrictlyLargerThan(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-            bool rv = false;
-            if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
-            {
-                if (O.ConvertToDate(x).StrictlyLargerThan(O.ConvertToDate(y))) rv = true;
-            }
-            else if ((x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) && (y.Type() == EVariableType.Series || y.Type() == EVariableType.Val))
-            {
-                //if (x.GetValOLD(smpl) > y.GetValOLD(smpl)) rv = true;   //#8097534320985
-            }
-            else
-            {
-                G.Writeln();
-                G.Writeln2("*** ERROR: Variable types do not match for '>' compare");
-                throw new GekkoException();
-            }
-            return rv;
-        }
-
+        
 
         public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
         {

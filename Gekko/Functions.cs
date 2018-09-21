@@ -1651,10 +1651,11 @@ namespace Gekko
             return x;
         }
 
-        public static IVariable iif(GekkoSmpl t, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
+        public static IVariable iif(GekkoSmpl smpl, IVariable i1, IVariable op, IVariable i2, IVariable o1, IVariable o2)
         {
-            if (G.IsGekkoNull(i1) && G.IsGekkoNull(i1)) return i1;
-            double result=double.NaN;
+
+            Series result = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+
             if (!IsValOrTimeseries(i1))
             {
                 G.Writeln2("*** ERROR: iif(): arg 1, type " + i1.Type().ToString() + " not supported");
@@ -1675,84 +1676,106 @@ namespace Gekko
                 G.Writeln2("*** ERROR: iif(): arg 5, type " + o2.Type().ToString() + " not supported");
                 throw new GekkoException();
             }
-            double di1 = O.ConvertToVal(i1); // #875324397
-            double di2 = O.ConvertToVal(i2);
-            double do1 = O.ConvertToVal(o1);
-            double do2 = O.ConvertToVal(o2);
+
+            Series di1 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+            Series di2 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+            Series do1 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+            Series do2 = new Series(ESeriesType.Light, smpl.t1, smpl.t2);
+
+            foreach (GekkoTime gt in smpl.Iterate12())
+            {
+                if (i1.Type() == EVariableType.Series) di1.SetData(gt, ((Series)i1).GetData(smpl, gt));
+                else di1.SetData(gt, ((ScalarVal)i1).val);
+
+                if (i2.Type() == EVariableType.Series) di2.SetData(gt, ((Series)i2).GetData(smpl, gt));
+                else di2.SetData(gt, ((ScalarVal)i2).val);
+
+                if (o1.Type() == EVariableType.Series) do1.SetData(gt, ((Series)o1).GetData(smpl, gt));
+                else do1.SetData(gt, ((ScalarVal)o1).val);
+
+                if (o2.Type() == EVariableType.Series) do2.SetData(gt, ((Series)o2).GetData(smpl, gt));
+                else do2.SetData(gt, ((ScalarVal)o2).val);
+
+            }
+            
             string x = O.ConvertToString(op).Trim();
 
-            if (x == "==")
+            foreach (GekkoTime gt in smpl.Iterate12())
             {
-                if (di1 == di2)
+
+                if (x == "==")
                 {
-                    result = do1;
+                    if (di1.GetData(smpl, gt) == di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
+                }
+                else if (x == "<>")
+                {
+                    if (di1.GetData(smpl, gt) != di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
+                }
+                else if (x == ">")
+                {
+                    if (di1.GetData(smpl, gt) > di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
+                }
+                else if (x == ">=")
+                {
+                    if (di1.GetData(smpl, gt) >= di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
+                }
+                else if (x == "<")
+                {
+                    if (di1.GetData(smpl, gt) < di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
+                }
+                else if (x == "<=")
+                {
+                    if (di1.GetData(smpl, gt) <= di2.GetData(smpl, gt))
+                    {                        
+                        result.SetData(gt, do1.GetData(smpl, gt));
+                    }
+                    else
+                    {                        
+                        result.SetData(gt, do2.GetData(smpl, gt));
+                    }
                 }
                 else
                 {
-                    result = do2;
+                    G.Writeln2("*** ERROR: iif(): Expected operator '==', '<>', '<', '<=', '>' or '>='");
+                    throw new GekkoException();
                 }
             }
-            else if (x == "<>")
-            {
-                if (di1 != di2)
-                {
-                    result = do1;
-                }
-                else
-                {
-                    result = do2;
-                }
-            }
-            else if (x == ">")
-            {
-                if (di1 > di2)
-                {
-                    result = do1;
-                }
-                else
-                {
-                    result = do2;
-                }
-            }
-            else if (x == ">=")
-            {
-                if (di1 >= di2)
-                {
-                    result = do1;
-                }
-                else
-                {
-                    result = do2;
-                }
-            }
-            else if (x == "<")
-            {
-                if (di1 < di2)
-                {
-                    result = do1;
-                }
-                else
-                {
-                    result = do2;
-                }
-            }
-            else if (x == "<=")
-            {
-                if (di1 <= di2)
-                {
-                    result = do1;
-                }
-                else
-                {
-                    result = do2;
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: iif(): Expected operator '==', '<>', '<', '<=', '>' or '>='");
-                throw new GekkoException();
-            }
-            return new ScalarVal(result);            
+            return result;            
         }
 
         //!! practical for empty lists and singletons, for instance #m = list(); or #m = list('a');
@@ -1881,7 +1904,7 @@ namespace Gekko
 
         private static bool IsValOrTimeseries(IVariable x)
         {
-            return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series || x.Type() == EVariableType.Series;
+            return x.Type() == EVariableType.Val || x.Type() == EVariableType.Series;
         }        
 
         //same as power()

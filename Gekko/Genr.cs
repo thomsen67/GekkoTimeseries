@@ -10,15 +10,8 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static int labelCounter;
-        public static readonly ScalarVal i14 = new ScalarVal(5d);
-        public static readonly ScalarVal i16 = new ScalarVal(6d);
-        public static readonly ScalarVal i18 = new ScalarVal(2d);
-        public static IVariable MapDef_mapTmpvar12(GekkoSmpl smpl)
-        {
-
-
-            return null;
-        }
+        public static readonly ScalarVal i59 = new ScalarVal(100d);
+        public static readonly ScalarVal i60 = new ScalarVal(10d);
         public static void ClearTS(P p)
         {
         }
@@ -33,7 +26,14 @@ namespace Gekko
             //[[splitSTART]]
             p.SetText(@"¤0"); O.InitSmpl(smpl, p);
 
-            
+            O.Assignment o0 = new O.Assignment();
+            O.AdjustT0(smpl, -1);
+            IVariable ivTmpvar58 = null;// O.Dollar(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var, null), i59), O.StrictlySmallerThan(smpl, O.Lookup(smpl, null, null, "x", null, null, false, EVariableType.Var, null), i60)
+            //);
+            O.AdjustT0(smpl, 1);
+            O.Lookup(smpl, null, null, "y1", null, ivTmpvar58, true, EVariableType.Var, o0)
+            ;
+
 
             //[[splitSTOP]]
 
