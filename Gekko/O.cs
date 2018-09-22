@@ -1591,6 +1591,7 @@ namespace Gekko
                         {
                             Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), nameWithFreq);
                             bank.AddIVariable(nameWithFreq, ts);
+                            iv = ts;
                         }
                         else
                         {
@@ -1607,6 +1608,7 @@ namespace Gekko
                             Series ts = new Series(iv_series.freq, nameWithFreq);
                             bank.RemoveIVariable(nameWithFreq);
                             bank.AddIVariable(nameWithFreq, ts);
+                            iv = ts;
                         }
                         else
                         {

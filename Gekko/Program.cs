@@ -24978,12 +24978,12 @@ namespace Gekko
                 string yRhs = xrhs[i];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError) as Series;
 
-                if (ts_lhs == null)
-                {
-                    G.Writeln2("*** ERROR: Cannot find: " + yRhs);
-                }
+                //if (ts_lhs == null)
+                //{
+                //    G.Writeln2("*** ERROR: Cannot find: " + yRhs);
+                //}
                                 
                 if (method == null) method = "total";
                                 
@@ -25093,7 +25093,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                G.Writeln("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                G.Writeln2("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
             }
             return;
         }
