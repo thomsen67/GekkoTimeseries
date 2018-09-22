@@ -4678,38 +4678,38 @@ namespace UnitTests
             I("TIME 2000 2010;");
             I("CREATE ser;");
             I("SERIES ser = 2010;");
-            I("VAL v = 2010;");
-            I("DATE d = 2010a1;");
-            I("STRING s = '2010';");
-            I("LIST l = a, b, c;");
+            I("VAL %v = 2010;");
+            I("DATE %d = 2010a1;");
+            I("STRING %s = '2010';");
+            I("LIST #l = a, b, c;");
 
-            I("STRING s1 = string(%v);");
-            AssertHelperScalarString("s1", "2010");
-            I("STRING s2 = string(%d);");
-            AssertHelperScalarString("s2", "2010");
-            I("STRING s3 = string(%s);");
-            AssertHelperScalarString("s3", "2010");
-            I("STRING s4 = string(#l);");
-            AssertHelperScalarString("s4", "a, b, c");
-            FAIL("STRING s5 = string(ser);");
+            I("STRING %s1 = string(%v);");
+            _AssertScalarString(First(), "%s1", "2010");
+            I("STRING %s2 = string(%d);");
+            _AssertScalarString(First(), "%s2", "2010");            
+            I("STRING %s3 = string(%s);");
+            _AssertScalarString(First(), "%s3", "2010");
+            I("STRING %s4 = string(#l);");
+            _AssertScalarString(First(), "%s4", "a, b, c");
+            FAIL("STRING %s5 = string(ser);");
 
-            I("VAL v1 = val(%v);");
-            AssertHelperScalarVal("v1", 2010);
-            I("VAL v2 = val(%d);");
-            AssertHelperScalarVal("v2", 2010);
-            I("VAL v3 = val(%s);");
-            AssertHelperScalarVal("v3", 2010);
-            FAIL("VAL v4 = val(#l);");
-            FAIL("VAL v5 = val(ser);");
+            I("VAL %v1 = val(%v);");
+            _AssertScalarVal(First(), "%v1", 2010);
+            I("VAL %v2 = val(%d);");
+            _AssertScalarVal(First(), "%v2", 2010);
+            I("VAL %v3 = val(%s);");
+            _AssertScalarVal(First(), "%v3", 2010);            
+            FAIL("VAL %v4 = val(#l);");
+            FAIL("VAL %v5 = val(ser);");
 
-            I("DATE d1 = date(%v);");
-            AssertHelperScalarDate("d1",EFreq.A, 2010, 1);
-            I("DATE d2 = date(%d);");
-            AssertHelperScalarDate("d2", EFreq.A, 2010, 1);
-            I("DATE d3 = date(%s);");
-            AssertHelperScalarDate("d3", EFreq.A, 2010, 1);
-            FAIL("DATE d4 = date(#l);");
-            FAIL("DATE d5 = date(ser);");
+            I("DATE %d1 = date(%v);");
+            _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);            
+            I("DATE %d2 = date(%d);");
+            _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);
+            I("DATE %d3 = date(%s);");
+            _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);
+            FAIL("DATE %d4 = date(#l);");
+            FAIL("DATE %d5 = date(ser);");
 
 
         }
@@ -4735,14 +4735,14 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Movavg()
+        public void _Test_ModelMovavg()
         {
             Program.Flush(); //wipes out existing cached models
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("OPTION freq a;");
-            I("MODEL movavg;");            
+            I("MODEL movavg;");
             I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
             I("FOR val i = 1 to 8; CREATE y{i}; END;");
             I("SIM <2013 2013>;");
@@ -4754,74 +4754,79 @@ namespace UnitTests
             AssertHelper(First(), "y6", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
             AssertHelper(First(), "y7", 2013, (3d + 4d) / 1d, sharedDelta);
             AssertHelper(First(), "y8", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
+        }
+
+        [TestMethod]
+        public void _Test_Movavg()
+        {            
 
             I("RESET; MODE data;");            
             I("OPTION freq a;");                        
-            I("CREATE x; SER <2006 2013> x = -.89, .33, -3.8, 4.32, 2, 3, 4, 5;");  //first 3 values are only used for some of the last tests in the following
-            I("FOR val i = 1 to 4; CREATE y{i}; END;");
+            I("CREATE x; SER <2006 2013> x = (-.89, .33, -3.8, 4.32, 2, 3, 4, 5);");  //first 3 values are only used for some of the last tests in the following
+            I("FOR val %i = 1 to 4; CREATE y{i}; END;");
             I("TIME 2013 2013;");
 
             I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
             I("SERIES y2 = movavg(0.5 * x + 0.5 * x, 3);");
             I("SERIES y3 = movavg(0.5 * x[-1] + 0.5 * x[-1], 2);");
             I("SERIES y4 = movavg(0.5 * x[-1] + 0.5 * x[-1], 3);");
-            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
-            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
 
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movavg(x, 2);");
             I("SERIES y2 = movavg(x, 3);");
             I("SERIES y3 = movavg(x[-1], 2);");
             I("SERIES y4 = movavg(x[-1], 3);");
-            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
-            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
 
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movsum(0.5 * x + 0.5 * x, 2);");
             I("SERIES y2 = movsum(0.5 * x + 0.5 * x, 3);");
             I("SERIES y3 = movsum(0.5 * x[-1] + 0.5 * x[-1], 2);");
             I("SERIES y4 = movsum(0.5 * x[-1] + 0.5 * x[-1], 3);");
-            AssertHelper(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
-            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movsum(x, 2);");
             I("SERIES y2 = movsum(x, 3);");
             I("SERIES y3 = movsum(x[-1], 2);");
             I("SERIES y4 = movsum(x[-1], 3);");
-            AssertHelper(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
-            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, (4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, (3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y4", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
 
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movsum(2*x-x,2);");
             I("SERIES y2 = movsum(movsum(2*x-x,2),2);");
             I("SERIES y3 = movsum(movsum(movsum(2*x-x,2),2),2);");            
-            AssertHelper(First(), "y1", 2013, 9d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, 16d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, 28d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, 9d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, 16d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, 28d, sharedDelta);
 
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movavg(2*x-x,2);");
             I("SERIES y2 = movavg(movavg(2*x-x,2),2);");
             I("SERIES y3 = movavg(movavg(movavg(2*x-x,2),2),2);");
-            AssertHelper(First(), "y1", 2013, 4.5d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, 4d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, 3.5d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, 4.5d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, 4d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, 3.5d, sharedDelta);
 
             I("DELETE y1;");            
             I("SERIES y1 = dif(movavg(pch(2*x-x),2));");
             I("SERIES <2012 2013> y2 = movavg(movavg(movavg(2*x-x,4),3),2);");
-            AssertHelper(First(), "y1", 2013, -12.5d, sharedDelta);
-            AssertHelper(First(), "y2", 2012, 1.25083333333333, sharedDelta);
-            AssertHelper(First(), "y2", 2013, 2.2720833333333d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, -12.5d, sharedDelta);
+            _AssertSeries(First(), "y2", 2012, 1.25083333333333, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, 2.2720833333333d, sharedDelta);
 
         }
 
@@ -7734,110 +7739,110 @@ namespace UnitTests
             I("CREATE gdp, x, a;");
             I("TIME 2010 2012;");
             I("SERIES<2010 2010> gdp = 100;");
-            I("SERIES<2011 2012> gdp ^ 1;");  //100, 101, 102
+            I("SERIES<2011 2012> gdp ^= 1;");  //100, 101, 102
             I("SERIES<2010 2012> x = 1;");            
-            I("SERIES<2009 2012> a = 10 13 17 25;");
+            I("SERIES<2009 2012> a = (10, 13, 17, 25);");
                         
             I("SERIES xx1 = dlog(gdp);");
-            AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2011, Math.Log(101d / 100d), sharedDelta);
-            AssertHelper(First(), "xx1", 2012, Math.Log(102d / 101d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2011, Math.Log(101d / 100d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2012, Math.Log(102d / 101d), sharedDelta);
             I("SERIES xx2 = pch(gdp);");
-            AssertHelper(First(), "xx2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2011, 100d * (101d / 100d - 1d), sharedDelta);
-            AssertHelper(First(), "xx2", 2012, 100d * (102d / 101d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2011, 100d * (101d / 100d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2012, 100d * (102d / 101d - 1d), sharedDelta);
             I("SERIES xx3 = dif(gdp);");
-            AssertHelper(First(), "xx3", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2011, (101d - 100d), sharedDelta);
-            AssertHelper(First(), "xx3", 2012, (102d - 101d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2011, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2012, (102d - 101d), sharedDelta);
             I("SERIES xx4 = diff(gdp);");
-            AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2011, (101d - 100d), sharedDelta);
-            AssertHelper(First(), "xx4", 2012, (102d - 101d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2011, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2012, (102d - 101d), sharedDelta);
             I("SERIES xx5 = lag(gdp, 2);");
-            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);            
+            _AssertSeries(First(), "xx5", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2012, 100d, sharedDelta);            
 
             I("SERIES xx1 = dlog(gdp/x+0);");
-            AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2011, Math.Log(101d / 100d), sharedDelta);
-            AssertHelper(First(), "xx1", 2012, Math.Log(102d / 101d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2011, Math.Log(101d / 100d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2012, Math.Log(102d / 101d), sharedDelta);
             I("SERIES xx2 = pch(gdp/x+0);");
-            AssertHelper(First(), "xx2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2011, 100d * (101d / 100d - 1d), sharedDelta);
-            AssertHelper(First(), "xx2", 2012, 100d * (102d / 101d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2011, 100d * (101d / 100d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2012, 100d * (102d / 101d - 1d), sharedDelta);
             I("SERIES xx3 = dif(gdp/x+0);");
-            AssertHelper(First(), "xx3", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2011, (101d - 100d), sharedDelta);
-            AssertHelper(First(), "xx3", 2012, (102d - 101d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2011, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2012, (102d - 101d), sharedDelta);
             I("SERIES xx4 = diff(gdp/x+0);");
-            AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2011, (101d - 100d), sharedDelta);
-            AssertHelper(First(), "xx4", 2012, (102d - 101d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2011, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2012, (102d - 101d), sharedDelta);
             I("SERIES xx5 = lag(gdp/x+0, 2);");
-            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2012, 100d, sharedDelta);
 
             I("SERIES xx1 = dlog(gdp[-1]);");
-            AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2012, Math.Log(101d / 100d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2012, Math.Log(101d / 100d), sharedDelta);
             I("SERIES xx2 = pch(gdp[-1]);");
-            AssertHelper(First(), "xx2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2012, 100d * (101d / 100d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2012, 100d * (101d / 100d - 1d), sharedDelta);
             I("SERIES xx3 = dif(gdp[-1]);");
-            AssertHelper(First(), "xx3", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2012, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2012, (101d - 100d), sharedDelta);
             I("SERIES xx4 = diff(gdp[-1]);");
-            AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2012, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2012, (101d - 100d), sharedDelta);
             I("SERIES xx5 = lag(gdp[-1], 1);");
-            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2012, 100d, sharedDelta);
 
             I("SERIES xx1 = dlog(gdp[-1]/x+0);");
-            AssertHelper(First(), "xx1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2012, Math.Log(101d / 100d), sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2012, Math.Log(101d / 100d), sharedDelta);
             I("SERIES xx2 = pch(gdp[-1]/x+0);");
-            AssertHelper(First(), "xx2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2012, 100d * (101d / 100d - 1d), sharedDelta);
+            _AssertSeries(First(), "xx2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2012, 100d * (101d / 100d - 1d), sharedDelta);
             I("SERIES xx3 = dif(gdp[-1]/x+0);");
-            AssertHelper(First(), "xx3", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", 2012, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx3", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", 2012, (101d - 100d), sharedDelta);
             I("SERIES xx4 = diff(gdp[-1]/x+0);");
-            AssertHelper(First(), "xx4", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx4", 2012, (101d - 100d), sharedDelta);
+            _AssertSeries(First(), "xx4", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx4", 2012, (101d - 100d), sharedDelta);
             I("SERIES xx5 = lag(gdp[-1]/x+0, 1);");
-            AssertHelper(First(), "xx5", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2012, 100d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2012, 100d, sharedDelta);
             I("SERIES xx6 = dif(gdp) + dif(gdp);");
-            AssertHelper(First(), "xx6", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx6", 2011, 2d, sharedDelta);
-            AssertHelper(First(), "xx6", 2012, 2d, sharedDelta);
+            _AssertSeries(First(), "xx6", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx6", 2011, 2d, sharedDelta);
+            _AssertSeries(First(), "xx6", 2012, 2d, sharedDelta);
             I("SERIES xx7 = dif(a) + dif(a[-1]);");  //10 13 17 25 from 2009-12, dif(a) -> m, 3, 4, 8, dif(a.1) -> m, m, 3, 4
-            AssertHelper(First(), "xx7", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx7", 2011, 4d + 3d, sharedDelta);
-            AssertHelper(First(), "xx7", 2012, 8d + 4d, sharedDelta);
+            _AssertSeries(First(), "xx7", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx7", 2011, 4d + 3d, sharedDelta);
+            _AssertSeries(First(), "xx7", 2012, 8d + 4d, sharedDelta);
             I("SERIES xx8 = dif(a) + dif(dif(a[-1]));");  //10 13 17 25 from 2009-12, dif(a) -> m, 3, 4, 8, dif(dif(a.1)) -> m, m, m, 1
-            AssertHelper(First(), "xx8", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx8", 2011, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx8", 2012, 8d + 1d, sharedDelta);
+            _AssertSeries(First(), "xx8", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx8", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx8", 2012, 8d + 1d, sharedDelta);
             I("SERIES<2009 2012> xx9 = 123, 124, 125, 126;");
             I("SERIES<2012 2012> dif(xx9) = dif(a) + dif(dif(a[-1]));");  //see above
-            AssertHelper(First(), "xx9", 2010, 124d, sharedDelta);
-            AssertHelper(First(), "xx9", 2011, 125d, sharedDelta);
-            AssertHelper(First(), "xx9", 2012, 125d + 8d + 1d, sharedDelta);
+            _AssertSeries(First(), "xx9", 2010, 124d, sharedDelta);
+            _AssertSeries(First(), "xx9", 2011, 125d, sharedDelta);
+            _AssertSeries(First(), "xx9", 2012, 125d + 8d + 1d, sharedDelta);
 
             //I("SERIES ");
         }
@@ -7846,10 +7851,10 @@ namespace UnitTests
         public void _Test_Filenames()
         {
             I("RESET;");
-            I("STRING s1 = 'Thomas';");
-            I("STRING s2 = 'Tho';");
-            I("STRING s3 = 'mas';");
-            I("STRING s4 = 'sletmig';");
+            I("STRING %s1 = 'Thomas';");
+            I("STRING %s2 = 'Tho';");
+            I("STRING %s3 = 'mas';");
+            I("STRING %s4 = 'sletmig';");
 
             //raw
             I("PIPE c:\\Thomas\\Desktop\\gekko\\testing\\sletmig;"); I("PIPE con;");
@@ -8598,6 +8603,15 @@ namespace UnitTests
             ScalarVal sv = db.GetIVariable(s) as ScalarVal;
             Assert.AreEqual(sv.val, d);
         }
+
+        private static void _AssertScalarDate(IBank db, string s, EFreq freq, int super, int sub)
+        {
+            ScalarDate sd = db.GetIVariable(s) as ScalarDate;
+            Assert.AreEqual(sd.date.freq, freq);
+            Assert.AreEqual(sd.date.super, super);
+            Assert.AreEqual(sd.date.sub, sub);
+        }
+
 
         private static void _AssertSeries(IBank db, string s, int year, double x, double delta)
         {
@@ -10603,15 +10617,15 @@ namespace UnitTests
             // FIXME FIXME FIXME
             I("OPTION freq q;");  //otherwise it will not work...!
 
-            I("STRING s1 = 'aBc';");
-            I("STRING s2 = 'aBcD';");
-            I("VAL v0 = 99.0;");
-            I("VAL v1 = 100.0;");
-            I("VAL v2 = 101.0;");
-            I("VAL v3 = miss();");
-            I("DATE d0 = 2000q3;");
-            I("DATE d1 = 2000q4;");
-            I("DATE d2 = 2001q1;");
+            I("STRING %s1 = 'aBc';");
+            I("STRING %s2 = 'aBcD';");
+            I("VAL %v0 = 99.0;");
+            I("VAL %v1 = 100.0;");
+            I("VAL %v2 = 101.0;");
+            I("VAL %v3 = miss();");
+            I("DATE %d0 = 2000q3;");
+            I("DATE %d1 = 2000q4;");
+            I("DATE %d2 = 2001q1;");
 
             I("IF(%s1 == 'abc'); END;");  //empty test
             I("IF(%s1 == 'abc'); ELSE tell'hej'; END;");  //empty test
@@ -10619,163 +10633,228 @@ namespace UnitTests
             I("IF(%s1 == 'abc'); ELSE ; END;");  //empty test
 
             //basic
-            I("IF(%s1 == 'abc') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
+            _AssertScalarVal(First(), "%xx", 1d);
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
 
-            I("IF(%s1 == 'abc ') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%s1 == 'abc0') VAL q = 0; VAL xx = 1; ELSE VAL q = 0; VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc ') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%s1 == 'abc0') VAL %q = 0; VAL %xx = 1; ELSE VAL %q = 0; VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
             //parentheses + not
-            I("IF((%s1 == 'abc')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(not %s1 == 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(not(%s1 == 'abc')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF((%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(not %s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(not(%s1 == 'abc')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
             //or table
-            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 == 'abc7' or %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
             //and table
-            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 == 'abc' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence and over or
-            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%s1 == 'abc' or %s2 == 'abcd7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 == 'abc' or (%s2 == 'abcd7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF((%s1 == 'abc' or %s2 == 'abcd7') and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
             //precedence not
-            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(not %s1 == 'abc7' and %s2 == 'abcd7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(not( %s1 == 'abc7' and %s2 == 'abcd7')) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             //expressions
-            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc' and %s1+%s2 == 'abcabcd' and %s1+%s2+%s1 == 'abcabcd'+%s1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
             //decorated with a lot of parentheses
-            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(((%s1 == 'abc')) and (((%s1)+%s2) == ('abcabcd')) and (%s1+(%s2+(%s1))) == ('abcabcd'+%s1)) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             // == and <> operators
-            I("IF(%s1 == 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%s1 <> 'abc') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%s1 == 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%s1 <> 'abc7') VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%s1 == 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%s1 <> 'abc') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%s1 == 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%s1 <> 'abc7') VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v3 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v3 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v2 == miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v2 <> miss()) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v3 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v3 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v2 == miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v2 <> miss()) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             //values, relations
 
-            I("IF(%v0+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v0+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v0+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v0+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v0+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v0+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v0+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v0+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v0+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v0+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v0+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v0+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%v1+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v1+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v1+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v1+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v1+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v1+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%v1+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v1+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v1+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v1+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v1+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v1+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%v2+1-1 < 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v2+1-1 <= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v2+1-1 == 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%v2+1-1 >= 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v2+1-1 > 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%v2+1-1 <> 100+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%v2+1-1 < 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v2+1-1 <= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v2+1-1 == 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%v2+1-1 >= 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v2+1-1 > 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%v2+1-1 <> 100+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             //dates, relations
 
-            I("IF(%d0-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d0-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d0-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d0-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d0-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d0-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d0-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d0-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d0-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d0-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d0-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d0-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
-            I("IF(%d1-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d1-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d1-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d1-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d1-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d1-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            I("IF(%d1-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d1-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d1-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d1-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d1-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d1-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
 
-            I("IF(%d2-1 < 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d2-1 <= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d2-1 == 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
-            I("IF(%d2-1 >= 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d2-1 > 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(%d2-1 <> 2000q4-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(%d2-1 < 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d2-1 <= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d2-1 == 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 0.0d);
+            _AssertScalarVal(First(), "%xx", 0d);
+            I("IF(%d2-1 >= 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d2-1 > 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(%d2-1 <> 2000q4-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             // FIXME FIXME FIXME
             // FIXME FIXME FIXME
@@ -10787,14 +10866,16 @@ namespace UnitTests
             //indexer
             I("RESET;");
             I("CREATE y;");
-            I("DATE d = 2000;");
-            I("VAL v = 2000;");  //must be integer, else fail
+            I("DATE %d = 2000;");
+            I("VAL %v = 2000;");  //must be integer, else fail
             I("TIME 2000 2001;");
             I("SERIES y = 123;");
-            I("IF(y[%d+1-1] == 123.0+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
-            I("IF(y[%v+1-1] == 123.0+1-1) VAL xx = 1; ELSE VAL xx = 0; END;");
-            Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            I("IF(y[%d+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
+            I("IF(y[%v+1-1] == 123.0+1-1) VAL %xx = 1; ELSE VAL %xx = 0; END;");
+            //Assert.AreEqual(Program.scalars["xx"].GetValOLD(null), 1.0d);
+            _AssertScalarVal(First(), "%xx", 1d);
 
             //casting
 
@@ -13860,65 +13941,66 @@ namespace UnitTests
             I("RESET;");
             I("CREATE xA, xB;");
             I("SERIES<2000 2000> xA = 10;");
-            I("SERIES<2001 2002> xA ^ 1;");
+            I("SERIES<2001 2002> xA ^= 1;");
             I("CLONE;");
-            I("SERIES<2001 2002> xA + 1;");  //10 11 12 in ref, 10 12 13 in work
+            I("SERIES<2001 2002> xA += 1;");  //10 11 12 in ref, 10 12 13 in work
             I("SERIES<2000 2002> xB = @xA;");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 10d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 11d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 10d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 11d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
+                        
             I("SERIES<2000 2002> xB = @xA[-1];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 10d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 11d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, 11d, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
+            
             I("SERIES<2000 2002> xB = xA[-1];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 10d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
-
-
-
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 10d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
+            
             I("SERIES<2000 2002> xB = @xA[+1];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 11d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 11d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
 
             I("SERIES<2000 2002> xB = xA[+1];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 13d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 13d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
 
             //just testing use of scalar for lead
-            I("VAL lead = 1;");
+            I("VAL %lead = 1;");
             I("SERIES<2000 2002> xB = xA[+%lead];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 13d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 13d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
 
             I("SERIES<2000 2002> xB = xA[2002];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 13d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 13d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 13d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 13d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 13d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, 13d, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
             I("SERIES<2000 2002> xB = @xA[2002];");
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 1999, 1)), double.NaN);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 12d);
-            Assert.AreEqual(First().GetVariable("xB").GetData(null, new GekkoTime(EFreq.A, 2003, 1)), double.NaN);
+            _AssertSeries(First(), "xb", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xb", 2000, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2001, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2002, 12d, sharedDelta);
+            _AssertSeries(First(), "xb", 2003, double.NaN, sharedDelta);
         }       
 
         [TestMethod]

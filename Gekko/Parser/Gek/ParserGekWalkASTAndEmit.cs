@@ -1326,14 +1326,13 @@ namespace Gekko.Parser.Gek
                             
                         }
                         break;
-                    //case "ASTCURLYSIMPLE":
-                    //    {                            
-                    //        //node[0].Code = null;  //clearing this
-                    //        node[0].Code = new GekkoSB();  //has a null inside as storage
-                    //        HandleScalar(node[0], true, w);
-                    //        node.Code.CA(node[0].Code);                         
-                    //    }
-                    //    break;
+                    case "ASTCURLYSIMPLE":
+                        {
+                            string name = node[0][0].Text;
+                            string s = "O.Lookup(smpl, null, null, `" + Globals.symbolScalar + name + "`, null, null, false, EVariableType.Var, null)";
+                            node.Code.CA(s);
+                        }
+                        break;
                     case "ASTEXPRESSIONNEW":
                         {
 

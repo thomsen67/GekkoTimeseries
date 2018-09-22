@@ -1977,6 +1977,13 @@ namespace Gekko
         }
 
         [MyCustom(Lag = "lag=1")]
+        public static IVariable diff(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
+        {
+            return dif(smplOriginal, smpl, x1);
+        }
+
+
+        [MyCustom(Lag = "lag=1")]
         public static IVariable dif(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
             if (G.IsGekkoNull(x1)) return x1;
@@ -1994,7 +2001,7 @@ namespace Gekko
         }
 
         [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
-        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, bool isLagOrLead, IVariable x1, IVariable ilag)
+        public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable x1, IVariable ilag)
         {
             if (G.IsGekkoNull(x1)) return x1;
             Program.RevertSmpl(smpl2, smpl);
