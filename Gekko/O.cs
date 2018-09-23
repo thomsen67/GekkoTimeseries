@@ -31,8 +31,9 @@ namespace Gekko
         public enum EIndexerType
         {
             None,
-            Lag,
-            Lead
+            IndexerLag,
+            IndexerLead,
+            Dot
         }
 
         public enum ECreateType
@@ -3038,7 +3039,7 @@ namespace Gekko
         private static bool CreateSeriesIfNotExisting(string varnameWithFreq, string freq, ref Series lhs_series)
         {
             bool create = false;
-            if (lhs_series != null && lhs_series.type == ESeriesType.Normal)
+            if (lhs_series != null && (lhs_series.type == ESeriesType.Normal || lhs_series.type == ESeriesType.Timeless))
             {
                 //do nothing, use it
             }
@@ -3329,7 +3330,7 @@ namespace Gekko
                 smplRemember.t0 = smpl.t0;
                 smplRemember.t3 = smpl.t3;
 
-                if (indexerType == O.EIndexerType.Lag || indexerType == O.EIndexerType.Lead)
+                if (indexerType == O.EIndexerType.IndexerLag || indexerType == O.EIndexerType.IndexerLead)
                 {
                     smpl.t0 = smpl.t0.Add(i);
                     smpl.t3 = smpl.t3.Add(i);

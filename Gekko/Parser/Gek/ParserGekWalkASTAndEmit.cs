@@ -3226,13 +3226,19 @@ namespace Gekko.Parser.Gek
                             {
                                 //x[-1] or x[(-1)] or x[+1], but not x[1] x[0-1] or x[0+1].
                                 //so it tests + or - in first pos after [, not counting blanks and parentheses
-                                if (node[1][0].Text == "ASTINDEXERELEMENTPLUS")
+                                if(node[1].Text=="ASTDOT")
                                 {
-                                    indexerType = "O.EIndexerType.Lead";
+                                    indexerType = "O.EIndexerType.Dot";
+                                }
+                                else if (node[1][0].Text == "ASTINDEXERELEMENTPLUS")
+                                {
+                                    //cannot be so for ASTDOT
+                                    indexerType = "O.EIndexerType.IndexerLead";
                                 }
                                 else if (node[1][0][0].Text == "ASTNEGATE")
                                 {
-                                    indexerType = "O.EIndexerType.Lag";
+                                    //cannot be so for ASTDOT
+                                    indexerType = "O.EIndexerType.IndexerLag";
                                 }
                                 else
                                 {

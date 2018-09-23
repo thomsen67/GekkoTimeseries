@@ -1587,7 +1587,7 @@ namespace Gekko
             {
                 if (indexerType == O.EIndexerType.None)
                 {
-                    rv = this.FindArraySeries(smpl, indexes, false);
+                    rv = this.FindArraySeries(smpl, indexes, false, false);  //last arg. not used
                 }
                 else
                 {
@@ -1602,7 +1602,7 @@ namespace Gekko
                 int i = -12345; GekkoTime t = GekkoTime.tNull;
                 Series.FindLagLeadOrFixedPeriod(ref i, ref t, indexes);  //issues error if for instance x[-2.4] or x[+3.1]
 
-                if (indexerType == O.EIndexerType.Lag || indexerType == O.EIndexerType.Lead)
+                if (indexerType == O.EIndexerType.IndexerLag || indexerType == O.EIndexerType.IndexerLead || (indexerType == O.EIndexerType.Dot && i != -12345))
                 {
                     //This is a lag or lead, [-...] or [+...]
                     //TODO: Broken lags!!
@@ -1622,9 +1622,11 @@ namespace Gekko
                         Series temp = new Series(this.type, this.freq);  //This series gets the same type, so if it is Normal and access is outside dataArray, it can safely return a NaN.
                         //The two below correspond to just moving pointers
                         temp.data = this.data;
-                        temp.dataOffsetLag = this.dataOffsetLag + i;
+                        int ii = i;
+                        if (indexerType == O.EIndexerType.Dot) ii = -i;
+                        temp.dataOffsetLag = this.dataOffsetLag + ii;
                         rv = temp;
-                    }                    
+                    }
                 }
                 else
                 {
@@ -1663,7 +1665,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Could not understand index " + this.name + "[...]");
                         }
                         throw new GekkoException();
-                    }                    
+                    }
                 }                
             }  //end of non-arraysuper
             
@@ -1676,7 +1678,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs)
+        private IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless)
         {
             if (indexes.Length == 0)
             {
@@ -1699,12 +1701,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            rv = FindArraySeriesHelper(smpl, isLhs, keys);
+            rv = FindArraySeriesHelper(smpl, isLhs, keys, rhsIsTimeless);
 
             return rv;
         }
 
-        private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys)
+        private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless)
         {
             IVariable rv = null;
             if (true)
@@ -1798,11 +1800,14 @@ namespace Gekko
                     }
                     else
                     {
-                        //ts = new Series(this.freq, null);
-
-                        rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
-                        //ts.type = ESeriesType.ArraySub;
-                        if (this.type == ESeriesType.Timeless) ((Series)rv).type = ESeriesType.Timeless;  //inherits from ghost   
+                        if(rhsIsTimeless)
+                        {
+                            rv = new Series(ESeriesType.Timeless, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq), double.NaN);                            
+                        }
+                        else
+                        {
+                            rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
+                        }                        
                         MapMultidimItem mmi = new MapMultidimItem(keys, this);
                         this.dimensionsStorage.AddIVariableWithOverwrite(mmi, rv);
                     }
@@ -1987,8 +1992,10 @@ namespace Gekko
             }
             else 
             {
-                //Will fail with an error if not all indexes are of STRING type                                
-                IVariable iv = this.FindArraySeries(smpl, indexes, true);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                //Will fail with an error if not all indexes are of STRING type     
+                bool rhsIsTimeless = false;
+                if (rhsExpression.Type() == EVariableType.Series && (rhsExpression as Series).type == ESeriesType.Timeless) rhsIsTimeless = true;                           
+                IVariable iv = this.FindArraySeries(smpl, indexes, true, rhsIsTimeless);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 Series ts = iv as Series;
                 if (ts == null)
                 {

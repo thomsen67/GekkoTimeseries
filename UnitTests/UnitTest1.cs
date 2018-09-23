@@ -976,43 +976,60 @@ namespace UnitTests
             I("x1 = timeless(100);");
             I("x2 = 200;");
             I("x3 = series(1);");
+            I("x4 = series(1);");
             I("x3['a'] = timeless(300);");
-            I("x3['b'] = 400;");  //timeless and non-timeless can be mixed
+            I("x4['b'] = 400;");
             I("x5 = 0;");
             I("x5 = timeless(500);");  //note: LHS if found as a normal series, so no creation
 
+            HelperTimeless();  //asserts
+            
+            I("WRITE <gdx> temp;");
+            I("RESET;");
+            I("READ <gdx> temp;");
+
+            HelperTimeless();  //asserts
+
+        }
+
+        private static void HelperTimeless()
+        {
             _AssertSeries(First(), "x1!a", 2000, 100d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2002, 100d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2003, 100d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2004, 100d, sharedDelta);
+            Assert.IsTrue((First().GetIVariable("x1!a") as Series).type == ESeriesType.Timeless);
+
             _AssertSeries(First(), "x2!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x2!a", 2001, 200d, sharedDelta);
             _AssertSeries(First(), "x2!a", 2002, 200d, sharedDelta);
             _AssertSeries(First(), "x2!a", 2003, 200d, sharedDelta);
             _AssertSeries(First(), "x2!a", 2004, double.NaN, sharedDelta);
+            Assert.IsTrue((First().GetIVariable("x2!a") as Series).type == ESeriesType.Normal);
 
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2000, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2001, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300d, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300d, sharedDelta);            
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300d, sharedDelta);
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);            
+            IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "a" }), out temp3);
+            Assert.IsTrue((temp3 as Series).type == ESeriesType.Timeless);
 
-            _AssertSeries(First(), "x3!a", new string[] { "b" }, 2000, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "b" }, 2001, 400d, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "b" }, 2002, 400d, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "b" }, 2003, 400d, sharedDelta);            
-            _AssertSeries(First(), "x3!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2001, 400d, sharedDelta);
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2002, 400d, sharedDelta);
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2003, 400d, sharedDelta);
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);            
+            IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "b" }), out temp4);
+            Assert.IsTrue((temp4 as Series).type == ESeriesType.Normal);
 
             _AssertSeries(First(), "x5!a", 2000, double.NaN, sharedDelta);  //Because it was found a a normal series to begin with
             _AssertSeries(First(), "x5!a", 2001, 500d, sharedDelta);
             _AssertSeries(First(), "x5!a", 2002, 500d, sharedDelta);
             _AssertSeries(First(), "x5!a", 2003, 500d, sharedDelta);
             _AssertSeries(First(), "x5!a", 2004, double.NaN, sharedDelta);  //Because it was found a a normal series to begin with
-
-
-
-            I("RESET;");
+            Assert.IsTrue((First().GetIVariable("x5!a") as Series).type == ESeriesType.Normal);
         }
 
         [TestMethod]
