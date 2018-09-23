@@ -838,10 +838,9 @@ namespace Gekko
         public static IVariable timeless(GekkoSmpl smpl, params IVariable[] x)
         {
             //timeless() normal timeless with current freq
-            //timeless(0) normal timeless with current freq
-            //timeless('a') normal annual timeless
-            //timeless(3) 3-dim timeless with current freq
-            //timeless('a', 3) 3-dim annual timeless
+            //timeless(200) normal timeless with value 200
+            //timeless('a') normal annual timeless            
+            //timeless('a', 200) annual timeless with value 200
             Series ts = HELPER_seriesAndTimeless("timeless", x);
             return ts;
         }

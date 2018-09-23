@@ -2601,20 +2601,23 @@ namespace Gekko
                                         double d = double.NaN;
                                         if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
 
-                                        if (operatorType == ESeriesUpdTypes.none)
-                                        {                                            
-                                            //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-                                            foreach (GekkoTime t in smpl.Iterate12())
-                                            {
-                                                lhs_series.SetData(t, d);
-                                            }
-                                            //if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                            
+                                        if (create)
+                                        {
+                                            lhs_series = rhs_series.DeepClone(null) as Series;  //so that it becomes timeless, too
                                         }
                                         else
                                         {
-                                            OperatorHelperScalar(smpl, lhs_series, operatorType, d);
-                                            //G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated <" + operatorType.ToString() + "> " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                            if (operatorType == ESeriesUpdTypes.none)
+                                            {
+                                                foreach (GekkoTime t in smpl.Iterate12())
+                                                {
+                                                    lhs_series.SetData(t, d);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                            }
                                         }
                                         G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                     }

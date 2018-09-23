@@ -60,7 +60,7 @@ namespace Gekko
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
 
             
-Dictionary<string, object> jsonTree = null;
+            Dictionary<string, object> jsonTree = null;
             try
             {
                 jsonTree = (Dictionary<string, object>)serializer.DeserializeObject(jsonCode);

@@ -2202,6 +2202,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | doc                  SEMICOLON!
+						  | download             SEMICOLON!
 						  | edit                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
@@ -2452,6 +2453,17 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
 						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DOC
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+download:                   DOWNLOAD downloadOpt1? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
+downloadOpt1:               ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
+downloadOpt1h:              ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
+						    ;
+
+url:                        expression;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // EDIT
