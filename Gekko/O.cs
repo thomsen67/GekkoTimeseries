@@ -3335,6 +3335,11 @@ namespace Gekko
                     smpl.t0 = smpl.t0.Add(i);
                     smpl.t3 = smpl.t3.Add(i);
                 }
+                else if (indexerType == O.EIndexerType.Dot)
+                {
+                    smpl.t0 = smpl.t0.Add(-i);
+                    smpl.t3 = smpl.t3.Add(-i);
+                }
                 else
                 {
                     smpl.t0 = new GekkoTime(EFreq.A, i, 1);
