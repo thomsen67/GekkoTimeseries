@@ -1333,6 +1333,44 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(s);
                         }
                         break;
+                    case "ASTCNAME":
+                        {
+
+                            int counter = 0;
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                ASTNode child = node[i];
+                                if (child.Text == "ASTPERCENT")
+                                {
+                                    string nameCode = "(new ScalarString(`%`)).Add(" + node[i + 1].Code.ToString() + ")";
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                            IVariable iv = null;
+                            string s = "O.Lookup(smpl, null, iv, null, false, EVariableType.Var, null);";
+
+
+                            counter = 0;
+                            foreach (ASTNode child in node.ChildrenIterator())
+                            {
+                                if (counter == 0)
+                                {
+                                    node.Code.A("(" + child.Code + ")");
+                                }
+                                else node.Code.A(".Add(smpl, " + child.Code + ")");
+                                counter++;
+                            }
+                            if (node.ChildrenCount() == 1 && node[0].Text == "ASTIDENT") node.nameSimpleIdent = node[0][0].Text;
+
+
+                            string name = node[0][0].Text;
+                            string s2 = "O.Lookup(smpl, null, null, `" + Globals.symbolScalar + name + "`, null, null, false, EVariableType.Var, null)";
+                            node.Code.CA(s2);
+                        }
+                        break;
                     case "ASTEXPRESSIONNEW":
                         {
 
@@ -4719,7 +4757,7 @@ namespace Gekko.Parser.Gek
                             }                            
 
                             node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
-                            givenLabel = givenLabel.Replace(G.NL, "");  //remove any newlines, else C# code will become invalid.
+                            if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
                             //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
                             
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);

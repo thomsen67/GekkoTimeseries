@@ -23708,11 +23708,11 @@ namespace Gekko
             s2.AppendLine(Globals.tableConverterText4);
             s2.AppendLine(Globals.tableConverterText5);
 
-            s2.AppendLine("DATE __t1 = %__tabletimestart;");
-            s2.AppendLine("DATE __t2 = %__tabletimeend;");
+            s2.AppendLine("DATE %__t1 = %__tabletimestart;");
+            s2.AppendLine("DATE %__t2 = %__tabletimeend;");
             s2.AppendLine("TABLE tab = new Table();");
-            s2.AppendLine("VAL __periods = %__t2 - %__t1 + 1 - filteredperiods(%__t1, %__t2);");
-            s2.AppendLine("VAL __c1 = 1;");
+            s2.AppendLine("VAL %__periods = %__t2 - %__t1 + 1 - filteredperiods(%__t1, %__t2);");
+            s2.AppendLine("VAL %__c1 = 1;");
 
             string s = s2.ToString() + xh.s.ToString() + xh.sEnd.ToString() + s3.ToString();
 
@@ -24116,7 +24116,7 @@ namespace Gekko
                 {
                     add = "%__periods";
                 }
-                xh.s.AppendLine("VAL __c" + (xh.cols.Count + 1) + " = %__c" + (xh.cols.Count) + " + " + add + ";");
+                xh.s.AppendLine("VAL %__c" + (xh.cols.Count + 1) + " = %__c" + (xh.cols.Count) + " + " + add + ";");
             }
 
             if (node.Name == "colborder")
