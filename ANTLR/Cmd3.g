@@ -545,6 +545,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_MERGE;
     ASTOPT_STRING_MP;
     ASTOPT_STRING_MUTE ;
+	ASTNONCURLY;
     ASTOPT_STRING_MUTE;
     ASTOPT_STRING_N;
     ASTOPT_STRING_NAMES;
@@ -2110,8 +2111,18 @@ nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE i
 					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
+//cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
+//cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
+
 cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
-cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
+cnameHelper:                GLUE hashOrPercent GLUE name -> ^(ASTNONCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER hashOrPercent) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )
+                       //   | GLUE PERCENT GLUE name -> ^(ASTNONCURLY ASTPERCENT name)
+						  | GLUE VERTICALBAR name -> name //does not have glue after
+						    ;
+
+hashOrPercent:              PERCENT -> ASTPERCENT
+						  | HASH -> ASTHASH
+						    ; 
 
 nameOrCname:                cname | name;  //cname must be before name
 
