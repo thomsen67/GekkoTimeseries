@@ -2115,14 +2115,13 @@ nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE i
 //cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
 
 cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
-cnameHelper:                GLUE hashOrPercent GLUE name -> ^(ASTNONCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER hashOrPercent) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )
-                       //   | GLUE PERCENT GLUE name -> ^(ASTNONCURLY ASTPERCENT name)
+cnameHelper:                GLUE sigil name -> ^(ASTCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )                       
 						  | GLUE VERTICALBAR name -> name //does not have glue after
 						    ;
 
-hashOrPercent:              PERCENT -> ASTPERCENT
-						  | HASH -> ASTHASH
-						    ; 
+//hashOrPercent:              PERCENT -> ASTPERCENT
+//						  | HASH -> ASTHASH
+//						    ; 
 
 nameOrCname:                cname | name;  //cname must be before name
 
