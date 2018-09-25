@@ -3636,7 +3636,7 @@ namespace Gekko.Parser.Gek
                             string operatorType = "ASTPLACEHOLDER";
                             if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
 
-                            if (node.Parent.Text == null)
+                            if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE")  //the last convers function/procedure, but also IF and FOR indentation
                             {
                                 //only for the top-most node, that is, only 1 time
                                 //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.

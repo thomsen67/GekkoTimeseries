@@ -4809,7 +4809,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_ModelMovavg()
+        public void Test_ModelMovavg()
         {
             Program.Flush(); //wipes out existing cached models
 
@@ -8509,8 +8509,8 @@ namespace UnitTests
             I("SERIES x = 2;");
             I("SERIES y = 3;");
             I("SERIES x = y;");
-            AssertHelper(First(), "x", 2000, 2005, 3, sharedDelta);
-            AssertHelper(First(), "y", 2000, 2005, 3, sharedDelta);
+            _AssertSeries(First(), "x", 2000, 2005, 3, sharedDelta);
+            _AssertSeries(First(), "y", 2000, 2005, 3, sharedDelta);
 
             //-----------------------------
             //Check of SERIES x = %y, were %y is a scalar
@@ -8518,9 +8518,9 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2005;");
             I("CREATE x;");
-            I("VAL y = 3;");
+            I("VAL %y = 3;");
             I("SERIES x = %y;");
-            AssertHelper(First(), "x", 2000, 2005, 3, sharedDelta);
+            _AssertSeries(First(), "x", 2000, 2005, 3, sharedDelta);
 
             //-----------------------------
             //Check of SERIES x = %y, where %y is a string, val, date
@@ -8530,13 +8530,13 @@ namespace UnitTests
             I("CREATE x;");
             I("CREATE a;");
             I("SERIES a = 3;");
-            I("STRING y = 'a';");
-            I("VAL z = 4;");
-            I("DATE d = 2000;");
+            I("STRING %y = 'a';");
+            I("VAL %z = 4;");
+            I("DATE %d = 2000;");
             I("SERIES x = {%y};");
-            AssertHelper(First(), "x", 2000, 2005, 3, sharedDelta);
+            _AssertSeries(First(), "x", 2000, 2005, 3, sharedDelta);
             I("SERIES x = %z;");
-            AssertHelper(First(), "x", 2000, 2005, 4, sharedDelta);
+            _AssertSeries(First(), "x", 2000, 2005, 4, sharedDelta);
 
             FAIL("SERIES x = %d;"); //Must not accept date here
 
@@ -8545,9 +8545,9 @@ namespace UnitTests
             //-----------------------------
             I("RESET;");
             I("TIME 2000 2005;");
-            I("STRING b = 'x';");
-            I("STRING c = 'y';");
-            I("VAL d = 123;");
+            I("STRING %b = 'x';");
+            I("STRING %c = 'y';");
+            I("VAL %d = 123;");
             I("CREATE zz;");
             I("CREATE a;"); I("SERIES a = 3;");    //a=3
             I("CREATE x;"); I("SERIES x = 4;");    //x=4
@@ -8560,25 +8560,30 @@ namespace UnitTests
             I("CREATE ya;"); I("SERIES ya = 11;"); //ya=11
             I("CREATE yx;"); I("SERIES yx = 12;"); //yx=12
             I("CREATE yy;"); I("SERIES yy = 13;"); //yx=13
-            I("SERIES zz = a;"); AssertHelper(First(), "zz", 2000, 2005, 3, sharedDelta);
+            I("SERIES zz = a;"); _AssertSeries(First(), "zz", 2000, 2005, 3, sharedDelta);
             FAIL("SERIES zz = %b;");
-            I("SERIES zz = {%c};"); AssertHelper(First(), "zz", 2000, 2005, 5, sharedDelta);
-            I("SERIES zz = {c};"); AssertHelper(First(), "zz", 2000, 2005, 5, sharedDelta);
-            I("SERIES zz = %d;"); AssertHelper(First(), "zz", 2000, 2005, 123, sharedDelta);
+            I("SERIES zz = {%c};"); _AssertSeries(First(), "zz", 2000, 2005, 5, sharedDelta);
+            I("SERIES zz = {c};"); _AssertSeries(First(), "zz", 2000, 2005, 5, sharedDelta);
+            I("SERIES zz = %d;"); _AssertSeries(First(), "zz", 2000, 2005, 123, sharedDelta);
             FAIL("SERIES zz = {%d};");
-            I("SERIES zz = a%b;"); AssertHelper(First(), "zz", 2000, 2005, 6, sharedDelta);
-            I("SERIES zz = a{%c};"); AssertHelper(First(), "zz", 2000, 2005, 7, sharedDelta);
-            I("SERIES zz = a{c};"); AssertHelper(First(), "zz", 2000, 2005, 7, sharedDelta);
-            I("SERIES zz = %b|a;"); AssertHelper(First(), "zz", 2000, 2005, 8, sharedDelta);
-            I("SERIES zz = %b%b;"); AssertHelper(First(), "zz", 2000, 2005, 9, sharedDelta);
-            I("SERIES zz = %b{%c};"); AssertHelper(First(), "zz", 2000, 2005, 10, sharedDelta);
-            I("SERIES zz = %b{c};"); AssertHelper(First(), "zz", 2000, 2005, 10, sharedDelta);
-            I("SERIES zz = {%c}a;"); AssertHelper(First(), "zz", 2000, 2005, 11, sharedDelta);
-            I("SERIES zz = {c}a;"); AssertHelper(First(), "zz", 2000, 2005, 11, sharedDelta);
-            I("SERIES zz = {%c}%b;"); AssertHelper(First(), "zz", 2000, 2005, 12, sharedDelta);
-            I("SERIES zz = {c}%b;"); AssertHelper(First(), "zz", 2000, 2005, 12, sharedDelta);
-            I("SERIES zz = {%c}{%c};"); AssertHelper(First(), "zz", 2000, 2005, 13, sharedDelta);
-            I("SERIES zz = {c}{c};"); AssertHelper(First(), "zz", 2000, 2005, 13, sharedDelta);
+
+            I("SERIES zz = a%b;"); _AssertSeries(First(), "zz", 2000, 2005, 6, sharedDelta);
+            I("SERIES zz = a{%c};"); _AssertSeries(First(), "zz", 2000, 2005, 7, sharedDelta);
+            I("SERIES zz = a{c};"); _AssertSeries(First(), "zz", 2000, 2005, 7, sharedDelta);
+
+            //To do this, setting a scalar first, you must use {...}
+            //Using %(...) is something completely different
+            FAIL("SERIES zz = %b|a;"); //_AssertSeries(First(), "zz", 2000, 2005, 8, sharedDelta);
+            FAIL("SERIES zz = %b%b;"); //_AssertSeries(First(), "zz", 2000, 2005, 9, sharedDelta);
+            FAIL("SERIES zz = %b{%c};"); //_AssertSeries(First(), "zz", 2000, 2005, 10, sharedDelta);
+            FAIL("SERIES zz = %b{c};"); //_AssertSeries(First(), "zz", 2000, 2005, 10, sharedDelta);
+
+            I("SERIES zz = {%c}a;"); _AssertSeries(First(), "zz", 2000, 2005, 11, sharedDelta);
+            I("SERIES zz = {c}a;"); _AssertSeries(First(), "zz", 2000, 2005, 11, sharedDelta);
+            I("SERIES zz = {%c}%b;"); _AssertSeries(First(), "zz", 2000, 2005, 12, sharedDelta);
+            I("SERIES zz = {c}%b;"); _AssertSeries(First(), "zz", 2000, 2005, 12, sharedDelta);
+            I("SERIES zz = {%c}{%c};"); _AssertSeries(First(), "zz", 2000, 2005, 13, sharedDelta);
+            I("SERIES zz = {c}{c};"); _AssertSeries(First(), "zz", 2000, 2005, 13, sharedDelta);
 
             //-----------------------------
             //Recursive
@@ -8590,35 +8595,44 @@ namespace UnitTests
             I("CREATE y, ayb;");
             I("SERIES y = 3;");
             I("SERIES ayb = 3;");
-            I("STRING s = 's1';");
-            I("STRING s1 = 'y';");
-            I("STRING ab = 'y';");
-            I("SERIES x1 = {%(%s)};");  //must be with {}, else error
-            AssertHelper(First(), "x1", 2000, 2005, 3, sharedDelta);
-            I("SERIES x2 = a%(%s)b;");
-            AssertHelper(First(), "x2", 2000, 2005, 3, sharedDelta);
-            I("SERIES x3 = a{%(%s)}b;");
-            AssertHelper(First(), "x3", 2000, 2005, 3, sharedDelta);
-            I("SERIES x4 = a{%({'a'+'b'})}b;");  //also ayb
-            AssertHelper(First(), "x4", 2000, 2005, 3, sharedDelta);
+            I("STRING %s = 's1';");
+            I("STRING %s1 = 'y';");
+            I("STRING %ab = 'y';");
+            FAIL("SERIES x1 = {%(%s)};");
+            I("SERIES x1 = {%{%s}};");
+            _AssertSeries(First(), "x1", 2000, 2005, 3, sharedDelta);
+            FAIL("SERIES x2 = a%(%s)b;");
+            FAIL("SERIES x2 = a%{%s}b;");  //looks for %s1b, fair enough, needs '|'
+            I("SERIES x2 = a%{%s}|b;");
+            _AssertSeries(First(), "x2", 2000, 2005, 3, sharedDelta);
+            FAIL("SERIES x3 = a{%(%s)}b;");
+            I("SERIES x3 = a{%{%s}}b;");
+            _AssertSeries(First(), "x3", 2000, 2005, 3, sharedDelta);
+            FAIL("SERIES x4 = a{%({'a'+'b'})}b;");  //also ayb
+            I("SERIES x4 = a{%{'a'+'b'}}b;");  //also ayb
+            _AssertSeries(First(), "x4", 2000, 2005, 3, sharedDelta);
 
-            //LIST
-            List<string> x = null;
-            I("RESET;");
-            I("STRING s = 'u';");
-            I("LIST x = a, b, c:d, 'e', 'f:g', %s, %s+%s, {%s}, {s}, {s}:{s}, %s+':'+%s, a%s:%s|a;");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 12); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "b"); Assert.AreEqual(x[2], "c:d"); Assert.AreEqual(x[3], "e"); Assert.AreEqual(x[4], "f:g"); Assert.AreEqual(x[5], "u"); Assert.AreEqual(x[6], "uu"); Assert.AreEqual(x[7], "u"); Assert.AreEqual(x[8], "u"); Assert.AreEqual(x[9], "u:u"); Assert.AreEqual(x[10], "u:u"); Assert.AreEqual(x[11], "au:ua");
-            I("CREATE a, abc, abbc, adc, addc;");
-            I("LIST x = [*];");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 5); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "abbc"); Assert.AreEqual(x[2], "abc"); Assert.AreEqual(x[3], "adc"); Assert.AreEqual(x[4], "addc");
-            I("LIST x = [a*];");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 5); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "abbc"); Assert.AreEqual(x[2], "abc"); Assert.AreEqual(x[3], "adc"); Assert.AreEqual(x[4], "addc");
-            I("LIST x = [*c];");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 4); Assert.AreEqual(x[0], "abbc"); Assert.AreEqual(x[1], "abc"); Assert.AreEqual(x[2], "adc"); Assert.AreEqual(x[3], "addc");
-            I("LIST x = [?];");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 1); Assert.AreEqual(x[0], "a");
-            I("LIST x = [a?c];");
-            x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 2); Assert.AreEqual(x[0], "abc"); Assert.AreEqual(x[1], "adc");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                //List def is more stringent now
+                //LIST
+                List<string> x = null;
+                I("RESET;");
+                I("STRING %s = 'u';");
+                I("LIST #x = a, b, c:d, 'e', 'f:g', %s, %s+%s, {%s}, {s}, {s}:{s}, %s+':'+%s, a%s:%s|a;");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 12); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "b"); Assert.AreEqual(x[2], "c:d"); Assert.AreEqual(x[3], "e"); Assert.AreEqual(x[4], "f:g"); Assert.AreEqual(x[5], "u"); Assert.AreEqual(x[6], "uu"); Assert.AreEqual(x[7], "u"); Assert.AreEqual(x[8], "u"); Assert.AreEqual(x[9], "u:u"); Assert.AreEqual(x[10], "u:u"); Assert.AreEqual(x[11], "au:ua");
+                I("CREATE a, abc, abbc, adc, addc;");
+                I("LIST x = [*];");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 5); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "abbc"); Assert.AreEqual(x[2], "abc"); Assert.AreEqual(x[3], "adc"); Assert.AreEqual(x[4], "addc");
+                I("LIST x = [a*];");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 5); Assert.AreEqual(x[0], "a"); Assert.AreEqual(x[1], "abbc"); Assert.AreEqual(x[2], "abc"); Assert.AreEqual(x[3], "adc"); Assert.AreEqual(x[4], "addc");
+                I("LIST x = [*c];");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 4); Assert.AreEqual(x[0], "abbc"); Assert.AreEqual(x[1], "abc"); Assert.AreEqual(x[2], "adc"); Assert.AreEqual(x[3], "addc");
+                I("LIST x = [?];");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 1); Assert.AreEqual(x[0], "a");
+                I("LIST x = [a?c];");
+                x = GetListOfStrings("x"); Assert.AreEqual(x.Count, 2); Assert.AreEqual(x[0], "abc"); Assert.AreEqual(x[1], "adc");
+            }
 
         }
 
@@ -11432,12 +11446,12 @@ namespace UnitTests
             //For putting data in: testing both SetData() and GetDataSequence() and setting the array value.
             //Testing that the data reads out correctly, both with GetData() and GetDataSequence()
             //Puts in 1500 / 1501 etc. for 'a', 1500.01 / 1500.02 / 1500.03 / 1500.04 / 1501.01 etc. for 'q'
-            Series tsA1 = new Series(EFreq.A, "test");
-            Series tsQ1 = new Series(EFreq.Q, "test");
-            Series tsM1 = new Series(EFreq.M, "test");
-            Series tsA2 = new Series(EFreq.A, "test");
-            Series tsQ2 = new Series(EFreq.Q, "test");
-            Series tsM2 = new Series(EFreq.M, "test");
+            Series tsA1 = new Series(EFreq.A, "test!a");
+            Series tsQ1 = new Series(EFreq.Q, "test!q");
+            Series tsM1 = new Series(EFreq.M, "test!m");
+            Series tsA2 = new Series(EFreq.A, "test!a");
+            Series tsQ2 = new Series(EFreq.Q, "test!q");
+            Series tsM2 = new Series(EFreq.M, "test!m");
             int start = 1500;
             int end = 3000;
             //writing data to timeseries
@@ -16928,6 +16942,14 @@ namespace UnitTests
             I("RESET;");
             FAIL("RUN return1c.cmd;");
             AssertHelperScalarString("x", "abcd");
+        }
+
+        [TestMethod]
+        public void _Test_MAKRO_test1()
+        {
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\MAKRO\test1\';");
+            I("RUN makro;");
         }
 
         [TestMethod]

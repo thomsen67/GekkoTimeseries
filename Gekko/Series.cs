@@ -707,7 +707,7 @@ namespace Gekko
                 double[] temp = new double[size];
                 Array.Copy(this.data.dataArray, index1, temp, 0, size);
                 index1 = 0;
-                index2 = temp.Length;
+                index2 = temp.Length - 1;  //TT changed 24-9-2018
                 return temp;
             }
             else
