@@ -42,17 +42,17 @@ namespace Gekko
         // --------------object methods start----------------
         // ----------------------------------------------------
 
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            return Functions.append(isLhs, this, x);
-        }
+        //public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
+        //{
+        //    return Functions.append(isLhs, this, x);
+        //}
 
         
 
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            return Functions.extend(isLhs, this, x);
-        }
+        //public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
+        //{
+        //    return Functions.extend(isLhs, this, x);
+        //}
 
         
 

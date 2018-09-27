@@ -26,9 +26,9 @@ namespace Gekko
 
             O.Assignment o0 = new O.Assignment();
             O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar24 = O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var, null).extend(false, smpl, O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var, null));
+            IVariable ivTmpvar22 = Functions.extend(smpl, O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var, null), O.Lookup(smpl, null, null, "#m", null, null, false, EVariableType.Var, null));
             O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "#m", null, ivTmpvar24, true, EVariableType.Var, o0)
+            O.Lookup(smpl, null, null, "#m", null, ivTmpvar22, true, EVariableType.Var, o0)
             ;
 
 

@@ -2416,10 +2416,25 @@ namespace Gekko
 
         public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
         {
-            //string s1 = O.ConvertToString(x1);
-            string s2 = O.ConvertToString(x2);
-                        
-            Series ts = O.Lookup(null, null, x1, null, false, EVariableType.Var, null) as Series;
+            Series ts = null;
+
+            if (x1.Type() == EVariableType.Series)
+            {
+                ts = x1 as Series;
+            }
+            else if (x1.Type() == EVariableType.String)
+            {
+                //ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
+                ts = O.Lookup(null, null, x1, null, false, EVariableType.Var, null) as Series;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: fromseries(): expected first argument to be series or string type");
+                throw new GekkoException();
+            }
+
+            string s2 = O.ConvertToString(x2);                       
+            
             if (ts == null)
             {
                 G.Writeln2("*** ERROR: Variable is not of series type");
@@ -2429,6 +2444,13 @@ namespace Gekko
             if (G.Equal(s2, "name"))
             {
                 return new ScalarString(ts.name);
+            }
+            else if (G.Equal(s2, "bank"))
+            {
+                string s = "";
+                string ss = ts?.meta?.parentDatabank.name;
+                if (ss != null) s = ss;
+                return new ScalarString(ss);
             }
             else if (G.Equal(s2, "label"))
             {
@@ -2614,22 +2636,21 @@ namespace Gekko
 
         // ====================== object methods =======================================
 
-        public static IVariable append(bool isLhs, List ths, IVariable x)
+        public static IVariable append(GekkoSmpl smpl, List ths, IVariable x)
         {
-            if (isLhs)
-            {
-                ths.Add(x);
-                return new GekkoNull();
-            }
-            else
-            {
-                List temp = ths.DeepClone(null) as List;
-                temp.Add(x);                
-                return temp;
-            }
+            List temp = ths.DeepClone(null) as List;
+            temp.Add(x);
+            return temp;
+
         }
 
-        public static IVariable extend(bool isLhs, List ths, IVariable x)
+        //public static IVariable append_naked(GekkoSmpl smpl, IVariable ths, IVariable x)
+        //{
+        //    ths.Add(x);
+        //    return new GekkoNull();
+        //}
+
+        public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
             List x_list = x as List;
             if (x_list == null)
@@ -2637,18 +2658,22 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
                 throw new GekkoException();
             }
-            if (isLhs)
-            {
-                ths.list.AddRange(x_list.list);
-                return new GekkoNull();
-            }
-            else
-            {
-                List temp = ths.DeepClone(null) as List;
-                temp.list.AddRange(x_list.list);
-                return temp;
-            }
+            List temp = ths.DeepClone(null) as List;
+            temp.list.AddRange(x_list.list);
+            return temp;
         }
+
+        //public static IVariable extend_naked(GekkoSmpl smpl, List ths, IVariable x)
+        //{
+        //    List x_list = x as List;
+        //    if (x_list == null)
+        //    {
+        //        G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
+        //        throw new GekkoException();
+        //    }
+        //    ths.list.AddRange(x_list.list);
+        //    return new GekkoNull();
+        //}
 
     }
 }
