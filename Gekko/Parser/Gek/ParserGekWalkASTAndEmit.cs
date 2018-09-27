@@ -2473,11 +2473,9 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 //Not a sum() or unfold() function that is going to be looped                                
-
-
-
+                                
                                 string meta = null;
-                                if (node.Text=="ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTIONNAKED" || Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
+                                if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
                                     string extra = null;
                                     int lagIndex = -12345;
@@ -2565,15 +2563,32 @@ namespace Gekko.Parser.Gek
                                     {
                                         args += ", " + node[i].Code;
                                     }
-                                    int numberOfArguments = node.ChildrenCount() - 1;
-                                    node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
+                                    int numberOfArguments = node.ChildrenCount() - 1;                                    
 
-                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
+                                    //TODO TODO TODO
+                                    // the 'extra' parameter indicating lag to come
+                                    //
+                                    if (node.Text == "ASTOBJECTFUNCTION")
+                                    {
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.xxx + "").A(args).A(")");
+                                    }
+                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
+                                    {                                        
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.xxx + "").A(args).A(")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
+                                    }
+                                    
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
-                                }
+                                    
 
+
+                                }
                             }
                         }
                         break;
@@ -3903,7 +3918,7 @@ namespace Gekko.Parser.Gek
                             bool functionHit = false;
                             if (internalName != null)
                             {
-                                if (isLeftSideVariable)
+                                if (isLeftSideVariable && ivTempVar != null)
                                 {
                                     node.Code.CA(internalName + " = " + ivTempVar + ";" + G.NL);
                                 }

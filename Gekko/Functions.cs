@@ -2636,8 +2636,9 @@ namespace Gekko
 
         // ====================== object methods =======================================
 
-        public static IVariable append(GekkoSmpl smpl, List ths, IVariable x)
+        public static IVariable append(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
+            //FIX: type checks etc.!
             List temp = ths.DeepClone(null) as List;
             temp.Add(x);
             return temp;
@@ -2652,6 +2653,7 @@ namespace Gekko
 
         public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
+            //FIX: type checks etc.!
             List x_list = x as List;
             if (x_list == null)
             {

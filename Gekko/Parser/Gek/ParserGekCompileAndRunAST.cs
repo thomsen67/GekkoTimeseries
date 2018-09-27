@@ -306,6 +306,23 @@ namespace Gekko.Parser.Gek
                         }
                     }
                 }
+                else if (G.Equal(ce.ErrorNumber, "CS0162"))
+                {
+                    G.Writeln2("*** ERROR: Unreachable code detected in user defined function");
+                    G.Writeln("           This may be because of missing return statement.", Color.Red);
+
+                    int pFrom = ce.ErrorText.IndexOf("Gekko.TranslatedCode.") + "Gekko.TranslatedCode.".Length;
+                    int pTo = ce.ErrorText.IndexOf("(");
+                    if (pFrom != -1 && pTo != -1)
+                    {
+                        int dif = pTo - pFrom;
+                        if (dif > 0)
+                        {
+                            string result = ce.ErrorText.Substring(pFrom, dif);
+                            G.Writeln("*** The function '" + result + "' contains unreachable code", Color.Red);
+                        }
+                    }
+                }
             }
 
             string text = "*** ERROR: Internal Gekko error regarding file: " + p.lastFileSentToANTLR;

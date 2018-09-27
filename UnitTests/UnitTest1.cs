@@ -12205,6 +12205,78 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ObjectOrientation()
+        {
+            // ---------------------------------------------------------------------------
+            // object method with 0 arguments, called as object method, or as function
+            // ---------------------------------------------------------------------------
+
+            I("reset;");
+            I("#sq = (%type = 'square', %size = 2, %color = 'red');");
+            I("#bx = (%type = 'box', %size = 3, %color = 'green');");
+            I("function val volume(map #m);"
+            + "  %volume = 0;"
+            + "  if (#m.%type == 'square');"
+            + "    %volume = #m.%size * #m.%size;"
+            + "  else;"
+            + "  if (#m.%type == 'box');"
+            + "    %volume = #m.%size * #m.%size * #m.%size;"
+            + "  end; end;"
+            + "  return %volume;"
+            + "end;");
+
+            I("tell'';");
+            I("tell'Type ' + #sq.%type + ': size = ' + #sq.%size + ', volume = ' + #sq.volume() + ', color = ' + #sq.%color;");
+            I("tell'Type ' + #bx.%type + ': size = ' + #bx.%size + ', volume = ' + volume(#bx) + ', color = ' + #bx.%color;");
+
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Type square: size = 2, volume = 4, color = red"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Type box: size = 3, volume = 27, color = green"));
+
+            // ---------------------------------------------------------------------------
+            // object method with 1 argument, called as object method, or as function
+            // ---------------------------------------------------------------------------
+
+            I("reset;");
+            I("function list plus(list #m, val %v);"
+            + "  for val %i = 1 to #m[0];"
+            + "    #m[%i] = #m[%i] + %v;"
+            + "  end;"
+            + "  return #m;"
+            + "end;");
+
+            I("function list mul(list #m, val %v);"
+            + "  for val %i = 1 to #m[0];"
+            + "    #m[%i] = #m[%i] * %v;"
+            + "  end;"
+            + "  return #m;"
+            + "end;");
+
+            I("#m1 = (1, 2, 3);");
+            I("#m1 = plus(#m1, 100);");
+
+            I("#m2 = (1, 2, 3);");
+            I("#m2 = #m2.plus(200);");
+
+            I("#m3 = (1, 2, 3);");
+            I("#m3 = mul(plus(#m3, 200), 1000);");   //(1 + 200) * 1000 = 201000, not 1200 if the other order
+
+            I("#m4 = (1, 2, 3);");
+            I("#m4 = #m4.plus(200).mul(10000);");  //(1 + 200) * 10000 = 2010000, not 10200 if the other order
+
+            I("print #m1;");
+            I("print #m2;");
+            I("print #m3;");
+            I("print #m4;");
+
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("101, 102, 103"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("201, 202, 203"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("201000, 202000, 203000"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2010000, 2020000, 2030000"));
+
+
+        }
+
+        [TestMethod]
         public void _Test__PipeAndTell()
         {
             //
