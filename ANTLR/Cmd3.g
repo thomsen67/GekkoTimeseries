@@ -1934,12 +1934,15 @@ value:                      function //must be before varname
 						  | double2 -> double2						
 						  | date2 -> ^(ASTDATE2 date2) //a date like: 2001q3 (luckily we do not have 'e' freq, then what about 2012e3 (in principle, = 2012000))
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
+					 	  | stringInQuotesWithCurlies
 						  | listFile						
 						  | matrix
 						  | list
 						  | map
 					//	  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						    ;
+
+stringInQuotesWithCurlies:  StringInQuotes1 expression StringInQuotes2 -> ^(ASTSTRINGINQUOTES TERMINAL);
 
 wildRange:                  wildcardWithBank | rangeWithBank;					    
 
@@ -4549,7 +4552,13 @@ fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 
 //Use ANTLR to resolve %x or %() inside a string
 //StringInQuotes:             ('\'' (~'\'')* '\'');
-StringInQuotes:             ('\'' ('~\'' | ~'\'')* '\'');
+
+//'....{...'.{....}..'..}....'
+
+StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+
+StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+StringInQuotes2:            ('}' ('~\'' | '~{' | ~('\'' | '{'))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
 
 //moved up here, because some of them start with glue, so better before GLUE token
 PLUSEQUAL:                  '+='; //<m>
