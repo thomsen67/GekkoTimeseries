@@ -690,7 +690,7 @@ namespace Gekko
                 s = s.Substring(1, s.Length - 2);
             }
             return s;
-        }
+        }        
 
         public static string StripQuotes2(string s)
         {

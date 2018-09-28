@@ -56,6 +56,7 @@ tokens {
 	ASTSTAR5;
 	ASTINDEXERALONE;
 	ASTINDEXERELEMENTPLUS;
+	ASTSTRINGINQUOTESWITHCURLIES;
 	ASTINTEGER;
 	ASTVARNAME;
 	ASTPLACEHOLDER;
@@ -1313,8 +1314,9 @@ Y2                    = 'Y2'                       ;
                               @lexer::namespace { Gekko }
 
                               @members {
-
-                                 private CommonToken token(string text, int type, int line) {
+							                                   
+								 
+								 private CommonToken token(string text, int type, int line) {
                                                                CommonToken t = new CommonToken(type, text);
                                                            t.Line = line;
                                                                return t;
@@ -1336,7 +1338,9 @@ Y2                    = 'Y2'                       ;
 
 							  @lexer::members {
 
-                                public static System.Collections.Generic.Dictionary<string, int> kw = GetKw();
+                                private int stringCounter = 0;
+								
+								public static System.Collections.Generic.Dictionary<string, int> kw = GetKw();
 
                                 public static System.Collections.Generic.Dictionary<string, int> GetKw()
                                 {
@@ -1942,7 +1946,7 @@ value:                      function //must be before varname
 					//	  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						    ;
 
-stringInQuotesWithCurlies:  StringInQuotes1 expression StringInQuotes2 -> ^(ASTSTRINGINQUOTES TERMINAL);
+stringInQuotesWithCurlies:  StringInQuotes1 expression StringInQuotes2 -> ^(ASTSTRINGINQUOTESWITHCURLIES StringInQuotes1 expression StringInQuotes2);
 
 wildRange:                  wildcardWithBank | rangeWithBank;					    
 
@@ -4553,12 +4557,22 @@ fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 //Use ANTLR to resolve %x or %() inside a string
 //StringInQuotes:             ('\'' (~'\'')* '\'');
 
-//'....{...'.{....}..'..}....'
+//PRT 'The value is {fy[2000]} in that year';          
+//PRT {%i}+1 'label';
+
+//https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687108/1.+Lexer
+
+
+//StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+//StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+//StringInQuotes2:            ('}' ('~\'' | '~{' | ~('\''))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+
 
 StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+StringInQuotes1:            ('\'' ('~{' | ~('\'' | '{'))* '{') { stringCounter++; } ;  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+StringInQuotes2:            { stringCounter == 1 }?=> ('}' ('~\'' | ~('\''))* '\'') { stringCounter--; };  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
 
-StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-StringInQuotes2:            ('}' ('~\'' | '~{' | ~('\'' | '{'))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
+
 
 //moved up here, because some of them start with glue, so better before GLUE token
 PLUSEQUAL:                  '+='; //<m>

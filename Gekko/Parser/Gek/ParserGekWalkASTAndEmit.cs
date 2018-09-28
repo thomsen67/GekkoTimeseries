@@ -5234,7 +5234,20 @@ namespace Gekko.Parser.Gek
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
                             s = s.Replace("\"", "\"\"");
-                            node.Code.CA("new ScalarString(ScalarString.SubstituteScalarsInString(@`" + s + "`, true, false))");
+                            //node.Code.CA("new ScalarString(ScalarString.SubstituteScalarsInString(@`" + s + "`, true, false))");
+                            node.Code.CA("new ScalarString(@`" + s + "`)");
+                        }
+                        break;
+                    case "ASTSTRINGINQUOTESWITHCURLIES":
+                        {
+                            
+                            string s1 = node[0].Text.Substring(1, node[0].Text.Length - 2).Replace("\"", "\"\"");
+                            string s2 = node[2].Text.Substring(1, node[2].Text.Length - 2).Replace("\"", "\"\"");
+
+                            //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
+                            //but @ will keep backslashes.
+
+                            node.Code.CA("(new ScalarString(@`" + s1 + "`)).Add(smpl, " + "" + node[1].Code + ").Add(smpl, " + "new ScalarString(@`" + s2 + "`))");
                         }
                         break;
                     case "ASTSTRING":
