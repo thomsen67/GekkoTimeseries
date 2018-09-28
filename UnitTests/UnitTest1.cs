@@ -9226,51 +9226,55 @@ namespace UnitTests
             I("RESET;");
             I("VAL %v = -1.2345;");
             I("STRING %s = 'a%v|b';");
+            _AssertScalarString(First(), "%s", "a%v|b");
+            I("STRING %s = 'a{%v}b';");
             _AssertScalarString(First(), "%s", "a-1.2345b");
+            I("STRING %s = 'a~{%v}b';");
+            _AssertScalarString(First(), "%s", "a{%v}b");
+            FAIL("STRING %s = 'a'b';");
+            I("STRING %s = 'a~'b';");
+            _AssertScalarString(First(), "%s", "a'b");
 
             I("RESET;");
             I("DATE %d = 2001;");
-            I("STRING %s = 'a%d|b';");
+            I("STRING %s = 'a{%d}b';");
             _AssertScalarString(First(), "%s", "a2001b");
 
             I("RESET;");
             I("DATE %d = 2001q2;");
-            I("STRING %s = 'a%d|b';");
+            I("STRING %s = 'a{%d}b';");
             _AssertScalarString(First(), "%s", "a2001q2b");
 
             I("RESET;");
             I("STRING %s2= 'Hej';");
-            I("STRING %s = 'a%s2|b';");
-            _AssertScalarString(First(), "%s", "aHejb");
+            FAIL("STRING %s = 'a%{s2}b';");
+            I("STRING %s = 'a%{%s2}b';");
+            _AssertScalarString(First(), "%s", "a%Hejb");
 
             I("RESET;");
             I("STRING %n = 'Hej';");
-            I("STRING %s7 = 'a%n|b';");
+            I("STRING %s7 = 'a{%n}b';");
             _AssertScalarString(First(), "%s7", "aHejb");
-            I("STRING %s7a = 'a%n%n|b';");  //two substitutions
+            I("STRING %s7a = 'a{%n}{%n}b';");  //two substitutions
             _AssertScalarString(First(), "%s7a", "aHejHejb");
-            //I("STRING s = 'a$%n|b';");  //stringify
-            //_AssertScalarString(First(), "s", "aHejb");
-            //I("STRING ss = 'a$n|b';");  //stringify
-            //_AssertScalarString(First(), "ss", "aHejb");
-
+            
             I("RESET;");
             I("STRING n = 'Hej';");
-            I("STRING %ss1 = 'a{n}b';");
+            FAIL("STRING %ss1 = 'a{n}b';");
             I("STRING %ss2 = 'a{%n}b';");
-            _AssertScalarString(First(), "%ss1", "aHejb");
+            //_AssertScalarString(First(), "%ss1", "aHejb");
             _AssertScalarString(First(), "%ss2", "aHejb");
 
             I("RESET;");
             I("STRING %s = 'Hej';");
-            I("STRING %ss1 = 'a{s}b';");
+            FAIL("STRING %ss1 = 'a{s}b';");
             I("STRING %ss2 = 'a{%s}b';");
-            I("STRING %ss3 = 'a{%s}{%s}{s}b';");
-            I("STRING %ss4 = 'a{%s} {%s} {s}b';");
-            _AssertScalarString(First(), "%ss1", "aHejb");
+            FAIL("STRING %ss3 = 'a{%s}{%s}{s}b';");
+            FAIL("STRING %ss4 = 'a{%s} {%s} {s}b';");
+            //_AssertScalarString(First(), "%ss1", "aHejb");
             _AssertScalarString(First(), "%ss2", "aHejb");
-            _AssertScalarString(First(), "%ss3", "aHejHejHejb");
-            _AssertScalarString(First(), "%ss4", "aHej Hej Hejb");
+            //_AssertScalarString(First(), "%ss3", "aHejHejHejb");
+            //_AssertScalarString(First(), "%ss4", "aHej Hej Hejb");
 
             // --------- tilde ------------
 

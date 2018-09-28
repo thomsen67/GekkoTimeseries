@@ -4554,25 +4554,25 @@ Double:                     DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+1
 
 fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 
-//Use ANTLR to resolve %x or %() inside a string
-//StringInQuotes:             ('\'' (~'\'')* '\'');
+//String interpolation: 'this is a {'r' + 'ed'} old car' 
+//                      aaaaaaaaaaaa          bbbbbbbbbb
+//String interpolation: 'this is a {'r' + 'ed'} old {'car'} from 1980' 
+//                      aaaaaaaaaaaa          bbbbbbb     cccccccccccc
+//starts in state 0. aaa turns on state 1. Because of state 1, bbb can be matched. Because bbb ends with
+//{ state 2 is set, else it would be state 1. State 2 allows match of naked expression. After that
+//state is set to 1.
 
-//PRT 'The value is {fy[2000]} in that year';          
-//PRT {%i}+1 'label';
+//Uses lexer gates to solve the problem. 
+//Problem is that we are going to match "} car'", but it should not match that pattern in for instance "PRT {%i} 'label';". 
+//Therefore, when "'this is a {" is matched, a counter is set. Then the "} car'" token is only allowed to match if the couter is set.
+//See: https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687108/1.+Lexer
+//The rules below do not allow nested interpolations, for instance %s = 'a{'b{'c'}d'}e'; That is crazy anyway.
+//StringInQuotes2: only allowed if after a StringInQuotes1, else normal '}' matches.
+//                 allows ~' but stops at ' or {.
 
-//https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687108/1.+Lexer
-
-
-//StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-//StringInQuotes1:            ('\'' ('~\'' | '~{' | ~('{'))* '{');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-//StringInQuotes2:            ('}' ('~\'' | '~{' | ~('\''))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-
-
-StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-StringInQuotes1:            ('\'' ('~{' | ~('\'' | '{'))* '{') { stringCounter++; } ;  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-StringInQuotes2:            { stringCounter == 1 }?=> ('}' ('~\'' | ~('\''))* '\'') { stringCounter--; };  //tilde+pling and tilde+lcurly allowed, but not lcurly or pling alone
-
-
+StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');
+StringInQuotes1:            ('\'' ('~{' | ~('\'' | '{'))* '{') { stringCounter++; };
+StringInQuotes2:            { stringCounter == 1 }?=> ('}' ('~\'' | ~('\''))* '\'') { stringCounter--; };
 
 //moved up here, because some of them start with glue, so better before GLUE token
 PLUSEQUAL:                  '+='; //<m>

@@ -3417,7 +3417,22 @@ namespace Gekko
             rv = new List<List<LabelHelperIVariable>>();
             return rv;
         }
-        
+
+        public static IVariable HandleString(ScalarString x)
+        {
+            //if (!x.string2.Contains("~") & !x.string2.Contains("\""))
+            if (!x.string2.Contains("~"))
+            {
+                //fast, covers most cases
+                return x;
+            }
+            string s = x.string2;
+            s = s.Replace("~'", "'");
+            s = s.Replace("~{", "{");
+            //s = s.Replace("~~", "~");
+            //s = s.Replace("\"", "\"\"");
+            return new ScalarString(s);  //costs a bit of time, but only if the string contains ~ or ".
+        }
 
         //========================================
         //======================================== Z() variants start
