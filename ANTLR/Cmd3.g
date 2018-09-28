@@ -1946,7 +1946,11 @@ value:                      function //must be before varname
 					//	  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						    ;
 
-stringInQuotesWithCurlies:  StringInQuotes1 expression StringInQuotes2 -> ^(ASTSTRINGINQUOTESWITHCURLIES StringInQuotes1 expression StringInQuotes2);
+stringInQuotesWithCurlies:  stringInQuotesWithCurliesA stringInQuotesWithCurliesB* stringInQuotesWithCurliesC -> ^(ASTSTRINGINQUOTESWITHCURLIES stringInQuotesWithCurliesA stringInQuotesWithCurliesB* stringInQuotesWithCurliesC);
+stringInQuotesWithCurliesA: StringInQuotes1 expression;
+stringInQuotesWithCurliesB: StringInQuotes2 expression;
+stringInQuotesWithCurliesC: StringInQuotes3;
+
 
 wildRange:                  wildcardWithBank | rangeWithBank;					    
 
@@ -4554,10 +4558,12 @@ Double:                     DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+1
 
 fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 
+//String interpolation: 'this is a red old car' 
+//                      00000000000000000000000
 //String interpolation: 'this is a {'r' + 'ed'} old car' 
-//                      aaaaaaaaaaaa          bbbbbbbbbb
+//                      111111111111          3333333333
 //String interpolation: 'this is a {'r' + 'ed'} old {'car'} from 1980' 
-//                      aaaaaaaaaaaa          bbbbbbb     cccccccccccc
+//                      111111111111          2222222     333333333333
 //starts in state 0. aaa turns on state 1. Because of state 1, bbb can be matched. Because bbb ends with
 //{ state 2 is set, else it would be state 1. State 2 allows match of naked expression. After that
 //state is set to 1.
@@ -4571,8 +4577,9 @@ fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
 //                 allows ~' but stops at ' or {.
 
 StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');
-StringInQuotes1:            ('\'' ('~{' | ~('\'' | '{'))* '{') { stringCounter++; };
-StringInQuotes2:            { stringCounter == 1 }?=> ('}' ('~\'' | ~('\''))* '\'') { stringCounter--; };
+StringInQuotes1:            { stringCounter == 0 }?=> ('\'' (~('{' | '\''))* '{') { stringCounter++; };
+StringInQuotes2:            { stringCounter == 1 }?=> ('}' (~('{' | '\''))* '{');
+StringInQuotes3:            { stringCounter == 1 }?=> ('}' (~('{' | '\''))* '\'') { stringCounter--; };
 
 //moved up here, because some of them start with glue, so better before GLUE token
 PLUSEQUAL:                  '+='; //<m>

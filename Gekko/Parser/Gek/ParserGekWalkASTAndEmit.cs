@@ -5240,14 +5240,24 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSTRINGINQUOTESWITHCURLIES":
                         {
-                            
-                            string s1 = node[0].Text.Substring(1, node[0].Text.Length - 2).Replace("\"", "\"\"");
-                            string s2 = node[2].Text.Substring(1, node[2].Text.Length - 2).Replace("\"", "\"\"");
+                            string ss = null;
+                            for (int i = 0; i < node.ChildrenCount(); i += 2)
+                            {
+                                //always uneven number of items
+                                //if there are 5 items, i will be 0, 2, 4, where 4 is the last.
+                                string s1 = node[i].Text.Substring(1, node[i].Text.Length - 2).Replace("\"", "\"\"");
+                                string s2 = null;
+                                string add = null;
+                                if (i + 1 < node.ChildrenCount()) add = ".Add(smpl, " + node[i + 1].Code.ToString() + ")";
+
+                                if (i >= 2) ss += ".Add(smpl, O.HandleString(new ScalarString(@`" + s1 + "`)))" + add;
+                                else ss += "O.HandleString(new ScalarString(@`" + s1 + "`))" + add;
+                            }                            
 
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
 
-                            node.Code.CA("O.HandleString(new ScalarString(@`" + s1 + "`)).Add(smpl, " + "" + node[1].Code + ").Add(smpl, " + "new ScalarString(@`" + s2 + "`))");
+                            node.Code.CA(ss.ToString());
                         }
                         break;
                     case "ASTSTRING":
