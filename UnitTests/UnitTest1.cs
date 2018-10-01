@@ -81,7 +81,38 @@ using System.IO;
 namespace UnitTests
 {
 
+    public class StringOrList
+    {
+        public string s = null;
+        public StringOrList[] ss = null;
 
+        public StringOrList()
+        {
+        }
+
+        public StringOrList(params string[] strings)
+        {
+            StringOrList[] temp = new StringOrList[strings.Length];
+            for (int i = 0; i < strings.Length; i++)
+            {
+                StringOrList temp2 = new StringOrList();
+                temp2.s = strings[i];
+                temp[i] = temp2;
+            }
+            this.ss = temp;
+        }
+
+        public void Add(string s)
+        {
+            this.s = s;
+        }
+        public void Add(StringOrList[] ss)
+        {
+            this.ss = ss;
+        }
+    }
+
+    
 
     /// <summary>
     /// Summary description for UnitTest1
@@ -215,6 +246,173 @@ namespace UnitTests
 
         public static double sharedDelta = 0.00000000001d;  //precision for accepting
         double sharedTableDelta = 0.0001d;  //printing
+
+        private static void _AssertListString(IBank db, string s, StringOrList ss)
+        {
+            List iv_list = db.GetIVariable(s) as List;
+            AssertListStringHelper(iv_list, ss.ss);
+        }
+
+        private static void AssertListStringHelper(List iv_list, StringOrList[] ss)
+        {
+            if (iv_list.list.Count != ss.Length) Assert.IsFalse(true);
+            for (int i = 0; i < iv_list.list.Count; i++)
+            {
+                IVariable item = iv_list.list[i];
+                if (item.Type() == EVariableType.String)
+                {
+                    if (ss[i].s == null) Assert.IsFalse(true);
+                    if (!G.Equal(ss[i].s, item.ConvertToString())) Assert.IsFalse(true);
+                }
+                else if (item.Type() == EVariableType.List)
+                {
+                    if (ss[i].ss == null) Assert.IsFalse(true);
+                    AssertListStringHelper(item as List, ss[i].ss);
+                }
+                else Assert.IsFalse(true);                
+            }            
+        }
+
+        [TestMethod]
+        public void _Test_ListAndStringFunctions()
+        {
+            //-------------------------------------------------------------------------
+            //-----------  assignment no sideeffects
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m2 = #m1;");
+            I("#m1[1] = 'x';");
+            _AssertListString(First(), "#m1", new StringOrList("x", "b", "c"));
+            _AssertListString(First(), "#m2", new StringOrList("a", "b", "c"));
+
+            //-------------------------------------------------------------------------
+            //-----------  IN logic 
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("%v = 0;");
+            I("if('b' in #m1); %v = 1; end;");
+            _AssertScalarVal(First(), "%v", 1d);
+            I("%v = 0;");
+            I("if('d' in #m1); %v = 1; end;");
+            _AssertScalarVal(First(), "%v", 0d);
+            I("%v = 0;");
+            I("%s = 'a';");
+            I("if(%s in #m1); %v = 1; end;");
+            _AssertScalarVal(First(), "%v", 1d);
+            I("%v = 0;");
+            I("if(#m1.contains(%s) == 1); %v = 1; end;");
+            _AssertScalarVal(First(), "%v", 1d);
+
+            //-------------------------------------------------------------------------
+            //-----------  extend(), includes inserting, and '+', also chaining
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m2 = b, c, d;");
+            I("#m = #m1.extend(#m2);");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+            _AssertListString(First(), "#m2", new StringOrList("b", "c", "d"));  //no sideeffects
+            I("#m = #m1.extend('f');");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            I("#m = extend(#m1, #m2);");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
+            I("#m = extend(#m1, 'f');");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            I("#m = #m1 + #m2;");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
+            I("#m = #m1 + 'f';");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            I("#m = #m1.extend(#m2).extend(#m2);");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
+            I("#m = #m1 + #m2 + #m2;");
+            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
+            I("#m = #m1.extend(3, #m2);");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "b", "c", "d", "c"));
+            
+            //-------------------------------------------------------------------------
+            //-----------  append(), includes inserting
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m2 = b, c, d;");
+            I("#m = #m1.append(#m2);");
+            StringOrList temp = new StringOrList("a", "b", "c", null);
+            temp.ss[4 - 1] = new StringOrList("b", "c", "d");
+            _AssertListString(First(), "#m", temp);
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+            _AssertListString(First(), "#m2", new StringOrList("b", "c", "d"));  //no sideeffects
+            I("#m = #m1.append('f').append('g');");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "f", "g"));
+            I("#m = #m1.append(3, #m2);");
+            temp = new StringOrList("a", "b", null, "c");
+            temp.ss[3 - 1] = new StringOrList("b", "c", "d");
+            _AssertListString(First(), "#m", temp);
+
+            //-------------------------------------------------------------------------
+            //-----------  union()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m2 = b, c, d, b, d;");  //d will not become dublet
+            I("#m = #m1.union(#m2);");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "d"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+            _AssertListString(First(), "#m2", new StringOrList("b", "c", "d", "b", "d"));  //no sideeffects
+            I("#m = #m1 || #m2;");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "d"));
+
+            //-------------------------------------------------------------------------
+            //-----------  except()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m2 = b, c, d;");  //d will not become dublet
+            I("#m = #m1.except(#m2);");
+            _AssertListString(First(), "#m", new StringOrList("a"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+            _AssertListString(First(), "#m2", new StringOrList("b", "c", "d"));  //no sideeffects
+            I("#m = #m1 - #m2;");
+            _AssertListString(First(), "#m", new StringOrList("a"));
+
+            //-------------------------------------------------------------------------
+            //-----------  count()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c, b;");            
+            I("%v = #m1.count('b');");
+            _AssertScalarVal(First(), "%v", 2d);
+            I("%v = #m1.count('e');");
+            _AssertScalarVal(First(), "%v", 0d);
+
+            //-------------------------------------------------------------------------
+            //-----------  remove()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");            
+            I("#m = #m1.remove('b');");
+            _AssertListString(First(), "#m", new StringOrList("a", "c"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+
+            //-------------------------------------------------------------------------
+            //-----------  pop()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("#m1 = a, b, c;");
+            I("#m = #m1.pop(2);");
+            _AssertListString(First(), "#m", new StringOrList("a", "c"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
+            I("#m = #m1.pop();");
+            _AssertListString(First(), "#m", new StringOrList("a", "b"));
+            I("#m = #m1.pop(3);");
+            _AssertListString(First(), "#m", new StringOrList("a", "b"));            
+            FAIL("#m = #m1.pop(4);");
+            FAIL("#m = #m1.pop(0);");
+
+
+        }
 
         [TestMethod]
         public void _Test_Compare()
@@ -8481,11 +8679,7 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("hello1hello2"));
         }
 
-        [TestMethod]
-        public void _Test_ListAndStringFunctions()
-        {
-
-        }
+        
 
         [TestMethod]
         public void _Test_NameComposition()
@@ -8666,7 +8860,7 @@ namespace UnitTests
             List iv_list = db.GetIVariable(s) as List;
             ScalarString ss = iv_list.list[i - 1] as ScalarString;
             Assert.AreEqual(x, ss.string2);
-        }
+        }            
 
         private static void _AssertListSize(IBank db, string s, int n)
         {

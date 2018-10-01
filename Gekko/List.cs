@@ -261,27 +261,9 @@ namespace Gekko
             return EVariableType.List;
         }
 
-        public IVariable Add(GekkoSmpl t, IVariable x)
+        public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
-            switch (x.Type())
-            {                    
-                case EVariableType.List:
-                    {                        
-                        return Functions.union(t, this, x);                     
-                    }
-                    break;
-                case EVariableType.String:                
-                    {
-                        return Functions.union(t, this, new List(new List<IVariable> { x }));
-                    }
-                    break;
-                default:
-                    {
-                        G.Writeln2("*** ERROR: Adding to list not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
-                    }
-                    break;
-            }
+            return Functions.extend(smpl, this, x);
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
@@ -290,12 +272,12 @@ namespace Gekko
             {
                 case EVariableType.List:
                     {
-                        return Functions.difference(t, this, x);
+                        return Functions.except(t, this, x);
                     }
                     break;
                 case EVariableType.String:
                     {
-                        return Functions.difference(t, this, new List(new List<IVariable> { x }));
+                        return Functions.except(t, this, new List(new List<IVariable> { x }));
                     }
                     break;
                 default:

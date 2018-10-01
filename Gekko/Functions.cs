@@ -1541,7 +1541,93 @@ namespace Gekko
             return Globals.scalarVal0;
         }
 
-        
+        public static IVariable count(GekkoSmpl smpl, IVariable ths, IVariable y)
+        {
+            string s = O.ConvertToString(y);
+            if (ths.Type() != EVariableType.List)
+            {
+                FunctionError("count", ths);
+            }
+            int c = 0;
+            foreach (IVariable iv in (ths as List).list)
+            {
+                ScalarString ss = iv as ScalarString;
+                if (ss != null)
+                {
+                    string s2 = O.ConvertToString(ss);
+                    if (G.Equal(s, s2)) c++;
+                }
+            }
+            return new ScalarVal(c);
+        }
+
+        public static IVariable remove(GekkoSmpl smpl, IVariable ths, IVariable y)
+        {
+            string s = O.ConvertToString(y);
+            if (ths.Type() != EVariableType.List)
+            {
+                FunctionError("remove", ths);
+            }
+            List m = new List();
+            
+            foreach (IVariable iv in (ths as List).list)
+            {
+                ScalarString ss = iv as ScalarString;
+                if (ss != null)
+                {
+                    string s2 = O.ConvertToString(ss);
+                    if (G.Equal(s, s2))
+                    {
+                        //discard                        
+                    }
+                    else
+                    {
+                        m.Add(iv);
+                    }
+                }
+            }
+            return m;
+        }
+
+        public static IVariable pop(GekkoSmpl smpl, IVariable ths, IVariable i)
+        {
+            int ii = O.ConvertToInt(i);
+            return PopHelper(ths, ii);
+        }
+
+        public static IVariable pop(GekkoSmpl smpl, IVariable ths)
+        {            
+            return PopHelper(ths, -12345);
+        }
+
+        private static IVariable PopHelper(IVariable ths, int ii)
+        {
+            //ii is 1-based
+            if (ths.Type() != EVariableType.List)
+            {
+                FunctionError("pop", ths);
+            }
+            List m = new List();
+
+            if (ii == -12345)
+            {
+                ii = (ths as List).Count();
+            }
+
+            if (ii < 1 || ii > (ths as List).Count())
+            {
+                G.Writeln2("*** ERROR: Cannot pop() at index " + ii);
+                throw new GekkoException();
+            }
+
+            int c = -1;  //0-based
+            foreach (IVariable iv in (ths as List).list)
+            {
+                c++;
+                if (ii != c + 1) m.Add(iv);
+            }
+            return m;
+        }
 
         public static IVariable sum(GekkoSmpl smpl, params IVariable[] items) //uuu
         {
@@ -2537,7 +2623,7 @@ namespace Gekko
             return new List(union);
         }               
 
-        public static IVariable difference(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable except(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
             List<string> lx1 = O.GetStringList(x1);
@@ -2656,7 +2742,20 @@ namespace Gekko
             List temp = ths.DeepClone(null) as List;
             temp.Add(x);
             return temp;
+        }
 
+        public static IVariable append(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
+        {
+            //FIX: type checks etc.!
+            int i = O.ConvertToInt(index, true);
+            List temp = ths.DeepClone(null) as List;
+            if (i - 1 < 0 || i - 1 > temp.list.Count)
+            {
+                G.Writeln2("*** ERROR: Cannot insert at position " + i);
+                throw new GekkoException();
+            }
+            temp.list.Insert(i - 1, x);            
+            return temp;
         }
 
         //public static IVariable append_naked(GekkoSmpl smpl, IVariable ths, IVariable x)
@@ -2665,18 +2764,62 @@ namespace Gekko
         //    return new GekkoNull();
         //}
 
+
         public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
-            //FIX: type checks etc.!
-            List x_list = x as List;
-            if (x_list == null)
+            if (ths.Type() != EVariableType.List) FunctionError("extend", x);
+            List temp = ths as List;
+            if (x.Type() == EVariableType.List)
             {
-                G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
+                List x_list = x as List;                
+                temp = temp.DeepClone(null) as List;
+                temp.list.AddRange(x_list.list);
+            }
+            else if(x.Type() == EVariableType.Val || x.Type() == EVariableType.Date || x.Type() == EVariableType.String)
+            {                
+                temp = temp.DeepClone(null) as List;
+                temp.list.Add(x);
+            }
+            else
+            {                
+                FunctionError("extend", x);
+            }
+            return temp;
+        }
+
+        public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
+        {
+            //FIX: type checks etc.!
+            int i = O.ConvertToInt(index, true);
+            List temp = ths.DeepClone(null) as List;
+            if (i - 1 < 0 || i - 1 > temp.list.Count)
+            {
+                G.Writeln2("*** ERROR: Cannot insert at position " + i);
                 throw new GekkoException();
             }
-            List temp = ths.DeepClone(null) as List;
-            temp.list.AddRange(x_list.list);
+            if (x.Type() == EVariableType.List)
+            {
+                List x_list = x as List;
+                temp = temp.DeepClone(null) as List;
+                temp.list.InsertRange(i - 1, x_list.list);
+            }
+            else if (x.Type() == EVariableType.Val || x.Type() == EVariableType.Date || x.Type() == EVariableType.String)
+            {
+                temp = temp.DeepClone(null) as List;
+                temp.list.Insert(i-1, x);
+            }
+            else
+            {
+                FunctionError("extend", x);
+            }
+
             return temp;
+        }
+
+        private static void FunctionError(string s, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Object method ." + s + "() does not allow a " + G.GetTypeString(x) + " variable");
+            throw new GekkoException();
         }
 
         //public static IVariable extend_naked(GekkoSmpl smpl, List ths, IVariable x)
