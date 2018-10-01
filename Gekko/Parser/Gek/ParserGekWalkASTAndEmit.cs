@@ -664,21 +664,31 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("O.Power(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
-                    case "&+":
+                    //case "&+":
+                    //    {
+                    //        node.Code.CA("O.AndAdd(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
+                    //case "&-":
+                    //    {
+                    //        node.Code.CA("O.AndSubtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
+                    //case "&*":
+                    //    {
+                    //        node.Code.CA("O.AndMultiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                    //    }
+                    //    break;
+                    case "ASTLISTAND":
                         {
-                            node.Code.CA("O.AndAdd(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Intersect(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
-                    case "&-":
+                    case "ASTLISTOR":
                         {
-                            node.Code.CA("O.AndSubtract(smpl, " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Union(smpl, " + node[0].Code + ", " + node[1].Code + ")");
                         }
-                        break;
-                    case "&*":
-                        {
-                            node.Code.CA("O.AndMultiply(smpl, " + node[0].Code + ", " + node[1].Code + ")");
-                        }
-                        break;
+                        break;                    
                     case "ASTPLUS":
                         {
                             node.Code.CA("O.Add(smpl, " + node[0].Code + ", " + node[1].Code + ")");
@@ -1326,13 +1336,13 @@ namespace Gekko.Parser.Gek
                             
                         }
                         break;
-                    case "ASTCURLYSIMPLE":
-                        {
-                            string name = node[0][0].Text;
-                            string s = "O.Lookup(smpl, null, null, `" + Globals.symbolScalar + name + "`, null, null, false, EVariableType.Var, null)";
-                            node.Code.CA(s);
-                        }
-                        break;
+                    //case "ASTCURLYSIMPLE":
+                    //    {
+                    //        string name = node[0][0].Text;
+                    //        string s = "O.Lookup(smpl, null, null, `" + Globals.symbolScalar + name + "`, null, null, false, EVariableType.Var, null)";
+                    //        node.Code.CA(s);
+                    //    }
+                    //    break;
                     //case "ASTCNAME":
                     //    {
                     //        GetCodeFromAllChildren(node);
@@ -1610,6 +1620,10 @@ namespace Gekko.Parser.Gek
                             else if (op == "ASTIFOPERATOR2") //"<>"
                             {
                                 node.Code.A("O.NonEquals(smpl, " + code1 + "," + code2 + ")");
+                            }
+                            else if (op == "ASTIFOPERATOR7") //"in"
+                            {
+                                node.Code.A("O.In(smpl, " + code1 + "," + code2 + ")");
                             }
                         }
                         break;

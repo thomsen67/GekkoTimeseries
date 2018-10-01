@@ -1529,6 +1529,20 @@ namespace Gekko
             return new ScalarVal(u2);
         }
 
+        public static IVariable contains(GekkoSmpl smpl, IVariable y, IVariable x)
+        {
+            string x_string = x.ConvertToString();
+            List<IVariable> y_list = y.ConvertToList();
+            foreach (IVariable iv in y_list)
+            {
+                ScalarString temp = iv as ScalarString;
+                if (temp != null && G.Equal(temp.string2, x_string)) return Globals.scalarVal1;
+            }
+            return Globals.scalarVal0;
+        }
+
+        
+
         public static IVariable sum(GekkoSmpl smpl, params IVariable[] items) //uuu
         {
             throw new GekkoException();

@@ -33,6 +33,7 @@ tokens {
 	ASTDOLLAR;
 	ASTLOCAL;
 	ASTGLOBAL;
+	ASTIN;
 	ASTOBJECTFUNCTION;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
@@ -58,6 +59,8 @@ tokens {
 	ASTINDEXERELEMENTPLUS;
 	ASTSTRINGINQUOTESWITHCURLIES;
 	ASTINTEGER;
+	ASTLISTAND;
+	ASTLISTOR;
 	ASTVARNAME;
 	ASTPLACEHOLDER;
 	ASTDOT;
@@ -1617,6 +1620,7 @@ d.Add("Y" ,Y);
                                         d.Add("IGNOREMISSINGVARS"           , IGNOREMISSINGVARS              );
                                         d.Add("ignorevars"              , IGNOREVARS             );
                                         d.Add("import", IMPORT);
+										d.Add("in", IN);
                                         d.Add("index"   , INDEX      );
                                         d.Add("info"    , INFO      );
 										d.Add("infofile"    , INFOFILE      );
@@ -1902,8 +1906,10 @@ expression:                 additiveExpression;
 
 additiveExpression:         (multiplicativeExpression -> multiplicativeExpression)
 							( (PLUS lbla=multiplicativeExpression -> ^(ASTPLUS $additiveExpression $lbla))
-							| (MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb)) )*
-						    ;
+							| (MINUS lblb=multiplicativeExpression -> ^(ASTMINUS $additiveExpression  $lblb)) 
+							| (doubleVerticalBar lblb=multiplicativeExpression -> ^(ASTLISTOR $additiveExpression  $lblb)) 
+							| (DOUBLEAND lblb=multiplicativeExpression -> ^(ASTLISTAND $additiveExpression  $lblb)) 							
+							)*;
 
 multiplicativeExpression:   (powerExpression -> powerExpression)
 						    ( (star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
@@ -1979,7 +1985,7 @@ dotHelper:				    objectFunction | varname | integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrix:                     matrixCol;
-matrixCol:                  leftBracketNoGlue matrixRow ((doubleVerticalBar|SEMICOLON) matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
+matrixCol:                  leftBracketNoGlue matrixRow (SEMICOLON matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow:                  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						    //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
@@ -2114,13 +2120,24 @@ name:                       name2 -> ^(ASTNAME name2);
 						    //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
 name2:                      (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
 
-nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-					      | leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+//nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+//					      | leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+//						    ;
+//
+//nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+//					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+//						    ;
+
+
+nameCurlyStart:             
+					        leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
-nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+nameCurly:                  
+					        leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
+
+
 
 //cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
 //cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
@@ -2187,7 +2204,8 @@ logicalNot:				    NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom:				expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  | leftParen! logicalOr rightParen!           // omit both '(' and ')'
-						  | bankvarnameindex						
+						  | bankvarnameindex			
+//						  | expression IN expression -> ^(ASTIN expression expression)
 						  ;
 
 ifOperator:		            ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
@@ -3838,6 +3856,7 @@ ident2: 					Ident |
   IGNOREVARS|
   IMPOSE|
   IMPULSES|
+  IN|
   INFOFILE|
   INFO|
   INIT|
@@ -4252,6 +4271,7 @@ ident3: 					Ident |
   IGNOREVARS|
   IMPOSE|
   IMPULSES|
+  IN|
   INFOFILE|
   INFO|
   INIT|
@@ -4634,6 +4654,7 @@ LEFTANGLESIMPLE:            '<';
 RIGHTANGLE:                 '>';
 STAR:                       '*';
 DOUBLEVERTICALBAR1:         '||';
+DOUBLEAND:                  '&&';
 DOUBLEVERTICALBAR2:         '|¨|';
 //GLUEDOUBLEVERTICALBAR:    '¨|¨|';
 VERTICALBAR:                '|';

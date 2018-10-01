@@ -7932,6 +7932,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Filenames()
         {
+            //Gekko 3.0 is more restrictive, use {...} to in-substitute
+
             I("RESET;");
             I("STRING %s1 = 'Thomas';");
             I("STRING %s2 = 'Tho';");
@@ -7940,15 +7942,7 @@ namespace UnitTests
 
             //raw
             I("PIPE c:\\Thomas\\Desktop\\gekko\\testing\\sletmig;"); I("PIPE con;");
-            //raw with %
-            I("PIPE c:\\%s1\\Desktop\\gekko\\testing\\%s4;"); I("PIPE con;");
-            //raw with %
-            I("PIPE c:\\%s2|mas\\Desktop\\gekko\\testing\\%s4;"); I("PIPE con;");
-            //raw with %
-            I("PIPE c:\\Tho%s3\\Desktop\\gekko\\testing\\%s4;"); I("PIPE con;");
-            //raw with %
-            I("PIPE c:\\%s2%s3\\Desktop\\gekko\\testing\\%s4;"); I("PIPE con;");
-
+                       
             //raw with {}
             I("PIPE c:\\{%s1}\\Desktop\\gekko\\testing\\{%s4};"); I("PIPE con;");
             //raw with {}
@@ -7960,19 +7954,11 @@ namespace UnitTests
 
             //quoted
             I("PIPE 'c:\\Thomas\\Desktop\\gekko\\testing\\sletmig';"); I("PIPE con;");
-            //quoted with %
-            I("PIPE 'c:\\%s1\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
-            //quoted with % --> this does NOT work
-            FAIL("PIPE 'c:\\%s2mas\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
-            //quoted with % --> this does work
-            I("PIPE 'c:\\%s2|mas\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
-            //quoted with % --> another way
+            //quoted with %            
             I("PIPE 'c:\\' + %s2 + 'mas\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
             //quoted with %
-            I("PIPE 'c:\\Tho%s3\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
-            //quoted with %
-            I("PIPE 'c:\\%s2%s3\\Desktop\\gekko\\testing\\%s4';"); I("PIPE con;");
-
+            I("PIPE 'c:\\Tho{%s3}\\Desktop\\gekko\\testing\\{%s4}';"); I("PIPE con;");
+            
             //expression
             I("PIPE 'c:\\Thomas\\Desktop\\gek' + 'ko\\testing\\sletmig';"); I("PIPE con;");
         }
@@ -8496,6 +8482,12 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ListAndStringFunctions()
+        {
+
+        }
+
+        [TestMethod]
         public void _Test_NameComposition()
         {
             //-----------------------------
@@ -8563,13 +8555,13 @@ namespace UnitTests
             I("SERIES zz = a;"); _AssertSeries(First(), "zz", 2000, 2005, 3, sharedDelta);
             FAIL("SERIES zz = %b;");
             I("SERIES zz = {%c};"); _AssertSeries(First(), "zz", 2000, 2005, 5, sharedDelta);
-            I("SERIES zz = {c};"); _AssertSeries(First(), "zz", 2000, 2005, 5, sharedDelta);
+            FAIL("SERIES zz = {c};"); //_AssertSeries(First(), "zz", 2000, 2005, 5, sharedDelta);
             I("SERIES zz = %d;"); _AssertSeries(First(), "zz", 2000, 2005, 123, sharedDelta);
             FAIL("SERIES zz = {%d};");
 
             I("SERIES zz = a%b;"); _AssertSeries(First(), "zz", 2000, 2005, 6, sharedDelta);
             I("SERIES zz = a{%c};"); _AssertSeries(First(), "zz", 2000, 2005, 7, sharedDelta);
-            I("SERIES zz = a{c};"); _AssertSeries(First(), "zz", 2000, 2005, 7, sharedDelta);
+            FAIL("SERIES zz = a{c};"); //_AssertSeries(First(), "zz", 2000, 2005, 7, sharedDelta);
 
             //To do this, setting a scalar first, you must use {...}
             //Using %(...) is something completely different
@@ -8579,11 +8571,11 @@ namespace UnitTests
             FAIL("SERIES zz = %b{c};"); //_AssertSeries(First(), "zz", 2000, 2005, 10, sharedDelta);
 
             I("SERIES zz = {%c}a;"); _AssertSeries(First(), "zz", 2000, 2005, 11, sharedDelta);
-            I("SERIES zz = {c}a;"); _AssertSeries(First(), "zz", 2000, 2005, 11, sharedDelta);
+            FAIL("SERIES zz = {c}a;"); //_AssertSeries(First(), "zz", 2000, 2005, 11, sharedDelta);
             I("SERIES zz = {%c}%b;"); _AssertSeries(First(), "zz", 2000, 2005, 12, sharedDelta);
-            I("SERIES zz = {c}%b;"); _AssertSeries(First(), "zz", 2000, 2005, 12, sharedDelta);
+            FAIL("SERIES zz = {c}%b;"); //_AssertSeries(First(), "zz", 2000, 2005, 12, sharedDelta);
             I("SERIES zz = {%c}{%c};"); _AssertSeries(First(), "zz", 2000, 2005, 13, sharedDelta);
-            I("SERIES zz = {c}{c};"); _AssertSeries(First(), "zz", 2000, 2005, 13, sharedDelta);
+            FAIL("SERIES zz = {c}{c};"); //_AssertSeries(First(), "zz", 2000, 2005, 13, sharedDelta);
 
             //-----------------------------
             //Recursive
@@ -9259,7 +9251,7 @@ namespace UnitTests
             _AssertScalarString(First(), "%s7a", "aHejHejb");
             
             I("RESET;");
-            I("STRING n = 'Hej';");
+            I("STRING %n = 'Hej';");
             FAIL("STRING %ss1 = 'a{n}b';");
             I("STRING %ss2 = 'a{%n}b';");
             //_AssertScalarString(First(), "%ss1", "aHejb");
@@ -9281,38 +9273,23 @@ namespace UnitTests
             I("RESET;");
             I("VAL %v = -1.2345;");
             I("STRING %s = 'a~%v|b';");
-            _AssertScalarString(First(), "%s", "a%vb");
+            _AssertScalarString(First(), "%s", "a~%v|b");  //no effect
+            I("STRING %s = 'a%v|b';");
+            _AssertScalarString(First(), "%s", "a%v|b");  //no effect
+            I("STRING %s = 'a|b';");
+            _AssertScalarString(First(), "%s", "a|b");  //no effect
 
             I("RESET;");
-            I("DATE %d = 2001;");
-            I("STRING %s = 'a~%d|b';");
-            _AssertScalarString(First(), "%s", "a%db");
-
-            I("RESET;");
-            I("DATE %d = 2001q2;");
-            I("STRING %s = 'a~%d|b';");
-            _AssertScalarString(First(), "%s", "a%db");
-
-            I("RESET;");
-            I("STRING %s2= 'Hej';");
-            I("STRING %s = 'a~%s2|b';");
-            _AssertScalarString(First(), "%s", "a%s2b");
-
-            I("RESET;");
-            I("STRING %n = 'Hej';");
-            I("STRING %s = 'a~%n|b';");
-            _AssertScalarString(First(), "%s", "a%nb");
-            //I("STRING s = 'a~$%n|b';");  //stringify
-            //_AssertScalarString(First(), "s", "a$%nb");
-            //I("STRING ss = 'a~$n|b';");  //stringify
-            //_AssertScalarString(First(), "ss", "a$nb");
-
-            I("RESET;");
-            I("STRING %n = 'Hej';");
-            I("STRING %ss1 = 'a{~n}b';");
-            I("STRING %ss2 = 'a{~%n}b';");
-            _AssertScalarString(First(), "%ss1", "a{n}b");
+            I("STRING %n = 'Hej';");            
+            I("STRING %ss2 = 'a~{%n}b';");            
             _AssertScalarString(First(), "%ss2", "a{%n}b");
+            FAIL("STRING %ss2 = 'ab'c';");
+            I("STRING %ss2 = 'ab~'c';");
+            _AssertScalarString(First(), "%ss2", "ab'c");
+            I("STRING %ss2 = 'a{'b'}c';");
+            _AssertScalarString(First(), "%ss2", "abc");
+            I("STRING %ss2 = 'a{'x~'b'}c';");
+            _AssertScalarString(First(), "%ss2", "ax'bc");
 
         }
 

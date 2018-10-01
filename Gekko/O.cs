@@ -237,17 +237,27 @@ namespace Gekko
             return x.Negate(smpl);
         }
 
-        public static IVariable AndAdd(GekkoSmpl smpl, IVariable x, IVariable y)
+        //public static IVariable AndAdd(GekkoSmpl smpl, IVariable x, IVariable y)
+        //{
+        //    return Functions.union(smpl, x, y);
+        //}
+
+        //public static IVariable AndSubtract(GekkoSmpl smpl, IVariable x, IVariable y)
+        //{
+        //    return Functions.difference(smpl, x, y);
+        //}
+
+        //public static IVariable AndMultiply(GekkoSmpl smpl, IVariable x, IVariable y)
+        //{
+        //    return Functions.intersect(smpl, x, y);
+        //}
+
+        public static IVariable Union(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return Functions.union(smpl, x, y);
-        }
+        }        
 
-        public static IVariable AndSubtract(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-            return Functions.difference(smpl, x, y);
-        }
-
-        public static IVariable AndMultiply(GekkoSmpl smpl, IVariable x, IVariable y)
+        public static IVariable Intersect(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             return Functions.intersect(smpl, x, y);
         }
@@ -4452,9 +4462,10 @@ namespace Gekko
             return rv;
         }
 
-
-
-
+        public static IVariable In(GekkoSmpl smpl, IVariable x, IVariable y)
+        {
+            return Functions.contains(smpl, y, x);
+        }
 
         public static bool IsTrue(GekkoSmpl smpl, IVariable x)
         {
