@@ -14196,21 +14196,21 @@ namespace Gekko
             //note that [bank:a*b?] is also allowed
             //note that [bank:a*b?!q] is also allowed
             //problem is that [a*b] looks like a matrix definition, therefore this code.
-            
+
             string[] sss = inside.Split(Globals.symbolBankColon2);
 
             if (sss.Length > 2) return false;
-            
+
             string bank = null;
             string rest = null;
             if (sss.Length == 1)
             {
-                rest = sss[0];
+                rest = sss[0].Trim();
             }
             else
             {
-                bank = sss[0];
-                rest = sss[1];
+                bank = sss[0].Trim();
+                rest = sss[1].Trim();
             }
             if (bank != null && !G.IsSimpleToken(bank)) return false;
 
@@ -14219,15 +14219,29 @@ namespace Gekko
             string[] ssss = rest.Split(Globals.freqIndicator);
             if (ssss.Length == 1)
             {
-                rest1 = ssss[0];
+                rest1 = ssss[0].Trim();
             }
             else
             {
-                rest1 = ssss[0];
-                rest2 = ssss[1];
+                rest1 = ssss[0].Trim();
+                rest2 = ssss[1].Trim();
             }
-            if (rest2 != null && !G.IsSimpleToken(rest2)) return false;
 
+            int starCountFreq = 0;
+            if (rest2 != null)
+            {
+                if (G.IsSimpleToken(rest2))
+                {
+                    //good
+                }
+                else if (rest2 == "*")
+                {
+                    //good
+                    starCountFreq = 1;
+                }
+                else return false;
+            }
+        
             //seems this regex splits after '*' and '?', but keeps these delimiters
             string[] ss = Regex.Matches(rest1, @"[-\*?]|[^\*?-]+")
                 .Cast<Match>()
@@ -14262,7 +14276,7 @@ namespace Gekko
             }
 
             //if (starCount > 1) return false;  //only 1 accepted here, else use {'...'}
-            if (starCount + qCount == 0) return false;
+            if (starCount + qCount + starCountFreq == 0) return false;
             return true;
         }
 
@@ -15784,6 +15798,7 @@ namespace Gekko
                 bool lhsHasStarOrQuestionLocal = false;
                 if (bank3 != null && (bank3.Contains("*") || bank3.Contains("?"))) lhsHasStarOrQuestionLocal = true;
                 if (name3.Contains("*") || name3.Contains("?")) lhsHasStarOrQuestionLocal = true;
+                if (freq3.Contains("*") || freq3.Contains("?")) lhsHasStarOrQuestionLocal = true;
                 if (lhsHasStarOrQuestionLocal) lhsHasStarOrQuestion = true;
 
                 if (index3 != null)
@@ -15817,7 +15832,7 @@ namespace Gekko
 
                     foreach (string db_bank in db_banks)
                     {
-                        lhsUnfolded.AddRange(MatchInBank(name3, freq3, db_bank));
+                        lhsUnfolded.AddRange(MatchInBank(db_bank, name3, freq3));
                     }
                 }
                 else
@@ -16052,15 +16067,15 @@ namespace Gekko
             return bank;
         }
 
-        private static List<string> MatchInBank(string wildcardName, string wildcardFreq, string db_bank)
+        private static List<string> MatchInBank(string bankname, string wildcardName, string wildcardFreq)
         {
             //For each matching databank
             List<string> varsMatched = new List<string>();
-            List<string> temp = new List<string>();
-            Databank db = Program.databanks.GetDatabank(db_bank, true);
+            List<string> namesInBank = new List<string>();
+            Databank db = Program.databanks.GetDatabank(bankname, true);
             foreach (KeyValuePair<string, IVariable> kvp in db.storage)
             {
-                temp.Add(kvp.Key);
+                namesInBank.Add(kvp.Key);
             }
             
             // 
@@ -16075,24 +16090,28 @@ namespace Gekko
             {
                 name3a += Globals.freqIndicator + wildcardFreq;
             }
-            List<string> matched = Match(name3a, temp);
+
+            List<string> matched = Match(name3a, namesInBank);
+
             foreach (string match in matched)
             {
-                varsMatched.Add(db_bank + Globals.symbolBankColon + match);
+                varsMatched.Add(bankname + Globals.symbolBankColon + match);
             }
+
             return varsMatched;
         }
 
         public static List<string> Match(string wild1, List<string> names)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
-            //Note: no sorting
+            //Sorted at the end
             List<string> inputs = new List<string>();
             Wildcard wc = new Wildcard(wild1, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             foreach (string n2 in names)
             {
                 if (wc.IsMatch(n2)) inputs.Add(n2);
-            }
+            }            
+            inputs.Sort(StringComparer.OrdinalIgnoreCase);
             return inputs;
         }
 

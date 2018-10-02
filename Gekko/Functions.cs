@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {    
@@ -38,82 +39,82 @@ namespace Gekko
 
 
         //See equivalent method in G.cs
-        public static IVariable getbank(GekkoSmpl smpl, IVariable x1)
+        public static IVariable getbank(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(getbank(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(getbank(smpl, item));
                 return rv;
             }
             else
             {
-                string ss = G.Chop_GetBank(O.ConvertToString(x1));
+                string ss = G.Chop_GetBank(O.ConvertToString(ths));
                 return new ScalarString(ss);
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable getname(GekkoSmpl smpl, IVariable x1)
+        public static IVariable getname(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(getname(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(getname(smpl, item));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_GetName(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_GetName(O.ConvertToString(ths)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable getfreq(GekkoSmpl smpl, IVariable x1)
+        public static IVariable getfreq(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(getfreq(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(getfreq(smpl, item));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_GetFreq(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_GetFreq(O.ConvertToString(ths)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable getnameandfreq(GekkoSmpl smpl, IVariable x1)
+        public static IVariable getnameandfreq(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(getnameandfreq(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(getnameandfreq(smpl, item));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_GetNameAndFreq(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_GetNameAndFreq(O.ConvertToString(ths)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable getindex(GekkoSmpl smpl, IVariable x1)
+        public static IVariable getindex(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(getindex(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(getindex(smpl, item));
                 return rv;
             }
             else
             {
-                return new List(G.Chop_GetIndex(O.ConvertToString(x1)));
+                return new List(G.Chop_GetIndex(O.ConvertToString(ths)));
             }
         }
 
@@ -137,205 +138,205 @@ namespace Gekko
         }
 
         //See equivalent method in G.cs
-        public static IVariable addbank(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable addbank(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(addbank(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(addbank(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_AddBank(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_AddBank(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable setbank(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable setbank(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(setbank(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(setbank(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_SetBank(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_SetBank(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable removebank(GekkoSmpl smpl, IVariable x1)
+        public static IVariable removebank(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(removebank(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(removebank(smpl, item));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_RemoveBank(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_RemoveBank(O.ConvertToString(ths)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable removebank(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable removebank(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(removebank(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(removebank(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_RemoveBank(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_RemoveBank(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable replacebank(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
+        public static IVariable replacebank(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(replacebank(smpl, item, x2, x3));
+                foreach (IVariable item in (ths as List).list) rv.Add(replacebank(smpl, item, x2, x3));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_ReplaceBank(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
+                return new ScalarString(G.Chop_ReplaceBank(O.ConvertToString(ths), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 
 
 
         //See equivalent method in G.cs
-        public static IVariable addfreq(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable addfreq(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(addfreq(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(addfreq(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_AddFreq(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_AddFreq(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable setfreq(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable setfreq(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(setfreq(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(setfreq(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_SetFreq(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_SetFreq(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable removefreq(GekkoSmpl smpl, IVariable x1)
+        public static IVariable removefreq(GekkoSmpl smpl, IVariable ths)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(removefreq(smpl, item));
+                foreach (IVariable item in (ths as List).list) rv.Add(removefreq(smpl, item));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_RemoveFreq(O.ConvertToString(x1)));
+                return new ScalarString(G.Chop_RemoveFreq(O.ConvertToString(ths)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable removefreq(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable removefreq(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(removefreq(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(removefreq(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_RemoveFreq(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_RemoveFreq(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
 
         //See equivalent method in G.cs
-        public static IVariable replacefreq(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
+        public static IVariable replacefreq(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(replacefreq(smpl, item, x2, x3));
+                foreach (IVariable item in (ths as List).list) rv.Add(replacefreq(smpl, item, x2, x3));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_ReplaceFreq(O.ConvertToString(x1), O.ConvertToString(x2), O.ConvertToString(x3)));
+                return new ScalarString(G.Chop_ReplaceFreq(O.ConvertToString(ths), O.ConvertToString(x2), O.ConvertToString(x3)));
             }
         }
 
         //See equivalent method in G.cs
-        public static IVariable setname(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable setname(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(setname(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(setname(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_SetName(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_SetName(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
-        public static IVariable setnameprefix(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable setnameprefix(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(setnameprefix(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(setnameprefix(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_SetNamePrefix(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_SetNamePrefix(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
-        public static IVariable setnamesuffix(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable setnamesuffix(GekkoSmpl smpl, IVariable ths, IVariable x2)
         {
-            if (x1.Type() == EVariableType.List)
+            if (ths.Type() == EVariableType.List)
             {
                 List rv = new List();
-                foreach (IVariable item in (x1 as List).list) rv.Add(setnamesuffix(smpl, item, x2));
+                foreach (IVariable item in (ths as List).list) rv.Add(setnamesuffix(smpl, item, x2));
                 return rv;
             }
             else
             {
-                return new ScalarString(G.Chop_SetNameSuffix(O.ConvertToString(x1), O.ConvertToString(x2)));
+                return new ScalarString(G.Chop_SetNameSuffix(O.ConvertToString(ths), O.ConvertToString(x2)));
             }
         }
 
@@ -1366,10 +1367,28 @@ namespace Gekko
             return obs;
         }
 
+        public static IVariable len(GekkoSmpl smpl, IVariable x1)
+        {
+            return length(smpl, x1);
+        }
+
         public static IVariable length(GekkoSmpl smpl, IVariable x1)
-        {            
-            string s1 = O.ConvertToString(x1);
-            return new ScalarVal(s1.Length);
+        {
+            if (x1.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(x1);
+                return new ScalarVal(s1.Length);
+            }
+            else if (x1.Type() == EVariableType.List)
+            {
+                List l1 = x1 as List;
+                return new ScalarVal(l1.list.Count);
+            }
+            else
+            {
+                FunctionError("length", x1);
+                return null;
+            }
         }
 
         public static IVariable chol(GekkoSmpl smpl, IVariable x)
@@ -2240,7 +2259,7 @@ namespace Gekko
             string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
             int i = 0;
-            if (s1.StartsWith(s2)) i = 1;
+            if (s1.StartsWith(s2, StringComparison.OrdinalIgnoreCase)) i = 1;
             return new ScalarVal(i);
         }
 
@@ -2249,7 +2268,7 @@ namespace Gekko
             string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
             int i = 0;
-            if (s1.EndsWith(s2)) i = 1;
+            if (s1.EndsWith(s2, StringComparison.OrdinalIgnoreCase)) i = 1;
             return new ScalarVal(i);
         }
 
@@ -2260,22 +2279,138 @@ namespace Gekko
             return new ScalarString(txt);
         }
 
-        public static IVariable trim(GekkoSmpl smpl, IVariable x1)
-        {
+        public static IVariable strip(GekkoSmpl smpl, IVariable x1)
+        {            
             string s1 = O.ConvertToString(x1);
             return new ScalarString(s1.Trim());
         }
 
-        public static IVariable upper(GekkoSmpl smpl, IVariable x1)
+        public static IVariable stripstart(GekkoSmpl smpl, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);
-            return new ScalarString(s1.ToUpper());
+            return new ScalarString(s1.TrimStart());
         }
 
-        public static IVariable lower(GekkoSmpl smpl, IVariable x1)
+        public static IVariable stripend(GekkoSmpl smpl, IVariable x1)
         {
-            string s1 = O.ConvertToString(x1);
-            return new ScalarString(s1.ToLower());
+            string s1 = O.ConvertToString(x1);            
+            return new ScalarString(s1.TrimEnd());
+        }
+
+        public static IVariable upper(GekkoSmpl smpl, IVariable ths)
+        {
+            //does not exist in AREMOS
+
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                string s4 = s1.ToUpper();
+                return new ScalarString(s4);
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List m = ths as List;                
+                List tmp = new List();
+                foreach (IVariable iv in m.list)
+                {                    
+                    if (iv.Type() == EVariableType.String)
+                    {                        
+                        tmp.Add(new ScalarString(iv.ConvertToString().ToUpper()));
+                    }
+                    else
+                    {
+                        tmp.Add(iv);
+                    }
+                }
+                return tmp;
+            }
+            else
+            {
+                FunctionError("upper", ths);  //throws exception
+                return null;
+            }
+        }
+
+        public static IVariable lower(GekkoSmpl smpl, IVariable ths)
+        {
+            //does not exist in AREMOS
+
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                string s4 = s1.ToLower();
+                return new ScalarString(s4);
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List m = ths as List;
+                List tmp = new List();
+                foreach (IVariable iv in m.list)
+                {
+                    if (iv.Type() == EVariableType.String)
+                    {
+                        tmp.Add(new ScalarString(iv.ConvertToString().ToLower()));
+                    }
+                    else
+                    {
+                        tmp.Add(iv);
+                    }
+                }
+                return tmp;
+            }
+            else
+            {
+                FunctionError("upper", ths);  //throws exception
+                return null;
+            }
+        }
+
+        public static IVariable sort(GekkoSmpl smpl, IVariable x1)
+        {
+            List<IVariable> tmp = O.ConvertToList(x1);
+            List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
+            xx.Sort(StringComparer.OrdinalIgnoreCase);
+            List m = new List();
+            foreach (string s in xx)
+            {
+                m.Add(new ScalarString(s));
+            }
+            return m;
+        }
+
+        public static IVariable flatten(GekkoSmpl smpl, IVariable x1)
+        {
+            if (x1.Type() == EVariableType.List)
+            {
+                List<IVariable> temp = O.ExplodeIvariables(x1);
+                return new List(temp);
+            }
+            else
+            {
+                return x1;  //not touched
+            }
+        }
+
+        public static IVariable unique(GekkoSmpl smpl, IVariable x1)
+        {
+            List<IVariable> tmp = O.ConvertToList(x1);
+            List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables(tmp.ToArray()));
+            List m = new List();
+            GekkoDictionary<string, string> dict = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string s in xx)
+            {
+                if (!dict.ContainsKey(s))
+                {
+                    dict.Add(s, null);
+                    m.Add(new ScalarString(s));
+                }
+                else
+                {
+                    //ignore
+                }
+            }            
+            
+            return m;
         }
 
         public static IVariable strip(GekkoSmpl smpl, IVariable x1, IVariable x2)
@@ -2425,14 +2560,47 @@ namespace Gekko
             return new ScalarVal(v);
         }
 
-        public static IVariable replace(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
+        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
         {
             //does not exist in AREMOS
-            string s1 = O.ConvertToString(x1);
-            string s2 = O.ConvertToString(x2);
-            string s3 = O.ConvertToString(x3);
-            string s4 = s1.Replace(s2, s3);
-            return new ScalarString(s4);
+
+            if (ths.Type() == EVariableType.String)
+            {
+
+                string s1 = O.ConvertToString(ths);
+                string s2 = O.ConvertToString(x2);
+                string s3 = O.ConvertToString(x3);
+                //string s4 = s1.Replace(s2, s3, );
+                string s4 = Regex.Replace(s1, s2, s3, RegexOptions.IgnoreCase);
+                return new ScalarString(s4);
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List m = ths as List;
+                string s2 = O.ConvertToString(x2);
+                string s3 = O.ConvertToString(x3);
+                List tmp = new List();
+                foreach (IVariable iv in m.list)
+                {
+                    bool hit = false;
+                    if (iv.Type() == EVariableType.String)
+                    {
+                        string s = O.ConvertToString(iv);
+                        if (G.Equal(s, s2))
+                        {
+                            hit = true;
+                            tmp.Add(new ScalarString(s3));
+                        }
+                    }
+                    if (!hit) tmp.Add(iv);                    
+                }
+                return tmp;
+            }
+            else
+            {
+                FunctionError("replace", ths);  //throws exception
+                return null;
+            }
         }
 
         public static IVariable gekkoversion(GekkoSmpl smpl)

@@ -411,7 +411,131 @@ namespace UnitTests
             FAIL("#m = #m1.pop(4);");
             FAIL("#m = #m1.pop(0);");
 
+            //-------------------------------------------------------------------------
+            //-----------  strip(), lstrip(), rstrip()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("%s1 = '  abc   ';");
+            I("%s2 = %s1.strip();");
+            _AssertScalarString(First(), "%s2", "abc");
+            I("%s2 = %s1.stripstart();");
+            _AssertScalarString(First(), "%s2", "abc   ");
+            I("%s2 = %s1.stripend();");
+            _AssertScalarString(First(), "%s2", "  abc");
 
+            //-------------------------------------------------------------------------
+            //-----------  replace()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%s2 = %s1.replace('ab', 'X');");
+            _AssertScalarString(First(), "%s2", "XcXC");
+
+            I("reset;");
+            I("#m1 = a, b, c, b;");
+            I("#m = #m1.replace('b', 'x');");
+            _AssertListString(First(), "#m", new StringOrList("a", "x", "c", "x"));
+
+            //-------------------------------------------------------------------------
+            //-----------  length()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%v = %s1.length();");
+            _AssertScalarVal(First(), "%v", 6d);
+            I("reset;");
+            I("#m1 = a, b, c, b;");
+            I("%v = #m1.length();");
+            _AssertScalarVal(First(), "%v", 4d);
+
+            //-------------------------------------------------------------------------
+            //-----------  lower()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%s2 = %s1.lower();");
+            _AssertScalarString(First(), "%s2", "abcabc");
+
+            I("reset;");
+            I("#m1 = AB, b, C, b;");
+            I("#m = #m1.lower();");
+            _AssertListString(First(), "#m", new StringOrList("ab", "b", "c", "b"));
+
+            //-------------------------------------------------------------------------
+            //-----------  upper()
+            //-------------------------------------------------------------------------
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%s2 = %s1.upper();");
+            _AssertScalarString(First(), "%s2", "ABCABC");
+
+            I("reset;");
+            I("#m1 = AB, b, C, b;");
+            I("#m = #m1.upper();");
+            _AssertListString(First(), "#m", new StringOrList("AB", "B", "C", "B"));
+
+            //-------------------------------------------------------------------------
+            //-----------  sort()
+            //-------------------------------------------------------------------------
+            
+            I("reset;");
+            I("#m1 = e, AB, c, B;");
+            I("#m = #m1.sort();");
+            _AssertListString(First(), "#m", new StringOrList("AB", "B", "c", "e"));
+            _AssertListString(First(), "#m1", new StringOrList("e", "AB", "c", "b"));  //no sideeffects
+
+            //-------------------------------------------------------------------------
+            //-----------  unique()
+            //-------------------------------------------------------------------------
+
+            I("reset;");
+            I("#m1 = a, b, c, b, b, e;");
+            I("#m = #m1.unique();");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "e"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "b", "c", "b", "b", "e"));  //no sideeffects
+
+            I("reset;");
+            I("#m1 = a, B, c, b, B, e;");
+            I("#m = #m1.unique();");
+            _AssertListString(First(), "#m", new StringOrList("a", "B", "c", "e"));
+            _AssertListString(First(), "#m1", new StringOrList("a", "B", "c", "b", "B", "e"));  //no sideeffects
+
+            //-------------------------------------------------------------------------
+            //-----------  startswith()
+            //-------------------------------------------------------------------------
+
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%s2 = %s1.startswith('abca');");
+            _AssertScalarVal(First(), "%s2", 1d);
+
+            //-------------------------------------------------------------------------
+            //-----------  startswith()
+            //-------------------------------------------------------------------------
+
+            I("reset;");
+            I("%s1 = 'abcABC';");
+            I("%s2 = %s1.startswith('abca');");
+            _AssertScalarVal(First(), "%s2", 1d);
+
+            //-------------------------------------------------------------------------
+            //-----------  flatten()
+            //-------------------------------------------------------------------------
+
+            I("reset;");
+            I("#m1 = ('a', 'b', ('c', 'd', 'e'), 'f');");
+            I("#m = #m1.flatten();");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "d", "e", "f"));
+            I("#m = #m1.flatten();");
+            I("%s1 = #m1[3][2];");
+            I("%s2 = #m[4];");
+            I("%s3 = #m1.flatten()[4];");
+            _AssertScalarString(First(), "%s1", "d");
+            _AssertScalarString(First(), "%s2", "d");
+            _AssertScalarString(First(), "%s3", "d");
+            I("#m1[1] = 'z';");
+            _AssertListString(First(), "#m1", 1, "z");
+            _AssertListString(First(), "#m", 1, "a");  //just to be sure that there are no dependency
         }
 
         [TestMethod]
@@ -4045,7 +4169,7 @@ namespace UnitTests
 
             // Work:x1 = 11 from 2001-2003
 
-            TestCopyHelper();
+            TestCopyHelper(0);
             I("RENAME x1 to b10:x2;");
             Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("x1!a"));
             Assert.IsTrue(Program.databanks.GetDatabank("b10").ContainsIVariable("x2!a"));
@@ -4077,7 +4201,7 @@ namespace UnitTests
 
             // Work:x1 = 11 from 2001-2003
 
-            TestCopyHelper();
+            TestCopyHelper(0);
             I("COPY x1 to b10:x2;");
             _AssertSeries(First(), "x1", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x1", 2001, 11d, sharedDelta);
@@ -4124,7 +4248,7 @@ namespace UnitTests
             //This also implicitly tests a lot of RENAME functionality,
             //since COPY and RENAME share a lot of code.
 
-            TestCopyHelper();
+            TestCopyHelper(0);
 
             //  Work     Ref      b1       b10
             //-------------------------------------
@@ -4799,21 +4923,25 @@ namespace UnitTests
 
         }
 
-        private static void TestCopyHelper()
+        private static void TestCopyHelper(int i)
         {
             I("reset; time 2001 2003;");
             I("x1 = 11;");
             I("%x1 = 12;");
             I("#x1 = (13,);");
+            if (i == 1) I("<2001q1 2003q4> x1!q = 111;");
             I("clone;");  //copies to Ref
             I("x2 = 21;");  //special for Work
             I("open<edit>b1; clear b1;");
             I("x3 = 31;");
             I("%x3 = 32;");
             I("#x3 = (33,);");
+            if (i == 1) I("<2001q1 2003q4> x3!q = 131;");
             I("close b1; open b1; unlock b1;");
             //hmmm seems the only way to create a fresh bank not in first position
             I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
+            
+            
         }
 
 
@@ -10323,8 +10451,23 @@ namespace UnitTests
             Globals.unitTestScreenOutput.Clear();
             I("RUN s5;"); //procedure
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("777 102 666 777 "));
+            
+        }
 
+        [TestMethod]
+        public void _Test_Wildcard()
+        {
+            //  Work     Ref      b1       b10
+            //-------------------------------------
+            //  x1       x1       x3       <empty>
+            //  %x1      %x1      %x3
+            //  #x1      #x1      #x3
+            //  x2                x3!q
+            //  x1!q
 
+            TestCopyHelper(0);
+            I("#m = {'x*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2"));
 
         }
 
@@ -11884,12 +12027,10 @@ namespace UnitTests
         public void _Test__Random()
         {            
             I("RESET;");
-            I("MATRIX #mean = [10 || 11];");
-            I("MATRIX #covar = [10, 3 || 3, 2];");
+            I("MATRIX #mean = [10; 11];");
+            I("MATRIX #covar = [10, 3; 3, 2];");
             I("MATRIX #norm = rnorm(#mean, #covar);");
-
             I("VAL %norm = rnorm(1, 2);");
-
             //hard to test random numbers.......               
         }
 

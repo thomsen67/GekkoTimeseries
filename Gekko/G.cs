@@ -327,7 +327,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("*** ERROR regarding frequency: '" + freq + "' not recognized");
+                    G.Writeln2("*** ERROR regarding frequency: '" + freq + "' not recognized");
                     throw new GekkoException();
                 }
             }

@@ -3900,6 +3900,8 @@ namespace Gekko.Parser.Gek
                             bool isMapItem = SearchUpwardsInTree9(node);  //finds ASTMAPITEM and ASTFUNCTIONDEFCODE
                             bool isLeftSide = node?.Parent.Text == "ASTLEFTSIDE";
 
+                            bool isSoleOnRightSide = node?.Parent.Text == "ASTASSIGNMENT";
+
                             string optionsString = "null";
                             if (!isMapItem && isLeftSide)
                             {
