@@ -4301,8 +4301,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             try
             {
@@ -4314,8 +4314,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //a-01-A-12
@@ -4329,8 +4329,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax1b!a");
 
             //---------------------------------------
             //a-01-B-11
@@ -4344,7 +4344,7 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
 
             //---------------------------------------
@@ -4359,7 +4359,7 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax1b!a");
 
             //---------------------------------------
@@ -4374,8 +4374,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //a-01-C-12
@@ -4389,8 +4389,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax1b!a");
 
 
             // ========================================================
@@ -4407,8 +4407,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //a-02-A-12
@@ -4422,8 +4422,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax2b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax2b!a");
 
             //---------------------------------------
             //a-02-B-11
@@ -4437,7 +4437,7 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
 
             try
@@ -4451,7 +4451,7 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:y1!a");
 
             //---------------------------------------
@@ -4466,7 +4466,7 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b:ax2b!a");
 
             //---------------------------------------
@@ -4481,8 +4481,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //a-01-C-12
@@ -4496,8 +4496,8 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax2b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax2b!a");
 
             // =====================================================================
             // =========== Given bank on LHS =======================================
@@ -4515,7 +4515,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             try
             {
@@ -4529,7 +4529,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //b-01-A-12
@@ -4544,7 +4544,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax3b!a");
 
             //---------------------------------------
             //b-01-B-11
@@ -4650,7 +4650,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //b-02-A-12
@@ -4665,7 +4665,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax3b!a");
 
             //---------------------------------------
             //b-02-B-11
@@ -4745,7 +4745,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //c-01-A-12
@@ -4760,7 +4760,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax3b!a");
 
             //---------------------------------------
             //c-01-B-11
@@ -4837,7 +4837,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:y1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:y1!a");
 
             //---------------------------------------
             //c-02-A-12
@@ -4852,7 +4852,7 @@ namespace UnitTests
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 1);
             Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax3b!a");
 
             //---------------------------------------
             //c-02-B-11
@@ -4911,14 +4911,14 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 4);
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "First:ax1b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[2].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[2].s2, "First:ax2b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[3].s1, "Ref:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[3].s2, "Ref:ax1b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "Work:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "Work:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "Work:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "Work:ax2b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[2].s1, "Ref:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[2].s2, "Ref:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[3].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[3].s2, "b1:ax3b!a");
 
 
         }
@@ -10528,8 +10528,8 @@ namespace UnitTests
             // everything
             // ------------------------------------------------
 
-            I("#m = {'*:*!*'} + {'*:%*'} + {'*:#*'};");
-            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
+            //I("#m = {'*:*!*'} + {'*:%*'} + {'*:#*'};");
+            //_AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
 
 
         }
