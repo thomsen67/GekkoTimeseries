@@ -4911,14 +4911,14 @@ namespace UnitTests
                 Globals.unitTestCopyHelper2 = false;
             }
             Assert.AreEqual(Globals.unitTestCopyHelper.Count, 4);
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "First:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "First:ax1b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "First:x2!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "First:ax2b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[2].s1, "Ref:x1!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[2].s2, "Ref:ax1b!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[3].s1, "b1:x3!a");
-            Assert.AreEqual(Globals.unitTestCopyHelper[3].s2, "b1:ax3b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s1, "First:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[1].s2, "First:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[2].s1, "First:x2!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[2].s2, "First:ax2b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[3].s1, "Ref:x1!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[3].s2, "Ref:ax1b!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s1, "b1:x3!a");
+            Assert.AreEqual(Globals.unitTestCopyHelper[0].s2, "b1:ax3b!a");
 
 
         }
@@ -10462,12 +10462,14 @@ namespace UnitTests
             //  x1       x1       x3       <empty>
             //  %x1      %x1      %x3
             //  #x1      #x1      #x3
-            //  x2                x3!q
+            //  x2       x1!q     x3!q
             //  x1!q
 
-            TestCopyHelper(0);
-            I("#m = {'x*'};");
-            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2"));
+            TestCopyHelper(1);
+            //I("#m = {'x*'};");
+            //_AssertListString(First(), "#m", new StringOrList("First:x1!a", "First:x2!a"));
+            //I("#m = {'x*!*'};");
+            //_AssertListString(First(), "#m", new StringOrList("First:x1!a", "First:x1!q", "First:x2!a"));
 
         }
 

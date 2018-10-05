@@ -107,7 +107,7 @@ namespace Gekko
                 if (index.Type() == EVariableType.String)
                 {
                     string s = (index as ScalarString).string2;
-                    string varnameWithFreq = G.AddFreq(s, null, EVariableType.Var, false);  //we do not know the freq. So if s has no '!', current freq will be added.
+                    string varnameWithFreq = G.AddFreq(s, null, EVariableType.Var, O.ELookupType.RightHandSide);  //we do not know the freq. So if s has no '!', current freq will be added.
                     IVariable rv = null; this.storage.TryGetValue(varnameWithFreq, out rv);
                     if (rv == null)
                     {
@@ -228,7 +228,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: You cannot state bank name (with colon) on the left-hand side in a MAP element");
                     throw new GekkoException();
                 }
-                string varnameWithFreq = G.AddFreq(varName, freq, EVariableType.Var, true);
+                string varnameWithFreq = G.AddFreq(varName, freq, EVariableType.Var, O.ELookupType.LeftHandSide);
                 O.LookupHelperLeftside(smpl, this, varnameWithFreq, freq, rhsExpression, EVariableType.Var, options);
                 
                 //IVariable iv = this.GetIVariable(s);

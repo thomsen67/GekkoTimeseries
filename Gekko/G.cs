@@ -262,7 +262,7 @@ namespace Gekko
             return allFreqsHelper;
         }
 
-        public static string AddFreq(string varname, string freq, EVariableType type, bool isLeftSideVariable)
+        public static string AddFreq(string varname, string freq, EVariableType type, O.ELookupType isLeftSideVariable)
         {
             //freq is added for all no-sigil rhs
             //freq is added for lhs if it is no-sigil AND the type is SERIES or VAR
@@ -271,7 +271,7 @@ namespace Gekko
 
             string varnameWithFreq = varname;
 
-            if ((!isLeftSideVariable && !hasSigil) || (isLeftSideVariable && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
+            if ((isLeftSideVariable != O.ELookupType.LeftHandSide && !hasSigil) || (isLeftSideVariable == O.ELookupType.LeftHandSide && !hasSigil && (type == EVariableType.Var || type == EVariableType.Series)))
             {
                 //Series has '!' added
                 //In VAL v = 100, there will be no freq added.

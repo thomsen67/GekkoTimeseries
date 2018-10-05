@@ -102,7 +102,7 @@ namespace Gekko
                             if (G.IsSimpleToken(ss, false))
                             {
                                 //look up the scalar
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, false, EVariableType.Var, null);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
                                 string s2 = a.ConvertToString();
                                 sb.Append(s2);
                                 i = j;  //to jump forwards
@@ -182,7 +182,7 @@ namespace Gekko
                     {
                         try
                         {
-                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var, null);
+                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -247,7 +247,7 @@ namespace Gekko
                         {
                             try
                             {
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, false, EVariableType.Var, null);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
 
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {
@@ -314,47 +314,54 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
-            if (indexes.Length == 1)
+            if (Globals.useIndexerAlone)
             {
-                IVariable index = indexes[0];
-                IVariable rv = null;
-                if (this.string2 == Globals.indexerAloneCheatString)
+                if (indexes.Length == 1)
                 {
-                    //corresponds to empty indexer like ['fy*'], different from #a['fy*']
-                    if (index.Type() == EVariableType.String)
+                    //All this is probably not relevant anymore
+
+                    IVariable index = indexes[0];
+                    IVariable rv = null;
+                    if (this.string2 == Globals.indexerAloneCheatString)
                     {
-                        //string vars = null;                    
-                        //ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
-                        //List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                        //rv = new List(output);
-                        string s = ((ScalarString)index).string2;
-                        if (s.StartsWith(Globals.firstCheatString + Globals.symbolBankColon2))
+                        //corresponds to empty indexer like ['fy*'], different from #a['fy*']
+                        if (index.Type() == EVariableType.String)
                         {
-                            s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
+                            //string vars = null;                    
+                            //ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
+                            //List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
+                            //rv = new List(output);
+                            string s = ((ScalarString)index).string2;
+                            if (s.StartsWith(Globals.firstCheatString + Globals.symbolBankColon2))
+                            {
+                                s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
+                            }
+                            rv = O.NOTUSED_HandleWildcards(s, null);
                         }
-                        rv = O.HandleWildcards(s, null);
+                        else
+                        {
+                            G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
+                            G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
+                            G.Writeln("    The right use is PRT [gd*] and similar.");
+                            throw new GekkoException();
+                        }
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
-                        G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
-                        G.Writeln("    The right use is PRT [gd*] and similar.");
+                        G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
+                        G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
                         throw new GekkoException();
                     }
-                }                
+                    return rv;
+                }
                 else
                 {
-                    G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
-                    G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
+                    G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on STRING or NAME");
                     throw new GekkoException();
                 }
-                return rv;
             }
-            else
-            {
-                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on STRING or NAME");
-                throw new GekkoException();
-            }
+            G.Writeln2("*** ERROR: You cannot (yet) use indexes on string type variable");
+            throw new GekkoException();
 
         }
 

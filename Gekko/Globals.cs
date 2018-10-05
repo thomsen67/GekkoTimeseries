@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "d33";
 
+        public static bool useIndexerAlone = false;
+
         //public static bool assignmentFix = true;
 
         public static bool JOrderFix = true;
@@ -171,6 +173,8 @@ namespace Gekko
         public const string First = "First";
         public const string Local = "Local";
         public const string Global = "Global";
+
+        //only used as keys in switches etc.
         public const string ref_name = "ref";
         public const string first_name = "first";
         public const string local_name = "local";

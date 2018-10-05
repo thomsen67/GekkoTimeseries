@@ -36,6 +36,13 @@ namespace Gekko
             Dot
         }
 
+        public enum ELookupType
+        {
+            LeftHandSide,
+            RightHandSide,
+            RightHandSideLoneVariable
+        }
+
         public enum ECreateType
         {
             Find,        //error if not found
@@ -1041,7 +1048,7 @@ namespace Gekko
         // LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START
 
         //NOTE: Must have same signature as Lookup(), #89075234532
-        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //Only encountered on the LHS
             if (logical == null)
@@ -1065,19 +1072,19 @@ namespace Gekko
             }
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //overload
             return Lookup(smpl, map, x, rhsExpression, isLeftSideVariable, type, true, options);
         }
 
-        public static IVariable NameLookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             return x;
         }
 
         //NOTE: Must have same signature as DollarLookup(), #89075234532
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
@@ -1130,13 +1137,13 @@ namespace Gekko
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //overload
             return Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true, options);
         }
 
-        public static IVariable NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             if (dbName != null || freq != null)
             {
@@ -1148,7 +1155,7 @@ namespace Gekko
         }
 
         //Also see #8093275432098
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             // =============================================================================================
             // =============================================================================================
@@ -1166,7 +1173,7 @@ namespace Gekko
             //only adds freq if not there. No sigil is added for lhs vars here.
             string varnameWithFreq = G.AddFreq(varname, freq, type, isLeftSideVariable);
 
-            if (isLeftSideVariable)
+            if (isLeftSideVariable == ELookupType.LeftHandSide)
             {
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
@@ -1243,12 +1250,12 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
 
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, errorIfNotFound);
+                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, isLeftSideVariable, errorIfNotFound);
             }
         }
 
         //Also see #8093275432098
-        public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, bool isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             return varname;
         }
@@ -1261,23 +1268,36 @@ namespace Gekko
         // LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END 
 
 
-        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname)
+        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, O.ELookupType isLeftSideVariable)
         {
-            return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, true);
+            return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, isLeftSideVariable, true);
         }
 
-        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, bool errorIfNotFound)
+        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, O.ELookupType isLeftSideVariable, bool errorIfNotFound)
         {
             //varname is used for local/global stuff, faster than chopping up varnameWithFreq up now
             //Can either look up stuff in a Map, or in a databank
 
             IVariable rv = null;
+            string frombank = null;
 
             if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
-                rv = HandleWildcards(varnameWithFreq, null);
-                rv = Program.GetListOfIVariablesFromListOfScalarStrings(rv);  //transforms til List<IVariable>
+                
+                List<TwoStrings> matches = Program.Wildcard(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
+                List rv_list = new List();
+                foreach (TwoStrings two in matches)
+                {
+                    ScalarString ss = new ScalarString(two.s1);
+                    rv_list.Add(ss);
+                }
+                rv = rv_list;
+
+                if (isLeftSideVariable != ELookupType.RightHandSideLoneVariable)  //We allow #m = {'x*a'} to return a list of strings, not a list of series. This is because it is similar to #m = a, b, c; --> envision that {'x*a'} returns more than 1 element. So this is the only case where #m = ... can work like seqOfBankVarNames even if it is only 1 element.
+                {
+                    rv = Program.GetListOfIVariablesFromListOfScalarStrings(rv);  //transforms til List<IVariable>
+                }
             }
             else
             {
@@ -1386,9 +1406,9 @@ namespace Gekko
             return rv;
         }
 
-        public static List HandleWildcards(string varnameWithFreq, string frombank)
+        public static List NOTUSED_HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.WildcardHelper(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
+            List<TwoStrings> matches = Program.Wildcard(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
             List rv = new List();
             foreach (TwoStrings two in matches)
             {
@@ -3369,21 +3389,24 @@ namespace Gekko
         {
             Program.RevertSmpl(smplRemember, smpl);
 
-            if (x == null)
+            if (Globals.useIndexerAlone)
             {
-                //this should not be possible, [a*x] is not wildcard anymore
+                if (x == null)
+                {
+                    //this should not be possible, [a*x] is not wildcard anymore
 
-                if (indexes.Length == 1)
-                {
-                    //[y]
-                    //['q*']
-                    ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                    return ss.Indexer(smpl, indexerType, indexes);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
-                    throw new GekkoException();
+                    if (indexes.Length == 1)
+                    {
+                        //[y]
+                        //['q*']
+                        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
+                        return ss.Indexer(smpl, indexerType, indexes);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
+                        throw new GekkoException();
+                    }
                 }
             }
 
@@ -7585,7 +7608,7 @@ namespace Gekko
                 EVariableType type = EVariableType.Var;
                 if (this.type != null) type = G.GetVariableType(this.type);
 
-                List<TwoStrings> matches = Program.WildcardHelper(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
+                List<TwoStrings> matches = Program.Wildcard(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
                 //List rv = new List();
                 List<string> names = new List<string>();
                 foreach (TwoStrings two in matches)
@@ -8239,12 +8262,51 @@ namespace Gekko
                     }
                 }
             }
-            
+
 
             private static void ExplodeArraySeriesHelper(Series tsFirst, List<List<MapMultidimItem>> check, string label2, List<O.RecordedPieces> recordedPieces, int firstVariableFoundInFirstOrRef, int bankNumber, List unfold, List<string> labels)
             {
 
                 List<MapMultidimItem> keys = tsFirst.dimensionsStorage.storage.Keys.ToList();
+
+                string[] domains = tsFirst.meta.domains;
+
+                List<List<string>> restrict = null;
+
+                if (domains != null)
+                {
+                    IVariable def = O.Lookup(null, null, null, "#default", null, null, ELookupType.RightHandSide, EVariableType.Var, false, null);
+                    if (def != null)
+                    {
+                        restrict = new List<List<string>>();
+                        int dimI = -1;
+                        foreach (string domain in domains)
+                        {
+                            dimI++;
+
+                            restrict.Add(new List<string>());
+
+                            if (def.Type() == EVariableType.Map)
+                            {
+                                Map def_map = def as Map;
+                                IVariable set = null; def_map.storage.TryGetValue(domain, out set);
+                                if (set.Type() == EVariableType.List)
+                                {
+                                    try
+                                    {
+                                        string[] ss = Program.GetListOfStringsFromListOfIvariables((set as List).list.ToArray());
+                                        restrict[dimI].AddRange(ss);
+                                    }
+                                    catch
+                                    {
+                                        G.Writeln2("*** ERROR: The map #default should contain lists of strings");
+                                        throw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 if (keys.Count == 0)
                 {
@@ -8256,19 +8318,30 @@ namespace Gekko
                 //List mm0 = new List();
                 foreach (MapMultidimItem key in keys)
                 {
-
+                    if (restrict != null)
+                    {
+                        for (int i = 0; i < key.storage.Length; i++)
+                        {
+                            if (restrict[i].Count > 0)
+                            {
+                                if (restrict[i].Contains(key.storage[i], StringComparer.OrdinalIgnoreCase))
+                                {
+                                    //show this one
+                                }
+                                else
+                                {
+                                    //skip this one
+                                    goto Flag1;
+                                }
+                            }
+                        }
+                    }
                     unfold.Add(tsFirst.dimensionsStorage.storage[key]);
                     check[bankNumber].Add(key);
 
                     string bankName = null;
 
                     bool isSimple = true;
-
-                    //int n = 1;
-                    //List<string> lbl = Program.OPrintLabels(label, recordedPieces, n, bankNumber);
-
-                    //string label2 = G.ReplaceGlueNew(Program.RemoveSplitter(label[0]).Split('|')[0]);
-                    //string label2 = lbl[0];
 
                     foreach (char c in label2)
                     {
@@ -8290,6 +8363,7 @@ namespace Gekko
                     {
                         labels.Add(label2 + blanks + "[" + key.ToString() + "]");
                     }
+                    Flag1: { };
 
                 }
             }

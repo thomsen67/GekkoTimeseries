@@ -423,11 +423,11 @@ namespace Gekko
             if (x1.Type() == EVariableType.String)
             {
                 string s = x1.ConvertToString();
-                if (G.Equal(s, "first"))
+                if (G.Equal(s, Globals.First))
                 {
                     return new ScalarString(Program.databanks.GetFirst().name);
                 }
-                else if (G.Equal(s, "ref"))
+                else if (G.Equal(s, Globals.Ref))
                 {
                     return new ScalarString(Program.databanks.GetRef().name);
                 }
@@ -2676,7 +2676,7 @@ namespace Gekko
         public static IVariable exist(GekkoSmpl smpl, IVariable x1)
         {
             double d = 0d;
-            IVariable y = O.Lookup(smpl, null, x1, null, false, EVariableType.Var, false, null);  //will use search settings (data, sim mode) if not bank is given
+            IVariable y = O.Lookup(smpl, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, false, null);  //will use search settings (data, sim mode) if not bank is given
             if (y != null) d = 1d;            
             ScalarVal v = new ScalarVal(d);
             return v;
@@ -2693,7 +2693,7 @@ namespace Gekko
             else if (x1.Type() == EVariableType.String)
             {
                 //ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
-                ts = O.Lookup(null, null, x1, null, false, EVariableType.Var, null) as Series;
+                ts = O.Lookup(null, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, null) as Series;
             }
             else
             {

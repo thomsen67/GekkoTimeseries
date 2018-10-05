@@ -2441,7 +2441,7 @@ namespace Gekko.Parser.Gek
 
                                     if (s == null)
                                     {
-                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, false, EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
+                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, O.ELookupType.RightHandSide, EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
                                     }
 
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
@@ -3684,7 +3684,7 @@ namespace Gekko.Parser.Gek
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, false, EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, O.ELookupType.RightHandSide, EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                 }
                             }                                                       
 
@@ -3900,7 +3900,7 @@ namespace Gekko.Parser.Gek
                             bool isMapItem = SearchUpwardsInTree9(node);  //finds ASTMAPITEM and ASTFUNCTIONDEFCODE
                             bool isLeftSide = node?.Parent.Text == "ASTLEFTSIDE";
 
-                            bool isSoleOnRightSide = node?.Parent.Text == "ASTASSIGNMENT";
+                            bool isLoneOnRightSide = node?.Parent.Text == "ASTASSIGNMENT";
 
                             string optionsString = "null";
                             if (!isMapItem && isLeftSide)
@@ -3920,7 +3920,9 @@ namespace Gekko.Parser.Gek
                             bool isLeftSideVariable = tuple.Item1;
                             string type = tuple.Item2;
 
-                            string isLeftSideVariableString = "false"; if (isLeftSideVariable) isLeftSideVariableString = "true";
+                            string isLeftSideVariableString = "O.ELookupType.RightHandSide";
+                            if (isLeftSideVariable) isLeftSideVariableString = "O.ELookupType.LeftHandSide";
+                            if (isLoneOnRightSide) isLeftSideVariableString = "O.ELookupType.RightHandSideLoneVariable";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
 
                             //string optionsString = "null";
@@ -3978,7 +3980,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         else if (node[0][0][0].Text == "REF")
                                         {
-                                            simpleBank = "Ref";
+                                            simpleBank = Globals.Ref;
                                         }
                                     }
                                 }
