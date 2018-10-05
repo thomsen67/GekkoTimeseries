@@ -10466,10 +10466,71 @@ namespace UnitTests
             //  x1!q
 
             TestCopyHelper(1);
-            //I("#m = {'x*'};");
-            //_AssertListString(First(), "#m", new StringOrList("First:x1!a", "First:x2!a"));
-            //I("#m = {'x*!*'};");
-            //_AssertListString(First(), "#m", new StringOrList("First:x1!a", "First:x1!q", "First:x2!a"));
+
+            // ------------------------------------------------
+            // no bank
+            // ------------------------------------------------
+
+            I("#m = {'*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x2"));
+            I("#m = {'*!*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2"));
+            
+            I("#m = {'*1'};");
+            _AssertListString(First(), "#m", new StringOrList("x1"));
+            I("#m = {'*1!*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q"));
+
+            I("#m = {'%*'};");
+            _AssertListString(First(), "#m", new StringOrList("%x1"));
+            I("#m = {'#*'};");
+            _AssertListString(First(), "#m", new StringOrList("#m", "#x1"));
+
+            // ------------------------------------------------
+            // with bank
+            // ------------------------------------------------
+
+            I("#m = {'b1:*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3"));
+            I("#m = {'b1:*!*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
+
+            I("#m = {'b1:*3'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3"));
+            I("#m = {'b1:*3!*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
+
+            I("#m = {'b1:%*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:%x3"));
+            I("#m = {'b1:#*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:#x3"));
+
+            // ------------------------------------------------
+            // all banks
+            // ------------------------------------------------
+
+            I("#m = {'*:*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x2", "ref:x1", "b1:x3"));
+            I("#m = {'*:*!*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q"));
+
+            I("#m = {'*:*3'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3"));
+            I("#m = {'*:*3!*'};");
+            _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
+
+            I("#m = {'*:%*'};");
+            _AssertListString(First(), "#m", new StringOrList("%x1", "ref:%x1", "b1:%x3"));
+            I("#m = {'*:#*'};");
+            _AssertListString(First(), "#m", new StringOrList("#m", "#x1", "ref:#x1", "b1:#x3"));
+
+            // ------------------------------------------------
+            // everything
+            // ------------------------------------------------
+
+            I("#m = {'*:*!*'} + {'*:%*'} + {'*:#*'};");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
+
 
         }
 

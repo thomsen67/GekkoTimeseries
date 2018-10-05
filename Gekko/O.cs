@@ -1281,9 +1281,14 @@ namespace Gekko
             IVariable rv = null;
             string frombank = null;
 
-            if (Program.CheckIfLooksLikeWildcard(varnameWithFreq))
+            if (Program.CheckIfLooksLikeWildcard2(dbName) || Program.CheckIfLooksLikeWildcard(varnameWithFreq))
             {
                 //a pattern like {'a*'} or rather {'a*!a'} is caught here
+
+                if (dbName != null)
+                {
+                    varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
+                }
                 
                 List<TwoStrings> matches = Program.MatchWildcard(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
                 List rv_list = new List();

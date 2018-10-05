@@ -14190,12 +14190,21 @@ namespace Gekko
             return inputFileLines2;
         }
 
+        public static bool CheckIfLooksLikeWildcard2(string inside)
+        {
+            if (inside == null) return false;
+            if (inside.Contains("*") || inside.Contains("?")) return true;
+            return false;
+        }
+
         public static bool CheckIfLooksLikeWildcard(string inside)
         {
             //finds [a*b?] patterns, handled like {'a*b?'}
             //note that [bank:a*b?] is also allowed
             //note that [bank:a*b?!q] is also allowed
             //problem is that [a*b] looks like a matrix definition, therefore this code.
+
+            if (inside == null) return false;
 
             string[] sss = inside.Split(Globals.symbolBankColon2);
 
@@ -15849,7 +15858,7 @@ namespace Gekko
                     }
                     else
                     {                        
-                        db_banks = Match(bankLhs, listOfAllOpenBanks);
+                        db_banks = Match(bankLhs, listOfAllOpenBanks, false);
                     }
 
                     foreach (string db_bank in db_banks)
@@ -16106,9 +16115,10 @@ namespace Gekko
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 Databank databank = Program.databanks.storage[i];
-                if (i == 0) temp.Add(Globals.First);
-                else if (i == 1) temp.Add(Globals.Ref);
-                else temp.Add(databank.name);
+                //if (i == 0) temp.Add(Globals.First);
+                //else if (i == 1) temp.Add(Globals.Ref);
+                //else temp.Add(databank.name);
+                temp.Add(databank.name);
             }
             temp.Add(Globals.Global);
             return temp;
@@ -16146,7 +16156,7 @@ namespace Gekko
                 name3a += Globals.freqIndicator + wildcardFreq;
             }
 
-            List<string> matched = Match(name3a, allVariablesInBank);
+            List<string> matched = Match(name3a, allVariablesInBank, true);
 
             foreach (string match in matched)
             {
@@ -16154,9 +16164,9 @@ namespace Gekko
             }
 
             return varsMatched;
-        }
+        }        
 
-        public static List<string> Match(string wild1, List<string> stringsThatCanBeMatched)
+        public static List<string> Match(string wild1, List<string> stringsThatCanBeMatched, bool sort)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
             //Sorted at the end
@@ -16165,8 +16175,8 @@ namespace Gekko
             foreach (string n2 in stringsThatCanBeMatched)
             {
                 if (wc.IsMatch(n2)) inputs.Add(n2);
-            }            
-            inputs.Sort(StringComparer.OrdinalIgnoreCase);
+            }
+            if (sort) inputs.Sort(StringComparer.OrdinalIgnoreCase);
             return inputs;
         }
 
