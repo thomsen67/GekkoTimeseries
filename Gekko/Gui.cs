@@ -2073,7 +2073,7 @@ namespace Gekko
             }
             string orignialFileName = fileName;
 
-            fileName = Program.SearchForFile(fileName, folders);  //calls CreateFullPathAndFileName()
+            fileName = Program.FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
 
             if (File.Exists(fileName))
             {

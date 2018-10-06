@@ -3501,7 +3501,7 @@ namespace Gekko
         {
             fileName = Program.AddExtension(fileName, "." + "lst");
             List<string> folders = new List<string>();
-            string fileNameTemp = Program.SearchForFile(fileName, folders);
+            string fileNameTemp = Program.FindFile(fileName, folders);
             if (fileNameTemp == null)
             {
                 G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");

@@ -7821,11 +7821,11 @@ namespace UnitTests
             I("CREATE fy;");
             I("SERIES fy = 2;");
             I("%s = 'fy';");
-            
+
             //Print a string
             I("PRT %s;");  //will print as string
             I("PRT {%s};"); //print as series
-            
+
             // ---------------------------- test of #(...)
             //Giver disse to lister:
             // a pV010000
@@ -7850,21 +7850,21 @@ namespace UnitTests
             I("STRING %s2b = 'x%s|y';");
             _AssertScalarString(First(), "%s2b", "x%s|y");
             I("STRING %s2b = 'x{%s}y';");
-            _AssertScalarString(First(), "%s2b", "xfyy");           
+            _AssertScalarString(First(), "%s2b", "xfyy");
 
             I("RESET;");
             I("CREATE fx, fy;");
-            I("TIME 2000 2000;");            
+            I("TIME 2000 2000;");
             I("LIST #n = fx, fy;"); //is list of names
             I("STRING %s = 'def';");
             I("STRING %s2 = %s + #n[2];");
             _AssertScalarString(First(), "%s2", "deffy");
             I("STRING %s4 = %s + '{#n[2]}';");
             _AssertScalarString(First(), "%s4", "deffy");
-            
-            
+
+
             //----- new stuff end.
-            
+
             //-----------------------------
             //Testing stuff in the blueprint paper
             //-----------------------------
@@ -7925,7 +7925,7 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2010;");
             I("CREATE a1, a2;");
-            I("LIST #a = a1, a2;");            
+            I("LIST #a = a1, a2;");
             I("SERIES {#a} = 100;");
             I("SERIES a2 = 200;");
             _AssertSeries(First(), "a1", 2010, 100, sharedDelta);
@@ -7938,9 +7938,9 @@ namespace UnitTests
             // Important
             // Important --> we can use {#a}[1] or {#a[1]} as we choose
             // Important
-            I("SERIES a2 = {#a}[1] + 2;");  
+            I("SERIES a2 = {#a}[1] + 2;");
             _AssertSeries(First(), "a2", 2010, 102, sharedDelta);
-            FAIL("#a = 1a, 1b;");            
+            FAIL("#a = 1a, 1b;");
             FAIL("#a = 1;");
             FAIL("#a = 007;");
             FAIL("#a = '007';");
@@ -7994,7 +7994,7 @@ namespace UnitTests
             I("CREATE a2, y;");
             I("SERIES a2 = 100;");
             I("LIST #b1 = #a[%i..%i+2];"); //b1 = a2, a3, a4. Sublist of names at position %i, %i+1, %i+2
-            _AssertListString(First(), "#b1", new StringOrList(new string[] { "a2", "a3", "a4" }));            
+            _AssertListString(First(), "#b1", new StringOrList(new string[] { "a2", "a3", "a4" }));
             FAIL("VAL %b2 = #a[0];");         //b2 = 5, length of the list as a value
             I("VAL %b2 = #a.len();");
             _AssertScalarVal(First(), "%b2", 5d);
@@ -8008,29 +8008,25 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+                        
+            //#085234375
+            I("LIST #a = fxa, fxb, pcp, tg, pxqz;");
+            I("LIST #a1 = #a['fX*'];              //pattern in #a list");
+            I("LIST #a2 = #a['f?nz'];             //pattern in #a list");
+            I("LIST #a3 = #a['pxa'..'pxqz'];        //range in #a list");
+            I("LIST #a4 = ['fX*'];                //pattern in Work databank");
+            I("LIST #a5 = ['f?n'];                //pattern in Work databank");
+            I("LIST #a6 = ['pxa'..'pxqz'];          //range in Work databank");
+            I("LIST #a7 = ['*'];                  //all items in Work databank");
 
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                
-                I("LIST a = fxa, fxb, pcp, tg, pxqz;");
-                I("LIST a1 = #a[fX*];              //pattern in #a list");
-                I("LIST a2 = #a[f?nz];             //pattern in #a list");
-                I("LIST a3 = #a[pxa..pxqz];        //range in #a list");
-                I("LIST a4 = [fX*];                //pattern in Work databank");
-                I("LIST a5 = [f?n];                //pattern in Work databank");
-                I("LIST a6 = [pxa..pxqz];          //range in Work databank");
-                I("LIST a7 = [*];                  //all items in Work databank");
-                //Double checked in Gekko 1.8, seems ok
-                AssertHelperList("a1", new List<string>() { "fxa", "fxb" });
-                AssertHelperList("a2", new List<string>());
-                AssertHelperList("a3", new List<string>() { "pxqz" });
-                Assert.AreEqual(GetListOfStrings("a4").Count, 30);
-                Assert.AreEqual(GetListOfStrings("a5").Count, 4);
-                Assert.AreEqual(GetListOfStrings("a6").Count, 42);
-                Assert.AreEqual(GetListOfStrings("a7").Count, 8358);
-
-            }
-
+            _AssertListSize(First(), "#a1", 2);
+            _AssertListSize(First(), "#a2", 0);
+            _AssertListSize(First(), "#a3", 1);
+            _AssertListSize(First(), "#a4", 30);
+            _AssertListSize(First(), "#a5", 4);
+            _AssertListSize(First(), "#a6", 42);
+            _AssertListSize(First(), "#a7", 8358);
+            
             I("CREATE gdp3;");
             I("SERIES gdp3 = 100;");
             I("STRING %s = 'dp';");

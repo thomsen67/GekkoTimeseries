@@ -89,7 +89,7 @@ namespace Gekko
                     }
                     else if (ival == 0)
                     {
-                        G.Writeln2("*** ERROR: Illegal [0] list indexing. Use #m.len() instead of #m[0] to get the length of list #m.");
+                        G.Writeln2("*** ERROR: Illegal [0] list indexing. Use #m.len() or len(#m) instead of #m[0] to get the length of list #m.");
                         throw new GekkoException();                        
                     }
                     else if (ival > this.list.Count)
@@ -105,21 +105,43 @@ namespace Gekko
                 else if (index.Type() == EVariableType.Range)
                 {
                     Range index_range = index as Range;
-                    int ival1 = O.ConvertToInt(index_range.first);
-                    int ival2 = O.ConvertToInt(index_range.last);
-                    if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
+
+                    if (index_range.first.Type() == EVariableType.String && index_range.last.Type() == EVariableType.String)
                     {
-                        G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
-                        throw new GekkoException();
+                        string s1 = O.ConvertToString(index_range.first);
+                        string s2 = O.ConvertToString(index_range.last);
+
+                        List<string> m = new List<string>();
+                        foreach (IVariable x in this.list)
+                        {
+                            string s = O.ConvertToString(x);
+                            if (string.Compare(s1, s, StringComparison.OrdinalIgnoreCase) <= 0 && string.Compare(s, s2, StringComparison.OrdinalIgnoreCase) <= 0)
+                            {
+                                m.Add(s);
+                            }                            
+                        }
+                        return new List(m);
                     }
-                    List<IVariable> tmp = new List<Gekko.IVariable>();
-                    for (int i = ival1 - 1; i <= ival2 - 1; i++)
+                    else
                     {
-                        tmp.Add(this.list[i].DeepClone(null));
+                        //slice like #m[2..5]
+
+                        int ival1 = O.ConvertToInt(index_range.first);
+                        int ival2 = O.ConvertToInt(index_range.last);
+                        if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
+                        {
+                            G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
+                            throw new GekkoException();
+                        }
+                        List<IVariable> tmp = new List<Gekko.IVariable>();
+                        for (int i = ival1 - 1; i <= ival2 - 1; i++)
+                        {
+                            tmp.Add(this.list[i].DeepClone(null));
+                        }
+                        List m = new List(tmp);
+                        m.isNameList = this.isNameList;
+                        return m;
                     }
-                    List m = new List(tmp);
-                    m.isNameList = this.isNameList;
-                    return m;
                 }
                 else if (index.Type() == EVariableType.String)
                 {                    
@@ -127,7 +149,10 @@ namespace Gekko
                     if(s5.Contains("?") || s5.Contains("*"))
                     {
                         //Wildcard: return a list of those
-                        List<string> found = Program.MatchWildcard(s5, this.list, null);
+
+                        List<string> found = Program.Search(s5, new List<string>(Program.GetListOfStringsFromListOfIvariables(this.list.ToArray())), false); //the list items are sorted, not like a dict
+
+                        //List<string> found = Program.MatchWildcard(s5, this.list, null);
                         return new List(found);
                     }
                     else

@@ -858,7 +858,7 @@ namespace Gekko
                 if (true)
                 {
 
-                    if (SearchException(e2, "lexer error"))
+                    if (FindException(e2, "lexer error"))
                     {
                         ParseHelper ph = new ParseHelper();
                         string s2 = p.GetStackCommandFileText(p.GetDepth());
@@ -866,14 +866,14 @@ namespace Gekko
                         if (s2 != null) s3 = s2;
                         ParserOLD.PrintModelParserErrors(Program.CreateListOfStringsFromString(e2.Message), Program.CreateListOfStringsFromString(s3), ph);
                     }
-                    if (SearchException(e2, "***") || SearchException(e2, "+++"))
+                    if (FindException(e2, "***") || FindException(e2, "+++"))
                     {
                         //for instance "*** ERROR: blablabla" or "+++ NOTE: blablabla"
                         //if *** we know that it is a Gekko-generated error text
                         G.Writeln("    " + e2.Message);
                     }
                     string ramProblem = "";
-                    if (SearchException(e2, "System.OutOfMemoryException"))
+                    if (FindException(e2, "System.OutOfMemoryException"))
                     {
                         G.Writeln2("*** ERROR: Out of memory (RAM). Please close some unnessecary programs if possible.");
                         Process[] processlist = Process.GetProcesses();
@@ -910,7 +910,8 @@ namespace Gekko
                             ramProblem += G.NL;
                         }
                     }
-                    if (SearchException(e2, "GekkoException"))
+                    
+                    if (FindException(e2, "GekkoException"))
                     {
                         G.Write("*** ERROR: The command failed");
                     }
@@ -1001,7 +1002,7 @@ namespace Gekko
             }
         }
 
-        public static bool SearchException(Exception ex, string s)
+        public static bool FindException(Exception ex, string s)
         {
             if (ex == null) return false;
             if (ex.Message != null && ex.Message.Contains(s)) return true;
@@ -7733,37 +7734,37 @@ namespace Gekko
             return ts;
         }
 
-        public static List<string> MatchWildcard(string wildcard, List<IVariable> input, string endsWith)
-        {
-            //endsWith might be for instance "=q" to indicate quarters. Can also be null.
-            Wildcard wc = new Wildcard(wildcard, RegexOptions.IgnoreCase);
-            List<string> found = new List<string>();
+        //public static List<string> MatchWildcard(string wildcard, List<IVariable> input, string endsWith)
+        //{
+        //    //endsWith might be for instance "=q" to indicate quarters. Can also be null.
+        //    Wildcard wc = new Wildcard(wildcard, RegexOptions.IgnoreCase);
+        //    List<string> found = new List<string>();
 
-            if (endsWith == null)
-            {
-                foreach (IVariable iv in input)
-                {
-                    string s = O.ConvertToString(iv);
-                    //if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
-                    if (wc.IsMatch(s)) found.Add(s);
-                }
-            }
-            else
-            {
-                foreach (IVariable iv in input)
-                {
-                    string s = O.ConvertToString(iv);
-                    if (!s.EndsWith(endsWith)) continue;
-                    string s2 = s.Substring(0, s.Length - endsWith.Length);
-                    if (wc.IsMatch(s2))
-                    {
-                        found.Add(s2);
-                    }
-                }
-            }
-            found.Sort(StringComparer.OrdinalIgnoreCase);
-            return found;
-        }
+        //    if (endsWith == null)
+        //    {
+        //        foreach (IVariable iv in input)
+        //        {
+        //            string s = O.ConvertToString(iv);
+        //            //if (s.Contains(Globals.freqIndicator)) continue;  //#09875230984, filters out fy=q, fy=m, etc. A bit of a hack. Could also check the second-last char to see if it is '='
+        //            if (wc.IsMatch(s)) found.Add(s);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (IVariable iv in input)
+        //        {
+        //            string s = O.ConvertToString(iv);
+        //            if (!s.EndsWith(endsWith)) continue;
+        //            string s2 = s.Substring(0, s.Length - endsWith.Length);
+        //            if (wc.IsMatch(s2))
+        //            {
+        //                found.Add(s2);
+        //            }
+        //        }
+        //    }
+        //    found.Sort(StringComparer.OrdinalIgnoreCase);
+        //    return found;
+        //}
 
         //public static List<string> MatchWildcardInDatabank(string wildcard, Databank db)
         //{
@@ -14385,7 +14386,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command2);
             //The assumption is that this check is ok to do at parse time (not run time), since it is not realistic
             //to imagine .cmd files being created dynamically while the command files are running.
-            fileName = SearchForFile(fileName, folders);  //calls CreateFullPathAndFileName()
+            fileName = FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
             if (fileName != null) found = true;
             return found;
         }
@@ -14546,7 +14547,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            string fileName2 = SearchForFile(s, folders);  //also calls CreateFullPathAndFileName()
+            string fileName2 = FindFile(s, folders);  //also calls CreateFullPathAndFileName()
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
@@ -14573,7 +14574,7 @@ namespace Gekko
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
 
-            string fileName2 = SearchForFile(s, folders);  //also calls CreateFullPathAndFileName()
+            string fileName2 = FindFile(s, folders);  //also calls CreateFullPathAndFileName()
 
             if (fileName2 == null)
             {
@@ -15895,7 +15896,7 @@ namespace Gekko
                     }
                     else
                     {                        
-                        db_banks = Match(bankLhs, listOfAllOpenBanks, false);
+                        db_banks = Search(bankLhs, listOfAllOpenBanks, false);
                     }
 
                     foreach (string db_bank in db_banks)
@@ -16197,7 +16198,7 @@ namespace Gekko
                 name3a += Globals.freqIndicator + wildcardFreq;
             }
 
-            List<string> matched = Match(name3a, allVariablesInBank, true);
+            List<string> matched = Search(name3a, allVariablesInBank, true);
 
             foreach (string match in matched)
             {
@@ -16207,7 +16208,7 @@ namespace Gekko
             return varsMatched;
         }        
 
-        public static List<string> Match(string wild1, List<string> stringsThatCanBeMatched, bool sort)
+        public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched, bool sort)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
             //Sorted at the end
@@ -16389,7 +16390,7 @@ namespace Gekko
             folders.Add(Program.options.folder_help);  //looks here first, will actually before anything else look in working folder (which should not contain any help files)
             folders.Add(Application.StartupPath + "\\helpfiles\\"); //most often and probably best, the helpfiles are found here, tied to the gekko version
 
-            string path = SearchForFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
+            string path = FindFile("gekko.chm", folders);  //calls CreateFullPathAndFileName()
 
             if (path == null)
             {
@@ -16696,7 +16697,7 @@ namespace Gekko
 
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
-            fileName = SearchForFile(fileName, folders);  //calls CreateFullPathAndFileName()
+            fileName = FindFile(fileName, folders);  //calls CreateFullPathAndFileName()
 
             Globals.modelPathAndFileName = fileName;  //always contains a path
             Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
@@ -17423,7 +17424,7 @@ namespace Gekko
                 //try to find it externally, look also in model path!
                 List<string> folders = new List<string>();
                 folders.Add(Program.options.folder_model);
-                fileNameTemp = Program.SearchForFile("varlist.dat", folders);
+                fileNameTemp = Program.FindFile("varlist.dat", folders);
                 if (fileNameTemp != null)
                 {
                     string s = Program.GetTextFromFileWithWait(fileNameTemp);  //can read an ANSI file without problems
@@ -17750,7 +17751,7 @@ namespace Gekko
             //fileName = Program.SubstituteAssignVarsInExpression(fileName);
             fileName = Program.AddExtension(fileName, "." + "prn");
             List<string> folders = new List<string>();
-            string fileNameTemp = Program.SearchForFile(fileName, folders);
+            string fileNameTemp = Program.FindFile(fileName, folders);
             string prnFile = GetTextFromFileWithWait(fileNameTemp);
             List<string> listFile2 = G.ExtractLinesFromText(prnFile);
 
@@ -17833,7 +17834,7 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                string fileNameTemp = SearchForFile(fileName, folders);
+                string fileNameTemp = FindFile(fileName, folders);
 
                 if (fileNameTemp == null)
                 {
@@ -17879,12 +17880,12 @@ namespace Gekko
             return s;
         }
 
-        public static string SearchForFile(string fileName, List<string> folders)
+        public static string FindFile(string fileName, List<string> folders)
         {
-            return SearchForFile(fileName, folders, true);
+            return FindFile(fileName, folders, true);
         }
 
-        public static string SearchForFile(string fileName, List<string> folders, bool includeWorkingFolder)
+        public static string FindFile(string fileName, List<string> folders, bool includeWorkingFolder)
         {
             string fileNameTemp = null;
             string fileNameWorkingFolder = CreateFullPathAndFileName(fileName);
@@ -18955,7 +18956,7 @@ namespace Gekko
                             LinkContainer lc1;
                             LinkContainer lc2;
                             UndoAndPackStuff(out lc1, out lc2, tStart, tEnd, tStart0, obsWithLagsIncludingLeadsAtEnd, obsSimPeriodIncludingLeadsAtEnd, a2);
-                            if (SearchException(e, "simFailure"))
+                            if (FindException(e, "simFailure"))
                             {
                                 SimPrintErrorOptionsUndo(lc1);
                                 SimPrintErrorOptionsPack(lc2);
@@ -36951,7 +36952,7 @@ namespace Gekko
                 inputFileName = Path.GetFileName(inputFileName);
             }
 
-            string fileNameTemp = SearchForFile(inputFileName, folders);
+            string fileNameTemp = FindFile(inputFileName, folders);
             if (fileNameTemp == null)
             {
                 string s = FileNotFoundErrorMessage(inputFileName);
