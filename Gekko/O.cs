@@ -3443,10 +3443,9 @@ namespace Gekko
             List<IVariable> temp = new List<IVariable>();
             temp.Add(r);
             List m = new List(temp);
-
-            Program.Search(m, null, EVariableType.Var);
-
-            return r;
+            List<string> mm = Program.Search(m, null, EVariableType.Var);
+            
+            return new List(mm);
         }       
 
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)

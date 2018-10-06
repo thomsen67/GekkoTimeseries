@@ -115,10 +115,7 @@ namespace Gekko
                         foreach (IVariable x in this.list)
                         {
                             string s = O.ConvertToString(x);
-                            if (string.Compare(s1, s, StringComparison.OrdinalIgnoreCase) <= 0 && string.Compare(s, s2, StringComparison.OrdinalIgnoreCase) <= 0)
-                            {
-                                m.Add(s);
-                            }                            
+                            Program.AddIfInRange(s, s1, s2, m);
                         }
                         return new List(m);
                     }
@@ -181,7 +178,9 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-               
+
+        
+
 
         //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
         //{
@@ -232,7 +231,7 @@ namespace Gekko
         //        return new List(this.list.GetRange(i1 - 1, i2 - i1 + 1)); //GetRange() is a shallow copy, but that is okay since it contains immutable strings            
         //    }
         //}
-        
+
         public IVariable Negate(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: You cannot use minus with lists");                

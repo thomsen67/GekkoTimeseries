@@ -15742,6 +15742,14 @@ namespace Gekko
 
         }
 
+        public static void AddIfInRange(string s, string s1, string s2, List<string> m)
+        {
+            if (string.Compare(s1, s, true) <= 0 && string.Compare(s, s2, true) <= 0)
+            {
+                m.Add(s);
+            }
+        }
+
         public static List<string> Search(List names1, string frombank, EVariableType type)
         {
             List<string> names = new List<string>();
@@ -15865,11 +15873,64 @@ namespace Gekko
 
             foreach (string wildCardLhs in lhs)
             {
+                string bankLhs = null;
+                string nameLhs = null; 
+                string freqLhs  = null;
+                string[] indexLhs = null;
 
-                HERE WE NEED TO HANDLE a..c type of ranges
+                string nameLhsRange1 = null;
+                string nameLhsRange2 = null;
 
-                string bankLhs, nameLhs, freqLhs; string[] indexLhs;
-                O.Chop(wildCardLhs, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
+                string[] ss = wildCardLhs.Split(new string[] { ".." }, StringSplitOptions.None);
+                if (ss.Length == 2)
+                {
+                    //stuff like ['ab'..'f']
+                    //['b2:ab'..'b2:f']
+                    //['ab!q'..'f!q']
+
+                    string bankLhs1, nameLhs1, freqLhs1; string[] indexLhs1;
+                    O.Chop(ss[0], out bankLhs1, out nameLhs1, out freqLhs1, out indexLhs1);
+
+                    string bankLhs2, nameLhs2, freqLhs2; string[] indexLhs2;
+                    O.Chop(ss[1], out bankLhs2, out nameLhs2, out freqLhs2, out indexLhs2);
+
+                    if (!G.Equal(bankLhs1, bankLhs2))
+                    {
+                        G.Writeln2("*** ERROR: You must use the same bankname before and after '..' in a range");
+                        throw new GekkoException();
+                    }
+
+                    if (!G.Equal(freqLhs1, freqLhs2))
+                    {
+                        G.Writeln2("*** ERROR: You must use the same freq before and after '..' in a range");
+                        throw new GekkoException();
+                    }
+
+                    if (nameLhs1[0] == Globals.symbolScalar && nameLhs2[0] != Globals.symbolScalar)
+                    {
+                        G.Writeln2("*** ERROR: Scalar symbol ('%') should be present both before and after '..'");
+                        throw new GekkoException();
+                    }
+
+                    if (nameLhs1[0] == Globals.symbolCollection && nameLhs2[0] != Globals.symbolCollection)
+                    {
+                        G.Writeln2("*** ERROR: Collection symbol ('#') should be present both before and after '..'");
+                        throw new GekkoException();
+                    }
+                    bankLhs = bankLhs1;
+                    nameLhsRange1 = nameLhs1;
+                    nameLhsRange2 = nameLhs2;
+                    freqLhs = freqLhs1;
+
+                }
+                else
+                {                    
+                    O.Chop(wildCardLhs, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
+                }
+
+                //Now we have bankLhs and freqLhs (indexLhs does not work...)
+                //if nameLhs != null, it is normal wildcard
+                //if nameLhsRange1 != null, it is a range
 
                 //any "first" or "ref" is set to their real names.
                 bankLhs = SubstituteFirstRefNames(bankLhs);
@@ -15878,8 +15939,9 @@ namespace Gekko
 
                 bool lhsHasStarOrQuestion = false;
                 if (bankLhs != null && (bankLhs.Contains("*") || bankLhs.Contains("?"))) lhsHasStarOrQuestion = true;
-                if (nameLhs.Contains("*") || nameLhs.Contains("?")) lhsHasStarOrQuestion = true;
+                if (nameLhs != null && (nameLhs.Contains("*") || nameLhs.Contains("?"))) lhsHasStarOrQuestion = true;
                 if (freqLhs != null && (freqLhs.Contains("*") || freqLhs.Contains("?"))) lhsHasStarOrQuestion = true;
+                if (nameLhsRange1 != null) lhsHasStarOrQuestion = true;  //range
                 if (lhsHasStarOrQuestion) lhsHasStarOrQuestionGlobal = true;  //used outside loop
 
                 if (indexLhs != null)
@@ -15890,14 +15952,13 @@ namespace Gekko
 
                 if (lhsHasStarOrQuestion)
                 {
-                    //There is a star or question in bank, name or freq
+                    //There is a star or question in bank, name or freq, or a range in name
 
                     List<string> listOfAllOpenBanks = GetListOfAllBanks();
                     List<string> db_banks = new List<string>();
                     if (bankLhs == null)
                     {
-                        db_banks.Add(currentFirstBankName);
-                        //db_banks.AddRange(listOfAllOpenBanks);
+                        db_banks.Add(currentFirstBankName);                        
                     }
                     else
                     {                        
@@ -15906,12 +15967,22 @@ namespace Gekko
 
                     foreach (string db_bank in db_banks)
                     {
-                        lhsUnfolded.AddRange(MatchInBank(db_bank, nameLhs, freqLhs));
+                        //
+                        // This is where the matching takes place
+                        //
+                        if (nameLhsRange1 != null)
+                        {
+                            lhsUnfolded.AddRange(RangeInBank(db_bank, nameLhsRange1, nameLhsRange2, freqLhs));
+                        }
+                        else
+                        {
+                            lhsUnfolded.AddRange(MatchInBank(db_bank, nameLhs, freqLhs));
+                        }
                     }
                 }
                 else
                 {
-                    //item without * or ?
+                    //item without * or ? or range
                     string bankTemp = bankLhs;
                     if (bankLhs == null) bankTemp = currentFirstBankName;
                     string freq = null;
@@ -16213,7 +16284,36 @@ namespace Gekko
             }
 
             return varsMatched;
-        }        
+        }
+
+        private static List<string> RangeInBank(string bankname, string name1, string name2, string wildcardFreq)
+        {
+            if (wildcardFreq == "*")
+            {
+                G.Writeln2("Frequency '!*' not supported for ranges ('...')");
+                throw new GekkoException();
+            }
+            if (wildcardFreq == null) wildcardFreq = G.GetFreq(Program.options.freq);
+            
+            //For each matching databank
+            List<string> varsMatched = new List<string>();
+            List<string> allVariablesInBank = new List<string>();
+            Databank db = Program.databanks.GetDatabank(bankname, true);
+            foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+            {
+                if (G.Chop_HasSigil(kvp.Key)) allVariablesInBank.Add(kvp.Key);
+                else if (G.Equal(G.Chop_GetFreq(kvp.Key), wildcardFreq)) allVariablesInBank.Add(G.Chop_RemoveFreq(kvp.Key));
+            }
+
+            //after this, allVariablesInBank only has the right frequency (which is dropped), or have sigil
+                        
+            foreach (string s in allVariablesInBank)
+            {
+                AddIfInRange(s, name1, name2, varsMatched);
+            }
+            
+            return varsMatched;
+        }
 
         public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched, bool sort)
         {
