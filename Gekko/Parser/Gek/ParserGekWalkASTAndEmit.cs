@@ -3114,6 +3114,11 @@ namespace Gekko.Parser.Gek
                     //        node.Code.A("O.Indexer(O.Indexer2(smpl, " + node[0].Code + "), smpl, null, " + node[0].Code + ")"); //null signals that it has nothing on the left
                     //    }
                     //    break;
+                    case "ASTINDEXERALONE":
+                        {
+                            GetCodeFromAllChildren(node);
+                        }
+                        break;
                     case "ASTDOTORINDEXER":
                         {
 
@@ -3420,6 +3425,11 @@ namespace Gekko.Parser.Gek
                     case "ASTLISTFILE":
                         {
                             node.Code.A(node[0].Code);
+                        }
+                        break;
+                    case "ASTRANGEGENERAL":
+                        {
+                            node.Code.A("O.RangeGeneral(" + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTRANGEWITHBANK":

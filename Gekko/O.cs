@@ -1786,6 +1786,14 @@ namespace Gekko
 
         private static string RestrictHelper(bool allowBank, bool allowSigil, bool allowFreq, bool allowIndexes, IVariable iv)
         {
+            if (iv.Type() == EVariableType.Range)
+            {
+                Range iv_range = iv as Range;
+                string s1 = iv_range.first.ConvertToString().Trim();
+                string s2 = iv_range.last.ConvertToString().Trim();
+                return s1 + ".." + s2;
+            }
+
             string s = iv.ConvertToString();
             if (!allowBank && s.Contains(Globals.symbolBankColon))
             {
@@ -3429,14 +3437,17 @@ namespace Gekko
             return rv;
         }
 
-        //public static IVariable ReportInterior(GekkoSmpl smpl, IVariable x, int i, int loopNumber)
-        //{
-        //    if (loopNumber == 0)
-        //    {                
-        //        smpl.labelHelper.Add(new LabelHelperIVariable(i, x));
-        //    }
-        //    return x;
-        //}
+        public static IVariable RangeGeneral(IVariable x1, IVariable x2)
+        {
+            Range r = new Range(x1, x2);
+            List<IVariable> temp = new List<IVariable>();
+            temp.Add(r);
+            List m = new List(temp);
+
+            Program.Search(m, null, EVariableType.Var);
+
+            return r;
+        }       
 
         public static IVariable ReportLabel(GekkoSmpl smpl, IVariable x, string s)
         {

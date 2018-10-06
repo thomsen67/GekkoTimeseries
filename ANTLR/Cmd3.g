@@ -59,6 +59,7 @@ tokens {
 	ASTINDEXERELEMENTPLUS;
 	ASTSTRINGINQUOTESWITHCURLIES;
 	ASTINTEGER;
+	ASTRANGEGENERAL;
 	ASTLISTAND;
 	ASTLISTOR;
 	ASTVARNAME;
@@ -1946,10 +1947,10 @@ value:                      function //must be before varname
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
 					 	  | stringInQuotesWithCurlies
 						  | listFile						
+						  | leftBracketNoGlue wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
 						  | matrix
 						  | list
-						  | map
-					//	  | leftBracketNoGlueWild wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
+						  | map						  
 						    ;
 
 stringInQuotesWithCurlies:  stringInQuotesWithCurliesA stringInQuotesWithCurliesB* stringInQuotesWithCurliesC -> ^(ASTSTRINGINQUOTESWITHCURLIES stringInQuotesWithCurliesA stringInQuotesWithCurliesB* stringInQuotesWithCurliesC);
@@ -1958,7 +1959,8 @@ stringInQuotesWithCurliesB: StringInQuotes2 expression;
 stringInQuotesWithCurliesC: StringInQuotes3;
 
 
-wildRange:                  wildcardWithBank | rangeWithBank;					    
+//wildRange:                  wildcardWithBank | rangeWithBank;					    
+wildRange:                  expression doubleDot2 expression -> ^(ASTRANGEGENERAL expression expression);  //for some reason, [a .. b] does not get glue between the dots, therefore doubleDot2
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
@@ -3578,6 +3580,7 @@ leftCurlyNoGlue:            LEFTCURLY;
 doubleVerticalBar:          GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
 doubleDot:                  GLUEDOT? DOT GLUEDOT DOT;
+doubleDot2:                 GLUEDOT? DOT GLUEDOT? DOT; //can accept two dots with space between
 
 double2:                    double2Helper -> ^(ASTDOUBLE double2Helper);
 double2Helper:              Double            //0.123 or 25e+12

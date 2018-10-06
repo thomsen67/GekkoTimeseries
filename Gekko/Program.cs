@@ -15763,6 +15763,8 @@ namespace Gekko
 
         public static List<TwoStrings> SearchFromTo(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
         {
+            //names0 may contain ranges
+            
             //In general, INDEX, DISP and {'...'} are maybe a bit different from 
             //wildcards in COPY, RENAME, WRITE, etc. In principle, the former could 
             //search in all banks, even without a '*:' but better to keep the logic unified.
@@ -15863,6 +15865,9 @@ namespace Gekko
 
             foreach (string wildCardLhs in lhs)
             {
+
+                HERE WE NEED TO HANDLE a..c type of ranges
+
                 string bankLhs, nameLhs, freqLhs; string[] indexLhs;
                 O.Chop(wildCardLhs, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
 
@@ -16149,6 +16154,8 @@ namespace Gekko
 
             return outputs;
         }
+
+        
 
         private static List<string> GetListOfAllBanks()
         {
