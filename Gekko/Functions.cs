@@ -2955,6 +2955,62 @@ namespace Gekko
             return temp;
         }
 
+        //See also suffix()
+        public static IVariable prefix(GekkoSmpl smpl, IVariable ths, IVariable x)
+        {
+            IVariable rv = null;
+            string x_string = O.ConvertToString(x);
+            if (ths.Type() == EVariableType.String)
+            {
+                string s = O.ConvertToString(ths);
+                rv = new ScalarString(x_string + s);
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
+                List rv2 = new List();
+                foreach (string s in xx)
+                {
+                    rv2.Add(new ScalarString(x_string + s));
+                }
+                rv = rv2;
+            }
+            else
+            {
+                FunctionError("prefix", ths);
+                throw new GekkoException();
+            }
+            return rv;            
+        }
+
+        //See also prefix()
+        public static IVariable suffix(GekkoSmpl smpl, IVariable ths, IVariable x)
+        {
+            IVariable rv = null;
+            string x_string = O.ConvertToString(x);
+            if (ths.Type() == EVariableType.String)
+            {
+                string s = O.ConvertToString(ths);
+                rv = new ScalarString(s + x_string);
+            }
+            else if (ths.Type() == EVariableType.List)
+            {
+                List<string> xx = new List<string>(Program.GetListOfStringsFromListOfIvariables((ths as List).list.ToArray()));
+                List rv2 = new List();
+                foreach (string s in xx)
+                {
+                    rv2.Add(new ScalarString(s + x_string));
+                }
+                rv = rv2;
+            }
+            else
+            {
+                FunctionError("prefix", ths);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
         public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
         {
             //FIX: type checks etc.!

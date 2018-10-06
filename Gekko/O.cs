@@ -870,6 +870,8 @@ namespace Gekko
             return rv;
         }
 
+        
+
         public static GekkoTimes HandleDates(GekkoTime t1, GekkoTime t2)
         {
             GekkoTimes gts = new GekkoTimes();
@@ -1290,19 +1292,21 @@ namespace Gekko
                     varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
                 }
                 
-                List<TwoStrings> matches = Program.MatchWildcard(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
-                List rv_list = new List();
-                foreach (TwoStrings two in matches)
-                {
-                    ScalarString ss = new ScalarString(two.s1);
-                    rv_list.Add(ss);
-                }
-                rv = rv_list;
+                List<string> names = Program.Search(new List(new List<string>() { varnameWithFreq }), frombank, EVariableType.Var);
 
-                if (isLeftSideVariable != ELookupType.RightHandSideLoneVariable)  //We allow #m = {'x*a'} to return a list of strings, not a list of series. This is because it is similar to #m = a, b, c; --> envision that {'x*a'} returns more than 1 element. So this is the only case where #m = ... can work like seqOfBankVarNames even if it is only 1 element.
+                List<IVariable> names2 = new List<IVariable>();
+
+                foreach (string name in names)
                 {
-                    rv = Program.GetListOfIVariablesFromListOfScalarStrings(rv);  //transforms til List<IVariable>
+                    names2.Add(O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError));
                 }
+
+                rv = new List(names2);
+
+                //if (isLeftSideVariable != ELookupType.RightHandSideLoneVariable)  //We allow #m = {'x*a'} to return a list of strings, not a list of series. This is because it is similar to #m = a, b, c; --> envision that {'x*a'} returns more than 1 element. So this is the only case where #m = ... can work like seqOfBankVarNames even if it is only 1 element.
+                //{
+                //    rv = Program.GetListOfIVariablesFromListOfScalarStrings(rv);  //transforms til List<IVariable>
+                //}
             }
             else
             {
@@ -1413,7 +1417,7 @@ namespace Gekko
 
         public static List NOTUSED_HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.MatchWildcard(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
+            List<TwoStrings> matches = Program.SearchFromTo(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
             List rv = new List();
             foreach (TwoStrings two in matches)
             {
@@ -5103,6 +5107,18 @@ namespace Gekko
                 throw new GekkoException();
             }
 
+            if (FirstDim == 1 && SecondDim == 1)
+            {
+                //An 1x1 matrix, defined like [...].
+                IVariable iv = list[0][0];
+                if (iv.Type() == EVariableType.String)
+                {
+                    string s = O.ConvertToString(iv);
+                    List<string> mm = Program.Search(new List(new List<string>() { s }), null, EVariableType.Var);
+                    return new List(mm);
+                }
+            }
+
             //loops over rows
             for (int i = 0; i < FirstDim; i++)
             {
@@ -7613,22 +7629,10 @@ namespace Gekko
                 EVariableType type = EVariableType.Var;
                 if (this.type != null) type = G.GetVariableType(this.type);
 
-                List<TwoStrings> matches = Program.MatchWildcard(names1, null, this.opt_frombank, null, EWildcardSearchType.Search);
-                //List rv = new List();
-                List<string> names = new List<string>();
-                foreach (TwoStrings two in matches)
-                {                    
-                    if (type != EVariableType.Var)
-                    {
-                        //a bit of double work here, but maybe it does not need to be super fast anyway
-                        IVariable iv = O.GetIVariableFromString(two.s1, ECreatePossibilities.NoneReportError);                        
-                        if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
-                    }
-                    names.Add(two.s1);
-                }
+                List<string> names = Program.Search(this.names1, opt_frombank, type);
 
                 if (!G.Equal(this.opt_mute, "yes"))
-                {                    
+                {
                     if (names.Count > 0)
                     {
                         G.Writeln();
@@ -7651,10 +7655,10 @@ namespace Gekko
                 }
                 else if (listFile != null)
                 {
-                    
+
                     //    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
                     //    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
-                    
+
                 }
                 else
                 {
@@ -7662,6 +7666,7 @@ namespace Gekko
                 }
             }
 
+            
 
         }
 

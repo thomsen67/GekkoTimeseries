@@ -1351,14 +1351,15 @@ namespace Gekko
             }
         }
         public static bool Chop_HasSigil(string varname)
-        {
-            if (varname == null || varname.Length == 0)
+        {            
+            string varname2 = Chop_GetName(varname);
+            if (varname2 == null || varname2.Length == 0)
             {
                 G.Writeln2("*** ERROR: Variable name with zero length");
                 throw new GekkoException();
             }
             bool hasSigil = false;
-            if (varname[0] == Globals.symbolScalar || varname[0] == Globals.symbolCollection) hasSigil = true;
+            if (varname2[0] == Globals.symbolScalar || varname2[0] == Globals.symbolCollection) hasSigil = true;
             return hasSigil;
         }
 

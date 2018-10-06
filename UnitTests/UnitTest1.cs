@@ -4170,6 +4170,7 @@ namespace UnitTests
             // Work:x1 = 11 from 2001-2003
 
             TestCopyHelper(0);
+
             I("RENAME x1 to b10:x2;");
             Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("x1!a"));
             Assert.IsTrue(Program.databanks.GetDatabank("b10").ContainsIVariable("x2!a"));
@@ -4202,6 +4203,7 @@ namespace UnitTests
             // Work:x1 = 11 from 2001-2003
 
             TestCopyHelper(0);
+
             I("COPY x1 to b10:x2;");
             _AssertSeries(First(), "x1", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x1", 2001, 11d, sharedDelta);
@@ -4233,6 +4235,7 @@ namespace UnitTests
 
             I("LIST #m = ('x1',);");
             I("COPY <2002 2003 respect> #m to #m2;");
+            
             //TODO: test that the copied series is truncated
             //TODO: also test array-series.
 
@@ -6271,150 +6274,155 @@ namespace UnitTests
             I("RESET;");
             I("CREATE fy;");
             I("TIME 2000 2002;");
-            I("SERIES fy = 100, 101, 102;");
-            I("STRING s = 'fy';");
-            I("STRING u = 'y';");
-            I("STRING v = 'f';");
+            I("SERIES fy = (100, 101, 102);");
+            I("%s = 'fy';");
+            I("%u = 'y';");
+            I("%v = 'f';");
 
             I("SERIES xx1 = {%s}[2000];");
-            I("VAL v1 = {%s}[2000];");
-            I("SERIES xx1 = {s}[2000];");
-            I("VAL v1 = {s}[2000];");
+            I("%v1 = {%s}[2000];");
+            FAIL("SERIES xx1 = {s}[2000];");
+            FAIL("%v1 = {s}[2000];");
             I("SERIES xx2 = fy[2000];");
-            I("VAL v1 = fy[2000];");
+            I("VAL %v1 = fy[2000];");
 
             I("SERIES xx2 = f%u[2000];");
-            I("VAL v1 = f%u[2000];");
-            I("SERIES xx2 = %v|y[2000];");
-            I("VAL v1 = %v|y[2000];");
-            I("SERIES xx2 = %v%u[2000];");
-            I("VAL v1 = %v%u[2000];");
+            I("%v1 = f%u[2000];");
+            FAIL("SERIES xx2 = %v|y[2000];");
+            FAIL("VAL %v1 = %v|y[2000];");
+            FAIL("SERIES xx2 = %v%u[2000];");
+            FAIL("VAL v1 = %v%u[2000];");
 
             I("SERIES xx2 = f{%u}[2000];");
-            I("VAL v1 = f{%u}[2000];");
+            I("VAL %v1 = f{%u}[2000];");
             I("SERIES xx2 = {%v}y[2000];");
-            I("VAL v1 = {%v}y[2000];");
+            I("VAL %v1 = {%v}y[2000];");
             I("SERIES xx2 = {%v}{%u}[2000];");
-            I("VAL v1 = {%v}{%u}[2000];");
+            I("VAL %v1 = {%v}{%u}[2000];");
 
-            I("SERIES xx2 = f{u}[2000];");
-            I("VAL v1 = f{u}[2000];");
-            I("SERIES xx2 = {v}y[2000];");
-            I("VAL v1 = {v}y[2000];");
-            I("SERIES xx2 = {v}{u}[2000];");
-            I("VAL v1 = {v}{u}[2000];");
+            FAIL("SERIES xx2 = f{u}[2000];");
+            FAIL("VAL v1 = f{u}[2000];");
+            FAIL("SERIES xx2 = {v}y[2000];");
+            FAIL("VAL v1 = {v}y[2000];");
+            FAIL("SERIES xx2 = {v}{u}[2000];");
+            FAIL("VAL v1 = {v}{u}[2000];");
 
             I("SERIES xx2 = {'f'+%u}[2000];");  //artificial... but must work anyway
-            I("VAL v1 = {'f'+%u}[2000];");
+            I("%v1 = {'f'+%u}[2000];");
 
             // ------------------ lists ----------------------------------------
-            I("LIST m = fe, fy;");
+            I("#m = fe, fy;");
             I("SERIES xx3 = {#m[2]}[2000];");
-            AssertHelper(First(), "xx3", 2000, 100d, sharedDelta);
-            AssertHelper(First(), "xx3", 2001, 100d, sharedDelta);
-            AssertHelper(First(), "xx3", 2002, 100d, sharedDelta);
-            I("VAL v1 = {#m[2]}[2000];");
+            _AssertSeries(First(), "xx3", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "xx3", 2002, 100d, sharedDelta);
+            I("%v1 = {#m[2]}[2000];");
             //TODO: assert
-            I("SERIES xx4 = #m[2][2000];");
-            AssertHelper(First(), "xx4", 2000, 100d, sharedDelta);
-            AssertHelper(First(), "xx4", 2001, 100d, sharedDelta);
-            AssertHelper(First(), "xx4", 2002, 100d, sharedDelta);
-            I("VAL v = #m[2][2000];");
-            AssertHelperScalarVal("v", 100d);
-            I("SERIES xx5 = #m[2][-1];");  //lagged values
-            AssertHelper(First(), "xx5", 1999, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2000, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx5", 2001, 100d, sharedDelta);
-            AssertHelper(First(), "xx5", 2002, 101d, sharedDelta);
-            AssertHelper(First(), "xx5", 2003, double.NaN, sharedDelta);
+            I("SERIES xx4 = {#m[2]}[2000];");
+            _AssertSeries(First(), "xx4", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "xx4", 2002, 100d, sharedDelta);
+            I("%v = {#m[2]}[2000];");
+            _AssertScalarVal(First(), "%v", 100d);
+            I("xx5 = {#m[2]}[-1];");  //lagged values
+            _AssertSeries(First(), "xx5", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx5", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "xx5", 2003, double.NaN, sharedDelta);
 
             // ------------- Left-side indexer ---------------------------------
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
-            I("SERIES gdp = 100, 101, 102;");
+            I("SERIES gdp = (100, 101, 102);");
             I("CLONE;");
             I("SERIES gdp[2011] = 1000;");
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES bank:series[...] = ...
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
-            I("SERIES gdp = 100, 101, 102;");
+            I("SERIES gdp = (100, 101, 102);");
             I("CLONE;");
             I("SERIES ref:gdp[2011] = 1000;");
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES #m[1] = ...
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("LIST m = gdp, gdp2;");
-            I("SERIES #m[1] = 1000;");
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
+            I("SERIES gdp = (100, 101, 102);");
+            I("#m = gdp, gdp2;");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                //#9874345348
+                I("{#m[1]} = 1000;");
+                _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+                _AssertSeries(First(), "gdp", 2010, 1000d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2012, 1000d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            }
 
             //With SERIES #m[1][2011] = ...
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("LIST m = gdp, gdp2;");
-            I("SERIES #m[1][2011] = 1000;");
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
-
-            //SERIES #m[1][-1] = ... is not legal
-            I("SERIES #m[1][2011] = 1000;");
-
-
+            I("SERIES gdp = (100, 101, 102);");
+            I("#m = gdp, gdp2;");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                //#9874345348
+                I("{#m[1]}[2011] = 1000;");
+                _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+                _AssertSeries(First(), "gdp", 2010, 100d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
+                _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            }
+            
             //---------------- loop with lags ---------------
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp1, gdp2;");
-            I("SERIES gdp1, gdp2 = 100, 110, 120;");
+            I("#m = gdp1, gdp2;");
+            I("{#m} = (100, 110, 120);");
             I("CLONE;");
 
             I("SERIES<2011 2012> gdp1 = gdp1[-1] * 1.01;");  //1% growth
-            I("FOR date t = 2011 to 2012; SERIES gdp2[%t] = gdp2[%t-1] * 1.01; END;");  //1% growth
+            I("FOR date %t = 2011 to 2012; SERIES gdp2[%t] = gdp2[%t-1] * 1.01; END;");  //1% growth
 
-            AssertHelper(First(), "gdp1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp1", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp1", 2011, 100d * 1.01d, sharedDelta);
-            AssertHelper(First(), "gdp1", 2012, 100d * 1.01d * 1.01d, sharedDelta);
-            AssertHelper(First(), "gdp1", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp1", 2010, 100d, sharedDelta);
+            _AssertSeries(First(), "gdp1", 2011, 100d * 1.01d, sharedDelta);
+            _AssertSeries(First(), "gdp1", 2012, 110d * 1.01d, sharedDelta);  //Beware: lagged endo does not accumulate anymore, use %= etc.
+            _AssertSeries(First(), "gdp1", 2013, double.NaN, sharedDelta);
 
-            AssertHelper(First(), "gdp2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp2", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp2", 2011, 100d * 1.01d, sharedDelta);
-            AssertHelper(First(), "gdp2", 2012, 100d * 1.01d * 1.01d, sharedDelta);
-            AssertHelper(First(), "gdp2", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp2", 2010, 100d, sharedDelta);
+            _AssertSeries(First(), "gdp2", 2011, 100d * 1.01d, sharedDelta);
+            _AssertSeries(First(), "gdp2", 2012, 100d * 1.01d * 1.01d, sharedDelta);
+            _AssertSeries(First(), "gdp2", 2013, double.NaN, sharedDelta);
 
         }
 
@@ -7781,6 +7789,29 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Blueprint()
         {
+            //TEST THIS:
+
+            I("#axc = a, x, c;");
+            I("%b = 'x';");
+            I("%s = #axc[2];");
+            _AssertScalarString(First(), "%s", "x");
+            I("%s = #a{'x'}c[2];");
+            _AssertScalarString(First(), "%s", "x");
+            I("%s = #a{%s}c[2];");
+            _AssertScalarString(First(), "%s", "x");
+            I("%s = #{'a' + %s + 'c'}[2];");
+            _AssertScalarString(First(), "%s", "x");
+            I("%s = #{'a{%s}c'}[2];");
+            _AssertScalarString(First(), "%s", "x");
+            I("%s = #(a%s|c)[2];");
+            _AssertScalarString(First(), "%s", "x");
+            FAIL("%s = #(a{%s}c)[2];"); //use: #a{%s}c without parenthesis
+
+            // #(a%b|c)[2]
+            // #(a{%b}c)[2]
+            // #{'a' + %b + 'c'}[2] 
+            // #{'a{%b}c'}[2] 
+
 
             //----- new stuff with $ etc.
 
@@ -7789,17 +7820,12 @@ namespace UnitTests
             I("TIME 2000 2001;");
             I("CREATE fy;");
             I("SERIES fy = 2;");
-            I("STRING s = 'fy';");
-            I("NAME n = 'fy';");
-
+            I("%s = 'fy';");
+            
             //Print a string
-            FAIL("PRT %s;");  //must fail since %s is a string ({s} or {%s} are ok)
-            I("PRT {%s};");  //ok
-
-            //Print a name
-            I("PRT %n;");  //is ok since %n is a name
-            I("PRT {%n};");  //kind of double-name, but ok
-
+            I("PRT %s;");  //will print as string
+            I("PRT {%s};"); //print as series
+            
             // ---------------------------- test of #(...)
             //Giver disse to lister:
             // a pV010000
@@ -7808,73 +7834,37 @@ namespace UnitTests
             // ---
             // b pV040000
             // b pV050000
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh%i'; list xxx = #(%xx) prefix=p; string sum = %sum + string(#xxx[2]); end;");
-            AssertHelperScalarString("sum", "pV020000pV050000");
-                        
-            I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; list xxx = #(erh%i) prefix=p; string sum = %sum + string(#xxx[2]); end;");
-            AssertHelperScalarString("sum", "pV020000pV050000");
+            //I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh%i'; list xxx = #(%xx) prefix=p; string sum = %sum + string(#xxx[2]); end;");
+            I("string %sum=''; list #erha = V010000,V020000,V030000; list #erhb = V040000,V050000; for %i = a, b; string %xx = 'erh{%i}'; list #xxx = #{%xx}.prefix('p'); string %sum = %sum + #xxx[2]; end;");
+            _AssertScalarString(First(), "%sum", "pV020000pV050000");
 
             // ----------------- First we use % ----------------------------------------------
 
             //Define a string from a string
-            I("STRING s1 = %s;");
-            AssertHelperScalarString("s1", "fy");
-            I("STRING s2 = '%s';");
-            AssertHelperScalarString("s2", "fy");
-            I("STRING s2b = 'x%s|y';");
-            AssertHelperScalarString("s2b", "xfyy");
-
-            //Define a string from a name
-            FAIL("STRING s3 = %n;");
-            I("STRING s4 = '%n';");
-            AssertHelperScalarString("s4", "fy");
-
-            //Define a name from a string
-            I("NAME n1 = %s;");  //this is ok, just like "NAME n1 = 'fy';".
-            AssertHelperScalarString("n1", "fy");
-            FAIL("NAME n2 = {%s};"); //NAME n3 = fy; would not work either
-
-            //Define a name from a name
-            FAIL("NAME n3 = %n;");  //NAME n3 = fy; would not work either
-            FAIL("NAME n4 = {%n};");  //NAME n4 = fy; would not work either
-                        
+            I("STRING %s1 = %s;");
+            _AssertScalarString(First(), "%s1", "fy");
+            I("STRING %s2 = '%s';");
+            _AssertScalarString(First(), "%s2", "%s");
+            I("STRING %s2 = '{%s}';");
+            _AssertScalarString(First(), "%s2", "fy");
+            I("STRING %s2b = 'x%s|y';");
+            _AssertScalarString(First(), "%s2b", "x%s|y");
+            I("STRING %s2b = 'x{%s}y';");
+            _AssertScalarString(First(), "%s2b", "xfyy");           
 
             I("RESET;");
             I("CREATE fx, fy;");
-            I("TIME 2000 2000;");
-            I("NAME n = 'abc';");
-            I("LIST n = fx, fy;"); //is list of names
-            I("STRING s = 'def';");
-            I("STRING s2 = '%n' + %s + string(#n[2]);");  //is string() function necessary??
-            AssertHelperScalarString("s2", "abcdeffy");
-            I("STRING s3 = '%n' + %s + string(#n[2]);");
-            AssertHelperScalarString("s3", "abcdeffy");
-            FAIL("STRING s2 = %s + %n;");
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                FAIL("STRING s2 = %s + #n[2];");
-            }
-            I("STRING s4 = %s + '#n[2]';");  //we cannot use #[...] inside quotes like this, only works for scalars.
-            AssertHelperScalarString("s4", "def#n[2]");  //refuses to substitute
-
-            //I("PRT #m[2];");  //ok since it is a name
-            //FAIL("STRING s = #m[2] + 'abc';");  //must fail same way as STRING s = fy + 'abc'
-
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB  return...............!!
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-            //!!!!!!!!!! NB NB NB NB NB NB NB NB NB NB NB
-
-
-
-
+            I("TIME 2000 2000;");            
+            I("LIST #n = fx, fy;"); //is list of names
+            I("STRING %s = 'def';");
+            I("STRING %s2 = %s + #n[2];");
+            _AssertScalarString(First(), "%s2", "deffy");
+            I("STRING %s4 = %s + '{#n[2]}';");
+            _AssertScalarString(First(), "%s4", "deffy");
+            
+            
             //----- new stuff end.
-
-
+            
             //-----------------------------
             //Testing stuff in the blueprint paper
             //-----------------------------
@@ -7882,52 +7872,53 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2001;");
 
-            I("VAL v1 = 1;");
-            I("VAL v2 = 2;");
-            I("VAL z = 3;");
-            I("VAL x = %v1 + %v2;");
-            I("VAL y = %x/%z;");
-            AssertHelperScalarVal("x", 3d);
-            AssertHelperScalarVal("y", 1d);
-            I("VAL y = (%v1+%v2)/%z;");
-            AssertHelperScalarVal("y", 1d);
-            I("VAL y = %v1+%v2/%z;");
-            AssertHelperScalarVal("y", 1d + 2d / 3d);
+            I("VAL %v1 = 1;");
+            I("VAL %v2 = 2;");
+            I("VAL %z = 3;");
+            I("VAL %x = %v1 + %v2;");
+            I("VAL %y = %x/%z;");
+            _AssertScalarVal(First(), "%x", 3d);
+            _AssertScalarVal(First(), "%y", 1d);
+            I("VAL %y = (%v1+%v2)/%z;");
+            _AssertScalarVal(First(), "%y", 1d);
+            I("VAL %y = %v1+%v2/%z;");
+            _AssertScalarVal(First(), "%y", 1d + 2d / 3d);
 
             I("CREATE gdp, g, dp, dpg;");
-            I("SERIES gdp = 1, 2;");
-            I("SERIES g = 3, 4;");
-            I("SERIES dp = 5, 6;");
-            I("SERIES dpg = 7, 8;");
-            I("STRING s = 'gdp';");
-            FAIL("PRT %s;");  //must fail
-            I("STRING i = 'g';");
-            I("STRING j = 'dp';");
+            I("SERIES gdp = (1, 2);");
+            I("SERIES g = (3, 4);");
+            I("SERIES dp = (5, 6);");
+            I("SERIES dpg = (7, 8);");
+            I("STRING %s = 'gdp';");
+            I("PRT %s;");  //just prints plain string
+            I("STRING %i = 'g';");
+            I("STRING %j = 'dp';");
             //Below testing out a lot of combinations (including blanks)
-            FAIL("PRT %i + %j;"); //same as PRT 'gdp', not PRT gdp.
+            I("PRT %i + %j;"); //plain
             I("PRT {%i} + {%j};");  //prints g and dp series
-            I("PRT {i} + {j};");  //same
+            FAIL("PRT {i} + {j};");  //same
             I("PRT {%i + %j};");  //gdp
             I("PRT {'g' + %j};");  //gdp
             I("PRT {%i}{%j};");  //gdp
             FAIL("PRT {%i} {%j};");
-            I("PRT {i}{j};");  //same
+            FAIL("PRT {i}{j};");  //same
             FAIL("PRT {i} {j};");
             I("PRT g{%j};");  //gdp
             FAIL("PRT g {%j};");
-            I("PRT g{j};");  //same
+            FAIL("PRT g{j};");  //same
             FAIL("PRT g {j};");
             I("PRT g%j;");  //gdp
             FAIL("PRT g %j;");  //gdp
-            I("PRT %j|g;");  //dpg
+            FAIL("PRT %j|g;");  //dpg
+            I("PRT {%j}g;");  //dpg
             FAIL("PRT %j |g;");
             FAIL("PRT %j| g;");
             FAIL("PRT %j g;");
-            I("PRT %i%j;");  //gdp
+            FAIL("PRT %i%j;");  //gdp
             FAIL("PRT %i %j;");  //gdp
-            FAIL("PRT %j;");  //'dp'
+            I("PRT %j;");  //'dp'
             I("PRT {%j};");  //dp
-            I("PRT {j};");  //dp
+            FAIL("PRT {j};");  //dp
 
             //--------------------------------------------
 
@@ -10471,67 +10462,77 @@ namespace UnitTests
             // no bank
             // ------------------------------------------------
 
-            I("#m = {'*'};");
+            I("#m = ['*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x2"));
-            I("#m = {'*!*'};");
+            I("#m = ['*!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2"));
             
-            I("#m = {'*1'};");
+            I("#m = ['*1'];");
             _AssertListString(First(), "#m", new StringOrList("x1"));
-            I("#m = {'*1!*'};");
+            I("#m = ['*1!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q"));
 
-            I("#m = {'%*'};");
+            I("#m = ['%*'];");
             _AssertListString(First(), "#m", new StringOrList("%x1"));
-            I("#m = {'#*'};");
+            I("#m = ['#*'];");
             _AssertListString(First(), "#m", new StringOrList("#m", "#x1"));
 
             // ------------------------------------------------
             // with bank
             // ------------------------------------------------
 
-            I("#m = {'b1:*'};");
+            I("#m = ['b1:*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
-            I("#m = {'b1:*!*'};");
+            I("#m = ['b1:*!*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
 
-            I("#m = {'b1:*3'};");
+            I("#m = ['b1:*3'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
-            I("#m = {'b1:*3!*'};");
+            I("#m = ['b1:*3!*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
 
-            I("#m = {'b1:%*'};");
+            I("#m = ['b1:%*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:%x3"));
-            I("#m = {'b1:#*'};");
+            I("#m = ['b1:#*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:#x3"));
 
             // ------------------------------------------------
             // all banks
             // ------------------------------------------------
 
-            I("#m = {'*:*'};");
+            I("#m = ['*:*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x2", "ref:x1", "b1:x3"));
-            I("#m = {'*:*!*'};");
+            I("#m = ['*:*!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q"));
 
-            I("#m = {'*:*3'};");
+            I("#m = ['*:*3'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
-            I("#m = {'*:*3!*'};");
+            I("#m = ['*:*3!*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
 
-            I("#m = {'*:%*'};");
+            I("#m = ['*:%*'];");
             _AssertListString(First(), "#m", new StringOrList("%x1", "ref:%x1", "b1:%x3"));
-            I("#m = {'*:#*'};");
+            I("#m = ['*:#*'];");
             _AssertListString(First(), "#m", new StringOrList("#m", "#x1", "ref:#x1", "b1:#x3"));
 
             // ------------------------------------------------
             // everything
             // ------------------------------------------------
 
-            //I("#m = {'*:*!*'} + {'*:%*'} + {'*:#*'};");
-            //_AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
+            I("#m = ['*:*!*'] + ['*:%*'] + ['*:#*'];");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
 
-
+            // ------------------------------------------------
+            // testing curly, returns list<var> not list<string>
+            // ------------------------------------------------
+            
+            I("#m = {'*:*3'};"); //b1:x3            
+            I("<2001 2003> zz = #m[1];");
+            _AssertSeries(First(), "zz", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "zz", 2001, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2002, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2003, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2004, double.NaN, sharedDelta);
         }
 
         [TestMethod]

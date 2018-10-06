@@ -11076,7 +11076,7 @@ namespace Gekko
                 row++;
                 foreach (string s in keys)
                 {
-                    IVariable a = Program.databanks.GetFirst().storage[s];
+                    IVariable a = db.storage[s];
                     string value = "";
                     if (a.Type() == EVariableType.Date)
                     {
@@ -14823,7 +14823,7 @@ namespace Gekko
             EVariableType type = EVariableType.Series;
             bool gamsStyle = true;
             bool gamsToGekko = true;
-            bool nonSeries = false;
+            int nonSeries = 0;
 
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
             if (o != null && G.Equal(o.opt_info, "yes"))
@@ -14837,7 +14837,6 @@ namespace Gekko
 
             int seriesCounter = 0;
 
-
             List<IVariable> m = new List<IVariable>();
             if (list != null)
             {
@@ -14850,29 +14849,40 @@ namespace Gekko
             }
             else
             {
-                List<TwoStrings> matches = Program.MatchWildcard(o.iv, null, null, null, EWildcardSearchType.Search);
+
+                List<string> names = Program.Search(o.iv, null, EVariableType.Var);
+
+                //List <TwoStrings> matches = Program.SearchFromTo(o.iv, null, null, null, EWildcardSearchType.Search);
+                
                 //List rv = new List();
                 //List<string> names = new List<string>();
-                foreach (TwoStrings two in matches)
+                
+                //foreach (TwoStrings two in matches)
+                //{
+                //    if (type != EVariableType.Var)
+                //    {
+                //        //a bit of double work here, but maybe it does not need to be super fast anyway
+                //        IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
+                //        if (type != EVariableType.Var && type != iv.Type())
+                //        {
+                //            PrintNonSeries(iv, null);
+                //            nonSeries = true;
+                //            continue; //skip it
+                //        }
+                //    }
+                //    m.Add(O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError));
+                //}
+
+                foreach(string s in names)
                 {
-                    if (type != EVariableType.Var)
-                    {
-                        //a bit of double work here, but maybe it does not need to be super fast anyway
-                        IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
-                        if (type != EVariableType.Var && type != iv.Type())
-                        {
-                            PrintNonSeries(iv, null);
-                            nonSeries = true;
-                            continue; //skip it
-                        }
-                    }
-                    m.Add(O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError));
+                    m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError));
                 }
+
             }
 
             foreach (IVariable x in m)
             {
-                seriesCounter++;
+                
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 
                 //IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
@@ -14881,174 +14891,412 @@ namespace Gekko
 
                 if (ts == null)
                 {
-                    ScalarString ss = x as ScalarString;
+                    //ScalarString ss = x as ScalarString;
 
-                    if (ss != null)
-                    {
-                        IVariable iv2 = O.Lookup(smpl, null, ss, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
-                        ts = iv2 as Series;
-                        if (ts == null)
-                        {
-                            G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
-                            throw new GekkoException();
-                        }
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
-                        throw new GekkoException();
-                    }
+                    //if (ss != null)
+                    //{
+                    //    IVariable iv2 = O.Lookup(smpl, null, ss, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
+                    //    ts = iv2 as Series;
+                    //    if (ts == null)
+                    //    {
+                    //        G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
+                    //        throw new GekkoException();
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
+                    //    throw new GekkoException();
+                    //}
+                    PrintNonSeries(x, null);
+                    nonSeries++;
+                    continue;
                 }
-
-                string var = ts.name;
-                string bank = ts.meta.parentDatabank.name;                                
-
-                string varnameWithoutFreq = G.Chop_RemoveFreq(ts.name);
-
-                if (gamsStyle)
+                else
                 {
 
-                    string s2 = "[" + G.GetListWithCommas(ts.meta.domains) + "]";
-                    if (s2 == "[]") s2 = null;                    
+                    seriesCounter++;
 
-                    G.Writeln2("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
-                    if (!G.NullOrEmpty(ts.meta.label)) G.Writeln(ts.meta.label);
-                    
-                    List<MapMultidimItem> keys = null;
-                    GekkoDictionary<string, string>[] temp = null;
+                    string var = ts.name;
+                    string bank = ts.meta.parentDatabank.name;
 
-                    if (ts.type == ESeriesType.ArraySuper)
+                    string varnameWithoutFreq = G.Chop_RemoveFreq(ts.name);
+
+                    if (gamsStyle)
                     {
-                        keys = ts.dimensionsStorage.storage.Keys.ToList();
-                        keys.Sort(CompareMapMultidimItems);
-                        temp = new GekkoDictionary<string, string>[ts.dimensions];
-                    }
 
-                    if (Program.modelGams?.equations != null)
-                    {
-                        GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equations)
+                        string s2 = "[" + G.GetListWithCommas(ts.meta.domains) + "]";
+                        if (s2 == "[]") s2 = null;
+
+                        G.Writeln2("==========================================================================================");
+                        G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
+                        if (!G.NullOrEmpty(ts.meta.label)) G.Writeln(ts.meta.label);
+
+                        List<MapMultidimItem> keys = null;
+                        GekkoDictionary<string, string>[] temp = null;
+
+                        if (ts.type == ESeriesType.ArraySuper)
                         {
-                            foreach (ModelGamsEquation e5 in e4.Value)
-                            {
-                                GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                                if (knownVars2.ContainsKey(varnameWithoutFreq) && !precedents.ContainsKey(e4.Key)) precedents.Add(e4.Key, null);
-                            }
+                            keys = ts.dimensionsStorage.storage.Keys.ToList();
+                            keys.Sort(CompareMapMultidimItems);
+                            temp = new GekkoDictionary<string, string>[ts.dimensions];
                         }
-                        List<string> precedents2 = new List<string>();
-                        precedents2.AddRange(precedents.Keys);
-                        precedents2.Sort();
 
-                        if (precedents2.Count > 0)
+                        if (Program.modelGams?.equations != null)
                         {
-                            G.Write("Influences: ");
-                            int counter = -1;
-                            foreach (string s in precedents2)
+                            GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equations)
                             {
-                                counter++;
-                                if (counter > 0)
+                                foreach (ModelGamsEquation e5 in e4.Value)
                                 {
-                                    G.Write(", ");
+                                    GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
+                                    if (knownVars2.ContainsKey(varnameWithoutFreq) && !precedents.ContainsKey(e4.Key)) precedents.Add(e4.Key, null);
                                 }
-                                G.WriteLink(s, "disp:" + s);
                             }
-                            G.Writeln();
-                        }                        
+                            List<string> precedents2 = new List<string>();
+                            precedents2.AddRange(precedents.Keys);
+                            precedents2.Sort();
 
-                        List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreq, out eqs);
+                            if (precedents2.Count > 0)
+                            {
+                                G.Write("Influences: ");
+                                int counter = -1;
+                                foreach (string s in precedents2)
+                                {
+                                    counter++;
+                                    if (counter > 0)
+                                    {
+                                        G.Write(", ");
+                                    }
+                                    G.WriteLink(s, "disp:" + s);
+                                }
+                                G.Writeln();
+                            }
 
-                        if (eqs != null && eqs.Count > 0)
-                        {
-                            PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs);
+                            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreq, out eqs);
+
+                            if (eqs != null && eqs.Count > 0)
+                            {
+                                PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs);
+                            }
+
+                            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+
                         }
 
-                        if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
-
-                    }
-
-                    if (ts.dimensions > 0)
-                    {
-                        GekkoTime t1 = GekkoTime.tNull;
-                        GekkoTime t2 = GekkoTime.tNull;
-
-                        foreach (IVariable iv in ts.dimensionsStorage.storage.Values)
+                        if (ts.dimensions > 0)
                         {
-                            Series ts2 = iv as Series;
-                            if (ts == null || ts.freq != ts2.freq) continue;
-                            GekkoTime tt1 = ts2.GetRealDataPeriodFirst();
-                            GekkoTime tt2 = ts2.GetRealDataPeriodLast();
-                            if (tt1.StrictlySmallerThan(t1)) t1 = tt1;
-                            if (tt2.StrictlyLargerThan(t2)) t2 = tt2;
-                        }
+                            GekkoTime t1 = GekkoTime.tNull;
+                            GekkoTime t2 = GekkoTime.tNull;
 
-                        string period = null;
-                        if (t1.IsNull() || t2.IsNull())
-                        {
-                            //skip period
+                            foreach (IVariable iv in ts.dimensionsStorage.storage.Values)
+                            {
+                                Series ts2 = iv as Series;
+                                if (ts == null || ts.freq != ts2.freq) continue;
+                                GekkoTime tt1 = ts2.GetRealDataPeriodFirst();
+                                GekkoTime tt2 = ts2.GetRealDataPeriodLast();
+                                if (tt1.StrictlySmallerThan(t1)) t1 = tt1;
+                                if (tt2.StrictlyLargerThan(t2)) t2 = tt2;
+                            }
+
+                            string period = null;
+                            if (t1.IsNull() || t2.IsNull())
+                            {
+                                //skip period
+                            }
+                            else
+                            {
+                                period = " (period " + t1.ToString() + " - " + t2.ToString() + ")";
+                            }
+
+                            G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
+
+                            double dimCount2 = 1d;
+                            string dimCount = null;
+                            for (int i = 0; i < ts.dimensions; i++)
+                            {
+                                string domain = null;
+                                try
+                                {
+                                    domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
+                                }
+                                catch { };
+                                if (domain == "*") domain = null;
+                                if (domain != null) domain = domain + ", ";
+                                temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                                int ii = 0;
+                                foreach (MapMultidimItem key in keys)
+                                {
+                                    if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
+                                    ii++;
+                                }
+                                List<string> temp2 = temp[i].Keys.ToList();
+                                temp2.Sort(G.CompareNaturalIgnoreCase);
+                                dimCount2 = dimCount2 * temp[i].Count;
+                                dimCount += temp2.Count + " * ";
+                                G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                            }
+                            dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
+
+                            MapMultidimItem mm = keys[0];
+                            string first = keys[0].ToString();
+                            string last = keys[keys.Count - 1].ToString();
+
+                            G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
+                            if (ts.dimensions > 1)
+                            {
+                                G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                            }
                         }
                         else
                         {
-                            period = " (period " + t1.ToString() + " - " + t2.ToString() + ")";
-                        }
-                        
-                        G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
-                        
-                        double dimCount2 = 1d;
-                        string dimCount = null;
-                        for (int i = 0; i < ts.dimensions; i++)
-                        {
-                            string domain = null;
-                            try
-                            {
-                                domain = ts.meta.domains[i];  //can fail in different ways, easiest with try-catch
-                            }
-                            catch { };
-                            if (domain == "*") domain = null;
-                            if (domain != null) domain = domain + ", ";
-                            temp[i] = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                            int ii = 0;
-                            foreach (MapMultidimItem key in keys)
-                            {
-                                if (!temp[i].ContainsKey(key.storage[i])) temp[i].Add(key.storage[i], null);
-                                ii++;
-                            }
-                            List<string> temp2 = temp[i].Keys.ToList();
-                            temp2.Sort(G.CompareNaturalIgnoreCase);
-                            dimCount2 = dimCount2 * temp[i].Count;
-                            dimCount += temp2.Count + " * ";
-                            G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
-                        }
-                        dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
+                            //normal timeseries (possibly timeless)
+                            bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
 
-                        MapMultidimItem mm = keys[0];
-                        string first = keys[0].ToString();
-                        string last = keys[keys.Count - 1].ToString();
+                            int max = Program.options.print_disp_maxlines;
+                            if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
 
-                        G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
-                        if (ts.dimensions > 1)
-                        {
-                            G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                            if (max > 0)
+                            {
+
+                                if (ts.type == ESeriesType.Timeless)
+                                {
+                                    G.Writeln("------------------------------------------------------------------------------------------");
+                                    G.Writeln("Value = " + G.levelFormatOld(ts.GetTimelessData()) + " (timeless)");
+                                    //G.Writeln("------------------------------------------------------------------------------------------");
+                                }
+                                else
+                                {
+
+                                    G.Writeln("------------------------------------------------------------------------------------------");
+                                    G.Writeln("Period        value        %");
+
+                                    int counter = 0;
+                                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                                    {
+                                        counter++;
+                                        if (hasFilter)  //some periods are set via TIMEFILTER
+                                        {
+                                            //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
+                                            if (ShouldFilterPeriod(gt)) continue;
+                                        }
+                                        else
+                                        {
+                                            if (!showAllPeriods && counter > max)
+                                            {
+                                                continue;
+                                            }
+                                        }
+
+                                        if (Program.options.freq == EFreq.A) G.Write((gt.super) + " ");
+                                        else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
+
+                                        double n1 = ts.GetData(null, gt);
+                                        double n0 = ts.GetData(null, gt.Add(-1));
+
+                                        double level1 = n1;
+                                        double pch1 = ((n1 / n0 - 1) * 100d);
+
+                                        if (n1 == n0) pch1 = 0d;
+
+                                        string levelFormatted;
+                                        string pchFormatted;
+                                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                                        G.Write(levelFormatted + " " + pchFormatted + " ");
+                                        G.Writeln();
+                                    }
+                                    int surplus = counter - max;
+                                    if (!showAllPeriods && surplus > 0)
+                                    {
+                                        G.Writeln("------------------------------------------------------------------------------------------");
+                                        string ps = "period";
+                                        if (surplus > 1) ps = "periods";
+                                        G.Write(surplus + " " + ps + " hidden (");
+                                        G.WriteLink("show", "disp3:" + var);
+                                        G.Writeln(")");
+                                    }
+                                }
+                            }
+
                         }
+                        G.Writeln("==========================================================================================");
                     }
                     else
                     {
-                        //normal timeseries (possibly timeless)
-                        bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+                        //ADAM-style, normal timeseries
 
-                        int max = Program.options.print_disp_maxlines;
-                        if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
-
-                        if (max > 0)
+                        G.Writeln();
+                        G.Writeln("==========================================================================================");
+                        G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + G.Chop_RemoveFreq(ts.name));
+                        if (true)
                         {
+                            EEndoOrExo type1 = VariableTypeEndoExo(var);
+                            string type3 = "";
+                            if (type1 == EEndoOrExo.Exo) type3 = "Exogenous, ";
+                            else if (type1 == EEndoOrExo.Endo) type3 = "Endogenous, ";
 
-                            if (ts.type == ESeriesType.Timeless)
+                            string freq = "[unknown frequency]";
+
+                            freq = G.GetFreqString(ts.freq);
+
+                            bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
+
+                            //GekkoTime first = ts.GetPeriodFirst();
+                            //GekkoTime last = ts.GetPeriodLast();
+
+                            GekkoTime first = ts.GetRealDataPeriodFirst();
+                            GekkoTime last = ts.GetRealDataPeriodLast();
+
+                            G.Write(type3);
+                            string stamp = null;
+                            if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
+                            if (ts.freq == EFreq.A || ts.freq == EFreq.U)
                             {
-                                G.Writeln("------------------------------------------------------------------------------------------");
-                                G.Writeln("Value = " + G.levelFormatOld(ts.GetTimelessData()) + " (timeless)");
-                                //G.Writeln("------------------------------------------------------------------------------------------");
+                                if (noData || first.super == -12345 || last.super == -12345)
+                                {
+                                    G.Writeln(freq + ", no data period");
+                                }
+                                else
+                                {
+                                    //we don't want 1995a1 to 2005a1, instead 1995 to 2005
+                                    G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
+                                }
                             }
                             else
+                            {
+                                if (noData || first.super == -12345 || last.super == -12345)
+                                {
+                                    G.Writeln(freq + ", no data period");
+                                }
+                                else
+                                {
+                                    G.Writeln(freq + " data from " + first.super + G.GetFreq(ts.freq) + first.sub + " to " + last.super + G.GetFreq(ts.freq) + last.sub + stamp);
+                                }
+                            }
+
+                            List<string> varExpl = Program.GetVariableExplanation(var);
+                            foreach (string line in varExpl)
+                            {
+                                if (line != "")
+                                {
+                                    G.Writeln(line);
+                                }
+                            }
+
+                            //ts.label = "BNP i faste priser";
+                            //ts.expression = "SERIES y = c + i + g;";
+                            //ts.stamp = "20-1-2016 10:34";
+
+                            if (!G.NullOrEmpty(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
+
+                            if (!G.NullOrEmpty(ts.meta.source))
+                            {
+                                string src2 = ts.meta.source.Trim();
+                                if (src2 != "")
+                                {
+                                    G.Writeln("Series source: " + src2);
+                                }
+                            }
+
+                            if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(var, clickedLink, 0);
+
+                            if (Program.model != null)
+                            {
+                                List<string> d4 = new List<string>();
+                                if (Program.model.dependents.ContainsKey(var))
+                                {
+                                    Dictionary<string, string> d2 = Program.model.dependents[var].storage;
+                                    if (d2 != null)
+                                    {
+                                        foreach (string d3 in d2.Keys)
+                                        {
+                                            d4.Add(d3);
+                                        }
+                                    }
+                                    d4.Sort(StringComparer.InvariantCulture);
+                                }
+
+                                EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
+
+                                if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
+                                {
+                                    G.Writeln("Modelblock: " + found.modelBlock);
+                                }
+
+                                G.Write("Influences: ");
+                                if (d4.Count == 0) G.Writeln("<none>");
+                                else
+                                {
+                                    G.PrintListWithCommas(d4, true);
+                                }
+
+                                G.Writeln("------------------------------------------------------------------------------------------");
+
+                                if (found != null)
+                                {
+                                    int widthRemember = Program.options.print_width;
+                                    int fileWidthRemember = Program.options.print_filewidth;
+                                    Program.options.print_width = int.MaxValue;
+                                    Program.options.print_filewidth = int.MaxValue;
+                                    try
+                                    {
+                                        //check for endo (but really not necessary, exo just does not exist)
+                                        //G.Writeln(found.equationFormula);
+                                        string strSplit = found.equationText;
+                                        strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
+                                        char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
+                                        List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
+                                        foreach (string s in alWork)
+                                        {
+                                            if (s == "£") G.Writeln();
+                                            else
+                                            {
+                                                if (Program.model.varsAType.ContainsKey(s))
+                                                {
+                                                    //seems the word exists as variable
+                                                    G.WriteLink(s, "disp:" + s);
+                                                }
+                                                else
+                                                {
+                                                    G.Write(s);
+                                                }
+                                            }
+                                        }
+                                        G.Writeln();
+                                    }
+                                    finally
+                                    {
+                                        //resetting, also if there is an error
+                                        Program.options.print_width = widthRemember;
+                                        Program.options.print_filewidth = fileWidthRemember;
+                                    }
+
+                                    G.Writeln("------------------------------------------------------------------------------------------");
+                                    string rhs = found.csCodeRhsHumanVersion;
+                                    rhs = rhs.Replace("\r\n", "");
+                                    //rhs = rhs.Replace("[", "(");
+                                    //rhs = rhs.Replace("]", ")");
+                                    rhs = rhs.Replace("[0]", "");
+
+                                    if (showFrnEquation)
+                                    {
+                                        G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
+                                    }
+                                    else
+                                    {
+                                        G.WriteLink("Show detailed equation", "disp2:" + var);
+                                        G.Writeln();
+                                    }
+                                }
+                            }
+
+                            bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
+
+                            int max = Program.options.print_disp_maxlines;
+                            if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
+
+                            if (max > 0)
                             {
 
                                 G.Writeln("------------------------------------------------------------------------------------------");
@@ -15100,251 +15348,21 @@ namespace Gekko
                                     G.Writeln(")");
                                 }
                             }
+                            G.Writeln("==========================================================================================");
+                            G.Writeln();
+
                         }
-
-                    }
-                    G.Writeln("==========================================================================================");                    
-                }
-                else
-                {
-                    //ADAM-style, normal timeseries
-
-                    G.Writeln();
-                    G.Writeln("==========================================================================================");
-                    G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + G.Chop_RemoveFreq(ts.name));
-                    if (true)
-                    {
-                        EEndoOrExo type1 = VariableTypeEndoExo(var);
-                        string type3 = "";
-                        if (type1 == EEndoOrExo.Exo) type3 = "Exogenous, ";
-                        else if (type1 == EEndoOrExo.Endo) type3 = "Endogenous, ";
-
-                        string freq = "[unknown frequency]";
-
-                        freq = G.GetFreqString(ts.freq);
-
-                        bool noData = ts.IsNullPeriod(); //We are opening up to this possibility of 'empty' data                    
-
-                        //GekkoTime first = ts.GetPeriodFirst();
-                        //GekkoTime last = ts.GetPeriodLast();
-
-                        GekkoTime first = ts.GetRealDataPeriodFirst();
-                        GekkoTime last = ts.GetRealDataPeriodLast();
-
-                        G.Write(type3);
-                        string stamp = null;
-                        if (ts.meta.stamp != null && ts.meta.stamp != "") stamp = " (updated: " + ts.meta.stamp + ")";
-                        if (ts.freq == EFreq.A || ts.freq == EFreq.U)
-                        {
-                            if (noData || first.super == -12345 || last.super == -12345)
-                            {
-                                G.Writeln(freq + ", no data period");
-                            }
-                            else
-                            {
-                                //we don't want 1995a1 to 2005a1, instead 1995 to 2005
-                                G.Writeln(freq + " data from " + first.super + " to " + last.super + stamp);
-                            }
-                        }
-                        else
-                        {
-                            if (noData || first.super == -12345 || last.super == -12345)
-                            {
-                                G.Writeln(freq + ", no data period");
-                            }
-                            else
-                            {
-                                G.Writeln(freq + " data from " + first.super + G.GetFreq(ts.freq) + first.sub + " to " + last.super + G.GetFreq(ts.freq) + last.sub + stamp);
-                            }
-                        }
-
-                        List<string> varExpl = Program.GetVariableExplanation(var);
-                        foreach (string line in varExpl)
-                        {
-                            if (line != "")
-                            {
-                                G.Writeln(line);
-                            }
-                        }
-
-                        //ts.label = "BNP i faste priser";
-                        //ts.expression = "SERIES y = c + i + g;";
-                        //ts.stamp = "20-1-2016 10:34";
-
-                        if (!G.NullOrEmpty(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
-
-                        if (!G.NullOrEmpty(ts.meta.source))
-                        {                            
-                            string src2 = ts.meta.source.Trim();
-                            if (src2 != "")
-                            {
-                                G.Writeln("Series source: " + src2);
-                            }
-                        }
-
-                        if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(var, clickedLink, 0);
-
-                        if (Program.model != null)
-                        {
-                            List<string> d4 = new List<string>();
-                            if (Program.model.dependents.ContainsKey(var))
-                            {
-                                Dictionary<string, string> d2 = Program.model.dependents[var].storage;
-                                if (d2 != null)
-                                {
-                                    foreach (string d3 in d2.Keys)
-                                    {
-                                        d4.Add(d3);
-                                    }
-                                }
-                                d4.Sort(StringComparer.InvariantCulture);
-                            }
-
-                            EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
-
-                            if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
-                            {
-                                G.Writeln("Modelblock: " + found.modelBlock);
-                            }
-
-                            G.Write("Influences: ");
-                            if (d4.Count == 0) G.Writeln("<none>");
-                            else
-                            {
-                                G.PrintListWithCommas(d4, true);
-                            }
-
-                            G.Writeln("------------------------------------------------------------------------------------------");
-
-                            if (found != null)
-                            {
-                                int widthRemember = Program.options.print_width;
-                                int fileWidthRemember = Program.options.print_filewidth;
-                                Program.options.print_width = int.MaxValue;
-                                Program.options.print_filewidth = int.MaxValue;
-                                try
-                                {
-                                    //check for endo (but really not necessary, exo just does not exist)
-                                    //G.Writeln(found.equationFormula);
-                                    string strSplit = found.equationText;
-                                    strSplit = strSplit.Replace("\r\n", "£");  //hack: £ unlikely to be used much
-                                    char[] arrDelimiters = new char[] { ' ', '(', ')', '=', '+', '-', '*', '/', ',', ';', '$', '£' };  //last one is part of new line (\r\n)
-                                    List<string> alWork = Program.SplitStringAndKeepDelimiters(strSplit, arrDelimiters);
-                                    foreach (string s in alWork)
-                                    {
-                                        if (s == "£") G.Writeln();
-                                        else
-                                        {
-                                            if (Program.model.varsAType.ContainsKey(s))
-                                            {
-                                                //seems the word exists as variable
-                                                G.WriteLink(s, "disp:" + s);
-                                            }
-                                            else
-                                            {
-                                                G.Write(s);
-                                            }
-                                        }
-                                    }
-                                    G.Writeln();
-                                }
-                                finally
-                                {
-                                    //resetting, also if there is an error
-                                    Program.options.print_width = widthRemember;
-                                    Program.options.print_filewidth = fileWidthRemember;
-                                }
-
-                                G.Writeln("------------------------------------------------------------------------------------------");
-                                string rhs = found.csCodeRhsHumanVersion;
-                                rhs = rhs.Replace("\r\n", "");
-                                //rhs = rhs.Replace("[", "(");
-                                //rhs = rhs.Replace("]", ")");
-                                rhs = rhs.Replace("[0]", "");
-
-                                if (showFrnEquation)
-                                {
-                                    G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
-                                }
-                                else
-                                {
-                                    G.WriteLink("Show detailed equation", "disp2:" + var);
-                                    G.Writeln();
-                                }
-                            }
-                        }
-
-                        bool hasFilter = false; if (Program.options.timefilter && Globals.globalPeriodTimeFilters2.Count > 0) hasFilter = true;
-
-                        int max = Program.options.print_disp_maxlines;
-                        if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
-
-                        if (max > 0)
-                        {
-
-                            G.Writeln("------------------------------------------------------------------------------------------");
-                            G.Writeln("Period        value        %");
-
-                            int counter = 0;
-                            foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
-                            {
-                                counter++;
-                                if (hasFilter)  //some periods are set via TIMEFILTER
-                                {
-                                    //if some filter is set, we never truncate output to 3 or 5 lines (showAllPeriods)
-                                    if (ShouldFilterPeriod(gt)) continue;
-                                }
-                                else
-                                {
-                                    if (!showAllPeriods && counter > max)
-                                    {
-                                        continue;
-                                    }
-                                }
-
-                                if (Program.options.freq == EFreq.A) G.Write((gt.super) + " ");
-                                else G.Write(gt.super + G.GetFreq(ts.freq) + gt.sub + " ");
-
-                                double n1 = ts.GetData(null, gt);
-                                double n0 = ts.GetData(null, gt.Add(-1));
-
-                                double level1 = n1;
-                                double pch1 = ((n1 / n0 - 1) * 100d);
-
-                                if (n1 == n0) pch1 = 0d;
-
-                                string levelFormatted;
-                                string pchFormatted;
-                                Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                                G.Write(levelFormatted + " " + pchFormatted + " ");
-                                G.Writeln();
-                            }
-                            int surplus = counter - max;
-                            if (!showAllPeriods && surplus > 0)
-                            {
-                                G.Writeln("------------------------------------------------------------------------------------------");
-                                string ps = "period";
-                                if (surplus > 1) ps = "periods";
-                                G.Write(surplus + " " + ps + " hidden (");
-                                G.WriteLink("show", "disp3:" + var);
-                                G.Writeln(")");
-                            }
-                        }
-                        G.Writeln("==========================================================================================");
-                        G.Writeln();
-                        
                     }
                 }                
             }
 
-            if (seriesCounter == 0 && nonSeries)
+            if (seriesCounter == 0 && nonSeries > 0)
             {
                 //nomessage
             }
             else
             {
-                G.Writeln2("Displayed " + seriesCounter + " series");
+                G.Writeln2("Displayed " + (seriesCounter + nonSeries) + " variables");
             }
             
         }
@@ -15592,7 +15610,7 @@ namespace Gekko
             EVariableType type = EVariableType.Var;
             if (o.type != null) type = G.GetVariableType(o.type);
 
-            List<TwoStrings> outputs = MatchWildcard(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename);
+            List<TwoStrings> outputs = SearchFromTo(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename);
 
             if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
             {
@@ -15634,7 +15652,7 @@ namespace Gekko
                 o.names2.Add(new ScalarString("First:*"));
             }
 
-            List<TwoStrings> outputs = MatchWildcard(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
+            List<TwoStrings> outputs = SearchFromTo(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy);
 
             bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
             int nIgnores = 0;
@@ -15723,7 +15741,26 @@ namespace Gekko
 
         }
 
-        public static List<TwoStrings> MatchWildcard(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
+        public static List<string> Search(List names1, string frombank, EVariableType type)
+        {
+            List<string> names = new List<string>();
+            List<TwoStrings> matches = Program.SearchFromTo(names1, null, frombank, null, EWildcardSearchType.Search);
+            //List rv = new List();
+
+            foreach (TwoStrings two in matches)
+            {
+                if (type != EVariableType.Var)
+                {
+                    //a bit of double work here, but maybe it does not need to be super fast anyway
+                    IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
+                    if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
+                }
+                names.Add(two.s1);
+            }
+            return names;
+        }
+
+        public static List<TwoStrings> SearchFromTo(List names0, List names1, string frombank, string tobank, EWildcardSearchType type)
         {
             //In general, INDEX, DISP and {'...'} are maybe a bit different from 
             //wildcards in COPY, RENAME, WRITE, etc. In principle, the former could 
@@ -15871,8 +15908,12 @@ namespace Gekko
                     //item without * or ?
                     string bankTemp = bankLhs;
                     if (bankLhs == null) bankTemp = currentFirstBankName;
-                    string freq = freqLhs;
-                    if (freqLhs == null) freq = currentFreq;
+                    string freq = null;
+                    if (!G.Chop_HasSigil(nameLhs))
+                    {
+                        freq = freqLhs;
+                        if (freqLhs == null) freq = currentFreq;
+                    }
                     lhsUnfolded.Add(O.UnChop(bankTemp, nameLhs, freq, indexLhs));
                 }
             }
@@ -21558,7 +21599,7 @@ namespace Gekko
             List<TwoStrings> list = null;
             if (o.list1 != null)
             {
-                list = MatchWildcard(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write);
+                list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write);
             }
             
             //foreach (TwoStrings output in outputs)
