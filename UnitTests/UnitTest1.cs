@@ -7925,184 +7925,134 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2010;");
             I("CREATE a1, a2;");
-            I("LIST a = a1, a2;");
-            AssertHelperList("a", new List<string>() { "a1", "a2" });
-            I("SERIES #a = 100;");
+            I("LIST #a = a1, a2;");            
+            I("SERIES {#a} = 100;");
             I("SERIES a2 = 200;");
-            AssertHelper(First(), "a1", 2010, 100, sharedDelta);
-            AssertHelper(First(), "a2", 2010, 200, sharedDelta);
+            _AssertSeries(First(), "a1", 2010, 100, sharedDelta);
+            _AssertSeries(First(), "a2", 2010, 200, sharedDelta);
             I("PRT #a;");
             I("PRT #a[2];");  //PRT a2
-            I("SERIES a2 = #a[1];");  //SERIES a2 = a1;
-            AssertHelper(First(), "a1", 2010, 100, sharedDelta);
-            AssertHelper(First(), "a2", 2010, 100, sharedDelta);
-            I("LIST a = 1a, 1b;");
-            AssertHelperList("a", new List<string>() { "1a", "1b" });
-            FAIL("LIST a = 1;");
-            FAIL("LIST a = 007;");
-            FAIL("LIST a = 2015q3;");
-            I("LIST a = '1', '007', '2015q3';");
-            AssertHelperList("a", new List<string>() { "1", "007", "2015q3" });
+            I("SERIES a2 = {#a[1]} + 1;");  //SERIES a2 = a1;
+            _AssertSeries(First(), "a1", 2010, 100, sharedDelta);
+            _AssertSeries(First(), "a2", 2010, 101, sharedDelta);
+            // Important
+            // Important --> we can use {#a}[1] or {#a[1]} as we choose
+            // Important
+            I("SERIES a2 = {#a}[1] + 2;");  
+            _AssertSeries(First(), "a2", 2010, 102, sharedDelta);
+            FAIL("#a = 1a, 1b;");            
+            FAIL("#a = 1;");
+            FAIL("#a = 007;");
+            FAIL("#a = '007';");
+            FAIL("#a = 2015q3;");
+            I("#a = ('1', '007', '2015q3');");
 
             if (Globals.UNITTESTFOLLOWUP)
             {
                 //fix freq issue
             }
             I("OPTION freq q;");
-            I("VAL a1 = 1;");
-            I("DATE a3 = 2015q3;");
-            I("LIST a = string(%a1), '007', string(%a3);");
-            AssertHelperList("a", new List<string>() { "1", "007", "2015q3" });
+            I("VAL %a1 = 1;");
+            I("DATE %a3 = 2015q3;");
+            I("LIST #a = (string(%a1), '007', string(%a3));");
+            //AssertHelperList("a", new List<string>() { "1", "007", "2015q3" });
+            _AssertListString(First(), "#a", 1, "1");
+            _AssertListString(First(), "#a", 2, "007");
+            _AssertListString(First(), "#a", 3, "2015q3");
 
             //--------------------------------------------
 
             I("RESET;");
             I("TIME 2000 2001;");
             I("CREATE fxa0, fxb0;");
-            I("SERIES fxa0 = 1, 2;");
-            I("SERIES fxb0 = 3, 4;");
-            I("LIST a = a, b;");
-            I("FOR i = #a; PRT fX{%i}0; END;");
-            I("FOR VAL i = 1 to #a[0]; PRT fX{#a[%i]}0; END;");
+            I("SERIES fxa0 = (1, 2);");
+            I("SERIES fxb0 = (3, 4);");
+            I("LIST #a = a, b;");
+            I("FOR %i = #a; PRT fX{%i}0; END;");
+            I("FOR VAL %i = 1 to #a.len(); PRT fX{#a[%i]}0; END;");
+
             if (Globals.UNITTESTFOLLOWUP)
             {
-                //these do not work yet, but should later on
-                I("PRT %s1#a%s2;");
-                I("PRT {%s1}#a{%s2};");
-                I("PRT {s1}#a{s2};");
-                I("PRT fX#a|0;");
+                //Maybe allow a list def on LHS for such cases:
+                //(pxa, pxb, fxa, fXb) = 100;
 
-                //Should be possible to put #a in {#a} and use prefix and suffix.
-                //OR MAYBE NOT>
-                //OR MAYBE NOT>
-                //OR MAYBE NOT>
-                //Maybe {#a} should not be allowed at all! But be reserved for stripping quotes of strings.
-                //The inside of {#a} is not meaningful as a string anyway, , but {#a[1]} could be ok...
-                I("PRT %s1{#a}%s2;");
-                I("PRT {%s1}{#a}{%s2};");
-                I("PRT {s1}{#a}{s2};");
-                I("PRT fX{#a}|0;");
-                I("PRT fX{#a}0;");
-
-                I("PRT #a/1000;         //PRT a/100, b/100;");
-                I("PRT #a+100;          //PRT a+100, b+100;");
+                I("CREATE pxa, pxb, fxa, fXb;");
+                I("SERIES pxa, pxb, fxa, fXb = 100;");
+                I("LIST a1 = a, B;");
+                I("FOR i = #a1; PRT px{i}*fX{i}; END;");
+                I("FOR i = #a1; PRT px%i*fX%i; END;");  //same
             }
-            I("CREATE pxa, pxb, fxa, fXb;");
-            I("SERIES pxa, pxb, fxa, fXb = 100;");
-            I("LIST a1 = a, B;");
-            I("FOR i = #a1; PRT px{i}*fX{i}; END;");
-            I("FOR i = #a1; PRT px%i*fX%i; END;");  //same
 
             //----------------
             //LIST operators, ranges etc.
             //----------------
 
-            I("LIST x1 = a, b, c;");
-            I("LIST x2 = b, c, d;");
-            I("LIST x3 = #x1, #x2;");
-            List<string> x1 = GetListOfStrings("x1");
-            List<string> x2 = GetListOfStrings("x2");
-            List<string> x3 = GetListOfStrings("x3");
-            Assert.AreEqual(x1.Count, 3);
-            Assert.AreEqual(x2.Count, 3);
-            Assert.AreEqual(x3.Count, 6);
-            Assert.AreEqual(x3[0], "a");
-            Assert.AreEqual(x3[1], "b");
-            Assert.AreEqual(x3[2], "c");
-            Assert.AreEqual(x3[3], "b");
-            Assert.AreEqual(x3[4], "c");
-            Assert.AreEqual(x3[5], "d");
 
-            I("LIST x4 = union(#x1, #x2);");
-            List<string> x4 = GetListOfStrings("x4");
-            Assert.AreEqual(x4.Count, 4);
-            Assert.AreEqual(x4[0], "a");
-            Assert.AreEqual(x4[1], "b");
-            Assert.AreEqual(x4[2], "c");
-            Assert.AreEqual(x4[3], "d");
-
-            I("LIST x5 = difference(#x1, #x2);");
-            List<string> x5 = GetListOfStrings("x5");
-            Assert.AreEqual(x5.Count, 1);
-            Assert.AreEqual(x5[0], "a");
-
-            I("LIST x6 = intersect(#x1, #x2);");
-            List<string> x6 = GetListOfStrings("x6");
-            Assert.AreEqual(x6.Count, 2);
-            Assert.AreEqual(x6[0], "b");
-            Assert.AreEqual(x6[1], "c");
-
-            I("LIST a = a1, a2, a3, a4, a5;");
-            I("VAL i = 2;");
+            I("TIME 2010;");
+            I("LIST #a = a1, a2, a3, a4, a5;");
+            I("VAL %i = 2;");
             I("CREATE a2, y;");
             I("SERIES a2 = 100;");
-            I("LIST b1 = #a[%i..%i+2];"); //b1 = a2, a3, a4. Sublist of names at position %i, %i+1, %i+2
-            List<string> b1 = GetListOfStrings("b1");
-            Assert.AreEqual(b1.Count, 3);
-            Assert.AreEqual(b1[0], "a2");
-            Assert.AreEqual(b1[1], "a3");
-            Assert.AreEqual(b1[2], "a4");
-            I("VAL b2 = #a[0];");         //b2 = 5, length of the list as a value
-            ScalarVal b2 = (ScalarVal)Program.scalars["b2"];
-            Assert.AreEqual(b2.val, 5d);
-            I("STRING b3 = string(#a[%i]);");     //b3 = 'a2', picking out the %i'th name as a string
-            ScalarString b3 = (ScalarString)Program.scalars["b3"];
-            Assert.AreEqual(b3.string2, "a2");
-            I("SERIES y = #a[%i];");      //y = a2, SERIES corresponds to the SERIES command.
-            AssertHelper(First(), "y", 2000, 100d, sharedDelta);
-            AssertHelper(First(), "y", 2001, 100d, sharedDelta);
+            I("LIST #b1 = #a[%i..%i+2];"); //b1 = a2, a3, a4. Sublist of names at position %i, %i+1, %i+2
+            _AssertListString(First(), "#b1", new StringOrList(new string[] { "a2", "a3", "a4" }));            
+            FAIL("VAL %b2 = #a[0];");         //b2 = 5, length of the list as a value
+            I("VAL %b2 = #a.len();");
+            _AssertScalarVal(First(), "%b2", 5d);
+            FAIL("VAL %z = #a[%i][2010];");
+            I("VAL %z = {#a[%i]}[2010] + 1;");
+            _AssertScalarVal(First(), "%z", 101d);
+            FAIL("VAL %z = {#a}[%i][2010] + 2;");  //fails because only a2 exists
 
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                //should work...
-                I("VAL z = #a[%i][2010];");
-            }
+            // -------------------------------------------------
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
-            I("LIST a = fxa, fxb, pcp, tg, pxqz;");
-            I("LIST a1 = #a[fX*];              //pattern in #a list");
-            I("LIST a2 = #a[f?nz];             //pattern in #a list");
-            I("LIST a3 = #a[pxa..pxqz];        //range in #a list");
-            I("LIST a4 = [fX*];                //pattern in Work databank");
-            I("LIST a5 = [f?n];                //pattern in Work databank");
-            I("LIST a6 = [pxa..pxqz];          //range in Work databank");
-            I("LIST a7 = [*];                  //all items in Work databank");
-            //Double checked in Gekko 1.8, seems ok
-            AssertHelperList("a1", new List<string>() { "fxa", "fxb" });
-            AssertHelperList("a2", new List<string>());
-            AssertHelperList("a3", new List<string>() { "pxqz" });
-            Assert.AreEqual(GetListOfStrings("a4").Count, 30);
-            Assert.AreEqual(GetListOfStrings("a5").Count, 4);
-            Assert.AreEqual(GetListOfStrings("a6").Count, 42);
-            Assert.AreEqual(GetListOfStrings("a7").Count, 8358);
+
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                
+                I("LIST a = fxa, fxb, pcp, tg, pxqz;");
+                I("LIST a1 = #a[fX*];              //pattern in #a list");
+                I("LIST a2 = #a[f?nz];             //pattern in #a list");
+                I("LIST a3 = #a[pxa..pxqz];        //range in #a list");
+                I("LIST a4 = [fX*];                //pattern in Work databank");
+                I("LIST a5 = [f?n];                //pattern in Work databank");
+                I("LIST a6 = [pxa..pxqz];          //range in Work databank");
+                I("LIST a7 = [*];                  //all items in Work databank");
+                //Double checked in Gekko 1.8, seems ok
+                AssertHelperList("a1", new List<string>() { "fxa", "fxb" });
+                AssertHelperList("a2", new List<string>());
+                AssertHelperList("a3", new List<string>() { "pxqz" });
+                Assert.AreEqual(GetListOfStrings("a4").Count, 30);
+                Assert.AreEqual(GetListOfStrings("a5").Count, 4);
+                Assert.AreEqual(GetListOfStrings("a6").Count, 42);
+                Assert.AreEqual(GetListOfStrings("a7").Count, 8358);
+
+            }
 
             I("CREATE gdp3;");
             I("SERIES gdp3 = 100;");
-            I("STRING s = 'dp';");
-            I("VAL x = 2;");
+            I("STRING %s = 'dp';");
+            I("VAL %x = 2;");
             I("PRT g{%s+%x*(%x+1)/2};");  //one kind of val+string
-            I("VAL v = 3;");
+            I("VAL %v = 3;");
             I("PRT g%s%v;");                //another kind of val+string
             I("PRT g{%s}{%v};");                //another kind of val+string
-            I("PRT g{s}{v};");                //another kind of val+string
+            FAIL("PRT g{s}{v};");                //another kind of val+string
 
 
             I("TIME 2004 2006;");
-            I("VAL v1 = 0.4;");
-            I("VAL v2 = 0.3;");
-            I("VAL v3 = 0.2;");
-            I("VAL v4 = 0.1;");
+            I("VAL %v1 = 0.4;");
+            I("VAL %v2 = 0.3;");
+            I("VAL %v3 = 0.2;");
+            I("VAL %v4 = 0.1;");
             I("CREATE gdp2; SERIES gdp2 = 0;");
-            I("FOR VAL i = 1 to 4; SERIES gdp2 = gdp2 + %(v%i) * fy[-%i]; END;");
+            I("FOR VAL %i = 1 to 4; SERIES gdp2 = gdp2 + %(v%i) * fy[-%i]; END;");
             I("CREATE gdp_true;");
             I("SERIES gdp_true = 0.4*fy[-1]+0.3*fy[-2]+0.2*fy[-3]+0.1*fy[-4];");
-            AssertHelper(First(), "gdp2", 2005, 1325794d, sharedDelta);
-            AssertHelper(First(), "gdp_true", 2005, 1325794d, sharedDelta);
-
-
-
+            _AssertSeries(First(), "gdp2", 2005, 1325794d, sharedDelta);
+            _AssertSeries(First(), "gdp_true", 2005, 1325794d, sharedDelta);
 
         }
 

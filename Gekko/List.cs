@@ -89,8 +89,8 @@ namespace Gekko
                     }
                     else if (ival == 0)
                     {
-                        ScalarVal a = new ScalarVal(this.list.Count);
-                        return a;
+                        G.Writeln2("*** ERROR: Illegal [0] list indexing. Use #m.len() instead of #m[0] to get the length of list #m.");
+                        throw new GekkoException();                        
                     }
                     else if (ival > this.list.Count)
                     {
