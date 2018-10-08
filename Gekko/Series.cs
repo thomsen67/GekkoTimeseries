@@ -1800,7 +1800,22 @@ namespace Gekko
                     }
                     else
                     {
-                        if(rhsIsTimeless)
+                        //lhs variable like the 'a' element in x[a], where x[a] is on LHS
+
+                        if (Program.options.databank_create_auto || this.name.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                        {
+                            //good
+                        }
+                        else
+                        {
+                            //#07549843254
+                            G.Writeln2("*** ERROR: Cannot auto-create array-series element " + this.GetNameWithoutCurrentFreq(true) + "[" + G.GetListWithCommas(keys) + "].");
+                            G.Writeln("           You may change the settings with the following option:", Color.Red);
+                            G.Writeln("           OPTION databank create auto = yes;", Color.Red);
+                            throw new GekkoException();
+                        }
+
+                        if (rhsIsTimeless)
                         {
                             rv = new Series(ESeriesType.Timeless, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq), double.NaN);                            
                         }

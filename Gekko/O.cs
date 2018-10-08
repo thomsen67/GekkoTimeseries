@@ -447,7 +447,7 @@ namespace Gekko
 
             Databank databank = Program.databanks.GetFirst();
 
-            string name = "endo"; if (!type) name = "exo";
+            string endoOrExoPrefix = "endo"; if (!type) endoOrExoPrefix = "exo";
 
             //Clear all endo_ or exo_ variables
             if (true)
@@ -455,7 +455,7 @@ namespace Gekko
                 List<string> delete = new List<string>();
                 foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
                 {
-                    if (kvp.Key.StartsWith(name + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                    if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
                     {
                         //starts with endo_ or exo_ and is of annual type
                         delete.Add(kvp.Key);
@@ -501,7 +501,7 @@ namespace Gekko
                     Program.Combine(h.indices, ss, depth, stack);
                 }
 
-                string varNameWithoutFreq = name + "_" + s;
+                string varNameWithoutFreq = endoOrExoPrefix + "_" + s;
                 string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
 
                 GekkoTimes gts = global;
@@ -521,6 +521,9 @@ namespace Gekko
                 {
                     foreach (List<string> ss2 in ss)
                     {
+
+                        //The following xx is not used, just used to check existence
+                        IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
 
                         //Multi-dim timeseries
                         //What about timeless??                        
@@ -553,6 +556,10 @@ namespace Gekko
                 {
                     //Normal 0-dim timeseries
                     //What about timeless??
+
+                    //The following xx is not used, just used to check existence
+                    IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
+
                     ts2 = ts;
                     if (ts2 == null)
                     {
@@ -1575,7 +1582,7 @@ namespace Gekko
 
                     if (iv == null)
                     {
-                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " does not exist in '" + dbName + "' databank");
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " does not exist in '" + bank.name + "' databank");
                         throw new GekkoException();
                     }
 
@@ -1583,9 +1590,9 @@ namespace Gekko
 
                     Series iv_series = iv as Series;
 
-                    if (iv_series.type == ESeriesType.ArraySuper)
+                    if (iv_series.type != ESeriesType.ArraySuper)
                     {
-                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + dbName + "' databank is not an array-series");
+                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + bank.name + "' databank is not an array-series");
                         throw new GekkoException();
                     }
 
@@ -2538,6 +2545,19 @@ namespace Gekko
                 // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                 // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
                 //name is of series type (no sigils), or we have that isArraySubSeries == true (or both)
+
+                if (lhs == null && !isArraySubSeries && !varnameWithFreq.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                {
+                    //nonexisting series
+                    if (!Program.options.databank_create_auto)
+                    {
+                        //#07549843254
+                        G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ".");
+                        G.Writeln("           You may change the settings with the following option:", Color.Red);
+                        G.Writeln("           OPTION databank create auto = yes;", Color.Red);
+                        throw new GekkoException();
+                    }
+                }
 
                 //The indicated LHS type can only be series or var type, for instance SERIES x = ...  or VAR x = ...  or x = ...  . 
                 if (type == EVariableType.Series || type == EVariableType.Var)

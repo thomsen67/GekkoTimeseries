@@ -48,7 +48,7 @@ Additionally, there are model, solve, equation options.
         //public bool bugfix_px = true;
         public bool bugfix_download = true;
 
-        public bool databank_create_auto = false;
+        public bool databank_create_auto = true;
         public bool databank_create_message = true;  //this option could be removed now
         public double databank_compare_tabs = 1.0d;
         public double databank_compare_trel = 0.0001d;
@@ -57,7 +57,7 @@ Additionally, there are model, solve, equation options.
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
         //public string databank_logic = "default";  //default | aremos
-        public bool databank_search = false;
+        public bool databank_search = true;
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";
@@ -94,7 +94,7 @@ Additionally, there are model, solve, equation options.
         public bool interface_excel_modernlook = true;
         public bool interface_help_copylocal = true;
         public bool interface_lagfix = true;
-        public string interface_mode = "sim";  //sim, data, mixed
+        public string interface_mode = "data";  //sim, data, mixed
         public bool interface_remote = false;  //remote control via remote.gcm
         public bool interface_sound = false;  //overall sound switch
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring
@@ -174,7 +174,7 @@ Additionally, there are model, solve, equation options.
         public bool sheet_prt_gdif = false;  //dp
         public bool sheet_cols = false;
         public bool sheet_rows = true;
-        public bool solve_data_create_auto = true;
+        public bool solve_data_create_auto = false;
 
         //for now, we keep it here...
         public bool solve_data_ignoremissing = false;

@@ -539,6 +539,43 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Create()
+        {
+            I("reset;");
+            I("option databank create auto = yes;");  //starts with this default
+            I("%v = 1;");
+            I("#m = a, b;");
+            I("a = 5;");
+            FAIL("b[i] = 5;");
+            I("b = series(1);");
+            I("b[i] = 5;");
+
+            I("reset;");
+            I("option databank create auto = no;");  //starts with this default
+            I("%v = 1;");
+            I("#m = a, b;");
+            //--------------
+            FAIL("a = 5;");
+            FAIL("b[i] = 5;");
+            FAIL("b = series(1);");
+            FAIL("b[i] = 5;");
+            //--------------
+            I("xx1 = 5;");
+            FAIL("xx2[i] = 5;");
+            I("xx2 = series(1);");
+            I("xx2[i] = 5;");  //xx-name will accept anything inside also with auto=no
+            //--------------
+            I("option databank create auto = yes;");
+            I("c = series(1);");
+            I("c[i] = 7;");
+            I("option databank create auto = no;");
+            FAIL("c[j] = 7;");  //will not allow new elements
+            I("c[i] = 8;"); //updating existing is ok
+            I("c = series(2);");  //even this is ok
+
+        }
+
+        [TestMethod]
         public void _Test_Compare()
         {
             I("time 2001 2002;");
@@ -12564,14 +12601,14 @@ namespace UnitTests
 
             I("reset;");
             I("function list plus(list #m, val %v);"
-            + "  for val %i = 1 to #m[0];"
+            + "  for val %i = 1 to #m.len();"
             + "    #m[%i] = #m[%i] + %v;"
             + "  end;"
             + "  return #m;"
             + "end;");
 
             I("function list mul(list #m, val %v);"
-            + "  for val %i = 1 to #m[0];"
+            + "  for val %i = 1 to #m.len();"
             + "    #m[%i] = #m[%i] * %v;"
             + "  end;"
             + "  return #m;"
