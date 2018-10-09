@@ -450,21 +450,9 @@ namespace Gekko
             string endoOrExoPrefix = "endo"; if (!type) endoOrExoPrefix = "exo";
 
             //Clear all endo_ or exo_ variables
-            if (true)
+            if (false)
             {
-                List<string> delete = new List<string>();
-                foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
-                {
-                    if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
-                    {
-                        //starts with endo_ or exo_ and is of annual type
-                        delete.Add(kvp.Key);
-                    }
-                }
-                foreach (string s in delete)
-                {
-                    databank.RemoveIVariable(s);
-                }
+                Program.Unfix(databank, endoOrExoPrefix);
             }
 
 
@@ -482,8 +470,12 @@ namespace Gekko
                 helper = Globals.exo.helper;
             }
 
+            int count = 0;
+
             foreach (HandleEndoHelper h in helper)
             {
+                count++; //array-series updates like x[#i, #j] will only count as 1.
+
                 string s = h.varname.ConvertToString();
                 if (!G.IsSimpleToken(s))
                 {
@@ -520,10 +512,13 @@ namespace Gekko
                 if (ss.Count > 0)
                 {
                     foreach (List<string> ss2 in ss)
-                    {
+                    {                        
 
-                        //The following xx is not used, just used to check existence
-                        IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
+                        if (!Program.options.databank_create_auto)
+                        {
+                            //The following xx is not used, just used to check existence
+                            IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
+                        }
 
                         //Multi-dim timeseries
                         //What about timeless??                        
@@ -556,6 +551,7 @@ namespace Gekko
                 {
                     //Normal 0-dim timeseries
                     //What about timeless??
+                                       
 
                     //The following xx is not used, just used to check existence
                     IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
@@ -572,9 +568,12 @@ namespace Gekko
                     }
                 }                
             }
+
+            G.Writeln2("Set " + count + " " + endoOrExoPrefix + "_... variables");
         }
 
         
+
         public static void HandleOptionBankRef1(string opt_bank, string opt_ref)
         {
             if (opt_bank != null)
@@ -1551,6 +1550,8 @@ namespace Gekko
 
             string nameWithFreq = G.AddFreqToName(varName, freq);
 
+            int[] dimMismatch = null;
+
             Databank bank = null;
             if (dbName == null) bank = Program.databanks.GetFirst();
             else bank = Program.databanks.GetDatabank(dbName, true);
@@ -1608,7 +1609,13 @@ namespace Gekko
                         }
                         else
                         {
-                            //do nothing, a null is returned
+                            if (iv_series.dimensions != indexes.Length)
+                            {
+                                dimMismatch = new int[2];
+                                dimMismatch[0] = iv_series.dimensions;
+                                dimMismatch[1] = indexes.Length;
+                            }
+                            iv = iv2;  //that is: iv = null;
                         }
                     }
                     else
@@ -1624,10 +1631,9 @@ namespace Gekko
                         else
                         {
                             //do nothing
+                            iv = iv2;
                         }
                     }
-
-
                 }
                 else
                 {
@@ -1672,18 +1678,20 @@ namespace Gekko
                 string vname = varName;
                 if (freq != null) vname += Globals.freqIndicator + freq;
                 if (dbName != null) vname = dbName + Globals.symbolBankColon2 + vname;
-                string s = null;
+                string s = null;                
                 if (indexes != null)
                 {
-                    s = "";
-                    foreach (string ix in indexes)
-                    {
-                        s += ix + ", ";
-                    }
-                    s = s.Substring(0, s.Length - 2);
+                    s = "[" + G.GetListWithCommas(indexes) + "]";
                 }
                 vname = vname + s;
-                G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
+                if (dimMismatch == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: '" + vname + "' has " + dimMismatch[1] + " dimensions, expected " + dimMismatch[0] + " dimensions");
+                }
                 throw new GekkoException();
             }
 

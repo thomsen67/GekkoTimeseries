@@ -8141,34 +8141,63 @@ namespace Gekko
             G.Writeln("Gekko version: " + Globals.gekkoVersion);
         }
 
+        public static void Unfix(Databank databank, string endoOrExoPrefix)
+        {
+            List<string> delete = new List<string>();
+            foreach (KeyValuePair<string, IVariable> kvp in databank.storage)
+            {
+                if (kvp.Key.StartsWith(endoOrExoPrefix + "_", StringComparison.OrdinalIgnoreCase) && kvp.Key.EndsWith(Globals.freqIndicator + G.GetFreq(Program.options.freq), StringComparison.OrdinalIgnoreCase))
+                {
+                    //starts with endo_ or exo_ and is of annual type
+                    delete.Add(kvp.Key);
+                }
+            }
+            int count = 0;
+            foreach (string s in delete)
+            {
+                databank.RemoveIVariable(s);
+                count++;
+            }
+            if(count > 0) G.Writeln2("Removed " + count + " " + endoOrExoPrefix + "_... variables");
+        }
+
         public static void Unfix()  //formerly ClearGoals()
         {
-            if (Program.model != null)
+            if (true)
             {
-                if (Program.model.exogenized.Count == 0 && Program.model.endogenized.Count == 0)
-                {
-                    G.Writeln2("No goals are set, so nothing to unfix");
-                }
-                else
-                {
-                    string s = "Unfixed/cleared ";
-                    if (Program.model.exogenized != null)
-                    {
-                        s += Program.model.exogenized.Count + " EXO and ";
-                    }
-                    if (Program.model.endogenized != null)
-                    {
-                        s += Program.model.endogenized.Count + " ENDO variables.";
-                    }
-                    Endo(null);  //--> better than clearing as above, since hasBeenEndoExoStatementsSinceLastSim flag is set
-                    Exo(null);
-                    G.Writeln2(s);
-                    G.Writeln("Please note that only SIM<fix> (and not SIM) enforces the ENDO/EXO goals");
-                }
+                Unfix(Program.databanks.GetFirst(), "endo");
+                Unfix(Program.databanks.GetFirst(), "exo");
             }
             else
             {
-                G.Writeln2("No model defined -- not possible to clear/unfix goals");
+
+                if (Program.model != null)
+                {
+                    if (Program.model.exogenized.Count == 0 && Program.model.endogenized.Count == 0)
+                    {
+                        G.Writeln2("No goals are set, so nothing to unfix");
+                    }
+                    else
+                    {
+                        string s = "Unfixed/cleared ";
+                        if (Program.model.exogenized != null)
+                        {
+                            s += Program.model.exogenized.Count + " EXO and ";
+                        }
+                        if (Program.model.endogenized != null)
+                        {
+                            s += Program.model.endogenized.Count + " ENDO variables.";
+                        }
+                        Endo(null);  //--> better than clearing as above, since hasBeenEndoExoStatementsSinceLastSim flag is set
+                        Exo(null);
+                        G.Writeln2(s);
+                        G.Writeln("Please note that only SIM<fix> (and not SIM) enforces the ENDO/EXO goals");
+                    }
+                }
+                else
+                {
+                    G.Writeln2("No model defined -- not possible to clear/unfix goals");
+                }
             }
         }
 
@@ -15742,11 +15771,15 @@ namespace Gekko
 
         }
 
-        public static void AddIfInRange(string s, string s1, string s2, List<string> m)
+        public static void AddIfInRange(string bankname, string freqname, string s, string s1, string s2, List<string> m)
         {
             if (string.Compare(s1, s, true) <= 0 && string.Compare(s, s2, true) <= 0)
             {
-                m.Add(s);
+                string ss1 = null;
+                string ss2 = null;
+                if (bankname != null) ss1 = bankname + Globals.symbolBankColon;
+                if (freqname != null) ss2 = Globals.freqIndicator + freqname;
+                m.Add(ss1 + s + ss2);                
             }
         }
 
@@ -15962,7 +15995,7 @@ namespace Gekko
                     }
                     else
                     {                        
-                        db_banks = Search(bankLhs, listOfAllOpenBanks, false);
+                        db_banks = Search(bankLhs, listOfAllOpenBanks);
                     }
 
                     foreach (string db_bank in db_banks)
@@ -15995,8 +16028,15 @@ namespace Gekko
                 }
             }
 
+            // ------------------------------------------------------------
+            // Now the variables have been found
+            // Next is which variables they (maybe) are
+            // matched with, for instance with COPY or RENAME.
+            // ------------------------------------------------------------
+            
             if (type == EWildcardSearchType.Search)
             {
+                //No matching with other variables
                 foreach (string s in lhsUnfolded)
                 {
                     outputs.Add(new TwoStrings(s, null)); //has no destination
@@ -16230,17 +16270,17 @@ namespace Gekko
 
         private static List<string> GetListOfAllBanks()
         {
+            //Sequence: local, first, ref, rest, global
             List<string> temp = new List<string>();
             temp.Add(Globals.Local);
             for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
-                Databank databank = Program.databanks.storage[i];
-                //if (i == 0) temp.Add(Globals.First);
-                //else if (i == 1) temp.Add(Globals.Ref);
-                //else temp.Add(databank.name);
+                //if (i == 1) continue; //skip ref bank
+                Databank databank = Program.databanks.storage[i];                
                 temp.Add(databank.name);
             }
             temp.Add(Globals.Global);
+            //temp.Add(Program.databanks.storage[1].name); //ref bank
             return temp;
         }
 
@@ -16262,26 +16302,44 @@ namespace Gekko
             {
                 allVariablesInBank.Add(kvp.Key);
             }
-            
-            // 
-            //------------------------------------
 
-            string name3a = wildcardName;
-            if (wildcardFreq == null)
+            if (wildcardName == "**")
             {
-                if (!G.Chop_HasSigil(wildcardName)) name3a += Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                //take all objects in given bank, corresponds to '*!*' + '%*' + '#*'
+                if (wildcardFreq != null)
+                {
+                    G.Writeln2("*** ERROR: You cannot combine '**' wildcard with frequency");
+                    throw new GekkoException();
+                }
+                //bankname + Globals.symbolBankColon
+                foreach (string s in allVariablesInBank)
+                {
+                    varsMatched.Add(bankname + Globals.symbolBankColon + s);
+                }
+                //varsMatched.AddRange(allVariablesInBank);
             }
             else
             {
-                name3a += Globals.freqIndicator + wildcardFreq;
+
+                string name3a = wildcardName;
+                if (wildcardFreq == null)
+                {
+                    if (!G.Chop_HasSigil(wildcardName)) name3a += Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                }
+                else
+                {
+                    name3a += Globals.freqIndicator + wildcardFreq;
+                }
+
+                List<string> matched = Search(name3a, allVariablesInBank);
+
+                foreach (string match in matched)
+                {
+                    varsMatched.Add(bankname + Globals.symbolBankColon + match);
+                }
             }
 
-            List<string> matched = Search(name3a, allVariablesInBank, true);
-
-            foreach (string match in matched)
-            {
-                varsMatched.Add(bankname + Globals.symbolBankColon + match);
-            }
+            varsMatched.Sort(StringComparer.OrdinalIgnoreCase);  //always sorting here because they stem from dict keys that are in random order
 
             return varsMatched;
         }
@@ -16290,7 +16348,7 @@ namespace Gekko
         {
             if (wildcardFreq == "*")
             {
-                G.Writeln2("Frequency '!*' not supported for ranges ('...')");
+                G.Writeln2("Frequency '!*' not supported for ranges ('..')");
                 throw new GekkoException();
             }
             if (wildcardFreq == null) wildcardFreq = G.GetFreq(Program.options.freq);
@@ -16309,23 +16367,28 @@ namespace Gekko
                         
             foreach (string s in allVariablesInBank)
             {
-                AddIfInRange(s, name1, name2, varsMatched);
+                string w = null;
+                if (!G.Chop_HasSigil(s)) w = wildcardFreq;
+                AddIfInRange(bankname, w, s, name1, name2, varsMatched);
             }
-            
+
+            varsMatched.Sort(StringComparer.OrdinalIgnoreCase);  //always sorting here because they stem from dict keys that are in random order
             return varsMatched;
         }
 
-        public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched, bool sort)
+        public static List<string> Search(string wild1, List<string> stringsThatCanBeMatched)
         {
             //Simple, can replace MatchWilcard() and similar methods, do a search on "IsMatch("
             //Sorted at the end
             List<string> inputs = new List<string>();
+
             Wildcard wc = new Wildcard(wild1, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             foreach (string n2 in stringsThatCanBeMatched)
             {
                 if (wc.IsMatch(n2)) inputs.Add(n2);
             }
-            if (sort) inputs.Sort(StringComparer.OrdinalIgnoreCase);
+
+            //if (sort) inputs.Sort(StringComparer.OrdinalIgnoreCase);
             return inputs;
         }
 

@@ -115,7 +115,7 @@ namespace Gekko
                         foreach (IVariable x in this.list)
                         {
                             string s = O.ConvertToString(x);
-                            Program.AddIfInRange(s, s1, s2, m);
+                            Program.AddIfInRange(null, null, s, s1, s2, m);
                         }
                         return new List(m);
                     }
@@ -147,7 +147,7 @@ namespace Gekko
                     {
                         //Wildcard: return a list of those
 
-                        List<string> found = Program.Search(s5, new List<string>(Program.GetListOfStringsFromListOfIvariables(this.list.ToArray())), false); //the list items are sorted, not like a dict
+                        List<string> found = Program.Search(s5, new List<string>(Program.GetListOfStringsFromListOfIvariables(this.list.ToArray()))); //the list items are sorted, not like a dict
 
                         //List<string> found = Program.MatchWildcard(s5, this.list, null);
                         return new List(found);

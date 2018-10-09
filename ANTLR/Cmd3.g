@@ -34,6 +34,7 @@ tokens {
 	ASTLOCAL;
 	ASTGLOBAL;
 	ASTIN;
+	ASTCURLYALONE;
 	ASTOBJECTFUNCTION;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
@@ -1948,6 +1949,7 @@ value:                      function //must be before varname
 					 	  | stringInQuotesWithCurlies
 						  | listFile						
 						  | leftBracketNoGlue wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
+						  | leftCurlyNoGlue wildRange RIGHTCURLY ->   ^(ASTBANKVARNAME ASTPLACEHOLDER ^(ASTVARNAME ASTPLACEHOLDER ^(ASTPLACEHOLDER ^(ASTNAME ^(ASTCURLY ^(ASTINDEXERALONE wildRange  )  ) ) )ASTPLACEHOLDER))
 						  | matrix
 						  | list
 						  | map						  
@@ -2291,6 +2293,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | timefilter           SEMICOLON!
 						  | truncate             SEMICOLON!
 						  | unlock_              SEMICOLON!
+						  | unfix                SEMICOLON!
 						  | write                SEMICOLON!	
 						  | x12a                 SEMICOLON!
 						  | xedit                SEMICOLON!					  
@@ -3121,6 +3124,12 @@ oneDate:                    expression;
 timefilter:                 TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, $TIMEFILTER.Line)} timefilterperiods);
 timefilterperiods:		    (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIMEFILTERPERIODS timefilterperiod+);
 timefilterperiod:           expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TIMEFILTER
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, $UNFIX.Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // WRITE and EXPORT

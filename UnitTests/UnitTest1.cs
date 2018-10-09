@@ -2851,11 +2851,25 @@ namespace UnitTests
 
                 if (i == 0)
                 {
+                    FAIL("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
+                    FAIL("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
+
+                    I("{%s2} = series(2);");
+                    I("{%s2}[%s1+'', 'k1'] = 1000;");                    
+                    I("y = 2000;");
+
                     I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
                     I("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
                 }
                 else
                 {
+                    FAIL("exo {%s2}[#a, #k1] <2002 2004>, y<2004 2006>;");
+                    FAIL("endo <2003 2005> x[#a, #k1]<2001 2002>, y;");
+
+                    I("{%s2} = series(2);");
+                    I("{%s2}[#a, #k1] = 1000;");
+                    I("y = 2000;");
+
                     I("exo {%s2}[#a, #k1] <2002 2004>, y<2004 2006>;");
                     I("endo <2003 2005> x[#a, #k1]<2001 2002>, y;");
                 }
@@ -8040,29 +8054,6 @@ namespace UnitTests
             _AssertScalarVal(First(), "%z", 101d);
             FAIL("VAL %z = {#a}[%i][2010] + 2;");  //fails because only a2 exists
 
-            // -------------------------------------------------
-
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
-                        
-            //#085234375
-            I("LIST #a = fxa, fxb, pcp, tg, pxqz;");
-            I("LIST #a1 = #a['fX*'];              //pattern in #a list");
-            I("LIST #a2 = #a['f?nz'];             //pattern in #a list");
-            I("LIST #a3 = #a['pxa'..'pxqz'];        //range in #a list");
-            I("LIST #a4 = ['fX*'];                //pattern in Work databank");
-            I("LIST #a5 = ['f?n'];                //pattern in Work databank");
-            I("LIST #a6 = ['pxa'..'pxqz'];          //range in Work databank");
-            I("LIST #a7 = ['*'];                  //all items in Work databank");
-
-            _AssertListSize(First(), "#a1", 2);
-            _AssertListSize(First(), "#a2", 0);
-            _AssertListSize(First(), "#a3", 1);
-            _AssertListSize(First(), "#a4", 30);
-            _AssertListSize(First(), "#a5", 4);
-            _AssertListSize(First(), "#a6", 42);
-            _AssertListSize(First(), "#a7", 8358);
             
             I("CREATE gdp3;");
             I("SERIES gdp3 = 100;");
@@ -10449,15 +10440,25 @@ namespace UnitTests
             _AssertListString(First(), "#m", new StringOrList("x1", "x2"));
             I("#m = ['*!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2"));
-            
+
+            I("#m = ['a'..'z'];");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x2"));
+            FAIL("#m = ['a!*'..'z!*'];");  //freq must be the same for ranges, could maybe implement !* at some point...
+            I("#m = ['a!a'..'z!a'];");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x2"));
+
             I("#m = ['*1'];");
             _AssertListString(First(), "#m", new StringOrList("x1"));
             I("#m = ['*1!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q"));
+            I("#m = ['a'..'x1'];");
+            _AssertListString(First(), "#m", new StringOrList("x1"));
 
             I("#m = ['%*'];");
             _AssertListString(First(), "#m", new StringOrList("%x1"));
             I("#m = ['#*'];");
+            _AssertListString(First(), "#m", new StringOrList("#m", "#x1"));
+            I("#m = ['#a'..'#z'];");
             _AssertListString(First(), "#m", new StringOrList("#m", "#x1"));
 
             // ------------------------------------------------
@@ -10466,8 +10467,13 @@ namespace UnitTests
 
             I("#m = ['b1:*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
+            FAIL("#m = ['b1:a'..'z'];");
+            FAIL("#m = ['b1:a'..'work:z'];");
+            I("#m = ['b1:a'..'b1:z'];");  //must be same bank both places
+            _AssertListString(First(), "#m", new StringOrList("b1:x3"));
             I("#m = ['b1:*!*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
+            FAIL("#m = ['b1:a!*'..'b1:z!*'];");
 
             I("#m = ['b1:*3'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
@@ -10478,6 +10484,8 @@ namespace UnitTests
             _AssertListString(First(), "#m", new StringOrList("b1:%x3"));
             I("#m = ['b1:#*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:#x3"));
+            I("#m = ['b1:#a'..'b1:#z'];");
+            _AssertListString(First(), "#m", new StringOrList("b1:#x3"));
 
             // ------------------------------------------------
             // all banks
@@ -10487,15 +10495,20 @@ namespace UnitTests
             _AssertListString(First(), "#m", new StringOrList("x1", "x2", "ref:x1", "b1:x3"));
             I("#m = ['*:*!*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q"));
+            I("#m = ['*:a'..'*:z'];");
+            _AssertListString(First(), "#m", new StringOrList("x1", "x2", "ref:x1", "b1:x3"));
 
             I("#m = ['*:*3'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3"));
             I("#m = ['*:*3!*'];");
             _AssertListString(First(), "#m", new StringOrList("b1:x3", "b1:x3!q"));
 
+
             I("#m = ['*:%*'];");
             _AssertListString(First(), "#m", new StringOrList("%x1", "ref:%x1", "b1:%x3"));
             I("#m = ['*:#*'];");
+            _AssertListString(First(), "#m", new StringOrList("#m", "#x1", "ref:#x1", "b1:#x3"));
+            I("#m = ['*:#a'..'*:#z'];");
             _AssertListString(First(), "#m", new StringOrList("#m", "#x1", "ref:#x1", "b1:#x3"));
 
             // ------------------------------------------------
@@ -10504,11 +10517,13 @@ namespace UnitTests
 
             I("#m = ['*:*!*'] + ['*:%*'] + ['*:#*'];");
             _AssertListString(First(), "#m", new StringOrList("x1", "x1!q", "x2", "ref:x1", "ref:x1!q", "b1:x3", "b1:x3!q", "%x1", "ref:%x1", "b1:%x3", "#m", "#x1", "ref:#x1", "b1:#x3"));
+            I("#m = ['*:**'];");
+            _AssertListString(First(), "#m", new StringOrList("#m", "#x1", "%x1", "x1", "x1!q", "x2", "ref:#x1", "ref:%x1", "ref:x1", "ref:x1!q", "b1:#x3", "b1:%x3", "b1:x3", "b1:x3!q"));
 
             // ------------------------------------------------
             // testing curly, returns list<var> not list<string>
             // ------------------------------------------------
-            
+
             I("#m = {'*:*3'};"); //b1:x3            
             I("<2001 2003> zz = #m[1];");
             _AssertSeries(First(), "zz", 2000, double.NaN, sharedDelta);
@@ -10516,6 +10531,61 @@ namespace UnitTests
             _AssertSeries(First(), "zz", 2002, 31d, sharedDelta);
             _AssertSeries(First(), "zz", 2003, 31d, sharedDelta);
             _AssertSeries(First(), "zz", 2004, double.NaN, sharedDelta);
+
+            I("#m = {['*:*3']};"); //b1:x3            
+            I("<2001 2003> zz = #m[1];");
+            _AssertSeries(First(), "zz", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "zz", 2001, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2002, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2003, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2004, double.NaN, sharedDelta);
+
+            I("#m = {'*:x3'..'*:x4'};"); //b1:x3            
+            I("<2001 2003> zz = #m[1];");
+            _AssertSeries(First(), "zz", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "zz", 2001, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2002, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2003, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2004, double.NaN, sharedDelta);
+
+            I("#m = {['*:x3'..'*:x3']};"); //b1:x3            
+            I("<2001 2003> zz = #m[1];");
+            _AssertSeries(First(), "zz", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "zz", 2001, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2002, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2003, 31d, sharedDelta);
+            _AssertSeries(First(), "zz", 2004, double.NaN, sharedDelta);
+
+            // ----------
+
+            I("#m = {['*:*!*'] + ['*:%*'] + ['*:#*']};");
+            _AssertListSize(First(), "#m", 14 + 1);  //includes zz variable
+
+            // -------------------------------------------------
+            // --------------- testing on a databank ---------------
+            // -------------------------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+                        
+            I("LIST #a = fxa, fxb, pcp, tg, pxqz;");
+            I("LIST #a1 = #a['fX*'];              //pattern in #a list");
+            I("LIST #a2 = #a['f?nz'];             //pattern in #a list");
+            I("LIST #a3 = #a['pxa'..'pxqz'];      //range in #a list");
+            I("LIST #a4 = ['fX*'];                //pattern in Work databank");
+            I("LIST #a5 = ['f?n'];                //pattern in Work databank");
+            I("LIST #a6 = ['pxa'..'pxqz'];        //range in Work databank");
+            I("LIST #a7 = ['*'];                  //all annual series in Work databank");
+
+            _AssertListSize(First(), "#a1", 2);
+            _AssertListSize(First(), "#a2", 0);
+            _AssertListSize(First(), "#a3", 1);
+            _AssertListSize(First(), "#a4", 30);
+            _AssertListSize(First(), "#a5", 4);
+            _AssertListSize(First(), "#a6", 42);
+            _AssertListSize(First(), "#a7", 8358);
+            
         }
 
         [TestMethod]
