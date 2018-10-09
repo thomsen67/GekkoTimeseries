@@ -179,7 +179,8 @@ namespace Gekko
         public const string first_name = "first";
         public const string local_name = "local";
         public const string global_name = "global";
-        public const string symbolBankName = "@";
+
+        public const string symbolRefShortcut = "@";
 
         public const string printCode_n = "n";        
         public const string printCode_p = "p";

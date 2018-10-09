@@ -2067,26 +2067,25 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 
 
 
-listItemsWildRange        : listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
+listItemsWildRange:         listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
 
-listItemWildRange         : wildcardWithBank ->                        wildcardWithBank
-						  | rangeWithBank ->                           rangeWithBank							 
+listItemWildRange:          rangeWithBank ->                           rangeWithBank							 
+						  | wildcardWithBank ->                        wildcardWithBank
 						  | expression ->						       expression
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 
 varnameOrWildcard:           wildcard | varname	;
 
-wildcardWithBank:           varnameOrWildcard COLON varnameOrWildcard -> ^(ASTWILDCARDWITHBANK varnameOrWildcard varnameOrWildcard)						  
+wildcardWithBank:           AT GLUE varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTNAME ^(ASTIDENT REF)) varnameOrWildcard)						  
+                          | varnameOrWildcard COLON varnameOrWildcard -> ^(ASTWILDCARDWITHBANK varnameOrWildcard varnameOrWildcard)						  
 						  | varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) varnameOrWildcard)
 						  ;
 
-rangeWithBank             : name COLON range -> ^(ASTRANGEWITHBANK ^(ASTBANK name) range)
-						  //| AT GLUE range -> ^(ASTRANGEWITHBANK ^(ASTBANK ASTAT) range)
-						  | range -> ^(ASTRANGEWITHBANK ^(ASTBANK) range)
+rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)
 						  ;
 
-range                     : name doubleDot name -> name name;
+range                     : wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
 
 wildcard:                   wildcard2 -> ^(ASTWILDCARD wildcard2);
 

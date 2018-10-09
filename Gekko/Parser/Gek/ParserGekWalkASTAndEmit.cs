@@ -3431,13 +3431,11 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.RangeGeneral(" + node[0].Code + ", " + node[1].Code + ")");
                         }
-                        break;
-                    case "ASTRANGEWITHBANK":
-                    case "ASTWILDCARDWITHBANK":
-                    case "ASTLISTITEMWILDRANGE": //can be deleted, does not exist anymore
+                        break;                    
+                    case "ASTWILDCARDWITHBANK":                    
                         {
                             string bankCs = node[0].Code.ToString();
-                            if (node.ChildrenCount() == 2)
+                            if (true)
                             {
                                 //wildcard   
                                 if (bankCs == null || bankCs == "")
@@ -3450,18 +3448,15 @@ namespace Gekko.Parser.Gek
                                 }
 
                             }
-                            else
+                                                        
+                        }
+                        break;
+                    case "ASTRANGEWITHBANK":
+                        {
+                            if (true)
                             {
-                                if (bankCs == null)
-                                {
-                                    node.Code.CA("(" + node[1].Code + ").Add(smpl, new ScalarString(\"..\")).Add(smpl, " + node[2].Code + ")");
-                                }
-                                else
-                                {
-                                    //range
-                                    node.Code.CA("(" + bankCs + ").Add(smpl, new ScalarString(\":\")).Add(smpl, " + node[1].Code + ").Add(smpl, new ScalarString(\"..\")).Add(smpl, " + node[2].Code + ")");
-                                }
-                            }                            
+                                node.Code.CA("(" + node[0].Code + ").Add(smpl, new ScalarString(\"..\")).Add(smpl, " + node[1].Code + ")");
+                            }
                         }
                         break;
                     case "ASTLISTITEMWILDRANGEBANK":
@@ -3773,7 +3768,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.Text == "ASTWILDCARDWITHBANK")
+                                if (child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK")
                                 {
                                     name = child.Code.ToString();
                                 }

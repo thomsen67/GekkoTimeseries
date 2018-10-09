@@ -578,6 +578,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Compare()
         {
+            I("reset;");
             I("time 2001 2002;");
             I("yy = series(1);");
             I("yy[i] = (1000, 1000);");
@@ -5105,7 +5106,7 @@ namespace UnitTests
         // --------------------------------------------------------------------------------
         
         [TestMethod]
-        public void _Test__Gekko20()
+        public void _Test_Gekko20()
         {
             I("FOR i = a, b, c; END;");
             I("FOR val v = 0 to 10 by 2; END;");
@@ -6167,7 +6168,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__BankSyntaxLogic()
+        public void _Test_BankSyntaxLogic()
         {
             //COPY: (the following should work for LIST command, too, excluding the stand-alone wildcards a*b and a..b)
             //------------------------------
@@ -6188,13 +6189,15 @@ namespace UnitTests
 
             //It is also possible to use scalar strings, for instance PRT %b:%ts
 
-            I("RESET;");
-            I("CREATE fa, fb, fc;");
+            I("RESET; mode data;");
+            //I("CREATE fa, fb, fc;");
+            I("#m = fa, fb, fc;");
+            I("{#m} = 1;");
             I("CLONE;");
-            I("list m = fa,fc;");
-            I("string s = 'fb';");
-            I("string b = 'ref';");
-            I("string ba = 'ref:fa';");
+            I("list #m = fa,fc;");
+            I("string %s = 'fb';");
+            I("string %b = 'ref';");
+            I("string %ba = 'ref:fa';");
 
 
             //================================ PRT start ==========================================
@@ -6202,47 +6205,48 @@ namespace UnitTests
             I("PRT fa;");
             I("PRT {%s};");
             I("PRT #m;");
-            I("PRT [f*];");
-            I("PRT [fa..fc];");
+            I("PRT ['f*'];");
+            I("PRT ['fa'..'fc'];");
             //---
             I("PRT #m[1];");
-            I("PRT [f*][1];");
-            I("PRT [fa..fc][1];");
+            I("PRT ['f*'][1];");
+            I("PRT ['fa'..'fc'][1];");
             //----------------------------
             I("PRT @fa;");
             I("PRT @{%s};");
             I("PRT @#m;");
-            //I("PRT @[f*];");
-            //I("PRT @[fa..fc];");
+            I("PRT ['ref:f*'];");
+            I("PRT ['ref:fa'..'ref:fc'];");
             //---
             I("PRT @#m[1];");
-            //I("PRT @[f*][1];");
-            //I("PRT @[fa..fc][1];");
+            I("PRT ['ref:f*'][1];");
+            I("PRT ['ref:fa'..'ref:fc'][1];");
             //----------------------------
             I("PRT ref:fa;");
             I("PRT ref:{%s};");
             I("PRT ref:#m;");
-            //I("PRT ref:[f*];");
-            //I("PRT ref:[fa..fc];");
+            I("PRT ['ref:f*'];");
+            I("PRT ['ref:fa'..'ref:fc'];");
             //---
             I("PRT ref:#m[1];");
-            //I("PRT ref:[f*][1];");
-            //I("PRT ref:[fa..fc][1];");
+            I("PRT ['ref:f*'][1];");
+            I("PRT ['ref:fa'..'ref:fc'][1];");
             //----------------------------
             I("PRT {%b}:fa;");
             I("PRT {%b}:{%s};");
             I("PRT {%b}:#m;");
-            //I("PRT {%b}:[f*];");
-            //I("PRT {%b}:[fa..fc];");
+            I("PRT ['{%b}:f*'];");
+            I("PRT ['{%b}:fa'..'{%b}:fc'];");
             //---
             I("PRT {%b}:#m[1];");
-            //I("PRT {%b}:[f*][1];");
-            //I("PRT {%b}:[fa..fc][1];");
+            I("PRT ['{%b}:f*'][1];");
+            I("PRT ['{%b}:fa'..'{%b}:fc'][1];");
             //----------------------------
 
-            I("PRT %b:%s;");
-            I("PRT %b:{%s};");
-            I("PRT {%b}:%s;");
+            FAIL("PRT %b:%s;");
+            FAIL("PRT %b:{%s};");
+            FAIL("PRT {%b}:%s;");  //%s is not in that bank
+            I("PRT {%b}:{%s};");
 
             //================================ PRT end ==========================================
 
@@ -6255,38 +6259,39 @@ namespace UnitTests
             I("COPY #m TO ref:*;");
             I("COPY f* TO ref:*;");
             I("COPY fa..fc TO ref:*;");
-            I("COPY [f*] TO ref:*;");
-            I("COPY [fa..fc] TO ref:*;");
+            I("COPY {'f*'} TO ref:*;");
+            I("COPY {'fa'..'fc'} TO ref:*;");
             //---
-            I("COPY #m[1] TO ref:*;");
+            I("COPY {#m[1]} TO ref:*;");
             //I("COPY f*[1];");                =====> NO GOOD, do not allow
             //I("COPY fa..fc[1];");            =====> NO GOOD, do not allow
-            I("COPY [f*][1] TO ref:*;");
-            I("COPY [fa..fc][1] TO ref:*;");
+            I("COPY {['f*'][1]} TO ref:*;");
+            I("COPY {['fa'..'fc'][1]} TO ref:*;");
             //----------------------------
             I("COPY @fa TO work:*;");
             I("COPY @{%s} TO work:*;");
             I("COPY @#m TO work:*;");
             I("COPY @f* TO work:*;");
-            I("COPY @fa..fc TO work:*;");
-            //I("COPY @[f*];");
-            //I("COPY @[fa..fc];");
+            I("COPY @fa..@fc TO work:*;");
+            I("COPY {'ref:f*'};");
+            I("COPY {'ref:fa'..'ref:fc'};");
+            I("COPY {'@f*'};");
+            I("COPY {'@fa'..'@fc'};");
             //---
-            I("COPY @#m[1] TO work:*;");
-            //I("COPY @f*[1];");                =====> NO GOOD, do not allow
-            //I("COPY @fa..fc[1];");            =====> NO GOOD, do not allow
-            //I("COPY @[f*][1];");
-            //I("COPY @[fa..fc][1];");
+            I("COPY @{#m[1]} TO work:*;");
+            I("COPY {['@f*'][1]};");     //           =====> NO GOOD, do not allow
+            I("COPY {['@fa..@fc'][1]};"); //           =====> NO GOOD, do not allow
+            
             //----------------------------
             I("COPY ref:fa TO work:*;");
             I("COPY ref:{%s} TO work:*;");
             I("COPY ref:#m TO work:*;");
             I("COPY ref:f* TO work:*;");
-            I("COPY ref:fa..fc TO work:*;");
-            //I("COPY ref:[f*];");
-            //I("COPY ref:[fa..fc];");
+            I("COPY ref:fa..ref:fc TO work:*;");
+            I("COPY {'ref:f*'};");
+            I("COPY {'ref:fa'..'ref:fc'};");
             //---
-            I("COPY ref:#m[1] TO work:*;");
+            I("COPY ref:{#m[1]} TO work:*;");
             //I("COPY ref:f*[1];");                =====> NO GOOD, do not allow
             //I("COPY ref:fa..fc[1];");            =====> NO GOOD, do not allow
             //I("COPY ref:[f*][1];");
@@ -6296,11 +6301,11 @@ namespace UnitTests
             I("COPY {%b}:{%s} TO work:*;");
             I("COPY {%b}:#m TO work:*;");
             I("COPY {%b}:f* TO work:*;");
-            I("COPY {%b}:fa..fc TO work:*;");
-            //I("COPY {%b}:[f*];");
-            //I("COPY {%b}:[fa..fc];");
+            I("COPY {%b}:fa..{%b}:fc TO work:*;");
+            I("COPY {'{%b}:f*'};");
+            I("COPY {'{%b}:fa'..'{%b}:fc'};");
             //---
-            I("COPY {%b}:#m[1] TO work:*;");
+            I("COPY {%b}:{#m[1]} TO work:*;");
             //I("COPY {%b}:f*[1];");                =====> NO GOOD, do not allow
             //I("COPY {%b}:fa..fc[1];");            =====> NO GOOD, do not allow
             //I("COPY {%b}:[f*][1];");
@@ -6309,8 +6314,11 @@ namespace UnitTests
             //
             //
             //
-            I("COPY %ba TO work:*;"); //string with bank
+            I("COPY %ba TO ref:*;"); //string with bank
             I("COPY %s TO ref:*;"); //string without bank
+
+            I("COPY {%ba} TO work:*;"); //string with bank
+            I("COPY {%s} TO ref:*;"); //string without bank
             //================================ COPY end ==========================================
 
 
@@ -8096,7 +8104,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Ini()
+        public void _Test_Ini()
         {
             I("RESET;");
             I("INI;");
@@ -8764,7 +8772,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Tell()
+        public void _Test_Tell()
         {
             I("RESET;");
             I("TELL<nocr>'hel'+'lo1';");
@@ -9243,7 +9251,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Hdg()
+        public void _Test_Hdg()
         {
             //Does not test the result of a simulation, only the commands
             I("RESET;");
@@ -10258,7 +10266,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Cls()
+        public void _Test_Cls()
         {
             I("CLS;");  //hard to check result of this here... never mind.
         }
@@ -10589,7 +10597,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Clear()
+        public void _Test_Clear()
         {
             //do a better test where banks are OPENed
 
@@ -10622,13 +10630,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Restart()
+        public void _Test_Restart()
         {
             I("RESTART;");
         }
 
         [TestMethod]
-        public void _Test__Reset()
+        public void _Test_Reset()
         {
             I("RESET;");
         }
@@ -12141,7 +12149,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Random()
+        public void _Test_Random()
         {            
             I("RESET;");
             I("MATRIX #mean = [10; 11];");
@@ -12465,7 +12473,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__Time()
+        public void _Test_Time()
         {
             //
             // Testing TIME            
@@ -12710,7 +12718,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__PipeAndTell()
+        public void _Test_PipeAndTell()
         {
             //
             // Testing of PIPE, PIPE<append>, PIPE<html>
@@ -16900,7 +16908,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__RAMLargeAware()
+        public void _Test_RAMLargeAware()
         {
             //Tests the version deployed
             //

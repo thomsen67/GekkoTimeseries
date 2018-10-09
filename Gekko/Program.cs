@@ -15921,6 +15921,9 @@ namespace Gekko
                     //['b2:ab'..'b2:f']
                     //['ab!q'..'f!q']
 
+                    if (ss[0].StartsWith(Globals.symbolRefShortcut)) ss[0] = "ref:" + ss[0].Substring(1);
+                    if (ss[1].StartsWith(Globals.symbolRefShortcut)) ss[1] = "ref:" + ss[1].Substring(1);
+
                     string bankLhs1, nameLhs1, freqLhs1; string[] indexLhs1;
                     O.Chop(ss[0], out bankLhs1, out nameLhs1, out freqLhs1, out indexLhs1);
 
@@ -15957,8 +15960,10 @@ namespace Gekko
 
                 }
                 else
-                {                    
-                    O.Chop(wildCardLhs, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
+                {
+                    string sss = wildCardLhs;
+                    if (sss.StartsWith(Globals.symbolRefShortcut)) sss = "ref:" + sss.Substring(1);
+                    O.Chop(sss, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
                 }
 
                 //Now we have bankLhs and freqLhs (indexLhs does not work...)
