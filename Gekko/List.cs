@@ -287,6 +287,34 @@ namespace Gekko
 
         public IVariable Add(GekkoSmpl smpl, IVariable x)
         {
+            switch (x.Type())
+            {
+                case EVariableType.List:
+                    {
+                        return Functions.extend(smpl, this, x);
+                    }
+                    break;
+                case EVariableType.String:
+                case EVariableType.Val:
+                case EVariableType.Date:
+                    {
+                        // #m + %s
+                        //This corresponds somewhat to "broadcasting" in numpy
+                        //Also a bit similar to x + %v, where %v is a value.
+                        //We add scalar x to each element of list ths
+                        //This turns up in names like {#m + '!q'} or {#m}!q.
+                        //See also #786592387654
+                        return Operators.ScalarList.Add(smpl, x, this, true);  //note: swapping
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Add to list not allowed for this type: " + G.GetTypeString(x));
+                        throw new GekkoException();
+                    }
+                    break;
+            }
+
             return Functions.extend(smpl, this, x);
         }
 

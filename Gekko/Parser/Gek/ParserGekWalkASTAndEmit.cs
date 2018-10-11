@@ -3776,13 +3776,13 @@ namespace Gekko.Parser.Gek
                                 {                                    
                                     if (child.AlternativeCode == null)
                                     {
-                                        G.Writeln2("*** ERROR #64537346");
+                                        G.Writeln2("*** ERROR: String used where name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }
                                     name = child.AlternativeCode.ToString();
                                     if (name == null || name == "")
                                     {
-                                        G.Writeln2("*** ERROR #64537346");
+                                        G.Writeln2("*** ERROR: String used where name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }                                    
                                 }

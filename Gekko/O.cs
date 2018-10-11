@@ -2527,7 +2527,10 @@ namespace Gekko
                             //---------------------------------------------------------
                             if (type == EVariableType.Matrix || type == EVariableType.Var)
                             {
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
+                                Matrix m = rhs.DeepClone(null) as Matrix;
+                                if (options.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_colnames).ToArray()));
+                                if (options.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_rownames).ToArray()));                                
+                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                             }
                             else
@@ -7086,7 +7089,8 @@ namespace Gekko
             public string opt_q = null;
             public string opt_mp = null;            
             public string opt_keep = null;
-            
+            public IVariable opt_rownames = null;
+            public IVariable opt_colnames = null;
         }
 
         public class Accept

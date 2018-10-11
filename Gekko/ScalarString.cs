@@ -462,7 +462,10 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        return Operators.StringList.Add(this, (List)x, false);
+                        //This is only allowed for string scalar, for instance:
+                        // %s + #m. Like this, we can use {'b:' + #m} or b:{#m} to compose.
+                        //See also #786592387654
+                        return Operators.ScalarList.Add(t, this, x, false);
                     }                    
                 case EVariableType.Series:
                     {

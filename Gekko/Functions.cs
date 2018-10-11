@@ -1274,18 +1274,23 @@ namespace Gekko
             }
             return m;
         }
-        
+
+        public static IVariable unpack(GekkoSmpl smpl, IVariable x)
+        {
+            return unpack(smpl, null, null, x);
+        }
+
         //Converts matrix to timeseries
-        public static IVariable unpack(GekkoSmpl smpl, GekkoTime t1, GekkoTime t2, IVariable x)
+        public static IVariable unpack(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable x)
         {            
             //from matrix to timeseries
             //smpl is not used
             GekkoTime gt1 = Globals.globalPeriodStart;
             GekkoTime gt2 = Globals.globalPeriodEnd;
-            if(!t1.IsNull())
+            if (t1 != null)
             {
-                gt1 = t1;
-                gt2 = t2;
+                gt1 = O.ConvertToDate(t1);
+                gt2 = O.ConvertToDate(t2);
             }
 
             int obs = GekkoTime.Observations(gt1, gt2);
@@ -2942,12 +2947,7 @@ namespace Gekko
                 List x_list = x as List;                
                 temp = temp.DeepClone(null) as List;
                 temp.list.AddRange(x_list.list);
-            }
-            else if(x.Type() == EVariableType.Val || x.Type() == EVariableType.Date || x.Type() == EVariableType.String)
-            {                
-                temp = temp.DeepClone(null) as List;
-                temp.list.Add(x);
-            }
+            }            
             else
             {                
                 FunctionError("extend", x);

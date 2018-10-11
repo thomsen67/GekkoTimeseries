@@ -77,6 +77,42 @@ namespace Gekko
             }
         }
 
+        public static class ScalarList
+        {
+            public static IVariable Add(GekkoSmpl smpl, IVariable scalar, IVariable list, bool swap)
+            {
+                List<IVariable> newList = new List<IVariable>();
+                List<IVariable> l = O.ConvertToList(list);
+                foreach (IVariable iv in l)
+                {
+                    IVariable temp = null;
+                    if (swap)
+                    {
+                        temp = iv.Add(smpl, scalar);
+                    }
+                    else
+                    {
+                        temp = scalar.Add(smpl, iv);
+                    }
+                    newList.Add(temp);
+                }
+
+                //List<string> m = O.GetStringList(l);
+                //List<string> newList = new List<string>();
+                //if (!swap)
+                //{
+                //    newList.Add(s.string2);
+                //    newList.AddRange(m);
+                //}
+                //else
+                //{
+                //    newList.AddRange(m);
+                //    newList.Add(s.string2);
+                //}
+                return new List(newList);
+            }
+        }
+
         public static class StringList
         {
             public static IVariable Add(ScalarString s, List l, bool swap)

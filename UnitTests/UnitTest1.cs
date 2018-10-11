@@ -1279,53 +1279,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, 100d, sharedDelta);
             _AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
         }
-
-        [TestMethod]
-        public void _Test_Matrix()
-        {
-            //I("time 2001 2003; xx = [1; 2; 3];");
-            //AssertHelper(First(), "xx", 2000, double.NaN, sharedDelta);
-            //AssertHelper(First(), "xx", 2001, 1d, sharedDelta);
-            //AssertHelper(First(), "xx", 2002, 2d, sharedDelta);
-            //AssertHelper(First(), "xx", 2003, 3d, sharedDelta);
-            //AssertHelper(First(), "xx", 2004, double.NaN, sharedDelta);
-
-            I("RESET; TIME 2001 2005;");
-            I("xx1 = (1, 2, 3, 4, 5);");
-            I("#m = xx1;");  //autoconverted into matrix    WHY???
-            _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
-
-            I("#m = [1, 2; 3, 4];");
-            _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
-
-            I("#m[1..2] = [100; 200];");
-            _AssertMatrix(First(), "#m", 1, 1, 100d, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 1, 200d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
-
-            I("#m = [1, 2; 3, 4];");
-            I("#m[1..2, 1] = #m[1..2, 2];");
-            _AssertMatrix(First(), "#m", 1, 1, 2d, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 1, 4d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
-
-            I("#m = [1; 2; 3];");
-            I("#m[2..3] = [20; 30];");
-            _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
-            _AssertMatrix(First(), "#m", 2, 1, 20d, sharedDelta);
-            _AssertMatrix(First(), "#m", 3, 1, 30d, sharedDelta);
-
-
-        }
+        
 
         [TestMethod]
         public void _Test_Timeless()
@@ -4240,7 +4194,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Copy()
+        public void _Test_Copy1()
         {
             //See also Test_CopyLogic(), where banks, wildcards, <tobank> and <frombank> are tested
             //Here, objects are actually copied
@@ -5663,15 +5617,15 @@ namespace UnitTests
             I("ser x3 = 7,5,4,1,6,5,9,7,8,9;");
             I("analyze x1,x2,x3;");
             double d = 0.00000001;  //very precise!
-            AssertHelperMatrix("corr", 1, 1, 1d, d);
-            AssertHelperMatrix("corr", 1, 2, 0.21295885d, d);
-            AssertHelperMatrix("corr", 1, 3, 0.31237800d, d);
-            AssertHelperMatrix("corr", 2, 1, 0.21295885d, d);
-            AssertHelperMatrix("corr", 2, 2, 1d, d);
-            AssertHelperMatrix("corr", 2, 3, 0.30733932d, d);
-            AssertHelperMatrix("corr", 3, 1, 0.31237800d, d);
-            AssertHelperMatrix("corr", 3, 2, 0.30733932d, d);
-            AssertHelperMatrix("corr", 3, 3, 1d, d);
+            _AssertMatrix(First(), "corr", 1, 1, 1d, d);
+            _AssertMatrix(First(), "corr", 1, 2, 0.21295885d, d);
+            _AssertMatrix(First(), "corr", 1, 3, 0.31237800d, d);
+            _AssertMatrix(First(), "corr", 2, 1, 0.21295885d, d);
+            _AssertMatrix(First(), "corr", 2, 2, 1d, d);
+            _AssertMatrix(First(), "corr", 2, 3, 0.30733932d, d);
+            _AssertMatrix(First(), "corr", 3, 1, 0.31237800d, d);
+            _AssertMatrix(First(), "corr", 3, 2, 0.30733932d, d);
+            _AssertMatrix(First(), "corr", 3, 3, 1d, d);
                         
             I("reset;");
             I("option freq q;");
@@ -5681,15 +5635,15 @@ namespace UnitTests
             I("ser x2 = 5,4,4,5,6,3,6,1,8,6;");
             I("ser x3 = 7,5,4,1,6,5,9,7,8,9;");
             I("analyze x1,x2,x3;");            
-            AssertHelperMatrix("corr", 1, 1, 1d, d);
-            AssertHelperMatrix("corr", 1, 2, 0.21295885d, d);
-            AssertHelperMatrix("corr", 1, 3, 0.31237800d, d);
-            AssertHelperMatrix("corr", 2, 1, 0.21295885d, d);
-            AssertHelperMatrix("corr", 2, 2, 1d, d);
-            AssertHelperMatrix("corr", 2, 3, 0.30733932d, d);
-            AssertHelperMatrix("corr", 3, 1, 0.31237800d, d);
-            AssertHelperMatrix("corr", 3, 2, 0.30733932d, d);
-            AssertHelperMatrix("corr", 3, 3, 1d, d);
+            _AssertMatrix(First(), "corr", 1, 1, 1d, d);
+            _AssertMatrix(First(), "corr", 1, 2, 0.21295885d, d);
+            _AssertMatrix(First(), "corr", 1, 3, 0.31237800d, d);
+            _AssertMatrix(First(), "corr", 2, 1, 0.21295885d, d);
+            _AssertMatrix(First(), "corr", 2, 2, 1d, d);
+            _AssertMatrix(First(), "corr", 2, 3, 0.30733932d, d);
+            _AssertMatrix(First(), "corr", 3, 1, 0.31237800d, d);
+            _AssertMatrix(First(), "corr", 3, 2, 0.30733932d, d);
+            _AssertMatrix(First(), "corr", 3, 3, 1d, d);
         }
 
            
@@ -6707,7 +6661,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Copy()
+        public void _Test_Copy2()
         {           
 
             //TODO: quarters and months
@@ -6721,23 +6675,24 @@ namespace UnitTests
             Databank bank2 = null;
             Databank work = null;
             Databank base2 = null;
+            
 
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             if (true)
             {
                 //we test this once
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             // ======================================================
@@ -6747,147 +6702,169 @@ namespace UnitTests
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...>
+            //    Testing <frombank=...> and <tobank=...>
             // -------------------------------------------------
             I("UNLOCK bank2;");
-            I("COPY <from=bank1 to=bank2> a1 TO a2;");
+            I("COPY <frombank=bank1 tobank=bank2> a1 TO a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);  //from here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 101, sharedDelta); //to here
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);  //from here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 101, sharedDelta); //to here
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...> where these are overridden with explicit banks
+            //    Testing <frombank=...> and <tobank=...> where these are overridden with explicit banks
             // -------------------------------------------------
             I("UNLOCK bank1;");
-            I("COPY <from=bank1 to=bank2> bank2:a1 TO bank1:a2;");
+            I("COPY <frombank=bank1 tobank=bank2> bank2:a1 TO bank1:a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...> where these are overridden with explicit banks
+            //    Testing <frombank=...> and <tobank=...> where these are overridden with explicit banks
             //    Here we use placeholder after TO
             // -------------------------------------------------
             I("UNLOCK bank2;");
             I("UNLOCK bank1;");
-            I("COPY <from=bank1 to=bank2> bank2:a1 TO bank1:*;");
+            I("COPY <frombank=bank1 tobank=bank2> bank2:a1 TO bank1:*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...> where these are overridden with explicit banks
+            //    Testing <frombank=...> and <tobank=...> where these are overridden with explicit banks
             //    Here we use wildcard before TO and placeholder after TO
             // -------------------------------------------------
             I("UNLOCK bank1;");
             I("UNLOCK bank2;");
-            I("COPY <from=bank1 to=bank2> bank2:a* TO bank1:*;");
+            I("COPY <frombank=bank1 tobank=bank2> bank2:a* TO bank1:*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta); //from here
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta); //from here
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...> where these are overridden with explicit banks
+            //    Testing <frombank=...> and <tobank=...> where these are overridden with explicit banks
             //    Here we use range before TO and placeholder after TO
             // -------------------------------------------------
             I("UNLOCK bank2;");
             I("UNLOCK bank1;");
-            I("COPY <from=bank1 to=bank2> bank2:a2..a3 TO bank1:*;");
+            I("COPY <frombank=bank1 tobank=bank2> bank2:a2..bank2:a3 TO bank1:*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta); //from here
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta); //from here
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
             //Includes RESET
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             // -------------------------------------------------
-            //    Testing <from=...> and <to=...> where these are overridden with explicit banks
+            //    Testing <frombank=...> and <tobank=...> where these are overridden with explicit banks
             //    Here we use lists
             // -------------------------------------------------
             I("UNLOCK bank1;");
             I("UNLOCK bank2;");
-            I("COPY <from=bank1 to=bank2> bank2:#m TO bank1:#m;");
+            I("COPY <frombank=bank1 tobank=bank2> bank2:{#m} TO bank1:{#m};");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
+            }
+
+            //Includes RESET
+            Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
+            //Same as above, just using .addbank() instead
+            I("UNLOCK bank1;");
+            I("UNLOCK bank2;");
+            I("COPY <frombank=bank1 tobank=bank2> {#m.addbank('bank2')} TO {#m.addbank('bank1')};");
+            if (true)
+            {
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
 
@@ -6903,18 +6880,18 @@ namespace UnitTests
             I("COPY a1 TO a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);  //from here
-                AssertHelper(First(), "a2", 2010, -101, sharedDelta);  //to here
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);  //from here
+                _AssertSeries(First(), "a2", 2010, -101, sharedDelta);  //to here
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -6926,18 +6903,18 @@ namespace UnitTests
             I("COPY bank2:a1 TO bank1:a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -6949,18 +6926,18 @@ namespace UnitTests
             I("COPY bank2:a1 TO bank1:*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -6973,18 +6950,18 @@ namespace UnitTests
 
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta); //from here
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta); //from here
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
             //Includes RESET
@@ -6993,21 +6970,21 @@ namespace UnitTests
             //    Here we use range before TO and placeholder after TO
             // -------------------------------------------------
             I("UNLOCK bank1;");
-            I("COPY bank2:a2..a3 TO bank1:*;");
+            I("COPY bank2:a2..bank2:a3 TO bank1:*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 202, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta); //from here
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta); //from here
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
             //Includes RESET
@@ -7016,21 +6993,21 @@ namespace UnitTests
             //    Here we use lists
             // -------------------------------------------------
             I("UNLOCK bank1;");
-            I("COPY bank2:#m TO bank1:#m;");
+            I("COPY bank2:{#m} TO bank1:{#m};");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta); //from here
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta); //from here
             }
 
 
@@ -7046,18 +7023,18 @@ namespace UnitTests
             I("COPY @a1 TO @a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -201, sharedDelta); //to here
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -201, sharedDelta); //to here
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -7069,18 +7046,18 @@ namespace UnitTests
             I("COPY @a1 TO bank1:a2;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);  //from here
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, -201, sharedDelta); //to here
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);  //from here
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, -201, sharedDelta); //to here
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -7091,18 +7068,18 @@ namespace UnitTests
             I("COPY bank2:a1 TO @*;");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, 201, sharedDelta); //to here
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta); //from here
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta); //from here
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //Includes RESET
@@ -7111,21 +7088,21 @@ namespace UnitTests
             //    Another variant
             // -------------------------------------------------
             I("UNLOCK bank1;");
-            I("COPY @#m TO bank1:#m;");
+            I("COPY @{#m} TO bank1:{#m};");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -101, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta); //from here
-                AssertHelper(bank1, "a1", 2010, -201, sharedDelta); //to here
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, -203, sharedDelta); //to here
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta); //from here
+                _AssertSeries(bank1, "a1", 2010, -201, sharedDelta); //to here
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, -203, sharedDelta); //to here
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
 
@@ -7139,23 +7116,23 @@ namespace UnitTests
             //    Expressions
             //    it even seems you can put a bank: before the stuff after TO here
             // -------------------------------------------------
-            I("STRING s1 = 'r';");
-            I("STRING s2 = 'ef:a1';");
-            I("COPY %s1+%s2 TO #m[1]+'';");
+            I("STRING %s1 = 'r';");
+            I("STRING %s2 = 'ef:a1';");
+            I("COPY {%s1+%s2} TO {#m[1]+''};");
             if (true)
             {
-                AssertHelper(First(), "a1", 2010, -201, sharedDelta);
-                AssertHelper(First(), "a2", 2010, -102, sharedDelta);
-                AssertHelper(First(), "a3", 2010, -103, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                AssertHelper(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
-                AssertHelper(bank1, "a1", 2010, 101, sharedDelta);
-                AssertHelper(bank1, "a2", 2010, 102, sharedDelta);
-                AssertHelper(bank1, "a3", 2010, 103, sharedDelta);
-                AssertHelper(bank2, "a1", 2010, 201, sharedDelta);
-                AssertHelper(bank2, "a2", 2010, 202, sharedDelta);
-                AssertHelper(bank2, "a3", 2010, 203, sharedDelta);
+                _AssertSeries(First(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
+                _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
+                _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
+                _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
+                _AssertSeries(bank2, "a1", 2010, 201, sharedDelta);
+                _AssertSeries(bank2, "a2", 2010, 202, sharedDelta);
+                _AssertSeries(bank2, "a3", 2010, 203, sharedDelta);
             }
 
             //======================== COPY ============================================
@@ -7171,62 +7148,62 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1;");
-            I("SERIES a1 = 111 112;");
+            I("SERIES a1 = (111, 112);");
             I("COPY a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("COPY a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2010, 222d, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, 222d, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, double.NaN, sharedDelta);
 
             //-----does exist beforehand
 
             //one item
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, b1;");
-            I("SERIES a1 = 111 112;");
+            //I("create a1, b1;");
+            I("SERIES a1 = (111, 112);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("COPY a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, a2, b1, b2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            //I("create a1, a2, b1, b2;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("SERIES b2 = 888;");
             I("COPY a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2010, 222d, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, 222d, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, double.NaN, sharedDelta);
 
             //=====with respect <>
 
@@ -7236,62 +7213,62 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1;");
-            I("SERIES a1 = 111 112;");
+            I("SERIES a1 = (111, 112);");
             I("COPY<2011 2011 respect> a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            //I("create a1, a2;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, double.NaN, sharedDelta);
 
             //-----does exist beforehand
 
             //one item
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, b1;");
-            I("SERIES a1 = 111 112;");
+            //I("create a1, b1;");
+            I("SERIES a1 = (111, 112);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("COPY<2011 2011 respect>  a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, 777d, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1, a2, b1, b2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("SERIES b2 = 888;");
             I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, 777d, sharedDelta);
-            AssertHelper(First(), "b2", 2009, 888d, sharedDelta);
-            AssertHelper(First(), "b2", 2010, 888d, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, 888d, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, 777d, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, 888d, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, 888d, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, 888d, sharedDelta);
 
             //=====with respect and TIME command
 
@@ -7300,87 +7277,87 @@ namespace UnitTests
             //one item
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1;");
-            I("SERIES a1 = 111 112;");
+            //I("create a1;");
+            I("SERIES a1 = (111, 112);");
             I("TIME 2011 2011;");
             I("COPY<respect> a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            //I("create a1, a2;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("TIME 2011 2011;");
             I("COPY<respect>  a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2010, double.NaN, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, double.NaN, sharedDelta);
 
             //-----does exist beforehand
 
             //one item
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, b1;");
-            I("SERIES a1 = 111 112;");
+            //I("create a1, b1;");
+            I("SERIES a1 = (111, 112);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("TIME 2011 2011;");
             I("COPY<respect>  a1 TO b1;");
-            AssertHelper(First(), "b1", 2009, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, 777d, sharedDelta);
 
             //two items
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1, a2, b1, b2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("SERIES b2 = 888;");
             I("TIME 2011 2011;");
             I("COPY<respect>  a1, a2 TO b1, b2;");
-            AssertHelper(First(), "b1", 2009, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2010, 777d, sharedDelta);
-            AssertHelper(First(), "b1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "b1", 2012, 777d, sharedDelta);
-            AssertHelper(First(), "b2", 2009, 888d, sharedDelta);
-            AssertHelper(First(), "b2", 2010, 888d, sharedDelta);
-            AssertHelper(First(), "b2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "b2", 2012, 888d, sharedDelta);
+            _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
+            _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "b1", 2012, 777d, sharedDelta);
+            _AssertSeries(First(), "b2", 2009, 888d, sharedDelta);
+            _AssertSeries(First(), "b2", 2010, 888d, sharedDelta);
+            _AssertSeries(First(), "b2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "b2", 2012, 888d, sharedDelta);
 
             //====================== copy from other bank
 
             //We assume all the respect etc. stuff (tested above) still works...!
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            //I("create a1, a2;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("CLONE;");  //Clones into Base
             I("DELETE a1, a2;"); //Now only left in Base
             I("COPY ref:a1, ref:a2;");
-            AssertHelper(First(), "a1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "a1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "a1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2010, 222d, sharedDelta);
-            AssertHelper(First(), "a2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "a2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "a1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "a1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2010, 222d, sharedDelta);
+            _AssertSeries(First(), "a2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "a2", 2012, double.NaN, sharedDelta);
 
             //====================== wildcards
 
@@ -7388,37 +7365,37 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2011;");
             I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("CLONE;");  //Clones into Base
             I("DELETE a1, a2;"); //Now only left in Base
             I("COPY ref:a*;");
-            AssertHelper(First(), "a1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "a1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "a1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2010, 222d, sharedDelta);
-            AssertHelper(First(), "a2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "a2", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "a1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "a1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2010, 222d, sharedDelta);
+            _AssertSeries(First(), "a2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "a2", 2012, double.NaN, sharedDelta);
 
             //We assume all the respect etc. stuff (tested above) still works...!
             I("RESET;");
             I("TIME 2010 2011;");
-            I("create a1, a2;");
-            I("SERIES a1 = 111 112;");
-            I("SERIES a2 = 222 223;");
+            //I("create a1, a2;");
+            I("SERIES a1 = (111, 112);");
+            I("SERIES a2 = (222, 223);");
             I("CLONE;");  //Clones into Base
             I("DELETE a1, a2;"); //Now only left in Base
-            I("COPY ref:a1..a2;");
-            AssertHelper(First(), "a1", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a1", 2010, 111d, sharedDelta);
-            AssertHelper(First(), "a1", 2011, 112d, sharedDelta);
-            AssertHelper(First(), "a1", 2012, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "a2", 2010, 222d, sharedDelta);
-            AssertHelper(First(), "a2", 2011, 223d, sharedDelta);
-            AssertHelper(First(), "a2", 2012, double.NaN, sharedDelta);
+            I("COPY ref:a1..ref:a2;");
+            _AssertSeries(First(), "a1", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a1", 2010, 111d, sharedDelta);
+            _AssertSeries(First(), "a1", 2011, 112d, sharedDelta);
+            _AssertSeries(First(), "a1", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "a2", 2010, 222d, sharedDelta);
+            _AssertSeries(First(), "a2", 2011, 223d, sharedDelta);
+            _AssertSeries(First(), "a2", 2012, double.NaN, sharedDelta);
 
             //====================== copy between two banks
 
@@ -7438,34 +7415,7 @@ namespace UnitTests
 
             FAIL("COPY a,b,c TO d,e;");  //3 versus 2
 
-            if (false)
-            {
-                I("COPY fy TO fe;");
-                I("COPY fy TO @fe;");
-                I("COPY @fy TO fe;");
-                I("COPY @fy TO @fe;");
-
-                I("COPY fy TO ref:fe;");
-                I("COPY ref:fy TO fe;");
-                I("COPY work:fy TO ref:fe;");
-
-                I("COPY work:fy, fe, @fe, work:#m, #m, @#m TO ref:fe, @pcp, fy, work:#m, #m, @#m;");
-
-                I("COPY a, b, c TO x*y;");
-                I("COPY #m TO x*y;");
-
-                I("COPY ref:a, work:b, ref:c TO ref:x*y;");
-                I("COPY ref:#m TO ref:x*y;");
-
-                I("COPY @a, b, @c TO @x*y;");
-                I("COPY @#m TO @x*y;");
-
-                I("COPY @a, b, @c;");
-                I("COPY @#m;");
-
-                I("COPY <from = @ to = work> a, b, c;");
-
-            }
+            
 
             //Test of COPY <error=no>
 
@@ -7485,32 +7435,68 @@ namespace UnitTests
             I("COPY <error=no> work:xx2 to tmp:xx2;");
             I("COPY <error=no> work:xx2* to tmp:*;");
             Assert.AreEqual(Program.databanks.GetDatabank("tmp").storage.Count, 1);
-            
 
+            if (true)
+            {
+                //some random syntax checks
+
+                I("fy = 100;");
+                I("fy = 100;");
+                I("fe = 100;");
+                I("pcp = 100;");
+                I("a = 1; b = 2; c = 3;");
+                I("#m = fy, fe;");
+                I("clone;");
+
+                I("COPY fy TO fe;");
+                I("COPY fy TO @fe;");
+                I("COPY @fy TO fe;");
+                I("COPY @fy TO @fe;");
+
+                I("COPY fy TO ref:fe;");
+                I("COPY ref:fy TO fe;");
+                I("COPY work:fy TO ref:fe;");
+
+                //hmmm, copying to itself, and TO statement in the middle how does that parse?
+                //I("COPY work:fy, fe, @fe, work:{#m}, {#m}, @{#m} TO ref:fe, @pcp, fy, work:{#m}, {#m}, @{#m};");
+
+                I("COPY a, b, c TO x*y;");
+                I("COPY {#m} TO x*y;");
+
+                I("COPY ref:a, work:b, ref:c TO ref:x*y;");
+                I("COPY ref:{#m} TO ref:x*y;");
+
+                I("COPY @a, b, @c TO @x*y;");
+                I("COPY @{#m} TO @x*y;");
+
+                FAIL("COPY @a, b, @c;");  //b copied to itself
+                I("COPY @{#m};");
+
+            }
         }
 
         private static void Helper_copy_init(ref Databank work, ref Databank bank1, ref Databank bank2, ref Databank base2)
         {
-            I("RESET;");
+            I("RESET; mode data;");
 
             I("TIME 2010 2010;");
             I("OPEN<edit>bank1;");
             I("CLEAR bank1;");
-            I("CREATE a1, a2, a3;");
+            //I("CREATE a1, a2, a3;");
             I("SERIES a1 = 101;");
             I("SERIES a2 = 102;");
             I("SERIES a3 = 103;");
             I("CLOSE bank1;");
             I("OPEN<edit>bank2;");
             I("CLEAR bank2;");
-            I("CREATE a1, a2, a3;");
+            //I("CREATE a1, a2, a3;");
             I("SERIES a1 = 201;");
             I("SERIES a2 = 202;");
             I("SERIES a3 = 203;");
             I("CLOSE bank2;");
 
             I("TIME 2010 2010;");
-            I("CREATE a1, a2, a3;");
+            //I("CREATE a1, a2, a3;");
             I("SERIES a1 = -201;");
             I("SERIES a2 = -202;");
             I("SERIES a3 = -203;");
@@ -7519,8 +7505,8 @@ namespace UnitTests
             I("SERIES a2 = -102;");
             I("SERIES a3 = -103;");
             I("OPEN bank1, bank2;");
-            I("LIST m = a1, a3;");
-            I("STRING s = 'a2';");
+            I("LIST #m = a1, a3;");
+            I("STRING %s = 'a2';");
 
             bank1 = Program.databanks.GetDatabank("bank1");
             bank2 = Program.databanks.GetDatabank("bank2");
@@ -7704,13 +7690,13 @@ namespace UnitTests
             I("matrix y = pack(2000, 2010, s0);");
             I("matrix b = inv(t(#x)*#x)*t(#x)*#y;");
             I("show #b;");
-            AssertHelperMatrix("b", "rows", 5);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 0.144517, 0.000001d);
-            AssertHelperMatrix("b", 2, 1, 0.613875, 0.000001d);
-            AssertHelperMatrix("b", 3, 1, 0.186740, 0.000001d);
-            AssertHelperMatrix("b", 4, 1, -0.350908, 0.000001d);
-            AssertHelperMatrix("b", 5, 1, 0.0298039, 0.000001d);
+            _AssertMatrix(First(), "b", "rows", 5);
+            _AssertMatrix(First(), "b", "cols", 1);
+            _AssertMatrix(First(), "b", 1, 1, 0.144517, 0.000001d);
+            _AssertMatrix(First(), "b", 2, 1, 0.613875, 0.000001d);
+            _AssertMatrix(First(), "b", 3, 1, 0.186740, 0.000001d);
+            _AssertMatrix(First(), "b", 4, 1, -0.350908, 0.000001d);
+            _AssertMatrix(First(), "b", 5, 1, 0.0298039, 0.000001d);
 
             //======================== See Test__R for the same results
 
@@ -7820,26 +7806,26 @@ namespace UnitTests
             I("r_export <target = 'data1'> #x, #y;");
             I("r_run;");
             I("SHOW #beta;");
-            AssertHelperMatrix("beta", "rows", 5);
-            AssertHelperMatrix("beta", "cols", 1);
-            AssertHelperMatrix("beta", 1, 1, 0.0298039, 0.000001d);
-            AssertHelperMatrix("beta", 2, 1, 0.144517, 0.000001d);
-            AssertHelperMatrix("beta", 3, 1, 0.613875, 0.000001d);
-            AssertHelperMatrix("beta", 4, 1, 0.186740, 0.000001d);
-            AssertHelperMatrix("beta", 5, 1, -0.350908, 0.000001d);
+            _AssertMatrix(First(), "beta", "rows", 5);
+            _AssertMatrix(First(), "beta", "cols", 1);
+            _AssertMatrix(First(), "beta", 1, 1, 0.0298039, 0.000001d);
+            _AssertMatrix(First(), "beta", 2, 1, 0.144517, 0.000001d);
+            _AssertMatrix(First(), "beta", 3, 1, 0.613875, 0.000001d);
+            _AssertMatrix(First(), "beta", 4, 1, 0.186740, 0.000001d);
+            _AssertMatrix(First(), "beta", 5, 1, -0.350908, 0.000001d);
 
             //testing without target
             I("r_file ols2.r;");
             I("r_export #x, #y;");
             I("r_run;");
             I("SHOW #beta2;");
-            AssertHelperMatrix("beta2", "rows", 5);
-            AssertHelperMatrix("beta2", "cols", 1);
-            AssertHelperMatrix("beta2", 1, 1, 0.0298039, 0.000001d);
-            AssertHelperMatrix("beta2", 2, 1, 0.144517, 0.000001d);
-            AssertHelperMatrix("beta2", 3, 1, 0.613875, 0.000001d);
-            AssertHelperMatrix("beta2", 4, 1, 0.186740, 0.000001d);
-            AssertHelperMatrix("beta2", 5, 1, -0.350908, 0.000001d);
+            _AssertMatrix(First(), "beta2", "rows", 5);
+            _AssertMatrix(First(), "beta2", "cols", 1);
+            _AssertMatrix(First(), "beta2", 1, 1, 0.0298039, 0.000001d);
+            _AssertMatrix(First(), "beta2", 2, 1, 0.144517, 0.000001d);
+            _AssertMatrix(First(), "beta2", 3, 1, 0.613875, 0.000001d);
+            _AssertMatrix(First(), "beta2", 4, 1, 0.186740, 0.000001d);
+            _AssertMatrix(First(), "beta2", 5, 1, -0.350908, 0.000001d);
 
 
 
@@ -8596,11 +8582,11 @@ namespace UnitTests
 
             I("RESET;");
             I("function matrix multiply(matrix x, matrix y); return #x * #y; end; matrix a = [1, 2 || 3, 4]; matrix b = [9, 8 || 7, 6]; matrix z = [0, 0 || 0, 0]; matrix c = multiply(#a, #b+#z);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 2);
-            AssertHelperMatrix("c", 1, 1, 23d, 0d);
-            AssertHelperMatrix("c", 1, 2, 20d, 0d);
-            AssertHelperMatrix("c", 2, 1, 55d, 0d);
+            _AssertMatrix(First(), "c", "rows", 2);
+            _AssertMatrix(First(), "c", "cols", 2);
+            _AssertMatrix(First(), "c", 1, 1, 23d, 0d);
+            _AssertMatrix(First(), "c", 1, 2, 20d, 0d);
+            _AssertMatrix(First(), "c", 2, 1, 55d, 0d);
             AssertHelperMatrix("c", 2, 2, 48d, 0d);
             
             Assert.AreEqual(z[0], "x1");
@@ -8973,6 +8959,20 @@ namespace UnitTests
         {
             Matrix m = db.GetIVariable(s) as Matrix;
             _AssertHelperTwoDoubles(d, m.data[i - 1, j - 1], sharedDelta);
+        }
+
+        private static void _AssertMatrix(IBank db, string s, string rowscols, double d)
+        {
+            Matrix m = db.GetIVariable(s) as Matrix;
+            if (G.Equal(rowscols, "rows"))
+            {
+                Assert.AreEqual(d, m.data.GetLength(0));
+            }
+            else if (G.Equal(rowscols, "cols"))
+            {
+                Assert.AreEqual(d, m.data.GetLength(1));
+            }
+            else throw new GekkoException();
         }
 
         private static void _AssertScalarString(IBank db, string s, string s2)
@@ -13460,856 +13460,886 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Matrix()
+        public void _Test_Matrix()
         {
-            
+
+            //I("time 2001 2003; xx = [1; 2; 3];");
+            //AssertHelper(First(), "xx", 2000, double.NaN, sharedDelta);
+            //AssertHelper(First(), "xx", 2001, 1d, sharedDelta);
+            //AssertHelper(First(), "xx", 2002, 2d, sharedDelta);
+            //AssertHelper(First(), "xx", 2003, 3d, sharedDelta);
+            //AssertHelper(First(), "xx", 2004, double.NaN, sharedDelta);
+
+            I("RESET; TIME 2001 2005;");
+            I("xx1 = (1, 2, 3, 4, 5);");
+            I("#m = xx1;");  //autoconverted into matrix    WHY???
+            _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
+
+            I("#m = [1, 2; 3, 4];");
+            _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+
+            I("#m[1..2] = [100; 200];");
+            _AssertMatrix(First(), "#m", 1, 1, 100d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 200d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+
+            I("#m = [1, 2; 3, 4];");
+            I("#m[1..2, 1] = #m[1..2, 2];");
+            _AssertMatrix(First(), "#m", 1, 1, 2d, sharedDelta);
+            _AssertMatrix(First(), "#m", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 2, 4d, sharedDelta);
+
+            I("#m = [1; 2; 3];");
+            I("#m[2..3] = [20; 30];");
+            _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 20d, sharedDelta);
+            _AssertMatrix(First(), "#m", 3, 1, 30d, sharedDelta);
+
+
             I("RESET;");
-            I("MATRIX a = miss(2,3);");
-            I("MATRIX a[1, 1] = 1;");
-            I("MATRIX a[1, 2] = 2;");
-            I("MATRIX a[1, 3] = 3;");
-            I("MATRIX a[2, 1] = 4;");
-            I("MATRIX a[2, 2] = 5;");
-            I("MATRIX a[2, 3] = 6;");
-            I("MATRIX b = zeros(3, 4);");
-            I("MATRIX b[1, 1] = 7;");
-            I("MATRIX b[1, 2] = 8;");
-            I("MATRIX b[1, 3] = 9;");
-            I("MATRIX b[1, 4] = 10;");
-            I("MATRIX b[2, 1] = 11;");
-            I("MATRIX b[2, 2] = 12;");
-            I("MATRIX b[2, 3] = 13;");
-            I("MATRIX b[2, 4] = 14;");
-            I("MATRIX b[3, 1] = 15;");
-            I("MATRIX b[3, 2] = 16;");
-            I("MATRIX b[3, 3] = 17;");
-            I("MATRIX b[3, 4] = 18;");
-            I("MATRIX onebyone = zeros(1, 1);");
-            I("MATRIX onebyone[1, 1] = 2;");
+            I("MATRIX #a = m(2,3);");
+            I("MATRIX #a[1, 1] = 1;");
+            I("MATRIX #a[1, 2] = 2;");
+            I("MATRIX #a[1, 3] = 3;");
+            I("MATRIX #a[2, 1] = 4;");
+            I("MATRIX #a[2, 2] = 5;");
+            I("MATRIX #a[2, 3] = 6;");
+            I("MATRIX #b = zeros(3, 4);");
+            I("#b[1, 1] = 7;");
+            I("#b[1, 2] = 8;");
+            I("#b[1, 3] = 9;");
+            I("#b[1, 4] = 10;");
+            I("#b[2, 1] = 11;");
+            I("#b[2, 2] = 12;");
+            I("#b[2, 3] = 13;");
+            I("#b[2, 4] = 14;");
+            I("#b[3, 1] = 15;");
+            I("#b[3, 2] = 16;");
+            I("#b[3, 3] = 17;");
+            I("#b[3, 4] = 18;");
+            I("#onebyone = zeros(1, 1);");
+            I("#onebyone[1, 1] = 2;");
 
             // ----------- multiply and divide
-            I("MATRIX c = #a * #b;");
-            AssertHelperMatrix("c", 1, 1, 74, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 80, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 86, sharedDelta);
-            AssertHelperMatrix("c", 1, 4, 92, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 173, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 188, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 203, sharedDelta);
-            AssertHelperMatrix("c", 2, 4, 218, sharedDelta);
-            I("VAL v = 2;");
-            I("MATRIX c2 = #c * %v;");
-            AssertHelperMatrix("c2", 1, 1, 2 * 74, sharedDelta);
-            AssertHelperMatrix("c2", 1, 2, 2 * 80, sharedDelta);
-            AssertHelperMatrix("c2", 1, 3, 2 * 86, sharedDelta);
-            AssertHelperMatrix("c2", 1, 4, 2 * 92, sharedDelta);
-            AssertHelperMatrix("c2", 2, 1, 2 * 173, sharedDelta);
-            AssertHelperMatrix("c2", 2, 2, 2 * 188, sharedDelta);
-            AssertHelperMatrix("c2", 2, 3, 2 * 203, sharedDelta);
-            AssertHelperMatrix("c2", 2, 4, 2 * 218, sharedDelta);
-            I("MATRIX c3 = %v * #c;");
-            AssertHelperMatrix("c3", 1, 1, 2 * 74, sharedDelta);
-            AssertHelperMatrix("c3", 1, 2, 2 * 80, sharedDelta);
-            AssertHelperMatrix("c3", 1, 3, 2 * 86, sharedDelta);
-            AssertHelperMatrix("c3", 1, 4, 2 * 92, sharedDelta);
-            AssertHelperMatrix("c3", 2, 1, 2 * 173, sharedDelta);
-            AssertHelperMatrix("c3", 2, 2, 2 * 188, sharedDelta);
-            AssertHelperMatrix("c3", 2, 3, 2 * 203, sharedDelta);
-            AssertHelperMatrix("c3", 2, 4, 2 * 218, sharedDelta);
-            I("MATRIX c4 = #c / %v;");
-            AssertHelperMatrix("c4", 1, 1, 0.5d * 74, sharedDelta);
-            AssertHelperMatrix("c4", 1, 2, 0.5d * 80, sharedDelta);
-            AssertHelperMatrix("c4", 1, 3, 0.5d * 86, sharedDelta);
-            AssertHelperMatrix("c4", 1, 4, 0.5d * 92, sharedDelta);
-            AssertHelperMatrix("c4", 2, 1, 0.5d * 173, sharedDelta);
-            AssertHelperMatrix("c4", 2, 2, 0.5d * 188, sharedDelta);
-            AssertHelperMatrix("c4", 2, 3, 0.5d * 203, sharedDelta);
-            AssertHelperMatrix("c4", 2, 4, 0.5d * 218, sharedDelta);
-            FAIL("MATRIX c4 = %v / #c;");
-            I("MATRIX c5 = #c * #onebyone;");
-            AssertHelperMatrix("c5", 1, 1, 2 * 74, sharedDelta);
-            AssertHelperMatrix("c5", 1, 2, 2 * 80, sharedDelta);
-            AssertHelperMatrix("c5", 1, 3, 2 * 86, sharedDelta);
-            AssertHelperMatrix("c5", 1, 4, 2 * 92, sharedDelta);
-            AssertHelperMatrix("c5", 2, 1, 2 * 173, sharedDelta);
-            AssertHelperMatrix("c5", 2, 2, 2 * 188, sharedDelta);
-            AssertHelperMatrix("c5", 2, 3, 2 * 203, sharedDelta);
-            AssertHelperMatrix("c5", 2, 4, 2 * 218, sharedDelta);
-            I("MATRIX c6 = #onebyone * #c;");
-            AssertHelperMatrix("c6", 1, 1, 2 * 74, sharedDelta);
-            AssertHelperMatrix("c6", 1, 2, 2 * 80, sharedDelta);
-            AssertHelperMatrix("c6", 1, 3, 2 * 86, sharedDelta);
-            AssertHelperMatrix("c6", 1, 4, 2 * 92, sharedDelta);
-            AssertHelperMatrix("c6", 2, 1, 2 * 173, sharedDelta);
-            AssertHelperMatrix("c6", 2, 2, 2 * 188, sharedDelta);
-            AssertHelperMatrix("c6", 2, 3, 2 * 203, sharedDelta);
-            AssertHelperMatrix("c6", 2, 4, 2 * 218, sharedDelta);
-            I("MATRIX c7 = #c / #onebyone;");
-            AssertHelperMatrix("c7", 1, 1, 0.5d * 74, sharedDelta);
-            AssertHelperMatrix("c7", 1, 2, 0.5d * 80, sharedDelta);
-            AssertHelperMatrix("c7", 1, 3, 0.5d * 86, sharedDelta);
-            AssertHelperMatrix("c7", 1, 4, 0.5d * 92, sharedDelta);
-            AssertHelperMatrix("c7", 2, 1, 0.5d * 173, sharedDelta);
-            AssertHelperMatrix("c7", 2, 2, 0.5d * 188, sharedDelta);
-            AssertHelperMatrix("c7", 2, 3, 0.5d * 203, sharedDelta);
-            AssertHelperMatrix("c7", 2, 4, 0.5d * 218, sharedDelta);
+            I("#c = #a * #b;");            
+            _AssertMatrix(First(), "#c", 1, 1, 74, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 80, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 86, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 4, 92, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 173, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 188, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 203, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 4, 218, sharedDelta);
+            I("VAL %v = 2;");
+            I("#c2 = #c * %v;");
+            _AssertMatrix(First(), "#c2", 1, 1, 2 * 74, sharedDelta);
+            _AssertMatrix(First(), "#c2", 1, 2, 2 * 80, sharedDelta);
+            _AssertMatrix(First(), "#c2", 1, 3, 2 * 86, sharedDelta);
+            _AssertMatrix(First(), "#c2", 1, 4, 2 * 92, sharedDelta);
+            _AssertMatrix(First(), "#c2", 2, 1, 2 * 173, sharedDelta);
+            _AssertMatrix(First(), "#c2", 2, 2, 2 * 188, sharedDelta);
+            _AssertMatrix(First(), "#c2", 2, 3, 2 * 203, sharedDelta);
+            _AssertMatrix(First(), "#c2", 2, 4, 2 * 218, sharedDelta);
+            I("#c3 = %v * #c;");
+            _AssertMatrix(First(), "#c3", 1, 1, 2 * 74, sharedDelta);
+            _AssertMatrix(First(), "#c3", 1, 2, 2 * 80, sharedDelta);
+            _AssertMatrix(First(), "#c3", 1, 3, 2 * 86, sharedDelta);
+            _AssertMatrix(First(), "#c3", 1, 4, 2 * 92, sharedDelta);
+            _AssertMatrix(First(), "#c3", 2, 1, 2 * 173, sharedDelta);
+            _AssertMatrix(First(), "#c3", 2, 2, 2 * 188, sharedDelta);
+            _AssertMatrix(First(), "#c3", 2, 3, 2 * 203, sharedDelta);
+            _AssertMatrix(First(), "#c3", 2, 4, 2 * 218, sharedDelta);
+            I("#c4 = #c / %v;");
+            _AssertMatrix(First(), "#c4", 1, 1, 0.5d * 74, sharedDelta);
+            _AssertMatrix(First(), "#c4", 1, 2, 0.5d * 80, sharedDelta);
+            _AssertMatrix(First(), "#c4", 1, 3, 0.5d * 86, sharedDelta);
+            _AssertMatrix(First(), "#c4", 1, 4, 0.5d * 92, sharedDelta);
+            _AssertMatrix(First(), "#c4", 2, 1, 0.5d * 173, sharedDelta);
+            _AssertMatrix(First(), "#c4", 2, 2, 0.5d * 188, sharedDelta);
+            _AssertMatrix(First(), "#c4", 2, 3, 0.5d * 203, sharedDelta);
+            _AssertMatrix(First(), "#c4", 2, 4, 0.5d * 218, sharedDelta);
+            FAIL("#c4 = %v / #c;");
+            I("#c5 = #c * #onebyone;");
+            _AssertMatrix(First(), "#c5", 1, 1, 2 * 74, sharedDelta);
+            _AssertMatrix(First(), "#c5", 1, 2, 2 * 80, sharedDelta);
+            _AssertMatrix(First(), "#c5", 1, 3, 2 * 86, sharedDelta);
+            _AssertMatrix(First(), "#c5", 1, 4, 2 * 92, sharedDelta);
+            _AssertMatrix(First(), "#c5", 2, 1, 2 * 173, sharedDelta);
+            _AssertMatrix(First(), "#c5", 2, 2, 2 * 188, sharedDelta);
+            _AssertMatrix(First(), "#c5", 2, 3, 2 * 203, sharedDelta);
+            _AssertMatrix(First(), "#c5", 2, 4, 2 * 218, sharedDelta);
+            I("#c6 = #onebyone * #c;");
+            _AssertMatrix(First(), "#c6", 1, 1, 2 * 74, sharedDelta);
+            _AssertMatrix(First(), "#c6", 1, 2, 2 * 80, sharedDelta);
+            _AssertMatrix(First(), "#c6", 1, 3, 2 * 86, sharedDelta);
+            _AssertMatrix(First(), "#c6", 1, 4, 2 * 92, sharedDelta);
+            _AssertMatrix(First(), "#c6", 2, 1, 2 * 173, sharedDelta);
+            _AssertMatrix(First(), "#c6", 2, 2, 2 * 188, sharedDelta);
+            _AssertMatrix(First(), "#c6", 2, 3, 2 * 203, sharedDelta);
+            _AssertMatrix(First(), "#c6", 2, 4, 2 * 218, sharedDelta);
+            I("#c7 = #c / #onebyone;");
+            _AssertMatrix(First(), "#c7", 1, 1, 0.5d * 74, sharedDelta);
+            _AssertMatrix(First(), "#c7", 1, 2, 0.5d * 80, sharedDelta);
+            _AssertMatrix(First(), "#c7", 1, 3, 0.5d * 86, sharedDelta);
+            _AssertMatrix(First(), "#c7", 1, 4, 0.5d * 92, sharedDelta);
+            _AssertMatrix(First(), "#c7", 2, 1, 0.5d * 173, sharedDelta);
+            _AssertMatrix(First(), "#c7", 2, 2, 0.5d * 188, sharedDelta);
+            _AssertMatrix(First(), "#c7", 2, 3, 0.5d * 203, sharedDelta);
+            _AssertMatrix(First(), "#c7", 2, 4, 0.5d * 218, sharedDelta);
 
             // --------- indexing
-            I("MATRIX r1 = zeros(1, 3);");
-            I("MATRIX r1[1,2] = 77;");
-            I("MATRIX c1 = zeros(3, 1);");
-            I("MATRIX c1[2,1] = 77;");
-            FAIL("VAL x = #r1[2];");
-            I("VAL x = #c1[2];");
-            AssertHelperScalarVal("x", 77d);
+            I("#r1 = zeros(1, 3);");
+            I("#r1[1,2] = 77;");
+            I("#c1 = zeros(3, 1);");
+            I("#c1[2,1] = 77;");
+            FAIL("%x = #r1[2];");
+            I("%x = #c1[2];");
+            _AssertScalarVal(First(), "%x", 77d);
 
             // --------------- add and subtract
             I("RESET;");
-            I("MATRIX a = zeros(2, 3);");
-            I("MATRIX a[1, 1] = 1;");
-            I("MATRIX a[1, 2] = 2;");
-            I("MATRIX a[1, 3] = 3;");
-            I("MATRIX a[2, 1] = 4;");
-            I("MATRIX a[2, 2] = 5;");
-            I("MATRIX a[2, 3] = 6;");
-            I("MATRIX b = zeros(2, 3);");
-            I("MATRIX b[1, 1] = 11;");
-            I("MATRIX b[1, 2] = 12;");
-            I("MATRIX b[1, 3] = 13;");
-            I("MATRIX b[2, 1] = 14;");
-            I("MATRIX b[2, 2] = 15;");
-            I("MATRIX b[2, 3] = 16;");
-            I("MATRIX c = #a + #b;");
-            AssertHelperMatrix("c", 1, 1, 12d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 14d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 16d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 18d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 20d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 22d, sharedDelta);
-            I("VAL v = 2;");
-            FAIL("MATRIX c2 = %v + #a;");
-            FAIL("MATRIX c2 = #a + %v;");
-            FAIL("MATRIX c2 = %v - #a;");
-            FAIL("MATRIX c2 = #a - %v;");
+            I("#a = zeros(2, 3);");
+            I("#a[1, 1] = 1;");
+            I("#a[1, 2] = 2;");
+            I("#a[1, 3] = 3;");
+            I("#a[2, 1] = 4;");
+            I("#a[2, 2] = 5;");
+            I("#a[2, 3] = 6;");
+            I("#b = zeros(2, 3);");
+            I("#b[1, 1] = 11;");
+            I("#b[1, 2] = 12;");
+            I("#b[1, 3] = 13;");
+            I("#b[2, 1] = 14;");
+            I("#b[2, 2] = 15;");
+            I("#b[2, 3] = 16;");
+            I("#c = #a + #b;");
+            _AssertMatrix(First(), "#c", 1, 1, 12d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 14d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 16d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 18d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 20d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 22d, sharedDelta);
+            I("%v = 2;");
+            FAIL("#c2 = %v + #a;");
+            FAIL("#c2 = #a + %v;");
+            FAIL("#c2 = %v - #a;");
+            FAIL("#c2 = #a - %v;");
 
             // ----------- transpose
             I("RESET;");
-            I("MATRIX a = zeros(2, 3);");
-            I("MATRIX a[1, 1] = 1;");
-            I("MATRIX a[1, 2] = 2;");
-            I("MATRIX a[1, 3] = 3;");
-            I("MATRIX a[2, 1] = 4;");
-            I("MATRIX a[2, 2] = 5;");
-            I("MATRIX a[2, 3] = 6;");
-            I("MATRIX b = t(#a);");
+            I("#a = zeros(2, 3);");
+            I("#a[1, 1] = 1;");
+            I("#a[1, 2] = 2;");
+            I("#a[1, 3] = 3;");
+            I("#a[2, 1] = 4;");
+            I("#a[2, 2] = 5;");
+            I("#a[2, 3] = 6;");
+            I("#b = t(#a);");
 
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 4d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 2d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 6d, sharedDelta);
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 4d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 6d, sharedDelta);
 
-            // Matrix construction/concatenation
+            // #construction/concatenation
             // -----------
             I("RESET;");
-            I("MATRIX a = [1,2||3,4];");
-            I("VAL v11 = #a[1,1];");
-            I("VAL v12 = #a[1,2];");
-            I("VAL v21 = #a[2,1];");
-            I("VAL v22 = #a[2,2];");
-            AssertHelperScalarVal("v11", 1d);
-            AssertHelperScalarVal("v12", 2d);
-            AssertHelperScalarVal("v21", 3d);
-            AssertHelperScalarVal("v22", 4d);
-            I("MATRIX b = [5,6,7||8,9,10];");
-            I("MATRIX c = [11,12||13,14||15,16];");
-            I("MATRIX d = [17,18,19||20,21,22||23,24,25];");
-            I("MATRIX x = [#a,#b||#c,#d];");
-            AssertHelperMatrix("x", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("x", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("x", 1, 3, 5d, sharedDelta);
-            AssertHelperMatrix("x", 1, 4, 6d, sharedDelta);
-            AssertHelperMatrix("x", 1, 5, 7d, sharedDelta);
+            I("#a = [1,2;3,4];");
+            I("%v11 = #a[1,1];");
+            I("%v12 = #a[1,2];");
+            I("%v21 = #a[2,1];");
+            I("%v22 = #a[2,2];");
+            
+            _AssertScalarVal(First(), "%v11", 1d);
+            _AssertScalarVal(First(), "%v12", 2d);
+            _AssertScalarVal(First(), "%v21", 3d);
+            _AssertScalarVal(First(), "%v22", 4d);
+            I("#b = [5,6,7;8,9,10];");
+            I("#c = [11,12;13,14;15,16];");
+            I("#d = [17,18,19;20,21,22;23,24,25];");
+            I("#x = [#a,#b;#c,#d];");
+            _AssertMatrix(First(), "#x", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#x", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#x", 1, 3, 5d, sharedDelta);
+            _AssertMatrix(First(), "#x", 1, 4, 6d, sharedDelta);
+            _AssertMatrix(First(), "#x", 1, 5, 7d, sharedDelta);
 
-            AssertHelperMatrix("x", 2, 1, 3d, sharedDelta);
-            AssertHelperMatrix("x", 2, 2, 4d, sharedDelta);
-            AssertHelperMatrix("x", 2, 3, 8d, sharedDelta);
-            AssertHelperMatrix("x", 2, 4, 9d, sharedDelta);
-            AssertHelperMatrix("x", 2, 5, 10d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 2, 4d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 3, 8d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 4, 9d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 5, 10d, sharedDelta);
 
-            AssertHelperMatrix("x", 3, 1, 11d, sharedDelta);
-            AssertHelperMatrix("x", 3, 2, 12d, sharedDelta);
-            AssertHelperMatrix("x", 3, 3, 17d, sharedDelta);
-            AssertHelperMatrix("x", 3, 4, 18d, sharedDelta);
-            AssertHelperMatrix("x", 3, 5, 19d, sharedDelta);
+            _AssertMatrix(First(), "#x", 3, 1, 11d, sharedDelta);
+            _AssertMatrix(First(), "#x", 3, 2, 12d, sharedDelta);
+            _AssertMatrix(First(), "#x", 3, 3, 17d, sharedDelta);
+            _AssertMatrix(First(), "#x", 3, 4, 18d, sharedDelta);
+            _AssertMatrix(First(), "#x", 3, 5, 19d, sharedDelta);
 
-            AssertHelperMatrix("x", 4, 1, 13d, sharedDelta);
-            AssertHelperMatrix("x", 4, 2, 14d, sharedDelta);
-            AssertHelperMatrix("x", 4, 3, 20d, sharedDelta);
-            AssertHelperMatrix("x", 4, 4, 21d, sharedDelta);
-            AssertHelperMatrix("x", 4, 5, 22d, sharedDelta);
+            _AssertMatrix(First(), "#x", 4, 1, 13d, sharedDelta);
+            _AssertMatrix(First(), "#x", 4, 2, 14d, sharedDelta);
+            _AssertMatrix(First(), "#x", 4, 3, 20d, sharedDelta);
+            _AssertMatrix(First(), "#x", 4, 4, 21d, sharedDelta);
+            _AssertMatrix(First(), "#x", 4, 5, 22d, sharedDelta);
 
-            AssertHelperMatrix("x", 5, 1, 15d, sharedDelta);
-            AssertHelperMatrix("x", 5, 2, 16d, sharedDelta);
-            AssertHelperMatrix("x", 5, 3, 23d, sharedDelta);
-            AssertHelperMatrix("x", 5, 4, 24d, sharedDelta);
-            AssertHelperMatrix("x", 5, 5, 25d, sharedDelta);
+            _AssertMatrix(First(), "#x", 5, 1, 15d, sharedDelta);
+            _AssertMatrix(First(), "#x", 5, 2, 16d, sharedDelta);
+            _AssertMatrix(First(), "#x", 5, 3, 23d, sharedDelta);
+            _AssertMatrix(First(), "#x", 5, 4, 24d, sharedDelta);
+            _AssertMatrix(First(), "#x", 5, 5, 25d, sharedDelta);
 
             //trying to fail some of them
-            FAIL("MATRIX x = [#b,#a||#c,#d];");
-            FAIL("MATRIX x = [#a,#c||#b,#d];");
-            FAIL("MATRIX x = [#a,#b||#d,#c];");
-            FAIL("MATRIX x = [#c,#b||#a,#d];");
-            FAIL("MATRIX x = [#a,#d||#c,#b];");
+            FAIL("#x = [#b,#a;#c,#d];");
+            FAIL("#x = [#a,#c;#b,#d];");
+            FAIL("#x = [#a,#b;#d,#c];");
+            FAIL("#x = [#c,#b;#a,#d];");
+            FAIL("#x = [#a,#d;#c,#b];");
 
             //recursive
-            I("MATRIX x = [[1,2||3,4],#b||#c,#d];");
+            I("#x = [[1,2;3,4],#b;#c,#d];");
 
-            I("MATRIX x = [1,2 ||3,4];");
-            I("MATRIX x = [1,2|| 3,4];");
-            I("MATRIX x = [1,2 || 3,4];");
-            FAIL("MATRIX x = [1,2| |3,4];");
-            FAIL("MATRIX x = [1,2 | | 3,4];");
+            I("#x = [1,2 ;3,4];");
+            I("#x = [1,2; 3,4];");
+            I("#x = [1,2 ; 3,4];");
+            FAIL("#x = [1,2| |3,4];");
+            FAIL("#x = [1,2 | | 3,4];");
 
-            I("MATRIX x = [1||3];");
-            AssertHelperMatrix("x", "rows", 2);
-            AssertHelperMatrix("x", "cols", 1);
-            AssertHelperMatrix("x", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("x", 2, 1, 3d, sharedDelta);
+            I("#x = [1;3];");
+            _AssertMatrix(First(), "#x", "rows", 2);
+            _AssertMatrix(First(), "#x", "cols", 1);
+            _AssertMatrix(First(), "#x", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#x", 2, 1, 3d, sharedDelta);
 
-            I("MATRIX x = [1,3];");
-            AssertHelperMatrix("x", "rows", 1);
-            AssertHelperMatrix("x", "cols", 2);
-            AssertHelperMatrix("x", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("x", 1, 2, 3d, sharedDelta);
+            I("#x = [1,3];");
+            _AssertMatrix(First(), "#x", "rows", 1);
+            _AssertMatrix(First(), "#x", "cols", 2);
+            _AssertMatrix(First(), "#x", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#x", 1, 2, 3d, sharedDelta);
 
-            I("MATRIX x = [1];");
-            AssertHelperMatrix("x", "rows", 1);
-            AssertHelperMatrix("x", "cols", 1);
-            AssertHelperMatrix("x", 1, 1, 1d, sharedDelta);
+            I("#x = [1];");
+            _AssertMatrix(First(), "#x", "rows", 1);
+            _AssertMatrix(First(), "#x", "cols", 1);
+            _AssertMatrix(First(), "#x", 1, 1, 1d, sharedDelta);
 
             // -------- subsections ---------
 
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX b = #a[1..2, 2..3];");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 6d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#b = #a[1..2, 2..3];");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 6d, sharedDelta);
 
-            I("MATRIX b = #a[..2, 2..];");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 6d, sharedDelta);
+            I("#b = #a[..2, 2..];");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 6d, sharedDelta);
 
-            I("MATRIX b = #a[.., ..];");
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 3);
+            I("#b = #a[.., ..];");
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 3);
 
-            I("MATRIX b = #a[2, 2..3];");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 6d, sharedDelta);
+            I("#b = #a[2, 2..3];");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 6d, sharedDelta);
 
-            I("MATRIX b = #a[2..3, 2];");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 8d, sharedDelta);
+            I("#b = #a[2..3, 2];");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 8d, sharedDelta);
 
-            I("MATRIX b = #a[3..3, 3..3];");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 9d, sharedDelta);
+            I("#b = #a[3..3, 3..3];");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 9d, sharedDelta);
 
-            I("MATRIX a = [1 || 3 || 7];");
-            I("MATRIX b = #a[2..3];");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 7d, sharedDelta);
+            I("#a = [1 ; 3 ; 7];");
+            I("#b = #a[2..3];");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 7d, sharedDelta);
 
             // -------- pack and unpack ---------
 
             I("RESET;");
             I("TIME 2010 2020;");
-            I("SERIES <2000 2002> xx1 = 5, 6, 7;");
-            I("SERIES <2000 2002> xx2 = 15, 16, 17;");
-            I("MATRIX b = pack(2000, 2002, xx1, xx2);");
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 6d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 15d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 16d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 17d, sharedDelta);
+            I("SERIES <2000 2002> xx1 = (5, 6, 7);");
+            I("SERIES <2000 2002> xx2 = (15, 16, 17);");
+            I("#b = pack(2000, 2002, xx1, xx2);");
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 6d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 15d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 16d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 17d, sharedDelta);
             I("TIME 2000 2002;");
-            I("MATRIX c = pack(xx1, xx2);");
-            AssertHelperMatrix("c", "rows", 3);
-            AssertHelperMatrix("c", "cols", 2);
-            AssertHelperMatrix("c", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 6d, sharedDelta);
-            AssertHelperMatrix("c", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 15d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 16d, sharedDelta);
-            AssertHelperMatrix("c", 3, 2, 17d, sharedDelta);
-            I("CREATE yy1 = unpack(#b[.., 1]);");
-            AssertHelper(First(), "yy1", 1999, double.NaN, sharedDelta);
-            AssertHelper(First(), "yy1", 2000, 5d, sharedDelta);
-            AssertHelper(First(), "yy1", 2001, 6d, sharedDelta);
-            AssertHelper(First(), "yy1", 2002, 7d, sharedDelta);
-            AssertHelper(First(), "yy1", 2003, double.NaN, sharedDelta);
-            I("CREATE yy2 = unpack(2000, 2002, #b[.., 2]);");
-            AssertHelper(First(), "yy2", 1999, double.NaN, sharedDelta);
-            AssertHelper(First(), "yy2", 2000, 15d, sharedDelta);
-            AssertHelper(First(), "yy2", 2001, 16d, sharedDelta);
-            AssertHelper(First(), "yy2", 2002, 17d, sharedDelta);
-            AssertHelper(First(), "yy2", 2003, double.NaN, sharedDelta);
+            I("#c = pack(xx1, xx2);");
+            _AssertMatrix(First(), "#c", "rows", 3);
+            _AssertMatrix(First(), "#c", "cols", 2);
+            _AssertMatrix(First(), "#c", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 6d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 15d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
+            I("yy1 = unpack(#b[.., 1]);");
+            _AssertSeries(First(), "yy1", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy1", 2000, 5d, sharedDelta);
+            _AssertSeries(First(), "yy1", 2001, 6d, sharedDelta);
+            _AssertSeries(First(), "yy1", 2002, 7d, sharedDelta);
+            _AssertSeries(First(), "yy1", 2003, double.NaN, sharedDelta);
+            I("yy2 = unpack(2000, 2002, #b[.., 2]);");
+            _AssertSeries(First(), "yy2", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy2", 2000, 15d, sharedDelta);
+            _AssertSeries(First(), "yy2", 2001, 16d, sharedDelta);
+            _AssertSeries(First(), "yy2", 2002, 17d, sharedDelta);
+            _AssertSeries(First(), "yy2", 2003, double.NaN, sharedDelta);
 
             I("RESET;");
             I("OPTION freq m;;");
             I("TIME 2010 2020;");
-            I("SERIES <2000m1 2000m3> xx1 = 5, 6, 7;");
-            I("SERIES <2000m1 2000m3> xx2 = 15, 16, 17;");
-            I("MATRIX b = pack(2000m1, 2000m3, xx1, xx2);");
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 6d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 15d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 16d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 17d, sharedDelta);
+            I("SERIES <2000m1 2000m3> xx1 = (5, 6, 7);");
+            I("SERIES <2000m1 2000m3> xx2 = (15, 16, 17);");
+            I("#b = pack(2000m1, 2000m3, xx1, xx2);");
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 6d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 15d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 16d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 17d, sharedDelta);
             I("TIME 2000m1 2000m3;");
-            I("MATRIX c = pack(xx1, xx2);");
-            AssertHelperMatrix("c", "rows", 3);
-            AssertHelperMatrix("c", "cols", 2);
-            AssertHelperMatrix("c", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 6d, sharedDelta);
-            AssertHelperMatrix("c", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 15d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 16d, sharedDelta);
-            AssertHelperMatrix("c", 3, 2, 17d, sharedDelta);
-            I("CREATE yy1 = unpack(#b[.., 1]);");
-            AssertHelper(First(), "yy1", EFreq.M, 1999, 12, double.NaN, sharedDelta);
-            AssertHelper(First(), "yy1", EFreq.M, 2000, 1, 5d, sharedDelta);
-            AssertHelper(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
-            AssertHelper(First(), "yy1", EFreq.M, 2000, 3, 7d, sharedDelta);
-            AssertHelper(First(), "yy1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
-            I("CREATE yy2 = unpack(2000m1, 2000m3, #b[.., 2]);");
-            AssertHelper(First(), "yy2", EFreq.M, 1999, 12, double.NaN, sharedDelta);
-            AssertHelper(First(), "yy2", EFreq.M, 2000, 1, 15d, sharedDelta);
-            AssertHelper(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
-            AssertHelper(First(), "yy2", EFreq.M, 2000, 3, 17d, sharedDelta);
-            AssertHelper(First(), "yy2", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            I("#c = pack(xx1, xx2);");
+            _AssertMatrix(First(), "#c", "rows", 3);
+            _AssertMatrix(First(), "#c", "cols", 2);
+            _AssertMatrix(First(), "#c", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 6d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 15d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
+            I("yy1 = unpack(#b[.., 1]);");
+            _AssertSeries(First(), "yy1", EFreq.M, 1999, 12, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy1", EFreq.M, 2000, 1, 5d, sharedDelta);
+            _AssertSeries(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
+            _AssertSeries(First(), "yy1", EFreq.M, 2000, 3, 7d, sharedDelta);
+            _AssertSeries(First(), "yy1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            I("yy2 = unpack(2000m1, 2000m3, #b[.., 2]);");
+            _AssertSeries(First(), "yy2", EFreq.M, 1999, 12, double.NaN, sharedDelta);
+            _AssertSeries(First(), "yy2", EFreq.M, 2000, 1, 15d, sharedDelta);
+            _AssertSeries(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
+            _AssertSeries(First(), "yy2", EFreq.M, 2000, 3, 17d, sharedDelta);
+            _AssertSeries(First(), "yy2", EFreq.M, 2000, 4, double.NaN, sharedDelta);
 
             // -------------- divide(), multiply()
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
-            I("MATRIX b = [2, 3, 4 || 5, 6, 7];");
-            I("MATRIX b1 = [2, 3 || 5, 6 || 1, 1];");
-            I("MATRIX b2 = [2, 3, 4 || 5, 6, 7 || 1, 1, 1];");
-            I("MATRIX c = multiply(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d * 3d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d * 4d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d * 5d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d * 6d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d * 7d, sharedDelta);
-            I("MATRIX c = divide(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d / 3d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d / 4d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d / 5d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d / 6d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d / 7d, sharedDelta);
-            FAIL("MATRIX c = multiply(#a, #b1);");
-            FAIL("MATRIX c = multiply(#a, #b2);");
+            I("#a = [1, 2, 3 ; 4, 5, 6];");
+            I("#b = [2, 3, 4 ; 5, 6, 7];");
+            I("#b1 = [2, 3 ; 5, 6 ; 1, 1];");
+            I("#b2 = [2, 3, 4 ; 5, 6, 7 ; 1, 1, 1];");
+            I("#c = multiply(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d * 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d * 4d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d * 5d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d * 6d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d * 7d, sharedDelta);
+            I("#c = divide(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d / 4d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d / 5d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d / 6d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d / 7d, sharedDelta);
+            FAIL("#c = multiply(#a, #b1);");
+            FAIL("#c = multiply(#a, #b2);");
             //Special 1
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
-            I("MATRIX b = [2, 3, 4];");            
-            I("MATRIX c = multiply(#a, #b);"); 
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d * 3d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d * 4d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d * 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d * 4d, sharedDelta);
-            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around
-            I("MATRIX c = divide(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d / 3d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d / 4d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d / 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d / 4d, sharedDelta);
-            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
+            I("#a = [1, 2, 3 ; 4, 5, 6];");
+            I("#b = [2, 3, 4];");            
+            I("#c = multiply(#a, #b);"); 
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d * 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d * 4d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d * 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d * 4d, sharedDelta);
+            FAIL("#c = multiply(#b, #a);");  //not the other way around
+            I("#c = divide(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d / 4d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d / 4d, sharedDelta);
+            FAIL("#c = divide(#b, #a);");  //not the other way around
             //Special 2
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
-            I("MATRIX b = [2 || 3];");
-            I("MATRIX c = multiply(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d * 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d * 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d * 3d, sharedDelta);
-            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around            
-            I("MATRIX c = divide(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d / 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d / 3d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d / 3d, sharedDelta);
-            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
+            I("#a = [1, 2, 3 ; 4, 5, 6];");
+            I("#b = [2 ; 3];");
+            I("#c = multiply(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d * 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d * 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d * 3d, sharedDelta);
+            FAIL("#c = multiply(#b, #a);");  //not the other way around            
+            I("#c = divide(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d / 3d, sharedDelta);
+            FAIL("#c = divide(#b, #a);");  //not the other way around
             //Special 3
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
-            I("MATRIX b = [2];");
-            I("MATRIX c = multiply(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d * 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d * 2d, sharedDelta);
-            FAIL("MATRIX c = multiply(#b, #a);");  //not the other way around            
-            I("MATRIX c = divide(#a, #b);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 2d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 3d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 4d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 5d / 2d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 6d / 2d, sharedDelta);
-            FAIL("MATRIX c = divide(#b, #a);");  //not the other way around
+            I("#a = [1, 2, 3 ; 4, 5, 6];");
+            I("#b = [2];");
+            I("#c = multiply(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d * 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d * 2d, sharedDelta);
+            FAIL("#c = multiply(#b, #a);");  //not the other way around            
+            I("#c = divide(#a, #b);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 2d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 3d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 4d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 5d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 6d / 2d, sharedDelta);
+            FAIL("#c = divide(#b, #a);");  //not the other way around
 
             // -------------- zeros(), ones()
 
             I("RESET;");
-            I("MATRIX c = ones(2, 3);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 1d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 1d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 1d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 1d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 1d, sharedDelta);
-            I("MATRIX c = zeros(2, 3);");
-            AssertHelperMatrix("c", "rows", 2);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 0d, sharedDelta);
+            I("#c = ones(2, 3);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 1d, sharedDelta);
+            I("#c = zeros(2, 3);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 0d, sharedDelta);
 
             // -------------i()
-            I("MATRIX c = i(3);");
-            AssertHelperMatrix("c", "rows", 3);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 1d, sharedDelta);
-            AssertHelperMatrix("c", 3, 3, 1d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 0d, sharedDelta);
-            AssertHelperMatrix("c", 3, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 3, 2, 0d, sharedDelta);
+            I("#c = i(3);");
+            _AssertMatrix(First(), "#c", "rows", 3);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 3, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 2, 0d, sharedDelta);
 
 
             // -------------- inv()
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || -4, 5, -6 || 7, 8, 9];");
-            I("MATRIX b = inv(#a);");
-            I("MATRIX c = #b*#a;");
-            AssertHelperMatrix("c", "rows", 3);
-            AssertHelperMatrix("c", "cols", 3);
-            AssertHelperMatrix("c", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("c", 2, 2, 1d, sharedDelta);
-            AssertHelperMatrix("c", 3, 3, 1d, sharedDelta);
-            AssertHelperMatrix("c", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("c", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 2, 3, 0d, sharedDelta);
-            AssertHelperMatrix("c", 3, 1, 0d, sharedDelta);
-            AssertHelperMatrix("c", 3, 2, 0d, sharedDelta);
-            FAIL("MATRIX d = inv([1, 2, 3 || -4, 5, -6]);");
-            FAIL("MATRIX d = inv([1, 2 || 3, 4 || 5, 6]);");
-            FAIL("MATRIX d = inv([1, 2 || 10, 20);");
+            I("#a = [1, 2, 3 ; -4, 5, -6 ; 7, 8, 9];");
+            I("#b = inv(#a);");
+            I("#c = #b*#a;");
+            _AssertMatrix(First(), "#c", "rows", 3);
+            _AssertMatrix(First(), "#c", "cols", 3);
+            _AssertMatrix(First(), "#c", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 3, 1d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#c", 3, 2, 0d, sharedDelta);
+            FAIL("#d = inv([1, 2, 3 ; -4, 5, -6]);");
+            FAIL("#d = inv([1, 2 ; 3, 4 ; 5, 6]);");
+            FAIL("#d = inv([1, 2 ; 10, 20);");
 
             I("RESET;");
-            I("MATRIX a = [1, 2 || 3, 4];");
-            I("VAL v = det(#a);");
-            AssertHelperScalarVal("v", -2d);
+            I("#a = [1, 2 ; 3, 4];");
+            I("%v = det(#a);");
+            _AssertScalarVal(First(), "%v", -2d);
 
             // ------------ diagonal, diag()
             I("RESET;");
-            I("MATRIX a = [1, 2 || 3, 4];");
-            I("MATRIX b = diag(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 4d, sharedDelta);
+            I("#a = [1, 2 ; 3, 4];");
+            I("#b = diag(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 4d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1 || 2];");
-            I("MATRIX b = diag(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 0d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 2d, sharedDelta);
-            FAIL("MATRIX b = diag([1, 2]);");
-            FAIL("MATRIX b = diag([1, 2 || 3, 4 || 5, 6]);");
-            I("MATRIX b = diag([123]);");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 123d, sharedDelta);
+            I("#a = [1 ; 2];");
+            I("#b = diag(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 2d, sharedDelta);
+            FAIL("#b = diag([1, 2]);");
+            FAIL("#b = diag([1, 2 ; 3, 4 ; 5, 6]);");
+            I("#b = diag([123]);");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 123d, sharedDelta);
 
             // ------------ sumr(), sumc(), minr(), minc(), maxr(), maxc()
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6];");
-            I("MATRIX b = sumr(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 6d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 15d, sharedDelta);
-            I("MATRIX b = avgr(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 6d / 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 15d / 3d, sharedDelta);
-            I("MATRIX b = minr(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 4d, sharedDelta);
-            I("MATRIX b = maxr(#a);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 1);
-            AssertHelperMatrix("b", 1, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 6d, sharedDelta);
-            I("MATRIX b = sumc(#a);");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 7d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 9d, sharedDelta);
-            I("MATRIX b = avgc(#a);");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 5d / 2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 7d / 2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 9d / 2d, sharedDelta);
-            I("MATRIX b = minc(#a);");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 3d, sharedDelta);
-            I("MATRIX b = maxc(#a);");
-            AssertHelperMatrix("b", "rows", 1);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 4d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 6d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6];");
+            I("#b = sumr(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 6d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 15d, sharedDelta);
+            I("#b = avgr(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 6d / 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 15d / 3d, sharedDelta);
+            I("#b = minr(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 4d, sharedDelta);
+            I("#b = maxr(#a);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 1);
+            _AssertMatrix(First(), "#b", 1, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 6d, sharedDelta);
+            I("#b = sumc(#a);");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 7d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 9d, sharedDelta);
+            I("#b = avgc(#a);");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 5d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 7d / 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 9d / 2d, sharedDelta);
+            I("#b = minc(#a);");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 3d, sharedDelta);
+            I("#b = maxc(#a);");
+            _AssertMatrix(First(), "#b", "rows", 1);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 6d, sharedDelta);
 
             // ------------ trace()
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("VAL v = trace(#a);");
-            AssertHelperScalarVal("v", 15d);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("%v = trace(#a);");
+            _AssertScalarVal(First(), "%v", 15d);
 
             // ------------ round()
             I("RESET;");
-            I("MATRIX a = [1.235, -2.55 || 1.55, 7.77];");
-            I("Matrix b = round(#a, 1);");
-            AssertHelperMatrix("b", "rows", 2);
-            AssertHelperMatrix("b", "cols", 2);
-            AssertHelperMatrix("b", 1, 1, 1.2d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, -2.6d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 1.6d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 7.8d, sharedDelta);
+            I("#a = [1.235, -2.55 ; 1.55, 7.77];");
+            I("#b = round(#a, 1);");
+            _AssertMatrix(First(), "#b", "rows", 2);
+            _AssertMatrix(First(), "#b", "cols", 2);
+            _AssertMatrix(First(), "#b", 1, 1, 1.2d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, -2.6d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 1.6d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 7.8d, sharedDelta);
 
             // ---------------------------------------------
             // --------- left-side indexer -----------------
             // ---------------------------------------------
                         
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1..2, 1..2] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 40d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[..2, ..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[..2, ..2] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 40d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2..3, 1..2] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 40d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[2..3, 1..2] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 40d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 2..3] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 40d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1..2, 2..3] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 40d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2..3, 2..3] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[2..3, 2..3] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 40d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[2.., 2..] = [10, 20 || 30, 40];");
-            AssertHelperMatrix("a", 1, 1, 1d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 20d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 30d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 40d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[2.., 2..] = [10, 20 ; 30, 40];");
+            _AssertMatrix(First(), "#a", 1, 1, 1d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 40d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1..2] = 100;");
-            AssertHelperMatrix("a", 1, 1, 100d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 100d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 100d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 100d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1..2, 1..2] = 100;");
+            _AssertMatrix(First(), "#a", 1, 1, 100d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 100d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 100d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 100d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1..2, 1] = [10 || 30];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 30d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1..2, 1] = [10 ; 30];");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 30d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1..2] = [10, 20];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 20d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1, 1..2] = [10, 20];");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 20d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1] = [10];");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1, 1] = [10];");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[1, 1] = 10;");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 2d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 3d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 4d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 5d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 6d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 7d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 8d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 9d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[1, 1] = 10;");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 2d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 3d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 4d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 5d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 6d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 7d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 8d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 9d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            I("MATRIX a[.., ..] = 10;");
-            AssertHelperMatrix("a", "rows", 3);
-            AssertHelperMatrix("a", "cols", 3);
-            AssertHelperMatrix("a", 1, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 1, 3, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 2, 3, 10d, sharedDelta);
-            AssertHelperMatrix("a", 3, 1, 10d, sharedDelta);
-            AssertHelperMatrix("a", 3, 2, 10d, sharedDelta);
-            AssertHelperMatrix("a", 3, 3, 10d, sharedDelta);
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            I("#a[.., ..] = 10;");
+            _AssertMatrix(First(), "#a", "rows", 3);
+            _AssertMatrix(First(), "#a", "cols", 3);
+            _AssertMatrix(First(), "#a", 1, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 1, 3, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 2, 3, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 1, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 2, 10d, sharedDelta);
+            _AssertMatrix(First(), "#a", 3, 3, 10d, sharedDelta);
             I("RESET;");
-            I("MATRIX a = [1, 2, 3 || 4, 5, 6 || 7, 8, 9];");
-            FAIL("MATRIX a[1..2, 2..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[2..2, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[2..1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 2..1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[0..1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 0..1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[3..4, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 3..4] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1, 1..2] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1..2, 1] = [10, 20 || 30, 40];");
-            FAIL("MATRIX a[1, 1] = [10, 20 || 30, 40];");
+            I("#a = [1, 2, 3 ; 4, 5, 6 ; 7, 8, 9];");
+            FAIL("#a[1..2, 2..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[2..2, 1..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[2..1, 1..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[1..2, 2..1] = [10, 20 ; 30, 40];");
+            FAIL("#a[0..1, 1..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[1..2, 0..1] = [10, 20 ; 30, 40];");
+            FAIL("#a[3..4, 1..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[1..2, 3..4] = [10, 20 ; 30, 40];");
+            FAIL("#a[1, 1..2] = [10, 20 ; 30, 40];");
+            FAIL("#a[1..2, 1] = [10, 20 ; 30, 40];");
+            FAIL("#a[1, 1] = [10, 20 ; 30, 40];");
 
             I("RESET;");
-            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
-            I("MATRIX b = chol(#a, 'lower');");  //upper er default
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
+            I("#a = [25, 15, -5 ; 15, 18, 0 ; -5, 0, 11];");
+            I("#b = chol(#a, 'lower');");  //upper er default
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, -1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 3, 3d, sharedDelta);
 
             I("RESET;");
-            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
-            I("MATRIX b = t(chol(#a, 'upper'));");
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
+            I("#a = [25, 15, -5 ; 15, 18, 0 ; -5, 0, 11];");
+            I("#b = t(chol(#a, 'upper'));");
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, -1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 3, 3d, sharedDelta);
 
             I("RESET;");
-            I("MATRIX a = [25, 15, -5 || 15, 18, 0 || -5, 0, 11];");
-            I("MATRIX b = t(chol(#a));");  //upper er default
-            AssertHelperMatrix("b", "rows", 3);
-            AssertHelperMatrix("b", "cols", 3);
-            AssertHelperMatrix("b", 1, 1, 5d, sharedDelta);
-            AssertHelperMatrix("b", 1, 2, 0d, sharedDelta);
-            AssertHelperMatrix("b", 1, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 2, 1, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 2, 3d, sharedDelta);
-            AssertHelperMatrix("b", 2, 3, 0d, sharedDelta);
-            AssertHelperMatrix("b", 3, 1, -1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 2, 1d, sharedDelta);
-            AssertHelperMatrix("b", 3, 3, 3d, sharedDelta);
+            I("#a = [25, 15, -5 ; 15, 18, 0 ; -5, 0, 11];");
+            I("#b = t(chol(#a));");  //upper er default
+            _AssertMatrix(First(), "#b", "rows", 3);
+            _AssertMatrix(First(), "#b", "cols", 3);
+            _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 2, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 1, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 1, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 2, 3d, sharedDelta);
+            _AssertMatrix(First(), "#b", 2, 3, 0d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 1, -1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 2, 1d, sharedDelta);
+            _AssertMatrix(First(), "#b", 3, 3, 3d, sharedDelta);
 
             //testing labels -----------------------------
 
             I("RESET;");
-            I("LIST rn = a, b, c;");
-            I("LIST cn = x, y, z, w;");
-            I("MATRIX <rownames = #rn colnames = #cn> a = ones(3, 4);");
-            Matrix m = (Matrix)Program.scalars["#a"];
+            I("LIST #rn = a, b, c;");
+            I("LIST #cn = x, y, z, w;");
+            I("matrix <rownames = #rn colnames = #cn> #a = ones(3, 4);");
+            Matrix m = (Matrix)Program.databanks.GetFirst().GetIVariable("#a");
             Assert.AreEqual(m.rownames.Count, 3);
             Assert.AreEqual(m.colnames.Count, 4);
-            I("SHOW #a;");
+            I("PRT #a;");
 
-            I("RESET;");
-            I("LIST rn = a, b, c;");
-            I("LIST cn = x, y, z, w;");
-            I("MATRIX a = ones(3, 4);");
-            I("MATRIX <rownames = #rn colnames = #cn> a;");
-            Matrix m2 = (Matrix)Program.scalars["#a"];
-            Assert.AreEqual(m2.rownames.Count, 3);
-            Assert.AreEqual(m2.colnames.Count, 4);
-            I("SHOW #a;");
-
-            FAIL("MATRIX a;");
-            FAIL("MATRIX <rownames = #rn colnames = #cn> b;");  //the #b matrix does not exist
-            I("LIST b = r, t;");  
-            FAIL("MATRIX <rownames = #rn colnames = #cn> b;");  //the #b object is a list
+            
         }
 
         [TestMethod]
@@ -14324,13 +14354,13 @@ namespace UnitTests
             I("RESET;");
 
             //1.2345 set at start
-            I("VAL v1 = 1.2345;");
-            I("VAL v2 = %v1 * 10;");
-            I("VAL v3 = %v1 + 10;");
-            I("VAL v4 = %v1 / 10;");
-            I("VAL v5 = log(%v1);");
-            I("VAL v6 = exp(%v1);");
-            I("VAL v7 = abs(%v1);");
+            I("%v1 = 1.2345;");
+            I("%v2 = %v1 * 10;");
+            I("%v3 = %v1 + 10;");
+            I("%v4 = %v1 / 10;");
+            I("%v5 = log(%v1);");
+            I("%v6 = exp(%v1);");
+            I("%v7 = abs(%v1);");
 
             AssertHelperScalarVal("v1", 1.2345d);
             AssertHelperScalarVal("v2", 12.345d, sharedDelta);
@@ -14340,7 +14370,7 @@ namespace UnitTests
             AssertHelperScalarVal("v6", Math.Exp(1.2345d));
             AssertHelperScalarVal("v7", Math.Abs(1.2345d));
 
-            FAIL("VAL v777 = v1 * 10;");  //this is not legal
+            FAIL("%v777 = v1 * 10;");  //this is not legal
 
             // ----------------------------------------------------------
             // ------------- testing VAL indexers (fy[2000]) ------------
@@ -14351,21 +14381,21 @@ namespace UnitTests
             I("TIME 2000 2003;");
             I("SERIES xx = 100;");
             I("SERIES<2001 2004> xx ^ 1;");
-            I("VAL v2000 = xx[2000];");
-            I("VAL v2001 = xx[2001];");
-            I("VAL v2002 = xx[2002] + xx[2003];");
+            I("%v2000 = xx[2000];");
+            I("%v2001 = xx[2001];");
+            I("%v2002 = xx[2002] + xx[2003];");
 
             AssertHelperScalarVal("v2000", 100d);
             AssertHelperScalarVal("v2001", 101d);
             AssertHelperScalarVal("v2002", 205d);
 
             I("DATE d = 2003;");
-            I("VAL v = 2005;");
-            I("VAL v2004 = xx[%d+1] + xx[%v-1];");
+            I("%v = 2005;");
+            I("%v2004 = xx[%d+1] + xx[%v-1];");
             AssertHelperScalarVal("v2004", 208d);
-            I("VAL v2004 = xx[2003a1+1] + xx[2005-1];");
+            I("%v2004 = xx[2003a1+1] + xx[2005-1];");
             AssertHelperScalarVal("v2004", 208d);  //same
-            I("VAL v2004 = xx[2004a1] + xx[2004];");
+            I("%v2004 = xx[2004a1] + xx[2004];");
             AssertHelperScalarVal("v2004", 208d);  //same
 
             //Brief test on quarters

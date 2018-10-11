@@ -2362,8 +2362,10 @@ seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | Q (EQUAL yesNo)? -> ^(ASTOPT_STRING_Q yesNo?)
 						  | MP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MP yesNo?)						
 						  | N (EQUAL yesNo)? -> ^(ASTOPT_STRING_N yesNo?)						
-						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)
-						  ;
+						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)						  
+                          | ROWNAMES EQUAL expression -> ^(ASTOPT_LIST_ROWNAMES expression)
+                          | COLNAMES EQUAL expression -> ^(ASTOPT_LIST_COLNAMES expression)
+						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
