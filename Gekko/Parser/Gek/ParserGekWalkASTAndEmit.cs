@@ -244,6 +244,75 @@ namespace Gekko.Parser.Gek
             //The #m is assigned to sum() or unfold() or to PRTELEMENT (last one will be converted to unfold()).
             //Also in x[#m] = y[#m] + ... , the #m is assigned to ASTASSIGNMENT
 
+            //Also locates listfiles via ASTBANKVARNAME2. For instance #(listfile m) or #(listfile {'m'})
+            //the former will work with sum(), unfold() etc.
+
+            if (node.Text == "ASTBANKVARNAME2")
+            {
+
+                //if (node?[1]?[0]?[0].Text != "ASTHASH") throw new GekkoException();  //must be a list
+                ASTNode name = node[1][1][0];
+
+                if (name[0].Text == "ASTIDENT")
+                {
+                    // ASTBANKVARNAME
+                    //   ASTPLACEHOLDER
+                    //   ASTVARNAME
+                    //     ASTPLACEHOLDER
+                    //       ASTHASH
+                    //     ASTPLACEHOLDER
+                    //       ASTNAME
+                    //         ASTIDENT
+                    //           i ------------>  changed
+                    //     ASTPLACEHOLDER
+
+                    name[0][0].Text = "listfile___" + name[0][0].Text;
+                }
+                else
+                {
+                    // ASTBANKVARNAME
+                    //   ASTPLACEHOLDER
+                    //   ASTVARNAME
+                    //     ASTPLACEHOLDER
+                    //       ASTHASH
+                    //     ASTPLACEHOLDER
+                    //       ASTNAME ----------> here an ASTCNAME is inserted with 'listfile' as first node
+                    //         ASTCURLY
+                    //           ASTSTRINGINQUOTES
+                    //             'i' 
+                    //     ASTPLACEHOLDER
+
+                    // becomes...
+
+                    // ASTBANKVARNAME
+                    //   ASTPLACEHOLDER
+                    //   ASTVARNAME
+                    //     ASTPLACEHOLDER
+                    //       ASTHASH
+                    //     ASTPLACEHOLDER
+                    //       ASTCNAME   ----------> here an ASTCNAME is inserted with 'listfile' as first node
+                    //         ASTNAME
+                    //           ASTIDENT
+                    //             listfile_
+                    //         ASTNAME -----------> is detached from ASTPLACEHOLDER above and attached here
+                    //           ASTCURLY
+                    //             ASTSTRINGINQUOTES
+                    //               'i' 
+                    //     ASTPLACEHOLDER
+
+                    ASTNode cname = new ASTNode("ASTCNAME", true);
+                    name.Parent[0] = cname;
+                    ASTNode extraname = new ASTNode("ASTNAME", true);
+                    extraname.Add(new ASTNode("ASTIDENT", true));
+                    extraname[0].Add(new ASTNode("listfile___"));
+                    cname.Add(extraname);
+                    cname.Add(name);
+
+
+                }
+                node.Text = "ASTBANKVARNAME";
+            }
+
             if (node.Text == "ASTBANKVARNAME")
             {
                 string s = GetSimpleName(node);

@@ -43,6 +43,7 @@ tokens {
 	ASTPERCENT2;
 	ASTDOTORINDEXER;
 	ASTBANKVARNAME;
+	ASTBANKVARNAME2;
 	ASTHASH;
 	ASTPERCENT;
 	ASTPLUS2;
@@ -1966,8 +1967,8 @@ wildRange:                  expression doubleDot2 expression -> ^(ASTRANGEGENERA
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
-leftSideDollarExpression:   (bankvarnameIndexer -> bankvarnameIndexer)
-						    (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*	
+leftSideDollarExpression:   listFile
+                          | (bankvarnameIndexer -> bankvarnameIndexer) (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*								
 						    ; 						
 
 bankvarnameIndexer:  (bankvarname -> bankvarname)
@@ -2012,7 +2013,8 @@ mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
 mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 
-listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
+//listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
+listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH) ^(ASTPLACEHOLDER name) ASTPLACEHOLDER) );
 
 function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
 objectFunction:             ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);

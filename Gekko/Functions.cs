@@ -2775,8 +2775,8 @@ namespace Gekko
         public static IVariable union(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og tilføjer dem fra b (uden dubletter). Hvis dubletter i b skal med, skal der bruges komma...
-            List<string> lx1 = O.GetStringList(x1);
-            List<string> lx2 = O.GetStringList(x2);
+            List<string> lx1 = Program.GetListOfStringsFromList(x1);
+            List<string> lx2 = Program.GetListOfStringsFromList(x2);
             List<string> union = new List<string>();
             union.AddRange(lx1);
             GekkoDictionary<string, bool> result = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
@@ -2799,8 +2799,8 @@ namespace Gekko
         public static IVariable except(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
-            List<string> lx1 = O.GetStringList(x1);
-            List<string> lx2 = O.GetStringList(x2);
+            List<string> lx1 = Program.GetListOfStringsFromList(x1);
+            List<string> lx2 = Program.GetListOfStringsFromList(x2);
             List<string> difference = new List<string>();
             GekkoDictionary<string, bool> temp = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             foreach (string s in lx2)
@@ -2821,8 +2821,8 @@ namespace Gekko
         public static IVariable intersect(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
-            List<string> lx1 = O.GetStringList(x1);
-            List<string> lx2 = O.GetStringList(x2);
+            List<string> lx1 = Program.GetListOfStringsFromList(x1);
+            List<string> lx2 = Program.GetListOfStringsFromList(x2);
             List<string> intersection = new List<string>();
             if (lx1.Count > lx2.Count)  //for speedup, we do the heaviest looping on the smaller list.
             {
@@ -2909,6 +2909,7 @@ namespace Gekko
 
         // ====================== object methods =======================================
 
+        //see also the other append method
         public static IVariable append(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
             //FIX: type checks etc.!
@@ -2917,6 +2918,7 @@ namespace Gekko
             return temp;
         }
 
+        //see also the other append method
         public static IVariable append(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
         {
             //FIX: type checks etc.!
@@ -2930,14 +2932,33 @@ namespace Gekko
             temp.list.Insert(i - 1, x);            
             return temp;
         }
+                
 
-        //public static IVariable append_naked(GekkoSmpl smpl, IVariable ths, IVariable x)
-        //{
-        //    ths.Add(x);
-        //    return new GekkoNull();
-        //}
+        //see also the other extend() method
+        public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
+        {
+            if (ths.Type() != EVariableType.List) FunctionError("extend", x);
+            int i = O.ConvertToInt(index, true);
+            List temp = ths.DeepClone(null) as List;
+            if (i - 1 < 0 || i - 1 > temp.list.Count)
+            {
+                G.Writeln2("*** ERROR: Cannot insert at position " + i);
+                throw new GekkoException();
+            }
+            if (x.Type() == EVariableType.List)
+            {
+                List x_list = x as List;
+                temp = temp.DeepClone(null) as List;
+                temp.list.InsertRange(i - 1, x_list.list);
+            }
+            else
+            {
+                FunctionError("extend", x);
+            }
+            return temp;
+        }
 
-
+        //see also the other extend() method
         public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable x)
         {
             if (ths.Type() != EVariableType.List) FunctionError("extend", x);
@@ -3011,34 +3032,7 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable extend(GekkoSmpl smpl, IVariable ths, IVariable index, IVariable x)
-        {
-            //FIX: type checks etc.!
-            int i = O.ConvertToInt(index, true);
-            List temp = ths.DeepClone(null) as List;
-            if (i - 1 < 0 || i - 1 > temp.list.Count)
-            {
-                G.Writeln2("*** ERROR: Cannot insert at position " + i);
-                throw new GekkoException();
-            }
-            if (x.Type() == EVariableType.List)
-            {
-                List x_list = x as List;
-                temp = temp.DeepClone(null) as List;
-                temp.list.InsertRange(i - 1, x_list.list);
-            }
-            else if (x.Type() == EVariableType.Val || x.Type() == EVariableType.Date || x.Type() == EVariableType.String)
-            {
-                temp = temp.DeepClone(null) as List;
-                temp.list.Insert(i-1, x);
-            }
-            else
-            {
-                FunctionError("extend", x);
-            }
-
-            return temp;
-        }
+        
 
         private static void FunctionError(string s, IVariable x)
         {

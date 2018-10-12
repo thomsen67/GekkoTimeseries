@@ -1423,7 +1423,7 @@ namespace Gekko
 
         public static List NOTUSED_HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.SearchFromTo(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search);
+            List<TwoStrings> matches = Program.SearchFromTo(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search, null);
             List rv = new List();
             foreach (TwoStrings two in matches)
             {
@@ -4262,7 +4262,7 @@ namespace Gekko
         public static IVariable GetListWithBankPrefix(IVariable x, IVariable y, int bankNumber)
         {
             string bankName = O.ConvertToString(x);
-            List<string> items = O.GetStringList(y);
+            List<string> items = Program.GetListOfStringsFromList(y);
             List<string> newList = new List<string>();
             foreach (string s in items)
             {
@@ -5045,32 +5045,7 @@ namespace Gekko
         }
 
 
-        public static List<string> GetStringList(IVariable a)
-        {
-            if (a.Type() == EVariableType.String)
-            {
-                List<string> mm = new List<string>();
-                mm.Add(a.ConvertToString());
-                return mm;
-            }
-            else if (a.Type() == EVariableType.List)
-            {
-                List<IVariable> m = a.ConvertToList();
-                List<string> mm = new List<string>();
-                foreach (IVariable iv in m)
-                {
-                    string s = O.ConvertToString(iv);
-                    mm.Add(s);
-                }
-                return mm;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: input must b a string or list of strings");
-                throw new GekkoException();
-            }
-
-        }
+        
 
         //public static Matrix GetMatrixFromString(IVariable name)
         //{
@@ -7180,7 +7155,7 @@ namespace Gekko
             public string opt_bank = null;
             public string opt_frombank = null;
             public string opt_tobank = null;
-            public string opt_error = null;
+            public string opt_error = null;  //note: COPY will stil error if a wildcard/range does not match anything
             public string opt_print = null;
             public string opt_type = null;
             public string type = null;

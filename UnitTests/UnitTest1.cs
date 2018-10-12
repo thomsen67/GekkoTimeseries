@@ -315,16 +315,17 @@ namespace UnitTests
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
             _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
             _AssertListString(First(), "#m2", new StringOrList("b", "c", "d"));  //no sideeffects
-            I("#m = #m1.extend('f');");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            FAIL("#m = #m1.extend('f');");  //this is not allowed and #m1 + 'f' would append 'f' to list elements
+            //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
             I("#m = extend(#m1, #m2);");
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
-            I("#m = extend(#m1, 'f');");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            //I("#m = extend(#m1, 'f');");  //not allowed
+            //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
             I("#m = #m1 + #m2;");
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
-            I("#m = #m1 + 'f';");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
+            I("#m = #m1 + 'f';");  //we have that {#m + 'f'} is same as {#m}f
+            //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));  //NO!
+            _AssertListString(First(), "#m", new StringOrList("af", "bf", "cf"));
             I("#m = #m1.extend(#m2).extend(#m2);");
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
             I("#m = #m1 + #m2 + #m2;");
@@ -4967,11 +4968,13 @@ namespace UnitTests
 
             I("#m3 = list();");
             I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 = #m3 + %s; end;");
-            _AssertListString(First(), "#m3", 1, "ax");
-            _AssertListString(First(), "#m3", 2, "by");
+            _AssertListSize(First(), "#m3", 0);  //a list + string appends string to each element in list
 
             I("#m3 = list();");
             I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 += %s; end;");
+            _AssertListSize(First(), "#m3", 0);  //a list + string appends string to each element in list
+
+            I("for %i = #m1, %j = #m2; %s = %i + %j; #m3 = #m3.append(%s); end;");
             _AssertListString(First(), "#m3", 1, "ax");
             _AssertListString(First(), "#m3", 2, "by");
 
@@ -5155,14 +5158,14 @@ namespace UnitTests
             I("CREATE x; SER <2010 2013> x = 2, 3, 4, 5;");
             I("FOR val i = 1 to 8; CREATE y{i}; END;");
             I("SIM <2013 2013>;");
-            AssertHelper(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
-            AssertHelper(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
-            AssertHelper(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
-            AssertHelper(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
-            AssertHelper(First(), "y5", 2013, (4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y6", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
-            AssertHelper(First(), "y7", 2013, (3d + 4d) / 1d, sharedDelta);
-            AssertHelper(First(), "y8", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2013, (4d + 5d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y2", 2013, (3d + 4d + 5d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y3", 2013, (3d + 4d) / 2d, sharedDelta);
+            _AssertSeries(First(), "y4", 2013, (2d + 3d + 4d) / 3d, sharedDelta);
+            _AssertSeries(First(), "y5", 2013, (4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y6", 2013, (3d + 4d + 5d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y7", 2013, (3d + 4d) / 1d, sharedDelta);
+            _AssertSeries(First(), "y8", 2013, (2d + 3d + 4d) / 1d, sharedDelta);
         }
 
         [TestMethod]
@@ -5254,17 +5257,17 @@ namespace UnitTests
                 I("FOR val i = 1 to 10; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
                 I("SIM <2011 2011>;");
 
-                AssertHelper(First(), "y1", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
-                AssertHelper(First(), "y2", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y3", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y4", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+                _AssertSeries(First(), "y1", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                _AssertSeries(First(), "y2", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y3", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y4", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
 
-                AssertHelper(First(), "y5", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
-                AssertHelper(First(), "y6", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y7", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y8", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
-                AssertHelper(First(), "y9", 2011, 0.5d * 200d + 1d, sharedDelta);
-                AssertHelper(First(), "y10", 2011, 2d, sharedDelta);
+                _AssertSeries(First(), "y5", 2011, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                _AssertSeries(First(), "y6", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y7", 2011, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y8", 2011, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+                _AssertSeries(First(), "y9", 2011, 0.5d * 200d + 1d, sharedDelta);
+                _AssertSeries(First(), "y10", 2011, 2d, sharedDelta);
 
                 if (i == 0) Program.Flush(); //wipes out existing cached models
 
@@ -5276,16 +5279,16 @@ namespace UnitTests
                 I("FOR val i = 1 to 10; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
                 I("SIM <2011q1 2011q1>;");
 
-                AssertHelper(First(), "y1", EFreq.Q, 2011, 1, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
-                AssertHelper(First(), "y2", EFreq.Q, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y3", EFreq.Q, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
-                AssertHelper(First(), "y4", EFreq.Q, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
+                _AssertSeries(First(), "y1", EFreq.Q, 2011, 1, 100d * ((0.5d * (202d / 200d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                _AssertSeries(First(), "y2", EFreq.Q, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y3", EFreq.Q, 2011, 1, 0.5d * (202d - 200d) + 1d + 100d, sharedDelta);
+                _AssertSeries(First(), "y4", EFreq.Q, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 200d) + 1d + Math.Log(100d)), sharedDelta);
 
-                AssertHelper(First(), "y5", EFreq.Q, 2011, 1, 7d * ((0.5d * (202d / 3d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
-                AssertHelper(First(), "y6", EFreq.Q, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
-                AssertHelper(First(), "y7", EFreq.Q, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
-                AssertHelper(First(), "y8", EFreq.Q, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 3d) + 1d + Math.Log(7d)), sharedDelta);
-                AssertHelper(First(), "y9", EFreq.Q, 2011, 1, 0.5d * 3d + 1d, sharedDelta);
+                _AssertSeries(First(), "y5", EFreq.Q, 2011, 1, 7d * ((0.5d * (202d / 3d - 1d) * 100d + 1d) / 100d + 1d), sharedDelta);
+                _AssertSeries(First(), "y6", EFreq.Q, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
+                _AssertSeries(First(), "y7", EFreq.Q, 2011, 1, 0.5d * (202d - 3d) + 1d + 7d, sharedDelta);
+                _AssertSeries(First(), "y8", EFreq.Q, 2011, 1, Math.Exp(0.5d * Math.Log(202d / 3d) + 1d + Math.Log(7d)), sharedDelta);
+                _AssertSeries(First(), "y9", EFreq.Q, 2011, 1, 0.5d * 3d + 1d, sharedDelta);
             }
 
             I("RESET; MODE data;");            
@@ -5299,10 +5302,10 @@ namespace UnitTests
             I("SERIES <2011q1 2011q1> y6 = dif(x);");
             I("SERIES <2011q1 2011q1> y7 = diff(x);");
             I("SERIES <2011q1 2011q1> y8 = dlog(x);");
-            AssertHelper(First(), "y1", EFreq.Q, 2011, 1,  (202d / 200d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y2", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y3", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y4", EFreq.Q, 2011, 1,  Math.Log(202d / 200d), sharedDelta);
+            _AssertSeries(First(), "y1", EFreq.Q, 2011, 1,  (202d / 200d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y2", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y3", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y4", EFreq.Q, 2011, 1,  Math.Log(202d / 200d), sharedDelta);
 
             //same with expression inside
             I("RESET; MODE data;");
@@ -5316,14 +5319,14 @@ namespace UnitTests
             I("SERIES <2011q1 2011q1> y6 = dif(0.5 * x + 0.5 * x);");
             I("SERIES <2011q1 2011q1> y7 = diff(0.5 * x + 0.5 * x);");
             I("SERIES <2011q1 2011q1> y8 = dlog(0.5 * x + 0.5 * x);");
-            AssertHelper(First(), "y1", EFreq.Q, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y2", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y3", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y4", EFreq.Q, 2011, 1, Math.Log(202d / 200d), sharedDelta);
-            AssertHelper(First(), "y5", EFreq.Q, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y6", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
-            AssertHelper(First(), "y7", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
-            AssertHelper(First(), "y8", EFreq.Q, 2011, 1, Math.Log(202d / 3d), sharedDelta);
+            _AssertSeries(First(), "y1", EFreq.Q, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y2", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y3", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y4", EFreq.Q, 2011, 1, Math.Log(202d / 200d), sharedDelta);
+            _AssertSeries(First(), "y5", EFreq.Q, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y6", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
+            _AssertSeries(First(), "y7", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
+            _AssertSeries(First(), "y8", EFreq.Q, 2011, 1, Math.Log(202d / 3d), sharedDelta);
 
             //same with expression inside, with lag
             I("RESET; MODE data;");
@@ -5337,14 +5340,14 @@ namespace UnitTests
             I("SERIES <2011q1 2011q1> y6 = dif(0.5 * x[-1] + 0.5 * x[-1]);");
             I("SERIES <2011q1 2011q1> y7 = diff(0.5 * x[-1] + 0.5 * x[-1]);");
             I("SERIES <2011q1 2011q1> y8 = dlog(0.5 * x[-1] + 0.5 * x[-1]);");
-            AssertHelper(First(), "y1", EFreq.Q, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y2", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y3", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
-            AssertHelper(First(), "y4", EFreq.Q, 2011, 1, Math.Log(202d / 200d), sharedDelta);
-            AssertHelper(First(), "y5", EFreq.Q, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
-            AssertHelper(First(), "y6", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
-            AssertHelper(First(), "y7", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
-            AssertHelper(First(), "y8", EFreq.Q, 2011, 1, Math.Log(202d / 3d), sharedDelta);
+            _AssertSeries(First(), "y1", EFreq.Q, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y2", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y3", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y4", EFreq.Q, 2011, 1, Math.Log(202d / 200d), sharedDelta);
+            _AssertSeries(First(), "y5", EFreq.Q, 2011, 1, (202d / 3d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y6", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
+            _AssertSeries(First(), "y7", EFreq.Q, 2011, 1, (202d - 3d), sharedDelta);
+            _AssertSeries(First(), "y8", EFreq.Q, 2011, 1, Math.Log(202d / 3d), sharedDelta);
         }
 
         [TestMethod]
@@ -5362,42 +5365,42 @@ namespace UnitTests
             I("WRITE sletmig;");
             I("READ sletmig;");
             I("SIM<static>;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 1750d, 1d);
-            AssertHelper(First(), "y", 2003, 1750d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 1750d, 1d);
+            _AssertSeries(First(), "y", 2003, 1750d, 1d);
             //--------------------------
             I("READ sletmig;");
             I("SIM<static=yes>;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 1750d, 1d);
-            AssertHelper(First(), "y", 2003, 1750d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 1750d, 1d);
+            _AssertSeries(First(), "y", 2003, 1750d, 1d);
             I("READ sletmig;");
             I("SIM<static=no>;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 4875d, 1d);
-            AssertHelper(First(), "y", 2003, 12687.5d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 4875d, 1d);
+            _AssertSeries(First(), "y", 2003, 12687.5d, 1d);
             I("READ sletmig;");
             I("SIM;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 4875d, 1d);
-            AssertHelper(First(), "y", 2003, 12687.5d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 4875d, 1d);
+            _AssertSeries(First(), "y", 2003, 12687.5d, 1d);
             //--------------------------
             I("OPTION solve static = yes;");
             I("READ sletmig;");
             I("SIM<static=yes>;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 1750d, 1d);
-            AssertHelper(First(), "y", 2003, 1750d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 1750d, 1d);
+            _AssertSeries(First(), "y", 2003, 1750d, 1d);
             I("READ sletmig;");
             I("SIM<static=no>;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 4875d, 1d);
-            AssertHelper(First(), "y", 2003, 12687.5d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 4875d, 1d);
+            _AssertSeries(First(), "y", 2003, 12687.5d, 1d);
             I("READ sletmig;");
             I("SIM;");
-            AssertHelper(First(), "y", 2001, 1750d, 1d);
-            AssertHelper(First(), "y", 2002, 1750d, 1d);
-            AssertHelper(First(), "y", 2003, 1750d, 1d);
+            _AssertSeries(First(), "y", 2001, 1750d, 1d);
+            _AssertSeries(First(), "y", 2002, 1750d, 1d);
+            _AssertSeries(First(), "y", 2003, 1750d, 1d);
         }
 
         [TestMethod]
@@ -5411,53 +5414,53 @@ namespace UnitTests
             I("TIME 2006 2008;");
             I("SIM;");
             I("CLONE;");
-            AssertHelper(First(), "fy", 2006, 1407457d, 1d);  //1.11%
-            AssertHelper(First(), "fy", 2007, 1437479d, 1d);  //2.13%
-            AssertHelper(First(), "fy", 2008, 1456464d, 1d);  //1.32%
+            _AssertSeries(First(), "fy", 2006, 1407457d, 1d);  //1.11%
+            _AssertSeries(First(), "fy", 2007, 1437479d, 1d);  //2.13%
+            _AssertSeries(First(), "fy", 2008, 1456464d, 1d);  //1.32%
             I("EXO fy; ENDO tg;");
             I("SERIES fy % 2;");
             I("SIM;");
-            AssertHelper(First(), "fy", 2006, 1407457d, 1d);  //no effect, same as above, since no SIM<fix> is used
-            AssertHelper(First(), "fy", 2007, 1437479d, 1d);
-            AssertHelper(First(), "fy", 2008, 1456464d, 1d);
+            _AssertSeries(First(), "fy", 2006, 1407457d, 1d);  //no effect, same as above, since no SIM<fix> is used
+            _AssertSeries(First(), "fy", 2007, 1437479d, 1d);
+            _AssertSeries(First(), "fy", 2008, 1456464d, 1d);
             I("SERIES fy % 2;");
             I("SIM<fix>;");
-            AssertHelper(First(), "fy", 2006, 1419830d, 1d);  //2% growth
-            AssertHelper(First(), "fy", 2007, 1448226d, 1d);
-            AssertHelper(First(), "fy", 2008, 1477191d, 1d);
-            AssertHelper(First(), "tg", 2006, 0.1974d, 0.0001d);
-            AssertHelper(First(), "tg", 2007, 0.2156d, 0.0001d);
-            AssertHelper(First(), "tg", 2008, 0.1831d, 0.0001d);
+            _AssertSeries(First(), "fy", 2006, 1419830d, 1d);  //2% growth
+            _AssertSeries(First(), "fy", 2007, 1448226d, 1d);
+            _AssertSeries(First(), "fy", 2008, 1477191d, 1d);
+            _AssertSeries(First(), "tg", 2006, 0.1974d, 0.0001d);
+            _AssertSeries(First(), "tg", 2007, 0.2156d, 0.0001d);
+            _AssertSeries(First(), "tg", 2008, 0.1831d, 0.0001d);
             I("WRITE sletmig;");
             I("READ sletmig;");
             I("SERIES boil % 10;");  //was 2%
             I("SIM<fix>;");
-            AssertHelper(First(), "fy", 2006, 1419830d, 1d);  //2% growth
-            AssertHelper(First(), "fy", 2007, 1448226d, 1d);
-            AssertHelper(First(), "fy", 2008, 1477191d, 1d);
+            _AssertSeries(First(), "fy", 2006, 1419830d, 1d);  //2% growth
+            _AssertSeries(First(), "fy", 2007, 1448226d, 1d);
+            _AssertSeries(First(), "fy", 2008, 1477191d, 1d);
             I("PRT fy, tg, boil;");
-            AssertHelper(First(), "tg", 2006, 0.1956d, 0.0001d);  //lower to compensate for boil
-            AssertHelper(First(), "tg", 2007, 0.2109d, 0.0001d);
-            AssertHelper(First(), "tg", 2008, 0.1762d, 0.0001d);
+            _AssertSeries(First(), "tg", 2006, 0.1956d, 0.0001d);  //lower to compensate for boil
+            _AssertSeries(First(), "tg", 2007, 0.2109d, 0.0001d);
+            _AssertSeries(First(), "tg", 2008, 0.1762d, 0.0001d);
             I("READ sletmig;");
             I("SERIES boil % 10;");  //was 2%
             I("SIM;"); //goal on fY still active, but not used because of SIM, not SIM<fix>
-            AssertHelper(First(), "fy", 2006, 1419379d, 1d);  //1.97%
-            AssertHelper(First(), "fy", 2007, 1446965d, 1d);  //1.94%
-            AssertHelper(First(), "fy", 2008, 1475103d, 1d);  //1.94%
-            AssertHelper(First(), "tg", 2006, 0.1974d, 0.0001d);  //no change
-            AssertHelper(First(), "tg", 2007, 0.2156d, 0.0001d);
-            AssertHelper(First(), "tg", 2008, 0.1831d, 0.0001d);
+            _AssertSeries(First(), "fy", 2006, 1419379d, 1d);  //1.97%
+            _AssertSeries(First(), "fy", 2007, 1446965d, 1d);  //1.94%
+            _AssertSeries(First(), "fy", 2008, 1475103d, 1d);  //1.94%
+            _AssertSeries(First(), "tg", 2006, 0.1974d, 0.0001d);  //no change
+            _AssertSeries(First(), "tg", 2007, 0.2156d, 0.0001d);
+            _AssertSeries(First(), "tg", 2008, 0.1831d, 0.0001d);
             I("READ sletmig;");
             I("SERIES boil % 10;");  //was 2%
             I("UNFIX;");
             I("SIM<fix>;"); //goal on fY removed, so SIM<fix> is like SIM
-            AssertHelper(First(), "fy", 2006, 1419379d, 1d);  //1.97%, same as above
-            AssertHelper(First(), "fy", 2007, 1446965d, 1d);  //1.94%
-            AssertHelper(First(), "fy", 2008, 1475103d, 1d);  //1.94%
-            AssertHelper(First(), "tg", 2006, 0.1974d, 0.0001d);  //no change
-            AssertHelper(First(), "tg", 2007, 0.2156d, 0.0001d);
-            AssertHelper(First(), "tg", 2008, 0.1831d, 0.0001d);
+            _AssertSeries(First(), "fy", 2006, 1419379d, 1d);  //1.97%, same as above
+            _AssertSeries(First(), "fy", 2007, 1446965d, 1d);  //1.94%
+            _AssertSeries(First(), "fy", 2008, 1475103d, 1d);  //1.94%
+            _AssertSeries(First(), "tg", 2006, 0.1974d, 0.0001d);  //no change
+            _AssertSeries(First(), "tg", 2007, 0.2156d, 0.0001d);
+            _AssertSeries(First(), "tg", 2008, 0.1831d, 0.0001d);
 
         }
 
@@ -5515,18 +5518,18 @@ namespace UnitTests
                 I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
                 I("prt <2000 2012> ts0a, ts1, ts2;");
                 double delta = 0.0001d;
-                AssertHelper(First(), "ts0a", 2006, 6d, delta);
-                AssertHelper(First(), "ts0a", 2007, 5.2381d, delta);
-                AssertHelper(First(), "ts0a", 2008, 5.3571d, delta);
-                AssertHelper(First(), "ts0a", 2009, 5.4762d, delta);
-                AssertHelper(First(), "ts0a", 2010, 5.5952d, delta);
+                _AssertSeries(First(), "ts0a", 2006, 6d, delta);
+                _AssertSeries(First(), "ts0a", 2007, 5.2381d, delta);
+                _AssertSeries(First(), "ts0a", 2008, 5.3571d, delta);
+                _AssertSeries(First(), "ts0a", 2009, 5.4762d, delta);
+                _AssertSeries(First(), "ts0a", 2010, 5.5952d, delta);
                 I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                 I("prt <2000 2012> ts0b, ts1, ts2;");
-                AssertHelper(First(), "ts0b", 2006, 6d, delta);
-                AssertHelper(First(), "ts0b", 2007, 6.1395d, delta);
-                AssertHelper(First(), "ts0b", 2008, 6.2791d, delta);
-                AssertHelper(First(), "ts0b", 2009, 6.4186d, delta);
-                AssertHelper(First(), "ts0b", 2010, 6.5581d, delta);
+                _AssertSeries(First(), "ts0b", 2006, 6d, delta);
+                _AssertSeries(First(), "ts0b", 2007, 6.1395d, delta);
+                _AssertSeries(First(), "ts0b", 2008, 6.2791d, delta);
+                _AssertSeries(First(), "ts0b", 2009, 6.4186d, delta);
+                _AssertSeries(First(), "ts0b", 2010, 6.5581d, delta);
             }
 
 
@@ -5567,30 +5570,30 @@ namespace UnitTests
                 I("SERIES <2004 2010> ts2 = 41 42 43 44 45 46 46;");
                 I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
                 double delta = 0.0001d;
-                AssertHelper(First(), "ts0a", 2001, double.NaN, delta);
-                AssertHelper(First(), "ts0a", 2002, 16.8d, delta);
-                AssertHelper(First(), "ts0a", 2003, 25.2d, delta);
-                AssertHelper(First(), "ts0a", 2004, 41d, delta);
-                AssertHelper(First(), "ts0a", 2005, 42d, delta);
-                AssertHelper(First(), "ts0a", 2006, 43d, delta);
-                AssertHelper(First(), "ts0a", 2007, 44d, delta);
-                AssertHelper(First(), "ts0a", 2008, 45d, delta);
-                AssertHelper(First(), "ts0a", 2009, 46d, delta);
-                AssertHelper(First(), "ts0a", 2010, 46d, delta);
-                AssertHelper(First(), "ts0a", 2011, double.NaN, delta);
+                _AssertSeries(First(), "ts0a", 2001, double.NaN, delta);
+                _AssertSeries(First(), "ts0a", 2002, 16.8d, delta);
+                _AssertSeries(First(), "ts0a", 2003, 25.2d, delta);
+                _AssertSeries(First(), "ts0a", 2004, 41d, delta);
+                _AssertSeries(First(), "ts0a", 2005, 42d, delta);
+                _AssertSeries(First(), "ts0a", 2006, 43d, delta);
+                _AssertSeries(First(), "ts0a", 2007, 44d, delta);
+                _AssertSeries(First(), "ts0a", 2008, 45d, delta);
+                _AssertSeries(First(), "ts0a", 2009, 46d, delta);
+                _AssertSeries(First(), "ts0a", 2010, 46d, delta);
+                _AssertSeries(First(), "ts0a", 2011, double.NaN, delta);
                 I("splice work:ts0b = work:ts1 2006 work:ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
-                AssertHelper(First(), "ts0b", 2001, double.NaN, delta);
-                AssertHelper(First(), "ts0b", 2002, 14.3333333d, delta);
-                AssertHelper(First(), "ts0b", 2003, 21.5d, delta);
-                AssertHelper(First(), "ts0b", 2004, 28.6666667d, delta);
-                AssertHelper(First(), "ts0b", 2005, 35.8333333d, delta);
-                AssertHelper(First(), "ts0b", 2006, 43d, delta);
-                AssertHelper(First(), "ts0b", 2007, 44d, delta);
-                AssertHelper(First(), "ts0b", 2008, 45d, delta);
-                AssertHelper(First(), "ts0b", 2009, 46d, delta);
-                AssertHelper(First(), "ts0b", 2010, 46d, delta);
-                AssertHelper(First(), "ts0b", 2011, double.NaN, delta);
-                AssertHelper(First(), "ts0b", 2011, double.NaN, delta);
+                _AssertSeries(First(), "ts0b", 2001, double.NaN, delta);
+                _AssertSeries(First(), "ts0b", 2002, 14.3333333d, delta);
+                _AssertSeries(First(), "ts0b", 2003, 21.5d, delta);
+                _AssertSeries(First(), "ts0b", 2004, 28.6666667d, delta);
+                _AssertSeries(First(), "ts0b", 2005, 35.8333333d, delta);
+                _AssertSeries(First(), "ts0b", 2006, 43d, delta);
+                _AssertSeries(First(), "ts0b", 2007, 44d, delta);
+                _AssertSeries(First(), "ts0b", 2008, 45d, delta);
+                _AssertSeries(First(), "ts0b", 2009, 46d, delta);
+                _AssertSeries(First(), "ts0b", 2010, 46d, delta);
+                _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
+                _AssertSeries(First(), "ts0b", 2011, double.NaN, delta);
             }
 
         }
@@ -5687,9 +5690,9 @@ namespace UnitTests
             I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
             I("smooth ts3 = work:ts geometric;                               //fill holes with geometric interpolation");
             I("smooth work:ts4 = work:ts repeat;                                  //fill holes with last known value.");
-            AssertHelper(First(), "ts4", 2005, 4d, sharedDelta);
-            AssertHelper(First(), "ts4", 2006, 4d, sharedDelta);
-            AssertHelper(First(), "ts4", 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2005, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2006, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
             I("prt <2002 2010> ts, ts1, ts2, ts3, ts4;");
         }
 
@@ -5702,13 +5705,13 @@ namespace UnitTests
             I("create ts4;");
             I("SERIES <2003 2009> ts4 = 1 1 2 3 4 5 5;");
             I("truncate <2005 2007> ts4;");
-            AssertHelper(First(), "ts4", 2003, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", 2005, 2d, sharedDelta);
-            AssertHelper(First(), "ts4", 2006, 3d, sharedDelta);
-            AssertHelper(First(), "ts4", 2007, 4d, sharedDelta);
-            AssertHelper(First(), "ts4", 2008, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", 2009, double.NaN, sharedDelta);                       
+            _AssertSeries(First(), "ts4", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2005, 2d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2006, 3d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", 2008, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", 2009, double.NaN, sharedDelta);                       
             
             //quarters
             I("RESET;");
@@ -5716,13 +5719,13 @@ namespace UnitTests
             I("create ts4;");
             I("SERIES <2000q1 2001q3> ts4 = 1 1 2 3 4 5 5;");
             I("truncate <2000q3 2001q1> ts4;");
-            AssertHelper(First(), "ts4", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2000, 2, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2000, 3, 2d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2000, 4, 3d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2001, 1, 4d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2002, 2, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.Q, 2003, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2000, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2000, 3, 2d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2000, 4, 3d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2001, 1, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2002, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.Q, 2003, 3, double.NaN, sharedDelta);
 
             //months
             I("RESET;");
@@ -5730,13 +5733,13 @@ namespace UnitTests
             I("create ts4;");
             I("SERIES <2000m1 2000m7> ts4 = 1 1 2 3 4 5 5;");
             I("truncate <2000m3 2000m5> work:ts4;");  //also testing bank
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 1, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 2, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 3, 2d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 4, 3d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 5, 4d, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 6, double.NaN, sharedDelta);
-            AssertHelper(First(), "ts4", EFreq.M, 2000, 7, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 3, 2d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 4, 3d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 5, 4d, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 6, double.NaN, sharedDelta);
+            _AssertSeries(First(), "ts4", EFreq.M, 2000, 7, double.NaN, sharedDelta);
 
             
         }
@@ -6066,8 +6069,8 @@ namespace UnitTests
             I("clone;");
             I("delete m;");
             I("aseries M[#psl,#scn] = myFM[#psl,#scn] * F[#psl,#scn] * ((PM[#psl,#scn]/PFF[#psl,#scn])*(PM[#psl,#scn]/PFF[#psl,#scn]))**(-EF[#psl]/2);");
-            AssertHelper(First(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
-            AssertHelper(Ref(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
+            _AssertSeries(First(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
+            _AssertSeries(Ref(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
 
             //Cutting off a dimension
             I("reset; mode data;");
@@ -6081,8 +6084,8 @@ namespace UnitTests
             I("clone;");
             I("delete m;");
             I("aseries M[#psl] = myFM[#psl] * F[#psl] * ((PM[#psl]/PFF[#psl])*(PM[#psl]/PFF[#psl]))**(-EF[#psl]/2);");
-            AssertHelper(First(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
-            AssertHelper(Ref(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
+            _AssertSeries(First(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
+            _AssertSeries(Ref(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
 
             //comparing scenarios            
             I("reset;");
@@ -6107,14 +6110,14 @@ namespace UnitTests
             I("mulprt m['chou'];");
             I("PRT m['chou'] - @m['chou'];");
             I("PRT work:m['chou'] - ref:m['chou'];");
-            AssertHelper(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
-            AssertHelper(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
+            _AssertSeries(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
+            _AssertSeries(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
 
             I("reset; mode data;");
             I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");            
             I("read <gdx> c:\\tools\\decomp\\calib.gdx;");            
-            AssertHelper(First(), "adam_ib", new string[] { "iba" }, 1990, 3147.56d, sharedDelta);
-            AssertHelper(First(), "qc_a_y", new string[] { "52", "ccon" }, 2047, 0.000865742646856205d, sharedDelta);
+            _AssertSeries(First(), "adam_ib", new string[] { "iba" }, 1990, 3147.56d, sharedDelta);
+            _AssertSeries(First(), "qc_a_y", new string[] { "52", "ccon" }, 2047, 0.000865742646856205d, sharedDelta);
 
         }
        
@@ -6486,46 +6489,46 @@ namespace UnitTests
             I("SER xx0 = 7, 8, 9;");
             I("VAL v = 10;");
             I("SER xx3 = iif(2*xx1, '<', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 7d, 0d);
-            AssertHelper(First(), "xx3", 2002, 10d, 0d);
-            AssertHelper(First(), "xx3", 2003, 10d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 7d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
             I("DELETE xx3;");
             I("SER xx3 = iif(2*xx1, '<=', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 7d, 0d);
-            AssertHelper(First(), "xx3", 2002, 8d, 0d);
-            AssertHelper(First(), "xx3", 2003, 10d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 7d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 8d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
             I("DELETE xx3;");
             I("SER xx3 = iif(2*xx1, '>', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 10d, 0d);
-            AssertHelper(First(), "xx3", 2002, 10d, 0d);
-            AssertHelper(First(), "xx3", 2003, 9d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 9d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
             I("DELETE xx3;");
             I("SER xx3 = iif(2*xx1, '>=', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 10d, 0d);
-            AssertHelper(First(), "xx3", 2002, 8d, 0d);
-            AssertHelper(First(), "xx3", 2003, 9d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 8d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 9d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
             I("DELETE xx3;");
             I("SER xx3 = iif(2*xx1, '==', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 10d, 0d);
-            AssertHelper(First(), "xx3", 2002, 8d, 0d);
-            AssertHelper(First(), "xx3", 2003, 10d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 8d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
             I("DELETE xx3;");
             I("SER xx3 = iif(2*xx1, '<>', xx2/0.5, 1*xx0, %v/1);");
-            AssertHelper(First(), "xx3", 2000, double.NaN, 0d);
-            AssertHelper(First(), "xx3", 2001, 7d, 0d);
-            AssertHelper(First(), "xx3", 2002, 10d, 0d);
-            AssertHelper(First(), "xx3", 2003, 9d, 0d);
-            AssertHelper(First(), "xx3", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "xx3", 2001, 7d, 0d);
+            _AssertSeries(First(), "xx3", 2002, 10d, 0d);
+            _AssertSeries(First(), "xx3", 2003, 9d, 0d);
+            _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
         }
 
         [TestMethod]
@@ -6537,37 +6540,37 @@ namespace UnitTests
             I("SERIES gdp = 100, 101, 102;");
             I("TIME 2011 2012;");
             I("SERIES log(gdp) = 10;");
-            AssertHelper(First(), "gdp", 2010, 100d, 0d);
-            AssertHelper(First(), "gdp", 2011, Math.Exp(10d), 0d);
-            AssertHelper(First(), "gdp", 2012, Math.Exp(10d), 0d);
+            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
+            _AssertSeries(First(), "gdp", 2011, Math.Exp(10d), 0d);
+            _AssertSeries(First(), "gdp", 2012, Math.Exp(10d), 0d);
             I("TIME 2010 2012;");
             I("SERIES gdp = 100, 101, 102;");
             I("TIME 2011 2012;");
             I("SERIES dlog(gdp) = 0.1;");
-            AssertHelper(First(), "gdp", 2010, 100d, 0d);
-            AssertHelper(First(), "gdp", 2011, 100d * Math.Exp(0.1d), 0d);
-            AssertHelper(First(), "gdp", 2012, 100d * Math.Exp(0.1d) * Math.Exp(0.1d), 0d);
+            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
+            _AssertSeries(First(), "gdp", 2011, 100d * Math.Exp(0.1d), 0d);
+            _AssertSeries(First(), "gdp", 2012, 100d * Math.Exp(0.1d) * Math.Exp(0.1d), 0d);
             I("TIME 2010 2012;");
             I("SERIES gdp = 100, 101, 102;");
             I("TIME 2011 2012;");
             I("SERIES pch(gdp) = 10;");
-            AssertHelper(First(), "gdp", 2010, 100d, 0d);
-            AssertHelper(First(), "gdp", 2011, 100d * 1.1d, 0d);
-            AssertHelper(First(), "gdp", 2012, 100d * 1.1d * 1.1d, 0d);
+            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
+            _AssertSeries(First(), "gdp", 2011, 100d * 1.1d, 0d);
+            _AssertSeries(First(), "gdp", 2012, 100d * 1.1d * 1.1d, 0d);
             I("TIME 2010 2012;");
             I("SERIES gdp = 100, 101, 102;");
             I("TIME 2011 2012;");
             I("SERIES dif(gdp) = 0.1;");
-            AssertHelper(First(), "gdp", 2010, 100d, 0d);
-            AssertHelper(First(), "gdp", 2011, 100.1d, 0.000001d);
-            AssertHelper(First(), "gdp", 2012, 100.2d, 0.000001d);
+            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
+            _AssertSeries(First(), "gdp", 2011, 100.1d, 0.000001d);
+            _AssertSeries(First(), "gdp", 2012, 100.2d, 0.000001d);
             I("TIME 2010 2012;");
             I("SERIES gdp = 100, 101, 102;");
             I("TIME 2011 2012;");
             I("SERIES diff(gdp) = 0.1;");
-            AssertHelper(First(), "gdp", 2010, 100d, 0d);
-            AssertHelper(First(), "gdp", 2011, 100.1d, 0.000001d);
-            AssertHelper(First(), "gdp", 2012, 100.2d, 0.000001d);
+            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
+            _AssertSeries(First(), "gdp", 2011, 100.1d, 0.000001d);
+            _AssertSeries(First(), "gdp", 2012, 100.2d, 0.000001d);
 
 
 
@@ -6589,16 +6592,16 @@ namespace UnitTests
             I("CLONE;");
             I("SERIES gdp = 1000;");
 
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 1000d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2010, 1000d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2012, 1000d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
 
             //Testing SERIES bank:series = ...
             I("RESET;");
@@ -6607,16 +6610,16 @@ namespace UnitTests
             I("SERIES gdp = 100, 101, 102;");
             I("CLONE;");
             I("SERIES ref:gdp = 1000;");
-            AssertHelper(First(), "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "gdp", 2010, 100d, sharedDelta);
-            AssertHelper(First(), "gdp", 2011, 101d, sharedDelta);
-            AssertHelper(First(), "gdp", 2012, 102d, sharedDelta);
-            AssertHelper(First(), "gdp", 2013, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2010, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2012, 1000d, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 1000d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 1000d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
         }
 
         [TestMethod]
@@ -6634,8 +6637,8 @@ namespace UnitTests
             I("DELETE ts1;");
             I("CREATE ts1;");
             I("SERIES ts1 = 300;");
-            AssertHelper(First(), "ts1", 2000, 300d, sharedDelta);
-            AssertHelper(First(), "ts2", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "ts1", 2000, 300d, sharedDelta);
+            _AssertSeries(First(), "ts2", 2000, 100d, sharedDelta);
 
             //One chunk is problematic
             I(@"
@@ -6648,8 +6651,8 @@ namespace UnitTests
                 CREATE ts1;
                 SERIES ts1 = 300;
             ");
-            AssertHelper(First(), "ts1", 2000, 300d, sharedDelta);
-            AssertHelper(First(), "ts2", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "ts1", 2000, 300d, sharedDelta);
+            _AssertSeries(First(), "ts2", 2000, 100d, sharedDelta);
 
 
 
@@ -7439,7 +7442,7 @@ namespace UnitTests
             if (true)
             {
                 //some random syntax checks
-
+                I("reset;");
                 I("fy = 100;");
                 I("fy = 100;");
                 I("fe = 100;");
@@ -8048,7 +8051,9 @@ namespace UnitTests
             _AssertScalarVal(First(), "%z", 101d);
             FAIL("VAL %z = {#a}[%i][2010] + 2;");  //fails because only a2 exists
 
-            
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("CREATE gdp3;");
             I("SERIES gdp3 = 100;");
             I("STRING %s = 'dp';");
@@ -8074,12 +8079,29 @@ namespace UnitTests
 
         }
 
+        //private static List<string> GetListOfStrings(string s)
+        //{
+        //    return Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + s]);
+        //}
+
         private static List<string> GetListOfStrings(string s)
         {
-            return O.GetStringList(Program.scalars[Globals.symbolCollection + s]);
+            IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + s);
+            List list = iv as List;                      
+            return Program.GetListOfStringsFromList(list);
         }
 
-        private static void AssertHelperList(string s, List<string> ss)
+        //private static void AssertHelperList(string s, List<string> ss)
+        //{
+        //    List<string> x = GetListOfStrings(s);
+        //    Assert.AreEqual(ss.Count, x.Count);
+        //    for (int i = 0; i < ss.Count; i++)
+        //    {
+        //        Assert.IsTrue(string.Compare(ss[i], x[i]) == 0);
+        //    }
+        //}
+
+        private static void _AssertHelperList(string s, List<string> ss)
         {
             List<string> x = GetListOfStrings(s);
             Assert.AreEqual(ss.Count, x.Count);
@@ -8272,11 +8294,11 @@ namespace UnitTests
             I("VAL v1 = avg(%a1, %a2);");
             AssertHelperScalarVal("v1", 1.5, sharedDelta);
             I("SERIES xx1 = avg(ts1, ts2);");
-            AssertHelper(First(), "xx1", 2010, 2012, 1.5, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 1.5, sharedDelta);
             I("SERIES xx1 = avg(ts1);");
-            AssertHelper(First(), "xx1", 2010, 2012, 1, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 1, sharedDelta);
             I("SERIES xx1 = avg(#m1);");
-            AssertHelper(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
 
             if (Globals.UNITTESTFOLLOWUP)
             {
@@ -8297,43 +8319,43 @@ namespace UnitTests
 
             //time()
             I("SER xxtrend = time();");
-            AssertHelper(First(), "xxtrend", 2010, 2010d, sharedDelta);
-            AssertHelper(First(), "xxtrend", 2011, 2011d, sharedDelta);
-            AssertHelper(First(), "xxtrend", 2012, 2012d, sharedDelta);
+            _AssertSeries(First(), "xxtrend", 2010, 2010d, sharedDelta);
+            _AssertSeries(First(), "xxtrend", 2011, 2011d, sharedDelta);
+            _AssertSeries(First(), "xxtrend", 2012, 2012d, sharedDelta);
 
             //avgt()
             I("SER v1 = avgt(ts5);");
-            AssertHelper(First(), "v1", 2011, 38d / 3d, sharedDelta);
+            _AssertSeries(First(), "v1", 2011, 38d / 3d, sharedDelta);
             I("SER v1 = avgt(2011, 2012, ts5);");
-            AssertHelper(First(), "v1", 2011, 28d / 2d, sharedDelta);
+            _AssertSeries(First(), "v1", 2011, 28d / 2d, sharedDelta);
             
             //sumt()
             I("SER v1 = sumt(ts5);");
-            AssertHelper(First(), "v1", 2011, 38d, sharedDelta);            
+            _AssertSeries(First(), "v1", 2011, 38d, sharedDelta);            
             I("SER v1 = sumt(2011, 2012, ts5);");
-            AssertHelper(First(), "v1", 2011, 28d, sharedDelta);            
+            _AssertSeries(First(), "v1", 2011, 28d, sharedDelta);            
 
             //sqrt()
             I("VAL v1 = sqrt(%a4);");
             AssertHelperScalarVal("v1", 2, sharedDelta);
             I("SERIES xx1 = sqrt(ts4);");
-            AssertHelper(First(), "xx1", 2010, 2012, 2, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 2, sharedDelta);
 
             //sum()
             I("VAL v1 = sum(%a1, %a2);");
             AssertHelperScalarVal("v1", 3, sharedDelta);
             I("SERIES xx1 = sum(ts1, ts2);");
-            AssertHelper(First(), "xx1", 2010, 2012, 3, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 3, sharedDelta);
             I("SERIES xx1 = avg(ts1);");
-            AssertHelper(First(), "xx1", 2010, 2012, 1, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 1, sharedDelta);
             I("SERIES xx1 = sum(#m1);");
-            AssertHelper(First(), "xx1", 2010, 2012, 10d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 10d, sharedDelta);
             //To make sure that it is not confused with sum(#i, x[#i]) stuff
             I("SERIES xx1 = sum(#m1, #m2);");            
-            AssertHelper(First(), "xx1", 2010, 2012, 13d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 13d, sharedDelta);
             //To make sure that it is not confused with sum(#i, x[#i]) stuff
             I("SERIES xx1 = sum(#m1, ts1);");
-            AssertHelper(First(), "xx1", 2010, 2012, 11d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, 2012, 11d, sharedDelta);
             I("RESET; TIME 2000 2000; MODE data;");
             I("open<edit> xx;");
             I("ser xx1 = 1;");
@@ -8342,7 +8364,7 @@ namespace UnitTests
             I("open xx;");
             I("list xx = xx1, xx2;");
             I("ser yy = sum(#xx);");  //test that timeseries are searched for in data mode
-            AssertHelper(First(), "yy", 2000, 3d, sharedDelta);
+            _AssertSeries(First(), "yy", 2000, 3d, sharedDelta);
 
             I("RESET;");
             I("OPEN <edit> b1;");
@@ -8468,10 +8490,10 @@ namespace UnitTests
             Assert.AreEqual(temp.Count, 2);
             Assert.AreEqual(temp[0], "q1");
             Assert.AreEqual(temp[1], "q2");
-            AssertHelper(First(), "x4", 2009, double.NaN, sharedDelta);
-            AssertHelper(First(), "x4", 2010, 777, sharedDelta);
-            AssertHelper(First(), "x4", 2011, 777, sharedDelta);
-            AssertHelper(First(), "x4", 2012, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4", 2009, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x4", 2010, 777, sharedDelta);
+            _AssertSeries(First(), "x4", 2011, 777, sharedDelta);
+            _AssertSeries(First(), "x4", 2012, double.NaN, sharedDelta);
             //FIXME: _newvar should not exist afterwards
 
             I("RESET;");
@@ -8625,10 +8647,10 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2001;");
             I("function (series, series) f(series x, series y); return (x*y, x*x); end; create xx, yy, zz1, zz2; SERIES xx= 2; SERIES yy = 3; (series zz1, series zz2) = f(xx, yy);");
-            AssertHelper(First(), "zz1", 2000, 6, sharedDelta);
-            AssertHelper(First(), "zz1", 2001, 6, sharedDelta);
-            AssertHelper(First(), "zz2", 2000, 4, sharedDelta);
-            AssertHelper(First(), "zz2", 2001, 4, sharedDelta);
+            _AssertSeries(First(), "zz1", 2000, 6, sharedDelta);
+            _AssertSeries(First(), "zz1", 2001, 6, sharedDelta);
+            _AssertSeries(First(), "zz2", 2000, 4, sharedDelta);
+            _AssertSeries(First(), "zz2", 2001, 4, sharedDelta);
 
         }
 
@@ -9062,64 +9084,64 @@ namespace UnitTests
         }
 
 
-        private static void AssertHelper(Databank db, string s, int year, double x, double delta)
-        {
-            AssertHelper(db, s, null, EFreq.A, year, 1, year, 1, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, int year, double x, double delta)
+        //{
+        //    AssertHelper(db, s, null, EFreq.A, year, 1, year, 1, x, delta);
+        //}
         
-        private static void AssertHelper(Databank db, string s, int year1, int year2, double x, double delta)
-        {
-            AssertHelper(db, s, null, EFreq.A, year1, 1, year2, 1, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, int year1, int year2, double x, double delta)
+        //{
+        //    AssertHelper(db, s, null, EFreq.A, year1, 1, year2, 1, x, delta);
+        //}
 
-        private static void AssertHelper(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
-        {
-            AssertHelper(db, s, null, freq, year, subper, year, subper, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
+        //{
+        //    AssertHelper(db, s, null, freq, year, subper, year, subper, x, delta);
+        //}
         
-        private static void AssertHelper(Databank db, string s, string[] indexes, int year, double x, double delta)
-        {
-            AssertHelper(db, s, indexes, EFreq.A, year, 1, year, 1, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, string[] indexes, int year, double x, double delta)
+        //{
+        //    AssertHelper(db, s, indexes, EFreq.A, year, 1, year, 1, x, delta);
+        //}
 
-        private static void AssertHelper(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
-        {
-            AssertHelper(db, s, indexes, EFreq.A, year1, 1, year2, 1, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
+        //{
+        //    AssertHelper(db, s, indexes, EFreq.A, year1, 1, year2, 1, x, delta);
+        //}
 
-        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
-        {
-            AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
-        }
+        //private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
+        //{
+        //    AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
+        //}
 
-        private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
-        {
-            GekkoTime t1 = new GekkoTime(freq, year1, sub1);
-            GekkoTime t2 = new GekkoTime(freq, year2, sub2);
+        //private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        //{
+        //    GekkoTime t1 = new GekkoTime(freq, year1, sub1);
+        //    GekkoTime t2 = new GekkoTime(freq, year2, sub2);
 
-            if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
+        //    if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
 
-            IVariable[] indexes2 = null;
+        //    IVariable[] indexes2 = null;
 
-            string name = null;
+        //    string name = null;
 
-            if (indexes != null)
-            {
-                name = s + Globals.symbolTurtle + Series.GetHashCodeFromIvariables(indexes);
-            }
-            else
-            {
-                name = s;
-            }
+        //    if (indexes != null)
+        //    {
+        //        name = s + Globals.symbolTurtle + Series.GetHashCodeFromIvariables(indexes);
+        //    }
+        //    else
+        //    {
+        //        name = s;
+        //    }
 
-            Series ts = db.GetVariable(freq, name);
+        //    Series ts = db.GetVariable(freq, name);
 
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-            {
-                double y = ts.GetData(null, t);
-                _AssertHelperTwoDoubles(x, y, delta);
-            }
-        }
+        //    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+        //    {
+        //        double y = ts.GetData(null, t);
+        //        _AssertHelperTwoDoubles(x, y, delta);
+        //    }
+        //}
 
         private static void _AssertHelperTwoDoubles(double x, double y, double delta)
         {
@@ -9380,28 +9402,28 @@ namespace UnitTests
             I("SERIES a = 1, m, 2, m;");
             I("SERIES b = m, 1, m, 2;");
             I("FINDMISSINGDATA <replace = 0> a, b;");
-            AssertHelper(w, "a", 2000, 1, sharedDelta);
-            AssertHelper(w, "a", 2001, 0, sharedDelta);
-            AssertHelper(w, "a", 2002, 2, sharedDelta);
-            AssertHelper(w, "a", 2003, 0, sharedDelta);
-            AssertHelper(w, "b", 2000, 0, sharedDelta);
-            AssertHelper(w, "b", 2001, 1, sharedDelta);
-            AssertHelper(w, "b", 2002, 0, sharedDelta);
-            AssertHelper(w, "b", 2003, 2, sharedDelta);
+            _AssertSeries(w, "a", 2000, 1, sharedDelta);
+            _AssertSeries(w, "a", 2001, 0, sharedDelta);
+            _AssertSeries(w, "a", 2002, 2, sharedDelta);
+            _AssertSeries(w, "a", 2003, 0, sharedDelta);
+            _AssertSeries(w, "b", 2000, 0, sharedDelta);
+            _AssertSeries(w, "b", 2001, 1, sharedDelta);
+            _AssertSeries(w, "b", 2002, 0, sharedDelta);
+            _AssertSeries(w, "b", 2003, 2, sharedDelta);
             I("RESET;");
             I("CREATE a, b;");
             I("TIME 2000 2003;");
             I("SERIES a = 1, m, 2, m;");
             I("SERIES b = m, 1, m, 2;");
             I("FINDMISSINGDATA <2001 2002 replace = 0> a;");
-            AssertHelper(w, "a", 2000, 1, sharedDelta);
-            AssertHelper(w, "a", 2001, 0, sharedDelta);
-            AssertHelper(w, "a", 2002, 2, sharedDelta);
-            AssertHelper(w, "a", 2003, double.NaN, sharedDelta);
-            AssertHelper(w, "b", 2000, double.NaN, sharedDelta);
-            AssertHelper(w, "b", 2001, 1, sharedDelta);
-            AssertHelper(w, "b", 2002, double.NaN, sharedDelta);
-            AssertHelper(w, "b", 2003, 2, sharedDelta);
+            _AssertSeries(w, "a", 2000, 1, sharedDelta);
+            _AssertSeries(w, "a", 2001, 0, sharedDelta);
+            _AssertSeries(w, "a", 2002, 2, sharedDelta);
+            _AssertSeries(w, "a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(w, "b", 2000, double.NaN, sharedDelta);
+            _AssertSeries(w, "b", 2001, 1, sharedDelta);
+            _AssertSeries(w, "b", 2002, double.NaN, sharedDelta);
+            _AssertSeries(w, "b", 2003, 2, sharedDelta);
 
             I("RESET;");
             I("CREATE a, b;");
@@ -9409,28 +9431,28 @@ namespace UnitTests
             I("SERIES a = 1, m, 2, m;");
             I("SERIES b = m, 1, m, 2;");
             I("FINDMISSINGDATA <replace = 0>;");
-            AssertHelper(w, "a", 2000, 1, sharedDelta);
-            AssertHelper(w, "a", 2001, 0, sharedDelta);
-            AssertHelper(w, "a", 2002, 2, sharedDelta);
-            AssertHelper(w, "a", 2003, 0, sharedDelta);
-            AssertHelper(w, "b", 2000, 0, sharedDelta);
-            AssertHelper(w, "b", 2001, 1, sharedDelta);
-            AssertHelper(w, "b", 2002, 0, sharedDelta);
-            AssertHelper(w, "b", 2003, 2, sharedDelta);
+            _AssertSeries(w, "a", 2000, 1, sharedDelta);
+            _AssertSeries(w, "a", 2001, 0, sharedDelta);
+            _AssertSeries(w, "a", 2002, 2, sharedDelta);
+            _AssertSeries(w, "a", 2003, 0, sharedDelta);
+            _AssertSeries(w, "b", 2000, 0, sharedDelta);
+            _AssertSeries(w, "b", 2001, 1, sharedDelta);
+            _AssertSeries(w, "b", 2002, 0, sharedDelta);
+            _AssertSeries(w, "b", 2003, 2, sharedDelta);
             I("RESET;");
             I("CREATE a, b;");
             I("TIME 2000 2003;");
             I("SERIES a = 1, m, 2, m;");
             I("SERIES b = m, 1, m, 2;");
             I("FINDMISSINGDATA <2001 2002 replace = 0>;");
-            AssertHelper(w, "a", 2000, 1, sharedDelta);
-            AssertHelper(w, "a", 2001, 0, sharedDelta);
-            AssertHelper(w, "a", 2002, 2, sharedDelta);
-            AssertHelper(w, "a", 2003, double.NaN, sharedDelta);
-            AssertHelper(w, "b", 2000, double.NaN, sharedDelta);
-            AssertHelper(w, "b", 2001, 1, sharedDelta);
-            AssertHelper(w, "b", 2002, 0, sharedDelta);
-            AssertHelper(w, "b", 2003, 2, sharedDelta);
+            _AssertSeries(w, "a", 2000, 1, sharedDelta);
+            _AssertSeries(w, "a", 2001, 0, sharedDelta);
+            _AssertSeries(w, "a", 2002, 2, sharedDelta);
+            _AssertSeries(w, "a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(w, "b", 2000, double.NaN, sharedDelta);
+            _AssertSeries(w, "b", 2001, 1, sharedDelta);
+            _AssertSeries(w, "b", 2002, 0, sharedDelta);
+            _AssertSeries(w, "b", 2003, 2, sharedDelta);
         }
 
         [TestMethod]
@@ -9463,16 +9485,16 @@ namespace UnitTests
             //3. sletmig2      a = b = 777
             //4. sletmig1      a = b = c = 100
 
-            AssertHelper(First(), "xa", 2000, 888d, 0d);
-            AssertHelper(First(), "xb", 2000, 777d, 0d);
-            AssertHelper(First(), "xc", 2000, 100d, 0d);
+            _AssertSeries(First(), "xa", 2000, 888d, 0d);
+            _AssertSeries(First(), "xb", 2000, 777d, 0d);
+            _AssertSeries(First(), "xc", 2000, 100d, 0d);
 
             I("OPTION databank search = no;");
             I("CREATE ya, yb, yc;");
             I("SER ya = a;");
             FAIL("SER yb = b;");
             FAIL("SER yc = c;");
-            AssertHelper(First(), "ya", 2000, 888d, 0d);
+            _AssertSeries(First(), "ya", 2000, 888d, 0d);
 
             // ---------------------------------------------
             //       REPEAT OF ABOVE, now with something in the ref databank
@@ -9497,13 +9519,13 @@ namespace UnitTests
             //4. sletmig1      a = b = c = 100
 
             Assert.AreEqual(Program.databanks.GetRef().storage.Count, 3);     //   <------ NEW
-            AssertHelper(Program.databanks.GetRef(), "a", 2000, 100d, 100d);  //   <------ NEW
-            AssertHelper(Program.databanks.GetRef(), "b", 2000, 100d, 100d);  //   <------ NEW
-            AssertHelper(Program.databanks.GetRef(), "c", 2000, 100d, 100d);  //   <------ NEW
+            _AssertSeries(Program.databanks.GetRef(), "a", 2000, 100d, 100d);  //   <------ NEW
+            _AssertSeries(Program.databanks.GetRef(), "b", 2000, 100d, 100d);  //   <------ NEW
+            _AssertSeries(Program.databanks.GetRef(), "c", 2000, 100d, 100d);  //   <------ NEW
             //below there is no impact from the values in the reference bank
-            AssertHelper(First(), "xa", 2000, 888d, 0d);
-            AssertHelper(First(), "xb", 2000, 777d, 0d);
-            AssertHelper(First(), "xc", 2000, 100d, 0d); 
+            _AssertSeries(First(), "xa", 2000, 888d, 0d);
+            _AssertSeries(First(), "xb", 2000, 777d, 0d);
+            _AssertSeries(First(), "xc", 2000, 100d, 0d); 
             
         }
 
@@ -10046,10 +10068,10 @@ namespace UnitTests
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
                 //changing REF stuff
                 I("RESET;");
@@ -10069,10 +10091,10 @@ namespace UnitTests
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
                 //changing normal open bank
                 I("RESET;");
@@ -10092,10 +10114,10 @@ namespace UnitTests
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
                 // ------------ <save=no> ----------------
 
@@ -10109,19 +10131,19 @@ namespace UnitTests
                 I("OPEN <edit save=no> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
                 I("CLOSE bankTemp;");
 
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
 
                 I("RESET;");
@@ -10134,19 +10156,19 @@ namespace UnitTests
                 I("OPEN <edit> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);  //changed
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
                 I("CLOSE <save=no> bankTemp;");
 
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
 
 
                 // --------- LOCK/UNLOCK ----------------
@@ -10247,9 +10269,9 @@ namespace UnitTests
                 I("RESET;");
                 if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankNew;");
-                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2009, double.NaN, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2010, 12345, sharedDelta);
-                AssertHelper(Program.databanks.GetDatabank("bankNew"), "tsNew", 2011, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankNew"), "tsNew", 2009, double.NaN, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankNew"), "tsNew", 2010, 12345, sharedDelta);
+                _AssertSeries(Program.databanks.GetDatabank("bankNew"), "tsNew", 2011, double.NaN, sharedDelta);
 
                 // --------- illegals ----------------
 
@@ -10680,16 +10702,16 @@ namespace UnitTests
             I("TIME 2001 2005;");
             I("SERIES @x = 1 5 3 m 10;");
             I("INTERPOLATE x1.q = ref:x.a repeat;");
-            AssertHelper(First(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 4; i++)
             {
-                AssertHelper(First(), "x1", EFreq.Q, 2001, i, 1d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.Q, 2002, i, 5d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.Q, 2003, i, 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.Q, 2005, i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.Q, 2001, i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.Q, 2002, i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.Q, 2003, i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.Q, 2005, i, 10d, sharedDelta);
             }
-            AssertHelper(First(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
 
             //
 
@@ -10699,16 +10721,16 @@ namespace UnitTests
             I("TIME 2001 2005;");
             I("SERIES x = 1 5 3 m 10;");
             I("INTERPOLATE ref:x1.q = x.a prorate;");
-            AssertHelper(Ref(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 4; i++)
             {
-                AssertHelper(Ref(), "x1", EFreq.Q, 2001, i, 1d / 4d, sharedDelta);
-                AssertHelper(Ref(), "x1", EFreq.Q, 2002, i, 5d / 4d, sharedDelta);
-                AssertHelper(Ref(), "x1", EFreq.Q, 2003, i, 3d / 4d, sharedDelta);
-                AssertHelper(Ref(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
-                AssertHelper(Ref(), "x1", EFreq.Q, 2005, i, 10d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1", EFreq.Q, 2001, i, 1d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1", EFreq.Q, 2002, i, 5d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1", EFreq.Q, 2003, i, 3d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(Ref(), "x1", EFreq.Q, 2005, i, 10d / 4d, sharedDelta);
             }
-            AssertHelper(Ref(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
 
             // ================================
             //        A to M
@@ -10719,16 +10741,16 @@ namespace UnitTests
             I("SERIES x = 1 5 3 m 10;");
             I("OPTION freq m;");
             I("INTERPOLATE x1 = x.a repeat;");  //the .m is removed on lhs
-            AssertHelper(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 12; i++)
             {
-                AssertHelper(First(), "x1", EFreq.M, 2001, i, 1d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2002, i, 5d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2003, i, 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2005, i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2002, i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2003, i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2005, i, 10d, sharedDelta);
             }
-            AssertHelper(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
 
             //
 
@@ -10737,16 +10759,16 @@ namespace UnitTests
             I("TIME 2001 2005;");
             I("SERIES x = 1 5 3 m 10;");
             I("INTERPOLATE x1.m = x prorate;");  //the .a is removed on rhs
-            AssertHelper(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 12; i++)
             {
-                AssertHelper(First(), "x1", EFreq.M, 2001, i, 1d / 12d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2002, i, 5d / 12d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2003, i, 3d / 12d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2005, i, 10d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, i, 1d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2002, i, 5d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2003, i, 3d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2005, i, 10d / 12d, sharedDelta);
             }
-            AssertHelper(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
 
 
             // ================================
@@ -10758,32 +10780,32 @@ namespace UnitTests
             I("OPTION freq q;");
             I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
             I("INTERPOLATE x1.m = x.q repeat;");
-            AssertHelper(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
             for (int i = 1; i <= 3; i++)
             {
-                AssertHelper(First(), "x1", EFreq.M, 2001, 0 + i, 1d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 3 + i, 5d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 6 + i, 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2002, 0 + i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 0 + i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 3 + i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 6 + i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2002, 0 + i, 10d, sharedDelta);
             }
-            AssertHelper(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
             I("OPTION freq q;");
             I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
             I("INTERPOLATE x1.m = x.q prorate;");
-            AssertHelper(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
             for (int i = 1; i <= 3; i++)
             {
-                AssertHelper(First(), "x1", EFreq.M, 2001, 0 + i, 1d / 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 3 + i, 5d / 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 6 + i, 3d / 3d, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
-                AssertHelper(First(), "x1", EFreq.M, 2002, 0 + i, 10d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 0 + i, 1d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 3 + i, 5d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 6 + i, 3d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1", EFreq.M, 2002, 0 + i, 10d / 3d, sharedDelta);
             }
-            AssertHelper(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
         }
 
@@ -11455,42 +11477,45 @@ namespace UnitTests
             //Test of LIST
             //----------------------------------------------------------------------
             I("RESET;");
-            I("LIST x1 = a, b, c, d, e;");
+            I("LIST #x1 = a, b, c, d, e;");
             Assert.AreEqual(GetListOfStrings("x1").Count, 5);
-            I("LIST x2 = '0', '00', '000';");
+            I("LIST #x2 = '0', '00', '000';");
             Assert.AreEqual(GetListOfStrings("x2").Count, 3);
-            I("LIST <direct> x2d = 0, 00, 000;");
-            Assert.AreEqual(GetListOfStrings("x2d").Count, 3);
-            I("LIST x3 = '0e', '00e', '000e';");
-            Assert.AreEqual(GetListOfStrings("x3").Count, 3);
-            I("LIST <direct> x3d = 0e, 00e, 000e;");
-            Assert.AreEqual(GetListOfStrings("x3d").Count, 3);
-            I("LIST x4 = #x1, #x2, #x3;");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("LIST <direct> #x2d = 0, 00, 000;");
+                Assert.AreEqual(GetListOfStrings("x2d").Count, 3);
+                I("LIST <direct> #x3d = 0e, 00e, 000e;");
+                Assert.AreEqual(GetListOfStrings("x3d").Count, 3);
+            }
+            I("LIST #x3 = '0e', '00e', '000e';");
+            Assert.AreEqual(GetListOfStrings("x3").Count, 3);            
+            I("LIST #x4 = #x1, #x2, #x3;");
             Assert.AreEqual(GetListOfStrings("x4").Count, 11);
-            I("STRING s1 = 'tt';");
-            I("LIST x5 = %s1, %s1;");
+            I("STRING %s1 = 'tt';");
+            I("LIST #x5 = %s1, %s1;");
             Assert.AreEqual(GetListOfStrings("x5").Count, 2);
-            I("LIST x6 = x%s1, x{%s1}, x{s1};");
+            I("LIST #x6 = x%s1, x{%s1}, x{s1};");
             Assert.AreEqual(GetListOfStrings("x6").Count, 3);
             Assert.AreEqual(GetListOfStrings("x6")[0], "xtt");
             Assert.AreEqual(GetListOfStrings("x6")[1], "xtt");
             Assert.AreEqual(GetListOfStrings("x6")[2], "xtt");
-            I("LIST x7 = a, b;");
-            I("LIST x7 = #x7, c, d;");
+            I("LIST #x7 = a, b;");
+            I("LIST #x7 = #x7, c, d;");
             Assert.AreEqual(GetListOfStrings("x7").Count, 4);  //such nesting is ok, equivalent to adding
-            I("LIST x8 = null;");
-            I("LIST x8 = #x8, c, d;");
+            I("LIST #x8 = null;");
+            I("LIST #x8 = #x8, c, d;");
             Assert.AreEqual(GetListOfStrings("x8").Count, 2);  //such nesting is ok, equivalent to adding
-            I("LIST x9 = null;");
+            I("LIST #x9 = null;");
             Assert.AreEqual(GetListOfStrings("x9").Count, 0);
-            I("LIST x10 = null; LIST x10 = null;");
+            I("LIST #x10 = null; LIST x10 = null;");
             Assert.AreEqual(GetListOfStrings("x9").Count, 0);
 
             //  ---------------------
             //  WILDCARDS start
             //  ---------------------
-            I("LIST y = abc, cde, abcd, abxcd, abxxcd, abxxxcd, ae, af;");
-            I("LIST y1 = #y[a*];");
+            I("LIST #y = abc, cde, abcd, abxcd, abxxcd, abxxxcd, ae, af;");
+            I("LIST #y1 = #y[a*];");
             List<string> y1 = GetListOfStrings("y1");
             Assert.AreEqual(y1.Count, 7);
             Assert.AreEqual(y1[0], "abc");
@@ -11501,7 +11526,7 @@ namespace UnitTests
             Assert.AreEqual(y1[5], "ae");
             Assert.AreEqual(y1[6], "af");
 
-            I("LIST y2 = #y[ab*];");
+            I("LIST #y2 = #y[ab*];");
             List<string> y2 = GetListOfStrings("y2");
             Assert.AreEqual(y2.Count, 5);
             Assert.AreEqual(y2[0], "abc");
@@ -11510,18 +11535,18 @@ namespace UnitTests
             Assert.AreEqual(y2[3], "abxxcd");
             Assert.AreEqual(y2[4], "abxxxcd");
 
-            I("LIST y3 = #y[a?];");
+            I("LIST #y3 = #y[a?];");
             List<string> y3 = GetListOfStrings("y3");
             Assert.AreEqual(y3.Count, 2);
             Assert.AreEqual(y3[0], "ae");
             Assert.AreEqual(y3[1], "af");
 
-            I("LIST y4 = #y[ab?];");
+            I("LIST #y4 = #y[ab?];");
             List<string> y4 = GetListOfStrings("y4");
             Assert.AreEqual(y4.Count, 1);
             Assert.AreEqual(y4[0], "abc");
 
-            I("LIST y5 = #y[ab*cd];");
+            I("LIST #y5 = #y[ab*cd];");
             List<string> y5 = GetListOfStrings("y5");
             Assert.AreEqual(y5.Count, 4);
             Assert.AreEqual(y5[0], "abcd");
@@ -11529,27 +11554,27 @@ namespace UnitTests
             Assert.AreEqual(y5[2], "abxxcd");
             Assert.AreEqual(y5[3], "abxxxcd");
 
-            I("LIST y6 = #y[ab?cd];");
+            I("LIST #y6 = #y[ab?cd];");
             List<string> y6 = GetListOfStrings("y6");
             Assert.AreEqual(y6.Count, 1);
             Assert.AreEqual(y6[0], "abxcd");
 
-            I("LIST y7 = #y[*e];");
+            I("LIST #y7 = #y[*e];");
             List<string> y7 = GetListOfStrings("y7");
             Assert.AreEqual(y7.Count, 2);
             Assert.AreEqual(y7[0], "ae");
             Assert.AreEqual(y7[1], "cde");
 
-            I("LIST y8 = #y[?e];");
+            I("LIST #y8 = #y[?e];");
             List<string> y8 = GetListOfStrings("y8");
             Assert.AreEqual(y8.Count, 1);
             Assert.AreEqual(y8[0], "ae");
 
-            I("LIST y9 = #y[*];");
+            I("LIST #y9 = #y[*];");
             List<string> y9 = GetListOfStrings("y9");
             Assert.AreEqual(y9.Count, 8);
 
-            I("LIST y10 = #y[?];");
+            I("LIST #y10 = #y[?];");
             List<string> y10 = GetListOfStrings("y10");
             Assert.AreEqual(y10.Count, 0);
 
@@ -11562,7 +11587,7 @@ namespace UnitTests
             //  ---------------------
             //  Parser-wise these are much easier than wildcards
 
-            I("LIST z1 = #y[ab..ae];");
+            I("LIST #z1 = #y[ab..ae];");
             List<string> z1 = GetListOfStrings("z1");
             Assert.AreEqual(z1.Count, 6);
 
@@ -11577,59 +11602,59 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
-            I("list a = a4, a2, a3, a1;");
-            I("val i = 2;");
-            I("val n = #a[0];                                           //number of items");
+            I("list #a = a4, a2, a3, a1;");
+            I("val %i = 2;");
+            I("val %n = #a[0];                                           //number of items");
             AssertHelperScalarVal("n", 4d);
-            I("list a2 = #a[%i..%i+1];                                   //sublist");
-            AssertHelperList("a2", new List<string>() { "a2", "a3" });
-            I("string a3 = #a[%i+1];                                    //single element");
+            I("list #a2 = #a[%i..%i+1];                                   //sublist");
+            _AssertHelperList("a2", new List<string>() { "a2", "a3" });
+            I("string %a3 = #a[%i+1];                                    //single element");
             AssertHelperScalarString("a3", "a3");
-            I("list a3 = #a[%i+1];                                      //single element");
-            AssertHelperList("a3", new List<string>() { "a3" });
-            I("list a4 = #a sort;                                       //sort");
-            AssertHelperList("a4", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list a5 = #a prefix='pf' suffix='sf';                    //pre/suffix");
-            AssertHelperList("a5", new List<string>() { "pfa4sf", "pfa2sf", "pfa3sf", "pfa1sf" });
-            I("list a6 = #a5 strip='pf';                                //strip");
-            AssertHelperList("a6", new List<string>() { "a4sf", "a2sf", "a3sf", "a1sf" });
-            I("list a7 = #a['a2'..'a3'];                                 //sublist with alphabetical range");
-            AssertHelperList("a7", new List<string>() { "a2", "a3" });
-            I("list a8 = #a['a*'];                                      //sublist with wildcard");
-            AssertHelperList("a8", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list a9 = #a['a?'];                                      //sublist with wildcard");
-            AssertHelperList("a9", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list x1 = a1, a2, a3, a4;");
-            I("list x2 = a2, a3, a5, a6;");
-            I("list x3 = #x1, #x2;                                      //concatenation");
-            AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a2", "a3", "a5", "a6" });
-            I("list x4 = union(#x1, #x2);                                     //union");
-            AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a5", "a6" });
-            I("list x5 = difference(#x1, #x2);                                     //difference");
-            AssertHelperList("x5", new List<string>() { "a1", "a4" });
-            I("list x6 = intersect(#x1, #x2);                                     //intersection");
-            AssertHelperList("x6", new List<string>() { "a2", "a3" });
-            I("list listfile b = b1, b2, b3, b4;                        //creates b.lst, accepts path and file too");
-            I("list listfile c = c1, c2, c3, c4;");
-            I("list listfile bc = union(#(listfile b), #(listfile c));        //listfiles work like normal lists");
-            I("list bc2 = #(listfile bc);");
-            AssertHelperList("bc2", new List<string>() { "b1", "b2", "b3", "b4", "c1", "c2", "c3", "c4" });
+            I("list #a3 = #a[%i+1];                                      //single element");
+            _AssertHelperList("a3", new List<string>() { "a3" });
+            I("list #a4 = #a sort;                                       //sort");
+            _AssertHelperList("a4", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list #a5 = #a prefix='pf' suffix='sf';                    //pre/suffix");
+            _AssertHelperList("a5", new List<string>() { "pfa4sf", "pfa2sf", "pfa3sf", "pfa1sf" });
+            I("list #a6 = #a5 strip='pf';                                //strip");
+            _AssertHelperList("a6", new List<string>() { "a4sf", "a2sf", "a3sf", "a1sf" });
+            I("list #a7 = #a['a2'..'a3'];                                 //sublist with alphabetical range");
+            _AssertHelperList("a7", new List<string>() { "a2", "a3" });
+            I("list #a8 = #a['a*'];                                      //sublist with wildcard");
+            _AssertHelperList("a8", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list #a9 = #a['a?'];                                      //sublist with wildcard");
+            _AssertHelperList("a9", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list #x1 = a1, a2, a3, a4;");
+            I("list #x2 = a2, a3, a5, a6;");
+            I("list #x3 = #x1, #x2;                                      //concatenation");
+            _AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a2", "a3", "a5", "a6" });
+            I("list #x4 = union(#x1, #x2);                                     //union");
+            _AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a5", "a6" });
+            I("list #x5 = difference(#x1, #x2);                                     //difference");
+            _AssertHelperList("x5", new List<string>() { "a1", "a4" });
+            I("list #x6 = intersect(#x1, #x2);                                     //intersection");
+            _AssertHelperList("x6", new List<string>() { "a2", "a3" });
+            I("list #(listfile b) = b1, b2, b3, b4;                        //creates b.lst, accepts path and file too");
+            I("list #(listfile c) = c1, c2, c3, c4;");
+            I("list #(listfile bc) = union(#(listfile b), #(listfile c));        //listfiles work like normal lists");
+            I("list #bc2 = #(listfile bc);");
+            _AssertHelperList("bc2", new List<string>() { "b1", "b2", "b3", "b4", "c1", "c2", "c3", "c4" });
 
             //dublets
-            I("list x1 = a1, a2, a3, a4, a1;");
-            I("list x2 = a2, a3, a5, a6, a2;");
-            I("list x3 = #x1, #x2;                                      //concatenation");
-            AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a2", "a3", "a5", "a6", "a2" });
-            I("list x4 = union(#x1, #x2);                                     //union");
-            AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a5", "a6" });
-            I("list x5 = difference(#x1, #x2);                                     //difference");
-            AssertHelperList("x5", new List<string>() { "a1", "a4", "a1" });
-            I("list x6 = intersect(#x1, #x2);                                     //intersection");
-            AssertHelperList("x6", new List<string>() { "a2", "a3" });
-            I("list x7 = #x1 trim;");
-            AssertHelperList("x7", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list x8 = #x1 sort trim;");
-            AssertHelperList("x8", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list #x1 = a1, a2, a3, a4, a1;");
+            I("list #x2 = a2, a3, a5, a6, a2;");
+            I("list #x3 = #x1, #x2;                                      //concatenation");
+            _AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a2", "a3", "a5", "a6", "a2" });
+            I("list #x4 = union(#x1, #x2);                                     //union");
+            _AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a5", "a6" });
+            I("list #x5 = difference(#x1, #x2);                                     //difference");
+            _AssertHelperList("x5", new List<string>() { "a1", "a4", "a1" });
+            I("list #x6 = intersect(#x1, #x2);                                     //intersection");
+            _AssertHelperList("x6", new List<string>() { "a2", "a3" });
+            I("list #x7 = #x1 trim;");
+            _AssertHelperList("x7", new List<string>() { "a1", "a2", "a3", "a4" });
+            I("list #x8 = #x1 sort trim;");
+            _AssertHelperList("x8", new List<string>() { "a1", "a2", "a3", "a4" });
 
 
 
@@ -12081,19 +12106,19 @@ namespace UnitTests
             FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
             I("UNLOCK temp;");
             I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
-            AssertHelper(First(), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
-            AssertHelper(First(), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
-            AssertHelper(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);            
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2010, -7d / 3d * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2011, 3d / 3d * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2012, 4d / 3d * 100d, sharedDelta);            
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / (-3d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / (-3d) * 100d, sharedDelta);
             I("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2012;");
-            AssertHelper(First(), "rey1", 2010, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(First(), "rey1", 2011, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(First(), "rey1", 2012, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2010, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2011, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "rey1", 2012, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2010, 7d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2011, -3d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "rey2", 2012, -4d / ((-3d - 4d) / 2d) * 100d, sharedDelta);
             FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011 2013;");
             FAIL("REBASE <bank=work prefix=re index = 100> y1 2010 2012;");
             FAIL("REBASE <bank=work prefix=re index = 100> temp:y2 2010 2012;");
@@ -12102,49 +12127,49 @@ namespace UnitTests
             FAIL("REBASE y1 2010m1 2012q4;");
             I("LIST m = work:y1, y2;");
             I("REBASE <bank=temp index = 1> #m 2010;");
-            AssertHelper(First(), "y1", 2010, -7d / (-7d) * 1d, sharedDelta);
-            AssertHelper(First(), "y1", 2011, 3d / (-7d) * 1d, sharedDelta);
-            AssertHelper(First(), "y1", 2012, 4d / (-7d) * 1d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2010, 7d / (7d) * 1d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2011, -3d / (7d) * 1d, sharedDelta);
-            AssertHelper(Program.databanks.GetDatabank("temp"), "y2", 2012, -4d / (7d) * 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2010, -7d / (-7d) * 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2011, 3d / (-7d) * 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2012, 4d / (-7d) * 1d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "y2", 2010, 7d / (7d) * 1d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "y2", 2011, -3d / (7d) * 1d, sharedDelta);
+            _AssertSeries(Program.databanks.GetDatabank("temp"), "y2", 2012, -4d / (7d) * 1d, sharedDelta);
 
             //quarterly
             I("OPTION freq q;");
             I("TIME 2010q1 2010q3;");
             I("SER z1 = -7, 3, 4;");
             I("REBASE z1 2010q2 2010q3;");
-            AssertHelper(First(), "z1", EFreq.Q, 2009, 4, double.NaN, sharedDelta);
-            AssertHelper(First(), "z1", EFreq.Q, 2010, 1, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(First(), "z1", EFreq.Q, 2010, 2, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(First(), "z1", EFreq.Q, 2010, 3, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
-            AssertHelper(First(), "z1", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z1", EFreq.Q, 2009, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z1", EFreq.Q, 2010, 1, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z1", EFreq.Q, 2010, 2, 3d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z1", EFreq.Q, 2010, 3, 4d / ((3d + 4d) / 2d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z1", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
 
             //using a whole year indicator for quarterly
             I("TIME 2010q4 2012q1;");
             I("SER z2 = 1, 2, 3, 4, 5, 6;");
             I("REBASE z2 2011;");
-            AssertHelper(First(), "z2", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z2", EFreq.Q, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);            
-            AssertHelper(First(), "z2", EFreq.Q, 2012, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z2", EFreq.Q, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);            
+            _AssertSeries(First(), "z2", EFreq.Q, 2012, 2, double.NaN, sharedDelta);
 
             //Same as above
             I("TIME 2010q4 2012q1;");
             I("SER z3 = 1, 2, 3, 4, 5, 6;");
             I("REBASE z3 2011q1 2011q4;");
-            AssertHelper(First(), "z3", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);
-            AssertHelper(First(), "z3", EFreq.Q, 2012, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2011, 1, 2d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2011, 2, 3d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2011, 3, 4d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2011, 4, 5d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2012, 1, 6d / (14d / 4d) * 100d, sharedDelta);
+            _AssertSeries(First(), "z3", EFreq.Q, 2012, 2, double.NaN, sharedDelta);
 
         }
 
@@ -13151,9 +13176,9 @@ namespace UnitTests
                             int number = Program.databanks.GetFirst().storage.Count;
                             Assert.AreEqual(1, number);
                             //just testing the first
-                            if (freq == "a") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, 1d, sharedDelta);
-                            if (freq == "q") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, 2010, 1, 1d, sharedDelta);
-                            if (freq == "m") AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.M, 2010, 1, 1d, sharedDelta);
+                            if (freq == "a") _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, 1d, sharedDelta);
+                            if (freq == "q") _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, 2010, 1, 1d, sharedDelta);
+                            if (freq == "m") _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.M, 2010, 1, 1d, sharedDelta);
                         }
                     }
                 }
@@ -13175,35 +13200,35 @@ namespace UnitTests
                     I("SER <2010m1 2013m2> xx3 = 3;");
                     I("WRITE mixed;");
                     I("RESET; IMPORT<2011 2011>mixed;");
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 1, 2011, 4, 2d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2012, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2010, 12, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 1, 2011, 12, 3d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2012, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 1, 2011, 4, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2012, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2010, 12, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 1, 2011, 12, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2012, 1, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011q2 2011q3>mixed;");
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 2, 2011, 3, 2d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 3, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 4, 2011, 9, 3d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 10, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 2, 2011, 3, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 4, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 3, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 4, 2011, 9, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 10, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011m2 2011m4>mixed;");
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 1, 2011, 2, 2d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 3, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 1, double.NaN, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 2, 2011, 4, 3d, sharedDelta);
-                    AssertHelper(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 5, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2010, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2011, 1, 1d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.A, 2012, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", null, EFreq.Q, 2011, 1, 2011, 2, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2", EFreq.Q, 2011, 3, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 1, double.NaN, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", null, EFreq.M, 2011, 2, 2011, 4, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3", EFreq.M, 2011, 5, double.NaN, sharedDelta);
                     FAIL("IMPORT<2011u1 2011u1>mixed;");
                     FAIL("IMPORT<2011 2011q1>mixed;");
                     FAIL("IMPORT<2011q1 2011m12>mixed;");
@@ -13243,17 +13268,17 @@ namespace UnitTests
                                         GekkoTime ttemp = t0.Add(ii);
                                         if (jj == 0)
                                         {
-                                            AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
+                                            _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
                                         }
                                         else
                                         {
-                                            AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, double.NaN, sharedDelta);
+                                            _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, double.NaN, sharedDelta);
                                         }
                                     }
                                     for (int ii = count1; ii <= count2; ii++)
                                     {
                                         GekkoTime ttemp = t0.Add(ii);
-                                        AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 1, sharedDelta);
+                                        _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 1, sharedDelta);
                                     }
                                     for (int ii = count2 + 1; ii < 3; ii++)
                                     {
@@ -13261,11 +13286,11 @@ namespace UnitTests
                                         GekkoTime ttemp = t0.Add(ii);
                                         if (jj == 0)
                                         {
-                                            AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
+                                            _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, (ii + 1) * 100, sharedDelta);
                                         }
                                         else
                                         {
-                                            AssertHelper(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, double.NaN, sharedDelta);
+                                            _AssertSeries(Program.databanks.GetFirst(), "xx1", EFreq.Q, ttemp.super, ttemp.sub, double.NaN, sharedDelta);
                                         }
                                     }
                                     count2++;
@@ -13464,11 +13489,11 @@ namespace UnitTests
         {
 
             //I("time 2001 2003; xx = [1; 2; 3];");
-            //AssertHelper(First(), "xx", 2000, double.NaN, sharedDelta);
-            //AssertHelper(First(), "xx", 2001, 1d, sharedDelta);
-            //AssertHelper(First(), "xx", 2002, 2d, sharedDelta);
-            //AssertHelper(First(), "xx", 2003, 3d, sharedDelta);
-            //AssertHelper(First(), "xx", 2004, double.NaN, sharedDelta);
+            //_AssertSeries(First(), "xx", 2000, double.NaN, sharedDelta);
+            //_AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            //_AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            //_AssertSeries(First(), "xx", 2003, 3d, sharedDelta);
+            //_AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
 
             I("RESET; TIME 2001 2005;");
             I("xx1 = (1, 2, 3, 4, 5);");
@@ -14915,30 +14940,30 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("IMPORT <px> data;");
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 1, 98.1d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 1, 98.3d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 1, 98.1d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 1, 98.3d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 3, 102.9d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 3, 103.1d, sharedDelta);
                         
             //Truncated time period
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
             I("IMPORT <2000m2 2001m3 px> data;");
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 1, double.NaN, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 1, double.NaN, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 2, 97.8, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 2, 98.7, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 3, 103.1d, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 4, double.NaN, sharedDelta);
-            AssertHelper(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2000, 2, 97.8, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2000, 2, 98.7, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 3, 102.9d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100", EFreq.M, 2001, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100", EFreq.M, 2001, 4, double.NaN, sharedDelta);
 
             //Another px-file, with blanks and parentheses in stub
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("IMPORT <px> prod01;");            
-            AssertHelper(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC", EFreq.M, 2017, 3, 119.9d, sharedDelta);
-            AssertHelper(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001", EFreq.M, 2017, 3, 106.5d, sharedDelta);
+            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC", EFreq.M, 2017, 3, 119.9d, sharedDelta);
+            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001", EFreq.M, 2017, 3, 106.5d, sharedDelta);
             
 
         }
@@ -14949,25 +14974,25 @@ namespace UnitTests
             {
                 if (freq == "a")
                 {
-                    AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx1", 2001, 1001, sharedDelta);
-                    AssertHelper(First(), "xx1", 2002, 1002, sharedDelta);
-                    AssertHelper(First(), "xx1", 2003, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", 2000, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", 2001, 3001, sharedDelta);
-                    AssertHelper(First(), "xx3", 2002, 3002, sharedDelta);
-                    AssertHelper(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2001, 3001, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2002, 3002, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
                 }
                 else if (freq == "q")
                 {
-                    AssertHelper(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 1, 3001, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 2, 3002, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 3001, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 3002, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
                 else throw new GekkoException();
             }
@@ -14975,25 +15000,25 @@ namespace UnitTests
             {
                 if (freq == "a")
                 {
-                    AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx1", 2001, 1001, sharedDelta);
-                    AssertHelper(First(), "xx1", 2002, 1002, sharedDelta);
-                    AssertHelper(First(), "xx1", 2003, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", 2000, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", 2001, 4001, sharedDelta);
-                    AssertHelper(First(), "xx3", 2002, 4002, sharedDelta);
-                    AssertHelper(First(), "xx3", 2003, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2001, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2002, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2000, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2001, 4001, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2002, 4002, sharedDelta);
+                    _AssertSeries(First(), "xx3", 2003, double.NaN, sharedDelta);
                 }
                 else if (freq == "q")
                 {
-                    AssertHelper(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
-                    AssertHelper(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 1, 4001, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 2, 4002, sharedDelta);
-                    AssertHelper(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 4001, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 4002, sharedDelta);
+                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
                 else throw new GekkoException();
             }
@@ -15028,11 +15053,11 @@ namespace UnitTests
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0d);
-            AssertHelper(First(), "y", 2002, 102d, 0d);
-            AssertHelper(First(), "y", 2003, 104d, 0d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0d);
+            _AssertSeries(First(), "y", 2002, 102d, 0d);
+            _AssertSeries(First(), "y", 2003, 104d, 0d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ '<nothing>' --------------------------------
 
@@ -15046,11 +15071,11 @@ namespace UnitTests
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0d);
-            AssertHelper(First(), "y", 2002, 102d, 0d);
-            AssertHelper(First(), "y", 2003, 104d, 0d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0d);
+            _AssertSeries(First(), "y", 2002, 102d, 0d);
+            _AssertSeries(First(), "y", 2003, 104d, 0d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ 'n' --------------------------------
 
@@ -15064,11 +15089,11 @@ namespace UnitTests
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0d);
-            AssertHelper(First(), "y", 2002, 102d, 0d);
-            AssertHelper(First(), "y", 2003, 104d, 0d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0d);
+            _AssertSeries(First(), "y", 2002, 102d, 0d);
+            _AssertSeries(First(), "y", 2003, 104d, 0d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ '^' --------------------------------
 
@@ -15084,11 +15109,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0d);
-            AssertHelper(First(), "y", 2002, 102d, 0d);
-            AssertHelper(First(), "y", 2003, 104d, 0d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0d);
+            _AssertSeries(First(), "y", 2002, 102d, 0d);
+            _AssertSeries(First(), "y", 2003, 104d, 0d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ 'd' --------------------------------
 
@@ -15104,11 +15129,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0d);
-            AssertHelper(First(), "y", 2002, 102d, 0d);
-            AssertHelper(First(), "y", 2003, 104d, 0d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0d);
+            _AssertSeries(First(), "y", 2002, 102d, 0d);
+            _AssertSeries(First(), "y", 2003, 104d, 0d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ '%' --------------------------------
 
@@ -15124,11 +15149,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 1.02 * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 1.04 * 1.02 * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 1.02 * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 1.04 * 1.02 * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ 'p' --------------------------------
 
@@ -15144,11 +15169,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 101d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 1.02 * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 1.04 * 1.02 * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 1.02 * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 1.04 * 1.02 * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ '+' --------------------------------
 
@@ -15165,11 +15190,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 102d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 104d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 108d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 102d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 104d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 108d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ 'm' --------------------------------
 
@@ -15186,11 +15211,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 102d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 104d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 108d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 102d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 104d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 108d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ '*' --------------------------------
 
@@ -15207,11 +15232,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 1.01d * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 1.02d * 102d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 1.04d * 104d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 1.01d * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 1.02d * 102d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 1.04d * 104d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
             // ------------------------ 'q' --------------------------------
 
@@ -15228,11 +15253,11 @@ namespace UnitTests
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
             I("RUN deleteme." + Globals.extensionCommand + ";");            
-            AssertHelper(First(), "y", 2000, double.NaN, 0d);
-            AssertHelper(First(), "y", 2001, 1.01d * 101d, 0.000001d);
-            AssertHelper(First(), "y", 2002, 1.02d * 102d, 0.000001d);
-            AssertHelper(First(), "y", 2003, 1.04d * 104d, 0.000001d);
-            AssertHelper(First(), "y", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2001, 1.01d * 101d, 0.000001d);
+            _AssertSeries(First(), "y", 2002, 1.02d * 102d, 0.000001d);
+            _AssertSeries(First(), "y", 2003, 1.04d * 104d, 0.000001d);
+            _AssertSeries(First(), "y", 2004, double.NaN, 0d);
 
 
         }
@@ -15287,72 +15312,72 @@ namespace UnitTests
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test =
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 = 200;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test +
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 + 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test <m>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 m> xx1 = 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test *
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 * 1.04;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test <q>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 q> xx1 = 4;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test ^
             I("RESET;");
@@ -15360,12 +15385,12 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 ^ 3;");
             UData u = null;
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2007, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2008, "a"); Assert.AreEqual(u.d, 3d);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test <d>
             I("RESET;");
@@ -15373,216 +15398,216 @@ namespace UnitTests
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 d> xx1 = 3;");
             u = null;
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2007, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2008, "a"); Assert.AreEqual(u.d, 3d);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test %
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 % 5;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test <p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 p> xx1 = 5;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test #
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 # 6;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test <mp>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 mp> xx1 = 6;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
-            AssertHelper(First(), "xx1", 2009, x2009, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, x2010, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, x2009, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, x2010, sharedDelta);
 
             //Test =$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 =$ 200;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, 200d, sharedDelta);
             double y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 keep=p> xx1 = 200;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, 200d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, 200d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, 200d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test +$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 +$ 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <m keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 m keep=p> xx1 = 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 + 3d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 + 3d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test *$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 *$ 1.04;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <q keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 q keep=p> xx1 = 4;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
-            AssertHelper(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
-            AssertHelper(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, x2006 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2007, x2007 * 1.04d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2008, x2008 * 1.04d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test ^$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 ^$ 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2007, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2008, "a"); Assert.AreEqual(u.d, 3d);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <d keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 d keep=p> xx1 = 3;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2007, "a"); Assert.AreEqual(u.d, 3d);
             u = Data("xx1", 2008, "a"); Assert.AreEqual(u.d, 3d);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test %$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 %$ 5;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <p keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 p keep=p> xx1 = 5;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 5d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test #$
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008> xx1 #$ 6;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
             //Test <mp keep=p>
             I("RESET;");
             I("SERIES<2005 2005> xx1 = 100;");
             I("SERIES<2006 2010> xx1 % 2;");
             I("SERIES<2006 2008 mp keep=p> xx1 = 6;");
-            AssertHelper(First(), "xx1", 2005, x2005, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, x2005, sharedDelta);
             u = Data("xx1", 2006, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2007, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             u = Data("xx1", 2008, "a"); _AssertHelperTwoDoubles(u.p, 8d, sharedDelta);
             y2008 = work.GetVariable("xx1").GetData(null, new GekkoTime(EFreq.A, 2008, 1));
-            AssertHelper(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
-            AssertHelper(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2009, y2008 * x2009 / x2008, sharedDelta);
+            _AssertSeries(First(), "xx1", 2010, y2008 * x2010 / x2008, sharedDelta);
 
 
             // ===============================================
@@ -15599,10 +15624,10 @@ namespace UnitTests
             I("CREATE xx1, xx2;");
             I("CLONE;");
             I("SERIES<2005 2005> ref:xx1, work:xx2 = 100;");
-            AssertHelper(First(), "xx1", 2005, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2005, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(), "xx1", 2005, 100, sharedDelta);
-            AssertHelper(Program.databanks.GetRef(), "xx2", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2005, 100, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "xx1", 2005, 100, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "xx2", 2005, double.NaN, sharedDelta);
 
             // ===================================================================================
             // =============== testing REP n, and REP * ==========================================
@@ -15612,68 +15637,68 @@ namespace UnitTests
             I("TIME 2005 2010;");
             I("CREATE rep1;");
             I("SERIES rep1 = 10 rep 1, 11 rep 3, 12, 13;");
-            AssertHelper(First(), "rep1", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep1", 2005, 10, sharedDelta);
-            AssertHelper(First(), "rep1", 2006, 11, sharedDelta);
-            AssertHelper(First(), "rep1", 2007, 11, sharedDelta);
-            AssertHelper(First(), "rep1", 2008, 11, sharedDelta);
-            AssertHelper(First(), "rep1", 2009, 12, sharedDelta);
-            AssertHelper(First(), "rep1", 2010, 13, sharedDelta);
-            AssertHelper(First(), "rep1", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep1", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep1", 2005, 10, sharedDelta);
+            _AssertSeries(First(), "rep1", 2006, 11, sharedDelta);
+            _AssertSeries(First(), "rep1", 2007, 11, sharedDelta);
+            _AssertSeries(First(), "rep1", 2008, 11, sharedDelta);
+            _AssertSeries(First(), "rep1", 2009, 12, sharedDelta);
+            _AssertSeries(First(), "rep1", 2010, 13, sharedDelta);
+            _AssertSeries(First(), "rep1", 2011, double.NaN, sharedDelta);
             I("CREATE rep2;");
             I("SERIES rep2 = 10 rep 1, 11 rep *;");
-            AssertHelper(First(), "rep2", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep2", 2005, 10, sharedDelta);
-            AssertHelper(First(), "rep2", 2006, 11, sharedDelta);
-            AssertHelper(First(), "rep2", 2007, 11, sharedDelta);
-            AssertHelper(First(), "rep2", 2008, 11, sharedDelta);
-            AssertHelper(First(), "rep2", 2009, 11, sharedDelta);
-            AssertHelper(First(), "rep2", 2010, 11, sharedDelta);
-            AssertHelper(First(), "rep2", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep2", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep2", 2005, 10, sharedDelta);
+            _AssertSeries(First(), "rep2", 2006, 11, sharedDelta);
+            _AssertSeries(First(), "rep2", 2007, 11, sharedDelta);
+            _AssertSeries(First(), "rep2", 2008, 11, sharedDelta);
+            _AssertSeries(First(), "rep2", 2009, 11, sharedDelta);
+            _AssertSeries(First(), "rep2", 2010, 11, sharedDelta);
+            _AssertSeries(First(), "rep2", 2011, double.NaN, sharedDelta);
             I("CREATE rep3;");
             I("SERIES rep3 = 10 rep *;");
-            AssertHelper(First(), "rep3", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep3", 2005, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2006, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2007, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2008, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2009, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2010, 10, sharedDelta);
-            AssertHelper(First(), "rep3", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep3", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep3", 2005, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2006, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2007, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2008, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2009, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2010, 10, sharedDelta);
+            _AssertSeries(First(), "rep3", 2011, double.NaN, sharedDelta);
             I("CREATE rep4;");
             I("SERIES rep4 = 10;");  //same as rep *
-            AssertHelper(First(), "rep4", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep4", 2005, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2006, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2007, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2008, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2009, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2010, 10, sharedDelta);
-            AssertHelper(First(), "rep4", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep4", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep4", 2005, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2006, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2007, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2008, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2009, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2010, 10, sharedDelta);
+            _AssertSeries(First(), "rep4", 2011, double.NaN, sharedDelta);
             I("CREATE rep5;");
             FAIL("SERIES rep5 = 10 rep 6;");  //is not legal, rep * is though
             
             I("CREATE rep6;");
             I("SERIES rep6 = 1, 2, 3, 4, 5, 6 rep *;");
-            AssertHelper(First(), "rep6", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep6", 2005, 1, sharedDelta);
-            AssertHelper(First(), "rep6", 2006, 2, sharedDelta);
-            AssertHelper(First(), "rep6", 2007, 3, sharedDelta);
-            AssertHelper(First(), "rep6", 2008, 4, sharedDelta);
-            AssertHelper(First(), "rep6", 2009, 5, sharedDelta);
-            AssertHelper(First(), "rep6", 2010, 6, sharedDelta);
-            AssertHelper(First(), "rep6", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep6", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep6", 2005, 1, sharedDelta);
+            _AssertSeries(First(), "rep6", 2006, 2, sharedDelta);
+            _AssertSeries(First(), "rep6", 2007, 3, sharedDelta);
+            _AssertSeries(First(), "rep6", 2008, 4, sharedDelta);
+            _AssertSeries(First(), "rep6", 2009, 5, sharedDelta);
+            _AssertSeries(First(), "rep6", 2010, 6, sharedDelta);
+            _AssertSeries(First(), "rep6", 2011, double.NaN, sharedDelta);
             I("VAL v = 2;");
             I("CREATE rep7;");
             I("SERIES rep7 = 1, 2 rep %v, 3 rep %v+%v-1;");
-            AssertHelper(First(), "rep7", 2004, double.NaN, sharedDelta);
-            AssertHelper(First(), "rep7", 2005, 1, sharedDelta);
-            AssertHelper(First(), "rep7", 2006, 2, sharedDelta);
-            AssertHelper(First(), "rep7", 2007, 2, sharedDelta);
-            AssertHelper(First(), "rep7", 2008, 3, sharedDelta);
-            AssertHelper(First(), "rep7", 2009, 3, sharedDelta);
-            AssertHelper(First(), "rep7", 2010, 3, sharedDelta);
-            AssertHelper(First(), "rep7", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep7", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "rep7", 2005, 1, sharedDelta);
+            _AssertSeries(First(), "rep7", 2006, 2, sharedDelta);
+            _AssertSeries(First(), "rep7", 2007, 2, sharedDelta);
+            _AssertSeries(First(), "rep7", 2008, 3, sharedDelta);
+            _AssertSeries(First(), "rep7", 2009, 3, sharedDelta);
+            _AssertSeries(First(), "rep7", 2010, 3, sharedDelta);
+            _AssertSeries(First(), "rep7", 2011, double.NaN, sharedDelta);
 
             I("CREATE rep;");
             FAIL("SERIES rep = 10 rep 0, 11 rep 3, 12, 13;");
@@ -16243,63 +16268,63 @@ namespace UnitTests
 
             double delta = 0.001d;
 
-            AssertHelper(First(), "y", EFreq.Q, 1999, 4, 100d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2000, 1, 400d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2000, 2, 600d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2000, 3, 733.3333d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2000, 4, 822.2222d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2001, 1, 881.4815d, delta);
-            AssertHelper(First(), "y", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 1999, 4, 100d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2000, 1, 400d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2000, 2, 600d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2000, 3, 733.3333d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2000, 4, 822.2222d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2001, 1, 881.4815d, delta);
+            _AssertSeries(First(), "y", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "c", EFreq.Q, 1999, 4, 100d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 1, 200d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 2, 400d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 3, 533.3333d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 4, 622.2222d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2001, 1, 681.4815d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 1999, 4, 100d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 1, 200d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 2, 400d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 3, 533.3333d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 4, 622.2222d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2001, 1, 681.4815d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "i", EFreq.Q, 1999, 3, double.NaN, delta);
-            AssertHelper(First(), "i", EFreq.Q, 1999, 4, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2000, 1, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2000, 2, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2000, 3, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2000, 4, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2001, 1, 100d, delta);
-            AssertHelper(First(), "i", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 1999, 3, double.NaN, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 1999, 4, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2000, 1, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2000, 2, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2000, 3, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2000, 4, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2001, 1, 100d, delta);
+            _AssertSeries(First(), "i", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "g", EFreq.Q, 1999, 3, double.NaN, delta);
-            AssertHelper(First(), "g", EFreq.Q, 1999, 4, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2000, 1, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2000, 2, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2000, 3, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2000, 4, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2001, 1, 100d, delta);
-            AssertHelper(First(), "g", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 1999, 3, double.NaN, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 1999, 4, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2000, 1, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2000, 2, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2000, 3, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2000, 4, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2001, 1, 100d, delta);
+            _AssertSeries(First(), "g", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "dc", EFreq.Q, 1999, 4, double.NaN, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2000, 1, 0d, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2000, 2, 0d, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2000, 3, 0d, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2000, 4, 0d, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2001, 1, 0d, delta);
-            AssertHelper(First(), "dc", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 1999, 4, double.NaN, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2000, 1, 0d, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2000, 2, 0d, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2000, 3, 0d, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2000, 4, 0d, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2001, 1, 0d, delta);
+            _AssertSeries(First(), "dc", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "jrc", EFreq.Q, 1999, 4, double.NaN, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2000, 1, 0d, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2000, 2, 0d, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2000, 3, 0d, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2000, 4, 0d, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2001, 1, 0d, delta);
-            AssertHelper(First(), "jrc", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 1999, 4, double.NaN, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2000, 1, 0d, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2000, 2, 0d, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2000, 3, 0d, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2000, 4, 0d, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2001, 1, 0d, delta);
+            _AssertSeries(First(), "jrc", EFreq.Q, 2001, 2, double.NaN, delta);
 
-            AssertHelper(First(), "zc", EFreq.Q, 1999, 4, double.NaN, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 1, 200d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 2, 400d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 3, 533.3333d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2000, 4, 622.2222d, delta);
-            AssertHelper(First(), "c", EFreq.Q, 2001, 1, 681.4815d, delta);
-            AssertHelper(First(), "zc", EFreq.Q, 2001, 2, double.NaN, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 1999, 4, double.NaN, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 1, 200d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 2, 400d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 3, 533.3333d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2000, 4, 622.2222d, delta);
+            _AssertSeries(First(), "c", EFreq.Q, 2001, 1, 681.4815d, delta);
+            _AssertSeries(First(), "zc", EFreq.Q, 2001, 2, double.NaN, delta);
 
         }
 
@@ -16373,10 +16398,10 @@ namespace UnitTests
             I("sim;");
             string stamp2 = Program.GetDateStamp();
 
-            AssertHelper(First(), "q", 2000, 1d, 0.0001d);
-            AssertHelper(First(), "q", 2001, 1d, 0.0001d);
-            AssertHelper(First(), "pxnk", 2000, 2d, 0.0001d);
-            AssertHelper(First(), "pxnk", 2001, 2d, 0.0001d);
+            _AssertSeries(First(), "q", 2000, 1d, 0.0001d);
+            _AssertSeries(First(), "q", 2001, 1d, 0.0001d);
+            _AssertSeries(First(), "pxnk", 2000, 2d, 0.0001d);
+            _AssertSeries(First(), "pxnk", 2001, 2d, 0.0001d);
 
             MetaHelperLabel();
             MetaHelperSourceStamp(stamp2);
@@ -16409,26 +16434,26 @@ namespace UnitTests
         {
             I("RESET;");
             I("READ <ser> " + Globals.ttPath2 + @"\regres\Databanks\test;");
-            AssertHelper(First(), "xx1", 2000, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx1", 2001, 1d, sharedDelta);
-            AssertHelper(First(), "xx1", 2002, -2d, sharedDelta);
-            AssertHelper(First(), "xx1", 2003, 1e5d, sharedDelta);
-            AssertHelper(First(), "xx1", 2004, -1.23d, sharedDelta);
-            AssertHelper(First(), "xx1", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, -2d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2003, 1e5d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2004, -1.23d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
 
-            AssertHelper(First(), "xx2", 2000, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx2", 2001, 3d, sharedDelta);
-            AssertHelper(First(), "xx2", 2002, 3d, sharedDelta);
-            AssertHelper(First(), "xx2", 2003, 3d, sharedDelta);
-            AssertHelper(First(), "xx2", 2004, 3d, sharedDelta);
-            AssertHelper(First(), "xx2", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx2", 2001, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2002, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2004, 3d, sharedDelta);
+            _AssertSeries(First(), "xx2", 2005, double.NaN, sharedDelta);
 
-            AssertHelper(First(), "xx3", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            AssertHelper(First(), "xx3", EFreq.Q, 2001, 1, 1d, sharedDelta);
-            AssertHelper(First(), "xx3", EFreq.Q, 2001, 2, 2, sharedDelta);
-            AssertHelper(First(), "xx3", EFreq.Q, 2001, 3, 3d, sharedDelta);
-            AssertHelper(First(), "xx3", EFreq.Q, 2001, 4, 4, sharedDelta);
-            AssertHelper(First(), "xx3", EFreq.Q, 2002, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 2, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, 3d, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 4, 4, sharedDelta);
+            _AssertSeries(First(), "xx3", EFreq.Q, 2002, 1, double.NaN, sharedDelta);
         }
 
 
@@ -16470,22 +16495,22 @@ namespace UnitTests
             Assert.AreEqual(First().GetVariable("y").meta.label, "label");
             Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
             Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
-            AssertHelper(First(), "y", 1999, double.NaN, 0d);
-            AssertHelper(First(), "y", 2000, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2001, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2002, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2003, double.NaN, 0d);
+            _AssertSeries(First(), "y", 1999, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2001, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2002, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2003, double.NaN, 0d);
             I("export<tsd>metaTemp;");
             I("reset;");
             I("import<tsd>metaTemp;");
             Assert.AreEqual(First().GetVariable("y").meta.label, "label");
             Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
             Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
-            AssertHelper(First(), "y", 1999, double.NaN, 0d);
-            AssertHelper(First(), "y", 2000, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2001, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2002, 1d / 3d, 0.0000001d);
-            AssertHelper(First(), "y", 2003, double.NaN, 0d);
+            _AssertSeries(First(), "y", 1999, double.NaN, 0d);
+            _AssertSeries(First(), "y", 2000, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2001, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2002, 1d / 3d, 0.0000001d);
+            _AssertSeries(First(), "y", 2003, double.NaN, 0d);
         }
 
         private static void MetaHelperLabel()
@@ -16568,18 +16593,18 @@ namespace UnitTests
             AssertHelperScalarDate("d3", EFreq.Q, 1990, 3);
             AssertHelperScalarVal("v1", 1.2345);
             AssertHelperScalarVal("v2", -1.23e-5);
-            AssertHelper(First(), "bce", 2000, double.NaN, 0d);
-            AssertHelper(First(), "bce", 2001, 5d, 0d);
-            AssertHelper(First(), "bce", 2002, 6d, 0d);
-            AssertHelper(First(), "bce", 2003, 7d, 0d);
-            AssertHelper(First(), "bce", 2004, double.NaN, 0d);
+            _AssertSeries(First(), "bce", 2000, double.NaN, 0d);
+            _AssertSeries(First(), "bce", 2001, 5d, 0d);
+            _AssertSeries(First(), "bce", 2002, 6d, 0d);
+            _AssertSeries(First(), "bce", 2003, 7d, 0d);
+            _AssertSeries(First(), "bce", 2004, double.NaN, 0d);
             AssertHelperScalarVal("v3", 1.2345 * 6d);
             AssertHelperScalarString("s2", "value:abc");
-            AssertHelper(First(), "bce2", EFreq.Q, 1990, 2, double.NaN, 0d);
-            AssertHelper(First(), "bce2", EFreq.Q, 1990, 3, 5d, 0d);
-            AssertHelper(First(), "bce2", EFreq.Q, 1990, 4, 6d, 0d);
-            AssertHelper(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
-            AssertHelper(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
+            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 2, double.NaN, 0d);
+            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 3, 5d, 0d);
+            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 4, 6d, 0d);
+            _AssertSeries(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
+            _AssertSeries(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
             AssertHelperScalarVal("v4", 1.2345 * 6d);
             
         }

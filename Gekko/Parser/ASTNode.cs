@@ -86,6 +86,10 @@ namespace Gekko.Parser
             {                
                 return this.GetChild(i);
             }
+            set
+            {
+                this.children[i] = value;
+            }
         }
 
         public int ChildrenCount()

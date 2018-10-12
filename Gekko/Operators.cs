@@ -117,7 +117,7 @@ namespace Gekko
         {
             public static IVariable Add(ScalarString s, List l, bool swap)
             {
-                List<string> m = O.GetStringList(l);
+                List<string> m = Program.GetListOfStringsFromList(l);
                 List<string> newList = new List<string>();
                 if (!swap)
                 {
