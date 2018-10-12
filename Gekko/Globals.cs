@@ -180,6 +180,8 @@ namespace Gekko
         public const string local_name = "local";
         public const string global_name = "global";
 
+        public const string listfile = "listfile";
+
         public const string symbolRefShortcut = "@";
 
         public const string printCode_n = "n";        

@@ -1100,8 +1100,20 @@ namespace Gekko
             {
 
                 IVariable rv = null;
+                string x_string = (x as ScalarString).string2;
+
+
                 string dbName, varName, freq; string[] indexes; char firstChar;
-                Chop((x as ScalarString).string2, out dbName, out varName, out freq, out indexes);
+                if (x_string.StartsWith(Globals.symbolCollection + Globals.listfile))
+                {
+                    dbName = null; varName = x_string; freq = null; indexes = null; firstChar = varName[0];
+                }
+                else
+                {
+                    Chop(x_string, out dbName, out varName, out freq, out indexes);
+                }
+
+
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound, options);
 
                 if (indexes != null)
@@ -1321,57 +1333,85 @@ namespace Gekko
                     //It must be a databank then
                     if (dbName == null)
                     {
-                        LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
-
-                        //databank name not given, for instance "PRT x"
-                        if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
+                        if (varname.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
                         {
-                            //No searching if the naked variable is local or global
-                            //options.databank_search is DATA mode
-                            //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
-                            if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                            string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+                            fileName = Program.AddExtension(fileName, "." + "lst");                            
+                            List<string> folders = new List<string>();
+                            string fileNameTemp = Program.FindFile(fileName, folders);
+                            if (fileNameTemp == null)
                             {
-                                //Ref lookup
-                                Databank db = null;
-                                db = Program.databanks.GetRef();
-                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
+                                throw new GekkoException();
                             }
-                            else
+                            string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
+                            List<string> input = G.ExtractLinesFromText(listFile);
+                                                        
+                            List<string> result = new List<string>();
+
+                            GetRawListElements(fileName, input, result);
+                            if (result.Count == 1 && G.Equal(result[0], "null"))
                             {
-                                //non-Ref lookup
-
-                                rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
-                                if (rv == null && errorIfNotFound)
-                                {
-                                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
-                                    throw new GekkoException();
-                                }
-
+                                //LIST mylist = null; ---> empty list
+                                result = new List<string>();
                             }
+                            List ml = new List(result);
+                            return ml;
                         }
                         else
                         {
-                            //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
-                            if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                            LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
+
+                            //databank name not given, for instance "PRT x"
+                            if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
                             {
-                                //Ref lookup
-                                Databank db = null;
-                                db = Program.databanks.GetRef();
-                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
-                            }
-                            else
-                            {
-                                //non-Ref lookup
-                                Databank db = null;
-                                if (lg != LocalGlobal.ELocalGlobalType.None)
+                                //No searching if the naked variable is local or global
+                                //options.databank_search is DATA mode
+                                //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
+                                if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                                 {
-                                    db = HandleLocalGlobalBank(lg);
+                                    //Ref lookup
+                                    Databank db = null;
+                                    db = Program.databanks.GetRef();
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
                                 }
                                 else
                                 {
-                                    db = Program.databanks.GetFirst();
+                                    //non-Ref lookup
+
+                                    rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
+                                    if (rv == null && errorIfNotFound)
+                                    {
+                                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
+                                        throw new GekkoException();
+                                    }
+
                                 }
-                                rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                            }
+                            else
+                            {
+                                //SIM mode, can only fetch it in the primary databank (unless bankNumber is active)
+                                if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
+                                {
+                                    //Ref lookup
+                                    Databank db = null;
+                                    db = Program.databanks.GetRef();
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                }
+                                else
+                                {
+                                    //non-Ref lookup
+                                    Databank db = null;
+                                    if (lg != LocalGlobal.ELocalGlobalType.None)
+                                    {
+                                        db = HandleLocalGlobalBank(lg);
+                                    }
+                                    else
+                                    {
+                                        db = Program.databanks.GetFirst();
+                                    }
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                }
                             }
                         }
                     }
@@ -2128,767 +2168,630 @@ namespace Gekko
 
             varnameWithFreq = G.AddSigil(varnameWithFreq, type);
 
-            IVariable lhs = null;
-            if (ib != null)
+            if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
-                //ib can be == null with an indexer on the lhs, like #m.#n.%s
-                lhs = ib.GetIVariable(varnameWithFreq); //may return null
-            }
-
-            //We divide into three groups depending on LHS name:
-            //  A. Starts with '%'
-            //  B. Starts with '#'
-            //  C. No sigil (or isArraySubSeries == true)
-
-            //For each A, B, C, we also have the 7 possible types of the RHS, for instace ... = 2012q1 (date type)
-            //  And for each of these 7 types, we may have a LHS type indicator, for instance DATE %d = ...  (should become date)
-
-            if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
-            {
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
-                // Starts with '%'
-
-                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date || type == EVariableType.Var)
-                {
-                    //good
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
-                    throw new GekkoException();
-                }
-
-                switch (rhs.Type())
-                {
-                    case EVariableType.Series:
-                        {
-                            //%x = SERIES
-
-                            Series rhsExpression_series = rhs as Series;
-                            switch (rhsExpression_series.type)
-                            {
-                                case ESeriesType.Timeless:
-                                    {
-                                        //---------------------------------------------------------
-                                        // %x = Series Timeless
-                                        //---------------------------------------------------------
-                                        if (type == EVariableType.Val || type == EVariableType.Var)
-                                        {
-                                            // VAL %x = Series Timeless
-                                            IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                            G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
-                                        }
-                                        else
-                                        {
-                                            ReportTypeError(varnameWithFreq, rhs, type);
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        //---------------------------------------------------------
-                                        // %x = Series Normal
-                                        //---------------------------------------------------------                                        
-                                        ReportTypeError(varnameWithFreq, rhs, type);
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case EVariableType.Val:
-                        {
-                            //---------------------------------------------------------
-                            // %x = VAL
-                            //---------------------------------------------------------
-                            //TODO: date %d = 2010.
-
-                            if (type == EVariableType.Val || type == EVariableType.Var)
-                            {
-                                IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else if (type == EVariableType.Date)
-                            {                                
-                                IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                //STRING command will fail
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-                        }
-                        break;
-                    case EVariableType.String:
-                        {
-                            //---------------------------------------------------------
-                            // %x = STRING
-                            //---------------------------------------------------------                            
-
-                            if (type == EVariableType.String || type == EVariableType.Var)
-                            {
-                                IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("STRING " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                //DATE and VAL commands will fail
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-
-                        }
-                        break;
-                    case EVariableType.Date:
-                        {
-                            //---------------------------------------------------------
-                            // %x = DATE
-                            //---------------------------------------------------------
-
-                            if (type == EVariableType.Date || type == EVariableType.Var)
-                            {
-                                IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                //STRING and VAL commands will fail
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-
-                        }
-                        break;
-                    case EVariableType.List:
-                        {
-                            //---------------------------------------------------------
-                            // %x = LIST
-                            //---------------------------------------------------------
-                            ReportTypeError(varnameWithFreq, rhs, type);
-                        }
-                        break;
-                    case EVariableType.Map:
-                        {
-                            //---------------------------------------------------------
-                            // %x = MAP
-                            //---------------------------------------------------------
-
-                            ReportTypeError(varnameWithFreq, rhs, type);
-
-                        }
-                        break;
-                    case EVariableType.Matrix:
-                        {
-                            //---------------------------------------------------------
-                            // %x = MATRIX
-                            //---------------------------------------------------------                            
-                            IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
-                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                            G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
-                        }
-                        break;
-                    default:
-                        {
-                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
-                            throw new GekkoException();
-                        }
-                        break;
-                }
-            }
-            else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolCollection)
-            {
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
-                // Starts with '#'
-
-                if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map || type == EVariableType.Var)
-                {
-                    //good
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
-                    throw new GekkoException();
-                }
-
-                switch (rhs.Type())
-                {
-                    case EVariableType.Series:
-                        {
-                            Series rhs_series = rhs as Series;
-                            switch (rhs_series.type)
-                            {
-                                case ESeriesType.Normal:
-                                    {
-                                        //---------------------------------------------------------
-                                        // #x = Series Normal
-                                        //---------------------------------------------------------
-
-                                        if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                        {
-
-                                            // array    smpl          destination
-                                            // source
-                                            //         
-                                            //           o   i1=-1    y 0             --> will become NaN
-                                            //   x 0     o            y 1
-                                            //   x 1     o            y 2
-                                            //   x 2     o            y 3
-                                            //   x 3     o            y 4
-                                            //           o   i2 = 4   y 5             --> will become NaN
-                                            //                                        
-
-                                            //method will only work if smpl freq is same as series freq
-                                            int n = smpl.Observations12();
-                                            int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
-                                            int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
-                                            Matrix m = new Matrix(1, n);
-                                            double[,] destination = m.data;
-                                            double[] source = rhs_series.data.dataArray;
-
-                                            int destinationStart = 0;
-                                            int ii1 = Math.Max(0, i1);
-                                            int ii2 = Math.Min(source.Length - 1, i2);
-                                            for (int j = i1; j < 0; j++)
-                                            {
-                                                destination[1, j - i1 + destinationStart] = double.NaN;
-                                            }
-                                            for (int j = i2; j >= source.Length; j--)
-                                            {
-                                                destination[1, j - i1 + destinationStart] = double.NaN;
-                                            }
-                                            //see also #0985324985237
-                                            Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
-                                            IVariable lhsNew = m;
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                            G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
-                                        }
-                                        else
-                                        {
-                                            ReportTypeError(varnameWithFreq, rhs, type);
-                                        }
-                                    }
-                                    break;
-                                case ESeriesType.Light:
-                                    {
-
-                                        //---------------------------------------------------------
-                                        // #x = Series Light
-                                        //---------------------------------------------------------
-
-                                        if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                        {
-
-                                            //method will only work if smpl freq is same as series freq
-                                            int n = smpl.Observations12();
-                                            Matrix m = new Matrix(1, n);
-                                            int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
-                                            int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
-
-                                            int tooSmall = 0; int tooLarge = 0;
-                                            rhs_series.TooSmallOrTooLarge(ii1, ii2, out tooSmall, out tooLarge);
-                                            if (tooSmall > 0 || tooLarge > 0)
-                                            {
-                                                if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
-                                                return;
-                                            }
-
-                                            int destinationStart = 0;
-                                            double[,] destination = m.data;
-                                            double[] source = rhs_series.data.dataArray;
-                                            //see #0985324985237
-                                            Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
-                                            IVariable lhsNew = m;
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                            G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
-                                        }
-                                        else
-                                        {
-                                            ReportTypeError(varnameWithFreq, rhs, type);
-                                        }
-                                    }
-                                    break;
-                                case ESeriesType.Timeless:
-                                    {
-                                        //---------------------------------------------------------
-                                        // #x = Series Timeless
-                                        //---------------------------------------------------------
-
-                                        if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                        {
-                                            int n = smpl.Observations12();
-                                            double d = rhs_series.data.dataArray[0];
-                                            Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
-                                            AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
-                                            G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
-                                        }
-                                        else
-                                        {
-                                            ReportTypeError(varnameWithFreq, rhs, type);
-                                        }
-                                    }
-                                    break;
-                                case ESeriesType.ArraySuper:
-                                    {
-                                        //---------------------------------------------------------
-                                        // #x = Series Array Super
-                                        //---------------------------------------------------------
-                                        {
-                                            ReportTypeError(varnameWithFreq, rhs, type);
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
-                                        throw new GekkoException();
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case EVariableType.Val:
-                        {
-                            //---------------------------------------------------------
-                            // #x = VAL
-                            //---------------------------------------------------------
-                            ReportTypeError(varnameWithFreq, rhs, type);
-                        }
-                        break;
-                    case EVariableType.String:
-                        {
-                            //---------------------------------------------------------
-                            // #x = STRING
-                            //---------------------------------------------------------
-
-                            ReportTypeError(varnameWithFreq, rhs, type);
-
-                        }
-                        break;
-                    case EVariableType.Date:
-                        {
-                            //---------------------------------------------------------
-                            // #x = DATE
-                            //---------------------------------------------------------
-
-                            ReportTypeError(varnameWithFreq, rhs, type);
-
-                        }
-                        break;
-                    case EVariableType.List:
-                        {
-                            //---------------------------------------------------------
-                            // #x = LIST
-                            //---------------------------------------------------------         
-                            if (type == EVariableType.List || type == EVariableType.Var)
-                            {
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
-                                G.ServiceMessage("LIST " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-                        }
-                        break;
-                    case EVariableType.Map:
-                        {
-                            //---------------------------------------------------------
-                            // #x = MAP
-                            //---------------------------------------------------------
-
-                            if (type == EVariableType.Map || type == EVariableType.Var)
-                            {
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
-                                G.ServiceMessage("MAP " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-                        }
-                        break;
-                    case EVariableType.Matrix:
-                        {
-                            //---------------------------------------------------------
-                            // #x = MATRIX
-                            //---------------------------------------------------------
-                            if (type == EVariableType.Matrix || type == EVariableType.Var)
-                            {
-                                Matrix m = rhs.DeepClone(null) as Matrix;
-                                if (options.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_colnames).ToArray()));
-                                if (options.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_rownames).ToArray()));                                
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
-                                G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
-                            }
-                            else
-                            {
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-                        }
-                        break;
-                    default:
-                        {
-                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
-                            throw new GekkoException();
-                        }
-                        break;
-                }
+                string fileName = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+                List<string> temp = Program.GetListOfStringsFromList(rhs);
+                Program.WriteExternalListFile(fileName, temp);
             }
             else
             {
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
-                //name is of series type (no sigils), or we have that isArraySubSeries == true (or both)
 
-                if (lhs == null && !isArraySubSeries && !varnameWithFreq.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                IVariable lhs = null;
+                if (ib != null)
                 {
-                    //nonexisting series
-                    if (!Program.options.databank_create_auto)
+                    //ib can be == null with an indexer on the lhs, like #m.#n.%s
+                    lhs = ib.GetIVariable(varnameWithFreq); //may return null
+                }
+
+                //We divide into three groups depending on LHS name:
+                //  A. Starts with '%'
+                //  B. Starts with '#'
+                //  C. No sigil (or isArraySubSeries == true)
+
+                //For each A, B, C, we also have the 7 possible types of the RHS, for instace ... = 2012q1 (date type)
+                //  And for each of these 7 types, we may have a LHS type indicator, for instance DATE %d = ...  (should become date)
+
+                if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolScalar)
+                {
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
+                    // Starts with '%'
+
+                    if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date || type == EVariableType.Var)
                     {
-                        //#07549843254
-                        G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ".");
-                        G.Writeln("           You may change the settings with the following option:", Color.Red);
-                        G.Writeln("           OPTION databank create auto = yes;", Color.Red);
+                        //good
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
                         throw new GekkoException();
                     }
-                }
 
-                //The indicated LHS type can only be series or var type, for instance SERIES x = ...  or VAR x = ...  or x = ...  . 
-                if (type == EVariableType.Series || type == EVariableType.Var)
-                {
-                    //good
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
-                    throw new GekkoException();
-                }
-
-                //Now we know that it is either SERIES x = ...  or VAR x = ...  or x = ...   
-
-                bool removeFirst = true;
-
-                Series lhs_series = null;
-                if (isArraySubSeries) lhs_series = arraySubSeries;
-                else lhs_series = lhs as Series;
-
-                //TODO: error if more than 1 is set
-                ESeriesUpdTypes operatorType = GetOperatorType(options);
-                bool keep = false; if (options != null && G.Equal(options.opt_keep, "p")) keep = true;
-
-                Series original = null;
-                if (keep || false)
-                {
-                    original = (Series)lhs_series.DeepClone(null);
-                }
-
-                bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-
-                switch (rhs.Type())
-                {
-                    case EVariableType.Series:
-                        {
-                            Series rhs_series = rhs as Series;
-                            string freq_rhs = G.GetFreq(rhs_series.freq);
-                            if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
+                    switch (rhs.Type())
+                    {
+                        case EVariableType.Series:
                             {
-                                G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
+                                //%x = SERIES
+
+                                Series rhsExpression_series = rhs as Series;
+                                switch (rhsExpression_series.type)
+                                {
+                                    case ESeriesType.Timeless:
+                                        {
+                                            //---------------------------------------------------------
+                                            // %x = Series Timeless
+                                            //---------------------------------------------------------
+                                            if (type == EVariableType.Val || type == EVariableType.Var)
+                                            {
+                                                // VAL %x = Series Timeless
+                                                IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+                                            }
+                                            else
+                                            {
+                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                            }
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            //---------------------------------------------------------
+                                            // %x = Series Normal
+                                            //---------------------------------------------------------                                        
+                                            ReportTypeError(varnameWithFreq, rhs, type);
+                                        }
+                                        break;
+                                }
+                            }
+                            break;
+                        case EVariableType.Val:
+                            {
+                                //---------------------------------------------------------
+                                // %x = VAL
+                                //---------------------------------------------------------
+                                //TODO: date %d = 2010.
+
+                                if (type == EVariableType.Val || type == EVariableType.Var)
+                                {
+                                    IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else if (type == EVariableType.Date)
+                                {
+                                    IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    //STRING command will fail
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        case EVariableType.String:
+                            {
+                                //---------------------------------------------------------
+                                // %x = STRING
+                                //---------------------------------------------------------                            
+
+                                if (type == EVariableType.String || type == EVariableType.Var)
+                                {
+                                    IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("STRING " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    //DATE and VAL commands will fail
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+
+                            }
+                            break;
+                        case EVariableType.Date:
+                            {
+                                //---------------------------------------------------------
+                                // %x = DATE
+                                //---------------------------------------------------------
+
+                                if (type == EVariableType.Date || type == EVariableType.Var)
+                                {
+                                    IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("DATE " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    //STRING and VAL commands will fail
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+
+                            }
+                            break;
+                        case EVariableType.List:
+                            {
+                                //---------------------------------------------------------
+                                // %x = LIST
+                                //---------------------------------------------------------
+                                ReportTypeError(varnameWithFreq, rhs, type);
+                            }
+                            break;
+                        case EVariableType.Map:
+                            {
+                                //---------------------------------------------------------
+                                // %x = MAP
+                                //---------------------------------------------------------
+
+                                ReportTypeError(varnameWithFreq, rhs, type);
+
+                            }
+                            break;
+                        case EVariableType.Matrix:
+                            {
+                                //---------------------------------------------------------
+                                // %x = MATRIX
+                                //---------------------------------------------------------                            
+                                IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
+                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+                            }
+                            break;
+                        default:
+                            {
+                                G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
                                 throw new GekkoException();
                             }
+                            break;
+                    }
+                }
+                else if (!isArraySubSeries && varnameWithFreq[0] == Globals.symbolCollection)
+                {
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
+                    // Starts with '#'
 
-                            
+                    if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map || type == EVariableType.Var)
+                    {
+                        //good
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
+                        throw new GekkoException();
+                    }
 
-                            switch (rhs_series.type)
+                    switch (rhs.Type())
+                    {
+                        case EVariableType.Series:
                             {
-
-                                case ESeriesType.Normal:
-                                case ESeriesType.Light:
-                                    {
-                                        //---------------------------------------------------------
-                                        // x = Series Normal or Light
-                                        //---------------------------------------------------------
-
-                                        if (operatorType == ESeriesUpdTypes.none)
+                                Series rhs_series = rhs as Series;
+                                switch (rhs_series.type)
+                                {
+                                    case ESeriesType.Normal:
                                         {
-                                            //this runs fast
+                                            //---------------------------------------------------------
+                                            // #x = Series Normal
+                                            //---------------------------------------------------------
 
-                                            GekkoTime tt1 = GekkoTime.tNull;
-                                            GekkoTime tt2 = GekkoTime.tNull;
-                                            GekkoTime.ConvertFreqs(G.GetFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
-                                            //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-                                            //Now the smpl window runs from tt1 to tt2
-                                            //We copy in from that window
-                                            if (lhs_series.freq != rhs_series.freq)
+                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
                                             {
-                                                G.Writeln2("*** ERROR: Frequency mismatch");
-                                                throw new GekkoException();
+
+                                                // array    smpl          destination
+                                                // source
+                                                //         
+                                                //           o   i1=-1    y 0             --> will become NaN
+                                                //   x 0     o            y 1
+                                                //   x 1     o            y 2
+                                                //   x 2     o            y 3
+                                                //   x 3     o            y 4
+                                                //           o   i2 = 4   y 5             --> will become NaN
+                                                //                                        
+
+                                                //method will only work if smpl freq is same as series freq
+                                                int n = smpl.Observations12();
+                                                int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
+                                                int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
+                                                Matrix m = new Matrix(1, n);
+                                                double[,] destination = m.data;
+                                                double[] source = rhs_series.data.dataArray;
+
+                                                int destinationStart = 0;
+                                                int ii1 = Math.Max(0, i1);
+                                                int ii2 = Math.Min(source.Length - 1, i2);
+                                                for (int j = i1; j < 0; j++)
+                                                {
+                                                    destination[1, j - i1 + destinationStart] = double.NaN;
+                                                }
+                                                for (int j = i2; j >= source.Length; j--)
+                                                {
+                                                    destination[1, j - i1 + destinationStart] = double.NaN;
+                                                }
+                                                //see also #0985324985237
+                                                Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                                IVariable lhsNew = m;
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                             }
-
-                                            if (rhs_series.type == ESeriesType.Light)
+                                            else
                                             {
+                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                            }
+                                        }
+                                        break;
+                                    case ESeriesType.Light:
+                                        {
+
+                                            //---------------------------------------------------------
+                                            // #x = Series Light
+                                            //---------------------------------------------------------
+
+                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
+                                            {
+
+                                                //method will only work if smpl freq is same as series freq
+                                                int n = smpl.Observations12();
+                                                Matrix m = new Matrix(1, n);
+                                                int ii1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
+                                                int ii2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
+
                                                 int tooSmall = 0; int tooLarge = 0;
-                                                rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
+                                                rhs_series.TooSmallOrTooLarge(ii1, ii2, out tooSmall, out tooLarge);
                                                 if (tooSmall > 0 || tooLarge > 0)
                                                 {
                                                     if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                                                     return;
                                                 }
-                                            }
 
-                                            int index1, index2;
-                                            //may enlarge the array with NaNs first and last
-                                            double[] data_beware_do_not_alter = rhs_series.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tt1, tt2);
-                                            //may enlarge the array with NaNs first and last
-                                            lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);
-                                            //if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                            
-                                        }
-                                        else
-                                        {
-                                            //not so fast running, could be improved                                            
-
-                                            OperatorHelperSeries(smpl, lhs_series, rhs_series, operatorType);
-
-                                        }
-                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                    }
-                                    break;
-                                case ESeriesType.Timeless:
-                                    {
-                                        //---------------------------------------------------------
-                                        // x = Series Timeless
-                                        //---------------------------------------------------------
-                                        // stuff below also handles array-timeseries just fine  
-
-                                        double d = double.NaN;
-                                        if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
-
-                                        if (create)
-                                        {
-                                            lhs_series = rhs_series.DeepClone(null) as Series;  //so that it becomes timeless, too
-                                        }
-                                        else
-                                        {
-                                            if (operatorType == ESeriesUpdTypes.none)
-                                            {
-                                                foreach (GekkoTime t in smpl.Iterate12())
-                                                {
-                                                    lhs_series.SetData(t, d);
-                                                }
+                                                int destinationStart = 0;
+                                                double[,] destination = m.data;
+                                                double[] source = rhs_series.data.dataArray;
+                                                //see #0985324985237
+                                                Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                                IVariable lhsNew = m;
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                                G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                             }
                                             else
                                             {
-                                                OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                                ReportTypeError(varnameWithFreq, rhs, type);
                                             }
                                         }
-                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                    }
-                                    break;
-                                case ESeriesType.ArraySuper:
-                                    {
-                                        //---------------------------------------------------------
-                                        // x = Series Array Super
-                                        //---------------------------------------------------------
-                                        if (isArraySubSeries)
+                                        break;
+                                    case ESeriesType.Timeless:
                                         {
-                                            G.Writeln2("*** ERROR: You cannot put an array-series inside an array-series");
+                                            //---------------------------------------------------------
+                                            // #x = Series Timeless
+                                            //---------------------------------------------------------
+
+                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
+                                            {
+                                                int n = smpl.Observations12();
+                                                double d = rhs_series.data.dataArray[0];
+                                                Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
+                                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
+                                                G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
+                                            }
+                                            else
+                                            {
+                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                            }
+                                        }
+                                        break;
+                                    case ESeriesType.ArraySuper:
+                                        {
+                                            //---------------------------------------------------------
+                                            // #x = Series Array Super
+                                            //---------------------------------------------------------
+                                            {
+                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                            }
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
                                             throw new GekkoException();
                                         }
-
-                                        if (operatorType != ESeriesUpdTypes.none)
-                                        {
-                                            G.Writeln2("*** ERROR: Printcodes cannot be used for array-series (yet)");
-                                            throw new GekkoException();
-                                        }
-
-                                        lhs_series = rhs.DeepClone(null) as Series;
-                                        lhs_series.name = varnameWithFreq;
-                                        removeFirst = lhs != null;
-                                        //lhs_series = clone;
-                                        //AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
-                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                    }
-                                    break;
-                                default:
-                                    {
-                                        G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
-                                        throw new GekkoException();
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                    case EVariableType.Val:
-                        {
-                            //---------------------------------------------------------
-                            // x = VAL
-                            //---------------------------------------------------------       
-                            // stuff below also handles array-timeseries just fine                     
-                            double d = ((ScalarVal)rhs).val;
-                            //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-
-                            if (operatorType == ESeriesUpdTypes.none)
-                            {
-                                foreach (GekkoTime t in smpl.Iterate12())
-                                {
-                                    lhs_series.SetData(t, d);
+                                        break;
                                 }
                             }
-                            else
+                            break;
+                        case EVariableType.Val:
                             {
-                                OperatorHelperScalar(smpl, lhs_series, operatorType, d);
-                            }
-
-                            //if (create)
-                            //{
-                            //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                            //}
-                            //else
-                            //{
-                            //    //nothing to do, either already existing in bank/map or array-subseries
-                            //}
-                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                        }
-                        break;
-                    case EVariableType.String:
-                        {
-                            //---------------------------------------------------------
-                            // x = STRING
-                            //---------------------------------------------------------
-                            {
+                                //---------------------------------------------------------
+                                // #x = VAL
+                                //---------------------------------------------------------
                                 ReportTypeError(varnameWithFreq, rhs, type);
                             }
-                        }
-                        break;
-                    case EVariableType.Date:
-                        {
-                            //---------------------------------------------------------
-                            // x = DATE
-                            //---------------------------------------------------------
+                            break;
+                        case EVariableType.String:
                             {
+                                //---------------------------------------------------------
+                                // #x = STRING
+                                //---------------------------------------------------------
+
                                 ReportTypeError(varnameWithFreq, rhs, type);
+
                             }
-                        }
-                        break;
-                    case EVariableType.List:
-                        {
-                            //---------------------------------------------------------
-                            // x = LIST
-                            //---------------------------------------------------------
-                            // stuff below also handles array-timeseries just fine 
-
-                            List rhs_list = rhs as List;
-
-                            bool lastElementStar = false;
-                            IVariable last = rhs_list.list[rhs_list.list.Count - 1];
-                            ScalarVal last_val = last as ScalarVal;
-                            if (last_val != null)
+                            break;
+                        case EVariableType.Date:
                             {
-                                lastElementStar = last_val.hasRepStar;
+                                //---------------------------------------------------------
+                                // #x = DATE
+                                //---------------------------------------------------------
+
+                                ReportTypeError(varnameWithFreq, rhs, type);
+
                             }
-
-                            int n = smpl.Observations12();
-
-                            if (rhs_list.list.Count < n)
+                            break;
+                        case EVariableType.List:
                             {
-                                //lacking elements
-                                if (!lastElementStar)
+                                //---------------------------------------------------------
+                                // #x = LIST
+                                //---------------------------------------------------------         
+                                if (type == EVariableType.List || type == EVariableType.Var)
                                 {
-                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
-                                    throw new GekkoException();
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
+                                    G.ServiceMessage("LIST " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, type);
                                 }
                             }
-                            else if (rhs_list.list.Count > n)
+                            break;
+                        case EVariableType.Map:
                             {
-                                G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                                //---------------------------------------------------------
+                                // #x = MAP
+                                //---------------------------------------------------------
+
+                                if (type == EVariableType.Map || type == EVariableType.Var)
+                                {
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
+                                    G.ServiceMessage("MAP " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        case EVariableType.Matrix:
+                            {
+                                //---------------------------------------------------------
+                                // #x = MATRIX
+                                //---------------------------------------------------------
+                                if (type == EVariableType.Matrix || type == EVariableType.Var)
+                                {
+                                    Matrix m = rhs.DeepClone(null) as Matrix;
+                                    if (options.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_colnames).ToArray()));
+                                    if (options.opt_rownames != null) m.rownames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_rownames).ToArray()));
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
+                                    G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        default:
+                            {
+                                G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
                                 throw new GekkoException();
                             }
+                            break;
+                    }
+                }
+                else
+                {
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    // C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C C
+                    //name is of series type (no sigils), or we have that isArraySubSeries == true (or both)
 
-                            //int offset = 1;
-                            double[] rhs_data = new double[n + Globals.smplOffset];
-                            for (int i = 0; i < rhs_list.list.Count; i++)
-                            {
-                                rhs_data[i + Globals.smplOffset] = rhs_list.list[i].ConvertToVal();
-                            }
-                            for (int i = 0; i < Globals.smplOffset; i++)
-                            {
-                                rhs_data[i] = double.NaN;
-                            }
+                    if (lhs == null && !isArraySubSeries && !varnameWithFreq.StartsWith("xx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        //nonexisting series
+                        if (!Program.options.databank_create_auto)
+                        {
+                            //#07549843254
+                            G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ".");
+                            G.Writeln("           You may change the settings with the following option:", Color.Red);
+                            G.Writeln("           OPTION databank create auto = yes;", Color.Red);
+                            throw new GekkoException();
+                        }
+                    }
 
-                            if (rhs_list.list.Count < n)
+                    //The indicated LHS type can only be series or var type, for instance SERIES x = ...  or VAR x = ...  or x = ...  . 
+                    if (type == EVariableType.Series || type == EVariableType.Var)
+                    {
+                        //good
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
+                        throw new GekkoException();
+                    }
+
+                    //Now we know that it is either SERIES x = ...  or VAR x = ...  or x = ...   
+
+                    bool removeFirst = true;
+
+                    Series lhs_series = null;
+                    if (isArraySubSeries) lhs_series = arraySubSeries;
+                    else lhs_series = lhs as Series;
+
+                    //TODO: error if more than 1 is set
+                    ESeriesUpdTypes operatorType = GetOperatorType(options);
+                    bool keep = false; if (options != null && G.Equal(options.opt_keep, "p")) keep = true;
+
+                    Series original = null;
+                    if (keep || false)
+                    {
+                        original = (Series)lhs_series.DeepClone(null);
+                    }
+
+                    bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
+
+                    switch (rhs.Type())
+                    {
+                        case EVariableType.Series:
                             {
-                                //then lastElementStar = true
-                                for (int i = rhs_list.list.Count; i < n; i++)
+                                Series rhs_series = rhs as Series;
+                                string freq_rhs = G.GetFreq(rhs_series.freq);
+                                if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
-                                    rhs_data[i + Globals.smplOffset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
+                                    G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
+                                    throw new GekkoException();
+                                }
+
+
+
+                                switch (rhs_series.type)
+                                {
+
+                                    case ESeriesType.Normal:
+                                    case ESeriesType.Light:
+                                        {
+                                            //---------------------------------------------------------
+                                            // x = Series Normal or Light
+                                            //---------------------------------------------------------
+
+                                            if (operatorType == ESeriesUpdTypes.none)
+                                            {
+                                                //this runs fast
+
+                                                GekkoTime tt1 = GekkoTime.tNull;
+                                                GekkoTime tt2 = GekkoTime.tNull;
+                                                GekkoTime.ConvertFreqs(G.GetFreq(freq, true), smpl.t1, smpl.t2, ref tt1, ref tt2);  //converts smpl.t1 and smpl.t2 to tt1 and tt2 in freq frequency
+                                                                                                                                    //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
+                                                                                                                                    //Now the smpl window runs from tt1 to tt2
+                                                                                                                                    //We copy in from that window
+                                                if (lhs_series.freq != rhs_series.freq)
+                                                {
+                                                    G.Writeln2("*** ERROR: Frequency mismatch");
+                                                    throw new GekkoException();
+                                                }
+
+                                                if (rhs_series.type == ESeriesType.Light)
+                                                {
+                                                    int tooSmall = 0; int tooLarge = 0;
+                                                    rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
+                                                    if (tooSmall > 0 || tooLarge > 0)
+                                                    {
+                                                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                                                        return;
+                                                    }
+                                                }
+
+                                                int index1, index2;
+                                                //may enlarge the array with NaNs first and last
+                                                double[] data_beware_do_not_alter = rhs_series.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tt1, tt2);
+                                                //may enlarge the array with NaNs first and last
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);
+                                                //if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+
+                                            }
+                                            else
+                                            {
+                                                //not so fast running, could be improved                                            
+
+                                                OperatorHelperSeries(smpl, lhs_series, rhs_series, operatorType);
+
+                                            }
+                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                        }
+                                        break;
+                                    case ESeriesType.Timeless:
+                                        {
+                                            //---------------------------------------------------------
+                                            // x = Series Timeless
+                                            //---------------------------------------------------------
+                                            // stuff below also handles array-timeseries just fine  
+
+                                            double d = double.NaN;
+                                            if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
+
+                                            if (create)
+                                            {
+                                                lhs_series = rhs_series.DeepClone(null) as Series;  //so that it becomes timeless, too
+                                            }
+                                            else
+                                            {
+                                                if (operatorType == ESeriesUpdTypes.none)
+                                                {
+                                                    foreach (GekkoTime t in smpl.Iterate12())
+                                                    {
+                                                        lhs_series.SetData(t, d);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                                }
+                                            }
+                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                        }
+                                        break;
+                                    case ESeriesType.ArraySuper:
+                                        {
+                                            //---------------------------------------------------------
+                                            // x = Series Array Super
+                                            //---------------------------------------------------------
+                                            if (isArraySubSeries)
+                                            {
+                                                G.Writeln2("*** ERROR: You cannot put an array-series inside an array-series");
+                                                throw new GekkoException();
+                                            }
+
+                                            if (operatorType != ESeriesUpdTypes.none)
+                                            {
+                                                G.Writeln2("*** ERROR: Printcodes cannot be used for array-series (yet)");
+                                                throw new GekkoException();
+                                            }
+
+                                            lhs_series = rhs.DeepClone(null) as Series;
+                                            lhs_series.name = varnameWithFreq;
+                                            removeFirst = lhs != null;
+                                            //lhs_series = clone;
+                                            //AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
+                                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            G.Writeln2("*** ERROR: Expected SERIES to be 1 of 4 types");
+                                            throw new GekkoException();
+                                        }
+                                        break;
                                 }
                             }
-
-                            if (operatorType == ESeriesUpdTypes.none)
+                            break;
+                        case EVariableType.Val:
                             {
-                                for (int i = 0; i < n; i++)
-                                {
-                                    lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
-                                }
-                            }
-                            else
-                            {
-                                OperatorHelperSequence(smpl, lhs_series, rhs_data, operatorType);
-                            }
-                            
-
-                            //if (create)
-                            //{
-                            //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                            //}
-                            //else
-                            //{
-                            //    //nothing to do, either already existing in bank/map or array-subseries
-                            //}
-                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                        }
-                        break;
-                    case EVariableType.Map:
-                        {
-                            //---------------------------------------------------------
-                            // x = MAP
-                            //---------------------------------------------------------
-                            {
-                                ReportTypeError(varnameWithFreq, rhs, type);
-                            }
-                        }
-                        break;
-                    case EVariableType.Matrix:
-                        {
-                            //---------------------------------------------------------
-                            // x = MATRIX
-                            //---------------------------------------------------------
-
-                            // stuff below also handles array-timeseries just fine     
-
-                            Matrix rhs_matrix = rhs as Matrix;
-                            //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
-
-                            if (rhs_matrix.data.Length == 1)
-                            {
-                                double d = rhs.ConvertToVal();  //will fail with error if not 1x1                            
+                                //---------------------------------------------------------
+                                // x = VAL
+                                //---------------------------------------------------------       
+                                // stuff below also handles array-timeseries just fine                     
+                                double d = ((ScalarVal)rhs).val;
+                                //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
                                 if (operatorType == ESeriesUpdTypes.none)
                                 {
@@ -2902,79 +2805,226 @@ namespace Gekko
                                     OperatorHelperScalar(smpl, lhs_series, operatorType, d);
                                 }
 
+                                //if (create)
+                                //{
+                                //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                //}
+                                //else
+                                //{
+                                //    //nothing to do, either already existing in bank/map or array-subseries
+                                //}
+                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             }
-                            else
+                            break;
+                        case EVariableType.String:
                             {
-                                int n = smpl.Observations12();
-                                if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
+                                //---------------------------------------------------------
+                                // x = STRING
+                                //---------------------------------------------------------
                                 {
-                                    G.Writeln2("*** ERROR: Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        case EVariableType.Date:
+                            {
+                                //---------------------------------------------------------
+                                // x = DATE
+                                //---------------------------------------------------------
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        case EVariableType.List:
+                            {
+                                //---------------------------------------------------------
+                                // x = LIST
+                                //---------------------------------------------------------
+                                // stuff below also handles array-timeseries just fine 
+
+                                List rhs_list = rhs as List;
+
+                                bool lastElementStar = false;
+                                IVariable last = rhs_list.list[rhs_list.list.Count - 1];
+                                ScalarVal last_val = last as ScalarVal;
+                                if (last_val != null)
+                                {
+                                    lastElementStar = last_val.hasRepStar;
+                                }
+
+                                int n = smpl.Observations12();
+
+                                if (rhs_list.list.Count < n)
+                                {
+                                    //lacking elements
+                                    if (!lastElementStar)
+                                    {
+                                        G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                                        throw new GekkoException();
+                                    }
+                                }
+                                else if (rhs_list.list.Count > n)
+                                {
+                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
                                     throw new GekkoException();
                                 }
+
+                                //int offset = 1;
+                                double[] rhs_data = new double[n + Globals.smplOffset];
+                                for (int i = 0; i < rhs_list.list.Count; i++)
+                                {
+                                    rhs_data[i + Globals.smplOffset] = rhs_list.list[i].ConvertToVal();
+                                }
+                                for (int i = 0; i < Globals.smplOffset; i++)
+                                {
+                                    rhs_data[i] = double.NaN;
+                                }
+
+                                if (rhs_list.list.Count < n)
+                                {
+                                    //then lastElementStar = true
+                                    for (int i = rhs_list.list.Count; i < n; i++)
+                                    {
+                                        rhs_data[i + Globals.smplOffset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
+                                    }
+                                }
+
                                 if (operatorType == ESeriesUpdTypes.none)
                                 {
-                                    for (int i = 0; i < rhs_matrix.data.GetLength(0); i++)
+                                    for (int i = 0; i < n; i++)
                                     {
-                                        lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
+                                        lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
                                     }
                                 }
                                 else
                                 {
-                                    //rhs_matrix.data[i, 0]
-
-                                    //int offset = 1;                                    
-                                    double[] rhsData = new double[smpl.Observations12() + Globals.smplOffset];
-                                    for (int i = 0; i < n; i++)
-                                    {
-                                        rhsData[i + Globals.smplOffset] = rhs_matrix.data[i, 0];
-                                    }
-                                    for (int i = 0; i < Globals.smplOffset; i++)
-                                    {
-                                        //just safety, probably not necessary
-                                        rhsData[i] = double.NaN;
-                                    }
-                                    OperatorHelperSequence(smpl, lhs_series, rhsData, operatorType);
+                                    OperatorHelperSequence(smpl, lhs_series, rhs_data, operatorType);
                                 }
 
+
+                                //if (create)
+                                //{
+                                //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                //}
+                                //else
+                                //{
+                                //    //nothing to do, either already existing in bank/map or array-subseries
+                                //}
+                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             }
-                            //if (create)
-                            //{
-                            //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                            //}
-                            //else
-                            //{
-                            //    //nothing to do, either already existing in bank/map or array-subseries
-                            //}
-                            G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                            break;
+                        case EVariableType.Map:
+                            {
+                                //---------------------------------------------------------
+                                // x = MAP
+                                //---------------------------------------------------------
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                }
+                            }
+                            break;
+                        case EVariableType.Matrix:
+                            {
+                                //---------------------------------------------------------
+                                // x = MATRIX
+                                //---------------------------------------------------------
 
-                        }
-                        break;
-                    default:
-                        {
-                            G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
-                            throw new GekkoException();
-                        }
-                        break;
-                }  //end switch
+                                // stuff below also handles array-timeseries just fine     
 
-                if (create)
-                {
-                    AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
-                }
-                else
-                {
-                    //nothing to do, either already existing in bank/map or array-subseries
-                }
+                                Matrix rhs_matrix = rhs as Matrix;
+                                //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                if (keep)
-                {
-                    GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
-                    foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))
+                                if (rhs_matrix.data.Length == 1)
+                                {
+                                    double d = rhs.ConvertToVal();  //will fail with error if not 1x1                            
+
+                                    if (operatorType == ESeriesUpdTypes.none)
+                                    {
+                                        foreach (GekkoTime t in smpl.Iterate12())
+                                        {
+                                            lhs_series.SetData(t, d);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        OperatorHelperScalar(smpl, lhs_series, operatorType, d);
+                                    }
+
+                                }
+                                else
+                                {
+                                    int n = smpl.Observations12();
+                                    if (n != rhs_matrix.data.GetLength(0) || 1 != rhs_matrix.data.GetLength(1))
+                                    {
+                                        G.Writeln2("*** ERROR: Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
+                                        throw new GekkoException();
+                                    }
+                                    if (operatorType == ESeriesUpdTypes.none)
+                                    {
+                                        for (int i = 0; i < rhs_matrix.data.GetLength(0); i++)
+                                        {
+                                            lhs_series.SetData(smpl.t1.Add(i), rhs_matrix.data[i, 0]);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //rhs_matrix.data[i, 0]
+
+                                        //int offset = 1;                                    
+                                        double[] rhsData = new double[smpl.Observations12() + Globals.smplOffset];
+                                        for (int i = 0; i < n; i++)
+                                        {
+                                            rhsData[i + Globals.smplOffset] = rhs_matrix.data[i, 0];
+                                        }
+                                        for (int i = 0; i < Globals.smplOffset; i++)
+                                        {
+                                            //just safety, probably not necessary
+                                            rhsData[i] = double.NaN;
+                                        }
+                                        OperatorHelperSequence(smpl, lhs_series, rhsData, operatorType);
+                                    }
+
+                                }
+                                //if (create)
+                                //{
+                                //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
+                                //}
+                                //else
+                                //{
+                                //    //nothing to do, either already existing in bank/map or array-subseries
+                                //}
+                                G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+
+                            }
+                            break;
+                        default:
+                            {
+                                G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
+                                throw new GekkoException();
+                            }
+                            break;
+                    }  //end switch
+
+                    if (create)
                     {
-                        //runs after the <...> period or globals period until data ends
-                        //so the updates outside of sample.
-                        double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
-                        lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                        AddIvariableWithOverwrite(ib, varnameWithFreq, removeFirst, lhs_series);
+                    }
+                    else
+                    {
+                        //nothing to do, either already existing in bank/map or array-subseries
+                    }
+
+                    if (keep)
+                    {
+                        GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
+                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))
+                        {
+                            //runs after the <...> period or globals period until data ends
+                            //so the updates outside of sample.
+                            double rel = original.GetData(smpl, t) / original.GetData(smpl, t.Add(-1));
+                            lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
+                        }
                     }
                 }
             }

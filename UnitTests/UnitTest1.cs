@@ -3056,6 +3056,34 @@ namespace UnitTests
             I("#m[1][2]='x';");
             I("p #m[1][2];");
 
+            //test listfiles
+            I("#(listfile m) = a, b, c;");
+            I("#(listfile m) = #(listfile m) + #(listfile m);");
+            I("%v = #(listfile m).length();");
+            _AssertScalarVal(First(), "%v", 6);
+
+            I("#(listfile {'n'}) = a, b, c;");
+            I("#(listfile {'n'}) = #(listfile {'n'}) + #(listfile {'n'});");
+            I("%v = #(listfile {'n'}).length();");
+            _AssertScalarVal(First(), "%v", 6);
+
+            string p = Globals.ttPath2 + @"\regres\mm";
+            I("#(listfile {'" + p + "'}) = a, b, c;");
+            I("#(listfile {'" + p + "'}) = #(listfile {'" + p + "'}) + #(listfile {'" + p + "'});");
+            I("%v = #(listfile {'" + p + "'}).length();");
+            _AssertScalarVal(First(), "%v", 6);
+
+            I("time 2000 2000;");
+            I("#(listfile i) = a, b;");
+            I("x = series(1); x[a] = 1; x[b] = 2;");
+            I("y = sum(#(listfile i), x[#(listfile i)]);");  //using listfile in sum(), only simple i accepted.
+            _AssertSeries(First(), "y", 2000, 3, sharedDelta);
+            FAIL("y = sum(#(listfile {'i'}), x[#(listfile {'i'})]);");  //using listfile in sum(), only simple i accepted.
+
+            
+
+
+
         }
 
         [TestMethod]
@@ -11470,7 +11498,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__List()
+        public void _Test_List2()
         {
 
             //----------------------------------------------------------------------
@@ -11479,7 +11507,7 @@ namespace UnitTests
             I("RESET;");
             I("LIST #x1 = a, b, c, d, e;");
             Assert.AreEqual(GetListOfStrings("x1").Count, 5);
-            I("LIST #x2 = '0', '00', '000';");
+            I("LIST #x2 = ('0', '00', '000');");
             Assert.AreEqual(GetListOfStrings("x2").Count, 3);
             if (Globals.UNITTESTFOLLOWUP)
             {
@@ -11488,34 +11516,39 @@ namespace UnitTests
                 I("LIST <direct> #x3d = 0e, 00e, 000e;");
                 Assert.AreEqual(GetListOfStrings("x3d").Count, 3);
             }
-            I("LIST #x3 = '0e', '00e', '000e';");
+            I("LIST #x3 = ('0e', '00e', '000e');");
             Assert.AreEqual(GetListOfStrings("x3").Count, 3);            
-            I("LIST #x4 = #x1, #x2, #x3;");
+            FAIL("LIST #x4 = #x1, #x2, #x3;");
+            I("LIST #x4 = #x1 + #x2 + #x3;");
             Assert.AreEqual(GetListOfStrings("x4").Count, 11);
             I("STRING %s1 = 'tt';");
-            I("LIST #x5 = %s1, %s1;");
+            FAIL("LIST #x5 = %s1, %s1;");
+            I("LIST #x5 = (%s1, %s1);");
             Assert.AreEqual(GetListOfStrings("x5").Count, 2);
-            I("LIST #x6 = x%s1, x{%s1}, x{s1};");
+            I("LIST #x6 = (x%s1, x{%s1}, x{s1});");
             Assert.AreEqual(GetListOfStrings("x6").Count, 3);
             Assert.AreEqual(GetListOfStrings("x6")[0], "xtt");
             Assert.AreEqual(GetListOfStrings("x6")[1], "xtt");
             Assert.AreEqual(GetListOfStrings("x6")[2], "xtt");
             I("LIST #x7 = a, b;");
-            I("LIST #x7 = #x7, c, d;");
-            Assert.AreEqual(GetListOfStrings("x7").Count, 4);  //such nesting is ok, equivalent to adding
-            I("LIST #x8 = null;");
-            I("LIST #x8 = #x8, c, d;");
+            I("LIST #x7 = #x7.append('c').append('d');");
+            Assert.AreEqual(GetListOfStrings("x7").Count, 4);
+            I("LIST #x7 = a, b;");
+            I("LIST #x7 = #x7.extend(('c', 'd'));");  //or use '+'
+            Assert.AreEqual(GetListOfStrings("x7").Count, 4);
+            I("LIST #x8 = list();");
+            I("LIST #x8 = #x8 + ('c', 'd');"); //instead of extend()
             Assert.AreEqual(GetListOfStrings("x8").Count, 2);  //such nesting is ok, equivalent to adding
-            I("LIST #x9 = null;");
+            I("LIST #x9 = list();");
             Assert.AreEqual(GetListOfStrings("x9").Count, 0);
-            I("LIST #x10 = null; LIST x10 = null;");
+            I("LIST #x10 = list(); LIST x10 = list();");
             Assert.AreEqual(GetListOfStrings("x9").Count, 0);
 
             //  ---------------------
             //  WILDCARDS start
             //  ---------------------
             I("LIST #y = abc, cde, abcd, abxcd, abxxcd, abxxxcd, ae, af;");
-            I("LIST #y1 = #y[a*];");
+            I("LIST #y1 = #y['a*'];");
             List<string> y1 = GetListOfStrings("y1");
             Assert.AreEqual(y1.Count, 7);
             Assert.AreEqual(y1[0], "abc");
@@ -11526,7 +11559,7 @@ namespace UnitTests
             Assert.AreEqual(y1[5], "ae");
             Assert.AreEqual(y1[6], "af");
 
-            I("LIST #y2 = #y[ab*];");
+            I("LIST #y2 = #y['ab*'];");
             List<string> y2 = GetListOfStrings("y2");
             Assert.AreEqual(y2.Count, 5);
             Assert.AreEqual(y2[0], "abc");
@@ -11535,18 +11568,18 @@ namespace UnitTests
             Assert.AreEqual(y2[3], "abxxcd");
             Assert.AreEqual(y2[4], "abxxxcd");
 
-            I("LIST #y3 = #y[a?];");
+            I("LIST #y3 = #y['a?'];");
             List<string> y3 = GetListOfStrings("y3");
             Assert.AreEqual(y3.Count, 2);
             Assert.AreEqual(y3[0], "ae");
             Assert.AreEqual(y3[1], "af");
 
-            I("LIST #y4 = #y[ab?];");
+            I("LIST #y4 = #y['ab?'];");
             List<string> y4 = GetListOfStrings("y4");
             Assert.AreEqual(y4.Count, 1);
             Assert.AreEqual(y4[0], "abc");
 
-            I("LIST #y5 = #y[ab*cd];");
+            I("LIST #y5 = #y['ab*cd'];");
             List<string> y5 = GetListOfStrings("y5");
             Assert.AreEqual(y5.Count, 4);
             Assert.AreEqual(y5[0], "abcd");
@@ -11554,27 +11587,27 @@ namespace UnitTests
             Assert.AreEqual(y5[2], "abxxcd");
             Assert.AreEqual(y5[3], "abxxxcd");
 
-            I("LIST #y6 = #y[ab?cd];");
+            I("LIST #y6 = #y['ab?cd'];");
             List<string> y6 = GetListOfStrings("y6");
             Assert.AreEqual(y6.Count, 1);
             Assert.AreEqual(y6[0], "abxcd");
 
-            I("LIST #y7 = #y[*e];");
+            I("LIST #y7 = #y['*e'];");
             List<string> y7 = GetListOfStrings("y7");
             Assert.AreEqual(y7.Count, 2);
             Assert.AreEqual(y7[0], "ae");
             Assert.AreEqual(y7[1], "cde");
 
-            I("LIST #y8 = #y[?e];");
+            I("LIST #y8 = #y['?e'];");
             List<string> y8 = GetListOfStrings("y8");
             Assert.AreEqual(y8.Count, 1);
             Assert.AreEqual(y8[0], "ae");
 
-            I("LIST #y9 = #y[*];");
+            I("LIST #y9 = #y['*'];");
             List<string> y9 = GetListOfStrings("y9");
             Assert.AreEqual(y9.Count, 8);
 
-            I("LIST #y10 = #y[?];");
+            I("LIST #y10 = #y['?'];");
             List<string> y10 = GetListOfStrings("y10");
             Assert.AreEqual(y10.Count, 0);
 
@@ -11587,7 +11620,7 @@ namespace UnitTests
             //  ---------------------
             //  Parser-wise these are much easier than wildcards
 
-            I("LIST #z1 = #y[ab..ae];");
+            I("LIST #z1 = #y['ab'..'ae'];");
             List<string> z1 = GetListOfStrings("z1");
             Assert.AreEqual(z1.Count, 6);
 
@@ -11604,19 +11637,19 @@ namespace UnitTests
 
             I("list #a = a4, a2, a3, a1;");
             I("val %i = 2;");
-            I("val %n = #a[0];                                           //number of items");
-            AssertHelperScalarVal("n", 4d);
+            I("val %n = #a.length();                                      //number of items");
+            _AssertScalarVal(First(), "%n", 4d);
             I("list #a2 = #a[%i..%i+1];                                   //sublist");
             _AssertHelperList("a2", new List<string>() { "a2", "a3" });
             I("string %a3 = #a[%i+1];                                    //single element");
-            AssertHelperScalarString("a3", "a3");
-            I("list #a3 = #a[%i+1];                                      //single element");
+            _AssertScalarString(First(), "a3", "a3");
+            I("list #a3 = (#a[%i+1],);                                   //single element");
             _AssertHelperList("a3", new List<string>() { "a3" });
-            I("list #a4 = #a sort;                                       //sort");
+            I("list #a4 = #a.sort();                                       //sort");
             _AssertHelperList("a4", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list #a5 = #a prefix='pf' suffix='sf';                    //pre/suffix");
+            I("list #a5 = #a.prefix('pf').suffix('sf');                    //pre/suffix");
             _AssertHelperList("a5", new List<string>() { "pfa4sf", "pfa2sf", "pfa3sf", "pfa1sf" });
-            I("list #a6 = #a5 strip='pf';                                //strip");
+            I("list #a6 = #a5.replace('pf', '');                              //strip");
             _AssertHelperList("a6", new List<string>() { "a4sf", "a2sf", "a3sf", "a1sf" });
             I("list #a7 = #a['a2'..'a3'];                                 //sublist with alphabetical range");
             _AssertHelperList("a7", new List<string>() { "a2", "a3" });
@@ -11626,11 +11659,11 @@ namespace UnitTests
             _AssertHelperList("a9", new List<string>() { "a1", "a2", "a3", "a4" });
             I("list #x1 = a1, a2, a3, a4;");
             I("list #x2 = a2, a3, a5, a6;");
-            I("list #x3 = #x1, #x2;                                      //concatenation");
+            I("list #x3 = #x1 + #x2;                                      //concatenation");
             _AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a2", "a3", "a5", "a6" });
             I("list #x4 = union(#x1, #x2);                                     //union");
             _AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a5", "a6" });
-            I("list #x5 = difference(#x1, #x2);                                     //difference");
+            I("list #x5 = except(#x1, #x2);                                     //difference");
             _AssertHelperList("x5", new List<string>() { "a1", "a4" });
             I("list #x6 = intersect(#x1, #x2);                                     //intersection");
             _AssertHelperList("x6", new List<string>() { "a2", "a3" });
@@ -11643,17 +11676,17 @@ namespace UnitTests
             //dublets
             I("list #x1 = a1, a2, a3, a4, a1;");
             I("list #x2 = a2, a3, a5, a6, a2;");
-            I("list #x3 = #x1, #x2;                                      //concatenation");
+            I("list #x3 = #x1 + #x2;                                      //concatenation");
             _AssertHelperList("x3", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a2", "a3", "a5", "a6", "a2" });
             I("list #x4 = union(#x1, #x2);                                     //union");
             _AssertHelperList("x4", new List<string>() { "a1", "a2", "a3", "a4", "a1", "a5", "a6" });
-            I("list #x5 = difference(#x1, #x2);                                     //difference");
+            I("list #x5 = except(#x1, #x2);                                     //difference");
             _AssertHelperList("x5", new List<string>() { "a1", "a4", "a1" });
             I("list #x6 = intersect(#x1, #x2);                                     //intersection");
             _AssertHelperList("x6", new List<string>() { "a2", "a3" });
-            I("list #x7 = #x1 trim;");
+            I("list #x7 = #x1.unique();");
             _AssertHelperList("x7", new List<string>() { "a1", "a2", "a3", "a4" });
-            I("list #x8 = #x1 sort trim;");
+            I("list #x8 = #x1.sotr().unique();");
             _AssertHelperList("x8", new List<string>() { "a1", "a2", "a3", "a4" });
 
 

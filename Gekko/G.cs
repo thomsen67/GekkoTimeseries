@@ -1351,7 +1351,8 @@ namespace Gekko
             }
         }
         public static bool Chop_HasSigil(string varname)
-        {            
+        {
+            if (varname.StartsWith(Globals.symbolCollection + Globals.listfile)) return true;  //otherwise Chop_GetName gets it wrong below
             string varname2 = Chop_GetName(varname);
             if (varname2 == null || varname2.Length == 0)
             {
