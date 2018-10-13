@@ -13,7 +13,8 @@ namespace Gekko
         //Abstract class containing a List
         //Used for pointing to Lists without having to create/clone them.      
 
-        public bool isNameList = true;
+        public bool isNameList = true;  //no protobuf
+        public bool isFromSeqOfBankvarnames = false;  //no protobuf
 
         [ProtoMember(1)]
         public List<IVariable> list = null;  

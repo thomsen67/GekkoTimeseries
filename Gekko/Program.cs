@@ -270,6 +270,7 @@ namespace Gekko
     public enum EWildcardSearchType
     {
         Copy,
+        Delete,
         Rename,
         Write,
         Search
@@ -15896,6 +15897,12 @@ namespace Gekko
                 command2 = "write";
                 command2 = "wrote";
             }
+            else if (type == EWildcardSearchType.Delete)
+            {
+                command = "DELETE";
+                command2 = "delete";
+                command2 = "deleted";
+            }
 
             List<TwoStrings> outputs = new List<TwoStrings>();
 
@@ -16055,7 +16062,7 @@ namespace Gekko
             // matched with, for instance with COPY or RENAME.
             // ------------------------------------------------------------
             
-            if (type == EWildcardSearchType.Search)
+            if (type == EWildcardSearchType.Search || type == EWildcardSearchType.Delete)
             {
                 //No matching with other variables
                 foreach (string s in lhsUnfolded)
@@ -25604,14 +25611,16 @@ namespace Gekko
 
         public static void Delete(List vars2)
         {
-            List<string> vars = O.Restrict(vars2, true, true, true, true);
+            List vars = O.Restrict2(vars2, true, true, true, false);
 
+            List<TwoStrings> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);
+            
             int counter = 0;
             G.Writeln();
 
-            for (int i = 0; i < vars.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
-                string var = vars[i];                
+                string var = list[i].s1;         
                 O.RemoveIVariableFromString(var);
                 counter++;
             }
@@ -36690,15 +36699,16 @@ namespace Gekko
 
                 foreach (string tsString in variables)
                 {
-                    //TODO: handle bank and freq, with chop
-                    string dbName, varName, freq; string[] indexes;
-                    O.Chop(tsString, out dbName, out varName, out freq, out indexes);
 
-                    if (G.Chop_HasSigil(varName)) continue;  //filter out non-series, like %s or #m
+                    IVariable iv = O.GetIVariableFromString(tsString, O.ECreatePossibilities.NoneReportError);
+                    IVariable ivGrund = O.GetIVariableFromString(G.Chop_SetBank(tsString, Globals.Ref), O.ECreatePossibilities.NoneReportError);
 
-                    IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
-                    IVariable ivGrund = O.GetIVariableFromString(Globals.Ref, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
-
+                    //string dbName, varName, freq; string[] indexes;
+                    //O.Chop(tsString, out dbName, out varName, out freq, out indexes);
+                    //if (G.Chop_HasSigil(varName)) continue;  //filter out non-series, like %s or #m
+                    //IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
+                    //IVariable ivGrund = O.GetIVariableFromString(Globals.Ref, varName, freq, indexes, O.ECreatePossibilities.NoneReturnNull);
+                                                            
                     //string tsNameWithFreq = varName;
                     //if (freq != null) tsNameWithFreq = Globals.freqIndicator + freq;
                     string tsNameWithFreq = tsString;                    

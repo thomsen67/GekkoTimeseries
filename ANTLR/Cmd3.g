@@ -2250,6 +2250,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | edit                 SEMICOLON!
 						  | endo                 SEMICOLON!
 						  | exo                  SEMICOLON!
+						  | exit                 SEMICOLON!
 						  | findmissingdata      SEMICOLON!
 						  | for2
 						  | functionDef          SEMICOLON!
@@ -2502,7 +2503,7 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-// DOC
+// DOWNLOAD
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 download:                   DOWNLOAD downloadOpt1? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
@@ -2530,6 +2531,12 @@ eeOpt1:				     ISNOTQUAL
 
 eeHelper:              eeHelper2 (COMMA2 eeHelper2)* -> eeHelper2+;
 eeHelper2:             indexerExpression eeOpt1?  -> ^(ASTPLACEHOLDER indexerExpression eeOpt1?);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// EXIT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+exit:					    EXIT -> ^({token("ASTEXIT", ASTEXIT, $EXIT.Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FINDMISSINGDATA

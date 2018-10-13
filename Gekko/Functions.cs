@@ -2386,9 +2386,8 @@ namespace Gekko
         public static IVariable flatten(GekkoSmpl smpl, IVariable x1)
         {
             if (x1.Type() == EVariableType.List)
-            {
-                List<IVariable> temp = O.ExplodeIvariables(x1);
-                return new List(temp);
+            {                
+                return O.ExplodeIvariables(x1);
             }
             else
             {
@@ -2567,15 +2566,26 @@ namespace Gekko
 
         public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
         {
+            return replace(smpl, ths, x2, x3, null);
+        }
+
+        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, IVariable inside)
+        {
             //does not exist in AREMOS
+
+            bool isInside = false;
+            if (inside != null && G.Equal(O.ConvertToString(inside), "inside")) isInside = true;
 
             if (ths.Type() == EVariableType.String)
             {
-
+                if (isInside)
+                {
+                    G.Writeln2("*** ERROR: 'inside' is for list argument only");
+                    throw new GekkoException();
+                }
                 string s1 = O.ConvertToString(ths);
                 string s2 = O.ConvertToString(x2);
                 string s3 = O.ConvertToString(x3);
-                //string s4 = s1.Replace(s2, s3, );
                 string s4 = Regex.Replace(s1, s2, s3, RegexOptions.IgnoreCase);
                 return new ScalarString(s4);
             }
@@ -2591,10 +2601,21 @@ namespace Gekko
                     if (iv.Type() == EVariableType.String)
                     {
                         string s = O.ConvertToString(iv);
-                        if (G.Equal(s, s2))
+                        if (isInside)
                         {
-                            hit = true;
-                            tmp.Add(new ScalarString(s3));
+                            if (G.Contains(s, s2))
+                            {
+                                hit = true;
+                                tmp.Add(new ScalarString(Regex.Replace(s, s2, s3, RegexOptions.IgnoreCase)));
+                            }
+                        }
+                        else
+                        {
+                            if (G.Equal(s, s2))
+                            {
+                                hit = true;
+                                tmp.Add(new ScalarString(s3));
+                            }
                         }
                     }
                     if (!hit) tmp.Add(iv);                    
@@ -2697,8 +2718,8 @@ namespace Gekko
             }
             else if (x1.Type() == EVariableType.String)
             {
-                //ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
-                ts = O.Lookup(null, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, null) as Series;
+                ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
+                //ts = O.Lookup(null, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, null) as Series;
             }
             else
             {

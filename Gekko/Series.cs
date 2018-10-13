@@ -1288,6 +1288,8 @@ namespace Gekko
                 List m0 = new List(); //subseries first
                 List m1 = new List(); //subseries ref
 
+                //#98075grane
+
                 if (keys1.Count != keys2.Count)
                 {
                     G.Writeln2("*** ERROR: The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");

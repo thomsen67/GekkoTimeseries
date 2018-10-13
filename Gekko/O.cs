@@ -285,8 +285,21 @@ namespace Gekko
             return rv;
         }
 
+        public static List ExplodeIvariablesSeq(IVariable iv)
+        {
+            List m = new List(ExplodeIvariablesHelper(iv));
+            m.isFromSeqOfBankvarnames = true;
+            return m;
+
+        }
+
+        public static List ExplodeIvariables(IVariable iv)
+        {
+            return new List(ExplodeIvariablesHelper(iv));
+        }
+
         //is recursive
-        public static List<IVariable> ExplodeIvariables(IVariable iv)
+        private static List<IVariable> ExplodeIvariablesHelper(IVariable iv)
         {
             List<IVariable> temp = new List<IVariable>();
             if (iv.Type() == EVariableType.List)
@@ -295,7 +308,7 @@ namespace Gekko
                 {
                     if (temp2.Type() == EVariableType.List)
                     {
-                        List<IVariable> temp3 = ExplodeIvariables(temp2);
+                        List<IVariable> temp3 = ExplodeIvariablesHelper(temp2);
                         temp.AddRange(temp3);
                     }
                     else
@@ -517,7 +530,8 @@ namespace Gekko
                         if (!Program.options.databank_create_auto)
                         {
                             //The following xx is not used, just used to check existence
-                            IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
+                            //IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
+                            IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
                         }
 
                         //Multi-dim timeseries
@@ -554,7 +568,8 @@ namespace Gekko
                                        
 
                     //The following xx is not used, just used to check existence
-                    IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
+                    //IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
+                    IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
                     ts2 = ts;
                     if (ts2 == null)
@@ -1297,7 +1312,7 @@ namespace Gekko
         {
             //varname is used for local/global stuff, faster than chopping up varnameWithFreq up now
             //Can either look up stuff in a Map, or in a databank
-
+            
             IVariable rv = null;
             string frombank = null;
 
@@ -1571,13 +1586,13 @@ namespace Gekko
                 }
             }
             return;
-
         }
-
 
 
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
+            //return O.Lookup(null, null, new ScalarString(fullname), null, ELookupType.RightHandSide, EVariableType.Var, null);
+
             string dbName, varName, freq; string[] indexes;
             O.Chop(fullname, out dbName, out varName, out freq, out indexes);
             IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
@@ -1718,7 +1733,7 @@ namespace Gekko
                 string vname = varName;
                 if (freq != null) vname += Globals.freqIndicator + freq;
                 if (dbName != null) vname = dbName + Globals.symbolBankColon2 + vname;
-                string s = null;                
+                string s = null;
                 if (indexes != null)
                 {
                     s = "[" + G.GetListWithCommas(indexes) + "]";
@@ -1823,7 +1838,7 @@ namespace Gekko
                 string s = RestrictHelper(allowBank, allowSigil, allowFreq, allowIndexes, iv);
                 //don't use the string, just test it
             }
-            return m;
+            return m;  //untouched
         }
 
         //See also Restrict2()
@@ -2161,6 +2176,19 @@ namespace Gekko
                 Databank ib_databank = ib as Databank;
                 if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank, see OPEN<edit> or UNLOCK");
                 ib_databank.isDirty = true;
+            }
+
+            if (rhs.Type() == EVariableType.List)
+            {
+                List rhs_list = rhs as List;
+                if (rhs_list.isFromSeqOfBankvarnames)
+                {
+                    //a list def like #m = a, b, c; will be ok,
+                    //but for instance #m = %a, #m, a!q, x[a]; will not be accepted,
+                    //since it is too confusing.
+                    //In such cases, use #m = ('%a', '#m', 'a!q', 'x[a]');
+                    rhs = O.Restrict2(rhs_list, false, false, false, false);  //only pure idents
+                }
             }
 
             bool isArraySubSeries = false;
@@ -2822,7 +2850,37 @@ namespace Gekko
                                 // x = STRING
                                 //---------------------------------------------------------
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    List converted = null;
+                                    string s = O.ConvertToString(rhs);
+                                    if (s.Trim().Contains(" "))
+                                    {
+                                        string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                                        foreach (string s2 in ss)
+                                        {
+                                            double v = double.NaN;
+                                            if (double.TryParse(s2, out v))
+                                            {
+                                                ScalarVal sv = new ScalarVal(v);
+                                                if (converted == null) converted = new List();
+                                                converted.Add(sv);
+                                            }
+                                            else
+                                            {
+                                                G.Writeln2("*** ERROR: Could not understand '" + s2 + "' as a number");
+                                                throw new GekkoException();
+                                            }
+                                        }
+                                    }
+
+                                    if (converted != null)
+                                    {
+                                        HelperListdata(smpl, lhs_series, operatorType, converted);
+                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
+                                    }
+                                    else
+                                    {
+                                        ReportTypeError(varnameWithFreq, rhs, type);
+                                    }
                                 }
                             }
                             break;
@@ -2845,62 +2903,7 @@ namespace Gekko
 
                                 List rhs_list = rhs as List;
 
-                                bool lastElementStar = false;
-                                IVariable last = rhs_list.list[rhs_list.list.Count - 1];
-                                ScalarVal last_val = last as ScalarVal;
-                                if (last_val != null)
-                                {
-                                    lastElementStar = last_val.hasRepStar;
-                                }
-
-                                int n = smpl.Observations12();
-
-                                if (rhs_list.list.Count < n)
-                                {
-                                    //lacking elements
-                                    if (!lastElementStar)
-                                    {
-                                        G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
-                                        throw new GekkoException();
-                                    }
-                                }
-                                else if (rhs_list.list.Count > n)
-                                {
-                                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
-                                    throw new GekkoException();
-                                }
-
-                                //int offset = 1;
-                                double[] rhs_data = new double[n + Globals.smplOffset];
-                                for (int i = 0; i < rhs_list.list.Count; i++)
-                                {
-                                    rhs_data[i + Globals.smplOffset] = rhs_list.list[i].ConvertToVal();
-                                }
-                                for (int i = 0; i < Globals.smplOffset; i++)
-                                {
-                                    rhs_data[i] = double.NaN;
-                                }
-
-                                if (rhs_list.list.Count < n)
-                                {
-                                    //then lastElementStar = true
-                                    for (int i = rhs_list.list.Count; i < n; i++)
-                                    {
-                                        rhs_data[i + Globals.smplOffset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
-                                    }
-                                }
-
-                                if (operatorType == ESeriesUpdTypes.none)
-                                {
-                                    for (int i = 0; i < n; i++)
-                                    {
-                                        lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
-                                    }
-                                }
-                                else
-                                {
-                                    OperatorHelperSequence(smpl, lhs_series, rhs_data, operatorType);
-                                }
+                                HelperListdata(smpl, lhs_series, operatorType, rhs_list);
 
 
                                 //if (create)
@@ -3031,6 +3034,66 @@ namespace Gekko
 
             return;
 
+        }
+
+        private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
+        {
+            bool lastElementStar = false;
+            IVariable last = rhs_list.list[rhs_list.list.Count - 1];
+            ScalarVal last_val = last as ScalarVal;
+            if (last_val != null)
+            {
+                lastElementStar = last_val.hasRepStar;
+            }
+
+            int n = smpl.Observations12();
+
+            if (rhs_list.list.Count < n)
+            {
+                //lacking elements
+                if (!lastElementStar)
+                {
+                    G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                    throw new GekkoException();
+                }
+            }
+            else if (rhs_list.list.Count > n)
+            {
+                G.Writeln2("*** ERROR: Expected " + n + " list items, got " + rhs_list.list.Count);
+                throw new GekkoException();
+            }
+
+            //int offset = 1;
+            double[] rhs_data = new double[n + Globals.smplOffset];
+            for (int i = 0; i < rhs_list.list.Count; i++)
+            {
+                rhs_data[i + Globals.smplOffset] = rhs_list.list[i].ConvertToVal();
+            }
+            for (int i = 0; i < Globals.smplOffset; i++)
+            {
+                rhs_data[i] = double.NaN;
+            }
+
+            if (rhs_list.list.Count < n)
+            {
+                //then lastElementStar = true
+                for (int i = rhs_list.list.Count; i < n; i++)
+                {
+                    rhs_data[i + Globals.smplOffset] = rhs_list.list[rhs_list.list.Count - 1].ConvertToVal();
+                }
+            }
+
+            if (operatorType == ESeriesUpdTypes.none)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    lhs_series.SetData(smpl.t1.Add(i), rhs_data[i + Globals.smplOffset]);
+                }
+            }
+            else
+            {
+                OperatorHelperSequence(smpl, lhs_series, rhs_data, operatorType);
+            }
         }
 
         private static void OperatorHelperSeries(GekkoSmpl smpl, Series lhs_series, Series rhs_series, ESeriesUpdTypes operatorType)
@@ -6838,14 +6901,30 @@ namespace Gekko
                 else
                 {
                     List<string> names = Restrict(this.listItems, false, false, false, false);
-                    foreach (string dbName in names)
+
+                    if (names.Count == 1 && names[0] == "*")
                     {
-                        if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
+                        foreach (Databank db in Program.databanks.storage)
                         {
-                            G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
-                            throw new GekkoException();
+                            if (G.Equal(db.name, Globals.Work) || G.Equal(db.name, Globals.Ref) || G.Equal(db.name, Globals.Local) || G.Equal(db.name, Globals.Global))
+                            {
+                                //skip it
+                            }
+                            else databanks.Add(db.name);
                         }
-                        databanks.Add(dbName);
+                    }
+                    else
+                    {
+
+                        foreach (string dbName in names)
+                        {
+                            if (G.Equal(dbName, Globals.Work) || G.Equal(dbName, Globals.Ref))
+                            {
+                                G.Writeln2("*** ERROR: Databanks '" + Globals.Work + "' or '" + Globals.Ref + "' cannot be closed (see CLEAR command)");
+                                throw new GekkoException();
+                            }
+                            databanks.Add(dbName);
+                        }
                     }
                 }
                 foreach (string databank in databanks)
@@ -8326,7 +8405,7 @@ namespace Gekko
                         {
                             if (element.variable[i].Type() == EVariableType.List)
                             {
-                                element.variable[i] = new List(O.ExplodeIvariables(element.variable[i]));
+                                element.variable[i] = O.ExplodeIvariables(element.variable[i]);
                                 //now, any sub-list inside this list is gone
                             }
                             //else

@@ -3833,7 +3833,7 @@ namespace Gekko.Parser.Gek
 
                     case "ASTBANKVARNAMELIST":                    
                         {   
-                            string code = "new List(O.ExplodeIvariables(new List(new List<IVariable> {";
+                            string code = "O.ExplodeIvariablesSeq(new List(new List<IVariable> {";
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
@@ -3858,13 +3858,13 @@ namespace Gekko.Parser.Gek
                                 code += name + ", ";
                             }
                             code = code.Substring(0, code.Length - ", ".Length);
-                            code += "})))";
+                            code += "}))";
                             node.Code.CA(code);  //CA() overrides the Lookup(...) stuff that was made in subnodes
                         }
                         break;
                     case "ASTFILENAMELIST":
                         {
-                            string code = "new List(O.ExplodeIvariables(new List(new List<IVariable> {";
+                            string code = "O.ExplodeIvariables(new List(new List<IVariable> {";
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;                                
@@ -3872,7 +3872,7 @@ namespace Gekko.Parser.Gek
                                 code += name + ", ";
                             }
                             code = code.Substring(0, code.Length - ", ".Length);
-                            code += "})))";
+                            code += "}))";
                             node.Code.CA(code);  //CA() overrides the Lookup(...) stuff that was made in subnodes
                         }
                         break;
