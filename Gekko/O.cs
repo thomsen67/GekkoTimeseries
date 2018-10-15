@@ -1690,174 +1690,165 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (Globals.fixLookup)
-            {
-                LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, noSearch);
-                IVariable iv2 = O.Lookup(null, null, new ScalarString(fullname), null, settings, EVariableType.Var, null);
-                return iv2;
-            }
-            else
-            { 
-                string dbName, varName, freq; string[] indexes;
-                O.Chop(fullname, out dbName, out varName, out freq, out indexes);
-                IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
-                return iv;
-            }
+            LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, noSearch);
+            IVariable iv2 = O.Lookup(null, null, new ScalarString(fullname), null, settings, EVariableType.Var, null);
+            return iv2;
+            
         }
 
-        public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes, ECreatePossibilities type)
-        {
-            //type is only relevant for series, ignored for others
+        //public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes, ECreatePossibilities type)
+        //{
+        //    //type is only relevant for series, ignored for others
 
-            string nameWithFreq = G.AddFreqToName(varName, freq);
+        //    string nameWithFreq = G.AddFreqToName(varName, freq);
 
-            int[] dimMismatch = null;
+        //    int[] dimMismatch = null;
 
-            Databank bank = null;
-            if (dbName == null) bank = Program.databanks.GetFirst();
-            else bank = Program.databanks.GetDatabank(dbName, true);
+        //    Databank bank = null;
+        //    if (dbName == null) bank = Program.databanks.GetFirst();
+        //    else bank = Program.databanks.GetDatabank(dbName, true);
 
-            IVariable iv = bank.GetIVariable(nameWithFreq);
+        //    IVariable iv = bank.GetIVariable(nameWithFreq);
 
-            if (G.Chop_HasSigil(nameWithFreq))
-            {
-                //%x or #x
-                if (indexes != null)
-                {
-                    G.Writeln2("*** ERROR: Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
-                    throw new GekkoException();
-                }
-                else
-                {
-                    //just return iv
-                }
-            }
-            else
-            {
-                //series name, not starting with % or #
+        //    if (G.Chop_HasSigil(nameWithFreq))
+        //    {
+        //        //%x or #x
+        //        if (indexes != null)
+        //        {
+        //            G.Writeln2("*** ERROR: Name like " + nameWithFreq + "[" + G.GetListWithCommas(indexes) + "]" + " not allowed");
+        //            throw new GekkoException();
+        //        }
+        //        else
+        //        {
+        //            //just return iv
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //series name, not starting with % or #
 
-                if (indexes != null)
-                {
-                    //array-series
+        //        if (indexes != null)
+        //        {
+        //            //array-series
 
-                    MapMultidimItem mmi = new MapMultidimItem(indexes);
+        //            MapMultidimItem mmi = new MapMultidimItem(indexes);
 
-                    if (iv == null)
-                    {
-                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " does not exist in '" + bank.name + "' databank");
-                        throw new GekkoException();
-                    }
+        //            if (iv == null)
+        //            {
+        //                G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " does not exist in '" + bank.name + "' databank");
+        //                throw new GekkoException();
+        //            }
 
-                    //now we know that the series exists
+        //            //now we know that the series exists
 
-                    Series iv_series = iv as Series;
+        //            Series iv_series = iv as Series;
 
-                    if (iv_series.type != ESeriesType.ArraySuper)
-                    {
-                        G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + bank.name + "' databank is not an array-series");
-                        throw new GekkoException();
-                    }
+        //            if (iv_series.type != ESeriesType.ArraySuper)
+        //            {
+        //                G.Writeln2("*** ERROR: Series with the name " + nameWithFreq + " from '" + bank.name + "' databank is not an array-series");
+        //                throw new GekkoException();
+        //            }
 
-                    IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
+        //            IVariable iv2 = null; iv_series.dimensionsStorage.TryGetValue(mmi, out iv2);
 
-                    if (iv2 == null)
-                    {
-                        if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
-                        {
-                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
-                            iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
-                            iv = ts;
-                        }
-                        else
-                        {
-                            if (iv_series.dimensions != indexes.Length)
-                            {
-                                dimMismatch = new int[2];
-                                dimMismatch[0] = iv_series.dimensions;
-                                dimMismatch[1] = indexes.Length;
-                            }
-                            iv = iv2;  //that is: iv = null;
-                        }
-                    }
-                    else
-                    {
-                        //it does exist
-                        if (type == ECreatePossibilities.Must)
-                        {
-                            //overwriting
-                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
-                            iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
-                            iv = ts;
-                        }
-                        else
-                        {
-                            //do nothing
-                            iv = iv2;
-                        }
-                    }
-                }
-                else
-                {
-                    //normal series, not array-series
-                    if (iv == null)
-                    {
-                        if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
-                        {
-                            Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), nameWithFreq);
-                            bank.AddIVariable(nameWithFreq, ts);
-                            iv = ts;
-                        }
-                        else
-                        {
-                            //do nothing, a null is returned
-                        }
-                    }
-                    else
-                    {
-                        //it does exist
-                        if (type == ECreatePossibilities.Must)
-                        {
-                            //overwriting
-                            Series iv_series = iv as Series;
-                            Series ts = new Series(iv_series.freq, nameWithFreq);
-                            bank.RemoveIVariable(nameWithFreq);
-                            bank.AddIVariable(nameWithFreq, ts);
-                            iv = ts;
-                        }
-                        else
-                        {
-                            //do nothing
-                        }
-                    }
-                }
+        //            if (iv2 == null)
+        //            {
+        //                if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
+        //                {
+        //                    Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
+        //                    iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
+        //                    iv = ts;
+        //                }
+        //                else
+        //                {
+        //                    if (iv_series.dimensions != indexes.Length)
+        //                    {
+        //                        dimMismatch = new int[2];
+        //                        dimMismatch[0] = iv_series.dimensions;
+        //                        dimMismatch[1] = indexes.Length;
+        //                    }
+        //                    iv = iv2;  //that is: iv = null;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //it does exist
+        //                if (type == ECreatePossibilities.Must)
+        //                {
+        //                    //overwriting
+        //                    Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), null);
+        //                    iv_series.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts);
+        //                    iv = ts;
+        //                }
+        //                else
+        //                {
+        //                    //do nothing
+        //                    iv = iv2;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //normal series, not array-series
+        //            if (iv == null)
+        //            {
+        //                if (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must)
+        //                {
+        //                    Series ts = new Series(G.GetFreq(G.Chop_GetFreq(nameWithFreq)), nameWithFreq);
+        //                    bank.AddIVariable(nameWithFreq, ts);
+        //                    iv = ts;
+        //                }
+        //                else
+        //                {
+        //                    //do nothing, a null is returned
+        //                }
+        //            }
+        //            else
+        //            {
+        //                //it does exist
+        //                if (type == ECreatePossibilities.Must)
+        //                {
+        //                    //overwriting
+        //                    Series iv_series = iv as Series;
+        //                    Series ts = new Series(iv_series.freq, nameWithFreq);
+        //                    bank.RemoveIVariable(nameWithFreq);
+        //                    bank.AddIVariable(nameWithFreq, ts);
+        //                    iv = ts;
+        //                }
+        //                else
+        //                {
+        //                    //do nothing
+        //                }
+        //            }
+        //        }
 
-            }
+        //    }
 
-            if (iv == null && type == ECreatePossibilities.NoneReportError)
-            {
-                //G.Writeln2("*** ERROR: Could not find ")
-                string vname = varName;
-                if (freq != null) vname += Globals.freqIndicator + freq;
-                if (dbName != null) vname = dbName + Globals.symbolBankColon2 + vname;
-                string s = null;
-                if (indexes != null)
-                {
-                    s = "[" + G.GetListWithCommas(indexes) + "]";
-                }
-                vname = vname + s;
-                if (dimMismatch == null)
-                {
-                    G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: '" + vname + "' has " + dimMismatch[1] + " dimensions, expected " + dimMismatch[0] + " dimensions");
-                }
-                throw new GekkoException();
-            }
+        //    if (iv == null && type == ECreatePossibilities.NoneReportError)
+        //    {
+        //        //G.Writeln2("*** ERROR: Could not find ")
+        //        string vname = varName;
+        //        if (freq != null) vname += Globals.freqIndicator + freq;
+        //        if (dbName != null) vname = dbName + Globals.symbolBankColon2 + vname;
+        //        string s = null;
+        //        if (indexes != null)
+        //        {
+        //            s = "[" + G.GetListWithCommas(indexes) + "]";
+        //        }
+        //        vname = vname + s;
+        //        if (dimMismatch == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Could not find variable '" + vname + "'");
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: '" + vname + "' has " + dimMismatch[1] + " dimensions, expected " + dimMismatch[0] + " dimensions");
+        //        }
+        //        throw new GekkoException();
+        //    }
 
-            return iv;
-        }
+        //    return iv;
+        //}
 
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {

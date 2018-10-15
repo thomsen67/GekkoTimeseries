@@ -15622,7 +15622,7 @@ namespace Gekko
 
         public static void Tell(string text, bool nocr)
         {
-            IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
+            //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
