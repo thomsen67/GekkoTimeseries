@@ -2508,9 +2508,9 @@ namespace Gekko.Parser.Gek
                                     string internalName = SearchUpwardsInTree3(node, listname);
                                     string s = SearchUpwardsInTree3(node, listname);
 
-                                    if (s == null)
+                                    if (s == null) 
                                     {
-                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, O.ELookupType.RightHandSide, EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
+                                        s = "O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, new  LookupSettings(), EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
                                     }
 
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
@@ -3758,7 +3758,7 @@ namespace Gekko.Parser.Gek
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, O.ELookupType.RightHandSide, EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                 }
                             }                                                       
 
@@ -3994,9 +3994,9 @@ namespace Gekko.Parser.Gek
                             bool isLeftSideVariable = tuple.Item1;
                             string type = tuple.Item2;
 
-                            string isLeftSideVariableString = "O.ELookupType.RightHandSide";
-                            if (isLeftSideVariable) isLeftSideVariableString = "O.ELookupType.LeftHandSide";
-                            if (isLoneOnRightSide) isLeftSideVariableString = "O.ELookupType.RightHandSideLoneVariable";
+                            string lookupSettings = "new  LookupSettings()";
+                            if (isLeftSideVariable) lookupSettings = "new  LookupSettings(O.ELookupType.LeftHandSide)";
+                            //if (isLoneOnRightSide) isLeftSideVariableString = "O.ELookupType.RightHandSideLoneVariable";
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
 
                             //string optionsString = "null";
@@ -4108,7 +4108,7 @@ namespace Gekko.Parser.Gek
                                     //optionsString = "null";  //the above does not work
 
 
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")";
+                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
                                     node.Code.CA(lookupCode);
 
                                     node.AlternativeCode = new GekkoSB();
@@ -4136,7 +4136,7 @@ namespace Gekko.Parser.Gek
                                         bankNameCs = node[0][0].Code.ToString();
                                         nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
                                     }
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + isLeftSideVariableString + ", EVariableType." + type + ", " + optionsString + ")");
+                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")");
                                     
                                     node.AlternativeCode = new GekkoSB();
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     

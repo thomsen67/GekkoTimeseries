@@ -102,7 +102,7 @@ namespace Gekko
                             if (G.IsSimpleToken(ss, false))
                             {
                                 //look up the scalar
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + ss, null, null, new LookupSettings(), EVariableType.Var, null);
                                 string s2 = a.ConvertToString();
                                 sb.Append(s2);
                                 i = j;  //to jump forwards
@@ -182,7 +182,7 @@ namespace Gekko
                     {
                         try
                         {
-                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
+                            IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, new LookupSettings(), EVariableType.Var, null);
                             if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                             {
                                 bool valfail = false;
@@ -247,7 +247,7 @@ namespace Gekko
                         {
                             try
                             {
-                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
+                                IVariable a = O.Lookup(null, null, null, Globals.symbolScalar + variable, null, null, new LookupSettings(), EVariableType.Var, null);
 
                                 if (a.Type() == EVariableType.String || a.Type() == EVariableType.Date || a.Type() == EVariableType.Val)
                                 {

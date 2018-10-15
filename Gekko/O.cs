@@ -16,6 +16,34 @@ namespace Gekko
     /// in the code.    
     /// </summary>
 
+    public class LookupSettings
+    {
+        public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
+        public O.ELookupType type = O.ELookupType.RightHandSide;
+        bool noSearch = false;
+
+        public LookupSettings()
+        {            
+        }
+
+        public LookupSettings(O.ELookupType type)
+        {
+            this.type = type;            
+        }
+
+        public LookupSettings(O.ELookupType type, O.ECreatePossibilities create)
+        {
+            this.type = type;
+            this.create = create;            
+        }
+
+        public LookupSettings(O.ELookupType type, O.ECreatePossibilities create, bool noSearch)
+        {
+            this.type = type;
+            this.create = create;
+            this.noSearch = noSearch;
+        }
+    }
 
     public static class O
     {
@@ -40,7 +68,7 @@ namespace Gekko
         {
             LeftHandSide,
             RightHandSide,
-            RightHandSideLoneVariable
+            //RightHandSideLoneVariable
         }
 
         public enum ECreateType
@@ -76,7 +104,7 @@ namespace Gekko
                 s = G.FromDateToString(t1) + "-" + G.FromDateToString(t2) + ": ";
             }
             return s;
-        }
+        }        
 
         public class HandleEndoHelper2
         {
@@ -1071,7 +1099,7 @@ namespace Gekko
         // LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START LOOKUPS START
 
         //NOTE: Must have same signature as Lookup(), #89075234532
-        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static void DollarLookup(IVariable logical, GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //Only encountered on the LHS
             if (logical == null)
@@ -1095,19 +1123,19 @@ namespace Gekko
             }
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //overload
             return Lookup(smpl, map, x, rhsExpression, isLeftSideVariable, type, true, options);
         }
 
-        public static IVariable NameLookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             return x;
         }
 
         //NOTE: Must have same signature as DollarLookup(), #89075234532
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
@@ -1172,13 +1200,13 @@ namespace Gekko
             return x;
         }
 
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             //overload
             return Lookup(smpl, map, dbName, varname, freq, rhsExpression, isLeftSideVariable, type, true, options);
         }
 
-        public static IVariable NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, O.Assignment options)
+        public static IVariable NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, O.Assignment options)
         {
             if (dbName != null || freq != null)
             {
@@ -1190,7 +1218,7 @@ namespace Gekko
         }
 
         //Also see #8093275432098
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, LookupSettings settings, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             // =============================================================================================
             // =============================================================================================
@@ -1206,9 +1234,9 @@ namespace Gekko
             //rhsExpression != null:   it is an assignment of the left-hand side
 
             //only adds freq if not there. No sigil is added for lhs vars here.
-            string varnameWithFreq = G.AddFreq(varname, freq, type, isLeftSideVariable);
+            string varnameWithFreq = G.AddFreq(varname, freq, type, settings.type);
 
-            if (isLeftSideVariable == ELookupType.LeftHandSide)
+            if (settings.type == ELookupType.LeftHandSide)
             {
                 //ASSIGNMENT OF LEFT-HAND SIDE
                 //ASSIGNMENT OF LEFT-HAND SIDE
@@ -1285,12 +1313,12 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
 
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, isLeftSideVariable, errorIfNotFound);
+                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, new LookupSettings());
             }
         }
 
         //Also see #8093275432098
-        public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, O.ELookupType isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static string NameLookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             return varname;
         }
@@ -1303,15 +1331,17 @@ namespace Gekko
         // LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END LOOKUP END 
 
 
-        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, O.ELookupType isLeftSideVariable)
-        {
-            return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, isLeftSideVariable, true);
-        }
+        //private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, LookupSettings settings)
+        //{
+        //    return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, settings);
+        //}
 
-        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, O.ELookupType isLeftSideVariable, bool errorIfNotFound)
+        private static IVariable LookupHelperRightside(GekkoSmpl smpl, Map map, string dbName, string varnameWithFreq, string varname, LookupSettings settings)
         {
             //varname is used for local/global stuff, faster than chopping up varnameWithFreq up now
             //Can either look up stuff in a Map, or in a databank
+
+            bool errorIfNotFound = settings.create == ECreatePossibilities.NoneReportError;  //else it will return null
             
             IVariable rv = null;
             string frombank = null;
@@ -8431,7 +8461,7 @@ namespace Gekko
 
                 if (domains != null)
                 {
-                    IVariable def = O.Lookup(null, null, null, "#default", null, null, ELookupType.RightHandSide, EVariableType.Var, false, null);
+                    IVariable def = O.Lookup(null, null, null, "#default", null, null, new LookupSettings(), EVariableType.Var, false, null);
                     if (def != null)
                     {
                         restrict = new List<List<string>>();
