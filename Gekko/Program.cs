@@ -522,10 +522,23 @@ namespace Gekko
         public bool ignoreErrors = false;
     }
 
-    /// <summary>
-    /// Simple helper class, obsolete??
-    /// </summary>
-    public class TwoStrings
+    public class ToFrom
+    {
+        public string s1 = null;
+        public string s2 = null;
+        public bool b1Explicit = false;
+        public ToFrom(string s1, string s2, bool b1Explicit)
+        {
+            this.s1 = s1;
+            this.s2 = s2;
+            this.b1Explicit = b1Explicit;
+        }
+    }
+
+        /// <summary>
+        /// Simple helper class, obsolete??
+        /// </summary>
+        public class TwoStrings
     {
         public string s1 = null;
         public string s2 = null;
@@ -5148,7 +5161,7 @@ namespace Gekko
         //    gdx.gdxDataWriteStr(Indx, Values);
         //}
 
-        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<TwoStrings> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdx(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list, string writeOption, bool isCloseCommand)
         {
             //merge and date truncation:
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
@@ -5295,7 +5308,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     //int counter = 0;
-                    foreach (TwoStrings bnv in list)
+                    foreach (ToFrom bnv in list)
                     {
 
                         //string name = bnv.s1;
@@ -5499,7 +5512,7 @@ namespace Gekko
             }
         }
 
-        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<TwoStrings> list, string writeOption, bool isCloseCommand)
+        public static void WriteGdxSlow(Databank databank, GekkoTime t1, GekkoTime t2, string pathAndFilename, List<ToFrom> list, string writeOption, bool isCloseCommand)
         {
             //TODO: try-catch if writing fails    
 
@@ -5533,7 +5546,7 @@ namespace Gekko
 
             GAMSDatabase db = ws.AddDatabase();
 
-            foreach (TwoStrings bnv in list)
+            foreach (ToFrom bnv in list)
             {
                 string name = bnv.s2;  // bnv.name;
                 
@@ -15647,7 +15660,7 @@ namespace Gekko
             EVariableType type = EVariableType.Var;
             if (o.type != null) type = G.GetVariableType(o.type);
 
-            List<TwoStrings> outputs = SearchFromTo(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename, null);
+            List<ToFrom> outputs = SearchFromTo(o.names0, o.names1, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Rename, null);
 
             if (G.IsUnitTesting() && Globals.unitTestCopyHelper2)
             {
@@ -15659,13 +15672,13 @@ namespace Gekko
             {
                 G.Writeln2("Renaming the following " + outputs.Count + " variables:");
                 G.Writeln();
-                foreach (TwoStrings two in outputs)
+                foreach (ToFrom two in outputs)
                 {
                     G.Writeln(two.s1 + " ---> " + two.s2);
                 }
             }
 
-            foreach (TwoStrings output in outputs)
+            foreach (ToFrom output in outputs)
             {
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
                 if (type != EVariableType.Var && type !=  iv.Type()) continue; //skip it                
@@ -15692,7 +15705,7 @@ namespace Gekko
             bool ignoreErrors = false; if (G.Equal(o.opt_error, "no")) ignoreErrors = true;
             SearchOptions options = new SearchOptions();
             if (ignoreErrors) options.ignoreErrors = true;
-            List<TwoStrings> outputs = SearchFromTo(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy, options);
+            List<ToFrom> outputs = SearchFromTo(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy, options);
                         
             int nIgnores = 0;
             int nOk = 0;
@@ -15707,7 +15720,7 @@ namespace Gekko
             {
                 G.Writeln2("Copying the following " + outputs.Count + " variables:");
                 G.Writeln();
-                foreach (TwoStrings two in outputs)
+                foreach (ToFrom two in outputs)
                 {
                     G.Writeln(two.s1 + " ---> " + two.s2);
                 }
@@ -15723,7 +15736,7 @@ namespace Gekko
                 //COPY<2010 2020> is just ignored regarding time period, <respect> must be used.
             }
 
-            foreach (TwoStrings output in outputs)
+            foreach (ToFrom output in outputs)
             {
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);
 
@@ -15795,10 +15808,10 @@ namespace Gekko
         public static List<string> Search(List names1, string frombank, EVariableType type)
         {
             List<string> names = new List<string>();
-            List<TwoStrings> matches = Program.SearchFromTo(names1, null, frombank, null, EWildcardSearchType.Search, null);
+            List<ToFrom> matches = Program.SearchFromTo(names1, null, frombank, null, EWildcardSearchType.Search, null);
             //List rv = new List();
 
-            foreach (TwoStrings two in matches)
+            foreach (ToFrom two in matches)
             {
                 if (type != EVariableType.Var)
                 {
@@ -15811,7 +15824,7 @@ namespace Gekko
             return names;
         }
 
-        public static List<TwoStrings> SearchFromTo(List names0, List names1, string frombank, string tobank, EWildcardSearchType type, SearchOptions options)
+        public static List<ToFrom> SearchFromTo(List names0, List names1, string frombank, string tobank, EWildcardSearchType type, SearchOptions options)
         {
             //names0 may contain ranges
             
@@ -15905,7 +15918,7 @@ namespace Gekko
                 command2 = "deleted";
             }
 
-            List<TwoStrings> outputs = new List<TwoStrings>();
+            List<ToFrom> outputs = new List<ToFrom>();
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
             bool allowBankRhs = true; if (type == EWildcardSearchType.Write) allowBankRhs = false;
@@ -15916,6 +15929,7 @@ namespace Gekko
             // --------------------------------------------
 
             List<string> lhsUnfolded = new List<string>();
+            List<bool> lhsUnfoldedExplicit = new List<bool>();
 
             bool lhsHasStarOrQuestionGlobal = false;  //true for LHS, for 'a*', '*:x', 'b?:x?', etc.
 
@@ -15985,7 +15999,7 @@ namespace Gekko
                 //if nameLhs != null, it is normal wildcard
                 //if nameLhsRange1 != null, it is a range
 
-                //any "first" or "ref" is set to their real names.
+                //any "first" or "ref" is set to their real names. Null will still be null.
                 bankLhs = SubstituteFirstRefNames(bankLhs);
 
                 if (bankLhs == null && frombank != null) bankLhs = frombank;  //overwrites "naked" vars, so "COPY <frombank=b> a, b to c, d;" is same as "COPY b:a, b:b to c, d;"
@@ -16002,6 +16016,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: " + command + " with indexes before TO/AS not yet implemented");
                     throw new GekkoException();
                 }
+
+                bool hasExplicitBank = bankLhs != null;
 
                 if (lhsHasStarOrQuestion)
                 {
@@ -16025,11 +16041,15 @@ namespace Gekko
                         //
                         if (nameLhsRange1 != null)
                         {
-                            lhsUnfolded.AddRange(RangeInBank(db_bank, nameLhsRange1, nameLhsRange2, freqLhs));
+                            List<string> range = RangeInBank(db_bank, nameLhsRange1, nameLhsRange2, freqLhs);
+                            lhsUnfolded.AddRange(range);
+                            foreach (string s in range) lhsUnfoldedExplicit.Add(hasExplicitBank);
                         }
                         else
                         {
-                            lhsUnfolded.AddRange(MatchInBank(db_bank, nameLhs, freqLhs));
+                            List<string> match = MatchInBank(db_bank, nameLhs, freqLhs);
+                            lhsUnfolded.AddRange(match);
+                            foreach (string s in match) lhsUnfoldedExplicit.Add(hasExplicitBank);
                         }
                     }
                 }
@@ -16045,6 +16065,7 @@ namespace Gekko
                         if (freqLhs == null) freq = currentFreq;
                     }
                     lhsUnfolded.Add(O.UnChop(bankTemp, nameLhs, freq, indexLhs));
+                    lhsUnfoldedExplicit.Add(hasExplicitBank);
                 }
             }
 
@@ -16065,11 +16086,15 @@ namespace Gekko
             
             if (type == EWildcardSearchType.Search || type == EWildcardSearchType.Delete)
             {
-                //No matching with other variables
-                foreach (string s in lhsUnfolded)
+                for (int i = 0; i < lhsUnfolded.Count; i++)
                 {
-                    outputs.Add(new TwoStrings(s, null)); //has no destination
-                }                
+                    outputs.Add(new ToFrom(lhsUnfolded[i], null, lhsUnfoldedExplicit[i]));
+                }
+                ////No matching with other variables
+                //foreach (string s in lhsUnfolded)
+                //{
+                //    outputs.Add(new ToFrom(s, null, false)); //has no destination
+                //}                
             }
             else
             {
@@ -16095,6 +16120,7 @@ namespace Gekko
                 for (int i = 0; i < lhsUnfolded.Count; i++)
                 {
                     string lhsElement = lhsUnfolded[i];
+                    bool lhsElementExplicit = lhsUnfoldedExplicit[i];
 
                     string rhsElement = null;
                     if (rhs.Count > 1) rhsElement = rhs[i];
@@ -16136,12 +16162,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(currentFirstBankName, nameRhs, freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(currentFirstBankName, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(currentFirstBankName, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(currentFirstBankName, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
                         }
                     }
                     else if (!bankRhs.Contains("*"))
@@ -16160,12 +16186,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bankRhs, nameRhs, freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bankRhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankRhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
                         }
                     }
                     else
@@ -16184,12 +16210,12 @@ namespace Gekko
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bankLhs, nameRhs, freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
                         }
                         else
                         {
                             //one star
-                            outputs.Add(new TwoStrings(lhsElement, O.UnChop(bankLhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), true));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankLhs, name2split[0] + nameLhs + name2split[1], freqLhs, indexLhs), lhsElementExplicit));
                         }
                     }
                 }
@@ -16203,7 +16229,7 @@ namespace Gekko
                                 
                 int counter = 0;
                 //G.Writeln();
-                foreach (TwoStrings two in outputs)
+                foreach (ToFrom two in outputs)
                 {
                     if (type != EWildcardSearchType.Write && G.Equal(two.s1, two.s2)) //blanks are removed in two list, so indexes should compare fine, too.
                     {
@@ -16223,7 +16249,7 @@ namespace Gekko
                     if (rhsCheck.ContainsKey(two.s2))
                     {
                         List<string> temp = new List<string>();
-                        foreach (TwoStrings two2 in outputs)
+                        foreach (ToFrom two2 in outputs)
                         {
                             if (G.Equal(two2.s2, two.s2))
                             {
@@ -16280,7 +16306,7 @@ namespace Gekko
             if (removeCurrentFirstBankAndCurrentFreq && type == EWildcardSearchType.Search)
             {               
 
-                foreach (TwoStrings two in outputs)
+                foreach (ToFrom two in outputs)
                 {
                     two.s1 = G.Chop_RemoveFreq(two.s1, currentFreq);
                     two.s1 = G.Chop_RemoveBank(two.s1, currentFirstBankName);                    
@@ -21249,7 +21275,7 @@ namespace Gekko
             }
         }
 
-        public static void Updprt(List<TwoStrings> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
+        public static void Updprt(List<ToFrom> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
         {
             if (op == "#")
             {
@@ -21823,7 +21849,7 @@ namespace Gekko
 
             EWriteType writeType = GetWriteType(o);
 
-            List<TwoStrings> list = null;
+            List<ToFrom> list = null;
             if (o.list1 != null)
             {
                 list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write, null);
@@ -21875,14 +21901,14 @@ namespace Gekko
                 //list = GetAllVariablesFromBank(Program.databanks.GetFirst());
 
                 //List<BankNameVersion> list = new List<BankNameVersion>();
-                list = new List<TwoStrings>();
+                list = new List<ToFrom>();
                 foreach (string s in Program.databanks.GetFirst().storage.Keys)
                 {
                     if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
                     {
                         continue;  //probably some artefact creeping in from PCIM?
                     }
-                    list.Add(new TwoStrings("First:" + s, "First:" + s));
+                    list.Add(new ToFrom("First:" + s, "First:" + s, true));
                     //BankNameVersion bnv = new Gekko.BankNameVersion();
                     //bnv.name = s;
                     //list.Add(bnv);
@@ -21900,7 +21926,7 @@ namespace Gekko
             //TODO TODO TODO
             //TODO TODO TODO
 
-            List<TwoStrings> listFilteredForCurrentFreq = null;
+            List<ToFrom> listFilteredForCurrentFreq = null;
             if (isRecordsFormat)
             {
                 //can handle multiple frequencies
@@ -21911,7 +21937,7 @@ namespace Gekko
                 //2D format, only 1 frequency
                 //listFilteredForCurrentFreq = FilterListForFrequency(list);
 
-                foreach (TwoStrings two in list)
+                foreach (ToFrom two in list)
                 {
                     if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))
                     {
@@ -22096,7 +22122,7 @@ namespace Gekko
         //    return list2;
         //}
 
-        private static void CheckSomethingToWrite(List<TwoStrings> listFilteredForCurrentFreq)
+        private static void CheckSomethingToWrite(List<ToFrom> listFilteredForCurrentFreq)
         {
             if (listFilteredForCurrentFreq.Count == 0)
             {
@@ -22105,7 +22131,7 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<TwoStrings> newList)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> newList)
         {
             G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
             //TODO: variables and time                
@@ -22221,7 +22247,7 @@ namespace Gekko
         //    return newList;
         //}
 
-        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<TwoStrings> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             if (databank.storage.Count == 0)
             {
@@ -22306,7 +22332,7 @@ namespace Gekko
                     // here, databank variable is not used (this is actually only used for CLOSEing a bank)
                     //-----------------------
                     databankWithFewerVariables = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-                    foreach (TwoStrings var in list)
+                    foreach (ToFrom var in list)
                     {
                         //Databank db = GetBankFromBankNameVersion(var.bank);
                         //IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
@@ -22398,7 +22424,7 @@ namespace Gekko
             return count;
         }
 
-        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<TwoStrings> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        public static int WriteTsd(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {            
             if (databank.storage.Count == 0)
             {
@@ -22451,12 +22477,12 @@ namespace Gekko
             return count;
         }
 
-        private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<TwoStrings> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
+        private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
         {
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
-                foreach (TwoStrings var in list)
+                foreach (ToFrom var in list)
                 {
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //IVariable iv = db.GetIVariable(var.name);
@@ -23005,7 +23031,7 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
+        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
         {
             int prnWidth = 18;
             //Databank first = Program.databanks.GetFirst();
@@ -23036,7 +23062,7 @@ namespace Gekko
                 }
                 file.WriteLine();
 
-                foreach (TwoStrings var in vars)
+                foreach (ToFrom var in vars)
                 {
                     //string s3 = var.name;
                     //Databank db = GetBankFromBankNameVersion(var.bank);
@@ -23114,13 +23140,13 @@ namespace Gekko
             return counter;
         }
 
-        private static void GetDatabankPeriodFilteredForFreq(List<TwoStrings> vars, ref GekkoTime per1, ref GekkoTime per2)
+        private static void GetDatabankPeriodFilteredForFreq(List<ToFrom> vars, ref GekkoTime per1, ref GekkoTime per2)
         {
             //Databank first = Program.databanks.GetFirst();
             //vars: annual is fy, quarterly is fy%q, monthly is fy%m, undated is fy%u
             int start = -12345;
             int end = -12345;
-            foreach (TwoStrings s in vars)
+            foreach (ToFrom s in vars)
             {
                 IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError);
 
@@ -23180,7 +23206,7 @@ namespace Gekko
             }
         }
 
-        private static int GnuplotWrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2)
+        private static int GnuplotWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2)
         {
             int prnWidth = 18;
             //Databank first = Program.databanks.GetFirst();
@@ -23196,7 +23222,7 @@ namespace Gekko
                 //Writing to csv/prn file
 
                 file.Write("# " + G.Blanks(prnWidth));  //comment
-                foreach (TwoStrings var in vars)
+                foreach (ToFrom var in vars)
                 {
                     //string s3 = var.name;
                     //Databank db = GetBankFromBankNameVersion(var.bank);
@@ -23215,7 +23241,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
                     file.Write(GetDateStringSuitableForGnuplot(t.ToString()) + " ");
-                    foreach (TwoStrings var in vars)
+                    foreach (ToFrom var in vars)
                     {
                         //string s3 = var.name;
                         //Databank db = GetBankFromBankNameVersion(var.bank);
@@ -23267,7 +23293,7 @@ namespace Gekko
             return s;
         }
 
-        private static int Tspwrite(List<TwoStrings> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
+        private static int Tspwrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, bool isCaps)
         {
             //Databank work = Program.databanks.GetFirst();
             filename = filename;
@@ -23296,7 +23322,7 @@ namespace Gekko
                 file.WriteLine();
                 file.WriteLine("freq a;");
                 file.WriteLine();
-                foreach (TwoStrings var in vars)
+                foreach (ToFrom var in vars)
                 {
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //Series ts = db.GetVariable(var.name);  //#getvar
@@ -25614,7 +25640,7 @@ namespace Gekko
         {
             List vars = O.Restrict2(vars2, true, true, true, false);
 
-            List<TwoStrings> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);
+            List<ToFrom> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);
             
             int counter = 0;
             G.Writeln();

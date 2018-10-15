@@ -1564,9 +1564,9 @@ namespace Gekko
 
         public static List NOTUSED_HandleWildcards(string varnameWithFreq, string frombank)
         {
-            List<TwoStrings> matches = Program.SearchFromTo(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search, null);
+            List<ToFrom> matches = Program.SearchFromTo(new List(new List<string>() { varnameWithFreq }), null, frombank, null, EWildcardSearchType.Search, null);
             List rv = new List();
-            foreach (TwoStrings two in matches)
+            foreach (ToFrom two in matches)
             {
                 ScalarString ss = new ScalarString(two.s1);
                 rv.Add(ss);
@@ -1864,6 +1864,7 @@ namespace Gekko
             {
                 bank = Program.databanks.GetDatabank(dbName, true);
             }
+
 
             if (!bank.editable) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
