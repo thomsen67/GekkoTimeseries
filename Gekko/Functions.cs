@@ -2702,7 +2702,7 @@ namespace Gekko
         public static IVariable exist(GekkoSmpl smpl, IVariable x1)
         {
             double d = 0d;
-            IVariable y = O.Lookup(smpl, null, x1, null, new LookupSettings(O.ELookupType.RightHandSide, O.ECreatePossibilities.NoneReportError), EVariableType.Var, false, null); //will use search settings (data, sim mode) if not bank is given
+            IVariable y = O.Lookup(smpl, null, x1, null, new LookupSettings(O.ELookupType.RightHandSide, O.ECreatePossibilities.NoneReportError, true), EVariableType.Var, false, null); //will use search settings (data, sim mode) if not bank is given
             if (y != null) d = 1d;            
             ScalarVal v = new ScalarVal(d);
             return v;

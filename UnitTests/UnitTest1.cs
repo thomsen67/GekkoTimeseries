@@ -10225,8 +10225,46 @@ namespace UnitTests
 
             I("CLEAR global;");
             FAIL("ref:%s = %s;");
-                        
+
             // ----------- test of LOCAL/GLOBAL commands -------------
+
+            I("RESET;");
+            I("LOCAL x;");
+            Assert.AreEqual(Local().storage.Count, 0);
+            I("x = 5;");
+            Assert.AreEqual(Local().storage.Count, 1);
+            I("DELETE x;");
+            Assert.AreEqual(Local().storage.Count, 0);
+            Assert.AreEqual(First().storage.Count, 0);
+
+            I("RESET;");
+            I("LOCAL x;");
+            Assert.AreEqual(Local().storage.Count, 0);
+            I("x = 5;");
+            Assert.AreEqual(Local().storage.Count, 1);
+            I("RENAME x TO y;"); //should stay in local bank
+            Assert.AreEqual(Local().storage.Count, 1);
+            Assert.AreEqual(First().storage.Count, 0);
+
+            I("RESET;");
+            I("GLOBAL x;");
+            Assert.AreEqual(Global().storage.Count, 0);
+            I("x = 5;");
+            Assert.AreEqual(Global().storage.Count, 1);
+            I("DELETE x;");
+            Assert.AreEqual(Global().storage.Count, 0);
+            Assert.AreEqual(First().storage.Count, 0);
+
+            I("RESET;");
+            I("GLOBAL x;");
+            Assert.AreEqual(Global().storage.Count, 0);
+            I("x = 5;");
+            Assert.AreEqual(Global().storage.Count, 1);
+            I("RENAME x TO y;"); //should stay in global bank
+            Assert.AreEqual(Global().storage.Count, 1);
+            Assert.AreEqual(First().storage.Count, 0);
+
+            // ----------------
 
             I("RESET;");
             I("LOCAL %s1;");

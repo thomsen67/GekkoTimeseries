@@ -1853,10 +1853,17 @@ namespace Gekko
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
-
+            
             Databank bank = null;
-            if (dbName == null) bank = Program.databanks.GetFirst();
-            else bank = Program.databanks.GetDatabank(dbName, true);
+            if (dbName == null)
+            {
+                LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varName);  //varname is always without freq 
+                bank = HandleLocalGlobalBank(lg);
+            }
+            else
+            {
+                bank = Program.databanks.GetDatabank(dbName, true);
+            }
 
             if (!bank.editable) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
