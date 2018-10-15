@@ -1135,7 +1135,7 @@ namespace Gekko
         }
 
         //NOTE: Must have same signature as DollarLookup(), #89075234532
-        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, LookupSettings isLeftSideVariable, EVariableType type, bool errorIfNotFound, O.Assignment options)
+        public static IVariable Lookup(GekkoSmpl smpl, Map map, IVariable x, IVariable rhsExpression, LookupSettings settings, EVariableType type, bool errorIfNotFound, O.Assignment options)
         {
             //This calls the more general Lookup(GekkoSmpl smpl, Map map, string dbName, string varname, string freq, IVariable rhsExpression)
 
@@ -1156,8 +1156,10 @@ namespace Gekko
                     Chop(x_string, out dbName, out varName, out freq, out indexes);
                 }
 
+                LookupSettings settingsTemp = settings;
+                if (indexes != null) settingsTemp = new LookupSettings();  //normal abort if array-super-series is not found, cannot just be created
 
-                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, isLeftSideVariable, type, errorIfNotFound, options);
+                IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, settingsTemp, type, errorIfNotFound, options);
 
                 if (indexes != null)
                 {
@@ -1168,7 +1170,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    rv = iv_series.FindArraySeries(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes), false, false);  //last arg. not used
+                    rv = iv_series.FindArraySeries(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes), false, false, settings);  //last arg. not used
 
                     //rv = iv.Indexer(smpl, O.EIndexerType.None, Program.GetListOfIVariablesFromListOfStrings(indexes));
                 }

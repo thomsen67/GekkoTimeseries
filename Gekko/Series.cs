@@ -1589,7 +1589,7 @@ namespace Gekko
             {
                 if (indexerType == O.EIndexerType.None)
                 {
-                    rv = this.FindArraySeries(smpl, indexes, false, false);  //last arg. not used
+                    rv = this.FindArraySeries(smpl, indexes, false, false, null);  //last arg. not used
                 }
                 else
                 {
@@ -1680,7 +1680,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        public IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless)
+        public IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless, LookupSettings settings)
         {
             if (indexes.Length == 0)
             {
@@ -1703,12 +1703,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            rv = FindArraySeriesHelper(smpl, isLhs, keys, rhsIsTimeless);
+            rv = FindArraySeriesHelper(smpl, isLhs, keys, rhsIsTimeless, settings);
 
             return rv;
         }
 
-        private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless)
+        private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless, LookupSettings settings)
         {
             IVariable rv = null;
             if (true)
@@ -1738,13 +1738,7 @@ namespace Gekko
                     {
 
                         //on the RHS
-
-
-                        //rv = new Series(ESeriesType.Timeless, this.freq, null);
-                        //(rv as Series).SetTimelessData(0d);
-                        //(rv as Series).isNotFoundArraySubSeries = true;
-
-
+                        
                         if (smpl != null && smpl.command == GekkoSmplCommand.Unfold)
                         {
                             //print
@@ -1774,10 +1768,21 @@ namespace Gekko
                         }
                         else //GekkoSmplCommand.Sum but also others, like GetIVariableFromString()
                         {
-                            //sum and others
+                            //sum and others, non-print
 
-                            //print
-                            if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
+                            //we start checking out settings (may be null). These origin from FindIVariableFromString(), will be null in normal expressions etc.
+
+                            if (settings?.create == O.ECreatePossibilities.NoneReturnNull)
+                            {
+                                rv = null;  //just return null
+                            }
+                            else if (settings?.create == O.ECreatePossibilities.Can || settings?.create == O.ECreatePossibilities.Must)
+                            {
+                                Series ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
+                                this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                                rv = ts;
+                            }
+                            else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
                             {
                                 FindArraySeriesHelper2(keys);  //error
                             }
@@ -1831,14 +1836,24 @@ namespace Gekko
                 }
                 else
                 {
-                    rv = iv as Series;
+                    if (settings?.create == O.ECreatePossibilities.Must)
+                    {
+                        //creates a brand new                        
+                        Series ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                        rv = ts;
+                    }
+                    else
+                    {
+                        rv = iv as Series;
+                    }
                     if (rv == null)
                     {
+                        //should not be possible
                         G.Writeln2("*** ERROR: Array-timeseries element is non-series.");
                         throw new GekkoException();
                     }
                 }
-
             }
             
 
@@ -2012,7 +2027,7 @@ namespace Gekko
                 //Will fail with an error if not all indexes are of STRING type     
                 bool rhsIsTimeless = false;
                 if (rhsExpression.Type() == EVariableType.Series && (rhsExpression as Series).type == ESeriesType.Timeless) rhsIsTimeless = true;                           
-                IVariable iv = this.FindArraySeries(smpl, indexes, true, rhsIsTimeless);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
+                IVariable iv = this.FindArraySeries(smpl, indexes, true, rhsIsTimeless, null);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 Series ts = iv as Series;
                 if (ts == null)
                 {
