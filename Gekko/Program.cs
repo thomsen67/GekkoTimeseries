@@ -16057,7 +16057,11 @@ namespace Gekko
                 {
                     //item without * or ? or range
                     string bankTemp = bankLhs;
-                    if (bankLhs == null) bankTemp = currentFirstBankName;
+                    if (bankLhs == null)
+                    {
+                        LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(nameLhs); //should be without freq                                                                                                             
+                        bankTemp = O.HandleLocalGlobalBank2(lg);
+                    }
                     string freq = null;
                     if (!G.Chop_HasSigil(nameLhs))
                     {
@@ -16158,11 +16162,18 @@ namespace Gekko
                         //COPY...to   x*y --> first, prefix suffix
                         //COPY...to   x --> first, fixed name
 
+                        string bankTemp = bankRhs;
+                        if (bankTemp == null)
+                        {
+                            LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(nameRhs); //should be without freq                                                                                                             
+                            bankTemp = O.HandleLocalGlobalBank2(lg);
+                        }
+
                         //no bank given in second part
                         if (name2split.Length == 1)
                         {
                             //no stars
-                            outputs.Add(new ToFrom(lhsElement, O.UnChop(currentFirstBankName, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
+                            outputs.Add(new ToFrom(lhsElement, O.UnChop(bankTemp, nameRhs, freqLhs, indexLhs), lhsElementExplicit));
                         }
                         else
                         {

@@ -1600,6 +1600,29 @@ namespace Gekko
             return db;
         }
 
+        public static string HandleLocalGlobalBank2(LocalGlobal.ELocalGlobalType lg)
+        {
+            string db = null;
+            if (lg == LocalGlobal.ELocalGlobalType.None)
+            {
+                db = Program.databanks.GetFirst().name;
+            }
+            else if (lg == LocalGlobal.ELocalGlobalType.Local)
+            {
+                db = Program.databanks.local.name;
+            }
+            else if (lg == LocalGlobal.ELocalGlobalType.Global)
+            {
+                db = Program.databanks.global.name;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: #8097432857");
+                throw new GekkoException();
+            }
+            return db;
+        }
+
         public static IVariable RemoveIVariableFromString(string fullname)
         {
             string dbName, varName, freq; string[] indexes;
@@ -1853,18 +1876,27 @@ namespace Gekko
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
-            
+
+            //Databank bank = null;
+            //if (dbName == null)
+            //{
+            //    LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varName);  //varname is always without freq 
+            //    bank = HandleLocalGlobalBank(lg);
+            //}
+            //else
+            //{
+            //    bank = Program.databanks.GetDatabank(dbName, true);
+            //}
+
             Databank bank = null;
             if (dbName == null)
             {
-                LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varName);  //varname is always without freq 
-                bank = HandleLocalGlobalBank(lg);
+                bank = Program.databanks.GetFirst();
             }
             else
             {
                 bank = Program.databanks.GetDatabank(dbName, true);
             }
-
 
             if (!bank.editable) Program.ProtectError("You cannot remove a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
 
