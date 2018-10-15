@@ -20,7 +20,7 @@ namespace Gekko
     {
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
-        bool noSearch = false;
+        public bool noSearch = false;
 
         public LookupSettings()
         {            
@@ -1161,7 +1161,16 @@ namespace Gekko
 
                 if (indexes != null)
                 {
-                    rv = iv.Indexer(smpl, O.EIndexerType.None, Program.GetListOfIVariablesFromListOfStrings(indexes));
+                    Series iv_series = iv as Series;
+                    if (iv_series == null || iv_series.type != ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: Expected array-series variable");
+                        throw new GekkoException();
+                    }
+
+                    rv = iv_series.FindArraySeries(smpl, Program.GetListOfIVariablesFromListOfStrings(indexes), false, false);  //last arg. not used
+
+                    //rv = iv.Indexer(smpl, O.EIndexerType.None, Program.GetListOfIVariablesFromListOfStrings(indexes));
                 }
                 else
                 {
@@ -1313,7 +1322,7 @@ namespace Gekko
                 //SIMPLE LOOKUP ON RIGHT-HAND SIDE
 
                 //NOTE: databank search may be allowed!
-                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, new LookupSettings());
+                return LookupHelperRightside(smpl, map, dbName, varnameWithFreq, varname, settings);
             }
         }
 
@@ -1380,27 +1389,7 @@ namespace Gekko
                     {
                         if (varname.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
                         {
-                            string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-                            fileName = Program.AddExtension(fileName, "." + "lst");                            
-                            List<string> folders = new List<string>();
-                            string fileNameTemp = Program.FindFile(fileName, folders);
-                            if (fileNameTemp == null)
-                            {
-                                G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
-                                throw new GekkoException();
-                            }
-                            string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
-                            List<string> input = G.ExtractLinesFromText(listFile);
-                                                        
-                            List<string> result = new List<string>();
-
-                            GetRawListElements(fileName, input, result);
-                            if (result.Count == 1 && G.Equal(result[0], "null"))
-                            {
-                                //LIST mylist = null; ---> empty list
-                                result = new List<string>();
-                            }
-                            List ml = new List(result);
+                            List ml = HandleListfile(varname);
                             return ml;
                         }
                         else
@@ -1408,7 +1397,7 @@ namespace Gekko
                             LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
 
                             //databank name not given, for instance "PRT x"
-                            if (Program.options.databank_search && lg == LocalGlobal.ELocalGlobalType.None)
+                            if ((Program.options.databank_search && settings.noSearch == false) && lg == LocalGlobal.ELocalGlobalType.None)
                             {
                                 //No searching if the naked variable is local or global
                                 //options.databank_search is DATA mode
@@ -1418,17 +1407,31 @@ namespace Gekko
                                     //Ref lookup
                                     Databank db = null;
                                     db = Program.databanks.GetRef();
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                                 }
                                 else
                                 {
                                     //non-Ref lookup
 
                                     rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
-                                    if (rv == null && errorIfNotFound)
+                                    if (rv == null)
                                     {
-                                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
-                                        throw new GekkoException();
+                                        if (settings.create == ECreatePossibilities.NoneReportError)
+                                        {
+                                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
+                                            throw new GekkoException();
+                                        }
+                                        else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
+                                        {
+                                            //This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
+                                            //This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
+                                            G.Writeln2("*** ERROR: Internal error #98253298");
+                                            throw new GekkoException();
+                                        }
+                                        else
+                                        {
+                                            //just return the null
+                                        }
                                     }
 
                                 }
@@ -1441,7 +1444,7 @@ namespace Gekko
                                     //Ref lookup
                                     Databank db = null;
                                     db = Program.databanks.GetRef();
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                                 }
                                 else
                                 {
@@ -1455,7 +1458,7 @@ namespace Gekko
                                     {
                                         db = Program.databanks.GetFirst();
                                     }
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                                 }
                             }
                         }
@@ -1468,13 +1471,13 @@ namespace Gekko
                         if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                         {
                             //only for series type
-                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, Program.databanks.GetRef());
+                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, Program.databanks.GetRef());
                         }
                         else
                         {
                             //databank name is given explicitly, and we are not doing bankNumber stuff
                             Databank db = Program.databanks.GetDatabank(dbName, true); //we know that dbName is not null
-                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, errorIfNotFound, db);
+                            rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                         }
                     }
                 }
@@ -1492,17 +1495,68 @@ namespace Gekko
             return rv;
         }
 
-        
-
-        private static IVariable LookupHelperFindVariableInSpecificBank(string varnameWithFreq, bool errorIfNotFound, Databank db)
+        private static List HandleListfile(string varname)
         {
-            IVariable rv = db.GetIVariable(varnameWithFreq);
-            if (rv == null && errorIfNotFound)
+            string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+            fileName = Program.AddExtension(fileName, "." + "lst");
+            List<string> folders = new List<string>();
+            string fileNameTemp = Program.FindFile(fileName, folders);
+            if (fileNameTemp == null)
             {
-                G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");
+                G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
                 throw new GekkoException();
             }
+            string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
+            List<string> input = G.ExtractLinesFromText(listFile);
 
+            List<string> result = new List<string>();
+
+            GetRawListElements(fileName, input, result);
+            if (result.Count == 1 && G.Equal(result[0], "null"))
+            {
+                //LIST mylist = null; ---> empty list
+                result = new List<string>();
+            }
+            List ml = new List(result);
+            return ml;
+        }
+
+
+        private static IVariable LookupHelperFindVariableInSpecificBank(string varnameWithFreq, LookupSettings settings, Databank db)
+        {
+            bool create = false;
+            IVariable rv = db.GetIVariable(varnameWithFreq);
+            if (rv == null)
+            {
+                if (settings.create == ECreatePossibilities.NoneReturnNull) return rv;
+                if (settings.create == ECreatePossibilities.NoneReportError)
+                {
+                    G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in databank '" + db.name + "'");
+                    throw new GekkoException();
+                }
+                else if (settings.create == ECreatePossibilities.Must || settings.create == ECreatePossibilities.Can)
+                {
+                    if (G.Chop_HasSigil(varnameWithFreq))
+                    {
+                        G.Writeln2("*** ERROR: Internal error #982437532");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        //series
+                        create = true;
+                    }
+                }
+            }
+            else
+            {
+                if (settings.create == ECreatePossibilities.Must) create = true;
+            }
+            if (create)
+            {
+                rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+                db.AddIVariableWithOverwrite(rv);
+            }
             return rv;
         }
 
@@ -1618,15 +1672,35 @@ namespace Gekko
             return;
         }
 
-
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {
-            //return O.Lookup(null, null, new ScalarString(fullname), null, ELookupType.RightHandSide, EVariableType.Var, null);
+            return GetIVariableFromString(fullname, type, true);  //no searching per default
+        }
 
-            string dbName, varName, freq; string[] indexes;
-            O.Chop(fullname, out dbName, out varName, out freq, out indexes);
-            IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
-            return iv;
+        public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type, bool noSearch)
+        {
+            //if noSearch = true, type .Can and .Must can be used, 
+            //else there will be a crash (too dangerous to create a series when the exact bank is not known)
+
+            if (noSearch == false && (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must))
+            {
+                G.Writeln2("*** ERROR: Internal error #80975234985");
+                throw new GekkoException();
+            }
+
+            if (Globals.fixLookup)
+            {
+                LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, noSearch);
+                IVariable iv2 = O.Lookup(null, null, new ScalarString(fullname), null, settings, EVariableType.Var, null);
+                return iv2;
+            }
+            else
+            { 
+                string dbName, varName, freq; string[] indexes;
+                O.Chop(fullname, out dbName, out varName, out freq, out indexes);
+                IVariable iv = O.GetIVariableFromString(dbName, varName, freq, indexes, type);
+                return iv;
+            }
         }
 
         public static IVariable GetIVariableFromString(string dbName, string varName, string freq, string[] indexes, ECreatePossibilities type)

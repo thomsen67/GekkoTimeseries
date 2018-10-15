@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "d33";
 
+        public static bool fixLookup = true;
+
         public static bool useIndexerAlone = false;
 
         //public static bool assignmentFix = true;

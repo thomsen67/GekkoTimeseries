@@ -1680,7 +1680,7 @@ namespace Gekko
             return this.name == null;  //then this.meta will also be null, but we only test .name
         }
 
-        private IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless)
+        public IVariable FindArraySeries(GekkoSmpl smpl, IVariable[] indexes, bool isLhs, bool rhsIsTimeless)
         {
             if (indexes.Length == 0)
             {
@@ -1745,7 +1745,7 @@ namespace Gekko
                         //(rv as Series).isNotFoundArraySubSeries = true;
 
 
-                        if (smpl.command == GekkoSmplCommand.Unfold)
+                        if (smpl != null && smpl.command == GekkoSmplCommand.Unfold)
                         {
                             //print
                             if (Program.options.series_array_print_missing == ESeriesMissing.Error)
@@ -1772,7 +1772,7 @@ namespace Gekko
                             }
                             else throw new GekkoException();
                         }
-                        else //GekkoSmplCommand.Sum but also others
+                        else //GekkoSmplCommand.Sum but also others, like GetIVariableFromString()
                         {
                             //sum and others
 
