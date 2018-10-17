@@ -20,7 +20,7 @@ namespace Gekko
     {
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
-        public bool noSearch = false;
+        public bool canSearch = true;
 
         public LookupSettings()
         {            
@@ -37,11 +37,11 @@ namespace Gekko
             this.create = create;            
         }
 
-        public LookupSettings(O.ELookupType type, O.ECreatePossibilities create, bool noSearch)
+        public LookupSettings(O.ELookupType type, O.ECreatePossibilities create, bool canSearch)
         {
             this.type = type;
             this.create = create;
-            this.noSearch = noSearch;
+            this.canSearch = canSearch;
         }
     }
 
@@ -1196,7 +1196,7 @@ namespace Gekko
                     List<IVariable> rv = new List<IVariable>();
                     foreach (string s in items)
                     {
-                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError, false);
+                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError, true);
                         rv.Add(iv);
                     }
                     List m = new List(rv);
@@ -1389,8 +1389,12 @@ namespace Gekko
                     //It must be a databank then
                     if (dbName == null)
                     {
+                        //No explicit databank name is provided
+
                         if (varname.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
                         {
+                            //special case: #(listfile m)
+
                             List ml = HandleListfile(varname);
                             return ml;
                         }
@@ -1399,11 +1403,14 @@ namespace Gekko
                             LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
 
                             //databank name not given, for instance "PRT x"
-                            if ((Program.options.databank_search && settings.noSearch == false) && lg == LocalGlobal.ELocalGlobalType.None)
+                            if ((Program.options.databank_search && settings.canSearch == true) && lg == LocalGlobal.ELocalGlobalType.None)
                             {
-                                //No searching if the naked variable is local or global
-                                //options.databank_search is DATA mode
-                                //Search if on the right-hand side (rhs), in data mode, and no bank is indicated
+                                //Searching only if:
+                                //  (1) OPTION databank search = yes
+                                //  (2) settings.canSearch = true (deactivated for commands like DOC, TRUNCATE and others)
+                                //  (3) the name is not found in Local or Global databanks
+                                //  (4) it is on the right-hand side (which is the case here)
+                                                                
                                 if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                                 {
                                     //Ref lookup
@@ -1413,7 +1420,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    //non-Ref lookup
+                                    //non-Ref lookup                                     
 
                                     rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
                                     if (rv == null)
@@ -1698,22 +1705,25 @@ namespace Gekko
         }
 
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
-        {
-            return GetIVariableFromString(fullname, type, true);  //no searching per default
+        {            
+            return GetIVariableFromString(fullname, type, false);  //no searching per default
         }
 
-        public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type, bool noSearch)
+        public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type, bool canSearch)
         {
             //if noSearch = true, type .Can and .Must can be used, 
             //else there will be a crash (too dangerous to create a series when the exact bank is not known)
 
-            if (noSearch == false && (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must))
+            //Note: Please do not use GetIVariableFromString(... , ... , false), use GetIVariableFromString(..., ...) instead.
+            //      This makes it easier to find the places where searching is active.
+
+            if (canSearch == true && (type == ECreatePossibilities.Can || type == ECreatePossibilities.Must))
             {
                 G.Writeln2("*** ERROR: Internal error #80975234985");
                 throw new GekkoException();
             }
 
-            LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, noSearch);
+            LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, type, canSearch);
             IVariable iv2 = O.Lookup(null, null, new ScalarString(fullname), null, settings, EVariableType.Var, null);
             return iv2;
             
@@ -5166,7 +5176,9 @@ namespace Gekko
         public static Series ConvertToSeriesMaybeConstant(GekkoSmpl smpl, IVariable x)
         {
             if (x.Type() == EVariableType.Series)
-                return x as Series; 
+            {
+                return x as Series;
+            }
             else
             {
                 //try to see if x can be a constant value
@@ -6687,7 +6699,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                IVariable ivOld = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError);
+                IVariable ivOld = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError, true);
                 IVariable ivLhs = O.GetIVariableFromString(listItems0[0], ECreatePossibilities.Can);
 
                 Series oldSeries = O.ConvertToSeries(ivOld) as Series;
@@ -6844,8 +6856,8 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                IVariable iv1 = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError);
-                IVariable iv2 = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError);
+                IVariable iv1 = O.GetIVariableFromString(listItems1[0], ECreatePossibilities.NoneReportError, true);
+                IVariable iv2 = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true);
                 IVariable iv3 = O.GetIVariableFromString(listItems0[0], ECreatePossibilities.Can);  //left side
 
                 Series ts1 = O.ConvertToSeries(iv1) as Series;
@@ -7319,7 +7331,7 @@ namespace Gekko
                 List<string> vars = Restrict(this.names, true, false, true, false);
                 foreach (string s in vars)
                 {
-                    IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);  //no searching!
                     Series iv_series = iv as Series;
                     if (iv_series == null)
                     {
@@ -7490,7 +7502,7 @@ namespace Gekko
                 int counter = 0;
                 foreach (string s in listItems)
                 {
-                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError); //no searching!
                     Series ts = O.ConvertToSeries(iv) as Series;
                     //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
                     //Now we are sure all the series are from Work
@@ -8891,11 +8903,12 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set    
             public string name = null;
-            public IVariable lhs = null;
-            public IVariable rhs = null;  
+            //public IVariable lhs = null;
+            //public IVariable rhs = null;  
             //public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
             public IVariable impose = null;
-            public string opt_constant = null;                
+            public string opt_constant = null;
+            public List<IVariable> expressions = null;          
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
@@ -9168,7 +9181,7 @@ namespace Gekko
                 List<string> r_exportItems = Restrict(names, true, true, false, false);  //only matrices, #x
                 foreach (string s in r_exportItems)
                 {
-                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError, true);
                     //IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
                     if (iv != null && iv.Type() == EVariableType.Matrix)
                     {

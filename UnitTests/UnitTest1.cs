@@ -5222,7 +5222,7 @@ namespace UnitTests
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
                 I("OPTION freq a;");
                 I("MODEL pchy;");
-                I("CREATE x; SER <2010 2011> x = 200, 202;");
+                I("CREATE x; SER <2010 2011> x = (200, 202);");
                 I("FOR val i = 1 to 10; CREATE y{i}; SER <2010 2010> y{i} = 100; END;");
                 I("SIM <2011 2011>;");
 
@@ -5244,7 +5244,7 @@ namespace UnitTests
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
                 I("OPTION freq q;");
                 I("MODEL pchy;");
-                I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
+                I("CREATE x; SER <2010q1 2011q1> x = (200, 1, 2, 3, 202);");
                 I("FOR val i = 1 to 10; CREATE y{i}; SER <2010q4 2010q4> y{i} = 7; SER <2010q1 2010q1> y{i} = 100; END;");
                 I("SIM <2011q1 2011q1>;");
 
@@ -5454,7 +5454,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__Splice()
+        public void _Test_Splice()
         {
 
             Databank work = First();
@@ -5550,7 +5550,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__AREMOS_ras()
+        public void _Test_AREMOS_ras()
         {
             Databank work = First();
             I("RESET;");
@@ -5566,9 +5566,9 @@ namespace UnitTests
             I("reset;");
             I("time 2001 2010;");
             I("create x1,x2,x3;");
-            I("ser x1 = 1,2,4,5,6,5,6,7,8,6;");
-            I("ser x2 = 5,4,4,5,6,3,6,1,8,6;");
-            I("ser x3 = 7,5,4,1,6,5,9,7,8,9;");
+            I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
+            I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
+            I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
             I("analyze x1,x2,x3;");
             double d = 0.00000001;  //very precise!
             _AssertMatrix(First(), "corr", 1, 1, 1d, d);
@@ -5585,9 +5585,9 @@ namespace UnitTests
             I("option freq q;");
             I("time 2001q1 2003q2;");
             I("create x1,x2,x3;");
-            I("ser x1 = 1,2,4,5,6,5,6,7,8,6;");
-            I("ser x2 = 5,4,4,5,6,3,6,1,8,6;");
-            I("ser x3 = 7,5,4,1,6,5,9,7,8,9;");
+            I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
+            I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
+            I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
             I("analyze x1,x2,x3;");            
             _AssertMatrix(First(), "corr", 1, 1, 1d, d);
             _AssertMatrix(First(), "corr", 1, 2, 0.21295885d, d);
@@ -5626,7 +5626,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Smooth()
+        public void _Test_Smooth()
         {
 
             Databank work = First();
@@ -6537,8 +6537,10 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Cache()
+        public void _Test_Cache()
         {
+            //But cache not active anymore...?
+            
             //==================== TRUNCATE ===========================================
             Databank work = First();
 
@@ -7467,18 +7469,7 @@ namespace UnitTests
             Assert.IsNotNull(work.GetIVariable("b2!a"));
             Assert.AreEqual(work.storage.Count, 2);
             I("PRT b1, b2;");
-
-        }
-
-        [TestMethod]
-        public void Test__DatarevisionRAS()
-        {
-            I("RESET; CLS;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\data_revision\ras';");
-            I("RUN kqr;");
-            I("COMPARE;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("found 0 differences"));
-        }
+        }        
 
         [TestMethod]
         public void _Test_Seasonal()
@@ -7584,9 +7575,9 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             //Same data as for Test__R()
             I("CREATE lna1, pcp, bul1;");
-            I("SERIES <1998 2010> lna1 =  166.223000  173.221000  179.571000  187.343000  194.888000  202.959000  209.426000  215.134000  222.716000  230.520000  238.518000  246.654000  254.991000 ;");
-            I("SERIES <1998 2010> pcp  =  0.9502030   0.9699920   1.0000000   1.0235000   1.0401100   1.0605400   1.0754700   1.0977800   1.1121200   1.1314800   1.1513000   1.1717600   1.1871600  ;");
-            I("SERIES <1998 2010> bul1 =  0.0684791   0.0591698   0.0560344   0.0535439   0.0535003   0.0631703   0.0649875   0.0578112   0.0473207   0.0404508   0.0467488   0.0472923   0.0475191  ;");
+            I("SERIES <1998 2010> lna1 = d(' 166.223000  173.221000  179.571000  187.343000  194.888000  202.959000  209.426000  215.134000  222.716000  230.520000  238.518000  246.654000  254.991000 ');");
+            I("SERIES <1998 2010> pcp  = d(' 0.9502030   0.9699920   1.0000000   1.0235000   1.0401100   1.0605400   1.0754700   1.0977800   1.1121200   1.1314800   1.1513000   1.1717600   1.1871600  ');");
+            I("SERIES <1998 2010> bul1 = d(' 0.0684791   0.0591698   0.0560344   0.0535439   0.0535003   0.0631703   0.0649875   0.0578112   0.0473207   0.0404508   0.0467488   0.0472923   0.0475191  ');");
             I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.144517"));  //stupid test, must be done better...
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.613875"));
@@ -7603,9 +7594,9 @@ namespace UnitTests
             I("series s4 = bul1.1;");
             I("series s5 = 1;");
             I("LIST m = s4, s5;");
-            I("matrix x = pack(2000, 2010, s1, work:s2, s3, work:#m);");  //just testing the syntax and that lists work
-            I("matrix y = pack(2000, 2010, s0);");
-            I("matrix b = inv(t(#x)*#x)*t(#x)*#y;");
+            I("matrix #x = pack(2000, 2010, s1, work:s2, s3, work:#m);");  //just testing the syntax and that lists work
+            I("matrix #y = pack(2000, 2010, s0);");
+            I("matrix #b = inv(t(#x)*#x)*t(#x)*#y;");
             I("show #b;");
             _AssertMatrix(First(), "b", "rows", 5);
             _AssertMatrix(First(), "b", "cols", 1);
@@ -8185,7 +8176,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__FunctionsInBuilt()
+        public void _Test_FunctionsInBuilt()
         {
             Databank work = First();
             //simplest possible
@@ -8645,7 +8636,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Mulbk()
+        public void _Test_Mulbk()
         {
             //TODO:
             //We really should have a READ<work>..., READ<ref>..., the last one is MULBK...
@@ -8653,7 +8644,7 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("READ jul05tsdx;");
             UData u = Data("fy", 2006, "a"); Assert.AreEqual(u.w, u.b); double fy0 = u.w;
-            I("SERIES<2006 2006>fy + 100;");
+            I("SERIES<2006 2006>fy += 100;");
             u = Data("fy", 2006, "a"); Assert.AreEqual(u.w, u.b + 100); Assert.AreEqual(u.w, fy0 + 100); //100 higher in work
             I("READ <ref> jul05tsdx;");
             u = Data("fy", 2006, "a"); Assert.AreEqual(u.w, u.b + 100); Assert.AreEqual(u.w, fy0 + 100);  //still 100 higher in work
@@ -8662,7 +8653,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Sys()
+        public void _Test_Sys()
         {
             I("RESET;");
             I("SYS 'di'+'r';");  //SYS 'dir' is ok            
@@ -9202,7 +9193,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Updprt()
+        public void _Test_ExportSeries()
         {
             //Only syntax check: do this seriously...!
             I("RESET;");
@@ -10589,7 +10580,7 @@ namespace UnitTests
         // ------------------------- older ----------------------
 
         [TestMethod]
-        public void Test__Interpolate()
+        public void _Test_Interpolate()
         {
             // ================================
             //        A to Q
@@ -10599,18 +10590,18 @@ namespace UnitTests
             I("RESET; MODE data;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
-            I("SERIES @x = 1 5 3 m 10;");
-            I("INTERPOLATE x1.q = ref:x.a repeat;");
-            _AssertSeries(First(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            I("SERIES @x = (1, 5, 3, m(), 10);");
+            I("INTERPOLATE x1!q = ref:x!a repeat;");
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 4; i++)
             {
-                _AssertSeries(First(), "x1", EFreq.Q, 2001, i, 1d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.Q, 2002, i, 5d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.Q, 2003, i, 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.Q, 2005, i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2001, i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2002, i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2003, i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!q", EFreq.Q, 2005, i, 10d, sharedDelta);
             }
-            _AssertSeries(First(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!q", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
 
             //
 
@@ -10618,18 +10609,18 @@ namespace UnitTests
             I("RESET; MODE data;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
-            I("SERIES x = 1 5 3 m 10;");
-            I("INTERPOLATE ref:x1.q = x.a prorate;");
-            _AssertSeries(Ref(), "x1", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            I("SERIES x = (1, 5, 3, m(), 10);");
+            I("INTERPOLATE ref:x1!q = x!a prorate;");
+            _AssertSeries(Ref(), "x1!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 4; i++)
             {
-                _AssertSeries(Ref(), "x1", EFreq.Q, 2001, i, 1d / 4d, sharedDelta);
-                _AssertSeries(Ref(), "x1", EFreq.Q, 2002, i, 5d / 4d, sharedDelta);
-                _AssertSeries(Ref(), "x1", EFreq.Q, 2003, i, 3d / 4d, sharedDelta);
-                _AssertSeries(Ref(), "x1", EFreq.Q, 2004, i, double.NaN, sharedDelta);
-                _AssertSeries(Ref(), "x1", EFreq.Q, 2005, i, 10d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1!q", EFreq.Q, 2001, i, 1d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1!q", EFreq.Q, 2002, i, 5d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1!q", EFreq.Q, 2003, i, 3d / 4d, sharedDelta);
+                _AssertSeries(Ref(), "x1!q", EFreq.Q, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(Ref(), "x1!q", EFreq.Q, 2005, i, 10d / 4d, sharedDelta);
             }
-            _AssertSeries(Ref(), "x1", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "x1!q", EFreq.Q, 2006, 1, double.NaN, sharedDelta);
 
             // ================================
             //        A to M
@@ -10637,37 +10628,37 @@ namespace UnitTests
 
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
-            I("SERIES x = 1 5 3 m 10;");
+            I("SERIES x = (1, 5, 3, m(), 10);");
             I("OPTION freq m;");
-            I("INTERPOLATE x1 = x.a repeat;");  //the .m is removed on lhs
-            _AssertSeries(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            I("INTERPOLATE x1 = x!a repeat;");  //the .m is removed on lhs
+            _AssertSeries(First(), "x1!m", EFreq.M, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 12; i++)
             {
-                _AssertSeries(First(), "x1", EFreq.M, 2001, i, 1d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2002, i, 5d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2003, i, 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2005, i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2002, i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2003, i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2005, i, 10d, sharedDelta);
             }
-            _AssertSeries(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2006, 1, double.NaN, sharedDelta);
 
             //
 
             I("RESET; MODE data;");
             I("OPTION freq a;");
             I("TIME 2001 2005;");
-            I("SERIES x = 1 5 3 m 10;");
-            I("INTERPOLATE x1.m = x prorate;");  //the .a is removed on rhs
-            _AssertSeries(First(), "x1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
+            I("SERIES x = (1, 5, 3, m(), 10);");
+            I("INTERPOLATE x1!m = x prorate;");  //the .a is removed on rhs
+            _AssertSeries(First(), "x1!m", EFreq.M, 2000, 4, double.NaN, sharedDelta);
             for (int i = 1; i <= 12; i++)
             {
-                _AssertSeries(First(), "x1", EFreq.M, 2001, i, 1d / 12d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2002, i, 5d / 12d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2003, i, 3d / 12d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2004, i, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2005, i, 10d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, i, 1d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2002, i, 5d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2003, i, 3d / 12d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2004, i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2005, i, 10d / 12d, sharedDelta);
             }
-            _AssertSeries(First(), "x1", EFreq.M, 2006, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2006, 1, double.NaN, sharedDelta);
 
 
             // ================================
@@ -10677,34 +10668,34 @@ namespace UnitTests
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
             I("OPTION freq q;");
-            I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
-            I("INTERPOLATE x1.m = x.q repeat;");
-            _AssertSeries(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
+            I("SERIES <2001q1 2002q1> x = (1, 5, 3, m(), 10);");
+            I("INTERPOLATE x1!m = x!q repeat;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 2000, 12, double.NaN, sharedDelta);
             for (int i = 1; i <= 3; i++)
             {
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 0 + i, 1d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 3 + i, 5d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 6 + i, 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2002, 0 + i, 10d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 0 + i, 1d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 3 + i, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 6 + i, 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2002, 0 + i, 10d, sharedDelta);
             }
-            _AssertSeries(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
             I("RESET; MODE data;");
             I("TIME 2001 2005;");
             I("OPTION freq q;");
-            I("SERIES <2001q1 2002q1> x = 1 5 3 m 10;");
-            I("INTERPOLATE x1.m = x.q prorate;");
-            _AssertSeries(First(), "x1", EFreq.M, 2000, 12, double.NaN, sharedDelta);
+            I("SERIES <2001q1 2002q1> x = (1, 5, 3, m(), 10);");
+            I("INTERPOLATE x1!m = x!q prorate;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 2000, 12, double.NaN, sharedDelta);
             for (int i = 1; i <= 3; i++)
             {
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 0 + i, 1d / 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 3 + i, 5d / 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 6 + i, 3d / 3d, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1", EFreq.M, 2002, 0 + i, 10d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 0 + i, 1d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 3 + i, 5d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 6 + i, 3d / 3d, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2001, 9 + i, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!m", EFreq.M, 2002, 0 + i, 10d / 3d, sharedDelta);
             }
-            _AssertSeries(First(), "x1", EFreq.M, 2002, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 2002, 4, double.NaN, sharedDelta);
 
         }
 
@@ -16710,7 +16701,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Exit()
+        public void _Test_Exit()
         {
             //-----------------------------------------------------------
             //----------------- testing EXIT --------------
@@ -17536,8 +17527,8 @@ namespace UnitTests
                 {
                     if (G.Equal(s, ss)) goto Flag;
                 }
-                Series tsW = First().GetVariable(s);
-                Series tsB = Program.databanks.GetRef().GetVariable(s);
+                Series tsW = First().GetIVariable(s) as Series;
+                Series tsB = Program.databanks.GetRef().GetIVariable(s) as Series;
 
                 if (tsW == null || tsB == null)
                 {

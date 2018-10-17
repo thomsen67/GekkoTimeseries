@@ -5322,7 +5322,7 @@ namespace Gekko
                         //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
                         //IVariable iv = gdb.GetIVariable(name);
 
-                        IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError);
+                        IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
 
                         string name = bnv.s2;
                         string nameWithoutFreq = G.Chop_GetName(name);
@@ -5559,7 +5559,7 @@ namespace Gekko
                 //Databank gdb = GetBankFromBankNameVersion(bnv.bank);
                 //IVariable iv = gdb.GetIVariable(name);
 
-                IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError);
+                IVariable iv = O.GetIVariableFromString(bnv.s1, O.ECreatePossibilities.NoneReportError, true);
 
                 //if (iv == null)
                 //{
@@ -9586,7 +9586,7 @@ namespace Gekko
 
             for (int i = 0; i < listItems.Count; i++)
             {
-                IVariable iv = O.GetIVariableFromString(listItems[i], O.ECreatePossibilities.NoneReportError);
+                IVariable iv = O.GetIVariableFromString(listItems[i], O.ECreatePossibilities.NoneReportError, true);
 
                 Series ts = O.ConvertToSeries(iv) as Series;
                 tss.Add(ts);  //for later use
@@ -11297,7 +11297,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: #09874323987");
                         throw new GekkoException();
                     }
-                    IVariable x = O.GetIVariableFromString(iv_string.string2, O.ECreatePossibilities.NoneReportError);  //should never return an error here
+                    IVariable x = O.GetIVariableFromString(iv_string.string2, O.ECreatePossibilities.NoneReportError, true);  //should never return an error here
                     y.Add(x);
                 }
                 rv = y;  //point to this instead, it is List<ScalarString> transformed into List<IVariable>
@@ -14892,7 +14892,7 @@ namespace Gekko
                 //seems list is always null when called from command
                 foreach (string listItem in list)
                 {
-                    IVariable x = O.GetIVariableFromString(listItem, O.ECreatePossibilities.NoneReportError);
+                    IVariable x = O.GetIVariableFromString(listItem, O.ECreatePossibilities.NoneReportError, true);
                     m.Add(x);
                 }
             }
@@ -14924,7 +14924,7 @@ namespace Gekko
 
                 foreach(string s in names)
                 {
-                    m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError));
+                    m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true));
                 }
 
             }
@@ -15680,7 +15680,7 @@ namespace Gekko
 
             foreach (ToFrom output in outputs)
             {
-                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //no search
                 if (type != EVariableType.Var && type !=  iv.Type()) continue; //skip it                
                 O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
@@ -15738,7 +15738,7 @@ namespace Gekko
 
             foreach (ToFrom output in outputs)
             {
-                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);
+                IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReturnNull);  //no search here
 
                 if (iv == null)
                 {
@@ -15816,7 +15816,7 @@ namespace Gekko
                 if (type != EVariableType.Var)
                 {
                     //a bit of double work here, but maybe it does not need to be super fast anyway
-                    IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);  //no search here
                     if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
                 }
                 names.Add(two.s1);
@@ -21345,10 +21345,10 @@ namespace Gekko
 
                     if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
-                        ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);
+                        ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);  //no search here
                     }
 
-                    IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
                     Series ts = iv as Series;
 
                     //Series tsBase = null;
@@ -22163,7 +22163,7 @@ namespace Gekko
 
                 //Series ts = db.GetIVariableWithAddedFreq(var) as Series;
 
-                IVariable iv = O.GetIVariableFromString(newList[i].s1, O.ECreatePossibilities.NoneReportError);
+                IVariable iv = O.GetIVariableFromString(newList[i].s1, O.ECreatePossibilities.NoneReportError, true);
                 Series ts = iv as Series;
                 string varLabel = G.Chop_GetName(newList[i].s2);
                 eo.excelRowLabels[i, 0] = varLabel;
@@ -22348,7 +22348,7 @@ namespace Gekko
                         //Databank db = GetBankFromBankNameVersion(var.bank);
                         //IVariable xx = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
-                        IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                        IVariable xx = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
 
                         //string varnameWithFreq = var.name;
                         string varnameWithFreq = G.Chop_GetNameAndFreq(var.s2);
@@ -22498,7 +22498,7 @@ namespace Gekko
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //IVariable iv = db.GetIVariable(var.name);
 
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
 
                     //IVariable iv = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
@@ -23077,7 +23077,7 @@ namespace Gekko
                 {
                     //string s3 = var.name;
                     //Databank db = GetBankFromBankNameVersion(var.bank);
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     //Series ts = db.GetVariable(s3);  //#getvar
                     Series ts = iv as Series;
                     if (ts == null)
@@ -23159,7 +23159,7 @@ namespace Gekko
             int end = -12345;
             foreach (ToFrom s in vars)
             {
-                IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError);
+                IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);
 
                 //if (G.Chop_HasSigil(s.s1)) continue;
                 ////if (G.StartsWithSigil(s.name)) continue;  //ignore % and #
@@ -23238,7 +23238,7 @@ namespace Gekko
                     //string s3 = var.name;
                     //Databank db = GetBankFromBankNameVersion(var.bank);
                     //Series ts = db.GetVariable(s3); //#getvar
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts= iv as Series;
                     if (ts == null)
                     {
@@ -23258,7 +23258,7 @@ namespace Gekko
                         //Databank db = GetBankFromBankNameVersion(var.bank);
                         //Series ts = db.GetVariable(s3);  //existence has been checked //#getvar
 
-                        IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                        IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                         Series ts = iv as Series;
 
                         double data = ts.GetData(null, t);
@@ -23338,7 +23338,7 @@ namespace Gekko
                     //Databank db = GetBankFromBankNameVersion(var.bank);                    
                     //Series ts = db.GetVariable(var.name);  //#getvar
 
-                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
 
                     if (ts == null)
@@ -25367,7 +25367,7 @@ namespace Gekko
                 string yRhs = xrhs[i];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
 
                 //if (ts_lhs == null)
                 //{
@@ -25511,7 +25511,7 @@ namespace Gekko
                 string yRhs = xrhs[ii];
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
-                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull) as Series;
+                Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReturnNull, true) as Series;  //can search
 
                 if (ts_lhs == null)
                 {
@@ -25800,8 +25800,12 @@ namespace Gekko
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
 
-            List<IVariable> rhs_unfolded = Unfold(o.rhs);
-            Series lhs_series = o.lhs as Series;
+            IVariable lhs = o.expressions[0];
+            List<IVariable> rhs = new List<IVariable>();
+            for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
+            List<IVariable> rhs_unfolded = Unfold(rhs);
+
+            Series lhs_series = lhs as Series;
             if (lhs_series == null)
             {
                 G.Writeln2("*** ERROR: Left-hand side should be a SERIES");
@@ -25838,11 +25842,12 @@ namespace Gekko
                 int k_i = 0;
                 foreach (IVariable xx in rhs_unfolded)
                 {
-                    x[n_i, k_i] = xx.GetVal(t);
+                    IVariable xx2 = O.ConvertToSeriesMaybeConstant(new GekkoSmpl(t1, t2), xx);
+                    x[n_i, k_i] = xx2.GetVal(t);
                     k_i++;
                 }
                 if (constant == 1) x[n_i, rhs_unfolded.Count] = 1d;
-                y[n_i] = o.lhs.GetVal(t);
+                y[n_i] = lhs_series.GetVal(t);
                 n_i++;
             }
 
@@ -26153,7 +26158,7 @@ namespace Gekko
                 }
             }
         }
-
+        
         public static List<IVariable> Unfold(IVariable x)
         {
             return Unfold(new List<IVariable> { x });
@@ -36738,7 +36743,7 @@ namespace Gekko
                 foreach (string tsString in variables)
                 {
 
-                    IVariable iv = O.GetIVariableFromString(tsString, O.ECreatePossibilities.NoneReportError);
+                    IVariable iv = O.GetIVariableFromString(tsString, O.ECreatePossibilities.NoneReportError);  //no search
                     IVariable ivGrund = O.GetIVariableFromString(G.Chop_SetBank(tsString, Globals.Ref), O.ECreatePossibilities.NoneReportError);
 
                     //string dbName, varName, freq; string[] indexes;

@@ -1032,8 +1032,14 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node, node[0]);
                             if(!node[1].Code.IsNull()) node.Code.A("o" + Num(node) + ".name = " + node[1].Code).End();
                             if (!node[2].Code.IsNull()) node.Code.A("o" + Num(node) + ".impose = " + node[2].Code).End();
-                            node.Code.A("o" + Num(node) + ".lhs = " + node[3].Code).End();
-                            node.Code.A("o" + Num(node) + ".rhs = " + node[4].Code).End();
+
+                            node.Code.A("o" + Num(node) + ".expressions = new List<IVariable>();" + G.NL);
+                            for (int i = 3; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".expressions.Add(" + node[i].Code + ");" + G.NL);
+                            }
+                            //node.Code.A("o" + Num(node) + ".lhs = " + node[3].Code).End();
+                            //node.Code.A("o" + Num(node) + ".rhs = " + node[4].Code).End();
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

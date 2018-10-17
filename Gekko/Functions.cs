@@ -1970,6 +1970,19 @@ namespace Gekko
             return result;            
         }
 
+        public static IVariable d(GekkoSmpl smpl, IVariable x)
+        {
+            string s = O.ConvertToString(x);
+            string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            List m = new List();
+            foreach (string s2 in ss)
+            {
+                double d = Functions.HelperValConvertFromString(s2);
+                m.Add(new ScalarVal(d));
+            }
+            return m;
+        }
+
         //!! practical for empty lists and singletons, for instance #m = list(); or #m = list('a');
         //!! for other cases, ('a', 'b') is shorter than list('a', 'b') but yields the same.
         public static IVariable list(GekkoSmpl smpl, params IVariable[] x)
@@ -2603,22 +2616,7 @@ namespace Gekko
             else if (x1.Type() == EVariableType.String)
             {
                 string s = ((ScalarString)x1).string2;
-                if (G.Equal(s, "m"))
-                {
-                    v = double.NaN;
-                }
-                else
-                {
-                    if (double.TryParse(s, out v))
-                    {
-                        //ok
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Could not convert STRING '" + s + "' to VAL");
-                        throw new GekkoException();
-                    }
-                }
+                v = HelperValConvertFromString(s);
             }
             else if (x1.Type() == EVariableType.List)
             {
@@ -2631,6 +2629,30 @@ namespace Gekko
                 throw new GekkoException();
             }
             return new ScalarVal(v);
+        }
+
+        private static double HelperValConvertFromString(string s)
+        {
+            double v;
+            s = s.Trim();
+            if (G.Equal(s, "m") || G.Equal(s, "m()") || G.Equal(s, "miss()") || G.Equal(s, "nan"))
+            {
+                v = double.NaN;
+            }
+            else
+            {
+                if (double.TryParse(s, out v))
+                {
+                    //ok
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Could not convert STRING '" + s + "' to VAL");
+                    throw new GekkoException();
+                }
+            }
+
+            return v;
         }
 
         public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
@@ -2787,7 +2809,7 @@ namespace Gekko
             }
             else if (x1.Type() == EVariableType.String)
             {
-                ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError) as Series;
+                ts = O.GetIVariableFromString(x1.ConvertToString(), O.ECreatePossibilities.NoneReportError, true) as Series;
                 //ts = O.Lookup(null, null, x1, null, O.ELookupType.RightHandSide, EVariableType.Var, null) as Series;
             }
             else
