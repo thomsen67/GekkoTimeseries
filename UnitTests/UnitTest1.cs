@@ -7585,6 +7585,8 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("-0.350908"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.0298039"));
 
+            return;
+
             I("time 2000 2010;");
             I("create s0, s1, s2, s3, s4, s5;");
             I("series s0 = dlog(lna1);");
@@ -7593,8 +7595,8 @@ namespace UnitTests
             I("series s3 = bul1;");
             I("series s4 = bul1.1;");
             I("series s5 = 1;");
-            I("LIST m = s4, s5;");
-            I("matrix #x = pack(2000, 2010, s1, work:s2, s3, work:#m);");  //just testing the syntax and that lists work
+            I("LIST #m = s4, s5;");
+            I("matrix #x = pack(2000, 2010, s1, work:s2, s3, work:{#m});");  //just testing the syntax and that lists work
             I("matrix #y = pack(2000, 2010, s0);");
             I("matrix #b = inv(t(#x)*#x)*t(#x)*#y;");
             I("show #b;");

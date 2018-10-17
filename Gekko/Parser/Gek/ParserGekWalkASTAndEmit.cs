@@ -1523,18 +1523,27 @@ namespace Gekko.Parser.Gek
                             if (ss2 == null) s2 = "Globals.globalPeriodEnd";
                             else s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd);" + G.NL;
 
-                            string xx = node?.Parent?.Parent?.Parent?.Text;
-                            if (xx == "ASTASSIGNMENT")  //these do not have an o object
+                            if (node?.Parent?.Parent?.Parent?.Text == "ASTASSIGNMENT")
                             {
+                                //assignment is a bit special
                                 node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
                                 node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
                                 node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
                                 node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
                             }
                             else
-                            {                                
+                            {
+                                if (node?.Parent?.Parent?.Text == "ASTOLS")  //so that the expressions get the right smpl period
+                                {
+                                    node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
+                                    node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
+                                    node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
+                                    node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
+                                }
+
                                 node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
-                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);                             
+                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
+
                             }
                         }
                         break;

@@ -2673,7 +2673,8 @@ modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 // OLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-ols:                        OLS olsOpt1? name? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
+ols:                        OLS olsOpt1? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
+                          | OLS olsOpt1? name? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
 						    ;
 olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
