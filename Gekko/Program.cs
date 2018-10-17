@@ -26157,7 +26157,7 @@ namespace Gekko
                     minI = i;
                 }
             }
-        }
+        }        
         
         public static List<IVariable> Unfold(IVariable x)
         {
@@ -26193,6 +26193,32 @@ namespace Gekko
                 {
                     G.Writeln2("ERROR: Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
                     throw new GekkoException();
+                }
+            }
+            return xlistUnfolded;
+        }
+
+        public static List<Series> UnfoldAsSeries(GekkoSmpl smpl, IVariable x)
+        {
+            return UnfoldAsSeries(smpl, new List<IVariable> { x });
+        }
+
+        public static List<Series> UnfoldAsSeries(GekkoSmpl smpl, List<IVariable> xlist)
+        {
+            List<Series> xlistUnfolded = new List<Series>();
+            foreach (IVariable x in xlist)
+            {
+                if (x.Type() != EVariableType.List)
+                {
+                    xlistUnfolded.Add(O.ConvertToSeriesMaybeConstant(smpl, x));
+                }                
+                else
+                {
+                    foreach (IVariable iv in ((List)x).list)
+                    {
+                        List<Series> extraContainerExplode = UnfoldAsSeries(smpl, iv);
+                        xlistUnfolded.AddRange(extraContainerExplode);
+                    }
                 }
             }
             return xlistUnfolded;
