@@ -1196,7 +1196,7 @@ namespace Gekko
                     List<IVariable> rv = new List<IVariable>();
                     foreach (string s in items)
                     {
-                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);
+                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError, false);
                         rv.Add(iv);
                     }
                     List m = new List(rv);
@@ -2077,81 +2077,7 @@ namespace Gekko
 
 
 
-        //how relates to ConvertToSeries()??
-        public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
-        {
-            if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) return x;
-            else if (x.Type() == EVariableType.Matrix)
-            {
-                int n = smpl.Observations12();
-                Matrix m = x as Matrix;
-                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
-                {
-                    return new ScalarVal(m.data[0, 0]);
-                }
-                else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
-                {
-                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                    int counter = -1;
-                    foreach (GekkoTime t in smpl.Iterate12())
-                    {
-                        counter++;
-                        rv_series.SetData(t, m.data[counter, 0]);  //column vector
-                    }
-                    return rv_series;
-                }
-                else if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == n)
-                {
-                    G.Writeln2("*** ERROR: Please use a column vector to transform MATRIX to SERIES. Cf. the t() transpose function");
-                    throw new GekkoException();
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + " x " + m.data.GetLength(1) + " MATRIX to " + n + " obs SERIES");
-                    throw new GekkoException();
-                }
-            }
-            else if (x.Type() == EVariableType.List)
-            {
-                int n = smpl.Observations12();
-                List m = x as List;
-                if (m.list.Count() == 1)
-                {
-                    ScalarVal mi_val = m.list[0] as ScalarVal;
-                    if (mi_val == null)
-                    {
-                        G.Writeln2("*** ERROR: Expected item 1 in LIST to be VAL type");
-                        throw new GekkoException();
-                    }
-                    return new ScalarVal(mi_val.val);
-                }
-                else if (m.list.Count() == n)
-                {
-                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                    int counter = -1;
-                    foreach (GekkoTime t in smpl.Iterate12())
-                    {
-                        counter++;
-                        ScalarVal mi_val = m.list[counter] as ScalarVal;
-                        if (mi_val == null)
-                        {
-                            G.Writeln2("*** ERROR: Expected item " + (counter + 1) + " in LIST to be VAL type");
-                            throw new GekkoException();
-                        }
-                        rv_series.SetData(t, mi_val.val);
-                    }
-                    return rv_series;
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Cannot convert " + m.list.Count() + " LIST elements to " + n + " obs SERIES");
-                    throw new GekkoException();
-                }
-
-            }
-            G.Writeln2("*** ERROR: Cannot convert " + G.GetTypeString(x) + " to SERIES");
-            throw new GekkoException();
-        }
+        
 
         public static IVariable LookupHelperLeftsideOLD(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
         {
@@ -4845,16 +4771,7 @@ namespace Gekko
         }
 
         
-
-        public static Series CreateTimeSeriesFromVal(GekkoSmpl smpl, double d)
-        {
-            Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
-            for (int i = 0; i < tsl.data.dataArray.Length; i++)
-            {
-                tsl.data.dataArray[i] = d;
-            }
-            return tsl;
-        }
+        
 
         public static void PrepareUfunction(int number, string name)
         {
@@ -5244,6 +5161,24 @@ namespace Gekko
             return m;
         }
 
+        // -------------- series converters start ---------------
+                
+        public static Series ConvertToSeriesMaybeConstant(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Series)
+                return x as Series; 
+            else
+            {
+                //try to see if x can be a constant value
+                Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
+                for (int i = 0; i < tsl.data.dataArray.Length; i++)
+                {
+                    tsl.data.dataArray[i] = O.ConvertToVal(x); //constant, will issue error if not a value
+                }
+                return tsl;
+            }
+        }
+
         //how relates to ConvertToTimeSeries()??
         public static IVariable ConvertToSeries(IVariable x)
         {
@@ -5254,6 +5189,84 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
+
+        //how relates to ConvertToSeries()??
+        public static IVariable ConvertToTimeSeries(GekkoSmpl smpl, IVariable x)
+        {
+            if (x.Type() == EVariableType.Series || x.Type() == EVariableType.Val) return x;
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                int n = smpl.Observations12();
+                Matrix m = x as Matrix;
+                if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == 1)
+                {
+                    return new ScalarVal(m.data[0, 0]);
+                }
+                else if (m.data.GetLength(0) == n && m.data.GetLength(1) == 1)
+                {
+                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                    int counter = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        counter++;
+                        rv_series.SetData(t, m.data[counter, 0]);  //column vector
+                    }
+                    return rv_series;
+                }
+                else if (m.data.GetLength(0) == 1 && m.data.GetLength(1) == n)
+                {
+                    G.Writeln2("*** ERROR: Please use a column vector to transform MATRIX to SERIES. Cf. the t() transpose function");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot convert " + m.data.GetLength(0) + " x " + m.data.GetLength(1) + " MATRIX to " + n + " obs SERIES");
+                    throw new GekkoException();
+                }
+            }
+            else if (x.Type() == EVariableType.List)
+            {
+                int n = smpl.Observations12();
+                List m = x as List;
+                if (m.list.Count() == 1)
+                {
+                    ScalarVal mi_val = m.list[0] as ScalarVal;
+                    if (mi_val == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected item 1 in LIST to be VAL type");
+                        throw new GekkoException();
+                    }
+                    return new ScalarVal(mi_val.val);
+                }
+                else if (m.list.Count() == n)
+                {
+                    Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                    int counter = -1;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        counter++;
+                        ScalarVal mi_val = m.list[counter] as ScalarVal;
+                        if (mi_val == null)
+                        {
+                            G.Writeln2("*** ERROR: Expected item " + (counter + 1) + " in LIST to be VAL type");
+                            throw new GekkoException();
+                        }
+                        rv_series.SetData(t, mi_val.val);
+                    }
+                    return rv_series;
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot convert " + m.list.Count() + " LIST elements to " + n + " obs SERIES");
+                    throw new GekkoException();
+                }
+
+            }
+            G.Writeln2("*** ERROR: Cannot convert " + G.GetTypeString(x) + " to SERIES");
+            throw new GekkoException();
+        }
+
+        // -------------- series converters end ---------------
 
         public static IVariable ConvertToMap(IVariable x)
         {

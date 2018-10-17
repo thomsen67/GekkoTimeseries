@@ -7481,7 +7481,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Seasonal()
+        public void _Test_Seasonal()
         {
             // ===> In AREMOS, you can run the following:
 
@@ -8190,28 +8190,28 @@ namespace UnitTests
             Databank work = First();
             //simplest possible
             I("RESET;");
-            I("VAL a1 = 1;");
-            I("VAL a2 = 2;");
-            I("VAL a3 = 3;");
-            I("VAL a4 = 4;");
+            I("VAL %a1 = 1;");
+            I("VAL %a2 = 2;");
+            I("VAL %a3 = 3;");
+            I("VAL %a4 = 4;");
             I("CREATE ts1, ts2, ts3, ts4, ts5, v1;");
             I("TIME 2010 2012;");
             I("SERIES ts1 = 1;");
             I("SERIES ts2 = 2;");
             I("SERIES ts3 = 3;");
             I("SERIES ts4 = 4;");
-            I("LIST m1 = ts1, ts2, ts3, ts4;");
-            I("LIST m2 = ts1, ts2;");
-            I("SERIES ts5 = 10, 12, 16;");
+            I("LIST #m1 = ts1, ts2, ts3, ts4;");
+            I("LIST #m2 = ts1, ts2;");
+            I("SERIES ts5 = (10, 12, 16);");
 
             //avg()
-            I("VAL v1 = avg(%a1, %a2);");
-            _AssertScalarVal(First(), "v1", 1.5, sharedDelta);
+            I("VAL %v1 = avg(%a1, %a2);");
+            _AssertScalarVal(First(), "%v1", 1.5, sharedDelta);
             I("SERIES xx1 = avg(ts1, ts2);");
             _AssertSeries(First(), "xx1", 2010, 2012, 1.5, sharedDelta);
             I("SERIES xx1 = avg(ts1);");
             _AssertSeries(First(), "xx1", 2010, 2012, 1, sharedDelta);
-            I("SERIES xx1 = avg(#m1);");
+            I("SERIES xx1 = avg({#m1});");
             _AssertSeries(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
 
             if (Globals.UNITTESTFOLLOWUP)
@@ -8240,35 +8240,35 @@ namespace UnitTests
             //avgt()
             I("SER v1 = avgt(ts5);");
             _AssertSeries(First(), "v1", 2011, 38d / 3d, sharedDelta);
-            I("SER v1 = avgt(2011, 2012, ts5);");
+            I("SER v1 = avgt(ts5, 2011, 2012);");
             _AssertSeries(First(), "v1", 2011, 28d / 2d, sharedDelta);
             
             //sumt()
             I("SER v1 = sumt(ts5);");
             _AssertSeries(First(), "v1", 2011, 38d, sharedDelta);            
-            I("SER v1 = sumt(2011, 2012, ts5);");
+            I("SER v1 = sumt(ts5, 2011, 2012);");
             _AssertSeries(First(), "v1", 2011, 28d, sharedDelta);            
 
             //sqrt()
-            I("VAL v1 = sqrt(%a4);");
+            I("VAL %v1 = sqrt(%a4);");
             _AssertScalarVal(First(), "%v1", 2, sharedDelta);
             I("SERIES xx1 = sqrt(ts4);");
             _AssertSeries(First(), "xx1", 2010, 2012, 2, sharedDelta);
 
             //sum()
-            I("VAL v1 = sum(%a1, %a2);");
+            I("VAL %v1 = sum(%a1, %a2);");
             _AssertScalarVal(First(), "%v1", 3, sharedDelta);
             I("SERIES xx1 = sum(ts1, ts2);");
             _AssertSeries(First(), "xx1", 2010, 2012, 3, sharedDelta);
             I("SERIES xx1 = avg(ts1);");
             _AssertSeries(First(), "xx1", 2010, 2012, 1, sharedDelta);
-            I("SERIES xx1 = sum(#m1);");
+            I("SERIES xx1 = sum({#m1});");
             _AssertSeries(First(), "xx1", 2010, 2012, 10d, sharedDelta);
             //To make sure that it is not confused with sum(#i, x[#i]) stuff
-            I("SERIES xx1 = sum(#m1, #m2);");            
+            I("SERIES xx1 = sum({#m1}, {#m2});");            
             _AssertSeries(First(), "xx1", 2010, 2012, 13d, sharedDelta);
             //To make sure that it is not confused with sum(#i, x[#i]) stuff
-            I("SERIES xx1 = sum(#m1, ts1);");
+            I("SERIES xx1 = sum({#m1}, ts1);");
             _AssertSeries(First(), "xx1", 2010, 2012, 11d, sharedDelta);
             I("RESET; TIME 2000 2000; MODE data;");
             I("open<edit> xx;");
@@ -8276,19 +8276,19 @@ namespace UnitTests
             I("ser xx2 = 2;");            
             I("close xx;");
             I("open xx;");
-            I("list xx = xx1, xx2;");
-            I("ser yy = sum(#xx);");  //test that timeseries are searched for in data mode
+            I("list #xx = xx1, xx2;");
+            I("ser yy = sum({#xx});");  //test that timeseries are searched for in data mode
             _AssertSeries(First(), "yy", 2000, 3d, sharedDelta);
 
             I("RESET;");
             I("OPEN <edit> b1;");
             I("OPEN <edit> b2;");
-            I("STRING b1 = bankname('first');");
-            I("STRING b0 = bankname('ref');");
-            I("STRING b1a = bankname(1);");
-            I("STRING b2 = bankname(2);");
-            I("STRING b3 = bankname(3);");
-            I("VAL v = bankname(0);");
+            I("STRING %b1 = bankname('first');");
+            I("STRING %b0 = bankname('ref');");
+            I("STRING %b1a = bankname(1);");
+            I("STRING %b2 = bankname(2);");
+            I("STRING %b3 = bankname(3);");
+            I("VAL %v = bankname(0);");
             _AssertScalarString(First(), "%b1", "b2");
             _AssertScalarString(First(), "%b1a", "b2");
             _AssertScalarString(First(), "%b0", "Ref");            
@@ -8300,38 +8300,38 @@ namespace UnitTests
             I("RESET;");
             I("CREATE a;");
             I("TIME 2000 2003;");
-            I("SERIES a =  1, 4, 7, 2;");
-            I("VAL v = percentile(a, 0.0);");
+            I("SERIES a =  (1, 4, 7, 2);");
+            I("VAL %v = percentile(a, 0.0);");
             _AssertScalarVal(First(), "%v", 1.0d, sharedDelta);  //same as min
-            I("VAL v = percentile(a, 0.1);");
+            I("VAL %v = percentile(a, 0.1);");
             _AssertScalarVal(First(), "%v", 1.3d, sharedDelta);
-            I("VAL v = percentile(a, 0.2);");
+            I("VAL %v = percentile(a, 0.2);");
             _AssertScalarVal(First(), "%v", 1.6d, sharedDelta);
-            I("VAL v = percentile(a, 0.3);");
+            I("VAL %v = percentile(a, 0.3);");
             _AssertScalarVal(First(), "%v", 1.9d, sharedDelta);
-            I("VAL v = percentile(a, 0.4);");
+            I("VAL %v = percentile(a, 0.4);");
             _AssertScalarVal(First(), "%v", 2.4d, sharedDelta);
-            I("VAL v = percentile(a, 0.5);");
+            I("VAL %v = percentile(a, 0.5);");
             _AssertScalarVal(First(), "%v", 3.0d, sharedDelta);  //same as median
-            I("VAL v = percentile(a, 0.6);");
+            I("VAL %v = percentile(a, 0.6);");
             _AssertScalarVal(First(), "%v", 3.6d, sharedDelta);
-            I("VAL v = percentile(a, 0.7);");
+            I("VAL %v = percentile(a, 0.7);");
             _AssertScalarVal(First(), "%v", 4.3d, sharedDelta);
-            I("VAL v = percentile(a, 0.8);");
+            I("VAL %v = percentile(a, 0.8);");
             _AssertScalarVal(First(), "%v", 5.2d, sharedDelta);
-            I("VAL v = percentile(a, 0.9);");
+            I("VAL %v = percentile(a, 0.9);");
             _AssertScalarVal(First(), "%v", 6.1d, sharedDelta);
-            I("VAL v = percentile(a, 1.0);");
+            I("VAL %v = percentile(a, 1.0);");
             _AssertScalarVal(First(), "%v", 7.0d, sharedDelta);  //same as max
 
             //percentile()
             I("RESET; TIME 2000 2002;");
-            I("VAL v = miss();");
-            I("SER xx = m, 1, m;");
-            I("VAL v1 = 0;");
-            I("VAL v2 = 0;");
-            I("IF(ismiss(%v)==1); VAL v1 = 1; END;");
-            I("IF(ismiss(xx[2002])==1); VAL v2 = 1; END;");
+            I("VAL %v = m();");
+            I("SER xx = (m(), 1, m());");
+            I("VAL %v1 = 0;");
+            I("VAL %v2 = 0;");
+            I("IF(ismiss(%v)==1); VAL %v1 = 1; END;");
+            I("IF(ismiss(xx[2002])==1); VAL %v2 = 1; END;");
             _AssertScalarVal(First(), "%v1", 1.0d, sharedDelta);
             _AssertScalarVal(First(), "%v2", 1.0d, sharedDelta);
 
@@ -10243,8 +10243,8 @@ namespace UnitTests
             I("x = 5;");
             Assert.AreEqual(Local().storage.Count, 1);
             I("RENAME x TO y;"); //should stay in local bank
-            Assert.AreEqual(Local().storage.Count, 1);
-            Assert.AreEqual(First().storage.Count, 0);
+            Assert.AreEqual(Local().storage.Count, 0);
+            Assert.AreEqual(First().storage.Count, 1);
 
             I("RESET;");
             I("GLOBAL x;");
@@ -10261,8 +10261,8 @@ namespace UnitTests
             I("x = 5;");
             Assert.AreEqual(Global().storage.Count, 1);
             I("RENAME x TO y;"); //should stay in global bank
-            Assert.AreEqual(Global().storage.Count, 1);
-            Assert.AreEqual(First().storage.Count, 0);
+            Assert.AreEqual(Global().storage.Count, 0);
+            Assert.AreEqual(First().storage.Count, 1);
 
             // ----------------
 
@@ -12065,9 +12065,9 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2010 2012;");
             I("MODE data;");
-            I("SER y1 = -7, 3, 4;");
+            I("SER y1 = (-7, 3, 4);");
             I("OPEN<edit>temp;");
-            I("SER y2 = 7, -3, -4;");
+            I("SER y2 = (7, -3, -4);");
             I("CLOSE temp; OPEN temp;");
             FAIL("REBASE <bank=work prefix=re index = 100> y1, temp:y2 2011;");
             I("UNLOCK temp;");
@@ -14022,7 +14022,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Scalars()
+        public void _Test_Scalars()
         {
             // Testing of VAL, DATE and STRING. Also test of indexer (fY[2000]).
 
@@ -14228,21 +14228,21 @@ namespace UnitTests
             _AssertScalarDate(First(), "%d", EFreq.A, 2010, 1);
             I("date %d = currentPerEnd();                                //for instance 2005q4");
             _AssertScalarDate(First(), "%d", EFreq.A, 2015, 1);
-            I("string %s = fromSeries('fY', 'label');                    //same as ASSIGN s FROM SERIES fY NAME. There will be fromMatrix etc.");
+            I("string %s = fromSeries(fY, 'label');                    //same as ASSIGN s FROM SERIES fY NAME. There will be fromMatrix etc.");
             _AssertScalarString(First(), "%s", "");
-            I("string %s = fromSeries('Work:fY', 'label');               //can use bankname with colon");
+            I("string %s = fromSeries(Work:fY, 'label');               //can use bankname with colon");
             _AssertScalarString(First(), "%s", "");
 
-            I("string %s = fromSeries('fY', 'source');");
+            I("string %s = fromSeries(fY, 'source');");
             _AssertScalarString(First(), "%s", "");
-            I("string %s = fromSeries('fY', 'stamp');");
+            I("string %s = fromSeries(fY, 'stamp');");
             _AssertScalarString(First(), "%s", "28-04-2008");
 
-            I("date %d = fromSeries('fY', 'perStart');                   //first obs");
+            I("date %d = fromSeries(fY, 'perStart');                   //first obs");
             _AssertScalarDate(First(), "%d", EFreq.A, 1998, 1);
-            I("date %d = fromSeries('fY', 'perEnd');                     //last obs");
+            I("date %d = fromSeries(fY, 'perEnd');                     //last obs");
             _AssertScalarDate(First(), "%d", EFreq.A, 2079, 1);
-            I("string %s = fromSeries('fY', 'freq');                     //freq of timeseries");
+            I("string %s = fromSeries(fY, 'freq');                     //freq of timeseries");
             _AssertScalarString(First(), "%s", "a");
             I("string %s = gekkoVersion();                               //for instance '1.8.1'");
 
@@ -15697,14 +15697,14 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__MetaTsd()
+        public void _Test_MetaTsd()
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("import<tsd>meta;");
-            Assert.AreEqual(First().GetVariable("y").meta.label, "label");
-            Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
-            Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "label");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "2/yyyy");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "25-12-2015");
             _AssertSeries(First(), "y", 1999, double.NaN, 0d);
             _AssertSeries(First(), "y", 2000, 1d / 3d, 0.0000001d);
             _AssertSeries(First(), "y", 2001, 1d / 3d, 0.0000001d);
@@ -15713,9 +15713,9 @@ namespace UnitTests
             I("export<tsd>metaTemp;");
             I("reset;");
             I("import<tsd>metaTemp;");
-            Assert.AreEqual(First().GetVariable("y").meta.label, "label");
-            Assert.AreEqual(First().GetVariable("y").meta.source, "2/yyyy");
-            Assert.AreEqual(First().GetVariable("y").meta.stamp, "25-12-2015");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "label");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "2/yyyy");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "25-12-2015");
             _AssertSeries(First(), "y", 1999, double.NaN, 0d);
             _AssertSeries(First(), "y", 2000, 1d / 3d, 0.0000001d);
             _AssertSeries(First(), "y", 2001, 1d / 3d, 0.0000001d);

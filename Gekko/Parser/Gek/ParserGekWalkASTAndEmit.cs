@@ -632,7 +632,8 @@ namespace Gekko.Parser.Gek
 
                         string functionName = GetFunctionName(node);
                         string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
-                        if (listNames != null)
+
+                        if (listNames != null && listNames.Length > 0 && listNames[0] != null)
                         {
                             if (node.listLoopAnchor == null) node.listLoopAnchor = new GekkoDictionary<string, TwoStrings>(StringComparer.OrdinalIgnoreCase);
                             foreach (string s in listNames)
@@ -2441,7 +2442,7 @@ namespace Gekko.Parser.Gek
                             //will always be null for ASTOBJECTFUNCTION
                             string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionNameLower);  //also checks that the name is "sum"
 
-                            if (listNames != null)
+                            if (listNames != null && listNames.Length > 0 && listNames[0] != null)
                             {
                                 //GAMS-like sum function, for instance sum(#i, x[#i]+1),
                                 //or unfold()-function, for instance unfold(#i, x[#i]+1)
@@ -4881,9 +4882,11 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
                             if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
-                            //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
-                            
-                            node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
+                                                                                               //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
+
+                            //node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
+                            node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); smpl.t0 = smpl.t0.Add(-2);" + G.NL);
+
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
                             
@@ -6057,6 +6060,7 @@ namespace Gekko.Parser.Gek
                     if (found[0] == 0) rv = null;  
                 }
             }
+            
             return rv;
         }
 

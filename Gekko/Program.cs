@@ -111,8 +111,8 @@ namespace Gekko
     public class GekkoSmpl
     {
         public GekkoTime t0 = GekkoTime.tNull;  //start of the period for which the expressions are calculated (<= t1)
-        public GekkoTime t1 = GekkoTime.tNull;  //start of real sample
-        public GekkoTime t2 = GekkoTime.tNull;  //end of real sample  
+        public GekkoTime t1 = GekkoTime.tNull;  //start of real sample, should normally not be lagged (then sumt() etc. will be wrong)
+        public GekkoTime t2 = GekkoTime.tNull;  //end of real sample, should normally not be leaded (then sumt() etc. will be wrong)
         public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (>= t2) 
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
         public int gekkoErrorI = 0;

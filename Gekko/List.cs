@@ -29,6 +29,11 @@ namespace Gekko
             this.list = list;
         }
 
+        public List(IVariable[] list)
+        {
+            this.list = list.ToList<IVariable>();
+        }
+
         public List(List<string> list)
         {
             List<IVariable> m = new List<Gekko.IVariable>();

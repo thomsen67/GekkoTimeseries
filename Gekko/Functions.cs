@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Gekko
-{    
+{
 
     public class Functions
     {
@@ -18,14 +18,14 @@ namespace Gekko
 
         public enum EElementByElementType {
             Times,
-            Divide            
+            Divide
         }
 
         public enum ESumDim {
             Rows,
             Cols
         }
-        
+
         public enum ESumType {
             Min,
             Max,
@@ -349,7 +349,7 @@ namespace Gekko
         public static IVariable rotate(GekkoSmpl smpl, IVariable x1, IVariable dim)
         {
             int iDim = O.ConvertToInt(dim);
-            
+
             Series ts = x1 as Series;
             if (ts == null || ts.type != ESeriesType.ArraySuper)
             {
@@ -362,7 +362,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Array-series does not have a dimension #" + iDim);
                 throw new GekkoException();
             }
-           
+
             Series tsRotated = new Series(EFreq.U, ts.name);
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
@@ -400,7 +400,7 @@ namespace Gekko
                     mapRotated.storage[iDim - 1] = t.ToString();
 
                     Series tsRotatedSub = null;
-                    IVariable iv2 = null; tsRotated.dimensionsStorage.TryGetValue(mapRotated, out iv2);                    
+                    IVariable iv2 = null; tsRotated.dimensionsStorage.TryGetValue(mapRotated, out iv2);
                     if (iv2 == null)
                     {
                         tsRotatedSub = new Series(EFreq.U, null);
@@ -411,7 +411,7 @@ namespace Gekko
                         tsRotatedSub = iv2 as Series;
                     }
                     GekkoTime tu = new GekkoTime(EFreq.U, a, 1);
-                    tsRotatedSub.SetData(tu, tsSub.GetVal(t));                    
+                    tsRotatedSub.SetData(tu, tsSub.GetVal(t));
                 }
             }
 
@@ -460,20 +460,20 @@ namespace Gekko
                 else
                 {
                     return new ScalarString(Program.databanks.storage[x].name);
-                }                
+                }
             }
             else
             {
                 G.Writeln2("*** ERROR: bankname() only accepts string or val");
                 throw new GekkoException();
             }
-            
+
         }
 
         public static IVariable getendoexo(GekkoSmpl smpl)
         {
             Databank databank = Program.databanks.GetFirst();
-            
+
             List<string> fixes = new List<string>();
             foreach (string name in new string[] { "endo", "exo" })
             {
@@ -487,7 +487,7 @@ namespace Gekko
                 }
             }
             fixes.Sort();
-            List fix = new List(fixes);            
+            List fix = new List(fixes);
             return fix;
         }
 
@@ -544,8 +544,8 @@ namespace Gekko
             //same as %s1 + %s2 anyway.
             string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
-            return new ScalarString(s1 + s2);            
-        }        
+            return new ScalarString(s1 + s2);
+        }
 
         //rename to substring()??
         public static IVariable piece(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
@@ -601,8 +601,8 @@ namespace Gekko
         }
 
         public static GekkoTuple.Tuple2 laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
-        {            
-            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);           
+        {
+            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
             return tuple;
         }
 
@@ -627,7 +627,7 @@ namespace Gekko
             return hpfilter(t, null, null, rightSide, ilambda, ilog);
         }
 
-        public static IVariable hpfilter(GekkoSmpl smpl, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog) 
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
             GekkoTime tStart = GekkoTime.tNull;
             GekkoTime tEnd = GekkoTime.tNull;
@@ -640,13 +640,13 @@ namespace Gekko
             {
                 tStart = O.ConvertToDate(per1);
                 tEnd = O.ConvertToDate(per2);
-            }           
-            
+            }
+
             int obs = GekkoTime.Observations(tStart, tEnd);
 
             double lambda = O.ConvertToVal(ilambda);
             double log = O.ConvertToVal(ilog);
-            
+
             Series rhs = O.GetTimeSeries(rightSide);
 
             Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
@@ -665,7 +665,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: hpfilter() logarithm argument should be 0 or 1");
                 throw new GekkoException();
             }
-            
+
             if (obs < 2)
             {
                 G.Writeln2("*** ERROR: hpfilter() needs at least two observations to make sense");
@@ -704,9 +704,9 @@ namespace Gekko
                     lhs.SetData(gt, output[counter]);
                 }
             }
-                                  
-            return lhs;            
-        }        
+
+            return lhs;
+        }
 
         // ====================== matrix stuff ===============================
         // ====================== matrix stuff ===============================
@@ -731,16 +731,16 @@ namespace Gekko
                 }
             }
             return y;
-        }        
+        }
 
         //Converts timeseries to matrix
         public static IVariable pack(GekkoSmpl smpl, params IVariable[] vars)
-        {            
+        {
             GekkoTime gt1 = Globals.globalPeriodStart;
             GekkoTime gt2 = Globals.globalPeriodEnd;
             int offset = 0;
-            int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);            
-                        
+            int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);
+
             List<Series> tss = new List<Series>();
             for (int j = offset; j < vars.Length; j++)
             {
@@ -757,12 +757,12 @@ namespace Gekko
                 {
                     //LIGHTFIXME
                     tss.Add((Series)vars[j]);
-                }       
+                }
                 else
                 {
                     G.Writeln2("*** ERROR: Expected timeseries or list as argument");
                     throw new GekkoException();
-                }         
+                }
             }
 
             int n = tss.Count;
@@ -777,7 +777,7 @@ namespace Gekko
             //    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
 
             int varcount = -1;
-            foreach(Series ts in tss)
+            foreach (Series ts in tss)
             {
                 varcount++;
                 int counter = -1;
@@ -800,14 +800,14 @@ namespace Gekko
         public static IVariable rows(GekkoSmpl smpl, IVariable x1)
         {
             Matrix m = O.ConvertToMatrix(x1);
-            return new ScalarVal(m.data.GetLength(0));            
+            return new ScalarVal(m.data.GetLength(0));
         }
 
         public static IVariable cols(GekkoSmpl smpl, IVariable x1)
         {
             Matrix m = O.ConvertToMatrix(x1);
             return new ScalarVal(m.data.GetLength(1));
-        }        
+        }
 
         public static IVariable multiply(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
@@ -823,8 +823,8 @@ namespace Gekko
         {
             return zeros(smpl, x1, x2);
         }
-        
-        
+
+
         public static IVariable series(GekkoSmpl smpl, params IVariable[] x)
         {
             //series() normal series with current freq
@@ -898,7 +898,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: series() does not accept > 2 arguments");
                     throw new GekkoException();
                 }
-                
+
             }
             else
             {
@@ -957,7 +957,7 @@ namespace Gekko
             for (int i = 0; i < n; i++)
             {
                 m.data[i, i] = 1d;
-            }            
+            }
             return m;
         }
 
@@ -1017,7 +1017,7 @@ namespace Gekko
             clone.data = Program.InvertMatrix(clone.data);
             return clone;
         }
-        
+
         public static IVariable zeros(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             int n1 = O.ConvertToInt(x1);
@@ -1055,7 +1055,7 @@ namespace Gekko
         {
             return SumHelper(smpl, x, ESumDim.Cols, ESumType.Min);
         }
-        
+
         public static IVariable maxr(GekkoSmpl smpl, IVariable x)
         {
             return SumHelper(smpl, x, ESumDim.Rows, ESumType.Max);
@@ -1077,7 +1077,7 @@ namespace Gekko
         public static IVariable miss(GekkoSmpl smpl)
         {
             return Globals.scalarValMissing;
-        }                
+        }
 
         public static IVariable miss(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
@@ -1104,7 +1104,7 @@ namespace Gekko
         {
             return SumHelper(smpl, x, ESumDim.Cols, ESumType.Max);
         }
-        
+
         private static IVariable SumHelper(GekkoSmpl smpl, IVariable x, ESumDim dim, ESumType type)
         {
             Matrix m = O.ConvertToMatrix(x);
@@ -1169,7 +1169,7 @@ namespace Gekko
                             m2.data[0, j] += m.data[i, j];
                         }
                         else throw new GekkoException();
-                    }                    
+                    }
                 }
                 if (type == ESumType.Avg)
                 {
@@ -1248,7 +1248,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 else
-                {                    
+                {
                     //for instance div ( 2x3 , 2x1 ) --> use fixed column 1 instead of j
                     fixedCol1 = true;
                 }
@@ -1263,7 +1263,7 @@ namespace Gekko
                     if (fixedRow1) ii = 0; //internal arrays are 0-based
                     if (fixedCol1) jj = 0; //internal arrays are 0-based
                     if (type == EElementByElementType.Times)
-                    {                        
+                    {
                         m.data[i, j] = m1.data[i, j] * m2.data[ii, jj];
                     }
                     else if (type == EElementByElementType.Divide)
@@ -1282,7 +1282,7 @@ namespace Gekko
 
         //Converts matrix to timeseries
         public static IVariable unpack(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable x)
-        {            
+        {
             //from matrix to timeseries
             //smpl is not used
             GekkoTime gt1 = Globals.globalPeriodStart;
@@ -1294,7 +1294,7 @@ namespace Gekko
             }
 
             int obs = GekkoTime.Observations(gt1, gt2);
-                        
+
             Matrix m = O.ConvertToMatrix(x);
 
             if (m.data.GetLength(1) > 1)
@@ -1420,7 +1420,7 @@ namespace Gekko
             string s = ((ScalarString)type).string2;
 
             bool upper = true;
-            if(G.Equal(s,"upper"))
+            if (G.Equal(s, "upper"))
             {
 
             }
@@ -1444,7 +1444,7 @@ namespace Gekko
         {
             double seed2 = O.ConvertToVal(seed);
             int i = (int)seed2;
-            Globals.random = new Random(i);            
+            Globals.random = new Random(i);
             return new ScalarVal(i);
         }
 
@@ -1456,7 +1456,7 @@ namespace Gekko
             {
                 //This will be SLOW, because of cholesky decomp for each drawing
                 //To circumvent this, we would have to define an object to store to fixed cover matrix
-                
+
                 //Otherwise, we could output a n x sims matrix instead of n x 1.
 
                 Matrix m = (Matrix)vcov;
@@ -1473,21 +1473,21 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Mean matrix does not correspond to covar matrix");
                     throw new GekkoException();
                 }
-                                
+
                 double[,] tmp = Cholesky(m.data, false);
                 //after this, #m = t(#tmp)*#tmp
-                
+
                 double[,] randoms = new double[n, 1];
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
                     double random = O.ConvertToVal(rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
-                }                
-                
+                }
+
                 Matrix rv = new Matrix();
                 rv.data = O.AddMatrixMatrix(mean.data, Program.MultiplyMatrices(tmp, randoms), n, 1);
-                
+
                 return rv;
 
 
@@ -1549,7 +1549,7 @@ namespace Gekko
 
         public static IVariable runif(GekkoSmpl smpl)
         {
-            double u2 = Globals.random.NextDouble();            
+            double u2 = Globals.random.NextDouble();
             return new ScalarVal(u2);
         }
 
@@ -1593,7 +1593,7 @@ namespace Gekko
                 FunctionError("remove", ths);
             }
             List m = new List();
-            
+
             foreach (IVariable iv in (ths as List).list)
             {
                 ScalarString ss = iv as ScalarString;
@@ -1620,7 +1620,7 @@ namespace Gekko
         }
 
         public static IVariable pop(GekkoSmpl smpl, IVariable ths)
-        {            
+        {
             return PopHelper(ths, -12345);
         }
 
@@ -1653,40 +1653,109 @@ namespace Gekko
             return m;
         }
 
-        public static IVariable sum(GekkoSmpl smpl, params IVariable[] items) //uuu
+        public static IVariable sum(GekkoSmpl smpl, params IVariable[] items)
         {
-            throw new GekkoException();
+            IVariable tsl2 = HelperSum(smpl.t0, smpl.t3, items, false);
+            return tsl2;
+        }
+
+        public static IVariable sumt(GekkoSmpl smpl, IVariable x)
+        {
+            IVariable iv = O.ConvertToSeriesMaybeConstant(smpl, x);
+            double d = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+            {
+                d += (iv as Series).GetData(smpl, t);
+            }
+            return new ScalarVal(d);
+        }
+
+        public static IVariable sumt(GekkoSmpl smpl, IVariable x, IVariable d1, IVariable d2)
+        {
+            GekkoTime t1 = O.ConvertToDate(d1);
+            GekkoTime t2 = O.ConvertToDate(d2);
+
+            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+            IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
+            double d = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
+            {
+                d += (iv as Series).GetData(smplHere, t);
+            }
+            return new ScalarVal(d);
+        }
+
+        public static IVariable avgt(GekkoSmpl smpl, IVariable x)
+        {
+            IVariable iv = O.ConvertToSeriesMaybeConstant(smpl, x);
+            double d = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
+            {
+                d += (iv as Series).GetData(smpl, t);
+            }
+            return new ScalarVal(d / GekkoTime.Observations(smpl.t1, smpl.t2));
+        }
+
+        public static IVariable avgt(GekkoSmpl smpl, IVariable x, IVariable d1, IVariable d2)
+        {
+            GekkoTime t1 = O.ConvertToDate(d1);
+            GekkoTime t2 = O.ConvertToDate(d2);
+
+            GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
+            IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
+            double d = 0d;
+            foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
+            {
+                d += (iv as Series).GetData(smplHere, t);
+            }
+            return new ScalarVal(d / GekkoTime.Observations(smplHere.t1, smplHere.t2));
+        }
+
+        public static IVariable avg(GekkoSmpl smpl, params IVariable[] items)
+        {
+            IVariable tsl2 = HelperSum(smpl.t0, smpl.t3, items, true);            
+            return tsl2;
+        }
+
+        private static IVariable HelperSum(GekkoTime t0, GekkoTime t3, IVariable[] items, bool avg)
+        {
+            List m = O.ExplodeIvariables(new List(items));
+            
+            bool hasSeries = false;
+            foreach (IVariable item in m.list)
+            {
+                if (item.Type() == EVariableType.Series)
+                {
+                    hasSeries = true;
+                    break;
+                }
+            }
 
             IVariable rv = null;
-            if (items.Length == 0)
+            if (hasSeries)
             {
-                G.Writeln2("*** ERROR: sum() function must have > 0 arguments.");
-                throw new GekkoException();
-            }            
-
-            if (true)
-            {
-                if (items.Length == 2 && items[0].Type() == EVariableType.List && items[1].Type() == EVariableType.Series)
-                {
-
-                }
+                rv = new Series(ESeriesType.Light, t0, t3); //will have small dataarray            
+                foreach (GekkoTime t in new GekkoTimeIterator(t0, t3)) (rv as Series).SetData(t, 0d);
             }
             else
             {
-
-                G.Writeln2("*** ERROR: sum error");
-                throw new GekkoException();
-
-                //fix #89043752438
+                rv = new ScalarVal(0d);
             }
+
+            GekkoSmpl smpl = new GekkoSmpl(t0, t3);
+            foreach (IVariable item in m.list)
+            {
+                IVariable xx = null;
+                if (hasSeries) xx = O.ConvertToSeriesMaybeConstant(smpl, item);
+                else xx = new ScalarVal(O.ConvertToVal(item));  //will not happen often
+                rv = O.Add(smpl, rv, xx);
+            }
+
+            if(avg) rv = O.Divide(smpl, rv, new ScalarVal(m.list.Count));
+
             return rv;
         }
-
-        public static IVariable avg(GekkoSmpl smpl, params IVariable[] items)//uuu
-        {
-            throw new GekkoException();
-            return null;
-        }
+    
 
         public static IVariable percentile(GekkoSmpl t, IVariable x1, IVariable percent)
         {
@@ -2708,7 +2777,7 @@ namespace Gekko
             return v;
         }
 
-        public static IVariable fromseries(GekkoTime t, IVariable x1, IVariable x2)
+        public static IVariable fromseries(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             Series ts = null;
 
