@@ -4234,57 +4234,57 @@ namespace Gekko
             return (List)a;
         }
 
-        public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber)
-        {
-            return GetTimeSeriesFromCache(smpl, ref a, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
-        }
+        //public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber)
+        //{
+        //    return GetTimeSeriesFromCache(smpl, ref a, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
+        //}
 
-        public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber, ECreatePossibilities autoCreate)
-        {
-            //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for bankNumber = 1 (Work).
-            //Using bankNumber = 2 is only done in PRT type statements, and these are slow anyway. GENR should NOT use bankNumber = 2,
-            //  because it overrides any bank given (so GENR y = x + mybank:z ---> GENR base:y = base:x + mybank:z).
-            //  maybe a GENR<base> or GENR<bank=xxx> should simply err if banks are given in expression.
-            if (bankNumber != 1)  //maybe a bit faster if bankNumber was a boolean??
-            {
-                //When quering Base databank, never use a pointer, and never change a pointer!
-                //The pointers are only for Work databank objects, and only those with simple names.
-                //So matrices will also be covered by that, and they should reside in Work to be fast.
-                Series ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
-                return ats;
-            }
-            else
-            {
-                //stuff like ... + fy + ...
-                if (Globals.useCache && a != null)
-                {
-                    //The typical case, so we try it first.
-                    return a;
-                }
-                else
-                {
-                    //Should not happen too often...                
-                    Series ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
-                    a = ats;  //sets the pointer
-                    return ats;
-                }
-            }
-        }
+        //public static IVariable GetTimeSeriesFromCache(GekkoSmpl smpl, ref IVariable a, string originalName, int bankNumber, ECreatePossibilities autoCreate)
+        //{
+        //    //For bankNumber = 2, no cache will ever be used to avoid confusion. Cache is only for bankNumber = 1 (Work).
+        //    //Using bankNumber = 2 is only done in PRT type statements, and these are slow anyway. GENR should NOT use bankNumber = 2,
+        //    //  because it overrides any bank given (so GENR y = x + mybank:z ---> GENR base:y = base:x + mybank:z).
+        //    //  maybe a GENR<base> or GENR<bank=xxx> should simply err if banks are given in expression.
+        //    if (bankNumber != 1)  //maybe a bit faster if bankNumber was a boolean??
+        //    {
+        //        //When quering Base databank, never use a pointer, and never change a pointer!
+        //        //The pointers are only for Work databank objects, and only those with simple names.
+        //        //So matrices will also be covered by that, and they should reside in Work to be fast.
+        //        Series ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
+        //        return ats;
+        //    }
+        //    else
+        //    {
+        //        //stuff like ... + fy + ...
+        //        if (Globals.useCache && a != null)
+        //        {
+        //            //The typical case, so we try it first.
+        //            return a;
+        //        }
+        //        else
+        //        {
+        //            //Should not happen too often...                
+        //            Series ats = GetTimeSeries(smpl, originalName, bankNumber, autoCreate);
+        //            a = ats;  //sets the pointer
+        //            return ats;
+        //        }
+        //    }
+        //}
 
-        public static Series GetTimeSeriesFromList(GekkoSmpl smpl, IVariable list, IVariable index, int bankNumber)
-        {
-            if (list.Type() == EVariableType.List)
-            {
-                ScalarString x = (ScalarString)list.Indexer(smpl, O.EIndexerType.None, new IVariable[] { index });  //will return ScalarString with .isName = true.
-                Series mts = O.GetTimeSeries(smpl, x.string2, 1);  //always from work....
-                return mts;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR #398754");
-                throw new GekkoException();
-            }
-        }
+        //public static Series GetTimeSeriesFromList(GekkoSmpl smpl, IVariable list, IVariable index, int bankNumber)
+        //{
+        //    if (list.Type() == EVariableType.List)
+        //    {
+        //        ScalarString x = (ScalarString)list.Indexer(smpl, O.EIndexerType.None, new IVariable[] { index });  //will return ScalarString with .isName = true.
+        //        Series mts = O.GetTimeSeries(smpl, x.string2, 1);  //always from work....
+        //        return mts;
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR #398754");
+        //        throw new GekkoException();
+        //    }
+        //}
 
         //public static IVariable GetValFromStringIndexer(GekkoSmpl smpl, string name, IVariable index, int bank)
         //{
@@ -4294,44 +4294,44 @@ namespace Gekko
         //    return result;
         //}
 
-        public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
-        {
-            return GetTimeSeries(smpl, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
-        }
+        //public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber)
+        //{
+        //    return GetTimeSeries(smpl, originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
+        //}
 
         //public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber)
         //{
         //    return GetTimeSeries(originalName, bankNumber, ECreatePossibilities.None);
         //}
 
-        public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
-        {
-            Series ts = FindTimeSeries(originalName, bankNumber, canAutoCreate);
-            //Series mts = new Series(smpl, ts);
-            return ts;
-        }
+        //public static Series GetTimeSeries(GekkoSmpl smpl, string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
+        //{
+        //    Series ts = FindTimeSeries(originalName, bankNumber, canAutoCreate);
+        //    //Series mts = new Series(smpl, ts);
+        //    return ts;
+        //}
 
 
-        public static Series FindTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
-        {
-            ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
-            if (h.bank == Globals.firstCheatString)
-            {
-                h.bank = Program.databanks.GetFirst().name;
-            }
-            if (bankNumber == 2)
-            {
-                h.bank = Program.databanks.GetRef().name;  //overrides the bank name given
-                h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
-            }
-            Series ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
-            return ts;
-        }
+        //public static Series FindTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
+        //{
+        //    ExtractBankAndRestHelper h = Program.ExtractBankAndRest(originalName, EExtrackBankAndRest.OnlyStrings);
+        //    if (h.bank == Globals.firstCheatString)
+        //    {
+        //        h.bank = Program.databanks.GetFirst().name;
+        //    }
+        //    if (bankNumber == 2)
+        //    {
+        //        h.bank = Program.databanks.GetRef().name;  //overrides the bank name given
+        //        h.hasColon = true;  //signals later on that this bank is explicitely given, so we cannot search for the timeseries
+        //    }
+        //    Series ts = Program.FindOrCreateTimeseries(h.bank, h.name, canAutoCreate, h.hasColon, false);
+        //    return ts;
+        //}
 
-        public static Series FindTimeSeries(string originalName, int bankNumber)
-        {
-            return FindTimeSeries(originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
-        }
+        //public static Series FindTimeSeries(string originalName, int bankNumber)
+        //{
+        //    return FindTimeSeries(originalName, bankNumber, ECreatePossibilities.NoneReturnNull);
+        //}
 
 
         //public static MetaTimeSeries GetTimeSeries(string originalName, int bankNumber, ECreatePossibilities canAutoCreate)
@@ -5081,14 +5081,14 @@ namespace Gekko
         //    return l;
         //}
 
-        public static Series IndirectionHelper(GekkoSmpl smpl, string variable)
-        {
-            //In that case, we are inside a GENR/PRT implicit time loop                        
-            //Code below implicitly calls Program.ExtractBankAndRest and Program.FindOrCreateTimeseries()
-            //So stuff in banks down the list will be found in data mode
-            Series ats = O.GetTimeSeries(smpl, variable, 0);
-            return ats;
-        }
+        //public static Series IndirectionHelper(GekkoSmpl smpl, string variable)
+        //{
+        //    //In that case, we are inside a GENR/PRT implicit time loop                        
+        //    //Code below implicitly calls Program.ExtractBankAndRest and Program.FindOrCreateTimeseries()
+        //    //So stuff in banks down the list will be found in data mode
+        //    Series ats = O.GetTimeSeries(smpl, variable, 0);
+        //    return ats;
+        //}
 
         public static IVariable GetScalar(string name)
         {
@@ -5731,32 +5731,32 @@ namespace Gekko
             return a.GetValOLD(smpl);
         }
 
-        public static Series GetTimeSeries(IVariable a)
-        {
-            if (a.Type() == EVariableType.Series)
-            {
-                return (Series)a;
-            }
-            else if (a.Type() == EVariableType.String)
-            {
-                ScalarString ss = (ScalarString)a;
-                if (false)
-                {
-                    Series ts = O.FindTimeSeries(ss.string2, 1);
-                    return ts;
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Cannot convert STRING into SERIES, use a NAME-scalar or {}-braces");
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Cannot convert variable of " + G.GetTypeString(a) + " type into SERIES");
-                throw new GekkoException();
-            }
-        }
+        //public static Series GetTimeSeries(IVariable a)
+        //{
+        //    if (a.Type() == EVariableType.Series)
+        //    {
+        //        return (Series)a;
+        //    }
+        //    else if (a.Type() == EVariableType.String)
+        //    {
+        //        ScalarString ss = (ScalarString)a;
+        //        if (false)
+        //        {
+        //            Series ts = O.FindTimeSeries(ss.string2, 1);
+        //            return ts;
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: Cannot convert STRING into SERIES, use a NAME-scalar or {}-braces");
+        //            throw new GekkoException();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Cannot convert variable of " + G.GetTypeString(a) + " type into SERIES");
+        //        throw new GekkoException();
+        //    }
+        //}
 
         // ------------------- type checks start ---------------------------
         // we do type checks as explicit functions since it is faster than using a switch
@@ -7554,27 +7554,27 @@ namespace Gekko
             }
         }
 
-        public class CreateExpression
-        {
-            public IVariable lhs = null;
-            public IVariable rhs = null;
-            public void Exe()
-            {
-                Series tlhs = O.GetTimeSeries(lhs);
+        //public class CreateExpression
+        //{
+        //    public IVariable lhs = null;
+        //    public IVariable rhs = null;
+        //    public void Exe()
+        //    {
+        //        Series tlhs = O.GetTimeSeries(lhs);
 
-                Databank bankName = tlhs.meta.parentDatabank;
-                string varName = tlhs.name;
+        //        Databank bankName = tlhs.meta.parentDatabank;
+        //        string varName = tlhs.name;
 
-                Series trhs = O.GetTimeSeries(rhs);
-                trhs.name = varName;
+        //        Series trhs = O.GetTimeSeries(rhs);
+        //        trhs.name = varName;
 
-                bankName.RemoveVariable(varName);
-                bankName.AddVariable(trhs);
+        //        bankName.RemoveVariable(varName);
+        //        bankName.AddVariable(trhs);
 
-                trhs.Stamp(); //for instance chain index function results in new date stamp                
+        //        trhs.Stamp(); //for instance chain index function results in new date stamp                
 
-            }
-        }
+        //    }
+        //}
 
         public class Delete
         {

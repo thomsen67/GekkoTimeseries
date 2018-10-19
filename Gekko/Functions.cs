@@ -581,24 +581,24 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        public static void HELPER_HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
-            //This is pretty bad style, but the content of the tuple is put into p and q...
+        //public static void HELPER_HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
+        //    //This is pretty bad style, but the content of the tuple is put into p and q...
 
-            Series tsp1 = O.GetTimeSeries(p);
-            Series tsq1 = O.GetTimeSeries(q);
+        //    Series tsp1 = O.GetTimeSeries(p);
+        //    Series tsq1 = O.GetTimeSeries(q);
 
-            Series tsp2 = O.GetTimeSeries(tuple.tuple0);
-            Series tsq2 = O.GetTimeSeries(tuple.tuple1);
+        //    Series tsp2 = O.GetTimeSeries(tuple.tuple0);
+        //    Series tsq2 = O.GetTimeSeries(tuple.tuple1);
 
-            tsp2.name = tsp1.name;
-            tsq2.name = tsq1.name;
+        //    tsp2.name = tsp1.name;
+        //    tsq2.name = tsq1.name;
 
-            tsp1.meta.parentDatabank.RemoveVariable(tsp1.name);
-            tsq1.meta.parentDatabank.RemoveVariable(tsq1.name);
+        //    tsp1.meta.parentDatabank.RemoveVariable(tsp1.name);
+        //    tsq1.meta.parentDatabank.RemoveVariable(tsq1.name);
 
-            tsp1.meta.parentDatabank.AddVariable(tsp2);
-            tsq1.meta.parentDatabank.AddVariable(tsq2);
-        }
+        //    tsp1.meta.parentDatabank.AddVariable(tsp2);
+        //    tsq1.meta.parentDatabank.AddVariable(tsq2);
+        //}
 
         public static IVariable laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
         {
@@ -659,7 +659,7 @@ namespace Gekko
             double lambda = O.ConvertToVal(ilambda);
             double log = O.ConvertToVal(ilog);
 
-            Series rhs = O.GetTimeSeries(rightSide);
+            Series rhs = O.ConvertToSeries(rightSide) as Series;
 
             Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
 
@@ -1784,7 +1784,7 @@ namespace Gekko
             GekkoTime t1 = Globals.globalPeriodStart;
             GekkoTime t2 = Globals.globalPeriodEnd;
 
-            Series ts = O.GetTimeSeries(x1);
+            Series ts = O.ConvertToSeries(x1) as Series;
             double percent2 = O.ConvertToVal(percent);
 
             int index1 = -12345;

@@ -2665,7 +2665,7 @@ namespace Gekko
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
-                    Series ts = Program.GetTimeSeriesFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must); //O
+                    Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must) as Series;
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
                         double v = double.NaN;
@@ -7570,106 +7570,106 @@ namespace Gekko
             return bank;
         }
 
-        public static Series FindOrCreateTimeseries(string bank, string variable, O.ECreatePossibilities isLhsSoCanAutoCreate, bool hasColon, bool isReadingDatabank)
-        {
-            //Looks for the timeseries, and if not existing it will be created if starting with 'xx'
-            //Has an overload used for reading tsd and PCIM files etc.
+        //public static Series FindOrCreateTimeseries(string bank, string variable, O.ECreatePossibilities isLhsSoCanAutoCreate, bool hasColon, bool isReadingDatabank)
+        //{
+        //    //Looks for the timeseries, and if not existing it will be created if starting with 'xx'
+        //    //Has an overload used for reading tsd and PCIM files etc.
 
-            if (variable.Contains("."))
-            {
-                G.Writeln2("*** ERROR: Malformed name: '" + variable + "'");
-                G.Writeln("           Dot freqs like .q or .m are not supported yet, please use 'OPTION freq'", Color.Red);
-                throw new GekkoException();
-            }
+        //    if (variable.Contains("."))
+        //    {
+        //        G.Writeln2("*** ERROR: Malformed name: '" + variable + "'");
+        //        G.Writeln("           Dot freqs like .q or .m are not supported yet, please use 'OPTION freq'", Color.Red);
+        //        throw new GekkoException();
+        //    }
 
-            Series ts = null;
+        //    Series ts = null;
 
-            if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can || isLhsSoCanAutoCreate == O.ECreatePossibilities.Must)
-            {
-                //Is on left side of = in SERIES or UPD, for instance SERIES newts = ... or UPD newts = ...
-                //No matter if databank search is active or not
-                Databank db = Program.databanks.GetDatabank(bank);
-                if (db == null)
-                {
-                    G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found.");
-                    throw new GekkoException();
-                }
-                ts = db.GetVariable(variable);
+        //    if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Can || isLhsSoCanAutoCreate == O.ECreatePossibilities.Must)
+        //    {
+        //        //Is on left side of = in SERIES or UPD, for instance SERIES newts = ... or UPD newts = ...
+        //        //No matter if databank search is active or not
+        //        Databank db = Program.databanks.GetDatabank(bank);
+        //        if (db == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Databank '" + bank + "' could not be found.");
+        //            throw new GekkoException();
+        //        }
+        //        ts = db.GetVariable(variable);
 
-                if (ts == null)
-                {
-                    //TODO: isReadingDatabank could be removed and replaced by .Must
-                    if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Must || isReadingDatabank || Program.options.databank_create_auto || variable.ToLower().StartsWith("xx"))
-                    {
-                        //See also similar code regarding CREATE
-                        ts = new Series(Program.options.freq, variable);
-                        //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
-                        //if (!Globals.globalPeriodStart.IsNull())
-                        //{
-                        //    //WHY is this done. For efficiency afterwards??
-                        //    //TO get start/end date??
-                        //    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
-                        //    {
-                        //        ts.SetData(gt, double.NaN);
-                        //    }
-                        //}
-                        //We know the timeseries does not already exist
-                        db.AddVariable(ts);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Series '" + variable + "' could not be auto-created in '" + bank + "' databank");
-                        G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
-                        G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
-                        throw new GekkoException();
-                    }
-                }
-            }
-            else
-            {
-                //canAutoCreate = false
-                //So we are on the right hand side of = in SERIES, or in PRT or other.
-                //Here, searching is possible!
-                if (Program.options.databank_search && !hasColon)
-                {
-                    //So we are on the right side of = in GENR (or in PRT, ...), and the varible has no bank indicated
-                    //This means we can search the banks for the variable.
+        //        if (ts == null)
+        //        {
+        //            //TODO: isReadingDatabank could be removed and replaced by .Must
+        //            if (isLhsSoCanAutoCreate == O.ECreatePossibilities.Must || isReadingDatabank || Program.options.databank_create_auto || variable.ToLower().StartsWith("xx"))
+        //            {
+        //                //See also similar code regarding CREATE
+        //                ts = new Series(Program.options.freq, variable);
+        //                //ts.dimensions = 0;  //to start with, else it is -12345. May later on be changed to > 0 via an indexer.
+        //                //if (!Globals.globalPeriodStart.IsNull())
+        //                //{
+        //                //    //WHY is this done. For efficiency afterwards??
+        //                //    //TO get start/end date??
+        //                //    foreach (GekkoTime gt in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))
+        //                //    {
+        //                //        ts.SetData(gt, double.NaN);
+        //                //    }
+        //                //}
+        //                //We know the timeseries does not already exist
+        //                db.AddVariable(ts);
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Series '" + variable + "' could not be auto-created in '" + bank + "' databank");
+        //                G.Writeln("           You should use CREATE to create the timeseries first, or alternatively use");
+        //                G.Writeln("           'MODE data', or set 'OPTION databank create auto = yes'");
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //canAutoCreate = false
+        //        //So we are on the right hand side of = in SERIES, or in PRT or other.
+        //        //Here, searching is possible!
+        //        if (Program.options.databank_search && !hasColon)
+        //        {
+        //            //So we are on the right side of = in GENR (or in PRT, ...), and the varible has no bank indicated
+        //            //This means we can search the banks for the variable.
 
-                    for (int i = 0; i < Program.databanks.storage.Count; i++)
-                    {
-                        if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
-                        Databank db2 = Program.databanks.storage[i];
-                        ts = db2.GetVariable(variable);
-                        if (ts != null) break;
-                    }
-                    if (ts == null)
-                    {
-                        ts = HandleMissingVariable(null, variable);
-                    }
-                }
-                else
-                {
-                    //simple
-                    Databank db = Program.databanks.GetDatabank(bank);
-                    if (db == null)
-                    {
-                        string s = "*** ERROR: Databank '" + bank + "' could not be found.";
-                        {
-                            G.Writeln2(s);
-                            throw new GekkoException();
-                        }
-                    }
-                    ts = db.GetVariable(variable);
-                    if (ts == null)
-                    {
-                        ts = HandleMissingVariable(bank, variable);
-                    }
-                }
-            }
+        //            for (int i = 0; i < Program.databanks.storage.Count; i++)
+        //            {
+        //                if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+        //                Databank db2 = Program.databanks.storage[i];
+        //                ts = db2.GetVariable(variable);
+        //                if (ts != null) break;
+        //            }
+        //            if (ts == null)
+        //            {
+        //                ts = HandleMissingVariable(null, variable);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //simple
+        //            Databank db = Program.databanks.GetDatabank(bank);
+        //            if (db == null)
+        //            {
+        //                string s = "*** ERROR: Databank '" + bank + "' could not be found.";
+        //                {
+        //                    G.Writeln2(s);
+        //                    throw new GekkoException();
+        //                }
+        //            }
+        //            ts = db.GetVariable(variable);
+        //            if (ts == null)
+        //            {
+        //                ts = HandleMissingVariable(bank, variable);
+        //            }
+        //        }
+        //    }
 
-            return ts;
+        //    return ts;
 
-        }
+        //}
 
         private static Series HandleMissingVariable(string bank, string variable)
         {
@@ -7733,13 +7733,13 @@ namespace Gekko
 
         }
 
-        //See also O.GetTimeSeries()
-        public static Series GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
-        {
-            ExtractBankAndRestHelper h = ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
-            Series ts = FindOrCreateTimeseries(h.bank, h.name, isLhsSoCanAutoCreate, h.hasColon, false);
-            return ts;
-        }
+        ////See also O.GetTimeSeries()
+        //public static Series GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
+        //{
+        //    ExtractBankAndRestHelper h = ExtractBankAndRest(s, EExtrackBankAndRest.OnlyStrings);
+        //    Series ts = FindOrCreateTimeseries(h.bank, h.name, isLhsSoCanAutoCreate, h.hasColon, false);
+        //    return ts;
+        //}
 
         //public static List<string> MatchWildcard(string wildcard, List<IVariable> input, string endsWith)
         //{
@@ -9956,7 +9956,7 @@ namespace Gekko
             }
             try
             {
-                Series ts = Program.databanks.GetFirst().GetVariable(variableNameWithoutLag);
+                Series ts = Program.databanks.GetFirst().GetIVariable(variableNameWithoutLag + "!a") as Series;
                 if (ts != null)
                 {
                     string label = ts.meta.label;
@@ -10095,7 +10095,7 @@ namespace Gekko
             Databank base2 = Program.databanks.GetRef();
             foreach (string tsString in work.storage.Keys)
             {
-                Series tsGrund = base2.GetVariable(tsString);
+                Series tsGrund = base2.GetIVariable(tsString + "!a") as Series;
                 if (tsGrund != null)
                 {
                     both.Add(tsString);
@@ -10109,8 +10109,8 @@ namespace Gekko
                 if (s.ToLower().StartsWith("j")) continue;
                 if (s.ToLower().StartsWith("z")) continue;
 
-                Series tsWork = work.GetVariable(s);
-                Series tsBase = base2.GetVariable(s);
+                Series tsWork = work.GetIVariable(s + "!a") as Series;
+                Series tsBase = base2.GetIVariable(s + "!a") as Series;
                 bool ok2 = true;
 
                 double maxVariance = 0d;
@@ -10158,7 +10158,7 @@ namespace Gekko
 
         public static void Randommodelcheck()
         {
-            Series ts = Program.databanks.GetFirst().GetVariable("sum");
+            Series ts = Program.databanks.GetFirst().GetIVariable("sum" + "!a") as Series;
             foreach (GekkoTime t in new GekkoTimeIterator(new GekkoTime((Program.options.freq), 2002, 1), new GekkoTime((Program.options.freq), 2100, 1)))
             {
                 if (Math.Abs(ts.GetData(null, t)) > 3 * 1.0e-4)  //hmmm seems error can be a little > 0.0001
@@ -10373,7 +10373,7 @@ namespace Gekko
 
         public static Series WG(string s, ref List<string> errorList)
         {
-            Series ts = w.GetVariable(s);
+            Series ts = w.GetIVariable(s + "!a") as Series;
             if (ts == null)
             {
                 if (errorList == null) errorList = new List<string>();
@@ -11512,7 +11512,7 @@ namespace Gekko
                         }
                         else
                         {
-                            yDatabank = databank.GetVariable(leftSideVariable).GetData(null, t);
+                            yDatabank = (databank.GetIVariable(leftSideVariable + "!a") as Series).GetData(null, t);
                         }
 
                         foreach (string variableWithLag in p2)
@@ -11521,9 +11521,9 @@ namespace Gekko
                             int lag = -12345;
                             G.ExtractVariableAndLag(variableWithLag, out variable, out lag);
 
-                            double before = databank.GetVariable(variable).GetData(null, t.Add(lag));
+                            double before = (databank.GetIVariable(variable + "!a") as Series).GetData(null, t.Add(lag));
                             double after = before + delta;
-                            databank.GetVariable(variable).SetData(t.Add(lag), after);
+                            (databank.GetIVariable(variable + "!a") as Series).SetData(t.Add(lag), after);
                             double y1 = double.NaN;
                             try
                             {
@@ -11532,7 +11532,7 @@ namespace Gekko
                             finally
                             {
                                 //to make 100% sure it is always reset
-                                databank.GetVariable(variable).SetData(t.Add(lag), before);
+                                (databank.GetIVariable(variable + "!a") as Series).SetData(t.Add(lag), before);
                             }
 
                             DecompHelper dh = new DecompHelper();
@@ -12454,88 +12454,88 @@ namespace Gekko
             }
         }
 
-        //Overload
-        public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type)
-        {
-            return ExtractBankAndRest(input, type, true);
-        }
+        ////Overload
+        //public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type)
+        //{
+        //    return ExtractBankAndRest(input, type, true);
+        //}
 
         public static TwoInts f(int x) { return new TwoInts(); }
 
-        //Does not allow wildcards in bankname
-        //returns whether there is a ':' or not
-        public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type, bool errorIfTimeseriesIsNotFound)
-        {                        
-            //If noErrorIfTimeseriesIsNotFound = false, and the timeseries is not fund, the h.ts will be = null
-            ExtractBankAndRestHelper h = new ExtractBankAndRestHelper();
-            string[] split = input.Split(':');
-            if (split.Length == 1)
-            {
-                if (type == EExtrackBankAndRest.OnlyStringNoFirstName) h.bank = null;  //so that we can see that the name is not explicitly indicated
-                else h.bank = Program.databanks.GetFirst().name;
-                h.name = split[0].Trim();
-            }
-            else if (split.Length == 2)
-            {
-                h.bank = split[0].Trim();
-                if (h.bank == Globals.firstCheatString)
-                {
-                    h.bank = Program.databanks.GetFirst().name;
-                }
-                else if (h.bank == "@")
-                {
-                    h.bank = Program.databanks.GetRef().name;
-                    h.hasColon = true;
-                }
-                else
-                {
-                    h.hasColon = true;
-                }
-                h.name = split[1].Trim();
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Did not expect more than 1 colon in '" + input + "'");
-                throw new GekkoException();
-            }
+        ////Does not allow wildcards in bankname
+        ////returns whether there is a ':' or not
+        //public static ExtractBankAndRestHelper ExtractBankAndRest(string input, EExtrackBankAndRest type, bool errorIfTimeseriesIsNotFound)
+        //{                        
+        //    //If noErrorIfTimeseriesIsNotFound = false, and the timeseries is not fund, the h.ts will be = null
+        //    ExtractBankAndRestHelper h = new ExtractBankAndRestHelper();
+        //    string[] split = input.Split(':');
+        //    if (split.Length == 1)
+        //    {
+        //        if (type == EExtrackBankAndRest.OnlyStringNoFirstName) h.bank = null;  //so that we can see that the name is not explicitly indicated
+        //        else h.bank = Program.databanks.GetFirst().name;
+        //        h.name = split[0].Trim();
+        //    }
+        //    else if (split.Length == 2)
+        //    {
+        //        h.bank = split[0].Trim();
+        //        if (h.bank == Globals.firstCheatString)
+        //        {
+        //            h.bank = Program.databanks.GetFirst().name;
+        //        }
+        //        else if (h.bank == "@")
+        //        {
+        //            h.bank = Program.databanks.GetRef().name;
+        //            h.hasColon = true;
+        //        }
+        //        else
+        //        {
+        //            h.hasColon = true;
+        //        }
+        //        h.name = split[1].Trim();
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Did not expect more than 1 colon in '" + input + "'");
+        //        throw new GekkoException();
+        //    }
 
-            if (h.bank != null && (h.bank.Contains("*") || h.bank.Contains("?")))
-            {
-                G.Writeln2("*** ERROR: Wildcard not allowed for bankname");
-                throw new GekkoException();
-            }
+        //    if (h.bank != null && (h.bank.Contains("*") || h.bank.Contains("?")))
+        //    {
+        //        G.Writeln2("*** ERROR: Wildcard not allowed for bankname");
+        //        throw new GekkoException();
+        //    }
 
-            if (type == EExtrackBankAndRest.GetDatabank || type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
-            {
-                //Will return databank object
-                h.databank = Program.databanks.GetDatabank(h.bank);
-                if (h.databank == null)
-                {
-                    G.Writeln2("*** ERROR: Could not find databank '" + h.bank + "': is the databank open?");
-                    throw new GekkoException();
-                }
-            }
+        //    if (type == EExtrackBankAndRest.GetDatabank || type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
+        //    {
+        //        //Will return databank object
+        //        h.databank = Program.databanks.GetDatabank(h.bank);
+        //        if (h.databank == null)
+        //        {
+        //            G.Writeln2("*** ERROR: Could not find databank '" + h.bank + "': is the databank open?");
+        //            throw new GekkoException();
+        //        }
+        //    }
 
-            if (type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
-            {
-                //Will return timeseries object
-                h.ts = h.databank.GetVariable(h.name);
-                if (h.ts == null)
-                {
-                    if (errorIfTimeseriesIsNotFound)
-                    {
-                        G.Writeln2("*** ERROR: Could not find timeseries '" + h.name + "' in '" + h.bank + "' databank");
-                        throw new GekkoException();
-                    }
-                    else
-                    {
-                        //Do nothing, h.ts = null is returned. But we do not allow this ignore regarding a databank name.
-                    }
-                }
-            }
+        //    if (type == EExtrackBankAndRest.GetDatabankAndTimeSeries)
+        //    {
+        //        //Will return timeseries object
+        //        h.ts = h.databank.GetVariable(h.name);
+        //        if (h.ts == null)
+        //        {
+        //            if (errorIfTimeseriesIsNotFound)
+        //            {
+        //                G.Writeln2("*** ERROR: Could not find timeseries '" + h.name + "' in '" + h.bank + "' databank");
+        //                throw new GekkoException();
+        //            }
+        //            else
+        //            {
+        //                //Do nothing, h.ts = null is returned. But we do not allow this ignore regarding a databank name.
+        //            }
+        //        }
+        //    }
 
-            return h;
-        }
+        //    return h;
+        //}
 
         public static void PutListIntoListOrListfile(List<string> listItems, string name, string listFile)
         {
