@@ -5485,64 +5485,64 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
-                    case "ASTUPD":
-                        {
-                            //TODO
-                            //TODO hmm what about $ operator??
-                            //TODO and what about 'xx' prefix? Maybe allow this for GENR too!
-                            //TODO
-                            //node.Code.A("O.Upd o" + Num(node) + " = new O.Upd();" + G.NL);
-                            node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);                            
-                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                    //case "ASTUPD":
+                    //    {
+                    //        //TODO
+                    //        //TODO hmm what about $ operator??
+                    //        //TODO and what about 'xx' prefix? Maybe allow this for GENR too!
+                    //        //TODO
+                    //        //node.Code.A("O.Upd o" + Num(node) + " = new O.Upd();" + G.NL);
+                    //        node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);                            
+                    //        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
 
-                            if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
-                            {
-                                //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                                node.Code.A("o").A(Num(node)).A(".meta = @`").A(G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1])).A("`;").A(G.NL);
-                            }
-                            node.Code.A(node[0].Code);  //listItems
-                            node.Code.A(node[1].Code);  //dates
-                            string op = node[2].Code.ToString();
-                            int nn = 3;
-                            int n = node.ChildrenCount() - nn;
-                            node.Code.A("o").A(Num(node)).A(".op = ").A(op).A(";").A(G.NL);
-                            node.Code.A("o").A(Num(node)).A(".data = new double[").A(n).A("];").A(G.NL);
-                            node.Code.A("o").A(Num(node)).A(".rep = new double[").A(n).A("];").A(G.NL);
-                            for (int i = 0; i < n; i++)
-                            {
-                                node.Code.A("o").A(Num(node)).A(".data[").A(i).A("] = (").A(node[i + nn][0].Code).A(").GetVal(" + Globals.smpl + ");").A(G.NL);
-                                string repCs = "new ScalarVal(1d)";
-                                bool one = false;
-                                if (node[i + nn].ChildrenCount() > 1)
-                                {
-                                    ASTNode rep = node[i + nn][1];
-                                    repCs = node[i + nn][1].Code.ToString();
-                                    if (rep.Text == "ASTSTAR")
-                                    {
-                                        repCs = "new ScalarVal(-12345d)";  //secret code for '*'                                        
-                                    }
-                                    else if (rep.Text == "ASTEMPTY")
-                                    {
-                                        one = true;
-                                    }
-                                }
-                                else
-                                {
-                                    one = true;
-                                }
-                                if (one)
-                                {
-                                    node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = 1d;").A(G.NL);
-                                }
-                                else
-                                {
-                                    node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = (").A(repCs).A(").GetVal(" + Globals.smpl + ")").A(G.NL);
-                                }
-                            }                            
-                            node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
-                            //G.Writeln(node.Code);
-                        }
-                        break;
+                    //        if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
+                    //        {
+                    //            //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
+                    //            node.Code.A("o").A(Num(node)).A(".meta = @`").A(G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1])).A("`;").A(G.NL);
+                    //        }
+                    //        node.Code.A(node[0].Code);  //listItems
+                    //        node.Code.A(node[1].Code);  //dates
+                    //        string op = node[2].Code.ToString();
+                    //        int nn = 3;
+                    //        int n = node.ChildrenCount() - nn;
+                    //        node.Code.A("o").A(Num(node)).A(".op = ").A(op).A(";").A(G.NL);
+                    //        node.Code.A("o").A(Num(node)).A(".data = new double[").A(n).A("];").A(G.NL);
+                    //        node.Code.A("o").A(Num(node)).A(".rep = new double[").A(n).A("];").A(G.NL);
+                    //        for (int i = 0; i < n; i++)
+                    //        {
+                    //            node.Code.A("o").A(Num(node)).A(".data[").A(i).A("] = (").A(node[i + nn][0].Code).A(").GetVal(" + Globals.smpl + ");").A(G.NL);
+                    //            string repCs = "new ScalarVal(1d)";
+                    //            bool one = false;
+                    //            if (node[i + nn].ChildrenCount() > 1)
+                    //            {
+                    //                ASTNode rep = node[i + nn][1];
+                    //                repCs = node[i + nn][1].Code.ToString();
+                    //                if (rep.Text == "ASTSTAR")
+                    //                {
+                    //                    repCs = "new ScalarVal(-12345d)";  //secret code for '*'                                        
+                    //                }
+                    //                else if (rep.Text == "ASTEMPTY")
+                    //                {
+                    //                    one = true;
+                    //                }
+                    //            }
+                    //            else
+                    //            {
+                    //                one = true;
+                    //            }
+                    //            if (one)
+                    //            {
+                    //                node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = 1d;").A(G.NL);
+                    //            }
+                    //            else
+                    //            {
+                    //                node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = (").A(repCs).A(").GetVal(" + Globals.smpl + ")").A(G.NL);
+                    //            }
+                    //        }                            
+                    //        node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
+                    //        //G.Writeln(node.Code);
+                    //    }
+                    //    break;
                     case "ASTUPDOPERATOR":
                         {
                             node.Code.A("`" + node[0].Code + "`");

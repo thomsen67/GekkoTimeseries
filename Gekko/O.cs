@@ -6209,7 +6209,7 @@ namespace Gekko
                 }
                 foreach (string s in Program.model.varsAType.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsVariable(s)) onlyModelNotDatabank.Add(s);
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a")) onlyModelNotDatabank.Add(s);
                 }
                 if (G.Equal(Program.options.interface_mode, "sim"))
                 {
@@ -8095,12 +8095,12 @@ namespace Gekko
                         }
 
 
-                        if (ts.meta.parentDatabank.ContainsVariable(tsNew.name))
+                        if (ts.meta.parentDatabank.ContainsIVariable(tsNew.name))
                         {
-                            ts.meta.parentDatabank.RemoveVariable(tsNew.name);
+                            ts.meta.parentDatabank.RemoveIVariable(tsNew.name);
                             counter++;
                         }
-                        ts.meta.parentDatabank.AddVariable(tsNew);
+                        ts.meta.parentDatabank.AddIVariable(tsNew.name, tsNew);
                     }
                     else tsNew = ts;
 
@@ -8130,37 +8130,37 @@ namespace Gekko
             }
         }
 
-        public class Upd
-        {
-            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            //public Series lhs = null;
-            public List<string> listItems = null;
-            public double[] data = null;
-            public double[] rep = null;
-            public string op = null;
-            public bool opDollar = false;
-            public string opt_d = null;
-            public string opt_p = null;
-            public string opt_m = null;
-            public string opt_q = null;
-            public string opt_mp = null;
-            public string opt_n = null;
-            public string opt_keep = null;
-            public string meta = null;
-            public P p = null;
-            public void Exe()
-            {
-                G.CheckLegalPeriod(this.t1, this.t2);
-                if (this.op.EndsWith(Globals.symbolDollar))
-                {
-                    this.opDollar = true;
-                    this.op = this.op.Substring(0, this.op.Length - 1);
-                }                
-                Program.Upd(this);
+        //public class Upd
+        //{
+        //    public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+        //    public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
+        //    //public Series lhs = null;
+        //    public List<string> listItems = null;
+        //    public double[] data = null;
+        //    public double[] rep = null;
+        //    public string op = null;
+        //    public bool opDollar = false;
+        //    public string opt_d = null;
+        //    public string opt_p = null;
+        //    public string opt_m = null;
+        //    public string opt_q = null;
+        //    public string opt_mp = null;
+        //    public string opt_n = null;
+        //    public string opt_keep = null;
+        //    public string meta = null;
+        //    public P p = null;
+        //    public void Exe()
+        //    {
+        //        G.CheckLegalPeriod(this.t1, this.t2);
+        //        if (this.op.EndsWith(Globals.symbolDollar))
+        //        {
+        //            this.opDollar = true;
+        //            this.op = this.op.Substring(0, this.op.Length - 1);
+        //        }                
+        //        Program.Upd(this);
                 
-            }
-        }
+        //    }
+        //}
 
         public class Time
         {

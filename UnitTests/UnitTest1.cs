@@ -12975,7 +12975,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 2);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            Series ts = First().GetVariable("a");
+            Series ts = First().GetIVariable("a" + "!a") as Series;
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2002);
             Assert.AreEqual(gt.sub, 1);
@@ -12996,7 +12996,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 3);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            Series ts = First().GetVariable("a");
+            Series ts = First().GetIVariable("a" + "!a") as Series;
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2002);
             Assert.AreEqual(gt.sub, 1);
@@ -13020,7 +13020,7 @@ namespace UnitTests
             Assert.AreEqual(nWork, 3);
             UData u;
             //just testing start/end for one of the timeseris (must be enough)
-            Series ts = First().GetVariable("a");
+            Series ts = First().GetIVariable("a" + "!a") as Series;
             GekkoTime gt = ts.GetPeriodFirst();
             Assert.AreEqual(gt.super, 2001);
             Assert.AreEqual(gt.sub, 1);
@@ -15395,14 +15395,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille1.cmd;");
             double delta = 0.0002d;
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 42960.0455d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 42960.0455d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 85920.0909d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 85920.0909d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 284964.7035d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 284964.7035d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 945121.0002d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 945121.0002d, delta);
         }
 
         [TestMethod]
@@ -15416,14 +15416,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille2.cmd;");
             double delta = 0.01d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 67695.0934d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 67695.0934d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 77545.9412d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 77545.9412d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 222821.3945d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 222821.3945d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 989331.9881d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 989331.9881d, delta);
         }
 
         [TestMethod]
@@ -15437,14 +15437,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille3.cmd;");
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 146098.8121d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 146098.8121d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 48482.9387d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 48482.9387d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 533625.2015d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 533625.2015d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 935807.1374d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 935807.1374d, delta);
         }
 
         [TestMethod]
@@ -15458,14 +15458,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille4.cmd;"); //option solve newton backtrack = no;
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 161071.7813d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x1").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 161071.7813d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 44425.9141d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x2").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 44425.9141d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 540864.2500d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x3").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 540864.2500d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 921567.5625d, delta);
-            _AssertHelperTwoDoubles(First().GetVariable("x4").GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 921567.5625d, delta);
         }
 
         [TestMethod]
@@ -15734,55 +15734,55 @@ namespace UnitTests
 
         private static void MetaHelperLabel()
         {
-            Assert.AreEqual(First().GetVariable("q").meta.label, null);
-            Assert.AreEqual(First().GetVariable("pxnk").meta.label, null);
-            Assert.AreEqual(First().GetVariable("pxnk2").meta.label, null);
-            Assert.AreEqual(First().GetVariable("tg").meta.label, null);
-            Assert.AreEqual(First().GetVariable("Dpxnk").meta.label, null);
-            Assert.AreEqual(First().GetVariable("JRpxnk").meta.label, null);
-            Assert.AreEqual(First().GetVariable("Zpxnk").meta.label, null);
-            Assert.AreEqual(First().GetVariable("extra1").meta.label, null);
-            Assert.AreEqual(First().GetVariable("extra2").meta.label, null);
+            Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("tg" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("Dpxnk" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("JRpxnk" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("Zpxnk" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("extra1" + "!a") as Series).meta.label, null);
+            Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.label, null);
         }
 
         private static void MetaHelperSourceStamp(string stamp2)
         {
             // endo simul
 
-            Assert.AreEqual(First().GetVariable("q").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("q").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual((First().GetIVariable("q" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual(First().GetVariable("pxnk").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("pxnk").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual((First().GetIVariable("pxnk" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
             // endo tablevars
 
-            Assert.AreEqual(First().GetVariable("pxnk2").meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
-            Assert.AreEqual(First().GetVariable("pxnk2").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.source, "2000-2001: SIM meta.frm (hash UZp0jFd11z6zvfS3MHPsaA)");
+            Assert.AreEqual((First().GetIVariable("pxnk2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
             // true exo
 
-            Assert.AreEqual(First().GetVariable("tg").meta.source, "2000-2001: series tg = 0.25");  //is detected as GENR type, nothing to do about that
-            Assert.AreEqual(First().GetVariable("tg").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("tg" + "!a") as Series).meta.source, "2000-2001: series tg = 0.25");  //is detected as GENR type, nothing to do about that
+            Assert.AreEqual((First().GetIVariable("tg" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
             // exo DJZ
 
-            Assert.AreEqual(First().GetVariable("Dpxnk").meta.source, null);
-            Assert.AreEqual(First().GetVariable("Dpxnk").meta.stamp, null);
+            Assert.AreEqual((First().GetIVariable("Dpxnk" + "!a") as Series).meta.source, null);
+            Assert.AreEqual((First().GetIVariable("Dpxnk" + "!a") as Series).meta.stamp, null);
 
-            Assert.AreEqual(First().GetVariable("JRpxnk").meta.source, null);
-            Assert.AreEqual(First().GetVariable("JRpxnk").meta.stamp, null);
+            Assert.AreEqual((First().GetIVariable("JRpxnk" + "!a") as Series).meta.source, null);
+            Assert.AreEqual((First().GetIVariable("JRpxnk" + "!a") as Series).meta.stamp, null);
 
-            Assert.AreEqual(First().GetVariable("Zpxnk").meta.source, null);
-            Assert.AreEqual(First().GetVariable("Zpxnk").meta.stamp, null);
+            Assert.AreEqual((First().GetIVariable("Zpxnk" + "!a") as Series).meta.source, null);
+            Assert.AreEqual((First().GetIVariable("Zpxnk" + "!a") as Series).meta.stamp, null);
 
             // Created vars
 
-            Assert.AreEqual(First().GetVariable("extra1").meta.source, "2000-2001: series extra1 = 2, 3");
-            Assert.AreEqual(First().GetVariable("extra1").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("extra1" + "!a") as Series).meta.source, "2000-2001: series extra1 = 2, 3");
+            Assert.AreEqual((First().GetIVariable("extra1" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
 
-            Assert.AreEqual(First().GetVariable("extra2").meta.source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
-            Assert.AreEqual(First().GetVariable("extra2").meta.stamp, stamp2);  //might fail around midnight!!
+            Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.source, "2000-2001: series extra2 = 1/extra1 + 0.1*extra1[-1]");
+            Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
         }
 
         [TestMethod]
@@ -17237,7 +17237,7 @@ namespace UnitTests
                         else I("RUN m" + ii + ".cmd;");
                         for (int t = 2002; t <= 2100; t++)
                         {
-                            _AssertHelperTwoDoubles(First().GetVariable("sum").GetData(null, new GekkoTime(EFreq.A, t, 1)), 0d, delta);
+                            _AssertHelperTwoDoubles((First().GetIVariable("sum!a") as Series).GetData(null, new GekkoTime(EFreq.A, t, 1)), 0d, delta);
                         }
                     }
                 }
@@ -17509,23 +17509,23 @@ namespace UnitTests
 
         private static void CheckDatabankSample(double[] limits, int t1, int t2, bool useBank)
         {
-            Series fy = First().GetVariable("fy");
-            Series cp = First().GetVariable("cp");
-            Series enl = First().GetVariable("enl");
+            Series fy = First().GetIVariable("fy") as Series;
+            Series cp = First().GetIVariable("cp") as Series;
+            Series enl = First().GetIVariable("enl") as Series;
             Series xx_fy = null;
             Series xx_cp = null;
             Series xx_enl = null;
             if (useBank)
             {
-                xx_fy = Program.databanks.GetRef().GetVariable("fy");
-                xx_cp = Program.databanks.GetRef().GetVariable("cp");
-                xx_enl = Program.databanks.GetRef().GetVariable("enl");
+                xx_fy = Program.databanks.GetRef().GetIVariable("fy") as Series;
+                xx_cp = Program.databanks.GetRef().GetIVariable("cp") as Series;
+                xx_enl = Program.databanks.GetRef().GetIVariable("enl") as Series;
             }
             else
             {
-                xx_fy = First().GetVariable("xx_fy");
-                xx_cp = First().GetVariable("xx_cp");
-                xx_enl = First().GetVariable("xx_enl");
+                xx_fy = First().GetIVariable("xx_fy") as Series;
+                xx_cp = First().GetIVariable("xx_cp") as Series;
+                xx_enl = First().GetIVariable("xx_enl") as Series;
             }
             for (int t = t1; t <= t2; t++)
             {

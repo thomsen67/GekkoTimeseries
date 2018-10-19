@@ -7697,41 +7697,41 @@ namespace Gekko
             return null;
         }
 
-        private static void ReportTimeseriesNotFound(string variable, string bank)
-        {
-            string b = "any open";
-            if (bank != null) b = "'" + bank + "'";
+        //private static void ReportTimeseriesNotFound(string variable, string bank)
+        //{
+        //    string b = "any open";
+        //    if (bank != null) b = "'" + bank + "'";
 
-            G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + G.PrettifyTimeseriesHash(variable, true, false) + "' could not be found in " + b + " databank");
+        //    G.Writeln2("*** ERROR: " + G.GetFreqString() + " timeseries '" + G.PrettifyTimeseriesHash(variable, true, false) + "' could not be found in " + b + " databank");
 
-            bool changeFreq = false;
+        //    bool changeFreq = false;
 
-            foreach (EFreq freq in Enum.GetValues(typeof(EFreq)))
-            {
-                List<string> found = new List<string>();
-                foreach (Databank db in Program.databanks.storage)
-                {
-                    Series ts = db.GetVariable(freq, variable);
-                    if (ts != null)
-                    {
-                        found.Add("'" + db.name + "'");
-                        if (freq != Program.options.freq) changeFreq = true;  //mention that freq change could be used
-                    }
-                }
-                if (found.Count > 0)
-                {
-                    G.Writeln("       --> Note: " + G.GetFreqString(freq) + " timeseries '" + variable + "' exists in: " + G.GetListWithCommas(found), Color.Red);
-                }
-            }
+        //    foreach (EFreq freq in Enum.GetValues(typeof(EFreq)))
+        //    {
+        //        List<string> found = new List<string>();
+        //        foreach (Databank db in Program.databanks.storage)
+        //        {
+        //            Series ts = db.GetIVariable(variable);
+        //            if (ts != null)
+        //            {
+        //                found.Add("'" + db.name + "'");
+        //                if (freq != Program.options.freq) changeFreq = true;  //mention that freq change could be used
+        //            }
+        //        }
+        //        if (found.Count > 0)
+        //        {
+        //            G.Writeln("       --> Note: " + G.GetFreqString(freq) + " timeseries '" + variable + "' exists in: " + G.GetListWithCommas(found), Color.Red);
+        //        }
+        //    }
 
-            if (changeFreq)
-            {
-                G.Writeln("       --> Note: You may change frequency by means of OPTION freq = ... ;", Color.Red);
-            }
+        //    if (changeFreq)
+        //    {
+        //        G.Writeln("       --> Note: You may change frequency by means of OPTION freq = ... ;", Color.Red);
+        //    }
 
-            //Program.databanks.storage
+        //    //Program.databanks.storage
 
-        }
+        //}
 
         ////See also O.GetTimeSeries()
         //public static Series GetTimeSeriesFromString(string s, O.ECreatePossibilities isLhsSoCanAutoCreate)
@@ -8302,97 +8302,97 @@ namespace Gekko
             }
         }
 
-        private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
-        {
-            GAMSVariable n = db.GetVariable(gvar);
+        //private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
+        //{
+        //    GAMSVariable n = db.GetVariable(gvar);
 
-            int[] dims = new int[n.Domains.Count];
+        //    int[] dims = new int[n.Domains.Count];
 
-            //N has --> a=86, t=116, s=4, scns=5.
+        //    //N has --> a=86, t=116, s=4, scns=5.
 
-            int timeIndex = -12345;
-            int scnsIndex = -12345;
-            for (int i = 0; i < n.Domains.Count; i++)
-            {
-                GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
-                dims[i] = gs.NumberRecords;
-                if (gs.Name == "t")
-                {
-                    timeIndex = i;
-                }
-                else if (gs.Name == "scns")
-                {
-                    scnsIndex = i;
-                }
-            }
+        //    int timeIndex = -12345;
+        //    int scnsIndex = -12345;
+        //    for (int i = 0; i < n.Domains.Count; i++)
+        //    {
+        //        GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
+        //        dims[i] = gs.NumberRecords;
+        //        if (gs.Name == "t")
+        //        {
+        //            timeIndex = i;
+        //        }
+        //        else if (gs.Name == "scns")
+        //        {
+        //            scnsIndex = i;
+        //        }
+        //    }
 
-            Series ts2 = null;
-            int counter = 0;
-            string oldHash = "";
+        //    Series ts2 = null;
+        //    int counter = 0;
+        //    string oldHash = "";
 
-            DateTime t0 = DateTime.Now;
+        //    DateTime t0 = DateTime.Now;
 
-            foreach (GAMSVariableRecord record in n)
-            {
-                if (scnsIndex != -12345)
-                {
-                    string scns = record.Keys[scnsIndex];
-                    if (filterScn != null && !G.Equal(scns, filterScn)) continue;
-                }
-                counter++;
+        //    foreach (GAMSVariableRecord record in n)
+        //    {
+        //        if (scnsIndex != -12345)
+        //        {
+        //            string scns = record.Keys[scnsIndex];
+        //            if (filterScn != null && !G.Equal(scns, filterScn)) continue;
+        //        }
+        //        counter++;
 
-                int tt = -12345;
-                string t = null;
-                if (timeIndex != -12345)
-                {
-                    t = record.Keys[timeIndex];
-                    tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
-                }
+        //        int tt = -12345;
+        //        string t = null;
+        //        if (timeIndex != -12345)
+        //        {
+        //            t = record.Keys[timeIndex];
+        //            tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
+        //        }
 
-                double d = record.Level;
+        //        double d = record.Level;
 
-                string hash = null;
-                for (int i = 0; i < record.Keys.Length; i++)
-                {
-                    if (i == timeIndex) continue;
-                    hash += record.Keys[i];
-                    if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
-                }
+        //        string hash = null;
+        //        for (int i = 0; i < record.Keys.Length; i++)
+        //        {
+        //            if (i == timeIndex) continue;
+        //            hash += record.Keys[i];
+        //            if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
+        //        }
 
-                if (hash != oldHash) ts2 = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar + Globals.symbolTurtle + hash);
+        //        if (hash != oldHash) ts2 = (Program.databanks.GetFirst().GetVariable(EFreq.A, gvar + Globals.symbolTurtle + hash);
 
-                if (ts2 == null)
-                {
-                    ts2 = new Series(EFreq.A, gvar + Globals.symbolTurtle + hash);
-                    Program.databanks.GetFirst().AddVariable(ts2);
-                    if (timeIndex == -12345)
-                    {
-                        ts2.type = ESeriesType.Timeless;
-                    }
-                }
+        //        if (ts2 == null)
+        //        {
+        //            ts2 = new Series(EFreq.A, gvar + Globals.symbolTurtle + hash);
+        //            Program.databanks.GetFirst().AddVariable(ts2);
+        //            if (timeIndex == -12345)
+        //            {
+        //                ts2.type = ESeriesType.Timeless;
+        //            }
+        //        }
 
-                if (timeIndex == -12345)
-                {
-                    ts2.SetTimelessData(d);
-                }
-                else
-                {
-                    ts2.SetData(new GekkoTime(EFreq.A, tt, 1), d);
-                }
-                oldHash = hash;
-            }
+        //        if (timeIndex == -12345)
+        //        {
+        //            ts2.SetTimelessData(d);
+        //        }
+        //        else
+        //        {
+        //            ts2.SetData(new GekkoTime(EFreq.A, tt, 1), d);
+        //        }
+        //        oldHash = hash;
+        //    }
 
-            Series ts = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar);
-            if (ts == null)
-            {
-                ts = new Series(EFreq.A, gvar);
-                //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
-                Program.databanks.GetFirst().AddVariable(ts);
-            }
+        //    Series ts = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar);
+        //    if (ts == null)
+        //    {
+        //        ts = new Series(EFreq.A, gvar);
+        //        //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
+        //        Program.databanks.GetFirst().AddVariable(ts);
+        //    }
 
-            double time = (DateTime.Now - t0).TotalMilliseconds;
-            G.Writeln2("TIME: " + time / 1000d);
-        }
+        //    double time = (DateTime.Now - t0).TotalMilliseconds;
+        //    G.Writeln2("TIME: " + time / 1000d);
+        //}
 
         /*
         /// <summary>
@@ -18251,9 +18251,9 @@ namespace Gekko
 
                 foreach (string s in onlyDatabankNotModel)
                 {
-                    if (bank.ContainsVariable(s))
+                    if (bank.ContainsIVariable(s + "!a"))
                     {
-                        bank.RemoveVariable(s);
+                        bank.RemoveIVariable(s);
                     }
                 }
                 G.Writeln2("Removed " + onlyDatabankNotModel.Count + " variable(s) in '" + bank.name + "' databank");
@@ -18927,7 +18927,7 @@ namespace Gekko
                 }
                 varNamePointers[value.bNumber] = value.variable;
                 //TODO: should make a check here that all slots are filled in from b[min] to b[max]
-                Series ts = work.GetVariable(value.variable);  //may be null
+                Series ts = work.GetIVariable(value.variable + "!a") as Series;  //may be null
                 timeSeriesPointers[value.bNumber] = ts;
                 lagPointers[value.bNumber] = value.lag;
                 aNumberPointers[value.bNumber] = value.aNumber;
@@ -19737,10 +19737,10 @@ namespace Gekko
                 if (Program.options.solve_forward_dump)
                 {
                     //G.writeln();
-                    if (Program.databanks.GetFirst().ContainsVariable(ts.name)) Program.databanks.GetFirst().RemoveVariable(ts.name);
-                    if (Program.databanks.GetFirst().ContainsVariable(tsrel.name)) Program.databanks.GetFirst().RemoveVariable(tsrel.name);
-                    Program.databanks.GetFirst().AddVariable(ts);
-                    Program.databanks.GetFirst().AddVariable(tsrel);
+                    if (Program.databanks.GetFirst().ContainsIVariable(ts.name)) Program.databanks.GetFirst().RemoveIVariable(ts.name);
+                    if (Program.databanks.GetFirst().ContainsIVariable(tsrel.name)) Program.databanks.GetFirst().RemoveIVariable(tsrel.name);
+                    Program.databanks.GetFirst().AddIVariable(ts.name, ts);
+                    Program.databanks.GetFirst().AddIVariable(tsrel.name, tsrel);
                 }
 
             }
@@ -19881,10 +19881,10 @@ namespace Gekko
                     if (Program.options.solve_forward_dump)
                     {
                         //G.writeln();
-                        if (Program.databanks.GetFirst().ContainsVariable(ts.name)) Program.databanks.GetFirst().RemoveVariable(ts.name);
-                        if (Program.databanks.GetFirst().ContainsVariable(tsrel.name)) Program.databanks.GetFirst().RemoveVariable(tsrel.name);
-                        Program.databanks.GetFirst().AddVariable(ts);
-                        Program.databanks.GetFirst().AddVariable(tsrel);
+                        if (Program.databanks.GetFirst().ContainsIVariable(ts.name)) Program.databanks.GetFirst().RemoveIVariable(ts.name);
+                        if (Program.databanks.GetFirst().ContainsIVariable(tsrel.name)) Program.databanks.GetFirst().RemoveIVariable(tsrel.name);
+                        Program.databanks.GetFirst().AddIVariable(ts.name, ts);
+                        Program.databanks.GetFirst().AddIVariable(tsrel.name, tsrel);
                     }
                 }
             }
@@ -20150,7 +20150,7 @@ namespace Gekko
                             val = 0d;  //DJZ set to 0 --> will end up in b[]
                             //J-factor or D or Z variable
                             Series tsNew = new Series(Program.options.freq, variable);
-                            work.AddVariable(tsNew);
+                            work.AddIVariable(tsNew.name, tsNew);
                             timeSeriesPointers[i] = tsNew;
                             extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
 
@@ -20312,7 +20312,7 @@ namespace Gekko
                 {
                     //This does not run fast, but is seldom used
                     //is also done for exogenous, maybe more safe only for lagged endo.
-                    Series tsUndoBank = Globals.undoBank.GetVariable(ts.name);
+                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name + "!a") as Series;
                     //overrides the value -- takes it from the undoBank -- if exo there should be no change
                     val = tsUndoBank.GetData(null, t.Add(lagPointers[i]));
                 }
@@ -20400,7 +20400,7 @@ namespace Gekko
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x_beware_do_not_change = null;
-                Series ts = work.GetVariable(var);  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + "!a") as Series;  //Could have an A-array with Series...
                 if (ts == null)
                 {
                     if (IsDjz(var))
@@ -20450,7 +20450,7 @@ namespace Gekko
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
-                Series ts = work.GetVariable(var);  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + "!a") as Series;  //Could have an A-array with Series...
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
@@ -21590,13 +21590,13 @@ namespace Gekko
 
         private static void CreateXxVariableOrIssueError(Databank work, string var)
         {
-            if (!work.ContainsVariable(var))
+            if (!work.ContainsIVariable(var + "!a"))
             {
                 if (var.ToLower().StartsWith("xx", true, null))
                 {
                     //only vars beginning with "xx"
                     Series tsNew = new Series(Program.options.freq, var);
-                    work.AddVariable(tsNew);
+                    work.AddIVariable(tsNew.name, tsNew);
                 }
                 else
                 {
@@ -21611,211 +21611,211 @@ namespace Gekko
 
 
 
-        public static void Upd(O.Upd o)
-        {
-            //We start with expansion of o.data (regarding REP n, REP *)
+        //public static void Upd(O.Upd o)
+        //{
+        //    //We start with expansion of o.data (regarding REP n, REP *)
 
-            ESeriesUpdTypes updType = ESeriesUpdTypes.none;
-            if (G.Equal(o.opt_d, "yes")) updType = ESeriesUpdTypes.d;
-            else if (G.Equal(o.opt_p, "yes")) updType = ESeriesUpdTypes.p;
-            else if (G.Equal(o.opt_m, "yes")) updType = ESeriesUpdTypes.m;
-            else if (G.Equal(o.opt_q, "yes")) updType = ESeriesUpdTypes.q;
-            else if (G.Equal(o.opt_mp, "yes")) updType = ESeriesUpdTypes.mp;
-            else if (G.Equal(o.opt_n, "yes")) updType = ESeriesUpdTypes.n;
+        //    ESeriesUpdTypes updType = ESeriesUpdTypes.none;
+        //    if (G.Equal(o.opt_d, "yes")) updType = ESeriesUpdTypes.d;
+        //    else if (G.Equal(o.opt_p, "yes")) updType = ESeriesUpdTypes.p;
+        //    else if (G.Equal(o.opt_m, "yes")) updType = ESeriesUpdTypes.m;
+        //    else if (G.Equal(o.opt_q, "yes")) updType = ESeriesUpdTypes.q;
+        //    else if (G.Equal(o.opt_mp, "yes")) updType = ESeriesUpdTypes.mp;
+        //    else if (G.Equal(o.opt_n, "yes")) updType = ESeriesUpdTypes.n;
 
-            if (o.op != "=" && updType != ESeriesUpdTypes.none)
-            {
-                G.Writeln2("*** ERROR: You cannot mix <" + updType.ToString() + "> and '" + o.op + "' operator at the same time");
-                throw new GekkoException();
-            }
+        //    if (o.op != "=" && updType != ESeriesUpdTypes.none)
+        //    {
+        //        G.Writeln2("*** ERROR: You cannot mix <" + updType.ToString() + "> and '" + o.op + "' operator at the same time");
+        //        throw new GekkoException();
+        //    }
 
-            bool updTypeDollar = false;
+        //    bool updTypeDollar = false;
 
-            if (G.Equal(o.opt_keep, "p"))
-            {
-                updTypeDollar = true;
-            }
-            else
-            {
-                if (o.opt_keep != null)
-                {
-                    G.Writeln2("*** ERROR: Only <keep=p> is supported at the moment");
-                    throw new GekkoException();
-                }
-            }
+        //    if (G.Equal(o.opt_keep, "p"))
+        //    {
+        //        updTypeDollar = true;
+        //    }
+        //    else
+        //    {
+        //        if (o.opt_keep != null)
+        //        {
+        //            G.Writeln2("*** ERROR: Only <keep=p> is supported at the moment");
+        //            throw new GekkoException();
+        //        }
+        //    }
 
-            if (o.opDollar && updTypeDollar)
-            {
-                G.Writeln2("*** ERROR: You cannot use <keep> and the '$' operator at the same time");
-                throw new GekkoException();
-            }
+        //    if (o.opDollar && updTypeDollar)
+        //    {
+        //        G.Writeln2("*** ERROR: You cannot use <keep> and the '$' operator at the same time");
+        //        throw new GekkoException();
+        //    }
 
-            GekkoTime tStart = o.t1;
-            GekkoTime tEnd = o.t2;
-            int expectedNumberOfObservations = GekkoTime.Observations(tStart, tEnd);
+        //    GekkoTime tStart = o.t1;
+        //    GekkoTime tEnd = o.t2;
+        //    int expectedNumberOfObservations = GekkoTime.Observations(tStart, tEnd);
 
-            List<double> data2 = new List<double>();
-            bool enlarge = false;
-            for (int i = 0; i < o.data.Length; i++)
-            {
-                double data = o.data[i];
-                double rep = o.rep[i];
+        //    List<double> data2 = new List<double>();
+        //    bool enlarge = false;
+        //    for (int i = 0; i < o.data.Length; i++)
+        //    {
+        //        double data = o.data[i];
+        //        double rep = o.rep[i];
 
-                if (rep == 1d)
-                {
-                    data2.Add(data);
-                }
-                else if (rep == -12345d)
-                {
-                    if (i != o.data.Length - 1)
-                    {
-                        G.Writeln2("*** ERROR: You can only use 'REP *' on the last UPD item");
-                        throw new GekkoException();
-                    }
-                    data2.Add(data);
-                    enlarge = true;
-                }
-                else
-                {
-                    int repI = (int)rep;
+        //        if (rep == 1d)
+        //        {
+        //            data2.Add(data);
+        //        }
+        //        else if (rep == -12345d)
+        //        {
+        //            if (i != o.data.Length - 1)
+        //            {
+        //                G.Writeln2("*** ERROR: You can only use 'REP *' on the last UPD item");
+        //                throw new GekkoException();
+        //            }
+        //            data2.Add(data);
+        //            enlarge = true;
+        //        }
+        //        else
+        //        {
+        //            int repI = (int)rep;
 
-                    if (repI != rep)
-                    {
-                        G.Writeln2("*** ERROR: UPD: REP " + rep + " is not an integer value");
-                        throw new GekkoException();
-                    }
+        //            if (repI != rep)
+        //            {
+        //                G.Writeln2("*** ERROR: UPD: REP " + rep + " is not an integer value");
+        //                throw new GekkoException();
+        //            }
 
-                    if (repI < 1)
-                    {
-                        G.Writeln2("*** ERROR: UPD: REP " + repI + " should not be zero or negative");
-                        throw new GekkoException();
-                    }
-                    else if (repI > 10000)
-                    {
-                        G.Writeln2("*** ERROR: UPD: REP " + repI + " seems too large... (> 10.000)");
-                        throw new GekkoException();
-                    }
-                    //Now we know that repI is 1, 2, 3, ... up to a resonable number
-                    for (int j = 0; j < repI; j++)
-                    {
-                        data2.Add(data);
-                    }
-                }
-            }
-            o.data = data2.ToArray();
-            if (enlarge) o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
+        //            if (repI < 1)
+        //            {
+        //                G.Writeln2("*** ERROR: UPD: REP " + repI + " should not be zero or negative");
+        //                throw new GekkoException();
+        //            }
+        //            else if (repI > 10000)
+        //            {
+        //                G.Writeln2("*** ERROR: UPD: REP " + repI + " seems too large... (> 10.000)");
+        //                throw new GekkoException();
+        //            }
+        //            //Now we know that repI is 1, 2, 3, ... up to a resonable number
+        //            for (int j = 0; j < repI; j++)
+        //            {
+        //                data2.Add(data);
+        //            }
+        //        }
+        //    }
+        //    o.data = data2.ToArray();
+        //    if (enlarge) o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
 
-            //ErrorIfDatabanksSwapped();
-            Databank first = Program.databanks.GetFirst();
+        //    //ErrorIfDatabanksSwapped();
+        //    Databank first = Program.databanks.GetFirst();
 
-            string op = o.op;
+        //    string op = o.op;
 
-            foreach(string name in o.listItems)
-            {
-                string var = name;
-                Series ts = GetTimeSeriesFromString(var, O.ECreatePossibilities.Can);
-                if (ts == null)
-                {
-                    if (op != "=")
-                    {
-                        IssueCreateWarning(var);
-                        continue;
-                    }
-                    else
-                    {
-                        if (var.ToLower().StartsWith("xx", true, null))
-                        {
-                            //only vars beginning with "xx", and only "="-operator
-                            //G.Writeln("+++ NOTE: upd: variable " + var + " not found in databank -- is created");
-                            ts = new Series(Program.options.freq, var);
-                            first.AddVariable(ts);
-                        }
-                        else
-                        {
-                            IssueCreateWarning(var);
-                            continue;
-                        }
-                    }
-                }
+        //    foreach(string name in o.listItems)
+        //    {
+        //        string var = name;
+        //        Series ts = GetTimeSeriesFromString(var, O.ECreatePossibilities.Can);
+        //        if (ts == null)
+        //        {
+        //            if (op != "=")
+        //            {
+        //                IssueCreateWarning(var);
+        //                continue;
+        //            }
+        //            else
+        //            {
+        //                if (var.ToLower().StartsWith("xx", true, null))
+        //                {
+        //                    //only vars beginning with "xx", and only "="-operator
+        //                    //G.Writeln("+++ NOTE: upd: variable " + var + " not found in databank -- is created");
+        //                    ts = new Series(Program.options.freq, var);
+        //                    first.AddVariable(ts);
+        //                }
+        //                else
+        //                {
+        //                    IssueCreateWarning(var);
+        //                    continue;
+        //                }
+        //            }
+        //        }
 
-                bool endo = false;
-                if (Program.model != null && Program.model.m2.endogenous != null)
-                {
-                    endo = Program.model.m2.endogenous.ContainsKey(ts.name);
-                    if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
-                }
+        //        bool endo = false;
+        //        if (Program.model != null && Program.model.m2.endogenous != null)
+        //        {
+        //            endo = Program.model.m2.endogenous.ContainsKey(ts.name);
+        //            if (endo) G.Writeln("+++ NOTE: You are updating a left-hand side variable (" + ts.name + ")");
+        //        }
 
-                //Series ts = work.GetVariable(var2);
-                Series tsOld = null;
-                if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
-                {
-                    tsOld = ts.DeepClone(null) as Series;  //make a copy for use in # or $ or <mp> operator
-                }
+        //        //Series ts = work.GetVariable(var2);
+        //        Series tsOld = null;
+        //        if (op == "#" || updTypeDollar || o.opDollar || updType == ESeriesUpdTypes.mp)
+        //        {
+        //            tsOld = ts.DeepClone(null) as Series;  //make a copy for use in # or $ or <mp> operator
+        //        }
 
-                if (o.data.Length > expectedNumberOfObservations)
-                {
-                    //TODO: truncate it
-                    G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
-                    throw new GekkoException();
-                }
+        //        if (o.data.Length > expectedNumberOfObservations)
+        //        {
+        //            //TODO: truncate it
+        //            G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+        //            throw new GekkoException();
+        //        }
 
-                if (o.data.Length < expectedNumberOfObservations)
-                {
-                    if (o.data.Length == 1)
-                    {
-                        //enlarge
-                        o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
-                        throw new GekkoException();
-                    }
-                }
+        //        if (o.data.Length < expectedNumberOfObservations)
+        //        {
+        //            if (o.data.Length == 1)
+        //            {
+        //                //enlarge
+        //                o.data = UpdEnlargeDataArray(expectedNumberOfObservations, o.data);
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: UPD " + ts.name + ": There were " + o.data.Length + " numbers given for the period " + tStart + " to " + tEnd + " (= " + expectedNumberOfObservations + " periods)");
+        //                throw new GekkoException();
+        //            }
+        //        }
 
-                GekkoTime tStartM1 = tStart.Add(-1);
-                if (op == "%" || op == "^" || op == "#" || updType == ESeriesUpdTypes.p || updType == ESeriesUpdTypes.d || updType == ESeriesUpdTypes.mp)
-                {
-                    double dataLag = ts.GetData(null, tStartM1);
-                    if (double.IsNaN(dataLag)) G.Writeln("+++ NOTE: variable '" + ts.name + "' is missing in period " + (tStartM1) + ", so the result will be missing values");
-                }
+        //        GekkoTime tStartM1 = tStart.Add(-1);
+        //        if (op == "%" || op == "^" || op == "#" || updType == ESeriesUpdTypes.p || updType == ESeriesUpdTypes.d || updType == ESeriesUpdTypes.mp)
+        //        {
+        //            double dataLag = ts.GetData(null, tStartM1);
+        //            if (double.IsNaN(dataLag)) G.Writeln("+++ NOTE: variable '" + ts.name + "' is missing in period " + (tStartM1) + ", so the result will be missing values");
+        //        }
 
-                int counter = 0;
-                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                {
-                    UpdHelper(ts, op, t, o.data[counter], tsOld, updType);
-                    counter++;  //IMPORTANT!
-                }
+        //        int counter = 0;
+        //        foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+        //        {
+        //            UpdHelper(ts, op, t, o.data[counter], tsOld, updType);
+        //            counter++;  //IMPORTANT!
+        //        }
 
-                if (o.opDollar || updTypeDollar)
-                {
-                    GekkoTime last = ts.GetPeriodLast();
-                    GekkoTime tEndP1 = tEnd.Add(1);
-                    foreach (GekkoTime t in new GekkoTimeIterator(tEndP1, last))
-                    {
-                        GekkoTime tM1 = t.Add(-1);
-                        double old = tsOld.GetData(null, t);
-                        double oldLag = tsOld.GetData(null, tM1);
-                        double newLag = ts.GetData(null, tM1);
-                        double v = old / oldLag;
-                        if (old == 0d && oldLag == 0d)
-                        {
-                            v = 0d;  //same in PCIM
-                        }
-                        ts.SetData(t, newLag * v);
-                    }
-                }
-                ts.Stamp();
+        //        if (o.opDollar || updTypeDollar)
+        //        {
+        //            GekkoTime last = ts.GetPeriodLast();
+        //            GekkoTime tEndP1 = tEnd.Add(1);
+        //            foreach (GekkoTime t in new GekkoTimeIterator(tEndP1, last))
+        //            {
+        //                GekkoTime tM1 = t.Add(-1);
+        //                double old = tsOld.GetData(null, t);
+        //                double oldLag = tsOld.GetData(null, tM1);
+        //                double newLag = ts.GetData(null, tM1);
+        //                double v = old / oldLag;
+        //                if (old == 0d && oldLag == 0d)
+        //                {
+        //                    v = 0d;  //same in PCIM
+        //                }
+        //                ts.SetData(t, newLag * v);
+        //            }
+        //        }
+        //        ts.Stamp();
 
-                if (o.meta != null)
-                {
-                    //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
-                    string s = O.ShowDatesAsString(tStart, tEnd);
-                    ts.meta.source = s + o.meta;                    
-                    ts.SetDirty(true);
-                }
-            }
-        }
+        //        if (o.meta != null)
+        //        {
+        //            //For instance, "UPD <p> y = 5, 4, 5;" --> meta = "UPD <p> y = 5, 4, 5"
+        //            string s = O.ShowDatesAsString(tStart, tEnd);
+        //            ts.meta.source = s + o.meta;                    
+        //            ts.SetDirty(true);
+        //        }
+        //    }
+        //}
 
         private static double[] UpdEnlargeDataArray(int expectedNumberOfObservations, double[] input)
         {
@@ -22528,7 +22528,7 @@ namespace Gekko
                 bool ok = true;
                 foreach (string s in Program.model.endogenousOriginallyInModel.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsVariable(s))
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
                     {
                         ok = false;
                         break;
@@ -24808,7 +24808,7 @@ namespace Gekko
         public static double Level(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsVariable(s))
+            if (!db.ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24819,13 +24819,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return db.GetVariable(s).GetData(null, t);  //#getvar
+            return (db.GetIVariable(s + "!a") as Series).GetData(null, t);  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulLevel(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24836,7 +24836,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24847,7 +24847,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            return Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t);  //#getvar
+            return (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t);  //#getvar
         }
         public static void RevertSmpl(GekkoSmpl2 smplRemember, GekkoSmpl smpl)
         {
@@ -24862,7 +24862,7 @@ namespace Gekko
         public static double Pch(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsVariable(s))
+            if (!db.ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24873,13 +24873,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetVariable(s).GetData(null, t) / db.GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            return ((db.GetIVariable(s + "!a") as Series).GetData(null, t) / (db.GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulPch(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24890,7 +24890,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -24901,8 +24901,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double pch_base = (Program.databanks.GetRef().GetVariable(s).GetData(null, t) / Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
-            double pch_work = (Program.databanks.GetFirst().GetVariable(s).GetData(null, t) / Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_base = ((Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t) / (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_work = ((Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) / (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
             return pch_work - pch_base;
         }
 
@@ -25156,7 +25156,7 @@ namespace Gekko
         public static double Dif(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsVariable(s))
+            if (!db.ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25167,13 +25167,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return db.GetVariable(s).GetData(null, t) - db.GetVariable(s).GetData(null, t.Add(-1));  //#getvar
+            return (db.GetIVariable(s + "!a") as Series).GetData(null, t) - (db.GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1));  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulDif(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsVariable(s))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25184,7 +25184,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsVariable(s))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25195,8 +25195,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double dif_base = Program.databanks.GetRef().GetVariable(s).GetData(null, t) - Program.databanks.GetRef().GetVariable(s).GetData(null, t.Add(-1)); //#getvar
-            double dif_work = Program.databanks.GetFirst().GetVariable(s).GetData(null, t) - Program.databanks.GetFirst().GetVariable(s).GetData(null, t.Add(-1)); //#getvar
+            double dif_base = (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)); //#getvar
+            double dif_work = (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)); //#getvar
             return dif_work - dif_base;
         }
 
@@ -29855,7 +29855,7 @@ namespace Gekko
         public static void CreateLeftSideVariableIfNeeded(List<Dictionary<string, string>> precedentsWithLagIndicator, string variable)
         {
             //variable = SubstituteAssignVars(variable);
-            if (Program.databanks.GetFirst().GetVariable(variable) == null)
+            if (Program.databanks.GetFirst().GetIVariable(variable) == null)
             {
                 if (!variable.ToLower().StartsWith("xx"))
                 {
@@ -29863,7 +29863,7 @@ namespace Gekko
                 }
                 G.Writeln("+++ NOTE: Variable " + variable + " not found in databank -- is created");
                 Series tempTs = new Series(Program.options.freq, variable);
-                Program.databanks.GetFirst().AddVariable(tempTs);
+                Program.databanks.GetFirst().AddIVariable(tempTs.name, tempTs);
 
                 for (int i = 0; i < precedentsWithLagIndicator.Count; i++)
                 {
@@ -30004,7 +30004,7 @@ namespace Gekko
                     {
                         bool noBank = false;
                         if (Program.databanks.GetDatabank(bank) == null) noBank = true;
-                        if (noBank || Program.databanks.GetDatabank(bank).GetVariable(variableName) == null)
+                        if (noBank || Program.databanks.GetDatabank(bank).GetIVariable(variableName) == null)
                         {
                             if (!problem.ContainsKey(varWithBaseBankIndicator))
                             {
@@ -36128,7 +36128,7 @@ namespace Gekko
             foreach (string s in Program.model.varsAType.Keys)
             {
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetFirst().ContainsVariable(s))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
                 {
                 }
                 else
@@ -36148,7 +36148,7 @@ namespace Gekko
 
             foreach (string s in varlist.Keys)
             {
-                if (Program.databanks.GetFirst().ContainsVariable(s))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
                 {
                 }
                 else
@@ -36313,7 +36313,7 @@ namespace Gekko
             {
                 foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
                 {
-                    double value = work.GetVariable(s).GetData(null, t);
+                    double value = (work.GetIVariable(s + "!a") as Series).GetData(null, t);
                     if (G.isNumericalError(value))
                     {
                         varsWithMissingValues.Add(s);
@@ -37304,7 +37304,7 @@ namespace Gekko
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            Series tsls = Program.databanks.GetFirst().GetVariable(lhs);  //#getvar
+            Series tsls = Program.databanks.GetFirst().GetIVariable(lhs + "!a") as Series;  //#getvar
 
             if (tsls == null)
             {
@@ -37340,7 +37340,7 @@ namespace Gekko
                     var2 = variable;
                 }
                 G.Write(var2 + G.Blanks(14 - var2.Length));
-                Series ts = Program.databanks.GetFirst().GetVariable(variable);
+                Series ts = Program.databanks.GetFirst().GetIVariable(variable + "!a") as Series;
 
                 if (variable == null)
                 {
@@ -37362,74 +37362,74 @@ namespace Gekko
         }
 
         //obsolete???
-        private static void UpdPrt(List<string> al, List<string> alType)
-        {
-            //         0        1        2      3
-            //      updprt <operator> <var1> <var2>
-            Databank work = Program.databanks.GetFirst();
-            Databank base2 = Program.databanks.GetRef();
-            string op = (string)al[1];
+        //private static void UpdPrt(List<string> al, List<string> alType)
+        //{
+        //    //         0        1        2      3
+        //    //      updprt <operator> <var1> <var2>
+        //    Databank work = Program.databanks.GetFirst();
+        //    Databank base2 = Program.databanks.GetRef();
+        //    string op = (string)al[1];
 
-            GekkoTime tStart = Globals.globalPeriodStart;
-            GekkoTime tEnd = Globals.globalPeriodEnd;
+        //    GekkoTime tStart = Globals.globalPeriodStart;
+        //    GekkoTime tEnd = Globals.globalPeriodEnd;
 
-            string extra = "¤ ";
-            extra = "";
+        //    string extra = "¤ ";
+        //    extra = "";
 
-            for (int j = 2; j < al.Count; j++)
-            {
-                string var = (String)al[j];
+        //    for (int j = 2; j < al.Count; j++)
+        //    {
+        //        string var = (String)al[j];
 
-                if (work.ContainsVariable(var))  //use tryGet for speedup
-                {
-                    G.Writeln();
-                    Series ts = work.GetVariable(var); //#getvar
+        //        if (work.ContainsIVariable(var + "!a"))  //use tryGet for speedup
+        //        {
+        //            G.Writeln();
+        //            Series ts = work.GetIVariable(var + "!a") as Series; //#getvar
 
-                    G.Write(extra + "upd " + var + " " + tStart.super + " " + tEnd.super + " " + op + " ");
-                    int counter = 0;
+        //            G.Write(extra + "upd " + var + " " + tStart.super + " " + tEnd.super + " " + op + " ");
+        //            int counter = 0;
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                    {
-                        if (counter % 5 == 0)
-                        {
-                            G.Writeln();
-                            G.Write(extra);
-                        }
-                        double data = double.NaN;
-                        if (op == "=")
-                        {
-                            data = ts.GetData(null, t);
-                        }
-                        else if (op == "+")
-                        {
-                            if (base2.ContainsVariable(var))
-                            {
-                                Series tsgrund = base2.GetVariable(var); //#getvar
-                                data = ts.GetData(null, t) - tsgrund.GetData(null, t);
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in base bank");
-                            }
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: updprt: operator not supported");
-                            return;
-                        }
-                        string s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
-                        if (data >= 0) G.Write(" ");
-                        G.Write(" " + s);
-                        counter++;
-                    }
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in work bank");
-                }
-            }
-            G.Writeln();
-        }
+        //            foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+        //            {
+        //                if (counter % 5 == 0)
+        //                {
+        //                    G.Writeln();
+        //                    G.Write(extra);
+        //                }
+        //                double data = double.NaN;
+        //                if (op == "=")
+        //                {
+        //                    data = ts.GetData(null, t);
+        //                }
+        //                else if (op == "+")
+        //                {
+        //                    if (base2.ContainsIVariable(var + "!a"))
+        //                    {
+        //                        Series tsgrund = base2.GetIVariable(var + "!a") as Series; //#getvar
+        //                        data = ts.GetData(null, t) - tsgrund.GetData(null, t);
+        //                    }
+        //                    else
+        //                    {
+        //                        G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in base bank");
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    G.Writeln2("*** ERROR: updprt: operator not supported");
+        //                    return;
+        //                }
+        //                string s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
+        //                if (data >= 0) G.Write(" ");
+        //                G.Write(" " + s);
+        //                counter++;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            G.Writeln2("*** ERROR: updprt: variable '" + var + "' does not exist in work bank");
+        //        }
+        //    }
+        //    G.Writeln();
+        //}
 
         public static string AddFreqAtEndOfVariableName(string var)  //used most of the time, uses global freq
         {

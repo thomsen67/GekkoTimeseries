@@ -101,56 +101,56 @@ namespace Gekko
             this.isDirty = true;
         }
 
-        public bool ContainsVariable(string variable) {
-            return ContainsVariable(true, variable);
-        }
-        public bool ContainsVariable(bool freqAddToName, string variable)
-        {
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            return this.storage.ContainsKey(variable);
-        }
+        //public bool ContainsVariable(string variable) {
+        //    return ContainsVariable(true, variable);
+        //}
+        //public bool ContainsVariable(bool freqAddToName, string variable)
+        //{
+        //    if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+        //    return this.storage.ContainsKey(variable);
+        //}
 
-        public void RemoveVariable(string variable)
-        {
-            RemoveVariable(true, variable);
-        }
+        //public void RemoveVariable(string variable)
+        //{
+        //    RemoveVariable(true, variable);
+        //}
 
-        public void RemoveVariable(EFreq eFreq, string variable)
-        {
-            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);
-            if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
-            {
-                this.storage.Remove(variable);
-            }
-            this.isDirty = true;
-            return;
-        }
+        //public void RemoveVariable(EFreq eFreq, string variable)
+        //{
+        //    if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+        //    variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);
+        //    if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
+        //    {
+        //        this.storage.Remove(variable);
+        //    }
+        //    this.isDirty = true;
+        //    return;
+        //}
 
-        public void RemoveVariable(bool freqAddToName, string variable)
-        {
-            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
-            {
-                this.storage.Remove(variable);
-            }
-            this.isDirty = true;
-            return;
-        }
+        //public void RemoveVariable(bool freqAddToName, string variable)
+        //{
+        //    if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+        //    if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+        //    if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
+        //    {
+        //        this.storage.Remove(variable);
+        //    }
+        //    this.isDirty = true;
+        //    return;
+        //}
 
         //Generic method, not for outside use!
-        private void RemoveVariable(bool freqAddToName, string freq, string variable)
-        {
-            if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
-            if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
-            {
-                this.storage.Remove(variable);
-            }
-            this.isDirty = true;
-            return;
-        }
+        //private void RemoveVariable(bool freqAddToName, string freq, string variable)
+        //{
+        //    if (!this.editable) Program.ProtectError("You cannot remove a timeseries in a non-editable databank, see OPEN<edit> or UNLOCK");
+        //    if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable, freq);
+        //    if (ContainsVariable(false, variable))  //do not add freq at the end (has just been added)
+        //    {
+        //        this.storage.Remove(variable);
+        //    }
+        //    this.isDirty = true;
+        //    return;
+        //}
 
         public void Trim()
         {
@@ -235,8 +235,7 @@ namespace Gekko
                 ts.SetDirty(true);
             }
             this.storage.Add(name, x);
-        }
-        
+        }        
 
         public void RemoveIVariable(string name)
         {
@@ -260,63 +259,63 @@ namespace Gekko
         //OLD OLD OLD
         //OLD OLD OLD
 
-        public void AddVariable(Series ts)
-        {
-            G.Writeln2("*** ERROR: #743297326");
-            throw new GekkoException();
-            AddVariable(true, ts, true);
-        }
+        //public void AddVariable(Series ts)
+        //{
+        //    G.Writeln2("*** ERROR: #743297326");
+        //    throw new GekkoException();
+        //    AddVariable(true, ts, true);
+        //}
 
-        public void AddVariable(Series ts, bool variableNameCheck)
-        {
-            G.Writeln2("*** ERROR: #743297325");
-            throw new GekkoException();
-            AddVariable(true, ts, variableNameCheck);
-        }
+        //public void AddVariable(Series ts, bool variableNameCheck)
+        //{
+        //    G.Writeln2("*** ERROR: #743297325");
+        //    throw new GekkoException();
+        //    AddVariable(true, ts, variableNameCheck);
+        //}
 
         //generic method, not for outside use
-        private void AddVariable(bool freqAddToName, Series ts, bool variableNameCheck)
-        {
-            G.Writeln2("*** ERROR: #743297324");
-            throw new GekkoException();
-            if (!this.editable) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
-            string variable = ts.name;
-            if (variableNameCheck && !G.IsSimpleToken(variable, true))  //also checks for null and "" and '¤'
-            {
-                G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
-                throw new GekkoException();
-            }
-            //if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
-            //else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
-            this.storage.Add(variable, ts);
-            ts.meta.parentDatabank = this;
-            this.isDirty = true;
-        }
+        //private void AddVariable(bool freqAddToName, Series ts, bool variableNameCheck)
+        //{
+        //    G.Writeln2("*** ERROR: #743297324");
+        //    throw new GekkoException();
+        //    if (!this.editable) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
+        //    string variable = ts.name;
+        //    if (variableNameCheck && !G.IsSimpleToken(variable, true))  //also checks for null and "" and '¤'
+        //    {
+        //        G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
+        //        throw new GekkoException();
+        //    }
+        //    //if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable); 
+        //    //else variable = Program.AddFreqAtEndOfVariableName(variable, G.GetFreq(ts.freq));                
+        //    this.storage.Add(variable, ts);
+        //    ts.meta.parentDatabank = this;
+        //    this.isDirty = true;
+        //}
 
-        public Series GetVariable(string variable)
-        {
-            G.Writeln2("*** ERROR: #743297321");
-            throw new GekkoException();
-            return GetVariable(true, variable);
-        }
+        //public Series GetVariable(string variable)
+        //{
+        //    G.Writeln2("*** ERROR: #743297321");
+        //    throw new GekkoException();
+        //    return GetVariable(true, variable);
+        //}
 
-        public Series GetVariable(bool freqAddToName, string variable)
-        {
-            G.Writeln2("*** ERROR: #743297322");
-            throw new GekkoException();
-            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
-            IVariable x = GetIVariable(variable);
-            return (Series)x;            
-        }
+        //public Series GetVariable(bool freqAddToName, string variable)
+        //{
+        //    G.Writeln2("*** ERROR: #743297322");
+        //    throw new GekkoException();
+        //    if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+        //    IVariable x = GetIVariable(variable);
+        //    return (Series)x;            
+        //}
 
-        public Series GetVariable(EFreq eFreq, string variable)
-        {
-            G.Writeln2("*** ERROR: #743297323");
-            throw new GekkoException();
-            if (eFreq != EFreq.A) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
-            IVariable x = GetIVariable(variable);
-            return (Series)x;
-        }      
+        //public Series GetVariable(EFreq eFreq, string variable)
+        //{
+        //    G.Writeln2("*** ERROR: #743297323");
+        //    throw new GekkoException();
+        //    if (eFreq != EFreq.A) variable = Program.AddFreqAtEndOfVariableName(variable, eFreq);  //we do this IF here because it is speed critical code. Else a new string object will be created.
+        //    IVariable x = GetIVariable(variable);
+        //    return (Series)x;
+        //}      
         
         public EBankType BankType()
         {
