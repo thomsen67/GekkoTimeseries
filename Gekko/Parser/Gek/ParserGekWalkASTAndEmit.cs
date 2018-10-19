@@ -3853,7 +3853,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK")
+                                if (child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" ||  child.Text == "ASTSEQITEMMINUS")
                                 {
                                     name = child.Code.ToString();
                                 }
@@ -3861,13 +3861,13 @@ namespace Gekko.Parser.Gek
                                 {                                    
                                     if (child.AlternativeCode == null)
                                     {
-                                        G.Writeln2("*** ERROR: String used where name is expected. Use {...} to turn a string into a name.");
+                                        G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }
                                     name = child.AlternativeCode.ToString();
                                     if (name == null || name == "")
                                     {
-                                        G.Writeln2("*** ERROR: String used where name is expected. Use {...} to turn a string into a name.");
+                                        G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
                                     }                                    
                                 }
@@ -4377,6 +4377,11 @@ namespace Gekko.Parser.Gek
                     case "ASTNEGATE":
                         {
                             node.Code.A("O.Negate(smpl, " + node.GetChildCode(0) + ")");
+                        }
+                        break;
+                    case "ASTSEQITEMMINUS":
+                        {                            
+                            node.Code.A("(").A("(new ScalarString(`-`)).Add(smpl, " + node[0].Code.ToString() + ")").A(")");
                         }
                         break;
                     case "ASTOPEN":
@@ -5210,7 +5215,12 @@ namespace Gekko.Parser.Gek
                     case "ASTSHEETIMPORT":
                         {
                             node.Code.A("O.SheetImport o" + Num(node) + " = new O.SheetImport();" + G.NL);
-                            GetCodeFromAllChildren(node);                            
+                            node.Code.A(node.GetChildCode(0).ToString());
+                            node.Code.A(node.GetChildCode(1).ToString());
+                            node.Code.A(node.GetChildCode(2).ToString());
+                            node.Code.A(node.GetChildCode(3).ToString());
+                            node.Code.A(node.GetChildCode(4).ToString());
+                            node.Code.A("o" + Num(node) + ".names = " + node[5].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

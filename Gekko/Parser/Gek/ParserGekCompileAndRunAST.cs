@@ -145,8 +145,8 @@ namespace Gekko.Parser.Gek
 
             if (cr.Errors.HasErrors)
             {
-                HandleCompileErrors(p, cr);
-            }
+                HandleCompileErrors(p, cr);                
+        }
             return cr;
         }
 

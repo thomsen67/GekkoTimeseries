@@ -600,34 +600,46 @@ namespace Gekko
             tsq1.meta.parentDatabank.AddVariable(tsq2);
         }
 
-        public static GekkoTuple.Tuple2 laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
+        public static IVariable laspchain(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
         {
-            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
-            return tuple;
+            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            return result;
         }
 
-        public static GekkoTuple.Tuple2 laspfixed(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
+        public static IVariable laspchain(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            GekkoTuple.Tuple2 tuple = Program.GenrTuple("laspfixed", plist, xlist, O.ConvertToDate(date), Globals.globalPeriodStart, Globals.globalPeriodEnd);
-            return tuple;
+            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1.ConvertToDate(O.GetDateChoices.Strict), t2.ConvertToDate(O.GetDateChoices.Strict));
+            return result;
+        }
+
+        public static IVariable laspfixed(GekkoSmpl smpl, IVariable plist, IVariable xlist, IVariable date)
+        {
+            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            return result;
+        }
+
+        public static IVariable laspfixed(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
+        {
+            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1.ConvertToDate(O.GetDateChoices.Strict), t2.ConvertToDate(O.GetDateChoices.Strict));
+            return result;
         }
 
         public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda)
         {
-            return hpfilter(t, null, null, rightSide, ilambda, Globals.scalarVal0);
+            return hpfilter(t, rightSide, null, null, ilambda, Globals.scalarVal0);
         }
 
-        public static IVariable hpfilter(GekkoSmpl t, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda)
+        public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda)
         {
-            return hpfilter(t, per1, per2, rightSide, ilambda, Globals.scalarVal0);
+            return hpfilter(t, rightSide, per1, per2, ilambda, Globals.scalarVal0);
         }
 
         public static IVariable hpfilter(GekkoSmpl t, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
-            return hpfilter(t, null, null, rightSide, ilambda, ilog);
+            return hpfilter(t, rightSide, null, null, ilambda, ilog);
         }
 
-        public static IVariable hpfilter(GekkoSmpl smpl, IVariable per1, IVariable per2, IVariable rightSide, IVariable ilambda, IVariable ilog)
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda, IVariable ilog)
         {
             GekkoTime tStart = GekkoTime.tNull;
             GekkoTime tEnd = GekkoTime.tNull;
@@ -741,29 +753,37 @@ namespace Gekko
             int offset = 0;
             int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);
 
-            List<Series> tss = new List<Series>();
-            for (int j = offset; j < vars.Length; j++)
+            List<IVariable> temp = new List<IVariable>();
+            for (int i = offset; i < vars.Length; i++)
             {
-                if (vars[j].Type() == EVariableType.List)
-                {
-                    foreach (IVariable iv in ((List)vars[j]).list)
-                    {
-                        string s = O.ConvertToString(iv);
-                        Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.NoneReturnNull);
-                        tss.Add(tmp);
-                    }
-                }
-                else if (vars[j].Type() == EVariableType.Series)
-                {
-                    //LIGHTFIXME
-                    tss.Add((Series)vars[j]);
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: Expected timeseries or list as argument");
-                    throw new GekkoException();
-                }
+                temp.Add(vars[i]);
             }
+
+            List<Series> tss = Program.UnfoldAsSeries(smpl, temp);
+
+            //List<Series> tss = new List<Series>();
+            //for (int j = offset; j < vars.Length; j++)
+            //{
+            //    if (vars[j].Type() == EVariableType.List)
+            //    {
+            //        foreach (IVariable iv in ((List)vars[j]).list)
+            //        {
+            //            string s = O.ConvertToString(iv);
+            //            Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.NoneReturnNull);
+            //            tss.Add(tmp);
+            //        }
+            //    }
+            //    else if (vars[j].Type() == EVariableType.Series)
+            //    {
+            //        //LIGHTFIXME
+            //        tss.Add((Series)vars[j]);
+            //    }
+            //    else
+            //    {
+            //        G.Writeln2("*** ERROR: Expected timeseries or list as argument");
+            //        throw new GekkoException();
+            //    }
+            //}
 
             int n = tss.Count;
             if (n < 1)
@@ -1970,7 +1990,7 @@ namespace Gekko
             return result;            
         }
 
-        public static IVariable d(GekkoSmpl smpl, IVariable x)
+        public static IVariable data(GekkoSmpl smpl, IVariable x)
         {
             string s = O.ConvertToString(x);
             string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);

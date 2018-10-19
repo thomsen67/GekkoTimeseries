@@ -81,6 +81,7 @@ tokens {
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
 	ASTHAT2;
+	ASTSEQITEMMINUS;
 	ASTPRINT;
 	ASTIFSTATEMENTS;
 	ASTELSESTATEMENTS;
@@ -1971,7 +1972,7 @@ leftSideDollarExpression:   listFile
                           | (bankvarnameIndexer -> bankvarnameIndexer) (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*								
 						    ; 						
 
-bankvarnameIndexer:  (bankvarname -> bankvarname)
+bankvarnameIndexer:         (bankvarname -> bankvarname)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $bankvarnameIndexer $lbla))*
 						    ;
 
@@ -2044,7 +2045,11 @@ expressionOrNothing:        expression -> expression
 //accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
 //seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
 
-seqItem:                    listItemWildRange | bankvarnameIndexer;
+seqItem:                      MINUS listItemWildRange -> ^(ASTSEQITEMMINUS listItemWildRange)
+							| listItemWildRange
+							| bankvarnameIndexer	//probably only indexer part of this is used...?					   
+						      ;
+
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
@@ -2272,6 +2277,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | option				 SEMICOLON!
 						  | pause                SEMICOLON!
 						  | pipe				 SEMICOLON!
+						  | sheetImport          SEMICOLON!  //maybe necessary that it is before print
 						  | print                SEMICOLON!
 						  | procedureDef         SEMICOLON!
 						  | r_file               SEMICOLON!
@@ -3026,6 +3032,26 @@ restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, $RESTA
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SHEET<import>
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+                          // This is SHEET<import> or SHEET<2010 2015 import>.
+						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
+						  // We also have a SHEET without import, see the prt rule
+sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^(ASTSHEETIMPORT sheetImportOpt1 ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
+sheetImportOpt1           : ISNOTQUAL
+						  | leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
+						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
+						  ;
+sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)						
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
+						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
+						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
+						  | MATRIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_MATRIX yesNo?)		
+						  | MISSING (EQUAL yesNo)? -> ^(ASTOPT_STRING_MISSING yesNo?)		
+						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SMOOTH

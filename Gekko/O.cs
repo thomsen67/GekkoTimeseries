@@ -2257,10 +2257,10 @@ namespace Gekko
                 if (rhs_list.isFromSeqOfBankvarnames)
                 {
                     //a list def like #m = a, b, c; will be ok,
-                    //but for instance #m = %a, #m, a!q, x[a]; will not be accepted,
-                    //since it is too confusing.
-                    //In such cases, use #m = ('%a', '#m', 'a!q', 'x[a]');
-                    rhs = O.Restrict2(rhs_list, false, false, false, false);  //only pure idents
+                    //and also #m = a, b!q, b:x, y[a, b]
+                    //but for instance #m = %a, #m are not allowed since it is too confusing.
+                    //In such cases, use #m = (..., ...);
+                    rhs = O.Restrict2(rhs_list, true, false, true, true);  //only pure idents
                 }
             }
 
@@ -6365,7 +6365,8 @@ namespace Gekko
             public string fileName = null;
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
+            //public List<string> listItems = null;
+            public List names = null;
             public string opt_sheet = null;
             public string opt_cell = null;
             public string opt_rows = null;
@@ -7254,6 +7255,8 @@ namespace Gekko
                 }
                 if (G.Equal(opt_ref, "yes"))
                 {
+                    G.Writeln2("*** ERROR: OPEN<ref> is not allowed in Gekko 3.0, please use READ<ref> or IMPORT<ref> instead");
+                    throw new GekkoException();
                     hlp.openType = EOpenType.Ref;
                 }
                 if (G.Equal(opt_sec, "yes"))
