@@ -2583,6 +2583,50 @@ namespace Gekko
             return new ScalarString(s);
         }
 
+        public static IVariable vals(GekkoSmpl smpl, IVariable x)
+        {
+            string s = null;
+            if (x.Type() == EVariableType.List)
+            {
+                List m = x as List;
+                List<IVariable> m2 = new List<IVariable>();
+                foreach (IVariable iv in m.list)
+                {
+                    IVariable iv2 = val(smpl, iv);
+                    m2.Add(iv2);
+                }
+                return new List(m2);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
+                throw new GekkoException();
+            }
+            return new ScalarString(s);
+        }
+
+        public static IVariable dates(GekkoSmpl smpl, IVariable x)
+        {
+            string s = null;
+            if (x.Type() == EVariableType.List)
+            {
+                List m = x as List;
+                List<IVariable> m2 = new List<IVariable>();
+                foreach (IVariable iv in m.list)
+                {
+                    IVariable iv2 = date(smpl, iv);
+                    m2.Add(iv2);
+                }
+                return new List(m2);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected a LIST variable as argument");
+                throw new GekkoException();
+            }
+            return new ScalarString(s);
+        }
+
         public static IVariable date(GekkoSmpl smpl, IVariable x)  //'string' not allowed as method name
         {
             GekkoTime d = GekkoTime.tNull;

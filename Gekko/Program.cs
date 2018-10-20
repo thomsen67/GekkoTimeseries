@@ -11240,17 +11240,45 @@ namespace Gekko
                 i++;
                 if (iv.Type() == EVariableType.String)
                 {
+                    //note: see same kind of code just below, //#98073245243875
                     stringCount++;
                     ScalarString ss = iv as ScalarString;
                     keys[i] = ss.string2;
                 }
                 else if (iv.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
                 {
+                    //note: see same kind of code just below, //#98073245243875
                     int ii = O.ConvertToInt(iv, false);
                     if (ii != int.MaxValue)
                     {
                         stringCount++;
                         keys[i] = ii.ToString();
+                    }
+                }
+                else if (iv.Type() == EVariableType.List)
+                {
+                    List iv_list = iv as List;
+                    if (iv_list.Count() == 1)
+                    {
+                        //Singleton list is allowed as a scalar
+                        IVariable singleton = iv_list.list[0];
+                        if (singleton.Type() == EVariableType.String)
+                        {
+                            //note: see same kind of code just above, //#98073245243875
+                            stringCount++;
+                            ScalarString ss = singleton as ScalarString;
+                            keys[i] = ss.string2;
+                        }
+                        else if (singleton.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
+                        {
+                            //note: see same kind of code just above, //#98073245243875
+                            int ii = O.ConvertToInt(singleton, false);
+                            if (ii != int.MaxValue)
+                            {
+                                stringCount++;
+                                keys[i] = ii.ToString();
+                            }
+                        }
                     }
                 }
             }
@@ -17560,16 +17588,28 @@ namespace Gekko
 
                         string lhs = lhsTokensGekko.ToStringTrim();
                         string rhs = rhsTokensGekko.ToStringTrim();
-
-                        if (lhs.Contains("$") || rhs.Contains("$"))
+                                                
+                        if (lhs.Contains("$") || rhs.Contains("$") || lhs.Contains("*"))
                         {
 
                         }
                         else
                         {
-                            sb.Append("PRT " + lhs + ";" + G.NL);
-                            sb.Append("PRT " + rhs + ";" + G.NL);
-                            sb.AppendLine();
+                            int v = 3;
+                            if (v == 1)
+                            {
+                                sb.Append("PRT " + lhs + ";" + G.NL);
+                                sb.Append("PRT " + rhs + ";" + G.NL);
+                                sb.AppendLine();
+                            }
+                            else if (v == 2)
+                            {
+                                sb.Append("PRT<n> " + lhs + " - ( " + rhs + " );" + G.NL);
+                            }
+                            else
+                            {
+                                sb.Append(lhs + " = " + rhs + ";" + G.NL);
+                            }
                         }
 
                         if (true)
@@ -28371,144 +28411,144 @@ namespace Gekko
             }
         }
 
-        public static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<O.LabelHelperIVariable>> labelHelper2)
-        {
-            //string elementLabel = G.ReplaceGlueNew(xelementLabel);
+        //public static void UnfoldLabels(string elementLabel, ref List<string> labels2, List<List<O.LabelHelperIVariable>> labelHelper2)
+        //{
+        //    //string elementLabel = G.ReplaceGlueNew(xelementLabel);
 
-            labels2 = new List<string>();
+        //    labels2 = new List<string>();
 
-            /*
-             * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
-             * Here freelists will be 'm' and 'n'.
-             * If these are a,b and x,y we get labelHelper2 like this:
-             * 
-             * a x a x e
-             * a y a y e
-             * b x b x e
-             * b y b y e
-             * 
-             * labelHelper2 only records inside [] or {} at the top level (not nested)
-             * 
-             * The tokens are like this:                 
-             */
-            //               
-            /*
+        //    /*
+        //     * For instance p x1[#m]+x2[#n]+sum(#k,x[#m,#n,#k]);   
+        //     * Here freelists will be 'm' and 'n'.
+        //     * If these are a,b and x,y we get labelHelper2 like this:
+        //     * 
+        //     * a x a x e
+        //     * a y a y e
+        //     * b x b x e
+        //     * b y b y e
+        //     * 
+        //     * labelHelper2 only records inside [] or {} at the top level (not nested)
+        //     * 
+        //     * The tokens are like this:                 
+        //     */
+        //    //               
+        //    /*
 
-            x1 
-              [
-               #                    
-               m                    
-              ]                    
-            + 
-             x2 
-               [
-               #                    
-               n                    
-               ]                    
-             + 
-             sum 
-               (
-               #                    
-               k                    
-               , 
-               x                    
-                 [
-                 #                    
-                 m                    
-                 , 
-                 #                    
-                 n                    
-                 , 
-                 #                    
-                 k                    
-                 ]                    
-               )                    
-                 EOF
-                 */
+        //    x1 
+        //      [
+        //       #                    
+        //       m                    
+        //      ]                    
+        //    + 
+        //     x2 
+        //       [
+        //       #                    
+        //       n                    
+        //       ]                    
+        //     + 
+        //     sum 
+        //       (
+        //       #                    
+        //       k                    
+        //       , 
+        //       x                    
+        //         [
+        //         #                    
+        //         m                    
+        //         , 
+        //         #                    
+        //         n                    
+        //         , 
+        //         #                    
+        //         k                    
+        //         ]                    
+        //       )                    
+        //         EOF
+        //         */
 
-            //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
-            //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
-            //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
-            //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
+        //    //So we walk the tokens, inserting from labelHelper2. Here, only STRING/DATE/VAL from labelHelper2are accepted, with 
+        //    //one exception: if the token is a #x AND the token is not in freelists, we keep the '#x' and not the string from
+        //    //labelHelper2. For instance: sum(#x, x[#x, #y, %s]). Here %s string is set in (easy). Also, the string in the
+        //    //place of #y is set in, because 'y' is in freelists. Regarding #x, it is kept as it is.
 
-            string[] freelists = new string[0];
-            string rawLabel = elementLabel;
-            string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+        //    string[] freelists = new string[0];
+        //    string rawLabel = elementLabel;
+        //    string[] ss = elementLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (ss.Length > 1)
-            {
-                rawLabel = ss[1];
-                freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
-                for (int i = 0; i < freelists.Length; i++)
-                {
-                    freelists[i] = freelists[i].Trim();  //there may be a blank
-                }
-            }
+        //    if (ss.Length > 1)
+        //    {
+        //        rawLabel = ss[1];
+        //        freelists = ss[0].Split(new string[] { "," }, StringSplitOptions.None);
+        //        for (int i = 0; i < freelists.Length; i++)
+        //        {
+        //            freelists[i] = freelists[i].Trim();  //there may be a blank
+        //        }
+        //    }
 
-            //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
+        //    //after this, free (uncontrolled) lists are in freelists, and rawLabel is the label.
 
-            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
+        //    var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };  //can in principle have such comments                         
 
-            TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
-            TokenList tokens2 = helperParent.subnodes;
+        //    TokenHelper helperParent = StringTokenizer2.GetTokensWithLeftBlanksRecursive(rawLabel, tags1, null, null, null);
+        //    TokenList tokens2 = helperParent.subnodes;
 
-            if (false && Globals.runningOnTTComputer)
-            {
-                TokenHelper.Print(tokens2, 0);
-                //TokenHelper.Print(tokens2.DeepClone(), 0);
-            }
+        //    if (false && Globals.runningOnTTComputer)
+        //    {
+        //        TokenHelper.Print(tokens2, 0);
+        //        //TokenHelper.Print(tokens2.DeepClone(), 0);
+        //    }
 
             
-            foreach (List<O.LabelHelperIVariable> list in labelHelper2)
-            {
-                bool problem = false;
-                string result = null;
-                try
-                {
-                    int counter = -1;
+        //    foreach (List<O.LabelHelperIVariable> list in labelHelper2)
+        //    {
+        //        bool problem = false;
+        //        string result = null;
+        //        try
+        //        {
+        //            int counter = -1;
 
-                    TokenList temp = tokens2.DeepClone(helperParent);
+        //            TokenList temp = tokens2.DeepClone(helperParent);
 
-                    problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
-                    if (!problem) result = temp.ToString();
-                }
-                catch (Exception e)
-                {
-                    problem = true;
-                }
-                if (problem)
-                {
-                    //this way, there is not a complete crash, and the users get something.
-                    //they may complain that the label is non-informative though.
-                    //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
-                    //if (ss.Length > 1) rawLabel = ss[1];
-                    labels2.Add(rawLabel);
-                }
-                else
-                {
-                    labels2.Add(result);
-                }
-                //
-            }
+        //            problem = HandleLabels(temp, 0, list, freelists, ref counter);  //the temp object is changed here, therefore it is cloned before.                            
+        //            if (!problem) result = temp.ToString();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            problem = true;
+        //        }
+        //        if (problem)
+        //        {
+        //            //this way, there is not a complete crash, and the users get something.
+        //            //they may complain that the label is non-informative though.
+        //            //string[] sss = rawLabel.Split(new string[] { Globals.freelists }, StringSplitOptions.RemoveEmptyEntries);
+        //            //if (ss.Length > 1) rawLabel = ss[1];
+        //            labels2.Add(rawLabel);
+        //        }
+        //        else
+        //        {
+        //            labels2.Add(result);
+        //        }
+        //        //
+        //    }
 
-            return;
-        }
+        //    return;
+        //}
 
-        private static void UnfoldLabelsHelper(List<TokenHelper> a, string list0, ref string ss2, ref int i, string freelist, ref bool flag)
-        {
-            if (a[i].s == "{" && a[i + 1].s == "#" && a[i + 3].s == "}" && G.Equal(a[i + 2].s, freelist))
-            {
-                ss2 += list0;  //no leftblanks                                
-                i += 3;
-                flag = true;
-            }
-            else if (a[i].s == "#" && G.Equal(a[i + 1].s, freelist))
-            {
-                ss2 += a[i].leftblanks + list0;
-                i++;
-                flag = true;
-            }
-        }
+        //private static void UnfoldLabelsHelper(List<TokenHelper> a, string list0, ref string ss2, ref int i, string freelist, ref bool flag)
+        //{
+        //    if (a[i].s == "{" && a[i + 1].s == "#" && a[i + 3].s == "}" && G.Equal(a[i + 2].s, freelist))
+        //    {
+        //        ss2 += list0;  //no leftblanks                                
+        //        i += 3;
+        //        flag = true;
+        //    }
+        //    else if (a[i].s == "#" && G.Equal(a[i + 1].s, freelist))
+        //    {
+        //        ss2 += a[i].leftblanks + list0;
+        //        i++;
+        //        flag = true;
+        //    }
+        //}
 
         
         private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)

@@ -441,17 +441,17 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_AddBank(string s1, string s2)
+        public static string Chop_AddBank(string name, string bank)
         {
-            string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (bank == null)
+            string bank0, name0, freq; string[] index;
+            O.Chop(name, out bank0, out name0, out freq, out index);
+            if (bank0 == null)
             {
-                return O.UnChop(s2, name, freq, index);
+                return O.UnChop(bank, name0, freq, index);
             }
             else
             {
-                return s1;
+                return name;
             }
         }
 

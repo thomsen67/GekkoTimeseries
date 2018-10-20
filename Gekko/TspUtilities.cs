@@ -167,9 +167,9 @@ namespace Gekko
                         
                         //data = new double[4000];   //slack, fix
                         varName = (string)al[i];
-                        
+
                         //HMMM, maybe use much simpler way here... (and remove last parameter in method):
-                        ts = Program.FindOrCreateTimeseries(databankName, varName, O.ECreatePossibilities.Can, false, true);                        
+                        ts = O.GetIVariableFromString(G.Chop_AddBank(varName, databankName), O.ECreatePossibilities.Can, true) as Series;
                         allCounter++;
 
                         //try

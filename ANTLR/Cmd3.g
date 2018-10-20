@@ -2321,25 +2321,25 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
-						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
-						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
+						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
 
-						  | assignmentType seriesOpt1? leftSide percentEqual seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
-						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
+						  | assignmentType seriesOpt1? leftSide percentEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
+						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
 
-						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
-						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
+						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
+						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
 
-						  | assignmentType seriesOpt1? leftSide hashEqual seqOfBankvarnamesAtLeast2 -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
-						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
+						  | assignmentType seriesOpt1? leftSide hashEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
+						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
 						  
 						    ;
 
@@ -2380,14 +2380,14 @@ seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 // ACCEPT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-accept:                     ACCEPT acceptType varname expression -> ^({token("ASTACCEPT", ASTACCEPT, $ACCEPT.Line)} acceptType varname expression);
+accept:                     ACCEPT acceptType varname expression -> ^({token("ASTACCEPT", ASTACCEPT, input.LT(1).Line)} acceptType varname expression);
 acceptType:                 VAL | STRING2 | DATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ANALYZE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-analyze:                    ANALYZE analyzeOpt1? expression -> ^({token("ASTANALYZE", ASTANALYZE, $ANALYZE.Line)} analyzeOpt1? expression);
+analyze:                    ANALYZE analyzeOpt1? expression -> ^({token("ASTANALYZE", ASTANALYZE, input.LT(1).Line)} analyzeOpt1? expression);
 analyzeOpt1:                ISNOTQUAL
 						  | leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
 						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
@@ -2399,7 +2399,7 @@ analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 // CLEAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 							
-clear:					    CLEAR clearOpt1? seqOfBankvarnames? -> ^({token("ASTCLEAR", ASTCLEAR, $CLEAR.Line)} ^(ASTPLACEHOLDER clearOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+clear:					    CLEAR clearOpt1? seqOfBankvarnames? -> ^({token("ASTCLEAR", ASTCLEAR, input.LT(1).Line)} ^(ASTPLACEHOLDER clearOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 clearOpt1:				    ISNOTQUAL | leftAngle clearOpt1h* RIGHTANGLE -> ^(ASTOPT1 clearOpt1h*);
 clearOpt1h:				    FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)	
                           | REF (EQUAL yesNo)? -> ^(ASTOPT_STRING_REF yesNo?)
@@ -2409,20 +2409,20 @@ clearOpt1h:				    FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
 // CLONE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-clone:                      CLONE -> ^({token("ASTCLONE", ASTCLONE, $CLONE.Line)});		
+clone:                      CLONE -> ^({token("ASTCLONE", ASTCLONE, input.LT(1).Line)});		
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-cls:					    CLS -> ^({token("ASTCLS", ASTCLS, $CLS.Line)});
+cls:					    CLS -> ^({token("ASTCLS", ASTCLS, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CLOSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 							
-close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLOSE, $CLOSE.Line)} seqOfBankvarnames closeOpt1?)
-						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, $CLOSE.Line)} closeOpt1?)
+close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLOSE, input.LT(1).Line)} seqOfBankvarnames closeOpt1?)
+						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, input.LT(1).Line)} closeOpt1?)
 						    ;
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
@@ -2432,14 +2432,14 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 // COLLAPSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, $COLLAPSE.Line)} seqOfBankvarnames seqOfBankvarnames collapseMethod?);
+collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames collapseMethod?);
 collapseMethod:			    FIRST|LAST|AVG|TOTAL;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // COMPARE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, $COMPARE.Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER fileName?));
+compare:   				    COMPARE compareOpt1? seqOfBankvarnames? (FILE EQUAL fileName)? -> ^({token("ASTCOMPARECOMMAND", ASTCOMPARECOMMAND, input.LT(1).Line)} ^(ASTOPT_ compareOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER fileName?));
 compareOpt1:			    ISNOTQUAL
 						  | leftAngle2          compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 compareOpt1h*)							
 						  | leftAngleNo2 dates? compareOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) compareOpt1h*)
@@ -2456,7 +2456,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, $COPY.Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
+copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
@@ -2474,20 +2474,20 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 // CREATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, $CREATE.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DELETE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-delete:					    DELETE seqOfBankvarnames -> ^({token("ASTDELETE", ASTDELETE, $DELETE.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+delete:					    DELETE seqOfBankvarnames -> ^({token("ASTDELETE", ASTDELETE, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, $DISP.Line)} StringInQuotes)
-						  | DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, $DISP.Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
+disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input.LT(1).Line)} StringInQuotes)
+						  | DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, input.LT(1).Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -2500,7 +2500,7 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // DOC
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-doc:                        DOC seqOfBankvarnames docOpt2 -> ^({token("ASTDOC", ASTDOC, $DOC.Line)} ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTOPT_ docOpt2?));
+doc:                        DOC seqOfBankvarnames docOpt2 -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTOPT_ docOpt2?));
 docOpt2:                    docOpt2h*;
 docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
@@ -2512,7 +2512,7 @@ docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expr
 // DOWNLOAD
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-download:                   DOWNLOAD downloadOpt1? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, $DOWNLOAD.Line)} url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
+download:                   DOWNLOAD downloadOpt1? url fileName (DUMP '=' fileName)* -> ^({token("ASTDOWNLOAD", ASTDOWNLOAD, input.LT(1).Line)} url ^(ASTHANDLEFILENAME fileName) ^(ASTHANDLEFILENAME2 fileName?) downloadOpt1?);
 downloadOpt1:               ISNOTQUAL | leftAngle downloadOpt1h* RIGHTANGLE -> ^(ASTOPT1 downloadOpt1h*);							
 downloadOpt1h:              ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)	
 						    ;
@@ -2523,14 +2523,14 @@ url:                        expression;
 // EDIT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-edit:                       EDIT fileNameStar -> ^({token("ASTEDIT", ASTEDIT, $EDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
+edit:                       EDIT fileNameStar -> ^({token("ASTEDIT", ASTEDIT, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ENDO/EXO
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-endo:                       ENDO eeOpt1? eeHelper -> ^(ASTENDO ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
-exo:                        EXO eeOpt1? eeHelper -> ^(ASTEXO ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
+endo:                       ENDO eeOpt1? eeHelper -> ^({token("ASTENDO", ASTENDO, input.LT(1).Line)} ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
+exo:                        EXO eeOpt1? eeHelper -> ^({token("ASTEXO", ASTEXO, input.LT(1).Line)} ^(ASTPLACEHOLDER eeOpt1?) eeHelper);
 
 eeOpt1:				     ISNOTQUAL
 						 | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTDATES2 dates?);
@@ -2542,14 +2542,14 @@ eeHelper2:             indexerExpression eeOpt1?  -> ^(ASTPLACEHOLDER indexerExp
 // EXIT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-exit:					    EXIT -> ^({token("ASTEXIT", ASTEXIT, $EXIT.Line)});
+exit:					    EXIT -> ^({token("ASTEXIT", ASTEXIT, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FINDMISSINGDATA
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-findmissingdata:			FINDMISSINGDATA findmissingdataOpt1? seqOfBankvarnames? -> ^({token("ASTFINDMISSINGDATA", ASTFINDMISSINGDATA, $FINDMISSINGDATA.Line)} ^(ASTPLACEHOLDER findmissingdataOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+findmissingdata:			FINDMISSINGDATA findmissingdataOpt1? seqOfBankvarnames? -> ^({token("ASTFINDMISSINGDATA", ASTFINDMISSINGDATA, input.LT(1).Line)} ^(ASTPLACEHOLDER findmissingdataOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 findmissingdataOpt1:        ISNOTQUAL | leftAngle2          findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 findmissingdataOpt1h*)							
 						  | leftAngleNo2 dates? findmissingdataOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) findmissingdataOpt1h*)
                             ;
@@ -2559,8 +2559,8 @@ findmissingdataOpt1h:       REPLACE EQUAL expression -> ^(ASTOPT_VAL_REPLACE exp
 // FOR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
-						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^(ASTFOR ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
+						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
 forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
@@ -2572,7 +2572,7 @@ forHelper2:                 type? svarname EQUAL expression TO expression2 (BY e
 // FUNCTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^(ASTFUNCTIONDEF2 type ident functionArg functionStatements);
+functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} type ident functionArg functionStatements);
 functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
@@ -2584,31 +2584,31 @@ objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (express
 // GOTO
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-goto2:                      GOTO ident -> ^({token("ASTGOTO", ASTGOTO, $GOTO.Line)} ident);
+goto2:                      GOTO ident -> ^({token("ASTGOTO", ASTGOTO, input.LT(1).Line)} ident);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // HDG
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, $HDG.Line)} expression);
+hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, input.LT(1).Line)} expression);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, $HELP.Line)} name?);
+help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, $IF.Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?));
+if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INDEX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, $INDEX.Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
+index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, input.LT(1).Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
 indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
 indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
 						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
@@ -2620,25 +2620,25 @@ indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)
 // INI
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-ini:					    INI -> ^({token("ASTINI", ASTINI, $INI.Line)});
+ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INTERPOLATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, $INTERPOLATE.Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
+interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
 interpolateMethod:			REPEAT | PRORATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // LOCAL/GLOBAL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-local:					    LOCAL localOpt1? seqOfBankvarnames? -> ^({token("ASTLOCAL", ASTLOCAL, $LOCAL.Line)} ^(ASTPLACEHOLDER localOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+local:					    LOCAL localOpt1? seqOfBankvarnames? -> ^({token("ASTLOCAL", ASTLOCAL, input.LT(1).Line)} ^(ASTPLACEHOLDER localOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 localOpt1:				    ISNOTQUAL | leftAngle localOpt1h* RIGHTANGLE -> ^(ASTOPT1 localOpt1h*);
 localOpt1h:				    ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						    ;	
 
-global:					    GLOBAL globalOpt1? seqOfBankvarnames? -> ^({token("ASTGLOBAL", ASTGLOBAL, $GLOBAL.Line)} ^(ASTPLACEHOLDER globalOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+global:					    GLOBAL globalOpt1? seqOfBankvarnames? -> ^({token("ASTGLOBAL", ASTGLOBAL, input.LT(1).Line)} ^(ASTPLACEHOLDER globalOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
 globalOpt1:				    ISNOTQUAL | leftAngle globalOpt1h* RIGHTANGLE -> ^(ASTOPT1 globalOpt1h*);
 globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						    ;
@@ -2647,21 +2647,21 @@ globalOpt1h:				ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
 // LOCK, UNLOCK
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-lock_:                      LOCK_ name -> ^({token("ASTLOCK", ASTLOCK, $LOCK_.Line)} name);
-unlock_:                    UNLOCK_ name -> ^({token("ASTUNLOCK", ASTUNLOCK, $UNLOCK_.Line)} name);
+lock_:                      LOCK_ name -> ^({token("ASTLOCK", ASTLOCK, input.LT(1).Line)} name);
+unlock_:                    UNLOCK_ name -> ^({token("ASTUNLOCK", ASTUNLOCK, input.LT(1).Line)} name);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // MEM
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-mem:                        MEM -> ^({token("ASTMEM", ASTMEM, $MEM.Line)});
+mem:                        MEM -> ^({token("ASTMEM", ASTMEM, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // MODE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-mode:                       MODE mode2 -> ^({token("ASTMODE", ASTMODE, $MODE.Line)} mode2)
-                          | MODE question -> ^({token("ASTMODEQUESTION", ASTMODEQUESTION, $MODE.Line)})	
+mode:                       MODE mode2 -> ^({token("ASTMODE", ASTMODE, input.LT(1).Line)} mode2)
+                          | MODE question -> ^({token("ASTMODEQUESTION", ASTMODEQUESTION, input.LT(1).Line)})	
 						    ;	
 mode2:                      MIXED | SIM | DATA;
 
@@ -2669,7 +2669,7 @@ mode2:                      MIXED | SIM | DATA;
 // MODEL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
+model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
 modelOpt1:                  ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
 modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
@@ -2679,8 +2679,8 @@ modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 // OLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-ols:                        OLS olsOpt1? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
-                          | OLS olsOpt1? name? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
+ols:                        OLS olsOpt1? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
+                          | OLS olsOpt1? name? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
 						    ;
 olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
@@ -2692,7 +2692,7 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 // OPEN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, $OPEN.Line)} openOpt1? openHelper+);
+open:                       OPEN openOpt1? openHelper (COMMA2 openHelper)* -> ^({token("ASTOPEN", ASTOPEN, input.LT(1).Line)} openOpt1? openHelper+);
 openHelper:                 seqOfFileNamesStar (AS seqOfBankvarnames)? -> ^(ASTOPENHELPER ^(ASTFILENAME seqOfFileNamesStar) ^(ASTAS seqOfBankvarnames?));
 openOpt1:                   ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
 openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
@@ -2723,19 +2723,19 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 // OPTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, $OPTION.Line)} optionType);
+option:                     OPTION optionType -> ^({token("ASTOPTION", ASTOPTION, input.LT(1).Line)} optionType);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PAUSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-pause:                      PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, $PAUSE.Line)} expression?);
+pause:                      PAUSE expression? -> ^({token("ASTPAUSE", ASTPAUSE, input.LT(1).Line)} expression?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PIPE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-pipe:                       PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, $PIPE.Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
+pipe:                       PIPE pipeOpt1? fileName? ->^({token("ASTPIPE", ASTPIPE, input.LT(1).Line)} pipeOpt1? ^(ASTHANDLEFILENAME fileName?));
 pipeOpt1:                   ISNOTQUAL | leftAngle pipeOpt1h* RIGHTANGLE -> pipeOpt1h*;
 pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | APPEND (EQUAL yesNo)? -> ^(ASTOPT_STRING_APPEND yesNo?)	
@@ -2747,22 +2747,14 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-procedure:					identWithoutCommand expression* -> ^(ASTPROCEDURE identWithoutCommand expression*);  
-functionNaked:              ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTIONNAKED ident expression*);      
+procedure:					identWithoutCommand expression* -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand expression*);  
+functionNaked:              ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident expression*);      
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE DEFINITION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//identWithoutCommand         : Ident -> ^(ASTIDENT Ident);
-//identWithoutCommand         : ident;
-
-//proceduredef              : PROCEDURE identWithoutCommand proceduredefRhsH1 SEMICOLON expressions? END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ^(ASTPROCEDUREDEFTYPE) ^(ASTPROCEDUREDEFNAME identWithoutCommand) proceduredefRhsH1 ^(ASTPROCEDUREDEFCODE expressions?));
-//proceduredefRhsH1         : (proceduredefRhsH2 (COMMA2 proceduredefRhsH2)*)? -> ^(ASTPROCEDUREDEFARGS proceduredefRhsH2*);  //for instance "VAL x, DATE d
-//proceduredefRhsH2         : proceduredefRhsH3 -> ^(ASTPROCEDUREDEFRHSSIMPLE proceduredefRhsH3+);  //for instance "VAL x"						
-//proceduredefRhsH3         : type ident -> ^(ASTPROCEDUREDEFARG type ident);  //for instance "VAL x"
-
-procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, $PROCEDURE.Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
+procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, input.LT(1).Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
 procedureArg:                (procedureArgElement (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
 procedureArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
 procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
@@ -2774,7 +2766,7 @@ procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 //print:					prtHelper expression -> ^(ASTPRINT expression);
-print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^(ASTPRT ^(ASTPRTTYPE prtHelper) ^(ASTPLACEHOLDER prtOpt1?) ^(ASTPLACEHOLDER prtOpt2?) prtElements);
+print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^({token("ASTPRT", ASTPRT, input.LT(1).Line)} ^(ASTPRTTYPE prtHelper) ^(ASTPLACEHOLDER prtOpt1?) ^(ASTPLACEHOLDER prtOpt2?) prtElements);
 prtHelper:				    P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
 prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS prtElement+);
 prtElement:                 expression
@@ -2949,13 +2941,13 @@ v:    					    V ('=' yesNo -> ^(ASTV yesNo) | -> ^(ASTV ASTYES))
 // R_FILE, R_EXPORT, R_RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-r_file:   				    R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, $R_FILE.Line)} ^(ASTPLACEHOLDER fileName?));
+r_file:   				    R_FILE fileName -> ^({token("ASTR_FILE", ASTR_FILE, input.LT(1).Line)} ^(ASTPLACEHOLDER fileName?));
 
-r_export:  				    R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, $R_EXPORT.Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
+r_export:  				    R_EXPORT r_exportOpt1? seqOfBankvarnames -> ^({token("ASTR_EXPORT", ASTR_EXPORT, input.LT(1).Line)}  ^(ASTPLACEHOLDER r_exportOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames));
 r_exportOpt1:			    ISNOTQUAL | leftAngle r_exportOpt1h* RIGHTANGLE -> r_exportOpt1h*;
 r_exportOpt1h:              TARGET EQUAL expression -> ^(ASTOPT_STRING_TARGET expression);
 
-r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, $R_RUN.Line)}  r_runOpt1? );
+r_run:  				    R_RUN r_runOpt1? -> ^({token("ASTR_RUN", ASTR_RUN, input.LT(1).Line)}  r_runOpt1? );
 r_runOpt1:			        ISNOTQUAL | leftAngle r_runOpt1h* RIGHTANGLE -> r_runOpt1h*;
 r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 
@@ -2963,7 +2955,7 @@ r_runOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rebase:                     REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, $REBASE.Line)} seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
+rebase:                     REBASE rebaseOpt1? seqOfBankvarnames rebaseDate1? rebaseDate2? -> ^({token("ASTREBASE", ASTREBASE, input.LT(1).Line)} seqOfBankvarnames ^(ASTPLACEHOLDER rebaseDate1? rebaseDate2?) rebaseOpt1?);
 rebaseDate1:                expression;
 rebaseDate2:                expression;
 rebaseOpt1:                 ISNOTQUAL | leftAngle rebaseOpt1h* RIGHTANGLE -> ^(ASTOPT1 rebaseOpt1h*);							
@@ -2976,7 +2968,7 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //nam
 // REBASE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, $RENAME.Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames renameOpt1?);
+rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames renameOpt1?);
 renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
 renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
 						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
@@ -2993,9 +2985,11 @@ asOrToBank:					ASBANK | TOBANK;
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!Two identical lines ONLY because of token stuff
-read:                       READ   readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, $READ.Line)}   READ   readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
-                          | IMPORT readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, $IMPORT.Line)} IMPORT readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
+read:                       readHelper   readOpt1? fileNameStar (TO nameOrStar)? -> ^({token("ASTREAD", ASTREAD, input.LT(1).Line)} readHelper readOpt1? ^(ASTHANDLEFILENAME fileNameStar) ^(ASTREADTO nameOrStar?))
 						    ;
+
+readHelper:                 READ | IMPORT;
+
 readOpt1:                   ISNOTQUAL
 						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
 						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
@@ -3025,13 +3019,13 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 // RESTART
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, $RESTART.Line)});
+restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.Line)} fileNameStar);
+run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, input.LT(1).Line)} fileNameStar);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SHEET<import>
@@ -3040,7 +3034,7 @@ run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, $RUN.
                           // This is SHEET<import> or SHEET<2010 2015 import>.
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
 						  // We also have a SHEET without import, see the prt rule
-sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^(ASTSHEETIMPORT sheetImportOpt1 ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
+sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^({token("ASTSHEETIMPORT", ASTSHEETIMPORT, input.LT(1).Line)} sheetImportOpt1 ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
 sheetImportOpt1           : ISNOTQUAL
 						  | leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
 						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
@@ -3057,7 +3051,7 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 // SMOOTH
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? -> ^({token("ASTSMOOTH", ASTSMOOTH, $SMOOTH.Line)} seqOfBankvarnames seqOfBankvarnames smoothOpt2?);
+smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames smoothOpt2?);
 smoothOpt2:                 smoothOpt2h;  //can only choose 1
 smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesNo?)
                           | REPEAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_REPEAT yesNo?)
@@ -3069,8 +3063,8 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 // SPLICE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames expression seqOfBankvarnames -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames expression     )
-                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames seqOfBankvarnames            -> ^({token("ASTSPLICE", ASTSPLICE, $SPLICE.Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames )  //no date
+splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames expression seqOfBankvarnames -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames expression     )
+                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames seqOfBankvarnames            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames )  //no date
 						    ;
 spliceOpt1:                 ISNOTQUAL
 						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
@@ -3082,13 +3076,13 @@ spliceOptions:              FIRST | LAST;
 // STOP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-stop:					    STOP -> ^({token("ASTSTOP", ASTSTOP, $STOP.Line)});
+stop:					    STOP -> ^({token("ASTSTOP", ASTSTOP, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SYS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-sys:						SYS -> ^({token("ASTSYS", ASTSYS, $SYS.Line)})
+sys:						SYS -> ^({token("ASTSYS", ASTSYS, input.LT(1).Line)})
 						  | SYS sysOpt1? expression -> ^({token("ASTSYS", ASTSYS, $SYS.Line)} expression sysOpt1?)
 						    ;
 sysOpt1:			        ISNOTQUAL | leftAngle sysOpt1h* RIGHTANGLE -> sysOpt1h*;
@@ -3142,15 +3136,15 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // TELL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, $TELL.Line)} expression NOCR?);
+tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TIME
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-time:                       TIME dates -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES dates))
-						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, $TIME.Line)})		
-						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, $TIME.Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
+time:                       TIME dates -> ^({token("ASTTIME", ASTTIME, input.LT(1).Line)} ^(ASTDATES dates))
+						  | TIME question -> ^({token("ASTTIMEQUESTION", ASTTIMEQUESTION, input.LT(1).Line)})		
+						  | TIME oneDate -> ^({token("ASTTIME", ASTTIME, input.LT(1).Line)} ^(ASTDATES oneDate oneDate))  //duplicating, TIME 2015 ==> TIME 2015 2015
 						    ;
 oneDate:                    expression;
 
@@ -3158,7 +3152,7 @@ oneDate:                    expression;
 // TIMEFILTER
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-timefilter:                 TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, $TIMEFILTER.Line)} timefilterperiods);
+timefilter:                 TIMEFILTER timefilterperiods -> ^({token("ASTTIMEFILTER", ASTTIMEFILTER, input.LT(1).Line)} timefilterperiods);
 timefilterperiods:		    (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIMEFILTERPERIODS timefilterperiod+);
 timefilterperiod:           expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
 
@@ -3166,18 +3160,18 @@ timefilterperiod:           expression ((doubleDot | TO) expression (BY expressi
 // TIMEFILTER
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, $UNFIX.Line)});
+unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // WRITE and EXPORT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    WRITE  writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
-						  | EXPORT writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))
-						  | WRITE  writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $WRITE.Line)}  WRITE ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))
-						  | EXPORT writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, $EXPORT.Line)} EXPORT ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))
+write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)}  writeHelper ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))						  
+						  | writeHelper writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)} writeHelper ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))						  
 						    ;
+
+writeHelper:                WRITE | EXPORT;
 writeOpt1:                  ISNOTQUAL
 						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
 						  | leftAngle dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
@@ -3204,19 +3198,19 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 // RESET
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-reset:					    RESET -> ^(ASTRESET);
+reset:					    RESET -> ^({token("ASTRESET", ASTRESET, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // RETURN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, $RETURN2.Line)} expression?); //used in functions
+return2:                    RETURN2 expression? -> ^({token("ASTRETURN", ASTRETURN, input.LT(1).Line)} expression?); //used in functions
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TRUNCATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-truncate:                   TRUNCATE truncateOpt1? seqOfBankvarnames -> ^({token("ASTTRUNCATE", ASTTRUNCATE, $TRUNCATE.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames);
+truncate:                   TRUNCATE truncateOpt1? seqOfBankvarnames -> ^({token("ASTTRUNCATE", ASTTRUNCATE, input.LT(1).Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ truncateOpt1?)) seqOfBankvarnames);
 truncateOpt1:               ISNOTQUAL | leftAngle truncateOpt1h? RIGHTANGLE -> truncateOpt1h?;
 truncateOpt1h:              dates -> ^(ASTDATES dates);
 
@@ -3224,13 +3218,13 @@ truncateOpt1h:              dates -> ^(ASTDATES dates);
 // XEDIT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-xedit:                      XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT, $XEDIT.Line)} ^(ASTHANDLEFILENAME fileNameStar));
+xedit:                      XEDIT fileNameStar -> ^({token("ASTXEDIT", ASTXEDIT, input.LT(1).Line)} ^(ASTHANDLEFILENAME fileNameStar));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // X12A
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-x12a:					    X12A x12aOpt1? seqOfBankvarnames -> ^({token("ASTX12A", ASTX12A, $X12A.Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ x12aOpt1?)) seqOfBankvarnames);
+x12a:					    X12A x12aOpt1? seqOfBankvarnames -> ^({token("ASTX12A", ASTX12A, input.LT(1).Line)} ^(ASTPLACEHOLDER ^(ASTOPT_ x12aOpt1?)) seqOfBankvarnames);
 x12aOpt1:                   ISNOTQUAL
 						  | leftAngle2          x12aOpt1h* RIGHTANGLE -> x12aOpt1h*
 						  | leftAngleNo2 dates? x12aOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) x12aOpt1h*

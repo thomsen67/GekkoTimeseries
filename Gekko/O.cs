@@ -157,6 +157,7 @@ namespace Gekko
 
             public IEnumerator<ScalarString> GetEnumerator()
             {
+                //#98073245243875
                 foreach (IVariable iv in _ml.list)
                 {
                     string s = O.ConvertToString(iv);
@@ -1427,7 +1428,9 @@ namespace Gekko
                                     {
                                         if (settings.create == ECreatePossibilities.NoneReportError)
                                         {
-                                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank (excluding Ref)");
+                                            string s = null;
+                                            if (Program.databanks.GetRef().storage.Count() > 0) s = " (excluding Ref)";
+                                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in any open databank" + s);
                                             throw new GekkoException();
                                         }
                                         else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
