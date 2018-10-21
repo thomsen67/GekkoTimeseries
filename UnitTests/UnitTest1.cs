@@ -1466,7 +1466,8 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-            I("xx = 1; xx $ (#i['a']) = 2;");
+            //I("xx = 1; xx $ (#i['a']) = 2;");
+            I("xx = 1; xx $ ('a' in #i) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
@@ -2323,21 +2324,23 @@ namespace UnitTests
 
             //No parenthesis in $-condition
             //Globals.lastPrtOrMulprtTable = null;
-            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ #m3[#m1]);");
+            //I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m3[#m1]));");
+            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m1 in #m3));");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
-            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "2003"); //why is it not a date?            
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "s");
-            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "um((#m1, #m2)");
-            Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], ", xx[#m1, #m2");
-            Assert.AreEqual(table.Get(4, 2).CellText.TextData[0], "] $ #m3[#m1])");
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "2003"); //why is it not a date?   
+            MessageBox.Show("HOVHOV");         
+            //Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "s");
+            //Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "um((#m1, #m2)");
+            //Assert.AreEqual(table.Get(3, 2).CellText.TextData[0], ", xx[#m1, #m2");
+            //Assert.AreEqual(table.Get(4, 2).CellText.TextData[0], "] $ #m3[#m1])");
             Assert.AreEqual(table.Get(5, 2).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(6, 2).number, 10.0000d, 0.0001);
             Assert.AreEqual(table.Get(7, 2).number, 12.0000d, 0.0001);
 
             //Globals.lastPrtOrMulprtTable = null;
-            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m3[#m1]));");
+            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m1 in #m3));");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
@@ -2351,7 +2354,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(7, 2).number, 12.0000d, 0.0001);
 
             //Globals.lastPrtOrMulprtTable = null;
-            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m4[#m1]));");
+            I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m1 in #m4));");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "2002"); //why is it not a date?
@@ -5871,7 +5874,8 @@ namespace UnitTests
             I("y['b', 'y'] = 103;");
             I("z['x'] = 1000;");
             I("z['y'] = 1001;");
-            I("x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            I("x[#i, #j] = 1 + y[#i, #j] $ (#i in #i0) + z[#j];");
+            //I("x[#i, #j] = 1 + y[#i, #j] $ (#i0[#i]) + z[#j];");
             _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1101d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1103d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1103d, sharedDelta);
@@ -5891,7 +5895,8 @@ namespace UnitTests
             _AssertSeries(First(), "x2", new string[] { "b" }, 2000, 2 * 205d + 10d, sharedDelta);
             
             I("LIST #i0 = list('a');");
-            I("SER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            //I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i0[#i]) + z[#j];");
+            I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i in #i0) + z[#j];");
             _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1101, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1103, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
@@ -5900,7 +5905,8 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
                    
             I("LIST #i0 = list();");
-            I("SER x[#i, #j] = 1 + y[#i, #j] $ #i0[#i] + z[#j];");
+            //I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i0[#i]) + z[#j];");
+            I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i in #i0) + z[#j];");
             _AssertSeries(First(), "x", new string[] { "a", "x" }, 2000, 1001, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a", "y" }, 2000, 1002, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1001, sharedDelta);
@@ -6020,32 +6026,35 @@ namespace UnitTests
             I("SERIES y = 3 $ (%v == 10);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['c']);");
+            //I("SERIES y = 3 $ (#m['c']);");
+            I("SERIES y = 3 $ ('c' in #m);");
             _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['b']);");
+            //I("SERIES y = 3 $ (#m['b']);");
+            I("SERIES y = 3 $ ('b' in #m);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['b'] and %v == 10);");
+            I("SERIES y = 3 $ ('b' in #m and %v == 10);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['b'] and %v == 9);");
+            I("SERIES y = 3 $ ('b' in #m and %v == 9);");
             _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['c'] and %v == 10);");
+            I("SERIES y = 3 $ ('c' in #m and %v == 10);");
             _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ (#m['c'] or %v == 10);");
+            I("SERIES y = 3 $ ('c' in #m or %v == 10);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
 
           
 
             //Without parenthesis (...) for lists
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ #m['a'];");
+            //I("SERIES y = 3 $ (#m['a']);");
+            I("SERIES y = 3 $ ('a' in #m);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
             I("SERIES y = 2;");
-            I("SERIES y = 3 $ #m['c'];");
+            I("SERIES y = 3 $ ('c' in #m);");
             _AssertSeries(First(), "y", 2000, 0d, sharedDelta);
 
             //PRT/PLOT

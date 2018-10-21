@@ -5057,31 +5057,31 @@ namespace Gekko
             return tsl;
         }
 
-        public static IVariable ListContains(IVariable x, IVariable y)
-        {
+        //public static IVariable ListContains(IVariable x, IVariable y)
+        //{
 
-            if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
-            {
-                G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
-                throw new GekkoException();
-            }
-            List ml = (List)x;
-            ScalarString ss = (ScalarString)y;
+        //    if (x.Type() != EVariableType.List || y.Type() != EVariableType.String)
+        //    {
+        //        G.Writeln2("*** ERROR: Expected syntax like ... $ #a['b'], with list and string");
+        //        throw new GekkoException();
+        //    }
+        //    List ml = (List)x;
+        //    ScalarString ss = (ScalarString)y;
 
-            bool b = false;
-            foreach (IVariable iv in ml.list)
-            {
-                string s = O.ConvertToString(iv);
-                if (G.Equal(ss.string2, s))
-                {
-                    b = true;
-                    break;
-                }
-            }
-            if (b) return Globals.scalarVal1;
-            else return Globals.scalarVal0;
+        //    bool b = false;
+        //    foreach (IVariable iv in ml.list)
+        //    {
+        //        string s = O.ConvertToString(iv);
+        //        if (G.Equal(ss.string2, s))
+        //        {
+        //            b = true;
+        //            break;
+        //        }
+        //    }
+        //    if (b) return Globals.scalarVal1;
+        //    else return Globals.scalarVal0;
 
-        }
+        //}
 
         // =================================== end comparisons ==================================        
 

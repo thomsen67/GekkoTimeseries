@@ -243,6 +243,7 @@ namespace Gekko.Parser.Gek
             //locates x[#m] or x[#m+...] or x[#m-...], or same for curlies         
             //The #m is assigned to sum() or unfold() or to PRTELEMENT (last one will be converted to unfold()).
             //Also in x[#m] = y[#m] + ... , the #m is assigned to ASTASSIGNMENT
+            //also locates ... $ (#m in ...)
 
             //Also locates listfiles via ASTBANKVARNAME2. For instance #(listfile m) or #(listfile {'m'})
             //the former will work with sum(), unfold() etc.
@@ -322,7 +323,8 @@ namespace Gekko.Parser.Gek
                     string listnameWithoutSigil = s.Substring(1);
                     //naked #m: ...[#m] or ...{#m} or #m1[#m]
                     //also ...[#m+...] and [#m-...] is supported
-                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number == 1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")))
+                    bool isIn = node.Parent.Text == "ASTCOMPARE" && node.Number == 1 && node.Parent[0][0].Text == "ASTIFOPERATOR7";
+                    if (node.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Text == "ASTCURLY" || (node.Parent.Text == "ASTCOMPARE2" && node.Number == 1) || ((node.Parent.Text == "ASTPLUS" || node.Parent.Text == "ASTMINUS") && (node.Parent.Parent.Text == "ASTINDEXERELEMENT" || node.Parent.Parent.Text == "ASTCURLY")) || isIn)
                     {
                         //ASTPLUS/MINUS: see also #980752345
                         //#m is inside a x[#m], or inside a x{#m} or is a #m1[#m] conditional
@@ -1708,7 +1710,32 @@ namespace Gekko.Parser.Gek
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
                             {
+                                //node.Code.A("O.In(smpl, " + code1 + "," + code2 + ")");
+
+
+                                ASTNode child = node[1];
+
+                                string indexes = null;
+                                string listName = GetSimpleHashName(child);
+                                string internalName = null;
+                                string internalFunction = null;
+                                if (listName != null)
+                                {
+                                    TwoStrings two = SearchUpwardsInTree2(node, listName);
+                                    if (two != null)
+                                    {
+                                        internalName = two.s1;
+                                        internalFunction = two.s2;
+                                    }
+                                }
+
+                                if (internalName != null)
+                                {
+                                    code1 = internalName;
+                                }                                
+
                                 node.Code.A("O.In(smpl, " + code1 + "," + code2 + ")");
+
                             }
                         }
                         break;
