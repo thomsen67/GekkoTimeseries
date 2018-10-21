@@ -103,12 +103,9 @@ namespace Gekko
         public string leftblanks = null; //if subnodes != null, leftblanks will always be = null.
         public int line = -12345;
         public int column = -12345;
-        //below is advanced (recursive) stuff
-        //public string subnodesType = null;  // "(", "[" or "{".
+        //below is advanced (recursive) stuff        
         public TokenList subnodes = null;
-        public TokenHelper parent = null;
-        //public TokenHelper siblingBefore = null;
-        //public TokenHelper siblingAfter = null;
+        public TokenHelper parent = null;        
         public int id = -12345;
         public bool artificialTopNode = false; //if true, it has subnodes, and the subnodes are not enclosed in parentheses
 
@@ -121,8 +118,7 @@ namespace Gekko
             th.column = this.column;
             th.parent = parent;
             th.id = this.id;
-            th.artificialTopNode = this.artificialTopNode;
-            //th.subnodesType = this.subnodesType;            
+            th.artificialTopNode = this.artificialTopNode;             
             th.subnodes = this.subnodes;
             if (th.HasChildren()) th.subnodes = this.subnodes.DeepClone(th);
             return th;
@@ -149,6 +145,10 @@ namespace Gekko
             OrganizeSubnodes(this);
         }
 
+        /// <summary>
+        /// Returns first item of subnodes which is also the type
+        /// </summary>
+        /// <returns></returns>
         public string SubnodesType()
         {
             if (!this.HasChildren()) return null;  //should not be called like this
@@ -156,18 +156,30 @@ namespace Gekko
             return this.subnodes[0].s;  //the first item is also the subnode-type      
         }
 
+        /// <summary>
+        /// Returns true if the subnodes start with a left-parenthesis (, [ or {
+        /// </summary>
+        /// <returns></returns>
         public bool SubnodesTypeParenthesisStart()
         {
             if (this.SubnodesType() == "(" || this.SubnodesType() == "[" || this.SubnodesType() == "{") return true;
             return false;
         }
 
+        /// <summary>
+        /// Returns true if the subnodes end with a right-parenthesis ), ] or }
+        /// </summary>
+        /// <returns></returns>
         public bool SubnodesTypeParenthesisEnd()
         {
             if (this.SubnodesType() == ")" || this.SubnodesType() == "]" || this.SubnodesType() == "}") return true;
             return false;
         }
 
+        /// <summary>
+        /// True if subnodes == null
+        /// </summary>
+        /// <returns></returns>
         public bool HasNoChildren()
         {
             if (this.subnodes == null)
@@ -187,6 +199,10 @@ namespace Gekko
             }
         }
 
+        /// <summary>
+        /// False if subnodes == null
+        /// </summary>
+        /// <returns></returns>
         public bool HasChildren()
         {
             return !HasNoChildren();
@@ -196,18 +212,21 @@ namespace Gekko
         {
             this.s = null;
             this.leftblanks = null;
-            this.subnodes = null;
-            //this.subnodesType = null;
+            this.subnodes = null;            
         }
 
         //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
         //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
 
+        /// <summary>
+        /// Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
+        /// Note that the commas are preserved as the second part of the tuple.
+        /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
+        /// </summary>
+        /// <returns></returns>
         public List<TokenHelperComma> SplitCommas()
         {
-            //Splits up in bits, depending on commas. For instance [1, 2] is split in 1 and 2. But [1, [2, 3]] is split in 1 and [2, 3].            
-            //Note that the commas are preserved as the second part of the tuple.
-            //The last item (or the 1 item if there is only 1) will have null as second part of tuple.
+            
             if (this.subnodes == null) return null;
             List<TokenHelperComma> temp = new List<TokenHelperComma>();
             TokenList temp2 = new TokenList();
@@ -229,22 +248,36 @@ namespace Gekko
             temp.Add(new TokenHelperComma(previousComma, temp2));
             return temp;
         }
+
+        /// <summary>
+        /// Returns the token to the left (null if not possible)
+        /// </summary>
+        /// <returns></returns>
         public TokenHelper SiblingBefore()
         {
             return this.Offset(-1);
         }
 
+        /// <summary>
+        /// /// Returns the token to the right (null if not possible)
+        /// </summary>
+        /// <returns></returns>
         public TokenHelper SiblingAfter()
         {
             return this.Offset(1);
         }
-
 
         public string LineAndPosText()
         {
             return "line " + this.line + " pos " + this.column;
         }
 
+        /// <summary>
+        /// Searches for specific strings
+        /// </summary>
+        /// <param name="i1Start"></param>
+        /// <param name="ss"></param>
+        /// <returns></returns>
         public int Search(int i1Start, List<string>ss)
         {
             int j = -12345;
@@ -279,18 +312,18 @@ namespace Gekko
                 counter++;
                 subnode.id = counter;
                 subnode.parent = temp;
-                //if (ii - 1 >= 0) subnode.siblingBefore = temp.subnodes[ii - 1];
-                //if (ii + 1 < temp.subnodes.storage.Count) subnode.siblingAfter = temp.subnodes[ii + 1];
             }
             temp.line = temp.subnodes[0].line;
             temp.column = temp.subnodes[0].column;
         }
-
-
-
+        
+        /// <summary>
+        /// Jump to previous/later tokens
+        /// </summary>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         public TokenHelper Offset(int offset)
         {
-
             //-1 is left sibling, +1 is right sibling
             int ii = this.id + offset;
             if (ii < 0 || ii >= this.parent.subnodes.Count())
@@ -298,9 +331,14 @@ namespace Gekko
                 return null;
             }
             return this.parent.subnodes[ii];
-
         }
 
+        /// <summary>
+        /// Get an interval of tokens, put it into TokenHelper
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public TokenHelper OffsetInterval(int start, int end)
         {
             TokenList rv2 = new TokenList();
@@ -312,11 +350,19 @@ namespace Gekko
             return rv;
         }
 
+        /// <summary>
+        /// Trimmed version of ToString()
+        /// </summary>
+        /// <returns></returns>
         public string ToStringTrim()
         {
             return this.ToString().Trim();
         }
 
+        /// <summary>
+        /// Loops through all subnodes to get string
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             if (subnodes != null)
@@ -335,10 +381,12 @@ namespace Gekko
             }
             else return leftblanks + s;
         }
-
-        
-
-
+                
+        /// <summary>
+        /// For debugging
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="level"></param>
         public static void Print(TokenList x, int level)
         {
             foreach (TokenHelper th in x.storage)

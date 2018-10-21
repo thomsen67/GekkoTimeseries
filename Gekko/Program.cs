@@ -17482,10 +17482,38 @@ namespace Gekko
                             {
                                 i++;
 
+                                //TODO: remove stray ANDs
+
                                 TokenHelper tok3 = tok.Offset(i);
                                 if (tok3.SubnodesTypeParenthesisStart())
                                 {
-                                    dollarGams = tok3.subnodes.ToString();
+                                    for (int ii = 0; ii < tok3.subnodes.storage.Count; ii++)
+                                    //foreach (TokenHelper th in tok3.subnodes.storage)
+                                    {
+                                        if (ii < tok3.subnodes.Count() - 1 && tok3.subnodes[ii].HasNoChildren() && tok3.subnodes[ii + 1] != null && tok3.subnodes[ii + 1].HasChildren())
+                                        {
+                                            //Remove anything that looks like time restriction
+                                            List<TokenHelperComma> temp = tok3.subnodes[ii + 1].SplitCommas();
+                                            if (temp.Count == 1 && G.Equal(temp[0].list.ToString().Trim(), "t"))
+                                            {
+                                                ii += 2;
+                                                if (G.Equal(tok3.subnodes[ii]?.s, "and"))
+                                                {
+                                                    ii++;  //also check before
+                                                }
+                                                ii--;  //will get 1 added at loop start
+                                                continue;
+                                            }
+                                        }
+                                        dollarGams += tok3.subnodes[ii].ToStringTrim();                                        
+                                    }
+
+                                    if (dollarGams.StartsWith("(") && dollarGams.EndsWith(")"))
+                                    {
+                                        dollarGams = dollarGams.Substring(1, dollarGams.Length - 2).Trim();
+                                        if (dollarGams.StartsWith("and ")) dollarGams = dollarGams.Substring("and ".Length).Trim();
+                                    }
+
                                     i++;
                                 }
                                 else
@@ -17589,9 +17617,9 @@ namespace Gekko
                         string lhs = lhsTokensGekko.ToStringTrim();
                         string rhs = rhsTokensGekko.ToStringTrim();
                                                 
-                        if (lhs.Contains("$") || rhs.Contains("$") || lhs.Contains("*"))
+                        if (lhs.Contains("*"))
                         {
-
+                            //skip
                         }
                         else
                         {
@@ -17608,7 +17636,14 @@ namespace Gekko
                             }
                             else
                             {
-                                sb.Append(lhs + " = " + rhs + ";" + G.NL);
+                                if (dollarGams != null)
+                                {
+                                    sb.Append(lhs + " $ (" + dollarGams + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                                }
+                                else
+                                {
+                                    sb.Append(lhs + " = " + rhs + ";" + G.NL);
+                                }
                             }
                         }
 
