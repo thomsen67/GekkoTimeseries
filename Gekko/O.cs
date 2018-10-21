@@ -1118,6 +1118,13 @@ namespace Gekko
                     //skip it!
                 }
             }
+            else if (logical.Type() == EVariableType.Series)
+            {
+                //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
+                //See also #6238454
+                IVariable y = Dollar(smpl, rhsExpression, logical);
+                Lookup(smpl, map, dbName, varname, freq, y, isLeftSideVariable, type, options);
+            }
             else
             {
                 DollarLHSError();
@@ -3547,6 +3554,13 @@ namespace Gekko
                     //skip it!
                 }
             }
+            else if (logical.Type() == EVariableType.Series)
+            {
+                //This deviates a bit from23 GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
+                //See also #6238454
+                IVariable z = Dollar(smpl, y, logical);
+                x.IndexerSetData(smpl, z, options, indexes);
+            }
             else
             {
                 DollarLHSError();
@@ -3556,7 +3570,7 @@ namespace Gekko
 
         private static void DollarLHSError()
         {
-            G.Writeln2("*** ERROR: $-conditional on left-hand side only supports VAL type");
+            G.Writeln2("*** ERROR: $-conditional on left-hand side only supports value or series type");
             throw new GekkoException();
         }
 
@@ -4750,7 +4764,7 @@ namespace Gekko
                 bool allOk = true;
                 foreach (GekkoTime t in smpl.Iterate12())
                 {
-                    if (IsTrue(ts.GetData(smpl, t)))
+                    if (!IsTrue(ts.GetData(smpl, t)))
                     {
                         allOk = false;
                         break;

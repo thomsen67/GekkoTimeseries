@@ -17435,6 +17435,8 @@ namespace Gekko
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
+            int counter = 0;
+
             foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
 
@@ -17446,6 +17448,7 @@ namespace Gekko
                     }
                     else
                     {
+                        
                         int iEqStart = 0;
                         //searches for '..' with no blank between (could be improved)
                         //now we search backwards for start of line
@@ -17606,7 +17609,7 @@ namespace Gekko
                         rhsTokensGams = tok.OffsetInterval(i2Start, iSemi - 1);
 
                         eqCounter++;
-
+                        
                         if (false && eqCounter < 10)
                         {
                             G.Writeln2("Eqname:  " + nameGams);
@@ -17646,7 +17649,7 @@ namespace Gekko
                         string lhs = lhsTokensGekko.ToStringTrim();
                         string rhs = rhsTokensGekko.ToStringTrim();
                                                 
-                        if (lhs.Contains("*"))
+                        if (eqCounter > 10 || lhs.Contains("*"))
                         {
                             //skip
                         }
@@ -17665,9 +17668,15 @@ namespace Gekko
                             }
                             else
                             {
-                                if (dollarGams != null)
+                                string dollarGams2 = null;
+                                if (dollarGams != null && dollarGams.Trim() != "" && dollarGams.Trim() != "()")
                                 {
-                                    sb.Append(lhs + " $ (" + dollarGams + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                                    dollarGams2 = dollarGams.Trim();
+                                }
+
+                                if (dollarGams2 != null)
+                                {
+                                    sb.Append(lhs + " $ (" + dollarGams2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
                                 }
                                 else
                                 {

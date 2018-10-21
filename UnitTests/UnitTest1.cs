@@ -1443,9 +1443,14 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Dollar()
+        public void _Test_DollarAndSomeIf()
         {
             I("reset; time 2000 2002;");
+
+            I("b = (102, 103, 102);");
+            I("#i = a, b;");
+
+            //$ on lhs ------------------------------------------------------------
 
             I("xx = 1; xx $ (5 == 5) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
@@ -1455,6 +1460,20 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
             I("xx = 1; xx $ (5 == 6) = 3;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("xx = 1; xx $ (#i['a']) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("xx = 1; xx $ (#i['c']) = 3;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
@@ -1474,7 +1493,50 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+            
+            //series condition ---
 
+            I("xx = 1; xx $ (b == 102) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("xx = 1; xx $ (b == 103) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("b3 = (0, 3, 1);");
+            I("xx = 1; xx $ (b3) = 2;");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);  
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+            
+            //in map ---
+
+            I("map #m = (xx = 1); #m.xx $ (b == 102) = 2;");
+            Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;            
+            _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(m, "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(m, "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
+
+            I("map #m = (xx = 1); #m.xx $ (b == 103) = 2;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(m, "xx", 2000, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(m, "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(m, "xx", 2002, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
+            _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
+            
+            //if ------------------------------------------------------------
 
             I("if (1 == 1) xx = 0; xx = 2; else xx = 0; xx = 1; end;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
@@ -1483,13 +1545,31 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-
-            I("if (1 == 0) xx = 0; xx = 2; else xx = 0; xx = 1; end;");
+            I("if (1 == 0); xx = 0; xx = 2; else xx = 0; xx = 1; end;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("if (b == 102); xx = 0; xx = 2; else xx = 0; xx = 1; end;");  //will be false, since 2001 is false
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("b2 = (102, 102, 102);"); 
+            I("if (b2 == 102); xx = 0; xx = 2; else xx = 0; xx = 1; end;");  //will be true
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            //$ on rhs ------------------------------------------------------------
+            //$ on rhs ------------------------------------------------------------
+            //$ on rhs ------------------------------------------------------------
 
             I("%v = 1 $ (0 == 1);");
             _AssertScalarVal(First(), "%v", 0d);
@@ -1501,13 +1581,27 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
-
+            
             I("xx1 = (1, 2, 3);");
             I("xx2 = (101, 102, 103);");
             I("xx = xx2 $ (xx1 == 2);");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2001, 102d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("xx = 100 $ (#i['a']);");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "xx", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
+
+            I("xx = 100 $ (#i['c']);");
+            _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);
+            _AssertSeries(First(), "xx", 2001, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 

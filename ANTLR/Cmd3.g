@@ -2021,7 +2021,7 @@ function:                   ident leftParenGlue (expression (',' expression)*)? 
 objectFunction:             ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);
 					
 dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //logicalOr can contain a listWithIndexer
-						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis						
+						  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis								
 						    ;
 
 bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^({token("ASTCOMPARE2¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCOMPARE2, 0)} bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!
@@ -2216,6 +2216,7 @@ logicalAtom:				expression ifOperator expression -> ^(ASTCOMPARE ifOperator expr
 						  | leftParen! logicalOr rightParen!           // omit both '(' and ')'
 						  | bankvarnameindex			
 //						  | expression IN expression -> ^(ASTIN expression expression)
+						  | expression -> expression
 						  ;
 
 ifOperator:		            ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
