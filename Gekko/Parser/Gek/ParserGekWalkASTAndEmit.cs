@@ -6267,7 +6267,7 @@ namespace Gekko.Parser.Gek
         private static string SearchUpwardsInTree4(ASTNode node)
         {
             //finds out if the variable is a LHS (left-side) variable
-            //returns null if RHS or (LHS and there is a ASTBANKVAR or ASTDOTORINDEXER above)
+            //returns null if RHS or (LHS and there is a ASTDOTORINDEXER or ASTDOLLOARabove, the a in x.a, or the a in y $ (a == 1) = 100;
             
             ASTNode tmp = node;            
             string rv = null;
@@ -6277,9 +6277,24 @@ namespace Gekko.Parser.Gek
                 {
                     rv = tmp.ivTempVarName;
                     break;
-                }                
+                }
+
+                if (tmp.Parent != null)
+                {
+                    if (tmp.Parent.Text == "ASTDOTORINDEXER")
+                    {
+                        return null;  //if any parent is like this, null is returned. We want to find the one highest in the tree.
+                    }
+                    else if (tmp.Parent.Text == "ASTDOLLAR")
+                    {
+                        if (tmp.Number == 1)
+                        {
+                            //In y $ (a == 1) = 100, we catch only the $-RHS of y $ (a == 1), that is the 'a' not the 'y'
+                            return null;
+                        }
+                    }
+                }
                 tmp = tmp.Parent;
-                if (tmp != null && (tmp.Text == "ASTBANKVAR" || tmp.Text == "ASTDOTORINDEXER")) return null;  //if any parent is like this, null is returned. We want to find the one highest in the tree.
             }
             return rv;
         }

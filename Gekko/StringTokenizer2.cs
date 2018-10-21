@@ -75,6 +75,11 @@ namespace Gekko
             }
             return s;
         }
+
+        public string ToStringTrim()
+        {            
+            return ToString().Trim();
+        }
     }
 
     public class TokenHelperComma

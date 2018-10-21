@@ -17081,8 +17081,22 @@ namespace Gekko
             Program.model.modelInfo.Print();
         }
 
+        public static void WalkTokens(TokenList nodes)
+        {
+            foreach (TokenHelper child in nodes.storage)
+            {
+                WalkTokens(child);
+            }
+        }
+
         public static void WalkTokens(TokenHelper node)
         {
+            //Performs these transformations:
+            //- GAMS functions are not touched (log, etc.)
+            //- sum() function has # put in on sets
+            //- parameter t is removed, and lags/leads like t-1 are transformed into [-1] etc. So x(a, t) --> x[#a], and x(t) --> x not x().
+            //- strings have quotes removed, x['a'] --> x[a]
+
             if (node.HasNoChildren())
             {
                 //not a sub-node
@@ -17271,8 +17285,17 @@ namespace Gekko
             }
         }
 
-        public static void WalkTokensHandleParentheses(TokenHelper node)
+        public static void WalkTokensHandleParentheses(TokenList nodes) {
+            foreach (TokenHelper child in nodes.storage)
+            {
+                WalkTokensHandleParentheses(child);
+            }
+        }
+
+
+    public static void WalkTokensHandleParentheses(TokenHelper node)
         {
+            //All [, {, } and ] are changed into soft parentheses ( )
             if (node.HasNoChildren())
             {
                 //not a sub-node
@@ -17487,8 +17510,9 @@ namespace Gekko
                                 TokenHelper tok3 = tok.Offset(i);
                                 if (tok3.SubnodesTypeParenthesisStart())
                                 {
+
+                                    TokenList list = new TokenList();
                                     for (int ii = 0; ii < tok3.subnodes.storage.Count; ii++)
-                                    //foreach (TokenHelper th in tok3.subnodes.storage)
                                     {
                                         if (ii < tok3.subnodes.Count() - 1 && tok3.subnodes[ii].HasNoChildren() && tok3.subnodes[ii + 1] != null && tok3.subnodes[ii + 1].HasChildren())
                                         {
@@ -17505,8 +17529,13 @@ namespace Gekko
                                                 continue;
                                             }
                                         }
-                                        dollarGams += tok3.subnodes[ii].ToStringTrim();                                        
+                                        list.storage.Add(tok3.subnodes[ii]);                                        
                                     }
+
+                                    WalkTokensHandleParentheses(list);
+                                    WalkTokens(list);
+
+                                    dollarGams = list.ToStringTrim();                                        
 
                                     if (dollarGams.StartsWith("(") && dollarGams.EndsWith(")"))
                                     {
