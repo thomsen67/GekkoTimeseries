@@ -8613,7 +8613,8 @@ namespace Gekko
 
                 if (domains != null)
                 {
-                    IVariable def = O.Lookup(null, null, null, "#default", null, null, new LookupSettings(), EVariableType.Var, false, null);
+                    LookupSettings settings = new LookupSettings(ELookupType.RightHandSide, ECreatePossibilities.NoneReturnNull, true);
+                    IVariable def = O.Lookup(null, null, null, "#default", null, null, settings, EVariableType.Var, false, null);
                     if (def != null)
                     {
                         restrict = new List<List<string>>();
@@ -8628,7 +8629,7 @@ namespace Gekko
                             {
                                 Map def_map = def as Map;
                                 IVariable set = null; def_map.storage.TryGetValue(domain, out set);
-                                if (set.Type() == EVariableType.List)
+                                if (set != null && set.Type() == EVariableType.List)
                                 {
                                     try
                                     {
@@ -8712,11 +8713,11 @@ namespace Gekko
                 List<int> rv = new List<int>();
 
                 //TODO: CLEAN THIS UP!!                                                
-                if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_n))
-                {
-                    rv = new List<int>(); rv.Add(0);
-                }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_d))
+                //if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_n))
+                //{
+                //    rv = new List<int>(); rv.Add(0);
+                //}
+                if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_d))
                 {
                     rv = new List<int>(); rv.Add(0);
                 }

@@ -1313,6 +1313,13 @@ namespace Gekko
                         sub.SetData(t, a.Invoke(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
                     }
                     temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+                    
+                    //For safety, we clone the domain array of strings.
+                    temp.meta.domains = new string[x1_series.meta.domains.Length];
+                    for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                    }
                 }                
                 
                 return temp;
