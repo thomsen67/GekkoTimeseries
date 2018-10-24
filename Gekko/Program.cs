@@ -1300,6 +1300,7 @@ namespace Gekko
             string input = GetTextFromFileWithWait(fullFileNameAndPath);
             List<string> lines = G.ExtractLinesFromText(input);
 
+            //#98045298375
             TableLight matrix = new TableLight();  //1-based coords. Could perhaps design a more lightweight version of cells for this if memory or speed becomes an issue. Perhaps with basic cell stuff, and then a field pointing to object with alignment etc. Or use inheritance.
 
             if (oRead.Type == EDataFormat.Prn)
@@ -12620,7 +12621,7 @@ namespace Gekko
                 res.Close();
             }
         }
-
+        
 
         public static string HandleOneLiners(string text)
         {
@@ -12630,9 +12631,10 @@ namespace Gekko
                 if (s2.EndsWith(";")) s2 = s2.Substring(0, s2.Length - 1);
                 s2 = s2.Trim();
 
-                if (s2.StartsWith("I(\"") && s2.EndsWith("\")"))
+                if (s2.StartsWith("I(\""))
                 {
-                    text = s2.Substring(3, s2.Length - 5);
+                    int i = s2.IndexOf("\")");
+                    text = s2.Substring(3, i - 3);
                 }
 
                 if (s2.StartsWith("bvar"))

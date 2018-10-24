@@ -7475,13 +7475,7 @@ namespace Gekko
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 Program.Copy(this);
-            }
-
-            //public static Databank SetPossibleToBank2(Databank toBank, ExtractBankAndRestHelper h)
-            //{
-            //    if (h.hasColon) toBank = h.databank;  //overrides                            
-            //    return toBank;
-            //}
+            }            
 
             public static Databank SetPossibleToBank(Databank localOptionToBank)
             {

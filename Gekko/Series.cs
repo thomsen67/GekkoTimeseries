@@ -1270,6 +1270,10 @@ namespace Gekko
         {
             if (x1_series.type == ESeriesType.ArraySuper && x2_series.type == ESeriesType.ArraySuper)
             {                                
+                //SOMETHING FISHY HERE, when domains do not match
+                //Make better check of matching domains, and how to use #default list.
+                //#894543543543
+                
                 //This is typically used for printing differences
                 if (x1_series.dimensions != x2_series.dimensions)
                 {
@@ -1278,6 +1282,7 @@ namespace Gekko
                 }
 
                 Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, "temp", x1_series.dimensions);
+                temp.meta = new SeriesMetaInformation();
 
                 List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
                 List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
@@ -1302,7 +1307,7 @@ namespace Gekko
                     MapMultidimItem mm2 = keys2[i];
                     if (!mm1.Equals(mm2))
                     {
-                        G.Writeln2("*** ERROR: Non-identical elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
+                        G.Writeln2("*** ERROR: Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
                         throw new GekkoException();
                     }
                     Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
@@ -1313,12 +1318,25 @@ namespace Gekko
                         sub.SetData(t, a.Invoke(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
                     }
                     temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
-                    
+
                     //For safety, we clone the domain array of strings.
-                    temp.meta.domains = new string[x1_series.meta.domains.Length];
-                    for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                    //We first try to steal domains from x1, then from x2
+                    //If these do not have domains, the resulting series is domain-less too
+                    if (x1_series.meta != null && x1_series.meta.domains != null)
                     {
-                        temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                        temp.meta.domains = new string[x1_series.meta.domains.Length];
+                        for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                        {
+                            temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                        }
+                    }
+                    else if (x2_series.meta != null && x2_series.meta.domains != null)
+                    {
+                        temp.meta.domains = new string[x2_series.meta.domains.Length];
+                        for (int ii = 0; ii < x2_series.meta.domains.Length; ii++)
+                        {
+                            temp.meta.domains[ii] = x2_series.meta.domains[ii];
+                        }
                     }
                 }                
                 

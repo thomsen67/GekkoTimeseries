@@ -8269,6 +8269,48 @@ namespace UnitTests
             I("PIPE 'c:\\Thomas\\Desktop\\gek' + 'ko\\testing\\sletmig';"); I("PIPE con;");
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [TestMethod]
+        public void _Test_DefaultDomains()
+        {
+            Databank work = First();
+            //simplest possible
+            I("RESET;");
+            I("time 2015 2020;");
+            I("x = series(1); p = series(1);");
+            I("x[a] = 100; p[a] = 2;");
+            I("x[b] = 110; p[b] = 3;");
+            I("#i = a, b;");  //not actually used
+            I("%v = x.setdomains(('#i',));");
+            I("%v = p.setdomains(('#i',));");            
+            I("p<n> x;");
+            Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);            
+            I("p<n> p*x;");
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
+            I("#default = map();");
+            I("#default.#i = list('b');");            
+            I("p<n> x;");
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);            
+            I("p<n> p*x;");
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
+            I("p<n> x*p;");
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
+
+        }
+
+
         [TestMethod]
         public void _Test_FunctionsInBuilt()
         {

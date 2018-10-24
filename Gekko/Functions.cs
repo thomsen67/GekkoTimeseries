@@ -1585,6 +1585,40 @@ namespace Gekko
             return Globals.scalarVal0;
         }
 
+
+        public static IVariable setdomains(GekkoSmpl smpl, IVariable x, IVariable m)
+        {
+            Series x_series = x as Series;
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: setdomains(): Expected array-series");
+                throw new GekkoException();
+            }
+            List m_list = m as List;
+            if (m_list == null)
+            {
+                G.Writeln2("*** ERROR: setdomains(): Expected list of strings");
+                throw new GekkoException();
+            }
+            string[] ss = Program.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
+            x_series.meta.domains = ss;
+            return new ScalarVal(1d);  //fix this!
+        }
+
+        public static List getdomains(GekkoSmpl smpl, IVariable x)
+        {
+            Series x_series = x as Series;
+            if (x_series.meta.domains == null) return new List(new List<string>());  //empty
+            if (x_series == null || x_series.type != ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: setdomains(): Expected array-series");
+                throw new GekkoException();
+            }
+            List<string> ss = new List<string>();
+            for (int i = 0; i < x_series.meta.domains.Length; i++) ss.Add(x_series.meta.domains[i]);  //cloning for safety
+            return new List(ss);
+        }
+
         public static IVariable count(GekkoSmpl smpl, IVariable ths, IVariable y)
         {
             string s = O.ConvertToString(y);
