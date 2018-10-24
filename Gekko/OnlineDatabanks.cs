@@ -219,7 +219,7 @@ namespace Gekko
                     int vars;
                     GekkoTime perStart;
                     GekkoTime perEnd;
-                    Program.ReadPx(o1.opt_array, true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
+                    Program.ReadPx(o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);
                 }
             }
         }
@@ -353,7 +353,7 @@ namespace Gekko
                     int vars;
                     GekkoTime perStart;
                     GekkoTime perEnd;
-                    Program.ReadPx(o1.opt_array, true, null, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);                    
+                    Program.ReadPx(o1.opt_array, true, source, tableName, codesHeaderJson, pxLinesText, out vars, out perStart, out perEnd);                    
                 }
             }
         }

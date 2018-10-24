@@ -120,16 +120,10 @@ namespace Gekko
         //1975            .
         //1976           0.72799
         //1977           0.68516 
-        public static void tspDataUtility(string dataFile, Databank databank, ReadOpenMulbkHelper oRead, Program.ReadInfo readInfo, bool open)
+        public static void tspDataUtility(string dataFile, Databank databank, ReadOpenMulbkHelper oRead, Program.ReadInfo readInfo)
         {
             // Used in READ<tsp>            
-
-            if (open)
-            {
-                G.Writeln2("*** ERROR: Cannot OPEN a tsp file, use READ.");
-                throw new GekkoException();
-            }
-            
+                        
             int allCounter = 0;
 
             string databankName = databank.name;
