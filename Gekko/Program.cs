@@ -2290,7 +2290,7 @@ namespace Gekko
 
                     //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
                     //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
-                    databank = databankTemp; databank.name = readInfo.dbName;
+                    databank = databankTemp;
 
                     if (false)
                     {
@@ -2315,6 +2315,8 @@ namespace Gekko
 
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit) databank.editable = true;
+
+                    databank.name = readInfo.dbName;
                 }
                 else
                 {

@@ -245,12 +245,12 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count);
             if (existI != -12345)  //the databank name already exists. No actual file reading, just rearrange the banks
             {
-                DatabankLogicExistingBankNew(databank, openType, openPosition, name, existI, WorkI, BaseI, m);
+                DatabankLogicExistingBankNew(databank, openType, openPosition, existI, workI, refI, m);
             }
             else  //the databank name does not exist, so it is new and will be read from file later on
             {
                 readFromFile = true;                
-                DatabankLogicDefaultNew(databank, openType, openPosition, name, m);                
+                DatabankLogicDefaultNew(databank, openType, openPosition, m);                
             }
             this.storage = m;
             return readFromFile;
@@ -356,7 +356,7 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count);
             if (existI != -12345)  //the databank name already exists. No actual file reading, just rearrange the banks
             {
-                DatabankLogicExistingBank(out databank, openType, openPosition, out readFromFile, name, existI, WorkI, BaseI, m);
+                DatabankLogicExistingBank(openType, openPosition, out readFromFile, name, existI, WorkI, BaseI, m);
             }
             else  //the databank name does not exist, so it is new and will be read from file later on
             {
@@ -367,9 +367,9 @@ namespace Gekko
             return readFromFile;
         }
 
-        private void DatabankLogicExistingBank(out Databank databank, EOpenType openType, int openPosition, out bool readFromFile, string name, int existI, int WorkI, int BaseI, List<Databank> m)
+        private void DatabankLogicExistingBank(EOpenType openType, int openPosition, out bool readFromFile, string name, int existI, int WorkI, int BaseI, List<Databank> m)
         {
-            databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
+            Databank databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
             readFromFile = false;
             if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
             {
@@ -417,9 +417,9 @@ namespace Gekko
                 if (openType == EOpenType.Edit)
                 {
                     if (openType == EOpenType.Edit) databank.editable = true;
-                    G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
+                    G.Writeln2("Databank '" + databank.name + "' set as editable databank, put in first position.");
                 }
-                else G.Writeln2("Databank '" + name + "' put in first position.");
+                else G.Writeln2("Databank '" + databank.name + "' put in first position.");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -450,11 +450,11 @@ namespace Gekko
                         m.Add(this.storage[i]);
                     }
                 }
-                G.Writeln2("Databank '" + name + "' set as ref bank");
+                G.Writeln2("Databank '" + databank.name + "' set as ref bank");
             }
         }
 
-        private void DatabankLogicExistingBankNew(Databank databank, EOpenType openType, int openPosition, string name, int existI, int WorkI, int RefI, List<Databank> m)
+        private void DatabankLogicExistingBankNew(Databank databank, EOpenType openType, int openPosition, int existI, int WorkI, int RefI, List<Databank> m)
         {
             databank = this.storage[existI];  //the databank at the slot where the new databank is to be put in
             //databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
@@ -505,9 +505,9 @@ namespace Gekko
                 if (openType == EOpenType.Edit)
                 {
                     if (openType == EOpenType.Edit) databank.editable = true;
-                    G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
+                    G.Writeln2("Databank '" + databank.name + "' set as editable databank, put in first position.");
                 }
-                else G.Writeln2("Databank '" + name + "' put in first position.");
+                else G.Writeln2("Databank '" + databank.name + "' put in first position.");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -544,7 +544,7 @@ namespace Gekko
             }
         }
 
-        private void DatabankLogicDefaultNew(Databank databank, EOpenType openType, int openPosition, string name, List<Databank> m)
+        private void DatabankLogicDefaultNew(Databank databank, EOpenType openType, int openPosition, List<Databank> m)
         {
             //default logic                                
             if (openType == EOpenType.Sec || (openType == EOpenType.Pos && openPosition == 2))
@@ -554,7 +554,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(databank);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Opening databank '" + name + "'");
+                G.Writeln2("Opening databank '" + databank.name + "'");
             }
             else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
             {
@@ -564,16 +564,18 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(this.storage[0]);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                if (openType == EOpenType.Edit) G.Writeln2("Opening databank '" + name + "' as editable in first position");
-                else G.Writeln2("Opening databank '" + name + "' in first position");
+                if (openType == EOpenType.Edit) G.Writeln2("Opening databank '" + databank.name + "' as editable in first position");
+                else G.Writeln2("Opening databank '" + databank.name + "' in first position");
             }
             else if (openType == EOpenType.Ref)
             {
-                m.Add(this.storage[0]);         //first
-                m.Add(databank);                //ref
-                m.Add(this.storage[1]);
-                for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Opening databank '" + name + "' as ref");
+                G.Writeln2("*** ERROR: OPEN <ref> not allowed.");
+                throw new GekkoException();
+                //m.Add(this.storage[0]);         //first
+                //m.Add(databank);                //ref
+                //m.Add(this.storage[1]);
+                //for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
+                //G.Writeln2("Opening databank '" + databank.name + "' as ref");
             }
             else if (ShouldPutBankLast(openType, openPosition))
             {
@@ -581,7 +583,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref                
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 m.Add(databank);
-                G.Writeln2("Opening databank '" + name + "'");
+                G.Writeln2("Opening databank '" + databank.name + "'");
             }
             else if (openType == EOpenType.Pos)
             {
@@ -602,11 +604,11 @@ namespace Gekko
                 {
                     m.Add(this.storage[i]);
                 }
-                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);
+                G.Writeln2("Opening databank '" + databank.name + "' in position " + openPosition);
             }
             else
             {
-                G.Writeln("*** ERROR: Internal error ¤89435735");
+                G.Writeln("*** ERROR: Internal error #89435735");
                 throw new GekkoException();
             }
 
