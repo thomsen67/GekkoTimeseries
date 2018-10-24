@@ -2297,7 +2297,7 @@ namespace Gekko
                         isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
                     }
 
-                    Program.databanks.OpenDatabankNew(databank, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+                    databank = Program.databanks.OpenDatabankNew(databank, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
                     
                     if (readInfo.type == EReadInfoTypes.NonExistingGbkFileOpened)
                     {

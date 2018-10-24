@@ -145,7 +145,7 @@ namespace Gekko
 
 
 
-        public bool OpenDatabankNew(Databank databank, EOpenType openType, int openPosition, int existI, int workI, int refI)
+        public Databank OpenDatabankNew(Databank databank, EOpenType openType, int openPosition, int existI, int workI, int refI)
         {
             if (openType == EOpenType.Pos)
             {
@@ -253,7 +253,7 @@ namespace Gekko
                 DatabankLogicDefaultNew(databank, openType, openPosition, m);                
             }
             this.storage = m;
-            return readFromFile;
+            return databank;
         }
 
         public bool OpenDatabank(ref Databank databank, EOpenType openType, int openPosition)
