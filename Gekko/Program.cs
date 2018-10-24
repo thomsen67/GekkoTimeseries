@@ -309,8 +309,8 @@ namespace Gekko
     public enum EReadInfoTypes
     {
         Normal,
-        OpenedNewNonExistingFile,
-        OpenedFirstOrRefAlreadyOpenBank
+        NonExistingGbkFileOpened,
+        //OpenedFirstOrRefAlreadyOpenBank
     }
 
     public enum EdataFormat
@@ -2205,15 +2205,15 @@ namespace Gekko
                 }
 
                 bool cancel = false;
-                bool createNewOpenFile = false;
-                ReadHelper(ref file, ref cancel, ref createNewOpenFile, extension, oRead.openType == EOpenType.Ref, open);
+                bool nonExistingGbkFileOpened = false;
+                ReadHelper(ref file, ref cancel, ref nonExistingGbkFileOpened, extension, oRead.openType == EOpenType.Ref, open);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
 
-                if (open && createNewOpenFile && !oRead.editable)
+                if (open && nonExistingGbkFileOpened && !oRead.editable)
                 {
                     G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                     throw new GekkoException();
@@ -2242,12 +2242,11 @@ namespace Gekko
 
                 readInfo.fileName = file;
 
+                Databank databank = null;                
 
-                Databank databank = null;
-                //readInfo.databank = databank;
+                if (nonExistingGbkFileOpened) readInfo.type = EReadInfoTypes.NonExistingGbkFileOpened;
 
-                if (createNewOpenFile) readInfo.type = EReadInfoTypes.OpenedNewNonExistingFile;
-                else if (!isReadFromFile) readInfo.type = EReadInfoTypes.OpenedFirstOrRefAlreadyOpenBank;
+                int existI; int workI; int refI; Databanks.FindBanksI(readInfo.dbName, out existI, out workI, out refI);
 
                 Databank databankTemp = null;  //temp bank where the external file is read into
 
@@ -2261,7 +2260,23 @@ namespace Gekko
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
                         file = tempPath;
                     }
-                    databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+
+                    bool alreadyOpen = false;                                                            
+                    if (existI != -12345)
+                    {
+                        alreadyOpen = true;
+                    }                    
+
+                    if (!alreadyOpen)
+                    {
+                        //If: (1) [read/import OR (2) OpenedNewNonExistingFile] AND bankname is not already open
+                        databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    }
+                    else
+                    {
+                        //do not read it: banks are just going to be rearranged
+                    }
+
                 }
                 else
                 {
@@ -2276,21 +2291,19 @@ namespace Gekko
                     //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
                     //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
                     databank = databankTemp; databank.name = readInfo.dbName;
-                    isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
 
-                    if (readInfo.type == EReadInfoTypes.OpenedNewNonExistingFile)
+                    if (false)
                     {
-                        //OPEN <edit> on a file that does not exist yet --> create brand new bank
+                        isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+                    }
+
+                    Program.databanks.OpenDatabankNew(databank, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+                    
+                    if (readInfo.type == EReadInfoTypes.NonExistingGbkFileOpened)
+                    {
+                        //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
                         databank = new Databank(readInfo.dbName);
-                    }
-                    else if (readInfo.type == EReadInfoTypes.OpenedFirstOrRefAlreadyOpenBank)
-                    {
-                        //OPEN <edit/first/ref> with a bankname that is already open --> rearrange positions only
-
-                        //
-                        // TODO: reorder banks
-                        //
-                    }
+                    }                    
                     else if (readInfo.type == EReadInfoTypes.Normal)
                     {
                         
@@ -2299,6 +2312,7 @@ namespace Gekko
                     {
                         throw new GekkoException();
                     }
+
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit) databank.editable = true;
                 }
@@ -2583,7 +2597,7 @@ namespace Gekko
                 {
                     if (open)
                     {
-                        if (createNewOpenFile) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
+                        if (nonExistingGbkFileOpened) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
                         else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
                     }
                 }
