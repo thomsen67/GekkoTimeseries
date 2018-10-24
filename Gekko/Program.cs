@@ -2277,10 +2277,12 @@ namespace Gekko
 
                     //Cleanup: put some of these params into readInfo
                     Databank databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-
-                    
+                                        
                     if (open)
                     {
+                        // ----------------------
+                        //OPEN or READ .. TO ..
+                        // ----------------------
                         //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
                         //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
                         databank = databankTemp; databank.name = readInfo.dbName;
@@ -2290,6 +2292,9 @@ namespace Gekko
                     }
                     else
                     {
+                        // ----------------------
+                        //READ or IMPORT, puts data into First or Ref
+                        // ----------------------
                         AllFreqsHelper dates = null;
                         if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                         {
@@ -2299,37 +2304,27 @@ namespace Gekko
                         else
                         {
                             dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);  //returns null if no truncation
-                        }
+                        }                        
 
                         //READ or READ<first>
                         databank = Program.databanks.GetFirst();
                         if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
                         readInfo.type = EReadInfoTypes.Normal;
-                    }
 
-                    if (wipeDatabankBeforeInsertingData)
-                    {
-                        databank = databankTemp;
-
-                        for (int ii = 0; ii < Program.databanks.storage.Count; ii++)
+                        if (wipeDatabankBeforeInsertingData)
                         {
-                            if (G.Equal(Program.databanks.storage[ii].name, databank.name))
-                            {
-                                Program.databanks.storage[ii] = databankTemp;
-                            }
+                            databank.Clear();
                         }
-                    }
-                    else
-                    {
-                        //merging
+
                         foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
                         {
                             if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
                             databank.AddIVariable(kvp.Key, kvp.Value); //no need to deep clone kvp.Value
                         }
                         databank.FileNameWithPath = databankTemp.FileNameWithPath;
-                    }
 
+                    }
+                    
                     HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
 
                     if (Program.options.solve_data_create_auto == true)
