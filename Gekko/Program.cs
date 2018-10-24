@@ -2283,12 +2283,24 @@ namespace Gekko
                     {
                         //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
                         //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
+                        databank = databankTemp; databank.name = readInfo.dbName;
                         isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file
                         if (createNewOpenFile) readInfo.type = EReadInfoTypes.OpenedNewNonExistingFile;
                         else if (!isReadFromFile) readInfo.type = EReadInfoTypes.OpenedFirstOrRefAlreadyOpenBank;
                     }
                     else
                     {
+                        AllFreqsHelper dates = null;
+                        if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
+                        {
+                            G.Writeln2("*** ERROR: Date-truncation not yet implemented for undated frequency.");
+                            throw new GekkoException();
+                        }
+                        else
+                        {
+                            dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);  //returns null if no truncation
+                        }
+
                         //READ or READ<first>
                         databank = Program.databanks.GetFirst();
                         if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
