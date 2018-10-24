@@ -1356,7 +1356,7 @@ namespace Gekko
             return matrix;
         }
 
-        private static void GetTimeseriesFromWorkbookMatrix(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
+        private static void GetTimeseriesFromWorkbookMatrix(ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo)
         {
 
             //TODO: gaps, READ<gap>
@@ -1633,22 +1633,22 @@ namespace Gekko
                                 }
                                 GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data   
                                 bool good = true;
-                                if (dates != null)
-                                {
-                                    good = false;
-                                    if (gt2.freq == EFreq.A)
-                                    {
-                                        if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;
-                                    }
-                                    else if (gt2.freq == EFreq.Q)
-                                    {
-                                        if (gt2.LargerThanOrEqual(dates.t1Quarterly) && gt2.SmallerThanOrEqual(dates.t2Quarterly)) good = true;
-                                    }
-                                    else if (gt2.freq == EFreq.M)
-                                    {
-                                        if (gt2.LargerThanOrEqual(dates.t1Monthly) && gt2.SmallerThanOrEqual(dates.t2Monthly)) good = true;
-                                    }
-                                }
+                                //if (dates != null)
+                                //{
+                                //    good = false;
+                                //    if (gt2.freq == EFreq.A)
+                                //    {
+                                //        if (gt2.LargerThanOrEqual(dates.t1Annual) && gt2.SmallerThanOrEqual(dates.t2Annual)) good = true;
+                                //    }
+                                //    else if (gt2.freq == EFreq.Q)
+                                //    {
+                                //        if (gt2.LargerThanOrEqual(dates.t1Quarterly) && gt2.SmallerThanOrEqual(dates.t2Quarterly)) good = true;
+                                //    }
+                                //    else if (gt2.freq == EFreq.M)
+                                //    {
+                                //        if (gt2.LargerThanOrEqual(dates.t1Monthly) && gt2.SmallerThanOrEqual(dates.t2Monthly)) good = true;
+                                //    }
+                                //}
 
                                 if (good == true)
                                 {
@@ -2294,15 +2294,15 @@ namespace Gekko
 
                     if (oRead.Type == EDataFormat.Pcim)
                     {
-                        Program.ReadPCIM(databankTemp, dates, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
+                        Program.ReadPCIM(databankTemp, oRead, oRead.FileName, open, as2, oRead.openType == EOpenType.Ref, oRead.Merge, readInfo, file);
                     }
                     else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
                     {
-                        ReadSheet(dates, oRead, readInfo, file, databankTemp, originalFilePath);
+                        ReadSheet(oRead, readInfo, file, databankTemp, originalFilePath);
                     }
                     else if (oRead.Type == EDataFormat.Tsd)
                     {
-                        ReadTsd(dates, oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref NaNCounter);
+                        ReadTsd(oRead, readInfo, ref file, ref databankTemp, originalFilePath, ref NaNCounter);
                     }
                     else if (oRead.Type == EDataFormat.Tsd || oRead.Type == EDataFormat.Tsdx || oRead.Type == EDataFormat.Gbk || oRead.Type == EDataFormat.None)
                     {
@@ -2550,7 +2550,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadSheet(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
+        private static void ReadSheet(ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath)
         {
             //TODO:
             //For speedup:
@@ -2571,7 +2571,7 @@ namespace Gekko
             {
                 matrix = ReadExcelWorkbook(file, databank, null);
             }
-            GetTimeseriesFromWorkbookMatrix(dates, oRead, databank, matrix, readInfo);
+            GetTimeseriesFromWorkbookMatrix(oRead, databank, matrix, readInfo);
         }
 
         public static int ExcelColumnNameToNumber(string columnName)
@@ -3326,26 +3326,26 @@ namespace Gekko
             return tsExisting;
         }
 
-        private static void ReadTsd(AllFreqsHelper dates, ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
+        private static void ReadTsd(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref int NaNCounter)
         {
             bool isTsdx = false;
-            bool mergeOrTimeLimit = oRead.Merge || dates != null;
+            //bool mergeOrTimeLimit = oRead.Merge || dates != null;
             readInfo.fileName = originalFilePath;
             //also deals with merging (not clearing the databank first if merging)
-            ReadAllTsdRecords(dates, file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
+            ReadAllTsdRecords(file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
             readInfo.nanCounter = NaNCounter;
 
             //See almost identical code in readCsv() and others
-            if (mergeOrTimeLimit)
-            {
-                readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-                readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-            }
-            else
-            {
+            //if (mergeOrTimeLimit)
+            //{
+            //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
+            //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
+            //}
+            //else
+            //{
                 readInfo.startPerResultingBank = readInfo.startPerInFile;
                 readInfo.endPerResultingBank = readInfo.endPerInFile;
-            }
+            //}
             Databank currentBank = Program.databanks.GetDatabank(databank.name);
             currentBank.yearStart = readInfo.startPerResultingBank;
             currentBank.yearEnd = readInfo.endPerResultingBank;
@@ -3406,7 +3406,7 @@ namespace Gekko
             return new Tuple<GekkoTime, GekkoTime, int>(firstRv, lastRv, offset);
         }
 
-        public static void ReadAllTsdRecords(AllFreqsHelper dates, string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
+        public static void ReadAllTsdRecords(string file, bool merge, bool isTsdx, Databank databank, ref int NaNCounter, ReadInfo readInfo)
         {
             int smallWarnings = 0;
             int emptyWarnings = 0;
@@ -3640,14 +3640,14 @@ namespace Gekko
 
                             int offset = 0;
 
-                            //See similar code in px reader
-                            if (dates != null)
-                            {
-                                var tuple = GetFirstLastDates(dates, gt1, gt2);
-                                gt1 = tuple.Item1;
-                                gt2 = tuple.Item2;
-                                offset = tuple.Item3;
-                            }
+                            ////See similar code in px reader
+                            //if (dates != null)
+                            //{
+                            //    var tuple = GetFirstLastDates(dates, gt1, gt2);
+                            //    gt1 = tuple.Item1;
+                            //    gt2 = tuple.Item2;
+                            //    offset = tuple.Item3;
+                            //}
 
                             int nob = GekkoTime.Observations(gt1, gt2);
                             if (nob > 0)
@@ -3876,7 +3876,7 @@ namespace Gekko
 
         }
 
-        public static void ReadPCIM(Databank databank, AllFreqsHelper dates, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
+        public static void ReadPCIM(Databank databank, ReadOpenMulbkHelper oRead, string file, bool open, string asName, bool baseline, bool merge, ReadInfo readInfo, string fileLocal)
         {
 
             //try
@@ -4044,11 +4044,10 @@ namespace Gekko
                             {
                                 short year = fid[per];
                                 GekkoTime t = new GekkoTime(EFreq.A, year, 1);
-                                if (t.LargerThanOrEqual(dates.t1Annual) && t.SmallerThanOrEqual(dates.t2Annual))
-                                {
-                                    float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
-                                    ts.SetData(t, ss);
-                                }
+
+                                float ss = gigant[var, per + 1];  //<==== because gigant[] is 1-based, not 0-based
+                                ts.SetData(t, ss);
+
                             }
                         }
                     }
