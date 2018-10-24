@@ -2269,21 +2269,8 @@ namespace Gekko
                     
                 }
                 else if (readInfo.type == EReadInfoTypes.Normal)
-                {                   
-
-                    //AllFreqsHelper dates = null;
-
-                    //if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
-                    //{
-                    //    G.Writeln2("*** ERROR: Sorry, date-truncation not yet implemented for undated frequency.");
-                    //    throw new GekkoException();
-                    //}
-                    //else
-                    //{
-                    //    dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);
-                    //}                    
-
-                    //Cleanup: put some of these params into readInfo
+                {                  
+                                       
                     
                     if (open)
                     {
