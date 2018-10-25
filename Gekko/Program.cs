@@ -16168,8 +16168,12 @@ namespace Gekko
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
             bool allowBankRhs = true;
-            if (type == EWildcardSearchType.Write) allowBankRhs = true;
-            if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
+            if (type == EWildcardSearchType.Write)
+            {
+                allowBankRhs = true;
+                if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
+            }
+            
             List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
             
             // --------------------------------------------
