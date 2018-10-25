@@ -2324,8 +2324,11 @@ namespace Gekko
                     }
                     databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
-                    {
-                        hash = Program.GetMD5Hash(GetTextFromFileWithWait(file));
+                    {                        
+                        if (!file.Contains(Globals.isAProto))
+                        {
+                            hash = Program.GetMD5Hash(GetTextFromFileWithWait(file));
+                        }
                     }
                 }
                 else
@@ -2633,7 +2636,9 @@ namespace Gekko
                     }
                     else
                     {
-                        databank.fileHash = hash;
+                        if (hash != null) databank.fileHash = hash;  //typically the MD5 has been done on the copylocal temp file
+                        else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));
+
                     }
                 }
             }  //for each bank in list
@@ -23062,7 +23067,7 @@ namespace Gekko
                             {
                                 tmp2.ExtractFiles(folder, tmp2.ArchiveFileData[i].Index);
                             }
-                            tsdFile = "Is_a_protobuffer_file";  //okay, this is a hacky way to signal back, I admit it...
+                            tsdFile = Globals.isAProto;  //okay, this is a hacky way to signal back, I admit it...
                         }
                         else
                         {
