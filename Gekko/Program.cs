@@ -2203,23 +2203,61 @@ namespace Gekko
                     extension = "px";
                     isGbk = false;
                 }
+                
+
+                // ---------------------------------------------------------------------------------
+                //                  Start of categories
+                // ---------------------------------------------------------------------------------
+
+                //                   +---------------------------+---------------------------------+                
+                //                   |       fileExists          |         file does not exist     |
+                // ------------------+---------------------------+---------------------------------+
+                //                   |                                                             |
+                //  alreadyOpen      |              move existing bank around                      |
+                //                   |                                                             |
+                // ----------------------------------------------+---------------------------------+
+                //                   |                           |                                 |
+                //  not already open |  read into position       |    fail unless OPEN<edit>       |
+                //                   |   maybe editable          |      createBrandNew             |
+                // ------------------+---------------------------+---------------------------------+
 
                 bool cancel = false;
                 bool nonExistingGbkFileOpened = false;
-                ReadHelper(ref file, ref cancel, ref nonExistingGbkFileOpened, extension, oRead.openType == EOpenType.Ref, open);
+                file = ReadHelper(file, ref cancel, extension);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
+                bool fileExists = false;
+                if (file != null) fileExists = true;
 
-                if (open && nonExistingGbkFileOpened && !oRead.editable)
+                int existI; int workI; int refI;
+                Databanks.FindBanksI(readInfo.dbName, out existI, out workI, out refI);
+                bool alreadyOpen = false;
+                if (existI != -12345)
                 {
-                    G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
-                    throw new GekkoException();
+                    alreadyOpen = true;
                 }
 
-                //At this point, we know that the file to be opened/read actually exists (or createOpenFile is true)
+                bool createBrandNew = false;
+                if (open && !fileExists && !alreadyOpen)
+                {
+                    if(oRead.editable)
+                    {
+                        createBrandNew = true;
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
+                        throw new GekkoException();
+                    }                    
+                }
+
+                // ---------------------------------------------------------------------------------
+                //                  End of categories
+                // ---------------------------------------------------------------------------------
+
 
                 readInfo.dbName = Path.GetFileNameWithoutExtension(file);  //may be overridden later on (Work for READ, and Base for MULBK)
                 if (as2 != null && as2 == "*") as2 = readInfo.dbName;    //With READ * TO *, as2 will be '*'. In that case, we use the filename. This will only happen regarding READ, we do not have an OPEN * AS * (would not be useful, OPEN * would do exactly the same)
@@ -2227,7 +2265,7 @@ namespace Gekko
 
                 DateTime dt1 = DateTime.Now;
 
-                bool isReadFromFile = true; //always true for READ/MULBK
+                //bool isReadFromFile = true; //always true for READ/MULBK
                 
                 //readInfo.databank = databank;
 
@@ -2244,13 +2282,11 @@ namespace Gekko
 
                 Databank databank = null;                
 
-                if (nonExistingGbkFileOpened) readInfo.type = EReadInfoTypes.NonExistingGbkFileOpened;
-
-                int existI; int workI; int refI; Databanks.FindBanksI(readInfo.dbName, out existI, out workI, out refI);
-
+                //if (nonExistingGbkFileOpened) readInfo.type = EReadInfoTypes.NonExistingGbkFileOpened;
+                
                 Databank databankTemp = null;  //temp bank where the external file is read into
 
-                if (!open || (open && readInfo.type == EReadInfoTypes.Normal))
+                if (!open || (open && !alreadyOpen && fileExists))
                 {
                     if (copyLocal)
                     {
@@ -2259,24 +2295,8 @@ namespace Gekko
                         WaitForFileCopy(file, tempPath);
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
                         file = tempPath;
-                    }
-
-                    bool alreadyOpen = false;                                                            
-                    if (existI != -12345)
-                    {
-                        alreadyOpen = true;
-                    }                    
-
-                    if (!alreadyOpen)
-                    {
-                        //If: (1) [read/import OR (2) OpenedNewNonExistingFile] AND bankname is not already open
-                        databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-                    }
-                    else
-                    {
-                        //do not read it: banks are just going to be rearranged
-                    }
-
+                    }                                                         
+                    databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);                    
                 }
                 else
                 {
@@ -2287,30 +2307,17 @@ namespace Gekko
                 if (open)
                 {
                     //OPEN or READ...TO...
-
-                    //if new databank (read from disk), the newly created 'databank' is put into the right slot (and other databanks are moved around)
-                    //if existing databank, isReadFromFile = false, 'databank' will point to the found databank (that may be moved, for instance with OPEN<first> of existing bank)
-                    databank = databankTemp;
-
-                    if (false)
-                    {
-                        isReadFromFile = Program.databanks.OpenDatabank(ref databank, oRead.openType, oRead.openTypePosition); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
-                    }
-
+                    
                     databank = Program.databanks.OpenDatabankNew(databank, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
                     
-                    if (readInfo.type == EReadInfoTypes.NonExistingGbkFileOpened)
+                    if (createBrandNew)
                     {
                         //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
                         databank = new Databank(readInfo.dbName);
                     }                    
-                    else if (readInfo.type == EReadInfoTypes.Normal)
-                    {
-                        
-                    }
                     else
                     {
-                        throw new GekkoException();
+
                     }
 
                     databank.editable = false;
@@ -2321,9 +2328,7 @@ namespace Gekko
                 else
                 {
                     //READ/IMPORT
-
-                    if (readInfo.type != EReadInfoTypes.Normal) throw new GekkoException();
-
+                                        
                     if (true)
                     {
                         //READ/IMPORT or OPEN a databank from file 
@@ -2347,8 +2352,7 @@ namespace Gekko
                             //READ or READ<first>
                             databank = Program.databanks.GetFirst();
                             if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
-                            readInfo.type = EReadInfoTypes.Normal;
-
+                            
                             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
                             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
                             //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
@@ -18324,18 +18328,19 @@ namespace Gekko
             }
         }        
 
-        private static void ReadHelper(ref string fileName, ref bool cancel, ref bool createOpenFile, string extension, bool isBase, bool open)
+        private static string ReadHelper(string fileName, ref bool cancel, string extension)
         {
+            string rv = null;
             if (fileName == "*")
             {
                 SelectFile(extension, ref fileName, ref cancel);
-                string type = "open";
-                if (!open)
-                {
-                    type = "read";
-                    if (isBase) type = "mulbk";
-                }
-                CrossThreadStuff.SetTextInput(fileName, type);
+                //string type = "open";
+                //if (!open)
+                //{
+                //    type = "read";
+                //    if (isBase) type = "mulbk";
+                //}
+                CrossThreadStuff.SetTextInput(fileName, null);
             }
             else
             {
@@ -18345,37 +18350,10 @@ namespace Gekko
                 folders.Add(Program.options.folder_bank);
                 folders.Add(Program.options.folder_bank1);
                 folders.Add(Program.options.folder_bank2);
-                string fileNameTemp = FindFile(fileName, folders);
-
-                if (fileNameTemp == null)
-                {
-                    if (open && extension == "" + Globals.extensionDatabank + "")
-                    {
-                        createOpenFile = true;
-                        fileNameTemp = CreateFullPathAndFileName(fileName);
-                        G.Writeln2("Creating new databank file: " + fileNameTemp);
-                    }
-                    else
-                    {
-
-                        FileNotFoundErrorMessage(fileName);
-
-                        if (fileName.ToLower().EndsWith("." + Globals.extensionDatabank + ""))
-                        {
-                            G.Writeln("           NOTE: the default databank format has been changed from .tsdx to ." + Globals.extensionDatabank + ".");
-                            G.Writeln("           You can rename a .tsdx file to ." + Globals.extensionDatabank + ", or use <tsdx> option.");
-                            G.Writeln();
-                        }
-
-                        throw new GekkoException();
-                    }
-                }
-                else
-                {
-                    //??
-                }
-                fileName = fileNameTemp;
+                fileName = FindFile(fileName, folders);
+                
             }
+            return fileName;
         }
 
         private static string FileNotFoundErrorMessage(string fileName)
@@ -37907,7 +37885,7 @@ namespace Gekko
         {
             public static GekkoTime tStart = GekkoTime.tNull;
             public static GekkoTime tEnd = GekkoTime.tNull;
-            public EReadInfoTypes type = EReadInfoTypes.Normal;
+            //public EReadInfoTypes type = EReadInfoTypes.Normal;
             public string fileName = null;
             //public bool copiedIntoBaseMessage = false;
             public int variables;
