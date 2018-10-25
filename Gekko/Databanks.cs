@@ -145,8 +145,9 @@ namespace Gekko
 
 
 
-        public Databank OpenDatabankNew(Databank databank, EOpenType openType, int openPosition, int existI, int workI, int refI)
+        public Databank OpenDatabankNew(string name, Databank databankTemp, EOpenType openType, int openPosition, int existI, int workI, int refI)
         {
+            Databank rv = null;
             if (openType == EOpenType.Pos)
             {
                 if (openPosition > this.storage.Count)
@@ -164,7 +165,7 @@ namespace Gekko
             bool readFromFile = false;
             //Does not read the actual bank, but just arranges for the bank to be read into the right 'slot'
             //If <first/edit> or <ref>, the bank in the [0] or [1] slot is pushed down to [2].
-            if (G.Equal(databank.name, Globals.Work))
+            if (G.Equal(name, Globals.Work))
             {
                 if (openType == EOpenType.Normal || openType == EOpenType.Last)
                 {
@@ -195,7 +196,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (G.Equal(databank.name, Globals.Ref))  //Ref
+            else if (G.Equal(name, Globals.Ref))  //Ref
             {
                 if (openType == EOpenType.Normal)
                 {
@@ -223,17 +224,17 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else if (G.Equal(databank.name, Globals.First))
+            else if (G.Equal(name, Globals.First))
             {
                 G.Writeln2("*** ERROR: The databank name 'First' is reserved and cannot be used.");
                 throw new GekkoException();
             }
-            else if (G.Equal(databank.name, Globals.Local))
+            else if (G.Equal(name, Globals.Local))
             {
                 G.Writeln2("*** ERROR: The databank name 'Local' is reserved and cannot be used.");
                 throw new GekkoException();
             }
-            else if (G.Equal(databank.name, Globals.Global))
+            else if (G.Equal(name, Globals.Global))
             {
                 G.Writeln2("*** ERROR: The databank name 'Global' is reserved and cannot be used.");
                 throw new GekkoException();
@@ -245,15 +246,15 @@ namespace Gekko
             List<Databank> m = new List<Databank>(this.storage.Count);
             if (existI != -12345)  //the databank name already exists. No actual file reading, just rearrange the banks
             {
-                DatabankLogicExistingBankNew(databank, openType, openPosition, existI, workI, refI, m);
+                rv = DatabankLogicExistingBankNew(name, databankTemp, openType, openPosition, existI, workI, refI, m);
             }
-            else  //the databank name does not exist, so it is new and will be read from file later on
+            else  //the databank name does not exist already
             {
                 readFromFile = true;                
-                DatabankLogicDefaultNew(databank, openType, openPosition, m);                
+                rv = DatabankLogicDefaultNew(name, databankTemp, openType, openPosition, m);                
             }
             this.storage = m;
-            return databank;
+            return rv;
         }
 
         public bool OpenDatabank(ref Databank databank, EOpenType openType, int openPosition)
@@ -454,9 +455,10 @@ namespace Gekko
             }
         }
 
-        private void DatabankLogicExistingBankNew(Databank databank, EOpenType openType, int openPosition, int existI, int WorkI, int RefI, List<Databank> m)
+        private Databank DatabankLogicExistingBankNew(string name, Databank databank, EOpenType openType, int openPosition, int existI, int WorkI, int RefI, List<Databank> m)
         {
             databank = this.storage[existI];  //the databank at the slot where the new databank is to be put in
+            Databank rv = databank;
             //databank = this.storage[existI];  //now points to the existing databank, and no longer the empty databank the method was called with
             //readFromFile = false;
             if (openType == EOpenType.Normal || openType == EOpenType.Last || (openType == EOpenType.Pos && openPosition != 1))
@@ -474,7 +476,7 @@ namespace Gekko
                     {
                         if (databank.editable)
                         {
-                            G.Writeln2("Databank '" + databank.name + "' is already editable in first position.");
+                            G.Writeln2("Databank '" + name + "' is already editable in first position.");
                         }
                     }
                     m.AddRange(this.storage);  //just copied, and put back again later on
@@ -505,9 +507,9 @@ namespace Gekko
                 if (openType == EOpenType.Edit)
                 {
                     if (openType == EOpenType.Edit) databank.editable = true;
-                    G.Writeln2("Databank '" + databank.name + "' set as editable databank, put in first position.");
+                    G.Writeln2("Databank '" + name + "' set as editable databank, put in first position.");
                 }
-                else G.Writeln2("Databank '" + databank.name + "' put in first position.");
+                else G.Writeln2("Databank '" + name + "' put in first position.");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -542,10 +544,13 @@ namespace Gekko
                 //}
                 //G.Writeln2("Databank '" + name + "' set as ref bank");
             }
+            return rv;
         }
 
-        private void DatabankLogicDefaultNew(Databank databank, EOpenType openType, int openPosition, List<Databank> m)
+        private Databank DatabankLogicDefaultNew(string name, Databank databank, EOpenType openType, int openPosition, List<Databank> m)
         {
+            Databank rv = databank;
+            
             //default logic                                
             if (openType == EOpenType.Sec || (openType == EOpenType.Pos && openPosition == 2))
             {
@@ -554,7 +559,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref
                 m.Add(databank);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
-                G.Writeln2("Opening databank '" + databank.name + "'");
+                G.Writeln2("Opening databank '" + name + "'");
             }
             else if (openType == EOpenType.First || openType == EOpenType.Edit || (openType == EOpenType.Pos && openPosition == 1))
             {
@@ -565,7 +570,7 @@ namespace Gekko
                 m.Add(this.storage[0]);
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 if (openType == EOpenType.Edit) G.Writeln2("Opening databank '" + databank.name + "' as editable in first position");
-                else G.Writeln2("Opening databank '" + databank.name + "' in first position");
+                else G.Writeln2("Opening databank '" + name + "' in first position");
             }
             else if (openType == EOpenType.Ref)
             {
@@ -583,7 +588,7 @@ namespace Gekko
                 m.Add(this.storage[1]);  //ref                
                 for (int i = 2; i < this.storage.Count; i++) m.Add(this.storage[i]);
                 m.Add(databank);
-                G.Writeln2("Opening databank '" + databank.name + "'");
+                G.Writeln2("Opening databank '" + name + "'");
             }
             else if (openType == EOpenType.Pos)
             {
@@ -604,7 +609,7 @@ namespace Gekko
                 {
                     m.Add(this.storage[i]);
                 }
-                G.Writeln2("Opening databank '" + databank.name + "' in position " + openPosition);
+                G.Writeln2("Opening databank '" + name + "' in position " + openPosition);
             }
             else
             {
@@ -612,7 +617,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            return;
+            return rv;
         }
 
         private void DatabankLogicDefault(Databank databank, EOpenType openType, int openPosition, string name, List<Databank> m)

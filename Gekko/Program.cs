@@ -2203,7 +2203,7 @@ namespace Gekko
                     extension = "px";
                     isGbk = false;
                 }
-                
+
 
                 // ---------------------------------------------------------------------------------
                 //                  Start of categories
@@ -2243,7 +2243,7 @@ namespace Gekko
                 bool createBrandNew = false;
                 if (open && !fileExists && !alreadyOpen)
                 {
-                    if(oRead.editable)
+                    if (oRead.editable)
                     {
                         createBrandNew = true;
                     }
@@ -2251,7 +2251,7 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
                         throw new GekkoException();
-                    }                    
+                    }
                 }
 
                 // ---------------------------------------------------------------------------------
@@ -2266,7 +2266,7 @@ namespace Gekko
                 DateTime dt1 = DateTime.Now;
 
                 //bool isReadFromFile = true; //always true for READ/MULBK
-                
+
                 //readInfo.databank = databank;
 
                 string originalFilePath = file;
@@ -2280,11 +2280,15 @@ namespace Gekko
 
                 readInfo.fileName = file;
 
-                Databank databank = null;                
+                Databank databank = null;
 
                 //if (nonExistingGbkFileOpened) readInfo.type = EReadInfoTypes.NonExistingGbkFileOpened;
-                
+
                 Databank databankTemp = null;  //temp bank where the external file is read into
+
+                // ---------------------------------------------------------------------------------
+                //                  Read the file into databankTemp
+                // ---------------------------------------------------------------------------------
 
                 if (!open || (open && !alreadyOpen && fileExists))
                 {
@@ -2295,8 +2299,8 @@ namespace Gekko
                         WaitForFileCopy(file, tempPath);
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
                         file = tempPath;
-                    }                                                         
-                    databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);                    
+                    }
+                    databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                 }
                 else
                 {
@@ -2304,17 +2308,24 @@ namespace Gekko
                     databankTemp = null; //already so, but just to state it here
                 }
 
+                // ---------------------------------------------------------------------------------
+                //                  Now handle READ/IMPORT or OPEN
+                // ---------------------------------------------------------------------------------
+
+
                 if (open)
                 {
+                    // -----------------------
                     //OPEN or READ...TO...
-                    
-                    databank = Program.databanks.OpenDatabankNew(databank, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
-                    
+                    // -----------------------
+
+                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName ,databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+
                     if (createBrandNew)
                     {
                         //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
                         databank = new Databank(readInfo.dbName);
-                    }                    
+                    }
                     else
                     {
 
@@ -2327,270 +2338,260 @@ namespace Gekko
                 }
                 else
                 {
+                    // -----------------------
                     //READ/IMPORT
-                                        
-                    if (true)
+                    // -----------------------
+
+
+                    // ----------------------
+                    //READ or IMPORT, puts data into First or Ref
+                    // ----------------------
+                    AllFreqsHelper dates = null;
+                    if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
                     {
-                        //READ/IMPORT or OPEN a databank from file 
+                        G.Writeln2("*** ERROR: Date-truncation not yet implemented for undated frequency.");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);  //returns null if no truncation
+                    }
 
-                        if (true)
+                    //READ or READ<first>
+                    databank = Program.databanks.GetFirst();
+                    if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
+
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                    //
+                    // when it is a simple read or import into an empty bank
+                    // and there is not time-truncation, just set dataBank = dataBankTemp
+                    //
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+
+                    if (wipeDatabankBeforeInsertingData)
+                    {
+                        databank.Clear();
+                    }
+
+                    if (dates == null)
+                    {
+                        foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
                         {
-                            // ----------------------
-                            //READ or IMPORT, puts data into First or Ref
-                            // ----------------------
-                            AllFreqsHelper dates = null;
-                            if (!oRead.t1.IsNull() && oRead.t1.freq == EFreq.U)
-                            {
-                                G.Writeln2("*** ERROR: Date-truncation not yet implemented for undated frequency.");
-                                throw new GekkoException();
-                            }
-                            else
-                            {
-                                dates = G.ConvertDateFreqsToAllFreqs(oRead.t1, oRead.t2);  //returns null if no truncation
-                            }
+                            if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
+                            IVariable iv = kvp.Value;
+                            databank.AddIVariable(kvp.Key, iv); //no need to deep clone kvp.Value
+                        }
+                    }
+                    else
+                    {
+                        //Cannot do a simple deflate in this case: has to move stuff from deflated file into existing first databank
 
-                            //READ or READ<first>
-                            databank = Program.databanks.GetFirst();
-                            if (oRead.openType == EOpenType.Ref) databank = Program.databanks.GetRef();
-                            
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-                            //
-                            // when it is a simple read or import into an empty bank
-                            // and there is not time-truncation, just set dataBank = dataBankTemp
-                            //
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
-                            //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+                        //
+                        // ------ WORK ----------            ------ FILE ---------
+                        //
+                        //           x1     x2                  x1      x3
+                        //
+                        // 2000       2                                1000
+                        // 2001       3     100                 10     2000
+                        // 2002       4     200                 11
+                        // 2003             300                 12
+                        //                    
+                        // We merge in the two dimensions:
+                        //
+                        // ------ WORK ----------        
+                        //
+                        //           x1     x2     x3       
+                        //
+                        // 2000       2            1000     
+                        // 2001      10     100    2000  
+                        // 2002      11     200          
+                        // 2003      12     300          
+                        //
+                        // If non-series or array-series, just replace any File object already in Work (never mind time truncation)
+                        // SERIES: Easy copy if series is not in Work (x3)
+                        // SERIES: If in Work, only inject over the overlap of date period and series data period)
+                        // ARRAYSERIES: do as above, just for these subseries
+                        //            
 
-                            if (wipeDatabankBeforeInsertingData)
-                            {
-                                databank.Clear();
-                            }
+                        int maxYearInProtobufFile = -12345;
+                        int minYearInProtobufFile = -12345;
 
-                            if (dates == null)
+                        foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)  //for each ivar in temp databank 
+                        {
+                            string name = kvp.Key;
+                            IVariable iv = kvp.Value;
+
+                            if (iv.Type() == EVariableType.Series)
                             {
-                                foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
+                                //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
+
+                                Series tsExisting = GetTsExisting(databank, name);  //may be null
+                                Series tsProtobuf = iv as Series;  //cannot be null
+
+                                if (tsProtobuf.type == ESeriesType.ArraySuper)
                                 {
-                                    if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
-                                    IVariable iv = kvp.Value;
-                                    databank.AddIVariable(kvp.Key, iv); //no need to deep clone kvp.Value
-                                }
-                            }
-                            else
-                            {
-                                //Cannot do a simple deflate in this case: has to move stuff from deflated file into existing first databank
+                                    //---------------------------
+                                    // handle array-timeseries
+                                    //---------------------------
 
-                                //
-                                // ------ WORK ----------            ------ FILE ---------
-                                //
-                                //           x1     x2                  x1      x3
-                                //
-                                // 2000       2                                1000
-                                // 2001       3     100                 10     2000
-                                // 2002       4     200                 11
-                                // 2003             300                 12
-                                //                    
-                                // We merge in the two dimensions:
-                                //
-                                // ------ WORK ----------        
-                                //
-                                //           x1     x2     x3       
-                                //
-                                // 2000       2            1000     
-                                // 2001      10     100    2000  
-                                // 2002      11     200          
-                                // 2003      12     300          
-                                //
-                                // If non-series or array-series, just replace any File object already in Work (never mind time truncation)
-                                // SERIES: Easy copy if series is not in Work (x3)
-                                // SERIES: If in Work, only inject over the overlap of date period and series data period)
-                                // ARRAYSERIES: do as above, just for these subseries
-                                //            
-
-                                int maxYearInProtobufFile = -12345;
-                                int minYearInProtobufFile = -12345;
-
-                                foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)  //for each ivar in temp databank 
-                                {
-                                    string name = kvp.Key;
-                                    IVariable iv = kvp.Value;
-
-                                    if (iv.Type() == EVariableType.Series)
+                                    if (tsExisting == null)
                                     {
-                                        //NOTE: we only time-truncate series and array-series at the direct level, not series inside lists, maps etc.
-
-                                        Series tsExisting = GetTsExisting(databank, name);  //may be null
-                                        Series tsProtobuf = iv as Series;  //cannot be null
-
-                                        if (tsProtobuf.type == ESeriesType.ArraySuper)
+                                        databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
+                                    }
+                                    else
+                                    {
+                                        if (tsExisting.dimensions == tsProtobuf.dimensions)
                                         {
-                                            //---------------------------
-                                            // handle array-timeseries
-                                            //---------------------------
+                                            //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
+                                            MapMultidim gmapExisting = tsExisting.dimensionsStorage;
+                                            MapMultidim gmapProtobuf = tsProtobuf.dimensionsStorage;
 
-                                            if (tsExisting == null)
+                                            foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
                                             {
-                                                databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
-                                            }
-                                            else
-                                            {
-                                                if (tsExisting.dimensions == tsProtobuf.dimensions)
+                                                MapMultidimItem nameDimProtobuf = kvpGmap.Key;
+                                                Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
+
+                                                IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
+                                                Series tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as Series;
+
+                                                //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
+
+                                                if (tsDimExisting == null)
                                                 {
-                                                    //now, we have same-name and same-dim array-timeseries in both Work and protobuf file.
-                                                    MapMultidim gmapExisting = tsExisting.dimensionsStorage;
-                                                    MapMultidim gmapProtobuf = tsProtobuf.dimensionsStorage;
-
-                                                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvpGmap in gmapProtobuf.storage)
-                                                    {
-                                                        MapMultidimItem nameDimProtobuf = kvpGmap.Key;
-                                                        Series tsDimProtobuf = kvp.Value as Series;  //must be timeseries, no need to check that the type is so
-
-                                                        IVariable ivDimExisting = null; gmapExisting.TryGetValue(nameDimProtobuf, out ivDimExisting);
-                                                        Series tsDimExisting = null; if (ivDimExisting != null) tsDimExisting = ivDimExisting as Series;
-
-                                                        //now we have a tsDimProtobuf, and if tsDimExisting != null, we merge the data
-
-                                                        if (tsDimExisting == null)
-                                                        {
-                                                            //add this sub-series to the array-timeseries                                   
-                                                            tsProtobuf.Truncate(dates);
-                                                            gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsProtobuf);
-                                                        }
-                                                        else
-                                                        {
-                                                            //now we need to merge the two series
-                                                            //also see #98520983
-                                                            bool shouldOverwriteLaterOn = false;
-                                                            MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
-                                                            MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
-                                                        }
-                                                    }
+                                                    //add this sub-series to the array-timeseries                                   
+                                                    tsProtobuf.Truncate(dates);
+                                                    gmapProtobuf.AddIVariableWithOverwrite(nameDimProtobuf, tsProtobuf);
                                                 }
                                                 else
                                                 {
-                                                    //dimensions do not match, wipt existing out!
-                                                    databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
+                                                    //now we need to merge the two series
+                                                    //also see #98520983
+                                                    bool shouldOverwriteLaterOn = false;
+                                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref shouldOverwriteLaterOn);
+                                                    MergeTwoTimeseriesWithDateWindowHelper(dates, gmapExisting, nameDimProtobuf, tsProtobuf, shouldOverwriteLaterOn);
                                                 }
                                             }
                                         }
                                         else
                                         {
-                                            //---------------------------
-                                            // handle normal timeseries
-                                            //---------------------------
-
-                                            //also see #98520983
-                                            bool wipeExistingOut = false;
-                                            MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
-                                            MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
+                                            //dimensions do not match, wipt existing out!
+                                            databank.AddIVariableWithOverwrite(name, tsProtobuf);  //the sub-timeseries will follow automatically!
                                         }
                                     }
-                                    else
-                                    {
-                                        //Non-series
-                                        //Easy: string, val, date, list, map, matrix
-                                        databank.AddIVariableWithOverwrite(name, iv);
-                                    }
                                 }
-
-                            }
-                            databank.FileNameWithPath = databankTemp.FileNameWithPath;
-
-                        }
-
-                        //readInfo.startPerInFile = minYearInProtobufFile;
-                        //readInfo.endPerInFile = maxYearInProtobufFile;
-                        //readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
-                        //readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
-
-                        HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
-
-                        if (Program.options.solve_data_create_auto == true)
-                        {
-                            //#i5432542345iou
-                            //if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
-                            //{
-                            //    IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
-                            //    if (all2 == null) all2 = new List(new List<string>());
-                            //    List<string> all = O.GetStringList(O.GetList(all2));
-                            //    readInfo.createdVars = Program.CreateVariables(all, false);
-                            //}
-                        }
-
-                        //Cleanup of local files
-                        if (copyLocal)
-                        {
-                            if (!isProtobuf)
-                            {
-                                try
+                                else
                                 {
-                                    File.SetAttributes(file, FileAttributes.Normal);  //it may be read-only if original file is so
-                                    File.Delete(file);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
-                                }
-                                catch (Exception e)
-                                {
-                                    //do nothing
-                                }
-                            }
+                                    //---------------------------
+                                    // handle normal timeseries
+                                    //---------------------------
 
-                            if (isGbk)
-                            {
-                                try
-                                {
-                                    File.SetAttributes(tsdxFile, FileAttributes.Normal);  //it may be read-only if original file is so
-                                    File.Delete(tsdxFile);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                                    //also see #98520983
+                                    bool wipeExistingOut = false;
+                                    MergeTwoTimeseriesWithDateWindow(dates, tsExisting, tsProtobuf, ref maxYearInProtobufFile, ref minYearInProtobufFile, ref wipeExistingOut);
+                                    MergeTwoTimeseriesWithDateWindowHelper(dates, databank, name, tsProtobuf, wipeExistingOut);
                                 }
-                                catch (Exception e)
-                                {
-                                    //do nothing
-                                }
-
-                                try
-                                {
-                                    DirectoryInfo folderInfo = new DirectoryInfo(tempTsdxPath);
-                                    if (System.IO.Directory.Exists(folderInfo.FullName))
-                                    {
-                                        System.IO.Directory.Delete(folderInfo.FullName, true);
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    //do nothing
-                                }
-                            }
-                        }
-
-                        readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
-
-                        databank.info1 = readInfo.info1;
-                        databank.date = readInfo.date;
-                        databank.FileNameWithPath = readInfo.fileName;
-
-                        if (open)
-                        {
-                            if (!oRead.editable)
-                            {
-                                databank.editable = false;
                             }
                             else
                             {
-                                if (!isGbk)
-                                {
-                                    if (databank.editable == true)
-                                    {
-                                        G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
-                                        databank.editable = false;
-                                    }
-                                }
+                                //Non-series
+                                //Easy: string, val, date, list, map, matrix
+                                databank.AddIVariableWithOverwrite(name, iv);
                             }
                         }
 
                     }
+                    databank.FileNameWithPath = databankTemp.FileNameWithPath;
+
+                }
+
+                //readInfo.startPerInFile = minYearInProtobufFile;
+                //readInfo.endPerInFile = maxYearInProtobufFile;
+                //readInfo.startPerResultingBank = G.GekkoMin(minYearInProtobufFile, databank.yearStart);
+                //readInfo.endPerResultingBank = G.GekkoMax(maxYearInProtobufFile, databank.yearEnd);
+
+                HandleCleanAndParentForTimeseries(databank, oRead.Merge);  //otherwise it will look dirty                    
+
+                if (Program.options.solve_data_create_auto == true)
+                {
+                    //#i5432542345iou
+                    //if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
+                    //{
+                    //    IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
+                    //    if (all2 == null) all2 = new List(new List<string>());
+                    //    List<string> all = O.GetStringList(O.GetList(all2));
+                    //    readInfo.createdVars = Program.CreateVariables(all, false);
+                    //}
+                }
+
+                //Cleanup of local files
+                if (copyLocal)
+                {
+                    if (!isProtobuf)
+                    {
+                        try
+                        {
+                            File.SetAttributes(file, FileAttributes.Normal);  //it may be read-only if original file is so
+                            File.Delete(file);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                        }
+                        catch (Exception e)
+                        {
+                            //do nothing
+                        }
+                    }
+
+                    if (isGbk)
+                    {
+                        try
+                        {
+                            File.SetAttributes(tsdxFile, FileAttributes.Normal);  //it may be read-only if original file is so
+                            File.Delete(tsdxFile);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                        }
+                        catch (Exception e)
+                        {
+                            //do nothing
+                        }
+
+                        try
+                        {
+                            DirectoryInfo folderInfo = new DirectoryInfo(tempTsdxPath);
+                            if (System.IO.Directory.Exists(folderInfo.FullName))
+                            {
+                                System.IO.Directory.Delete(folderInfo.FullName, true);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            //do nothing
+                        }
+                    }
+                }
+
+                readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+                databank.info1 = readInfo.info1;
+                databank.date = readInfo.date;
+                databank.FileNameWithPath = readInfo.fileName;
+
+                if (open)
+                {
+                    if (!oRead.editable)
+                    {
+                        databank.editable = false;
+                    }
                     else
                     {
-                        throw new GekkoException();
+                        if (!isGbk)
+                        {
+                            if (databank.editable == true)
+                            {
+                                G.Writeln2("The file is opened as non-editable, since it is not a ." + Globals.extensionDatabank + " file");
+                                databank.editable = false;
+                            }
+                        }
                     }
                 }
 
@@ -2599,13 +2600,10 @@ namespace Gekko
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 //databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!                
 
-                if (Globals.testFileChange && readInfo.type == EReadInfoTypes.Normal)
+                if (Globals.testFileChange && open && !createBrandNew)
                 {
-                    if (open)
-                    {
-                        if (nonExistingGbkFileOpened) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
-                        else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
-                    }
+                    if (nonExistingGbkFileOpened) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
+                    else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
                 }
             }  //for each bank in list
 
@@ -37920,7 +37918,7 @@ namespace Gekko
 
             public void Print()
             {
-                if (this.type != EReadInfoTypes.Normal) return;  //no printing of these
+                if (this.databank == null || this.databank.storage.Count == 0) return;  //no printing of these
                 Table tab = new Table();
                 tab.CurRow.SetTopBorder(1, 1);
                 //this strange stuff is sometimes read from PCIM databanks
