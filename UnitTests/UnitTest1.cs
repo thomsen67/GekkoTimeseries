@@ -7532,8 +7532,8 @@ namespace UnitTests
         public void _Test_ReadImportTo()
         {
             //also tests EXPORT a little bit
-            I("RESET;");
-            I("CREATE xx1, xx2;");
+            I("RESET; TIME 2010 2015;");
+            I("xx1 = 10; xx2 = 20;");
             I("WRITE temp;");
             I("EXPORT<tsd>temptsd;");
             I("READ temp TO *;");
@@ -9642,7 +9642,7 @@ namespace UnitTests
 
             }
 
-            for (int i = 1; i >= 0; i--)
+            if (true)
             {               
                 
                 //Basic test first
@@ -9650,7 +9650,7 @@ namespace UnitTests
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
                 Directory.CreateDirectory(Globals.ttPath2 + @"\regres\Databanks\temp");
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
                 I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
                 I("OPEN <tsd> small;");
@@ -9688,7 +9688,7 @@ namespace UnitTests
                 // ------------ open normal bank
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("TIME 2010 2011;");
                 I("CREATE a;");
                 I("SERIES a = (10, 11);");
@@ -9699,7 +9699,7 @@ namespace UnitTests
                 I("WRITE temp\\bank3;"); //<----
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank1;");
                 Assert.AreEqual(Program.databanks.storage.Count, 3);
                 Assert.AreEqual(Program.databanks.storage[0].name, "Work");
@@ -9712,7 +9712,7 @@ namespace UnitTests
 
                 //bulk close
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank1;");
                 I("OPEN temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);                
@@ -9722,22 +9722,16 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank1;");
                 I("OPEN temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
                 Assert.AreEqual(Program.databanks.storage[0].name, "Work");
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
-                if (i == 0)
-                {
-                    Assert.AreEqual(Program.databanks.storage[2].name, "bank2");
-                    Assert.AreEqual(Program.databanks.storage[3].name, "bank1");
-                }
-                else
-                {
+                
                     Assert.AreEqual(Program.databanks.storage[2].name, "bank1");
                     Assert.AreEqual(Program.databanks.storage[3].name, "bank2");
-                }
+                
 
                 I("CLOSE *;");
                 Assert.AreEqual(Program.databanks.storage.Count, 2);
@@ -9745,7 +9739,7 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 FAIL("OPEN temp\\bank1, temp\\bank2 as bank3;");
                 I("OPEN temp\\bank1, temp\\bank2 as *, bank3;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
@@ -9761,7 +9755,7 @@ namespace UnitTests
                 // ---- EDIT and REF, also with test of PRT<m>, PRT @a, etc.
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank2;");
                 I("OPEN<first>temp\\bank1;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
@@ -9775,7 +9769,7 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank2;");
                 I("OPEN<first>temp\\bank1;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
@@ -9789,27 +9783,26 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
                 Assert.AreEqual(Program.databanks.storage[2].name, "bank2");
 
-                if (false)
+                if (false)  //swapping
                 {
 
                     I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
-                I("OPEN temp\\bank2;");
-                I("OPEN<ref>temp\\bank1;");
-                Assert.AreEqual(Program.databanks.storage.Count, 4);
-                Assert.AreEqual(Program.databanks.storage[0].name, "Work");
-                Assert.AreEqual(Program.databanks.storage[1].name, "bank1");
-                Assert.AreEqual(Program.databanks.storage[2].name, Globals.Ref);
-                Assert.AreEqual(Program.databanks.storage[3].name, "bank2");
-                I("CLOSE *;");
-                Assert.AreEqual(Program.databanks.storage.Count, 2);
-                Assert.AreEqual(Program.databanks.storage[0].name, "Work");
-                Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
-
-                
+                    //if (i == 0) I("OPTION databank logic = aremos;");
+                    I("OPEN temp\\bank2;");
+                    I("OPEN<ref>temp\\bank1;");
+                    Assert.AreEqual(Program.databanks.storage.Count, 4);
+                    Assert.AreEqual(Program.databanks.storage[0].name, "Work");
+                    Assert.AreEqual(Program.databanks.storage[1].name, "bank1");
+                    Assert.AreEqual(Program.databanks.storage[2].name, Globals.Ref);
+                    Assert.AreEqual(Program.databanks.storage[3].name, "bank2");
+                    I("CLOSE *;");
+                    Assert.AreEqual(Program.databanks.storage.Count, 2);
+                    Assert.AreEqual(Program.databanks.storage[0].name, "Work");
+                    Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
+                    
 
                     I("RESET;");
-                    if (i == 0) I("OPTION databank logic = aremos;");
+                    //if (i == 0) I("OPTION databank logic = aremos;");
                     I("OPEN temp\\bank2;");
                     I("OPEN<ref>temp\\bank1;");
                     Assert.AreEqual(Program.databanks.storage.Count, 4);
@@ -9825,7 +9818,7 @@ namespace UnitTests
 
                     //An unswap test
                     I("RESET;");
-                    if (i == 0) I("OPTION databank logic = aremos;");
+                    //if (i == 0) I("OPTION databank logic = aremos;");
                     I("READ temp\\bank1;");
                     I("OPEN<first>temp\\bank2;");
                     I("OPEN<ref>temp\\bank3;");
@@ -9843,7 +9836,7 @@ namespace UnitTests
 
                     //also with tests of PRT etc
                     I("RESET;");
-                    if (i == 0) I("OPTION databank logic = aremos;");
+                    //if (i == 0) I("OPTION databank logic = aremos;");
                     I("READ temp\\bank1;");
                     I("OPEN<first>temp\\bank2;");
                     I("OPEN<ref>temp\\bank3;");
@@ -9893,7 +9886,7 @@ namespace UnitTests
                 // ---- succession
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN \\temp\\bank1;");
                 Assert.AreEqual(Program.databanks.storage.Count, 3);
                 Assert.AreEqual(Program.databanks.storage[0].name, "Work");
@@ -9903,16 +9896,10 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
                 Assert.AreEqual(Program.databanks.storage[0].name, "Work");
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
-                if (i == 0)
-                {
-                    Assert.AreEqual(Program.databanks.storage[2].name, "bank2");
-                    Assert.AreEqual(Program.databanks.storage[3].name, "bank1");
-                }
-                else
-                {
+                
                     Assert.AreEqual(Program.databanks.storage[2].name, "bank1");
                     Assert.AreEqual(Program.databanks.storage[3].name, "bank2");
-                }
+                
                 I("OPEN<first> \\temp\\bank1;");
                 Assert.AreEqual(Program.databanks.storage.Count, 4);
                 Assert.AreEqual(Program.databanks.storage[0].name, "bank1");
@@ -9923,7 +9910,7 @@ namespace UnitTests
                 // ------- <first>, <>, <last>
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN<first>temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
@@ -9938,31 +9925,24 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
                 Assert.AreEqual(Program.databanks.storage[0].name, Globals.Work);
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
-                if (i == 0)
-                {
-                    Assert.AreEqual(Program.databanks.storage[2].name, "bank1");
-                    Assert.AreEqual(Program.databanks.storage[3].name, "bank2");
-                    Assert.AreEqual(Program.databanks.storage[4].name, "bank3");
-                }
-                else
-                {
+                
                     Assert.AreEqual(Program.databanks.storage[2].name, "bank3");
                     Assert.AreEqual(Program.databanks.storage[3].name, "bank1");
                     Assert.AreEqual(Program.databanks.storage[4].name, "bank2");
-                }
+                
                 I("CLOSE *;");
                 Assert.AreEqual(Program.databanks.storage.Count, 2);
                 Assert.AreEqual(Program.databanks.storage[0].name, "Work");
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN<last> temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
@@ -9979,9 +9959,9 @@ namespace UnitTests
                 // ------- <sec>
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
-                I("OPEN<sec>temp\\bank1, temp\\bank2;");
+                I("OPEN<pos=2>temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage[0].name, Globals.Work);                
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
                 Assert.AreEqual(Program.databanks.storage[2].name, "bank1");
@@ -9995,7 +9975,7 @@ namespace UnitTests
                 // ------- <pos=n>
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN<pos=1>temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
@@ -10010,7 +9990,7 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN <pos=2> temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
@@ -10025,7 +10005,7 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 I("OPEN<pos=3> temp\\bank1, temp\\bank2;");
                 Assert.AreEqual(Program.databanks.storage.Count, 5);
@@ -10040,7 +10020,7 @@ namespace UnitTests
                 Assert.AreEqual(Program.databanks.storage[1].name, Globals.Ref);
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bank3;");
                 FAIL("OPEN<pos=4> temp\\bank1, temp\\bank2;");
 
@@ -10048,19 +10028,19 @@ namespace UnitTests
 
                 //changing first stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <edit> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
                 I("CLOSE bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
@@ -10069,14 +10049,14 @@ namespace UnitTests
 
                 //changing REF stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 if (false)
                 {
                     I("RESET;");
-                    if (i == 0) I("OPTION databank logic = aremos;");
+                    // if (i == 0)I("OPTION databank logic = aremos;");
                     I("OPEN <ref> temp\\bankTemp;");
                     I("TIME 2010 2010;");
                     FAIL("SERIES @a = 100;");
@@ -10087,7 +10067,7 @@ namespace UnitTests
 
                 
                     I("RESET;");
-                    if (i == 0) I("OPTION databank logic = aremos;");
+                    // if (i == 0)I("OPTION databank logic = aremos;");
                     I("OPEN <edit> temp\\bankTemp;");
                     I("TIME 2010 2010;");                    
                     I("SERIES a = 100;");
@@ -10095,7 +10075,7 @@ namespace UnitTests
                 
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
@@ -10104,12 +10084,12 @@ namespace UnitTests
 
                 //changing normal open bank
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 FAIL("SERIES bankTemp:a = 100;");
@@ -10118,7 +10098,7 @@ namespace UnitTests
                 I("CLOSE bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 100, sharedDelta);
@@ -10128,12 +10108,12 @@ namespace UnitTests
                 // ------------ <save=no> ----------------
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <edit save=no> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
@@ -10144,7 +10124,7 @@ namespace UnitTests
                 I("CLOSE bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
@@ -10153,12 +10133,12 @@ namespace UnitTests
 
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <edit> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 I("SERIES a = 100;");
@@ -10167,9 +10147,8 @@ namespace UnitTests
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2011, 11, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2012, double.NaN, sharedDelta);
                 I("CLOSE <save=no> bankTemp;");
-
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankTemp"), "a", 2010, 10, sharedDelta);  //original
@@ -10181,12 +10160,12 @@ namespace UnitTests
 
                 //changing first stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <first> temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 FAIL("SERIES a = 100;");
@@ -10195,26 +10174,26 @@ namespace UnitTests
 
                 //changing ref stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
-                I("OPEN <ref> temp\\bankTemp;");
-                I("TIME 2010 2010;");
-                FAIL("SERIES @a = 100;");
-                I("UNLOCK bankTemp;");
-                I("SERIES @a = 100;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
+                FAIL("OPEN <ref> temp\\bankTemp;");
+                //I("TIME 2010 2010;");
+                //FAIL("SERIES @a = 100;");
+                //I("UNLOCK bankTemp;");
+                //I("SERIES @a = 100;");
 
                 //changing normal open bank
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTemp;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankTemp;");
                 I("TIME 2010 2010;");
                 FAIL("SERIES bankTemp:a = 100;");
@@ -10225,36 +10204,36 @@ namespace UnitTests
 
                 //changing FIRST stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("EXPORT <tsd> temp\\bankTsd;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <edit tsd> temp\\bankTsd;");
                 I("TIME 2010 2010;");
                 FAIL("SERIES a = 100;");
 
                 //changing REF stuff
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("EXPORT <tsd> temp\\bankTsd;");
 
-                I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
-                I("OPEN <ref tsd> temp\\bankTsd;");
-                I("TIME 2010 2010;");
-                FAIL("SERIES @a = 100;");
+                //I("RESET;");
+                //// if (i == 0)I("OPTION databank logic = aremos;");
+                //I("OPEN <ref tsd> temp\\bankTsd;");
+                //I("TIME 2010 2010;");
+                //FAIL("SERIES @a = 100;");
 
                 //changing normal open bank
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("READ \\temp\\bank1;");
                 I("WRITE temp\\bankTsd;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <tsd> temp\\bankTsd;");
                 I("TIME 2010 2010;");
                 FAIL("SERIES bankTsd:a = 100;");
@@ -10262,7 +10241,7 @@ namespace UnitTests
                 // --------- constructing a bank ----------------
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN <edit> temp\\bankNew;");
                 Assert.AreEqual(Program.databanks.storage.Count, 3);
                 Assert.AreEqual(Program.databanks.storage[0].name, "bankNew");
@@ -10273,7 +10252,7 @@ namespace UnitTests
                 I("CLOSE bankNew;");
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 I("OPEN temp\\bankNew;");
                 _AssertSeries(Program.databanks.GetDatabank("bankNew"), "tsNew", 2009, double.NaN, sharedDelta);
                 _AssertSeries(Program.databanks.GetDatabank("bankNew"), "tsNew", 2010, 12345, sharedDelta);
@@ -10282,14 +10261,14 @@ namespace UnitTests
                 // --------- illegals ----------------
 
                 I("RESET;");
-                if (i == 0) I("OPTION databank logic = aremos;");
+                // if (i == 0)I("OPTION databank logic = aremos;");
                 FAIL("CLOSE work;");
                 FAIL("CLOSE ref;");
                 FAIL("OPEN<edit>a, b;");
                 FAIL("OPEN<ref>a, b;");
-                FAIL("OPEN *, b;");
-                FAIL("OPEN a, *;");
-                FAIL("OPEN *, *;");
+                //FAIL("OPEN *, b;");
+                //FAIL("OPEN a, *;");
+                //FAIL("OPEN *, *;");
             }
         }
 
@@ -14784,14 +14763,14 @@ namespace UnitTests
                 }
                 else if (freq == "q")
                 {
-                    _AssertSeries(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 3001, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 3002, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 1, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 2, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 1, 3001, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 3002, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
                 else throw new GekkoException();
             }

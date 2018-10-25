@@ -957,7 +957,8 @@ namespace Gekko.Parser.Gek
                     case "ASTCLOSE":
                         {                            
                             node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);                            
-                            node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
+                            GetCodeFromAllChildren(node, node[1]);  //options                      
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;

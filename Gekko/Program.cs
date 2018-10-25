@@ -2124,6 +2124,8 @@ namespace Gekko
             {
                 ReadInfo readInfo = new ReadInfo();
 
+                string localFileThatShouldBeDeletedPathAndFilename = null;
+
                 string file = null;
                 string as2 = null;
                 if (open)
@@ -2141,7 +2143,7 @@ namespace Gekko
                 string originalFileName = file;
 
                 bool isGbk = true;
-                bool isProtobuf = false;
+                //bool isProtobuf = false;
                 string extension = "" + Globals.extensionDatabank + "";
 
                 if (oRead.Type == EDataFormat.Tsd)  //overrules any global settings
@@ -2206,7 +2208,7 @@ namespace Gekko
                 }
 
                 string originalFileNameWithExtension =  AddExtension(originalFileName, "." + extension);  //just for error messages
-                                
+
 
                 // ---------------------------------------------------------------------------------
                 //                  Start of categories
@@ -2223,16 +2225,18 @@ namespace Gekko
                 //  not already open |  read into position       |    fail unless OPEN<edit>       |
                 //                   |   maybe editable          |      createBrandNew             |
                 // ------------------+---------------------------+---------------------------------+
+                //
+                // Note: regarding databank name there is the complication that this may given as '*'
+                //       and also that ... AS ... may be used. In general, the resulting 'real' databank
+                //       name (not file name) as shown in the F2 window is readInfo.dbName
 
-                bool cancel = false;
-                //bool nonExistingGbkFileOpened = false;
+                bool cancel = false;                
                 file = ReadHelper(file, ref cancel, extension);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
-
                 bool category2_fileExists = false;
                 if (file == null)
                 {
@@ -2240,10 +2244,16 @@ namespace Gekko
                 }
                 else
                 {
-                    readInfo.dbName = Path.GetFileNameWithoutExtension(file);
+                    readInfo.dbName = Path.GetFileNameWithoutExtension(file);                    
                     category2_fileExists = true;
                 }
+                if (as2 != null && as2.Trim() != "*")
+                {
+                    //overrides in all cases (except OPEN a AS *), if the name is explicitly given with AS                  
+                    readInfo.dbName = as2;
+                }
 
+                // -----
                 // -----
 
                 int existI; int workI; int refI;
@@ -2254,6 +2264,7 @@ namespace Gekko
                     category1_alreadyOpen = true;
                 }
 
+                // -----
                 // -----
 
                 bool category3_createBrandNew = false;
@@ -2317,10 +2328,10 @@ namespace Gekko
                     if (copyLocal)
                     {
                         DateTime t0 = DateTime.Now;
-                        string tempPath = GetTempTsdFilePath(extension);
-                        WaitForFileCopy(file, tempPath);
+                        localFileThatShouldBeDeletedPathAndFilename = GetTempTsdFilePath(extension);
+                        WaitForFileCopy(file, localFileThatShouldBeDeletedPathAndFilename);
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
-                        file = tempPath;
+                        file = localFileThatShouldBeDeletedPathAndFilename;
                     }
                     databankTemp = GetDatabankFromFile(oRead, readInfo, file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
@@ -2558,12 +2569,12 @@ namespace Gekko
                 //Cleanup of local files
                 if (copyLocal)
                 {
-                    if (!isProtobuf)
+                    if (true)
                     {
                         try
                         {
-                            File.SetAttributes(file, FileAttributes.Normal);  //it may be read-only if original file is so
-                            File.Delete(file);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
+                            File.SetAttributes(localFileThatShouldBeDeletedPathAndFilename, FileAttributes.Normal);  //it may be read-only if original file is so
+                            File.Delete(localFileThatShouldBeDeletedPathAndFilename);  //hmm probably best not to use WaitForFileDelete() here, since it seems it is ok if delete fails here
                         }
                         catch (Exception e)
                         {
@@ -2622,7 +2633,7 @@ namespace Gekko
                         }
                     }
                 }
-
+                readInfo.databank = databank;
                 readInfos.Add(readInfo);
 
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.

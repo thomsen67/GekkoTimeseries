@@ -7293,6 +7293,7 @@ namespace Gekko
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
                 Program.OpenOrRead(false, hlp, true, readInfos);
 
+
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {
                     readInfo.open = true;
