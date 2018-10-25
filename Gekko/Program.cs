@@ -2206,7 +2206,7 @@ namespace Gekko
                 }
 
                 string originalFileNameWithExtension =  AddExtension(originalFileName, "." + extension);  //just for error messages
-
+                                
 
                 // ---------------------------------------------------------------------------------
                 //                  Start of categories
@@ -2233,7 +2233,7 @@ namespace Gekko
                     return;  //from READ * cancelling
                 }
 
-                bool fileExists = false;
+                bool category2_fileExists = false;
                 if (file == null)
                 {
                     readInfo.dbName = Path.GetFileNameWithoutExtension(originalFileName);
@@ -2241,34 +2241,34 @@ namespace Gekko
                 else
                 {
                     readInfo.dbName = Path.GetFileNameWithoutExtension(file);
-                    fileExists = true;
+                    category2_fileExists = true;
                 }
 
                 // -----
 
                 int existI; int workI; int refI;
                 Databanks.FindBanksI(readInfo.dbName, out existI, out workI, out refI);
-                bool alreadyOpen = false;
+                bool category1_alreadyOpen = false;
                 if (existI != -12345)
                 {
-                    alreadyOpen = true;
+                    category1_alreadyOpen = true;
                 }
 
                 // -----
 
-                bool createBrandNew = false;
-                if (open && !fileExists && !alreadyOpen)
+                bool category3_createBrandNew = false;
+                if (open && !category2_fileExists && !category1_alreadyOpen)
                 {
                     if (oRead.editable)
                     {
-                        createBrandNew = true;
+                        category3_createBrandNew = true;
                     }
                     else
                     {
                         G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
                         throw new GekkoException();
                     }
-                }
+                }                
 
                 // ---------------------------------------------------------------------------------
                 //                  End of categories
@@ -2312,7 +2312,7 @@ namespace Gekko
 
                 string hash = null;
 
-                if (!open || (open && !alreadyOpen && fileExists))
+                if (!open || (open && !category1_alreadyOpen && category2_fileExists))
                 {
                     if (copyLocal)
                     {
@@ -2322,10 +2322,10 @@ namespace Gekko
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
                         file = tempPath;
                     }
-                    databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    databankTemp = GetDatabankFromFile(oRead, readInfo, file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
-                    {                        
-                        if (!file.Contains(Globals.isAProto))
+                    {
+                        if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
                         {
                             hash = Program.GetMD5Hash(GetTextFromFileWithWait(file));
                         }
@@ -2630,15 +2630,18 @@ namespace Gekko
 
                 if (open)
                 {
-                    if (createBrandNew)
+                    if (category3_createBrandNew)
                     {
                         databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
+                        databank.FileNameWithPath = Program.CreateFullPathAndFileName(originalFileNameWithExtension);
                     }
                     else
                     {
-                        if (hash != null) databank.fileHash = hash;  //typically the MD5 has been done on the copylocal temp file
-                        else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));
-
+                        if (category2_fileExists && !category1_alreadyOpen)
+                        {
+                            if (hash != null) databank.fileHash = hash; //typically the MD5 has already been done on the copylocal temp file
+                            else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));
+                        }
                     }
                 }
             }  //for each bank in list
@@ -2646,8 +2649,10 @@ namespace Gekko
             return;
         }
 
-        private static Databank GetDatabankFromFile(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        private static Databank GetDatabankFromFile(ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
+            //note: file is altered below, not sure why
+
             Databank databankTemp = new Databank("temporary"); //doing it like this, merging is much easier
 
             if (oRead.Type == EDataFormat.Pcim)
@@ -2959,6 +2964,8 @@ namespace Gekko
 
         private static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
+            
+            //Note: file is altered below in several places, including is_a_protobuffer_file stuff
             
             //NOTE: time-truncation is only done at the uppermost level: series or array-series. Stuff inside LIST or MAP is not time-truncated.
 
