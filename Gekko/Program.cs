@@ -2416,7 +2416,7 @@ namespace Gekko
                         databank.Clear();
                     }
 
-                    if (dates == null)
+                    if (false && dates == null)
                     {
                         foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
                         {
@@ -4077,7 +4077,7 @@ namespace Gekko
             int vars = -12345;
             GekkoTime startYear;
             GekkoTime endYear;
-            ReadPx(oRead.array, false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
+            ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
             readInfo.endPerInFile = endYear.super;
@@ -4318,7 +4318,7 @@ namespace Gekko
         }
 
 
-        public static void ReadPx(string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
+        public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
         {
 
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
@@ -4629,7 +4629,7 @@ namespace Gekko
                 string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
                 Series tsGhost = new Series(G.GetFreq(freq), varNameWithFreq);
                 tsGhost.SetArrayTimeseries(dimensionsWithoutTime + 1, true);
-                Databank databank = Program.databanks.GetFirst();
+                //Databank databank = Program.databanks.GetFirst();
                 databank.AddIVariableWithOverwrite(tsGhost.name, tsGhost);
                 tsGhost.SetDirty(true);
 
@@ -4758,7 +4758,7 @@ namespace Gekko
 
                     //put in the timeseries
                     string varNameWithFreq = G.Chop_AddFreq(tableName, freq);
-                    Databank databank = Program.databanks.GetFirst();
+                    //Databank databank = Program.databanks.GetFirst();
                     databank.AddIVariableWithOverwrite(ts.name, ts);
                     ts.SetDirty(true);
 
@@ -4803,7 +4803,7 @@ namespace Gekko
                 //Only for !isArray
                 G.Writeln2("+++ WARNING: Underscores ('_') in names have been removed");
             }
-
+            
         }
 
         private static string GetArrayName(string tableName, string codesCombi)
@@ -16167,7 +16167,9 @@ namespace Gekko
             List<ToFrom> outputs = new List<ToFrom>();
 
             List<string> lhs = O.Restrict(names0, true, true, true, true);
-            bool allowBankRhs = true; if (type == EWildcardSearchType.Write) allowBankRhs = false;
+            bool allowBankRhs = true;
+            if (type == EWildcardSearchType.Write) allowBankRhs = true;
+            if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
             List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
             
             // --------------------------------------------
