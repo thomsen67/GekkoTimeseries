@@ -2139,6 +2139,7 @@ namespace Gekko
                 }
 
                 string originalFileName = file;
+
                 bool isGbk = true;
                 bool isProtobuf = false;
                 string extension = "" + Globals.extensionDatabank + "";
@@ -2204,6 +2205,8 @@ namespace Gekko
                     isGbk = false;
                 }
 
+                string originalFileNameWithExtension =  AddExtension(originalFileName, "." + extension);  //just for error messages
+
 
                 // ---------------------------------------------------------------------------------
                 //                  Start of categories
@@ -2222,15 +2225,26 @@ namespace Gekko
                 // ------------------+---------------------------+---------------------------------+
 
                 bool cancel = false;
-                bool nonExistingGbkFileOpened = false;
+                //bool nonExistingGbkFileOpened = false;
                 file = ReadHelper(file, ref cancel, extension);
                 if (cancel)
                 {
                     readInfo.abortedStar = true;
                     return;  //from READ * cancelling
                 }
+
                 bool fileExists = false;
-                if (file != null) fileExists = true;
+                if (file == null)
+                {
+                    readInfo.dbName = Path.GetFileNameWithoutExtension(originalFileName);
+                }
+                else
+                {
+                    readInfo.dbName = Path.GetFileNameWithoutExtension(file);
+                    fileExists = true;
+                }
+
+                // -----
 
                 int existI; int workI; int refI;
                 Databanks.FindBanksI(readInfo.dbName, out existI, out workI, out refI);
@@ -2239,6 +2253,8 @@ namespace Gekko
                 {
                     alreadyOpen = true;
                 }
+
+                // -----
 
                 bool createBrandNew = false;
                 if (open && !fileExists && !alreadyOpen)
@@ -2249,7 +2265,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: OPEN: The databank '" + file + "' could not be found");
+                        G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
                         throw new GekkoException();
                     }
                 }
@@ -2258,8 +2274,12 @@ namespace Gekko
                 //                  End of categories
                 // ---------------------------------------------------------------------------------
 
-
-                readInfo.dbName = Path.GetFileNameWithoutExtension(file);  //may be overridden later on (Work for READ, and Base for MULBK)
+                if (!open && file == null)
+                {
+                    G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
+                    throw new GekkoException();
+                }
+                
                 if (as2 != null && as2 == "*") as2 = readInfo.dbName;    //With READ * TO *, as2 will be '*'. In that case, we use the filename. This will only happen regarding READ, we do not have an OPEN * AS * (would not be useful, OPEN * would do exactly the same)
                 if (as2 != null) readInfo.dbName = as2;
 
@@ -2290,6 +2310,8 @@ namespace Gekko
                 //                  Read the file into databankTemp
                 // ---------------------------------------------------------------------------------
 
+                string hash = null;
+
                 if (!open || (open && !alreadyOpen && fileExists))
                 {
                     if (copyLocal)
@@ -2301,6 +2323,10 @@ namespace Gekko
                         file = tempPath;
                     }
                     databankTemp = GetDatabankFromFile(oRead, readInfo, ref file, originalFilePath, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    if (open)
+                    {
+                        hash = Program.GetMD5Hash(GetTextFromFileWithWait(file));
+                    }
                 }
                 else
                 {
@@ -2311,25 +2337,24 @@ namespace Gekko
                 // ---------------------------------------------------------------------------------
                 //                  Now handle READ/IMPORT or OPEN
                 // ---------------------------------------------------------------------------------
-
-
+                
                 if (open)
                 {
                     // -----------------------
                     //OPEN or READ...TO...
                     // -----------------------
 
-                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName ,databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
 
-                    if (createBrandNew)
-                    {
-                        //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
-                        databank = new Databank(readInfo.dbName);
-                    }
-                    else
-                    {
+                    //if (createBrandNew)
+                    //{
+                    //    //OPEN <edit> on a gbk file that does not exist yet --> create brand new bank
+                        
+                    //}
+                    //else
+                    //{
 
-                    }
+                    //}
 
                     databank.editable = false;
                     if (oRead.openType == EOpenType.Edit) databank.editable = true;
@@ -2600,10 +2625,16 @@ namespace Gekko
                 //databank.Trim();  //This way, the bank is not too bulky in RAM. The operation takes almost no time, and if it is a .tsdx file, the timeseries are already trimmed and trimming is hence skipped.
                 //databank.readInfo = readInfo;  //Not really used at the moment, but practical to have a pointer to this information!                
 
-                if (Globals.testFileChange && open && !createBrandNew)
+                if (open)
                 {
-                    if (nonExistingGbkFileOpened) databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
-                    else databank.fileHash = Program.GetMD5Hash(GetTextFromFileWithWait(databank.FileNameWithPath));  //MD5 hash of file                
+                    if (createBrandNew)
+                    {
+                        databank.fileHash = Globals.brandNewFile; //signifies that the bank is brand new
+                    }
+                    else
+                    {
+                        databank.fileHash = hash;
+                    }
                 }
             }  //for each bank in list
 
