@@ -2300,6 +2300,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | tell                 SEMICOLON!
 						  | time                 SEMICOLON!
 						  | timefilter           SEMICOLON!
+						  | translate            SEMICOLON!
 						  | truncate             SEMICOLON!
 						  | unlock_              SEMICOLON!
 						  | unfix                SEMICOLON!
@@ -3158,10 +3159,20 @@ timefilterperiods:		    (timefilterperiod (',' timefilterperiod)*)?  -> ^(ASTTIM
 timefilterperiod:           expression ((doubleDot | TO) expression (BY expression)?)? -> ^(ASTTIMEFILTERPERIOD expression (expression expression?)?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-// TIMEFILTER
+// UNFIX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, input.LT(1).Line)});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// TRANSLATE
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+translate: TRANSLATE translateOpt1? fileName -> ^({token("ASTTRANSLATE", ASTTRANSLATE, input.LT(1).Line)} translateOpt1?  ^(ASTHANDLEFILENAME fileName?));
+translateOpt1: ISNOTQUAL | leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						
+translateOpt1h: GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
+						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
+						  ;	
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // WRITE and EXPORT

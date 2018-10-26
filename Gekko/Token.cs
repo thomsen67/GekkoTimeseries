@@ -22,7 +22,8 @@ namespace Gekko
 		WhiteSpace,
 		Symbol,
 		EOL,
-		EOF
+		EOF,
+        Null  //used to signal out of range
 	}
 
 	public class Token

@@ -271,6 +271,7 @@
     <Compile Include="Timer.cs" />
     <Compile Include="Translator2.cs" />
     <Compile Include="Translators.cs" />
+    <Compile Include="Translator_AREMOS_Gekko30.cs" />
     <Compile Include="TspUtilitiesDataGui.cs">
       <SubType>Form</SubType>
     </Compile>

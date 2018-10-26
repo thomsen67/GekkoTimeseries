@@ -101,6 +101,12 @@ namespace Gekko
         }
     }
 
+    public class TokenHelperMeta
+    {
+        //stash extra info here
+        public string aremosCommandName = null;
+    }
+
     public class TokenHelper
     {
         public string s = null;  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
@@ -113,6 +119,7 @@ namespace Gekko
         public TokenHelper parent = null;        
         public int id = -12345;
         public bool artificialTopNode = false; //if true, it has subnodes, and the subnodes are not enclosed in parentheses
+        public TokenHelperMeta meta = new TokenHelperMeta(); //stash extra info here
 
         public TokenHelper DeepClone(TokenHelper parent)
         {
@@ -132,7 +139,20 @@ namespace Gekko
 
         public TokenHelper()
         {
+            
+        }
 
+        public TokenHelper(string s)
+        {
+            this.s = s;
+            this.type = ETokenType.Word;
+        }
+
+        public TokenHelper(string leftblanks, string s)
+        {
+            this.leftblanks = leftblanks;
+            this.s = s;
+            this.type = ETokenType.Word;
         }
 
         public TokenHelper(TokenList tl, string type)

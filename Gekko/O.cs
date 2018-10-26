@@ -9344,14 +9344,11 @@ namespace Gekko
                 }
                 string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, ".cmd"));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
-                List<string> xxx = G.ExtractLinesFromText(xx);
-                //string s1 = null;
-                //string s2 = null;
-                //G.ExtractNameAndExtension(zfilename, out s1, out s2);
+                List<string> xxx = G.ExtractLinesFromText(xx);                
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 
                     zfilename = zfilename.Substring(0, zfilename.Length - 4);
-                string zz = zfilename + "." + Globals.extensionCommand;
-                if (File.Exists(zz))
+                string zz = zfilename + "_translate." + Globals.extensionCommand;
+                if (File.Exists(zz) && !Globals.runningOnTTComputer)
                 {
                     G.Writeln2("*** ERROR: The destination file '" + zz + "' already exists:");                    
                     throw new GekkoException();
@@ -9370,15 +9367,30 @@ namespace Gekko
                 }
                 else if (G.Equal(opt_aremos, "yes"))
                 {
-                    string ss = Translator2.Translate2(true, xxx);
-                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
-                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    if (true)
                     {
-                        sw.Write(ss);
-                        sw.Flush();
-                        sw.Close();
+                        string ss = Translator_AREMOS_Gekko30.Translate(xx);
+                        using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                        {
+                            sw.Write(ss);
+                            sw.Flush();
+                            sw.Close();
+                        }
+                        G.Writeln2("Translated file into: " + zz);
                     }
-                    G.Writeln2("Translated file into: " + zz);
+                    else
+                    {
+                        string ss = Translator2.Translate2(true, xxx);
+                        using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                        using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                        {
+                            sw.Write(ss);
+                            sw.Flush();
+                            sw.Close();
+                        }
+                        G.Writeln2("Translated file into: " + zz);
+                    }
                 }
                 else
                 {

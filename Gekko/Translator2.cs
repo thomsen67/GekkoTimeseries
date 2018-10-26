@@ -1085,7 +1085,7 @@ namespace Gekko
             return gekkoType;
         }            
 
-        private static List<string> FromTo(string s1, string s2)
+        public static List<string> FromTo(string s1, string s2)
         {
             List<string> s3 = new List<string>();
             if (!s2.StartsWith(s1)) throw new GekkoException();
