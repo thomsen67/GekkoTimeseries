@@ -3618,16 +3618,13 @@ leftBracketNoGlue:          LEFTBRACKET;
 leftBracketNoGlueWild:      LEFTBRACKETWILD;
 
 identDigit:                 identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
-
-
-identDigitHelper:		    name;
-identDigitHelper3:		    nameCurly | nameCurlyStart;
-identDigitHelper2:		    ident                 //for instance ab27
+identDigitHelper:		    ident                 //for instance ab27
 						  | Integer               //for instance 0123
 						  | DigitsEDigits         //for instance 25e12 (will end here, not in IdentStartingWithInt)
 						  | DateDef               //for instance 2012q3 (will end here, not in IdentStartingWithInt)						  						
 						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)								  			  						
-						    ;			
+						  | name                  //for instance {%s}
+						    ;						    
 						
 leftCurly:                  (GLUE!)? LEFTCURLY;
 leftCurlyGlue:              GLUE! LEFTCURLY;

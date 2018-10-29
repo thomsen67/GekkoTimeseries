@@ -5537,6 +5537,16 @@ namespace UnitTests
             I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
             I("index ref:fx..ref:fy to #mylist;                                //range");
             I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
+                        
+            //Now with {}-names.
+            I("index {'f'}* to #mylist;                                      //finds all series in Work and puts them in #mylist");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
+            I("index {'ref'}:{'f'}* to #mylist;                                 //same, for another bank");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
+            I("index {'fx'}..{'fy'} to #mylist;                                //range");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
+            I("index {'ref'}:{'fx'}..{'ref'}:{'fy'} to #mylist;                                //range");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
 
         }
 
