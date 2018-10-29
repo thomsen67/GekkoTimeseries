@@ -15225,7 +15225,7 @@ namespace Gekko
 
                         G.Writeln2("==========================================================================================");
                         G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + varnameWithoutFreq + s2);
-                        if (!G.NullOrEmpty(ts.meta.label)) G.Writeln(ts.meta.label);
+                        if (!G.NullOrBlanks(ts.meta.label)) G.Writeln(ts.meta.label);
 
                         List<MapMultidimItem> keys = null;
                         GekkoDictionary<string, string>[] temp = null;
@@ -15483,9 +15483,9 @@ namespace Gekko
                             //ts.expression = "SERIES y = c + i + g;";
                             //ts.stamp = "20-1-2016 10:34";
 
-                            if (!G.NullOrEmpty(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
+                            if (!G.NullOrBlanks(ts.meta.label)) G.Writeln("Series label: " + ts.meta.label);
 
-                            if (!G.NullOrEmpty(ts.meta.source))
+                            if (!G.NullOrBlanks(ts.meta.source))
                             {
                                 string src2 = ts.meta.source.Trim();
                                 if (src2 != "")
@@ -28513,7 +28513,7 @@ namespace Gekko
 
         private static void PrintLabel(string labelGiven)
         {
-            if (!G.NullOrEmpty(labelGiven)) G.Writeln2(labelGiven);
+            if (!G.NullOrBlanks(labelGiven)) G.Writeln2(labelGiven);
             else G.Writeln();
         }
 
@@ -31072,29 +31072,29 @@ namespace Gekko
                 {
                     txt.AppendLine("set ytics nomirror " + ticsInOut);
                     txt.AppendLine("set border 3");                    
-                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
+                    if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                    
                 }
                 else if (ymirror == "1")  //y2 axis
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
+                    if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);
                 }
                 else if (ymirror == "2")  //y2 axis and y2 tics
                 {
                     txt.AppendLine("set ytics " + ticsInOut);
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                                    
+                    if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                                    
                 }
                 else if (ymirror == "3")
                 {
                     txt.AppendLine("set ytics " + ticsInOut);  //y2 axis and y2 tics and y2 label
                     txt.AppendLine("set y2tics " + ticsInOut);
                     txt.AppendLine("set border 11");                    
-                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                    
-                    if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
+                    if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                    
+                    if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 }
             }
             else
@@ -31103,20 +31103,20 @@ namespace Gekko
                 txt.AppendLine("set ytics nomirror " + ticsInOut);
                 txt.AppendLine("set y2tics " + ticsInOut);
                 txt.AppendLine("set border 11");                
-                if (!G.NullOrEmpty(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                
-                if (!G.NullOrEmpty(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
+                if (!G.NullOrBlanks(ytitle)) setTitlePlaceholder = SetYAxisText(ytitle, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", true);                
+                if (!G.NullOrBlanks(y2title)) setTitlePlaceholder = SetYAxisText(y2title, txt, "'" + font + ytitle_bold + ytitle_italic + "," + siz2 + "'", false);
                 if (NotNullAndNotNo(x2zeroaxis) || isSeparated) txt.AppendLine("set x2zeroaxis lt -1");  //draws x axis for y2=0, #23475432985 
             }
 
             //must be after labels
             string subtitle2 = null;
-            if (!G.NullOrEmpty(subtitle)) subtitle2 = subtitle;
-            if (!G.NullOrEmpty(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
-            if (!G.NullOrEmpty(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
+            if (!G.NullOrBlanks(subtitle)) subtitle2 = subtitle;
+            if (!G.NullOrBlanks(o.opt_subtitle)) subtitle2 = o.opt_subtitle;
+            if (!G.NullOrBlanks(subtitle2)) subtitle2 = "\\n{/*0.80 " + subtitle2 + "}";
             string title2 = null;
-            if (!G.NullOrEmpty(title)) title2 = title;
-            if (!G.NullOrEmpty(o.opt_title)) title2 = o.opt_title;
-            if (!G.NullOrEmpty(title2))
+            if (!G.NullOrBlanks(title)) title2 = title;
+            if (!G.NullOrBlanks(o.opt_title)) title2 = o.opt_title;
+            if (!G.NullOrBlanks(title2))
             {
                 txt.AppendLine("set title " + Globals.QT + EncodeDanish(GnuplotText(title2 + subtitle2, true)) + Globals.QT);
             }
@@ -31563,7 +31563,7 @@ namespace Gekko
                 label = GnuplotText(label);
 
                 string s = null;
-                if (!G.NullOrEmpty(linetype))
+                if (!G.NullOrBlanks(linetype))
                 {
                     if (G.Equal(linetype, "filledcurve") || G.Equal(linetype, "filledcurves"))
                     {
@@ -31596,13 +31596,13 @@ namespace Gekko
                 catch { };
 
 
-                if (!G.NullOrEmpty(dashtype)) s += " dashtype " + dashtype;
-                if (!G.NullOrEmpty(linewidth)) s += " linewidth " + linewidth;
-                if (!G.NullOrEmpty(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
-                if (!G.NullOrEmpty(pointtype)) s += " pointtype " + pointtype;
-                if (!G.NullOrEmpty(pointtype)) s += " pointsize " + pointsize;
-                if (!G.NullOrEmpty(fillstyle)) s += " fillstyle " + fillstyle;
-                if (!G.NullOrEmpty(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
+                if (!G.NullOrBlanks(dashtype)) s += " dashtype " + dashtype;
+                if (!G.NullOrBlanks(linewidth)) s += " linewidth " + linewidth;
+                if (!G.NullOrBlanks(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
+                if (!G.NullOrBlanks(pointtype)) s += " pointtype " + pointtype;
+                if (!G.NullOrBlanks(pointtype)) s += " pointsize " + pointsize;
+                if (!G.NullOrBlanks(fillstyle)) s += " fillstyle " + fillstyle;
+                if (!G.NullOrBlanks(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
 
                 //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                 //linetype is the same, just permanent
@@ -31800,7 +31800,7 @@ namespace Gekko
             else  //for instance: PLOT x*y;
             {
                 label = labelCleaned;
-                if (!G.NullOrEmpty(labelGpt)) label = labelGpt;  //xml label overrides variables
+                if (!G.NullOrBlanks(labelGpt)) label = labelGpt;  //xml label overrides variables
             }
 
             return label;
@@ -32079,21 +32079,21 @@ namespace Gekko
 
             string left = null;
             string right = null;
-            if (!G.NullOrEmpty(ymin))
+            if (!G.NullOrBlanks(ymin))
             {                
                 left = ymin;
             }
             else
             {                
-                if (!G.NullOrEmpty(yminhard) && !G.NullOrEmpty(yminsoft))
+                if (!G.NullOrBlanks(yminhard) && !G.NullOrBlanks(yminsoft))
                 {
                     left = yminhard + " < * < " + yminsoft;
                 }
-                else if (!G.NullOrEmpty(yminhard) && G.NullOrEmpty(yminsoft))
+                else if (!G.NullOrBlanks(yminhard) && G.NullOrBlanks(yminsoft))
                 {
                     left = yminhard + " < * ";
                 }
-                else if (G.NullOrEmpty(yminhard) && !G.NullOrEmpty(yminsoft))
+                else if (G.NullOrBlanks(yminhard) && !G.NullOrBlanks(yminsoft))
                 {
                     left = " * < " + yminsoft;
                 }
@@ -32103,22 +32103,22 @@ namespace Gekko
                 }
             }
 
-            if (!G.NullOrEmpty(ymax))
+            if (!G.NullOrBlanks(ymax))
             {
                 double xx = ParseIntoDouble(ymax);  //just testing
                 right = ymax;
             }
             else
             {
-                if (!G.NullOrEmpty(ymaxhard) && !G.NullOrEmpty(ymaxsoft))
+                if (!G.NullOrBlanks(ymaxhard) && !G.NullOrBlanks(ymaxsoft))
                 {
                     right = ymaxsoft + " < * < " + ymaxhard;
                 }
-                else if (!G.NullOrEmpty(ymaxhard) && G.NullOrEmpty(ymaxsoft))
+                else if (!G.NullOrBlanks(ymaxhard) && G.NullOrBlanks(ymaxsoft))
                 {
                     right = " * < " + ymaxhard;
                 }
-                else if (G.NullOrEmpty(ymaxhard) && !G.NullOrEmpty(ymaxsoft))
+                else if (G.NullOrBlanks(ymaxhard) && !G.NullOrBlanks(ymaxsoft))
                 {
                     right = ymaxsoft + " < * ";
                 }

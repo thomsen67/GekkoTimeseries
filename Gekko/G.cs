@@ -1458,9 +1458,14 @@ namespace Gekko
             }
             return etype;
         }
-        public static bool NullOrEmpty(string x)
+        public static bool NullOrBlanks(string x)
         {
             return !(x != null && x.Trim() != "");
+        }
+
+        public static bool NullOrEmpty(string x)
+        {
+            return !(x != null && x != "");
         }
 
         public static string AddSigil(string varnameWithFreq, string type)

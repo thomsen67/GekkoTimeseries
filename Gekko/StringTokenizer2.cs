@@ -79,7 +79,7 @@ namespace Gekko
         public string ToStringTrim()
         {            
             return ToString().Trim();
-        }
+        }        
     }
 
     public class TokenHelperComma
@@ -249,6 +249,9 @@ namespace Gekko
         /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
         /// </summary>
         /// <returns></returns>
+
+            
+
         public List<TokenHelperComma> SplitCommas()
         {
             

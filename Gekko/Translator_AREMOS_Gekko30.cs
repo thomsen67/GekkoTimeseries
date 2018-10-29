@@ -15,7 +15,10 @@ namespace Gekko
         public static string Translate(string input)
         {
 
-            //string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
+            listMemory.Clear();
+            matrixMemory.Clear();
+            scalarMemory.Clear();
+
             string txt = input;            
             var tags2 = new List<string>() { "!" };
 
@@ -101,18 +104,140 @@ namespace Gekko
             for (int i = 0; i < line.Count; i++)
             {
                 if (line[i].HasChildren())
-                {                    
+                {
                     HandleExpressionsRecursive(line[i].subnodes.storage);
                     continue;
                 }
-                if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == null && GetType(line, i + 1) == ETokenType.Word)
+
+                // ------------- start of real stuff ---------------------------
+
+                if (IsNamePartStart(line, i))
                 {
-                    if (scalarMemory.ContainsKey(line[i + 1].s))
+                    int i2 = -12345;
+                    for (int i1 = i + 1; i1 < line.Count; i1++)
+                    {
+                        if (!IsNamePartMiddle(line, i1))
+                        {
+                            i2 = i1;
+                            break;
+                        }
+                    }
+                    if (i2 > i + 1)
+                    {
+                        //this is a composed name
+                        int iStart = i;
+                        int iEnd = i2;
+                        string s = null;
+                        for (int i1 = iStart; i1 <= iEnd; i1++)
+                        {
+                            if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
+                            {
+                                s += "{%" + GetS(line, i1 + 1) + "}";
+                                i1++;
+                            }
+                            else if (GetS(line, i1) == "|")
+                            {
+                                //skip
+                            }
+                            else
+                            {
+                                s += GetS(line, i1);
+                            }                            
+                        }
+                        for (int i1 = iStart; i1 <= iEnd; i1++)
+                        {
+                            SetNull(line, i1);
+                        }
+                        line[i].s = s;
+                        line[i].type = ETokenType.Unknown;
+                    }
+                }
+
+                else if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == null && GetType(line, i + 1) == ETokenType.Word)
+                {
+                    if (!(matrixMemory.ContainsKey(line[i + 1].s) || listMemory.ContainsKey(line[i + 1].s)))
                     {
                         line[i].s = "%";
                     }
                 }
-                if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
+
+                else if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prim", "primary")))
+                {
+                    line[i].s = "edit";
+                }
+
+                else if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prot", "protect")))
+                {
+                    line[i].s = "";  //all banks are protected, unless <edit> or unlock.
+                }
+                else if (Equal(line, i, "="))
+                {
+                    if (Equal(line, i - 1, "<")) line[i].leftblanks = null;  //'<='
+                    if (Equal(line, i - 1, "=")) line[i].leftblanks = null;  //'=='
+                    if (Equal(line, i - 1, ">")) line[i].leftblanks = null;  //'>='  
+                }
+                else if (Equal(line, i, ">"))
+                {
+                    if (Equal(line, i - 1, ">")) line[i].leftblanks = null;  //'>'                
+                }
+                else if (Equal(line, i, "repeat"))
+                {
+                    line[i].s = "rep";
+                }
+
+                else if (line[i].type == ETokenType.Comment)
+                {
+                    if (line[i].s.StartsWith("!"))
+                    {
+                        line[i].s = "//" + line[i].s.Substring(1);
+                    }
+                }
+
+                //double quotes to single quotes
+                else if (line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
+                {
+                    line[i].s = "'" + line[i].s.Substring(1, line[i].s.Length - 2) + "'";
+                }
+
+                //quotes                
+                else if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
+                {
+                    string ss = line[i].s;
+                    line[i].s = line[i].s.Replace("#", "%");
+                    if (ss != line[i].s) AddComment(line, "You must change %x into {%x} inside strings");
+                }
+
+                else if (GetS(line, i) == "+")
+                {
+                    if (IsToken(line, i - 2) && IsToken(line, i + 2))
+                    {
+                        if (IsHashVariable(line, i - 2) && IsHashVariable(line, i + 1))
+                        {
+                            line[i].s = "||";  //#a + #b --> #a || #b
+                        }
+                    }
+                }
+                else if (GetS(line, i) == "*")
+                {
+                    if (IsToken(line, i - 2) && IsToken(line, i + 2))
+                    {
+                        if (IsHashVariable(line, i - 2) && IsHashVariable(line, i + 1))
+                        {
+                            line[i].s = "&&";  //#a * #b --> #a && #b
+                        }
+                    }
+                }
+                else if (GetType(line, i) == ETokenType.Word && IsToken(line, i + 1) && line[i + 1].SubnodesType() == "(")
+                {
+                    // log (x) --> log(x)                    
+                    if (KnownFunction(GetS(line, i))) line[i + 1].subnodes[0].leftblanks = null;
+                }
+                else if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
+                {
+                    AddComment(line, "Please note that ##x in Gekko is %{%x} or #{%x}");
+                }
+
+                else if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
                 {
                     //normal variable/word
 
@@ -127,32 +252,95 @@ namespace Gekko
                         }
                     }
                 }
+                else if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
+                {
+                    //Handle '123.' etc.
+                    if (G.IsIntegerTranslate(GetS(line, i).Substring(0, GetS(line, i).Length - 1)))
+                    {
+                        //is like '12345.' or '5.' 
+                        line[i].s += "0";
+                        //transforms '12345.' into '12345.0'
+                        //Gekko does not like these end dots, they interfere with range (..) indicator.
+                    }
+                }
+
+                else if (GetS(line, i) == "|")
+                {
+                    //ASTNode2 x = node.GetNext();
+                    string x = GetS(line, i + 1);
+                    if (x != null)
+                    {
+                        bool hit = false;
+                        if (x == "+" || x == "-" || x == "*" || x == "/" || x == "**" || x == "^" || x == ")" || x == "]" || x == "=" || x == ">" || x == "<" || x == "," || x == ":" || x == ";")
+                        {
+                            SetNull(line, i);
+                            //remove it, for instance a%s|*fY or a%s,b%s
+                            hit = true;
+                        }
+                        if (!hit)
+                        {
+                            x = x = GetS(line, i - 1);
+                            if (x != null)
+                            {
+                                if (x == "+" || x == "-" || x == "*" || x == "/" || x == "**" || x == "^" || x == "(" || x == "[" || x == "=" || x == ">" || x == "<" || x == "," || x == ":" || x == ";")
+                                {
+                                    SetNull(line, i); ;  //remove it, for instance fy+|%s+...
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SetNull(line, i); ;  //last token is just before the ';', for instance ...+a%s|;
+                    }
+                }
+
+
+
             }
+        }
+
+        private static bool IsNamePartStart(List<TokenHelper> line, int i)
+        {
+            return GetType(line, i) == ETokenType.Word || GetS(line, i) == "|" || GetS(line, i) == "#";
+        }
+
+        private static bool IsNamePartMiddle(List<TokenHelper> line, int i)
+        {
+            bool b = GetType(line, i) == ETokenType.Word || GetS(line, i) == "|" || GetS(line, i) == "#" || (GetType(line, i) == ETokenType.Word && !GetS(line, i).Contains("."));
+            if (b && G.NullOrEmpty(GetLeftblanks(line, i))) return true;
+            return false;
+        }
+
+        private static bool IsHashVariable(List<TokenHelper> line, int i)
+        {
+            //both #a and #(...), for instance #(listfile a)
+            return GetS(line, i) == "#" && (GetType(line, i + 1) == ETokenType.Word || line[i + 1].SubnodesType() == "(") && GetLeftblanks(line, i + 1) == null;
         }
 
         public static void HandleCommandName(List<TokenHelper> line)
         {
             int pos = 0;
             bool hasCloseall = false;
-
+            
             HandleExpressionsRecursive(line);
 
             if (G.Equal(line[pos].s, FromTo("ac", "accept")) != null)
             {
                 line[pos].meta.aremosCommandName = "accept";
-                line[pos].s = "accept";                
+                line[pos].s = "accept";
                 AddComment(line, "Note that ACCEPT in Gekko is \"ACCEPT type variable 'message';\"");
-            }            
+            }
 
             else if (G.Equal(line[pos].s, FromTo("as", "assign")) != null)
             {
                 //AREMOS: assign variable type value
                 //          0       1       2    3
-                string name = line[pos+1].s;
+                string name = line[pos + 1].s;
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
-                line[pos].meta.aremosCommandName = "assign";                
+                line[pos].meta.aremosCommandName = "assign";
                 line[pos].s = "%";
-                line[pos + 1].leftblanks = null;                
+                line[pos + 1].leftblanks = null;
                 line[pos + 2].s = "="; line[pos + 2].leftblanks = " ";
             }
 
@@ -203,7 +391,7 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("cop", "copy")) != null)
             {
                 line[pos].meta.aremosCommandName = "copy";
-                line[pos].s = "copy";                                
+                line[pos].s = "copy";
             }
 
             else if (G.Equal(line[pos].s, FromTo("de", "delete")) != null)
@@ -217,15 +405,7 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "display";
                 line[pos].s = "disp";
             }
-
-            else if (G.Equal(line[pos].s, FromTo("for", "for")) != null)
-            {
-                string name = line[pos + 1].s;
-                if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
-                line[pos].meta.aremosCommandName = "for";
-                line[pos].s = "for";
-            }
-
+            
             else if (G.Equal(line[pos].s, FromTo("excelexport", "excelexport")) != null)
             {
                 line[pos].meta.aremosCommandName = "excelexport";
@@ -237,28 +417,25 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "excelimport";
                 line[pos].s = "sheet";
-                AddToOptionField(line, " ", "import");                
+                AddToOptionField(line, " ", "import");
                 AddComment(line, "Note that the SHEET<import> syntax is quite different, please see the Gekko help file");
             }
 
-            else if (G.Equal(line[pos].s, FromTo("vis", "vis")) != null)
+            else if (G.Equal(line[pos].s, FromTo("for", "for")) != null)
             {
-                line[pos].meta.aremosCommandName = "vis";
-                line[pos].s = "plot";
+                string name = line[pos + 1].s;
+                if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
+                line[pos + 1].s = "%" + line[pos + 1].s;
+                line[pos].meta.aremosCommandName = "for";
+                line[pos].s = "for";
             }
-
+                        
             else if (G.Equal(line[pos].s, FromTo("expo", "export")) != null)
             {
                 line[pos].meta.aremosCommandName = "export";
                 line[pos].s = "export";
             }
-
-            else if (G.Equal(line[pos].s, FromTo("for", "for")) != null)
-            {
-                line[pos].meta.aremosCommandName = "for";
-                line[pos].s = "for";
-            }
-
+            
             else if (G.Equal(line[pos].s, FromTo("func", "function")) != null)
             {
                 line[pos].meta.aremosCommandName = "function";
@@ -281,6 +458,13 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "if";
                 line[pos].s = "if";
+
+                if (!(line[pos + 1].SubnodesType() == "("))
+                {
+                    //will not become sub-node, but oh well...
+                    line.Insert(pos + 1, new TokenHelper(" ", "("));
+                    line.Insert(line.Count - 1, new TokenHelper(" ", ")"));
+                }
             }
 
             else if (G.Equal(line[pos].s, FromTo("impor", "import")) != null)
@@ -293,6 +477,12 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "index";
                 line[pos].s = "index";
+                TokenHelper last = line[line.Count - 2];  //remember semicolon
+                if (G.IsIdentTranslate(last.s) && !G.NullOrEmpty(last.leftblanks))
+                {
+                    if (!listMemory.ContainsKey(last.s)) listMemory.Add(last.s, "");
+                    last.s = "to #" + last.s;                    
+                }
 
                 //TODO:
 
@@ -312,17 +502,17 @@ namespace Gekko
                 string name = line[pos + 1].s;
                 if (!listMemory.ContainsKey(name)) listMemory.Add(name, "");
                 line[pos].meta.aremosCommandName = "list";
-                
+
                 if (Equal(line, 2, "="))
                 {
                     line[pos].s = "#";
-                    line[pos + 1].leftblanks = null;                    
+                    line[pos + 1].leftblanks = null;
                 }
                 else if (Equal(line, 1, "listfile") && Equal(line, 3, "="))
                 {
                     line[pos].s = "#(listfile " + line[pos + 2].s + ")"; line[pos + 1].leftblanks = null;
                     SetNull(line, pos + 1);
-                    SetNull(line, pos + 2);                    
+                    SetNull(line, pos + 2);
                 }
             }
 
@@ -337,7 +527,7 @@ namespace Gekko
                     line[pos + 1].leftblanks = null;
                 }
             }
-            
+
             else if (G.Equal(line[pos].s, FromTo("mo", "model")) != null)
             {
                 line[pos].meta.aremosCommandName = "model";
@@ -374,6 +564,34 @@ namespace Gekko
                 line[pos].s = "prt";
             }
 
+            else if (G.Equal(line[pos].s, FromTo("proc", "procedure")) != null)
+            {
+                line[pos].meta.aremosCommandName = "procedure";
+                line[pos].s = "procedure";
+                TokenHelper artificial = new TokenHelper(new TokenList(line), null);
+                List<TokenHelperComma> split = artificial.SplitCommas();
+                for (int i = 0; i < split.Count; i++)
+                {
+                    TokenHelperComma thc = split[i];
+                    if (i == 0)
+                    {
+                        if (thc.list.Count() == 2)
+                        {
+                            thc.list[1].s = "[type] %" + thc.list[0].s;
+                        }
+                    }
+                    else
+                    {
+                        if (thc.list.Count() == 1)
+                        {
+                            thc.list[0].s = "[type] %" + thc.list[0].s;
+                        }
+                    }
+                }
+                AddComment(line, "Please add [type], and perhaps alter '%'");
+
+            }
+
             else if (G.Equal(line[pos].s, FromTo("ren", "rename")) != null)
             {
                 line[pos].meta.aremosCommandName = "rename";
@@ -384,6 +602,7 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "restore";
                 line[pos].s = "run";
+                AddComment(line, "Use for instance 'RUN settings.opt;'");
             }
 
             else if (G.Equal(line[pos].s, FromTo("ret", "return")) != null)
@@ -397,15 +616,28 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "series";
                 line[pos].s = null; //not needed
                 line[pos + 1].leftblanks = null;
+
+                int count1 = 0;
+                int count2 = 0;
+                foreach (TokenHelper th in line)
+                {
+                    if (G.Equal(th.s, "if")) count1++;
+                    if (G.Equal(th.s, "then")) count2++;
+                }
+
+                if (count1 > 0 && count2 > 0)
+                {
+                    AddComment(line, "Please use iif() function");
+                }
             }
 
             else if (G.Equal(line[pos].s, FromTo("set", "set")) != null)
-            {                
+            {
                 if (G.Equal(line[pos + 1].s, FromTo("per", "period")) != null)
                 {
                     line[pos].meta.aremosCommandName = "set period";
                     line[pos].s = "time";
-                    SetNull(line, pos + 1);               
+                    SetNull(line, pos + 1);
                 }
                 else if (G.Equal(line[pos + 1].s, FromTo("freq", "frequency")) != null)
                 {
@@ -413,7 +645,7 @@ namespace Gekko
                     line[pos].s = "option";
                     line[pos + 1].s = "freq";
                 }
-                else if (G.Equal(line[pos + 1].s, FromTo("savefile", "savefile")) != null)                
+                else if (G.Equal(line[pos + 1].s, FromTo("savefile", "savefile")) != null)
                 {
                     line[pos].meta.aremosCommandName = "set";
                     line[pos].s = "option";
@@ -425,7 +657,7 @@ namespace Gekko
                     line[pos].s = "option";
                     AddComment(line, "'set report ...': use 'option print fields...' instead.");
                 }
-                else 
+                else
                 {
                     line[pos].meta.aremosCommandName = "set";
                     line[pos].s = "option";
@@ -494,11 +726,17 @@ namespace Gekko
                 line[pos].s = "pipe con";
                 //AddOption(node, "fix");  //JUST TESTING ------------------- !
             }
+
+            else if (G.Equal(line[pos].s, FromTo("vis", "vis")) != null)
+            {
+                line[pos].meta.aremosCommandName = "vis";
+                line[pos].s = "plot";
+            }
         }
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
-            line.Add(new TokenHelper(" /*" + s + " */"));
+            line.Add(new TokenHelper(" /* " + s + " */"));
         }
 
         private static bool Equal(List<TokenHelper> line, int i, string s)
@@ -506,15 +744,21 @@ namespace Gekko
             return G.Equal(GetS(line, i), s);
         }
 
-        private static string Equal(List<TokenHelper> line, int i, List<string> ss)
+        private static bool Equal(List<TokenHelper> line, int i, List<string> ss)
         {
-            return G.Equal(GetS(line, i), ss);
+            return G.Equal(GetS(line, i), ss) != null;
         }
 
         private static string GetS(List<TokenHelper> line, int i)
         {
             if (i < 0 || i >= line.Count) return null;
             return line[i].s;
+        }
+
+        private static bool IsToken(List<TokenHelper> line, int i)
+        {
+            if (i < 0 || i >= line.Count) return false;
+            return true;
         }
 
         private static string GetLeftblanks(List<TokenHelper> line, int i)
@@ -539,9 +783,18 @@ namespace Gekko
             return line[0].type == ETokenType.Word;
         }
 
-        private static Tuple<int, int> FindOptionField(List<TokenHelper> line)
+        private static bool IsInsideOptionField(List<TokenHelper> line, int i)
         {
+            Tuple<int, int> tup = FindOptionField(line);
+            if (tup.Item1 == -12345) return false;  //no <>-field
+            if (i > tup.Item1 && i < tup.Item2) return true;
+            return false;
+        }
+
+        private static Tuple<int, int> FindOptionField(List<TokenHelper> line)
+        {            
             int i1 = 1;  //always
+            if (!Equal(line, 1, "<")) return new Tuple<int, int>(-12345, -12345);
             int i2 = -12345;
             for (int i = i1 + 1; i < line.Count; i++)
             {
@@ -551,7 +804,7 @@ namespace Gekko
                     break;
                 }
             }
-            if (i2 == -12345) i1 = -12345;
+            if (i2 == -12345) return new Tuple<int, int>(-12345, -12345);
             return new Tuple<int, int>(i1, i2);
         }
 
@@ -585,6 +838,12 @@ namespace Gekko
                 s3.Add(s);
             }
             return s3;
+        }
+
+        private static bool KnownFunction(string ss2)
+        {
+            string ss = ss2.Trim().ToLower();
+            return ss == "log" || ss == "exp" || ss == "pow" || ss == "abs" || ss == "pch" || ss == "dlog";
         }
     }
 }
