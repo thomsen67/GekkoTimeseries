@@ -109,9 +109,9 @@ namespace Gekko
 
     public class TokenHelper
     {
-        public string s = null;  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
+        public string s = "";  //note that if subnodes != null, any string s here will be ignored. So you cannot BOTH has a string here, and a TokenList with subtokens. In this sense, the token containging the subtokens needs to be an empty placeholder.
         public ETokenType type = ETokenType.Unknown;
-        public string leftblanks = null; //if subnodes != null, leftblanks will always be = null.
+        public int leftblanks = 0; //if subnodes != null, leftblanks will always be = 0.
         public int line = -12345;
         public int column = -12345;
         //below is advanced (recursive) stuff        
@@ -148,7 +148,7 @@ namespace Gekko
             this.type = ETokenType.Word;
         }
 
-        public TokenHelper(string leftblanks, string s)
+        public TokenHelper(int leftblanks, string s)
         {
             this.leftblanks = leftblanks;
             this.s = s;
@@ -216,7 +216,7 @@ namespace Gekko
             else
             {
                 //internal node
-                if (this.s != null)
+                if (this.s != "")
                 {
                     throw new GekkoException();  //must no contain anything
                 }
@@ -235,8 +235,8 @@ namespace Gekko
 
         public void Clear()
         {
-            this.s = null;
-            this.leftblanks = null;
+            this.s = "";
+            this.leftblanks = 0;
             this.subnodes = null;            
         }
 
@@ -395,7 +395,7 @@ namespace Gekko
         {
             if (subnodes != null)
             {
-                if (s != null && !(s == Globals.artificial))
+                if (s != "" && !(s == Globals.artificial))
                 {
                     G.Writeln2("*** ERROR: #875627897");
                     throw new GekkoException();
@@ -407,7 +407,7 @@ namespace Gekko
                 }
                 return ss;
             }
-            else return leftblanks + s;
+            else return G.Blanks(leftblanks) + s;
         }
                 
         /// <summary>
@@ -426,7 +426,7 @@ namespace Gekko
                 else
                 {
                     int b = 0;
-                    if (th.leftblanks != null) b = th.leftblanks.Length;
+                    if (th.leftblanks != 0) b = th.leftblanks;
                     string bb = null;
                     if (b > 0) bb = " [lb " + b.ToString() + "]";
                     G.Writeln(G.Blanks(2 * level) + th.ToString() + "                    " + th.type.ToString() + bb);
@@ -1029,7 +1029,7 @@ namespace Gekko
             Token token;
             int numberCounter = 0;
             List<TokenHelper> a = new List<TokenHelper>();
-            string white = null;
+            int white = 0;
             do
             {
                 token = tok.Next();  //this is where the action is!
@@ -1042,14 +1042,14 @@ namespace Gekko
 
                 if (kind == ETokenType.WhiteSpace)
                 {
-                    white = value;
+                    white = value.Length;
                 }
                 else
                 {
                     two.line = token.Line;
                     two.column = token.Column;
                     a.Add(two);
-                    white = null;
+                    white = 0;
                 }
 
             } while (token.Kind != ETokenType.EOF);

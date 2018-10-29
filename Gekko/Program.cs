@@ -14178,18 +14178,18 @@ namespace Gekko
                         }
 
                         // -------------------------------------------------------------
-                        // Handle wildcards a*b, a?b -> a½*½b, a½?½b
+                        // Handle wildcards a*b, a?b -> a½*½b, a½?½b, also {'a'}*{'b'} will become {'a'}½*½{'b'}
                         // A * will get glue (½) to the left if there is ldu to the left. a* -> a½*
                         // A * will get glue (½) to the right if there is ldu the right.  *b -> *½b
                         // -------------------------------------------------------------
                         if (glued6.Contains(c2))
                         {
-                            if (G.IsLetterOrDigitOrUnderscore(c1))
+                            if (G.IsLetterOrDigitOrUnderscore(c1) || c1 == '}')
                             {
                                 sb.Append(Globals.symbolGlueChar4);
                             }
                             sb.Append(c2);
-                            if (G.IsLetterOrDigitOrUnderscore(c3))
+                            if (G.IsLetterOrDigitOrUnderscore(c3) || c3 == '{')
                             {
                                 sb.Append(Globals.symbolGlueChar4);
                             }
@@ -15686,7 +15686,7 @@ namespace Gekko
                     for (int i = 0; i < tokens.storage.Count; i++)
                     {
                         TokenHelper token = tokens[i];
-                        if (token.leftblanks != null) G.Write(token.leftblanks);
+                        if (token.leftblanks > 0) G.Write(G.Blanks(token.leftblanks));
                         if (token.type == ETokenType.Word && knownVars.ContainsKey(token.s))
                         {
                             G.WriteLink(token.s, "disp:" + token.s);
@@ -15700,12 +15700,12 @@ namespace Gekko
                                     if (i > 1 && tokens[i - 2].s == "\\" && G.Equal(tokens[i - 1].s, "n"))
                                     {
                                         //do nothing                                                        
-                                        tokens[i + 2].leftblanks = null;
+                                        tokens[i + 2].leftblanks = 0;
                                     }
                                     else
                                     {
                                         G.Writeln();
-                                        tokens[i + 2].leftblanks = G.Blanks(length);
+                                        tokens[i + 2].leftblanks = length;
                                     }
                                     i++;
                                     continue;
@@ -17340,12 +17340,12 @@ namespace Gekko
             if (node.HasNoChildren())
             {
                 //not a sub-node
-                if (node.s != null && node.type == ETokenType.Word)
+                if (node.s != "" && node.type == ETokenType.Word)
                 {
                     //a leaf node
                     //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided
                     TokenHelper nextNode = node.Offset(1);
-                    if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == null)
+                    if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
                         //a pattern like "x(" with no blanks in between                    
 
@@ -17482,8 +17482,8 @@ namespace Gekko
                                                         {
                                                             helper.comma.s = "][";
                                                         }
-                                                        helper.list[0].Clear();  //kill the 't'completely including blanks
-                                                        helper.list[1].leftblanks = null;  //no blanks to the left of for instance '-1'
+                                                        helper.list[0].Clear(); //kill the 't'completely including blanks
+                                                        helper.list[1].leftblanks = 0; //no blanks to the left of for instance '-1'
                                                     }
                                                     else
                                                     {
@@ -17506,7 +17506,7 @@ namespace Gekko
                             {
                                 nextNode.subnodes[0].s = "[";
                                 nextNode.subnodes[nextNode.subnodes.Count() - 1].s = "]";
-                                nextNode.subnodes[nextNode.subnodes.Count() - 1].leftblanks = null; //we do not want x[#i, #j ], x[#i, #j] is nicer.
+                                nextNode.subnodes[nextNode.subnodes.Count() - 1].leftblanks = 0; //we do not want x[#i, #j ], x[#i, #j] is nicer.
                             }
                         }
                     }
@@ -17680,7 +17680,7 @@ namespace Gekko
             foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
 
-                if (tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == null)
+                if (tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == 0)
                 {
                     if (tok.Offset(2).s == "\\" || tok.Offset(2).s == "/")
                     {
@@ -28686,7 +28686,7 @@ namespace Gekko
             temp2[0].subnodes = null;
             for (int ii = 1; ii < temp2.storage.Count; ii++)
             {
-                temp2[ii].s = null;
+                temp2[ii].s = "";
                 temp2[ii].type = ETokenType.Unknown;
                 temp2[ii].subnodes = null;
             }
@@ -28694,7 +28694,7 @@ namespace Gekko
             {
                 //Removing the '{'and '}'
                 th.subnodes[0].s = null;
-                th.subnodes[th.subnodes.storage.Count - 1].s = null;
+                th.subnodes[th.subnodes.storage.Count - 1].s = "";
             }
         }
 

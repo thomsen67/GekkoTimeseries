@@ -113,16 +113,17 @@ namespace Gekko
 
                 if (IsNamePartStart(line, i))
                 {
-                    int i2 = -12345;
+                    int i2 = i;
                     for (int i1 = i + 1; i1 < line.Count; i1++)
                     {
                         if (!IsNamePartMiddle(line, i1))
-                        {
-                            i2 = i1;
+                        {                            
                             break;
                         }
+                        i2 = i1;
                     }
-                    if (i2 > i + 1)
+                    int tokens = i2 - i + 1;
+                    if (tokens > 1 && !( tokens==2 && GetS(line,i)=="#" && GetType(line, i+1) == ETokenType.Word)) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
                     {
                         //this is a composed name
                         int iStart = i;
@@ -142,14 +143,16 @@ namespace Gekko
                             else
                             {
                                 s += GetS(line, i1);
-                            }                            
+                            }
                         }
+                        int lb = GetLeftblanks(line, iStart);
                         for (int i1 = iStart; i1 <= iEnd; i1++)
                         {
                             SetNull(line, i1);
                         }
                         line[i].s = s;
                         line[i].type = ETokenType.Unknown;
+                        line[i].leftblanks = lb;
                     }
                 }
 
@@ -172,13 +175,13 @@ namespace Gekko
                 }
                 else if (Equal(line, i, "="))
                 {
-                    if (Equal(line, i - 1, "<")) line[i].leftblanks = null;  //'<='
-                    if (Equal(line, i - 1, "=")) line[i].leftblanks = null;  //'=='
-                    if (Equal(line, i - 1, ">")) line[i].leftblanks = null;  //'>='  
+                    if (Equal(line, i - 1, "<")) line[i].leftblanks = 0;  //'<='
+                    if (Equal(line, i - 1, "=")) line[i].leftblanks = 0;  //'=='
+                    if (Equal(line, i - 1, ">")) line[i].leftblanks = 0;  //'>='  
                 }
                 else if (Equal(line, i, ">"))
                 {
-                    if (Equal(line, i - 1, ">")) line[i].leftblanks = null;  //'>'                
+                    if (Equal(line, i - 1, ">")) line[i].leftblanks = 0;  //'>'                
                 }
                 else if (Equal(line, i, "repeat"))
                 {
@@ -194,13 +197,13 @@ namespace Gekko
                 }
 
                 //double quotes to single quotes
-                else if (line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
+                else if (line[i].s != null && line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
                 {
                     line[i].s = "'" + line[i].s.Substring(1, line[i].s.Length - 2) + "'";
                 }
 
                 //quotes                
-                else if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
+                else if (line[i].s != null && line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
                     string ss = line[i].s;
                     line[i].s = line[i].s.Replace("#", "%");
@@ -230,7 +233,7 @@ namespace Gekko
                 else if (GetType(line, i) == ETokenType.Word && IsToken(line, i + 1) && line[i + 1].SubnodesType() == "(")
                 {
                     // log (x) --> log(x)                    
-                    if (KnownFunction(GetS(line, i))) line[i + 1].subnodes[0].leftblanks = null;
+                    if (KnownFunction(GetS(line, i))) line[i + 1].subnodes[0].leftblanks = 0;
                 }
                 else if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
@@ -246,8 +249,8 @@ namespace Gekko
                         if (!(line[0].s == "set"))
                         {
                             //avoid set freq a --> set freq #a...
-                            string lb = line[i + 1].leftblanks;
-                            line[i + 1].leftblanks = null;
+                            int lb = line[i + 1].leftblanks;
+                            line[i + 1].leftblanks = 0;
                             line.Insert(i + 1, new TokenHelper(lb, "#")); i++;
                         }
                     }
@@ -307,8 +310,8 @@ namespace Gekko
 
         private static bool IsNamePartMiddle(List<TokenHelper> line, int i)
         {
-            bool b = GetType(line, i) == ETokenType.Word || GetS(line, i) == "|" || GetS(line, i) == "#" || (GetType(line, i) == ETokenType.Word && !GetS(line, i).Contains("."));
-            if (b && G.NullOrEmpty(GetLeftblanks(line, i))) return true;
+            bool b = GetType(line, i) == ETokenType.Word || GetS(line, i) == "|" || GetS(line, i) == "#" || (GetType(line, i) == ETokenType.Number && !GetS(line, i).Contains("."));
+            if (b && GetLeftblanks(line, i) == 0) return true;
             return false;
         }
 
@@ -340,8 +343,8 @@ namespace Gekko
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
                 line[pos].meta.aremosCommandName = "assign";
                 line[pos].s = "%";
-                line[pos + 1].leftblanks = null;
-                line[pos + 2].s = "="; line[pos + 2].leftblanks = " ";
+                line[pos + 1].leftblanks = 0;
+                line[pos + 2].s = "="; line[pos + 2].leftblanks = 1;
             }
 
             else if (G.Equal(line[pos].s, FromTo("cle", "clear")) != null)
@@ -417,7 +420,7 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "excelimport";
                 line[pos].s = "sheet";
-                AddToOptionField(line, " ", "import");
+                AddToOptionField(line, 1, "import");
                 AddComment(line, "Note that the SHEET<import> syntax is quite different, please see the Gekko help file");
             }
 
@@ -462,8 +465,8 @@ namespace Gekko
                 if (!(line[pos + 1].SubnodesType() == "("))
                 {
                     //will not become sub-node, but oh well...
-                    line.Insert(pos + 1, new TokenHelper(" ", "("));
-                    line.Insert(line.Count - 1, new TokenHelper(" ", ")"));
+                    line.Insert(pos + 1, new TokenHelper(1, "("));
+                    line.Insert(line.Count - 1, new TokenHelper(1, ")"));
                 }
             }
 
@@ -478,10 +481,10 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "index";
                 line[pos].s = "index";
                 TokenHelper last = line[line.Count - 2];  //remember semicolon
-                if (G.IsIdentTranslate(last.s) && !G.NullOrEmpty(last.leftblanks))
+                if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
                 {
                     if (!listMemory.ContainsKey(last.s)) listMemory.Add(last.s, "");
-                    last.s = "to #" + last.s;                    
+                    last.s = "to #" + last.s;
                 }
 
                 //TODO:
@@ -506,11 +509,11 @@ namespace Gekko
                 if (Equal(line, 2, "="))
                 {
                     line[pos].s = "#";
-                    line[pos + 1].leftblanks = null;
+                    line[pos + 1].leftblanks = 0;
                 }
                 else if (Equal(line, 1, "listfile") && Equal(line, 3, "="))
                 {
-                    line[pos].s = "#(listfile " + line[pos + 2].s + ")"; line[pos + 1].leftblanks = null;
+                    line[pos].s = "#(listfile " + line[pos + 2].s + ")"; line[pos + 1].leftblanks = 0;
                     SetNull(line, pos + 1);
                     SetNull(line, pos + 2);
                 }
@@ -524,7 +527,7 @@ namespace Gekko
                 if (Equal(line, 2, "="))
                 {
                     line[pos].s = "#";
-                    line[pos + 1].leftblanks = null;
+                    line[pos + 1].leftblanks = 0;
                 }
             }
 
@@ -614,8 +617,8 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("ser", "series")) != null)
             {
                 line[pos].meta.aremosCommandName = "series";
-                line[pos].s = null; //not needed
-                line[pos + 1].leftblanks = null;
+                line[pos].s = ""; //not needed
+                line[pos + 1].leftblanks = 0;
 
                 int count1 = 0;
                 int count2 = 0;
@@ -761,9 +764,9 @@ namespace Gekko
             return true;
         }
 
-        private static string GetLeftblanks(List<TokenHelper> line, int i)
+        private static int GetLeftblanks(List<TokenHelper> line, int i)
         {
-            if (i < 0 || i >= line.Count) return null;
+            if (i < 0 || i >= line.Count) return 0;
             return line[i].leftblanks;
         }
 
@@ -775,7 +778,7 @@ namespace Gekko
 
         private static void SetNull(List<TokenHelper> line, int pos)
         {
-            line[pos].s = ""; line[pos].leftblanks = null;
+            line[pos].s = ""; line[pos].leftblanks = 0; line[pos].subnodes = null;
         }
 
         private static bool LineStartsWithWord(List<TokenHelper> line)
@@ -808,13 +811,13 @@ namespace Gekko
             return new Tuple<int, int>(i1, i2);
         }
 
-        private static void AddToOptionField(List<TokenHelper> line, string leftblanks, string s)
+        private static void AddToOptionField(List<TokenHelper> line, int leftblanks, string s)
         {
             Tuple<int, int> ii = FindOptionField(line);
 
             if (ii.Item1 == -12345)
             {
-                TokenHelper th1 = new TokenHelper(" ", "<");
+                TokenHelper th1 = new TokenHelper(1, "<");
                 TokenHelper th2 = new TokenHelper(s);
                 TokenHelper th3 = new TokenHelper(">");
                 line.Insert(1, th3);

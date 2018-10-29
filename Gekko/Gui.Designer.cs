@@ -1221,18 +1221,18 @@ namespace Gekko
                 x.Add("stacktrace");
                 for (int i = 0; i < ths.storage.Count; i++)
                 {
-                    if (ths[i].s == "#" && ths[i + 1].leftblanks == null && x.Contains(ths[i + 1].s.ToLower()) && ths[i + 2].leftblanks == null && ths[i + 2].s == ":")
+                    if (ths[i].s == "#" && ths[i + 1].leftblanks == 0 && x.Contains(ths[i + 1].s.ToLower()) && ths[i + 2].leftblanks == 0 && ths[i + 2].s == ":")
                     {
-                        ths[i].s = null;
-                        ths[i + 1].s = null;
-                        ths[i + 2].s = null;
-                        ths[i + 3].s = null;
+                        ths[i].s = "";
+                        ths[i + 1].s = "";
+                        ths[i + 2].s = "";
+                        ths[i + 3].s = "";
                     }
                 }
                 string ss = null;
                 foreach (TokenHelper th in ths.storage)
                 {
-                    ss += th.leftblanks;
+                    ss += G.Blanks(th.leftblanks);
                     ss += th.s;
                 }
                 Clipboard.SetText(ss, TextDataFormat.Text);

@@ -3086,7 +3086,7 @@ namespace Gekko.Parser.Gek
                                             
                     case "ASTIDENTDIGIT":
                         {
-                            if (node[0].Text == "ASTIDENT")
+                            if (node[0].Text == "ASTIDENT" || node[0].Text == "ASTNAME")
                             {
                                 node.Code.CA(node[0].Code);
                             }

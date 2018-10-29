@@ -2082,7 +2082,7 @@ listItemWildRange:          rangeWithBank ->                           rangeWith
 						  | identDigit  ->                             ^(ASTGENERIC1 identDigit)   //accepts stuff like 0e. Integers are caught via expression.												
 						  ;
 
-varnameOrWildcard:           wildcard | varname	;
+varnameOrWildcard:           wildcard | varname;
 
 wildcardWithBank:           AT GLUE varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTNAME ^(ASTIDENT REF)) varnameOrWildcard)						  
                           | varnameOrWildcard COLON varnameOrWildcard -> ^(ASTWILDCARDWITHBANK varnameOrWildcard varnameOrWildcard)						  
@@ -3618,11 +3618,15 @@ leftBracketNoGlue:          LEFTBRACKET;
 leftBracketNoGlueWild:      LEFTBRACKETWILD;
 
 identDigit:                 identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
-identDigitHelper:		    ident                 //for instance ab27
+
+
+identDigitHelper:		    name;
+identDigitHelper3:		    nameCurly | nameCurlyStart;
+identDigitHelper2:		    ident                 //for instance ab27
 						  | Integer               //for instance 0123
 						  | DigitsEDigits         //for instance 25e12 (will end here, not in IdentStartingWithInt)
 						  | DateDef               //for instance 2012q3 (will end here, not in IdentStartingWithInt)						  						
-						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)						  						
+						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)								  			  						
 						    ;			
 						
 leftCurly:                  (GLUE!)? LEFTCURLY;
