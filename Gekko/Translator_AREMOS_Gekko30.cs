@@ -78,7 +78,33 @@ namespace Gekko
                 }
             }
 
+            List<List<TokenHelper>> temp = new List<List<TokenHelper>>();
+
             foreach (List<TokenHelper> line in statements)
+            {
+                if (Equal(line, 0, "else"))
+                {
+                    List<TokenHelper> line2 = new List<TokenHelper>();
+                    line2.Add(line[0]);
+                    line2.Add(new TokenHelper(";"));
+                    temp.Add(line2);
+
+                    List<TokenHelper> line3 = new List<TokenHelper>();
+                    for (int i = 1; i < line.Count; i++)
+                    {
+                        if (line[i].s.Trim() == "") continue;  //skip blank tokens
+                        line3.Add(line[i]);
+                    }
+                    if (line3[line3.Count - 1].s != ";") line3.Add(new TokenHelper(";"));
+                    temp.Add(line3);
+                }
+                else
+                {
+                    temp.Add(line);
+                }
+            }
+
+            foreach (List<TokenHelper> line in temp)
             {
                 //Takes care of the first part of the line,
                 //option field etc.
@@ -87,7 +113,7 @@ namespace Gekko
                 HandleExpressionsRecursive(line);
             }            
 
-            foreach (List<TokenHelper> line in statements)
+            foreach (List<TokenHelper> line in temp)
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (TokenHelper tok in line)
@@ -143,7 +169,7 @@ namespace Gekko
                         //this is a composed name
                         int iStart = i;
                         int iEnd = i2;
-                        string s = null;
+                        string s = "";
                         for (int i1 = iStart; i1 <= iEnd; i1++)
                         {
                             if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
@@ -171,7 +197,7 @@ namespace Gekko
                     }
                 }
 
-                if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == null && GetType(line, i + 1) == ETokenType.Word)
+                if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
                 {
                     if (!(matrixMemory.ContainsKey(line[i + 1].s) || listMemory.ContainsKey(line[i + 1].s)))
                     {
@@ -179,7 +205,16 @@ namespace Gekko
                     }
                 }
 
-                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prim", "primary")))
+                else if (Equal(line, i, "."))
+                {
+                    if (Equal(line, i + 1, new List<string>() { "a", "q", "m" }) && GetLeftblanks(line, i + 1) == 0)
+                    {
+                        //x.q --> x!q
+                        line[i].s = "!";
+                    }
+                }
+
+                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("pri", "primary")))
                 {
                     line[i].s = "edit";
                 }
@@ -195,7 +230,7 @@ namespace Gekko
                     }
                 }
 
-                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prot", "protect")))
+                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("pro", "protect")))
                 {
                     line[i].s = "";  //all banks are protected, unless <edit> or unlock.
                 }
@@ -223,17 +258,41 @@ namespace Gekko
                 }
 
                 //double quotes to single quotes
-                if (line[i].s != null && line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
+                if (line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
                 {
                     line[i].s = "'" + line[i].s.Substring(1, line[i].s.Length - 2) + "'";
                 }
 
                 //quotes                
-                if (line[i].s != null && line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
+                if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
                     string ss = line[i].s;
-                    line[i].s = line[i].s.Replace("#", "%");
-                    if (ss != line[i].s) AddComment(line, "You must change %x into {%x} inside strings");
+                    string ss2 = "";
+                    for (int ci = 0; ci < ss.Length; ci++)
+                    {
+                        if (ss[ci] == '#')
+                        {
+                            ss2 += '{';
+                            ss2 += '%'; ci++;
+                            //ss2 += ss[ci]; ci++;
+                            for (int cii = ci; cii < ss.Length; cii++)
+                            {
+                                if (G.IsLetterOrDigitOrUnderscore(ss[cii]))
+                                {
+                                    //good
+                                    ss2 += ss[cii];
+                                }
+                                else
+                                {
+                                    ss2 += '}';
+                                    ci = cii;
+                                    break;
+                                }
+                            }
+                        }
+                        ss2 += ss[ci];
+                    }
+                    line[i].s = ss2;
                 }
 
                 if (GetS(line, i) == "+")
@@ -281,6 +340,10 @@ namespace Gekko
                         }
                     }
                 }
+                if(GetS(line, i)==null)
+                {
+
+                }
                 if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
                 {
                     //Handle '123.' etc.
@@ -297,7 +360,7 @@ namespace Gekko
                 {
                     //ASTNode2 x = node.GetNext();
                     string x = GetS(line, i + 1);
-                    if (x != null)
+                    if (x != "")
                     {
                         bool hit = false;
                         if (x == "+" || x == "-" || x == "*" || x == "/" || x == "**" || x == "^" || x == ")" || x == "]" || x == "=" || x == ">" || x == "<" || x == "," || x == ":" || x == ";")
@@ -309,7 +372,7 @@ namespace Gekko
                         if (!hit)
                         {
                             x = x = GetS(line, i - 1);
-                            if (x != null)
+                            if (x != "")
                             {
                                 if (x == "+" || x == "-" || x == "*" || x == "/" || x == "**" || x == "^" || x == "(" || x == "[" || x == "=" || x == ">" || x == "<" || x == "," || x == ":" || x == ";")
                                 {
@@ -341,7 +404,7 @@ namespace Gekko
         private static bool IsHashVariable(List<TokenHelper> line, int i)
         {
             //both #a and #(...), for instance #(listfile a)
-            return GetS(line, i) == "#" && (GetType(line, i + 1) == ETokenType.Word || line[i + 1].SubnodesType() == "(") && GetLeftblanks(line, i + 1) == null;
+            return GetS(line, i) == "#" && (GetType(line, i + 1) == ETokenType.Word || line[i + 1].SubnodesType() == "(") && GetLeftblanks(line, i + 1) == 0;
         }
 
         public static void HandleCommandName(List<TokenHelper> line)
@@ -359,13 +422,36 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("as", "assign")) != null)
             {
                 //AREMOS: assign variable type value
+                //AREMOS: assign variable value
                 //          0       1       2    3
                 string name = line[pos + 1].s;
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
                 line[pos].meta.aremosCommandName = "assign";
                 line[pos].s = "%";
                 line[pos + 1].leftblanks = 0;
-                line[pos + 2].s = "="; line[pos + 2].leftblanks = 1;
+                List<string> x = new List<string>();
+                x.Add("bank");
+                x.Add("current");
+                x.Add("date");
+                x.Add("direct");
+                x.Add("exist");
+                x.Add("for");
+                x.Add("from");
+                x.Add("index");
+                x.Add("integer");
+                x.Add("literal");
+                x.Add("period");
+                x.Add("string");
+                x.Add("time");
+                x.Add("value");
+                if (Equal(line, pos + 2, x))
+                {
+                    line[pos + 2].s = "="; line[pos + 2].leftblanks = 1;
+                }
+                else
+                {
+                    line.Insert(pos + 2, new TokenHelper(1, "="));
+                }
             }
 
             else if (G.Equal(line[pos].s, FromTo("cle", "clear")) != null)

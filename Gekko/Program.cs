@@ -28693,7 +28693,7 @@ namespace Gekko
             if (th.SubnodesType() == "{")
             {
                 //Removing the '{'and '}'
-                th.subnodes[0].s = null;
+                th.subnodes[0].s = "";
                 th.subnodes[th.subnodes.storage.Count - 1].s = "";
             }
         }
