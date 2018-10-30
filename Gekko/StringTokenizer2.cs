@@ -155,6 +155,13 @@ namespace Gekko
             this.type = ETokenType.Word;
         }
 
+        public TokenHelper(int leftblanks, string s, ETokenType type)
+        {
+            this.leftblanks = leftblanks;
+            this.s = s;
+            this.type = type;
+        }
+
         public TokenHelper(TokenList tl, string type)
         {
             //TokenHelper parent = new TokenHelper();
@@ -252,14 +259,16 @@ namespace Gekko
 
             
 
-        public List<TokenHelperComma> SplitCommas()
+        public List<TokenHelperComma> SplitCommas(bool firstLast)
         {
             
             if (this.subnodes == null) return null;
             List<TokenHelperComma> temp = new List<TokenHelperComma>();
             TokenList temp2 = new TokenList();
             TokenHelper previousComma = null;
-            for (int i = 0 + 1; i < this.subnodes.storage.Count - 1; i++)  //omit the parentheses
+            int d = 0;
+            if (firstLast) d = 1;
+            for (int i = 0 + d; i < this.subnodes.storage.Count - d; i++)  //omit the parentheses
             {
                 if (this.subnodes[i].s == ",")
                 {

@@ -2566,10 +2566,12 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 type? svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | type? svarname EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
-                          | type? svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER type?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+forHelper2:                 typeHelper svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
+                          | typeHelper svarname EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | typeHelper svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
+
+typeHelper:                 type | ;
                           
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FUNCTION

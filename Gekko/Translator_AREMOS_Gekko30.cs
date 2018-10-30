@@ -86,13 +86,13 @@ namespace Gekko
                 {
                     List<TokenHelper> line2 = new List<TokenHelper>();
                     line2.Add(line[0]);
-                    line2.Add(new TokenHelper(";"));
+                    line2.Add(new TokenHelper(0, ";", ETokenType.Symbol));
                     temp.Add(line2);
 
                     List<TokenHelper> line3 = new List<TokenHelper>();
                     for (int i = 1; i < line.Count; i++)
                     {
-                        if (line[i].s.Trim() == "") continue;  //skip blank tokens
+                        //if (line[i].s.Trim() == "") continue;  //skip blank tokens
                         line3.Add(line[i]);
                     }
                     if (line3[line3.Count - 1].s != ";") line3.Add(new TokenHelper(";"));
@@ -160,9 +160,14 @@ namespace Gekko
                     {
                         //tokens == 2
                         bool isHashIdent = GetS(line, i) == "#" && GetType(line, i + 1) == ETokenType.Word;
-                        if (line[0].meta.aremosCommandName == "series") setCurlies = true;
+                        List<string> commands = new List<string>();
+                        commands.Add("series");
+                        commands.Add("open");
+                        if (!IsInsideOptionField(line, i) && commands.Contains(line[0].meta.aremosCommandName))
+                        {
+                            setCurlies = true;
+                        }                        
                     }
-
 
                     if (setCurlies) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
                     {
@@ -235,7 +240,7 @@ namespace Gekko
                     {
                         if (GetS(line, i + 1) != "(")
                         {
-                            AddComment(line, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'internal')");
+                            AddComment(line, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'inside')");
                         }
                     }
                 }
@@ -350,10 +355,7 @@ namespace Gekko
                         }
                     }
                 }
-                if(GetS(line, i)==null)
-                {
-
-                }
+                
                 if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
                 {
                     //Handle '123.' etc.
@@ -525,7 +527,13 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "display";
                 line[pos].s = "disp";
             }
-            
+
+            else if (G.Equal(line[pos].s, FromTo("else", "else")) != null)
+            {
+                line[pos].meta.aremosCommandName = "else";
+                line[pos].s = "else";
+            }
+
             else if (G.Equal(line[pos].s, FromTo("excelexport", "excelexport")) != null)
             {
                 line[pos].meta.aremosCommandName = "excelexport";
@@ -560,6 +568,7 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "function";
                 line[pos].s = "function";
+                AddComment(line, "Please add types and symbols, for instance '... string %s, list #m, ...' etc.");
             }
 
             else if (G.Equal(line[pos].s, FromTo("got", "goto")) != null)
@@ -598,23 +607,22 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "index";
                 line[pos].s = "index";
                 TokenHelper last = line[line.Count - 2];  //remember semicolon
+                int start = pos + 1;
+
+                Tuple<int, int> tup = FindOptionField(line);
+                if (tup.Item2 != -12345) start = tup.Item2 + 1;
+
+                if (Equal(line, start, "series")) start++;
+
+                int end = line.Count - 2;
                 if (G.IsIdentTranslate(last.s) && last.leftblanks > 0)
                 {
                     if (!listMemory.ContainsKey(last.s)) listMemory.Add(last.s, "");
                     last.s = "to #" + last.s;
+                    end = line.Count - 3;
                 }
 
-                //TODO:
-
-                //ASTNode2 xx = node.GetCommand3();
-                //string last = null;
-                //string leftBlanks = "";
-                //last = xx.GetLastChild().Text;
-                //leftBlanks = xx.GetLastChild().leftBlanks;                
-                //if (G.IsIdentTranslate(last) && leftBlanks.Length > 0)  //so that "LIST *a;" does not put a in mem
-                //{
-                //    if (!listMemory.ContainsKey(last)) listMemory.Add(last, "");
-                //}
+                AddBracesAroundWildcard(line, start, end);
             }
 
             else if (G.Equal(line[pos].s, FromTo("lis", "list")) != null)
@@ -687,28 +695,8 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("proc", "procedure")) != null)
             {
                 line[pos].meta.aremosCommandName = "procedure";
-                line[pos].s = "procedure";
-                TokenHelper artificial = new TokenHelper(new TokenList(line), null);
-                List<TokenHelperComma> split = artificial.SplitCommas();
-                for (int i = 0; i < split.Count; i++)
-                {
-                    TokenHelperComma thc = split[i];
-                    if (i == 0)
-                    {
-                        if (thc.list.Count() == 2)
-                        {
-                            thc.list[1].s = "[type] %" + thc.list[0].s;
-                        }
-                    }
-                    else
-                    {
-                        if (thc.list.Count() == 1)
-                        {
-                            thc.list[0].s = "[type] %" + thc.list[0].s;
-                        }
-                    }
-                }
-                AddComment(line, "Please add [type], and perhaps alter '%'");
+                line[pos].s = "procedure";                
+                AddComment(line, "Please add types and symbols, for instance '... string %s, list #m, ...' etc.");
 
             }
 
@@ -851,6 +839,30 @@ namespace Gekko
             {
                 line[pos].meta.aremosCommandName = "vis";
                 line[pos].s = "plot";
+            }
+        }
+
+        private static void AddBracesAroundWildcard(List<TokenHelper> line, int start, int end)
+        {
+            bool ok = true;
+            if (end - start > 1)
+            {
+                for (int i = start + 1; i <= end; i++)
+                {
+                    if (GetLeftblanks(line, i) > 0)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+
+            if (ok)
+            {
+                line.Insert(start, new TokenHelper(1, "{'"));
+                line[start + 1].leftblanks = 0;
+                line.Insert(end + 2, new TokenHelper(0, "'}"));
+                AddComment(line, "{'...'}-braces mandatory, will be fixed");
             }
         }
 

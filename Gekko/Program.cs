@@ -17378,7 +17378,7 @@ namespace Gekko
                                     else
                                     {
                                         //stuff like "sum((i, j), x(i, j))"
-                                        List<TokenHelperComma> list2 = first.SplitCommas();
+                                        List<TokenHelperComma> list2 = first.SplitCommas(true);
                                         foreach (TokenHelperComma item in list2)
                                         {
                                             //TODO CHECK
@@ -17407,7 +17407,7 @@ namespace Gekko
                         else
                         {
                             //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')
-                            List<TokenHelperComma> split = nextNode.SplitCommas();
+                            List<TokenHelperComma> split = nextNode.SplitCommas(true);
 
                             bool removeParenthesis = false;
                             for (int iSplit = 0; iSplit < split.Count; iSplit++)
@@ -17769,7 +17769,7 @@ namespace Gekko
                                         if (ii < tok3.subnodes.Count() - 1 && tok3.subnodes[ii].HasNoChildren() && tok3.subnodes[ii + 1] != null && tok3.subnodes[ii + 1].HasChildren())
                                         {
                                             //Remove anything that looks like time restriction
-                                            List<TokenHelperComma> temp = tok3.subnodes[ii + 1].SplitCommas();
+                                            List<TokenHelperComma> temp = tok3.subnodes[ii + 1].SplitCommas(true);
                                             if (temp.Count == 1 && G.Equal(temp[0].list.ToString().Trim(), "t"))
                                             {
                                                 ii += 2;
@@ -28541,7 +28541,7 @@ namespace Gekko
                 {
                     if (token.SubnodesType() == "[" || token.SubnodesType() == "{")
                     {
-                        List<TokenHelperComma> listOfTokensListsCommaSplit = token.SplitCommas();
+                        List<TokenHelperComma> listOfTokensListsCommaSplit = token.SplitCommas(true);
                         int ii = -1;
                         foreach (TokenHelperComma tokenListCommaSplit in listOfTokensListsCommaSplit)  //does not include start and end parenthesis
                         {
@@ -28562,7 +28562,7 @@ namespace Gekko
                                         {
                                             if (G.Equal(left.s, "sum"))
                                             {
-                                                List<TokenHelperComma> split = parent.SplitCommas();
+                                                List<TokenHelperComma> split = parent.SplitCommas(true);
                                                 if (split.Count > 1)
                                                 {
                                                     TokenList firstSplit = split[0].list;
@@ -28571,7 +28571,7 @@ namespace Gekko
                                                         if (firstSplit[0].SubnodesType() == "(")
                                                         {
                                                             //handles sum((#i, #j), ...)
-                                                            List<TokenHelperComma> splitNew = firstSplit[0].SplitCommas();
+                                                            List<TokenHelperComma> splitNew = firstSplit[0].SplitCommas(true);
                                                             foreach (TokenHelperComma splitNewItem in splitNew)
                                                             {
                                                                 string listName2 = HandleLabelsIsSimpleListName(splitNewItem.list);
