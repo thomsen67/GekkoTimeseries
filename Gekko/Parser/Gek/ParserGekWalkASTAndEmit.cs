@@ -3859,6 +3859,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.scalarStringHash");
                         }
                         break;
+                    case "ASTEXCLAMATION":
+                        {
+                            node.Code.A("O.scalarStringExclamation");
+                        }
+                        break;
                     case "ASTMAPDEF":
                         {
                             string funcName = "MapDef_" + node.mapTempVarName;

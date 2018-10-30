@@ -57,6 +57,7 @@ namespace Gekko
         public static ScalarString scalarStringHash = new ScalarString(Globals.symbolCollection.ToString());
         public static ScalarString scalarStringTilde = new ScalarString(Globals.freqIndicator.ToString());
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
+        public static ScalarString scalarStringExclamation = new ScalarString(Globals.freqIndicator.ToString());
 
         public enum EIndexerType
         {

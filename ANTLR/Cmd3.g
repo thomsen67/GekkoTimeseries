@@ -410,6 +410,7 @@ ASTCOMPARE2;
     ASTLISTWITHBANK;
 	ASTLOCK;
 	ASTUNLOCK;
+	ASTEXCLAMATION;
     ASTM;
     ASTMACRO;
     ASTMACROPLUS;
@@ -3622,9 +3623,12 @@ identDigitHelper:		    ident                 //for instance ab27
 						  | Integer               //for instance 0123
 						  | DigitsEDigits         //for instance 25e12 (will end here, not in IdentStartingWithInt)
 						  | DateDef               //for instance 2012q3 (will end here, not in IdentStartingWithInt)						  						
-						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)								  			  						
+						  | IdentStartingWithInt  //for instance 0123ab27 (catches the rest of these cases)								  			  												  
+						  | HASH
+						  | PERCENT
+						  | EXCLAMATION
 						  | name                  //for instance {%s}
-						    ;						    
+						    ;
 						
 leftCurly:                  (GLUE!)? LEFTCURLY;
 leftCurlyGlue:              GLUE! LEFTCURLY;

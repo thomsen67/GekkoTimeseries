@@ -2418,12 +2418,12 @@ namespace Gekko
 
                     if (false && dates == null)
                     {
-                        foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
-                        {
-                            if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
-                            IVariable iv = kvp.Value;
-                            databank.AddIVariable(kvp.Key, iv); //no need to deep clone kvp.Value
-                        }
+                        //foreach (KeyValuePair<string, IVariable> kvp in databankTemp.storage)
+                        //{
+                        //    if (databank.ContainsIVariable(kvp.Key)) databank.RemoveIVariable(kvp.Key);
+                        //    IVariable iv = kvp.Value;
+                        //    databank.AddIVariable(kvp.Key, iv); //no need to deep clone kvp.Value
+                        //}
                     }
                     else
                     {
@@ -3486,8 +3486,17 @@ namespace Gekko
                     GekkoTime firstSource = GekkoTime.tNull;
                     GekkoTime lastSource = GekkoTime.tNull;
 
-                    firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
-                    lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+                    if (true)
+                    {
+                        //takes a bit of time but not that much
+                        firstSource = tsSource.GetRealDataPeriodFirst(); //takes a bit of time, but then we get the real period 
+                        lastSource = tsSource.GetRealDataPeriodLast(); //takes a bit of time, but then we get the real period
+                    }
+                    else
+                    {
+                        firstSource = tsSource.GetPeriodFirst(); //takes a bit of time, but then we get the real period 
+                        lastSource = tsSource.GetPeriodLast(); //takes a bit of time, but then we get the real period
+                    }
 
                     //only for printing out the period
                     maxYearInProtobufFile = G.GekkoMax(maxYearInProtobufFile, lastSource.super);
@@ -3698,21 +3707,21 @@ namespace Gekko
 
                         //read stamp
                         string stamp = line.Substring(32, 8).Trim();
-                        if (stamp.Length > 0)
-                        {
-                            try
-                            {
-                                // #80927435209843
-                                int i1 = int.Parse(stamp.Substring(0, 2)); //month
-                                int i2 = int.Parse(stamp.Substring(3, 2)); //day
-                                int i3 = int.Parse(stamp.Substring(6, 2)); //year
-                                if (i3 > 80) i3 = 1900 + i3;  //will work until 2080!
-                                else i3 = 2000 + i3;
-                                stamp = stamp.Substring(3, 2) + "-" + stamp.Substring(0, 2) + "-" + i3;
-                            }
-                            catch { };
+                        //if (stamp.Length > 0)  //catcing is timeconsuming, and it does not work properly anyway
+                        //{
+                        //    try
+                        //    {
+                        //        // #80927435209843
+                        //        int i1 = int.Parse(stamp.Substring(0, 2)); //month
+                        //        int i2 = int.Parse(stamp.Substring(3, 2)); //day
+                        //        int i3 = int.Parse(stamp.Substring(6, 2)); //year
+                        //        if (i3 > 80) i3 = 1900 + i3;  //will work until 2080!
+                        //        else i3 = 2000 + i3;
+                        //        stamp = stamp.Substring(3, 2) + "-" + stamp.Substring(0, 2) + "-" + i3;
+                        //    }
+                        //    catch { };
 
-                        }
+                        //}
 
                         //read date
                         int iiStart = 37;

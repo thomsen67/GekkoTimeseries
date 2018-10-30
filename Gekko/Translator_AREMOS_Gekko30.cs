@@ -205,7 +205,17 @@ namespace Gekko
                     }
                 }
 
-                else if (Equal(line, i, "."))
+                if (Equal(line, i, "sum") && line[i + 1].SubnodesType() == "(")
+                {
+                    if (Equal(line[i + 1].subnodes.storage, 1, "0") && Equal(line[i + 1].subnodes.storage, 2, ","))
+                    {
+                        SetNull(line[i + 1].subnodes.storage, 1);
+                        SetNull(line[i + 1].subnodes.storage, 2);
+                        line[i + 1].subnodes.storage[3].leftblanks = 0;
+                    }
+                }
+
+                if (Equal(line, i, "."))
                 {
                     if (Equal(line, i + 1, new List<string>() { "a", "q", "m" }) && GetLeftblanks(line, i + 1) == 0)
                     {
