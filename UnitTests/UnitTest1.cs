@@ -15817,13 +15817,13 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("import<tsd>meta;");
             I("DOC y label='' source='' stamp='';");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.label, "");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.source, "");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.stamp, "");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "");
             I("DOC y label='a' source='b' stamp='c';");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.label, "a");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.source, "b");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.stamp, "c");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "a");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "b");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "c");
 
             //Testing quarters
             I("RESET;");
@@ -15831,12 +15831,19 @@ namespace UnitTests
             I("CREATE x, y;");
             I("LIST #m = x, y;");
             I("DOC {#m} label='a' source='b' stamp='c';");
-            Assert.AreEqual((First().GetIVariable("x") as Series).meta.label, "a");
-            Assert.AreEqual((First().GetIVariable("x") as Series).meta.source, "b");
-            Assert.AreEqual((First().GetIVariable("x") as Series).meta.stamp, "c");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.label, "a");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.source, "b");
-            Assert.AreEqual((First().GetIVariable("y") as Series).meta.stamp, "c");
+            Assert.AreEqual((First().GetIVariable("x!q") as Series).meta.label, "a");
+            Assert.AreEqual((First().GetIVariable("x!q") as Series).meta.source, "b");
+            Assert.AreEqual((First().GetIVariable("x!q") as Series).meta.stamp, "c");
+            Assert.AreEqual((First().GetIVariable("y!q") as Series).meta.label, "a");
+            Assert.AreEqual((First().GetIVariable("y!q") as Series).meta.source, "b");
+            Assert.AreEqual((First().GetIVariable("y!q") as Series).meta.stamp, "c");
+
+            //Test inline label in SERIES
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
+            I("import<tsd>meta;");
+            I("SERIES y 'a' = 5;");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "a");
         }
 
         [TestMethod]

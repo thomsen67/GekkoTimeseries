@@ -4421,14 +4421,13 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTLEFTSIDE":
-                        {                            
-                            string s = null;
-                            foreach (ASTNode child in node.ChildrenIterator())
+                        {
+                            if (node[1] != null)
                             {
-                                s += child.Code + G.NL;
+                                node.Code.A("o" + Num(node) + ".label = " + node[1].Code + ";" + G.NL);
                             }
-                            if(false) node.Code.LoopSmplCode(s);
-                            node.Code.A(s);
+                            node.Code.A(node[0].Code + G.NL);
+                            
                         }
                         break;
                     case "ASTOPENHELPER":

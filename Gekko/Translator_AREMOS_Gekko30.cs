@@ -83,7 +83,8 @@ namespace Gekko
                 //Takes care of the first part of the line,
                 //option field etc.
                 //Records names of assigns, lists and matrices
-                HandleCommandName(line);                
+                HandleCommandName(line);
+                HandleExpressionsRecursive(line);
             }            
 
             foreach (List<TokenHelper> line in statements)
@@ -109,6 +110,8 @@ namespace Gekko
                     continue;
                 }
 
+                //bool isSeries = G.Equal(line[0].s, FromTo("ser", "series")) != null;
+
                 // ------------- start of real stuff ---------------------------
 
                 if (IsNamePartStart(line, i))
@@ -117,13 +120,25 @@ namespace Gekko
                     for (int i1 = i + 1; i1 < line.Count; i1++)
                     {
                         if (!IsNamePartMiddle(line, i1))
-                        {                            
+                        {
                             break;
                         }
                         i2 = i1;
                     }
                     int tokens = i2 - i + 1;
-                    if (tokens > 1 && !( tokens==2 && GetS(line,i)=="#" && GetType(line, i+1) == ETokenType.Word)) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
+
+                    bool setCurlies = false;
+                    if (tokens > 2) setCurlies = true;
+                    else if (tokens == 1) setCurlies = true;
+                    else
+                    {
+                        //tokens == 2
+                        bool isHashIdent = GetS(line, i) == "#" && GetType(line, i + 1) == ETokenType.Word;
+                        if (line[0].meta.aremosCommandName == "series") setCurlies = true;
+                    }
+
+
+                    if (setCurlies) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
                     {
                         //this is a composed name
                         int iStart = i;
@@ -156,7 +171,7 @@ namespace Gekko
                     }
                 }
 
-                else if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == null && GetType(line, i + 1) == ETokenType.Word)
+                if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == null && GetType(line, i + 1) == ETokenType.Word)
                 {
                     if (!(matrixMemory.ContainsKey(line[i + 1].s) || listMemory.ContainsKey(line[i + 1].s)))
                     {
@@ -164,31 +179,42 @@ namespace Gekko
                     }
                 }
 
-                else if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prim", "primary")))
+                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prim", "primary")))
                 {
                     line[i].s = "edit";
                 }
 
-                else if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prot", "protect")))
+                if (Equal(line, i, FromTo("strip", "strip")))
+                {
+                    if (line[0].meta.aremosCommandName == "list")
+                    {
+                        if (GetS(line, i + 1) != "(")
+                        {
+                            AddComment(line, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'internal')");
+                        }
+                    }
+                }
+
+                if (IsInsideOptionField(line, i) && Equal(line, i, FromTo("prot", "protect")))
                 {
                     line[i].s = "";  //all banks are protected, unless <edit> or unlock.
                 }
-                else if (Equal(line, i, "="))
+                if (Equal(line, i, "="))
                 {
                     if (Equal(line, i - 1, "<")) line[i].leftblanks = 0;  //'<='
                     if (Equal(line, i - 1, "=")) line[i].leftblanks = 0;  //'=='
                     if (Equal(line, i - 1, ">")) line[i].leftblanks = 0;  //'>='  
                 }
-                else if (Equal(line, i, ">"))
+                if (Equal(line, i, ">"))
                 {
                     if (Equal(line, i - 1, ">")) line[i].leftblanks = 0;  //'>'                
                 }
-                else if (Equal(line, i, "repeat"))
+                if (Equal(line, i, "repeat"))
                 {
                     line[i].s = "rep";
                 }
 
-                else if (line[i].type == ETokenType.Comment)
+                if (line[i].type == ETokenType.Comment)
                 {
                     if (line[i].s.StartsWith("!"))
                     {
@@ -197,20 +223,20 @@ namespace Gekko
                 }
 
                 //double quotes to single quotes
-                else if (line[i].s != null && line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
+                if (line[i].s != null && line[i].s.StartsWith("\"") && line[i].s.EndsWith("\""))
                 {
                     line[i].s = "'" + line[i].s.Substring(1, line[i].s.Length - 2) + "'";
                 }
 
                 //quotes                
-                else if (line[i].s != null && line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
+                if (line[i].s != null && line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
                     string ss = line[i].s;
                     line[i].s = line[i].s.Replace("#", "%");
                     if (ss != line[i].s) AddComment(line, "You must change %x into {%x} inside strings");
                 }
 
-                else if (GetS(line, i) == "+")
+                if (GetS(line, i) == "+")
                 {
                     if (IsToken(line, i - 2) && IsToken(line, i + 2))
                     {
@@ -220,7 +246,7 @@ namespace Gekko
                         }
                     }
                 }
-                else if (GetS(line, i) == "*")
+                if (GetS(line, i) == "*")
                 {
                     if (IsToken(line, i - 2) && IsToken(line, i + 2))
                     {
@@ -230,17 +256,17 @@ namespace Gekko
                         }
                     }
                 }
-                else if (GetType(line, i) == ETokenType.Word && IsToken(line, i + 1) && line[i + 1].SubnodesType() == "(")
+                if (GetType(line, i) == ETokenType.Word && IsToken(line, i + 1) && line[i + 1].SubnodesType() == "(")
                 {
                     // log (x) --> log(x)                    
                     if (KnownFunction(GetS(line, i))) line[i + 1].subnodes[0].leftblanks = 0;
                 }
-                else if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
+                if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
                     AddComment(line, "Please note that ##x in Gekko is %{%x} or #{%x}");
                 }
 
-                else if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
+                if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
                 {
                     //normal variable/word
 
@@ -255,7 +281,7 @@ namespace Gekko
                         }
                     }
                 }
-                else if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
+                if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
                 {
                     //Handle '123.' etc.
                     if (G.IsIntegerTranslate(GetS(line, i).Substring(0, GetS(line, i).Length - 1)))
@@ -267,7 +293,7 @@ namespace Gekko
                     }
                 }
 
-                else if (GetS(line, i) == "|")
+                if (GetS(line, i) == "|")
                 {
                     //ASTNode2 x = node.GetNext();
                     string x = GetS(line, i + 1);
@@ -297,9 +323,6 @@ namespace Gekko
                         SetNull(line, i); ;  //last token is just before the ';', for instance ...+a%s|;
                     }
                 }
-
-
-
             }
         }
 
@@ -326,8 +349,6 @@ namespace Gekko
             int pos = 0;
             bool hasCloseall = false;
             
-            HandleExpressionsRecursive(line);
-
             if (G.Equal(line[pos].s, FromTo("ac", "accept")) != null)
             {
                 line[pos].meta.aremosCommandName = "accept";
@@ -739,7 +760,18 @@ namespace Gekko
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
-            line.Add(new TokenHelper(" /* " + s + " */"));
+            string s2 = " /* " + s + " */";
+            TokenHelper th = new TokenHelper(s2);
+            bool ok = true;
+            foreach(TokenHelper th2 in line)
+            {
+                if (th2.s == s2)
+                {
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) line.Add(th);  //avoid dublets
         }
 
         private static bool Equal(List<TokenHelper> line, int i, string s)

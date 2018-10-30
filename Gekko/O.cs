@@ -21,6 +21,7 @@ namespace Gekko
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
         public bool canSearch = true;
+       // public string label = null;
 
         public LookupSettings()
         {            
@@ -43,6 +44,7 @@ namespace Gekko
             this.create = create;
             this.canSearch = canSearch;
         }
+               
     }
 
     public static class O
@@ -2760,6 +2762,11 @@ namespace Gekko
                     }
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
+
+                    if (!isArraySubSeries && options.label != null)
+                    {
+                        lhs_series.meta.label = O.ConvertToString(options.label);
+                    }
 
                     switch (rhs.Type())
                     {
@@ -7378,6 +7385,7 @@ namespace Gekko
             public string opt_keep = null;
             public IVariable opt_rownames = null;
             public IVariable opt_colnames = null;
+            public IVariable label = null;
         }
 
         public class Accept

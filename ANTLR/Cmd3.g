@@ -2323,25 +2323,25 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
-						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
-						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
+assignment:				    assignmentType seriesOpt1? leftSide expression4 EQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType seriesOpt1? leftSide expression4 EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
+						  | assignmentType seriesOpt1? leftSide expression4 PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide expression4 PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide expression4 MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
+						  | assignmentType seriesOpt1? leftSide expression4 MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
+						  | assignmentType seriesOpt1? leftSide expression4 STAREQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
+						  | assignmentType seriesOpt1? leftSide expression4 STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
+						  | assignmentType seriesOpt1? leftSide expression4 DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
+						  | assignmentType seriesOpt1? leftSide expression4 DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
 
-						  | assignmentType seriesOpt1? leftSide percentEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
-						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
+						  | assignmentType seriesOpt1? leftSide expression4 percentEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
+						  | assignmentType seriesOpt1? leftSide expression4 percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
 
-						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
-						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
+						  | assignmentType seriesOpt1? leftSide expression4 HATEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
+						  | assignmentType seriesOpt1? leftSide expression4 HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
 
-						  | assignmentType seriesOpt1? leftSide hashEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
-						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
+						  | assignmentType seriesOpt1? leftSide expression4 hashEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
+						  | assignmentType seriesOpt1? leftSide expression4 hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide expression4?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
 						  
 						    ;
 
@@ -4593,6 +4593,7 @@ ident3: 					Ident |
 
 expression2:                expression;  //just an alias
 expression3:                expression;  //just an alias
+expression4:                expression | ;  //alias
 
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
  //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the
