@@ -6,27 +6,32 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static int labelCounter;
-        public static void ClearTS(P p) {
-        }
-        public static void ClearScalar(P p) {
-        }
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static int labelCounter;
+public static void ClearTS(P p) {
+}
+public static void ClearScalar(P p) {
+}
 
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            //[[splitSTART]]
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+//[[splitSTART]]
+p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            Functions.setdomains(smpl, O.Lookup(smpl, null, null, "px_s", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "#m", null, null, new LookupSettings(), EVariableType.Var, null));
-        
+O.Index o0 = new O.Index();
+o0.opt_showfreq = O.ConvertToString((new ScalarString("all")));
+
+o0.type = @"ASTPLACEHOLDER";o0.names1 = O.ExplodeIvariablesSeq(new List(new List<IVariable> {new ScalarString("*")}));
+o0.Exe();
+
+
 //[[splitSTOP]]
 
 
-        }
-    }
+}
+}
 }

@@ -516,6 +516,8 @@ ASTOPT_STRING_Y2;
 	ASTOPT_STRING_DUMP;
 	ASTOPT_STRING_BANK;
 	ASTOPT_STRING_ADDBANK;
+	ASTOPT_STRING_SHOWBANK;
+	ASTOPT_STRING_SHOWFREQ;
 	ASTOPT_STRING_ERROR;
 	ASTOPT_STRING_USING;
     ASTOPT_STRING_ABS ;
@@ -816,6 +818,8 @@ ASTOPT_STRING_Y2;
 			GDXOPT = 'GDXOPT';
 	LAGFIX = 'LAGFIX';
 	ADDBANK = 'ADDBANK';
+	SHOWBANK = 'SHOWBANK';
+	SHOWFREQ = 'SHOWFREQ';
 	REBASE = 'REBASE';
 	LINESPOINTS = 'LINESPOINTS';
 //LINES = 'LINES';
@@ -1374,6 +1378,8 @@ d.Add("X" ,X);
 d.Add("Y" ,Y);
 		d.Add("LAGFIX" ,LAGFIX);
 		d.Add("ADDBANK" ,ADDBANK);
+		d.Add("SHOWBANK" ,SHOWBANK);
+		d.Add("SHOWFREQ" ,SHOWFREQ);
 		d.Add("LINESPOINTS" ,LINESPOINTS);
 		d.Add("REBASE", REBASE);
 //d.Add("LINES" , LINES);
@@ -2566,12 +2572,12 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 typeHelper svarname EQUAL expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | typeHelper svarname EQUAL seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
-                          | typeHelper svarname EQUAL expression -> ^(ASTPLACEHOLDER ^(ASTPLACEHOLDER typeHelper?) ^(ASTPLACEHOLDER svarname) ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+forHelper2:                 xx expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
+                          | xx seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | xx expression -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
 
-typeHelper:                 type | ;
+xx:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTPLACEHOLDER svarname);
                           
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FUNCTION
@@ -2615,10 +2621,10 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 
 index:                      INDEX indexOpt1? assignmentType seqOfBankvarnames2 (TO seqOfBankvarnames)?  -> ^({token("ASTINDEX", ASTINDEX, input.LT(1).Line)} ^(ASTPLACEHOLDER indexOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
 indexOpt1:                  ISNOTQUAL | leftAngle indexOpt1h* RIGHTANGLE -> ^(ASTOPT1 indexOpt1h*);							
-indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)	
-						  |	ADDBANK (EQUAL yesNo)? -> ^(ASTOPT_STRING_ADDBANK yesNo?)	
-						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)  //name can be without quotes
-					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
+indexOpt1h:                 MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?)							  
+						  | BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes					
+						  |	SHOWBANK EQUAL name -> ^(ASTOPT_STRING_SHOWBANK name)	//yes|no|all
+						  |	SHOWFREQ EQUAL name -> ^(ASTOPT_STRING_SHOWFREQ name)	//yes|no|all
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3765,6 +3771,8 @@ ident2: 					Ident |
   // ---------------------------------------
   ABS|
   ADDBANK|
+  SHOWBANK|
+  SHOWFREQ|
   ADD|
   AFTER2|
   AFTER|
@@ -4183,6 +4191,8 @@ ident3: 					Ident |
   FROMBANK|
   ABS|
   ADDBANK|
+  SHOWBANK|
+  SHOWFREQ|
   ADD|
   AFTER2|
   AFTER|

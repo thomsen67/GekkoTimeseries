@@ -84,15 +84,20 @@ namespace Gekko
             {
                 if (Equal(line, 0, "else"))
                 {
+                    int ii = 1;
                     List<TokenHelper> line2 = new List<TokenHelper>();
                     line2.Add(line[0]);
                     line2.Add(new TokenHelper(0, ";", ETokenType.Symbol));
+                    if (GetS(line, 1) == "\r\n")
+                    {
+                        line2.Add(line[1]); ii++;
+                    }                    
                     temp.Add(line2);
 
                     List<TokenHelper> line3 = new List<TokenHelper>();
-                    for (int i = 1; i < line.Count; i++)
+                    for (int i = ii; i < line.Count; i++)
                     {
-                        //if (line[i].s.Trim() == "") continue;  //skip blank tokens
+                        //if (IsEmptyToken(line, i)) continue;  //skip blank tokens
                         line3.Add(line[i]);
                     }
                     if (line3[line3.Count - 1].s != ";") line3.Add(new TokenHelper(";"));
@@ -140,67 +145,7 @@ namespace Gekko
 
                 // ------------- start of real stuff ---------------------------
 
-                if (IsNamePartStart(line, i))
-                {
-                    int i2 = i;
-                    for (int i1 = i + 1; i1 < line.Count; i1++)
-                    {
-                        if (!IsNamePartMiddle(line, i1))
-                        {
-                            break;
-                        }
-                        i2 = i1;
-                    }
-                    int tokens = i2 - i + 1;
-
-                    bool setCurlies = false;
-                    if (tokens > 2) setCurlies = true;
-                    else if (tokens == 1) setCurlies = true;
-                    else
-                    {
-                        //tokens == 2
-                        bool isHashIdent = GetS(line, i) == "#" && GetType(line, i + 1) == ETokenType.Word;
-                        List<string> commands = new List<string>();
-                        commands.Add("series");
-                        commands.Add("open");
-                        if (!IsInsideOptionField(line, i) && commands.Contains(line[0].meta.aremosCommandName))
-                        {
-                            setCurlies = true;
-                        }                        
-                    }
-
-                    if (setCurlies) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
-                    {
-                        //this is a composed name
-                        int iStart = i;
-                        int iEnd = i2;
-                        string s = "";
-                        for (int i1 = iStart; i1 <= iEnd; i1++)
-                        {
-                            if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
-                            {
-                                s += "{%" + GetS(line, i1 + 1) + "}";
-                                i1++;
-                            }
-                            else if (GetS(line, i1) == "|")
-                            {
-                                //skip
-                            }
-                            else
-                            {
-                                s += GetS(line, i1);
-                            }
-                        }
-                        int lb = GetLeftblanks(line, iStart);
-                        for (int i1 = iStart; i1 <= iEnd; i1++)
-                        {
-                            SetNull(line, i1);
-                        }
-                        line[i].s = s;
-                        line[i].type = ETokenType.Unknown;
-                        line[i].leftblanks = lb;
-                    }
-                }
+                SetCurliesAroundNakedHash(line, i);
 
                 if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
                 {
@@ -218,6 +163,12 @@ namespace Gekko
                         SetNull(line[i + 1].subnodes.storage, 2);
                         line[i + 1].subnodes.storage[3].leftblanks = 0;
                     }
+                    //else if (Equal(line[i + 1].subnodes.storage, 1, "#") && line[i + 1].subnodes.storage.Count == 4)
+                    //{
+                    //    //4 items including ( and ), for instance '#' and 'x' (will probably work with listfile too)
+                    //    line[i + 1].subnodes.storage.Insert(1, new TokenHelper(0, "{", ETokenType.Symbol));
+                    //    line[i + 1].subnodes.storage.Insert(line[i + 1].subnodes.storage.Count - 1, new TokenHelper(0, "}", ETokenType.Symbol));
+                    //}
                 }
 
                 if (Equal(line, i, "."))
@@ -236,7 +187,7 @@ namespace Gekko
 
                 if (Equal(line, i, FromTo("strip", "strip")))
                 {
-                    if (line[0].meta.aremosCommandName == "list")
+                    if (GetAremosCommandName(line) == "list")
                     {
                         if (GetS(line, i + 1) != "(")
                         {
@@ -355,7 +306,7 @@ namespace Gekko
                         }
                     }
                 }
-                
+
                 if (GetS(line, i).Length > 1 && GetS(line, i).EndsWith("."))
                 {
                     //Handle '123.' etc.
@@ -401,6 +352,72 @@ namespace Gekko
             }
         }
 
+        private static void SetCurliesAroundNakedHash(List<TokenHelper> line, int i)
+        {
+            if (IsNamePartStart(line, i))
+            {
+                int i2 = i;
+                for (int i1 = i + 1; i1 < line.Count; i1++)
+                {
+                    if (!IsNamePartMiddle(line, i1))
+                    {
+                        break;
+                    }
+                    i2 = i1;
+                }
+                int tokens = i2 - i + 1;
+
+                bool setCurlies = false;
+                if (tokens > 2) setCurlies = true;
+                else if (tokens == 1) setCurlies = true;
+                else
+                {
+                    //tokens == 2
+                    bool isHashIdent = GetS(line, i) == "#" && GetType(line, i + 1) == ETokenType.Word;
+                    List<string> commands = new List<string>();
+                    commands.Add("series");
+                    commands.Add("open");
+                    commands.Add("close");
+                    if (!IsInsideOptionField(line, i) && commands.Contains(GetAremosCommandName(line)))
+                    {
+                        setCurlies = true;
+                    }
+                }
+
+                if (setCurlies) //if 2 tokens or more, unless it is these two tokens: '#' + Word 
+                {
+                    //this is a composed name
+                    int iStart = i;
+                    int iEnd = i2;
+                    string s = "";
+                    for (int i1 = iStart; i1 <= iEnd; i1++)
+                    {
+                        if (GetS(line, i1) == "#" && GetType(line, i1 + 1) == ETokenType.Word)
+                        {
+                            s += "{%" + GetS(line, i1 + 1) + "}";
+                            i1++;
+                        }
+                        else if (GetS(line, i1) == "|")
+                        {
+                            //skip
+                        }
+                        else
+                        {
+                            s += GetS(line, i1);
+                        }
+                    }
+                    int lb = GetLeftblanks(line, iStart);
+                    for (int i1 = iStart; i1 <= iEnd; i1++)
+                    {
+                        SetNull(line, i1);
+                    }
+                    line[i].s = s;
+                    line[i].type = ETokenType.Unknown;
+                    line[i].leftblanks = lb;
+                }
+            }
+        }
+
         private static bool IsNamePartStart(List<TokenHelper> line, int i)
         {
             return GetType(line, i) == ETokenType.Word || GetS(line, i) == "|" || GetS(line, i) == "#";
@@ -423,7 +440,7 @@ namespace Gekko
         {
             int pos = 0;
             bool hasCloseall = false;
-            
+
             if (G.Equal(line[pos].s, FromTo("ac", "accept")) != null)
             {
                 line[pos].meta.aremosCommandName = "accept";
@@ -553,17 +570,29 @@ namespace Gekko
             {
                 string name = line[pos + 1].s;
                 if (!scalarMemory.ContainsKey(name)) scalarMemory.Add(name, "");
-                line[pos + 1].s = "%" + line[pos + 1].s;
+                bool hasTo = false;
+                for (int ii = 1; ii < line.Count; ii++)
+                {
+                    if (Equal(line, ii, "to") && line[ii].leftblanks > 0)
+                    {
+                        hasTo = true; break;
+                    }
+                }
+                string t = "string";
+                if (hasTo) t = "val";  //could be date...
+                line[pos + 1].s = t + " " + "%" + line[pos + 1].s;
                 line[pos].meta.aremosCommandName = "for";
                 line[pos].s = "for";
+                if (hasTo) AddComment(line, "Check that val type is ok (could be date)");
+                else AddComment(line, "Check that string type is ok");
             }
-                        
+
             else if (G.Equal(line[pos].s, FromTo("expo", "export")) != null)
             {
                 line[pos].meta.aremosCommandName = "export";
                 line[pos].s = "export";
             }
-            
+
             else if (G.Equal(line[pos].s, FromTo("func", "function")) != null)
             {
                 line[pos].meta.aremosCommandName = "function";
@@ -623,6 +652,9 @@ namespace Gekko
                 }
 
                 AddBracesAroundWildcard(line, start, end);
+
+                AddToOptionField(line, 1, "showbank=no showfreq=no");
+                
             }
 
             else if (G.Equal(line[pos].s, FromTo("lis", "list")) != null)
@@ -695,7 +727,7 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("proc", "procedure")) != null)
             {
                 line[pos].meta.aremosCommandName = "procedure";
-                line[pos].s = "procedure";                
+                line[pos].s = "procedure";
                 AddComment(line, "Please add types and symbols, for instance '... string %s, list #m, ...' etc.");
 
             }
@@ -866,8 +898,18 @@ namespace Gekko
             }
         }
 
-        private static void AddComment(List<TokenHelper> line, string s)
+        private static bool IsEmptyToken(List<TokenHelper> line, int i)
         {
+            if (i < 0 || i >= line.Count) return false;
+            TokenHelper th = line[i];
+            if (th.HasChildren()) return false;
+            if (th.s != "") return false;
+            return true;                
+        }
+
+        private static void AddComment(List<TokenHelper> line2, string s)
+        {
+            List<TokenHelper> line = GetCommandLine(line2);
             string s2 = " /* " + s + " */";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
@@ -880,6 +922,14 @@ namespace Gekko
                 }
             }
             if (ok) line.Add(th);  //avoid dublets
+        }
+
+        private static string GetAremosCommandName(List<TokenHelper> line2)
+        {
+            List<TokenHelper> line = GetCommandLine(line2);
+            TokenHelper th = line[0];
+            if (th.meta != null) return th.meta.aremosCommandName;
+            return null;
         }
 
         private static bool Equal(List<TokenHelper> line, int i, string s)
@@ -926,16 +976,37 @@ namespace Gekko
             return line[0].type == ETokenType.Word;
         }
 
-        private static bool IsInsideOptionField(List<TokenHelper> line, int i)
+        private static bool IsInsideOptionField(List<TokenHelper> line2, int i)
         {
-            Tuple<int, int> tup = FindOptionField(line);
+            List<TokenHelper> line = GetCommandLine(line2);
+            Tuple<int, int> tup = FindOptionField(line);  //could be COMMAND <... ( ..something.. ) ...>
             if (tup.Item1 == -12345) return false;  //no <>-field
             if (i > tup.Item1 && i < tup.Item2) return true;
             return false;
         }
 
-        private static Tuple<int, int> FindOptionField(List<TokenHelper> line)
-        {            
+        private static List<TokenHelper> GetCommandLine(List<TokenHelper> line)
+        {
+            TokenHelper startNode = line[0];
+            if (startNode?.meta.aremosCommandName != null) return line;
+            while (true)
+            {
+                startNode = startNode.parent;
+                if (startNode == null) break;
+                if (startNode?.meta.aremosCommandName != null)
+                {
+                    return startNode.subnodes.storage;
+                }
+                if (startNode.artificialTopNode) return line;
+                
+            }
+            return null;
+        }
+
+
+        private static Tuple<int, int> FindOptionField(List<TokenHelper> line2)
+        {
+            List<TokenHelper> line = GetCommandLine(line2);
             int i1 = 1;  //always
             if (!Equal(line, 1, "<")) return new Tuple<int, int>(-12345, -12345);
             int i2 = -12345;
@@ -951,8 +1022,9 @@ namespace Gekko
             return new Tuple<int, int>(i1, i2);
         }
 
-        private static void AddToOptionField(List<TokenHelper> line, int leftblanks, string s)
+        private static void AddToOptionField(List<TokenHelper> line2, int leftblanks, string s)
         {
+            List<TokenHelper> line = GetCommandLine(line2);
             Tuple<int, int> ii = FindOptionField(line);
 
             if (ii.Item1 == -12345)

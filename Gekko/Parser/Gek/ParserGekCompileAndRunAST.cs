@@ -177,7 +177,8 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
-                    problemLine = commandLines[lineNumber - 1];
+                    problemLine = "";
+                    if (lineNumber - 1 < commandLines.Count) problemLine = commandLines[lineNumber - 1];
                 }
 
                 bool lexer = false;

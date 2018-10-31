@@ -5548,6 +5548,39 @@ namespace UnitTests
             I("index {'ref'}:{'fx'}..{'ref'}:{'fy'} to #mylist;                                //range");
             I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
 
+            I("RESET;");
+            I("TIME 2001 2003;");
+            I("x1 = 1;");
+            I("x2 = 2;");
+            I("<2001q1 2004q4> x1!q = 1;");
+            I("<2001q1 2004q4> x2!q = 2;");
+            I("CLONE;");
+            I("index {'*'} to #mylist;");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 2);
+            I("index {'*:*'} to #mylist;");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 4);
+            I("index {'*:#*'} to #mylist;");
+            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 1);  //the list is only in work            
+            I("index <showbank=yes> {'*:*'} to #mylist;");  //default
+            _AssertHelperList("mylist", new List<string>() { "x1", "x2", "Ref:x1", "Ref:x2" });
+            I("index <showbank=no> {'*:*'} to #mylist;");
+            _AssertHelperList("mylist", new List<string>() { "x1", "x2", "x1", "x2" });
+            I("index <showbank=all> {'*:*'} to #mylist;");
+            _AssertHelperList("mylist", new List<string>() { "Work:x1", "Work:x2", "Ref:x1", "Ref:x2" });
+            I("index <showfreq=yes> {'*:*!*'} to #mylist;");  //default
+            _AssertHelperList("mylist", new List<string>() { "x1", "x1!q", "x2", "x2!q", "Ref:x1", "Ref:x1!q", "Ref:x2", "Ref:x2!q" });
+            I("index <showfreq=no> {'*:*!*'} to #mylist;");  //default
+            _AssertHelperList("mylist", new List<string>() { "x1", "x1", "x2", "x2", "Ref:x1", "Ref:x1", "Ref:x2", "Ref:x2" });
+            I("index <showfreq=all> {'*:*!*'} to #mylist;");  //default
+            _AssertHelperList("mylist", new List<string>() { "x1!a", "x1!q", "x2!a", "x2!q", "Ref:x1!a", "Ref:x1!q", "Ref:x2!a", "Ref:x2!q" });
+            I("index <showbank=all showfreq=all> {'*:*!*'} to #mylist;");  //default
+            _AssertHelperList("mylist", new List<string>() { "Work:x1!a", "Work:x1!q", "Work:x2!a", "Work:x2!q", "Ref:x1!a", "Ref:x1!q", "Ref:x2!a", "Ref:x2!q" });
+            
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("index {'**'} to #mylist;");
+                I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 3);  //2 series + the list in work
+            }
         }
 
 

@@ -2260,7 +2260,7 @@ namespace Gekko
             {
                 //ib can be == null with an indexer on the lhs, like #m.#n.%s
                 Databank ib_databank = ib as Databank;
-                if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank, see OPEN<edit> or UNLOCK");
+                if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank ('" + ib_databank.name + "'), see OPEN<edit> or UNLOCK");
                 ib_databank.isDirty = true;
             }
 
@@ -2764,7 +2764,7 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    if (!isArraySubSeries && options.label != null)
+                    if (!isArraySubSeries && options?.label != null)
                     {
                         lhs_series.meta.label = O.ConvertToString(options.label);
                     }
@@ -7940,28 +7940,75 @@ namespace Gekko
 
         public class Index
         {
-            public string name = null;
-            public string opt_mute = null;
-            //public string opt_addbank = null;
-            public string opt_frombank = null;
-            //public string listFile = null; //make it work
-            //public string wildCard1 = null; //--> delete??
-            //public string wildCard2 = null;  //only active if range   //--> delete??
-            public List<string> listItems = null;
-            public List names1 = null; //the wildcard(s)
-            public List names2 = null; //destination list
-            public string listFile = null;
-
-            public string opt_type = null;
+            // INDEX <mute frombank=.... showbank=... showfreq=...> [type] [wildcard] to [#list]
+                        
+            public string opt_mute = null;            
+            public string opt_bank = null;
+            public string opt_showbank = null;
+            public string opt_showfreq = null;
             public string type = null;
+            public List names1 = null; //the wildcard(s)
+            public List names2 = null; //destination list            
 
             public void Exe()
             {
                 if (this.type == "ASTPLACEHOLDER") this.type = null;
                 EVariableType type = EVariableType.Var;
                 if (this.type != null) type = G.GetVariableType(this.type);
+                
+                List<string> names = Program.Search(this.names1, opt_bank, type);
 
-                List<string> names = Program.Search(this.names1, opt_frombank, type);
+                if (G.Equal(opt_showbank, "all"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will add first-name (e.g. 'Work') if it is not there
+                        names[i] = G.Chop_AddBank(names[i], Program.databanks.GetFirst().name);
+                    }
+                }
+                else if (G.Equal(opt_showbank, "no"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will remove any bank
+                        names[i] = G.Chop_RemoveBank(names[i]);
+                    }
+                }
+                else if (G.Equal(opt_showbank, "yes") || opt_showbank == null)
+                {
+                    //this is default
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: showbank must be = yes, no or all");
+                    throw new GekkoException();
+                }
+
+                if (G.Equal(opt_showfreq, "all"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will add current freq (e.g. '!a') if it is not there
+                        names[i] = G.Chop_AddFreq(names[i], G.GetFreq(Program.options.freq));
+                    }
+                }
+                else if (G.Equal(opt_showfreq, "no"))
+                {
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        //This will remove any freq
+                        names[i] = G.Chop_RemoveFreq(names[i]);
+                    }
+                }
+                else if (G.Equal(opt_showfreq, "yes") || opt_showfreq == null)
+                {
+                    //this is default
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: showfreq must be = yes, no or all");
+                    throw new GekkoException();
+                }
 
                 if (!G.Equal(this.opt_mute, "yes"))
                 {
@@ -7973,8 +8020,7 @@ namespace Gekko
                 }
 
                 if (this.names2 != null)
-                {
-                    //Program.PutListIntoListOrListfile(names, this.name, this.listFile);
+                {                    
                     List<string> dest = O.Restrict(this.names2, true, true, false, false);
                     if (dest.Count > 1)
                     {
@@ -7984,14 +8030,7 @@ namespace Gekko
                     O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
 
                     G.Writeln2("Put " + names.Count + " matching items into list " + dest[0]);
-                }
-                else if (listFile != null)
-                {
-
-                    //    Program.PutListIntoListOrListfile(names, this.name, this.listFile);
-                    //    G.Writeln2("Put " + names.Count + " matching items into external file " + Program.AddExtension(listFile, "." + "lst"));
-
-                }
+                }                
                 else
                 {
                     G.Writeln2("Found " + names.Count + " matching items");
@@ -8053,7 +8092,7 @@ namespace Gekko
                     //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(listItems[i], opt_bank);
                     //foreach (Series ts in tss)
 
-                    if (!ts.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank + ")");
+                    if (!ts.meta.parentDatabank.editable) Program.ProtectError("You cannot change/add a timeseries in a non-editable databank (" + ts.meta.parentDatabank.name + ")");
 
                     GekkoTime ddate1 = t1;
                     GekkoTime ddate2 = t2;
