@@ -15246,6 +15246,8 @@ namespace Gekko
                             temp = new GekkoDictionary<string, string>[ts.dimensions];
                         }
 
+                        bool eqsPrinted = false;
+
                         if (Program.modelGams?.equations != null)
                         {
                             GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -15282,6 +15284,7 @@ namespace Gekko
                             if (eqs != null && eqs.Count > 0)
                             {
                                 PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs);
+                                eqsPrinted = true;
                             }
 
                             if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
@@ -15312,6 +15315,8 @@ namespace Gekko
                             {
                                 period = " (period " + t1.ToString() + " - " + t2.ToString() + ")";
                             }
+
+                            if (eqsPrinted) G.Writeln("");
 
                             G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
 
@@ -17570,15 +17575,15 @@ namespace Gekko
         {
             if (!G.Equal(Path.GetExtension(fileName), ".csv"))
             {
-                ReadGamsModelNormal(textInputRaw);
+                ReadGamsModelNormal(textInputRaw, fileName);
             }
             else
             {
-                ReadGamsModelCsv(textInputRaw);
+                ReadGamsModelCsv(textInputRaw, fileName);
             }
         }
 
-        private static void ReadGamsModelCsv(string textInputRaw)
+        private static void ReadGamsModelCsv(string textInputRaw, string fileName)
         {
             TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
             List<List<string>> eqLines = new List<List<string>>();
@@ -17598,8 +17603,7 @@ namespace Gekko
                 {
                     temp.Add(token.s);
                 }
-            }
-            G.Writeln2("Read " + eqLines.Count + " lines from csv file");
+            }            
 
             Program.modelGams = new ModelGams();
             //Program.modelGams.equations = eqLines;
@@ -17663,10 +17667,13 @@ namespace Gekko
                 }
             }
             Program.modelGams.equations = xx;
-            G.Writeln("Found " + xx.Count + " distinct equations");
+            
+            G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
+            G.Writeln("Read " + eqLines.Count + " lines from " + fileName);
+            G.Writeln("Found " + xx.Count + " distinct equations (use DISP to display them)");
         }
 
-        private static void ReadGamsModelNormal(string textInputRaw)
+        private static void ReadGamsModelNormal(string textInputRaw, string fileName)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -17688,6 +17695,10 @@ namespace Gekko
 
             foreach (TokenHelper tok in tokens2.subnodes.storage)
             {
+                if (tok.type == ETokenType.EOL)
+                {
+                    counter++;
+                }
 
                 if (tok.s == "." && tok.Offset(1).s == "." && tok.Offset(1).leftblanks == 0)
                 {
@@ -17977,7 +17988,10 @@ namespace Gekko
             }
             Program.modelGams = new ModelGams();
             Program.modelGams.equations = xx;
-            G.Writeln2("Found " + xx.Count + " distinct equations");
+
+            G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
+            G.Writeln("Read " + counter + " lines from " + fileName);
+            G.Writeln("Found " + xx.Count + " distinct equations (use DISP to display them)");
 
             if (Globals.runningOnTTComputer)
             {

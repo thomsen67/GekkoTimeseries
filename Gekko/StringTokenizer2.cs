@@ -105,6 +105,7 @@ namespace Gekko
     {
         //stash extra info here
         public string aremosCommandName = null;
+        public List<TokenHelper> commandLine = null;
     }
 
     public class TokenHelper

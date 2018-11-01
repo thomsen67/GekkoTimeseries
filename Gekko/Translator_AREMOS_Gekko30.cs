@@ -131,6 +131,19 @@ namespace Gekko
             return rv.ToString();
         }
 
+        public static void SetLineStartRecursive(List<TokenHelper> line, List<TokenHelper> pointer)
+        {
+            for (int i = 0; i < line.Count; i++)
+            {
+                if (line[i].HasChildren())
+                {
+                    SetLineStartRecursive(line[i].subnodes.storage, pointer);
+                    continue;
+                }
+                line[i].meta.commandLine = pointer;
+            }
+        }
+
         public static void HandleExpressionsRecursive(List<TokenHelper> line)
         {
             for (int i = 0; i < line.Count; i++)
@@ -872,6 +885,8 @@ namespace Gekko
                 line[pos].meta.aremosCommandName = "vis";
                 line[pos].s = "plot";
             }
+
+            SetLineStartRecursive(line, line);
         }
 
         private static void AddBracesAroundWildcard(List<TokenHelper> line, int start, int end)
@@ -987,18 +1002,13 @@ namespace Gekko
 
         private static List<TokenHelper> GetCommandLine(List<TokenHelper> line)
         {
-            TokenHelper startNode = line[0];
-            if (startNode?.meta.aremosCommandName != null) return line;
+            TokenHelper startNode = line[0];            
             while (true)
-            {
+            {                
+                if (startNode.parent == null) return line;
+                if (startNode.parent.artificialTopNode) return line;
                 startNode = startNode.parent;
-                if (startNode == null) break;
-                if (startNode?.meta.aremosCommandName != null)
-                {
-                    return startNode.subnodes.storage;
-                }
-                if (startNode.artificialTopNode) return line;
-                
+                line = startNode.subnodes.storage;
             }
             return null;
         }
