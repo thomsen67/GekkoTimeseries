@@ -2764,11 +2764,14 @@ namespace Gekko
 
                     bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                    if (!isArraySubSeries && options?.label != null)
+                    if (!isArraySubSeries)
                     {
-                        lhs_series.meta.label = O.ConvertToString(options.label);
+                        if (options?.opt_label != null) lhs_series.meta.label = O.ConvertToString(options.opt_label);
+                        if (options?.opt_source != null) lhs_series.meta.source = O.ConvertToString(options.opt_source);
+                        if (options?.opt_units != null) lhs_series.meta.units = O.ConvertToString(options.opt_units);
+                        if (options?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(options.opt_stamp);
                     }
-
+                        
                     switch (rhs.Type())
                     {
                         case EVariableType.Series:
@@ -7387,6 +7390,10 @@ namespace Gekko
             public IVariable opt_rownames = null;
             public IVariable opt_colnames = null;
             public IVariable label = null;
+            public string opt_label = null;
+            public string opt_source = null;
+            public string opt_units = null;
+            public string opt_stamp = null;
         }
 
         public class Accept

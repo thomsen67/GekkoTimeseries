@@ -4427,10 +4427,10 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTLEFTSIDE":
                         {
-                            if (node[1] != null)
-                            {
-                                node.Code.A("o" + Num(node) + ".label = " + node[1].Code + ";" + G.NL);
-                            }
+                            //if (node[1] != null)
+                            //{
+                            //    node.Code.A("o" + Num(node) + ".label = " + node[1].Code + ";" + G.NL);
+                            //}
                             node.Code.A(node[0].Code + G.NL);
                             
                         }
