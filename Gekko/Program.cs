@@ -15122,7 +15122,7 @@ namespace Gekko
         }
 
 
-        public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showFrnEquation, bool showAllPeriods, bool clickedLink, O.Disp o)
+        public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showDetailed, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
             EVariableType type = EVariableType.Series;
             bool gamsStyle = true;
@@ -15283,10 +15283,17 @@ namespace Gekko
 
                             if (eqs != null && eqs.Count > 0)
                             {
-                                PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs);
+                                PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs, showDetailed);
                                 eqsPrinted = true;
-                            }
 
+                                if (!showDetailed)
+                                {
+                                    G.Writeln();
+                                    G.WriteLink("Show GAMS equation" + G.S(eqs.Count), "disp2:" + var);
+                                    G.Writeln();
+                                }
+                            }
+                            
                             if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
 
                         }
@@ -15319,7 +15326,7 @@ namespace Gekko
                             if (eqsPrinted) G.Writeln("");
 
                             G.Writeln(G.GetFreqString(ts.freq) + " series has " + keys.Count + " elements in " + ts.dimensions + " dimensions" + period);
-
+                            
                             double dimCount2 = 1d;
                             string dimCount = null;
                             for (int i = 0; i < ts.dimensions; i++)
@@ -15343,18 +15350,28 @@ namespace Gekko
                                 temp2.Sort(G.CompareNaturalIgnoreCase);
                                 dimCount2 = dimCount2 * temp[i].Count;
                                 dimCount += temp2.Count + " * ";
-                                G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                                if (temp[i].Count > 0)
+                                {
+                                    G.Writeln("Dimension " + (i + 1) + " (" + domain + temp[i].Count + " members): " + G.GetListWithCommas(temp2));
+                                }
                             }
                             dimCount = dimCount.Substring(0, dimCount.Length - " * ".Length);
 
-                            MapMultidimItem mm = keys[0];
-                            string first = keys[0].ToString();
-                            string last = keys[keys.Count - 1].ToString();
-
-                            G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
-                            if (ts.dimensions > 1)
+                            if (keys == null || keys.Count == 0)
                             {
-                                G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                                //do nothing
+                            }
+                            else
+                            {
+                                MapMultidimItem mm = keys[0];
+                                string first = keys[0].ToString();
+                                string last = keys[keys.Count - 1].ToString();
+
+                                G.Writeln("First/last elements (alphabetically): " + G.Chop_RemoveFreq(ts.name) + "[" + first + "]" + " ... " + G.Chop_RemoveFreq(ts.name) + "[" + last + "]");
+                                if (ts.dimensions > 1)
+                                {
+                                    G.Writeln("Dimension span: " + dimCount + " = " + dimCount2 + ", density: " + keys.Count + "/" + dimCount2 + " = " + Program.NumberFormat(100d * (keys.Count / dimCount2), "0.00") + "%");
+                                }
                             }
                         }
                         else
@@ -15588,7 +15605,7 @@ namespace Gekko
                                     //rhs = rhs.Replace("]", ")");
                                     rhs = rhs.Replace("[0]", "");
 
-                                    if (showFrnEquation)
+                                    if (showDetailed)
                                     {
                                         G.Writeln(found.csCodeLhsHuman + " = " + rhs + " " + ";");
                                     }
@@ -15671,12 +15688,16 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("Displayed " + (seriesCounter + nonSeries) + " variables");
+                if (seriesCounter + nonSeries > 1)
+                {
+                    G.Writeln2("Displayed " + (seriesCounter + nonSeries) + " variables");
+                }
+
             }
             
         }
 
-        private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs)
+        private static void PrintEquationWithLinks(bool gamsToGekko, string varnameWithoutFreq, List<ModelGamsEquation> eqs, bool showGamsEquation)
         {
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -15688,10 +15709,26 @@ namespace Gekko
                 foreach (ModelGamsEquation eq in eqs)
                 {
 
-                    string lhs = eq.lhs;
-                    string rhs = eq.rhs;
+                    string lhs = null;
+                    string rhs = null;
+                    string conditionals = null;
 
-                    G.Write2(lhs + " = ");
+                    if (showGamsEquation)
+                    {
+                        lhs = eq.lhsGams;
+                        rhs = eq.rhsGams;
+                        conditionals = eq.conditionalsGams;
+                    }
+                    else
+                    {
+                        lhs = eq.lhs;
+                        rhs = eq.rhs;
+                        conditionals = eq.conditionals;
+                    }
+
+                    G.Writeln();
+                    
+                    G.Write(lhs + " = ");
                     int length = (rhs + " = ").Length;
 
                     GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
@@ -15729,7 +15766,8 @@ namespace Gekko
                         }
                     }
                     G.Writeln(";");
-                }
+                    if (conditionals != null && conditionals.Trim() != "") G.Writeln("Conditionals: " + conditionals);
+                }                
             }
 
             finally
@@ -17753,6 +17791,8 @@ namespace Gekko
                         TokenHelper lhsTokensGams = null;
                         TokenHelper rhsTokensGams = null;
 
+                        string dollar = null;
+
                         nameGams = tok.Offset(i)?.s;
 
                         i++;
@@ -17770,7 +17810,14 @@ namespace Gekko
 
                                 //TODO: remove stray ANDs
 
+                                
                                 TokenHelper tok3 = tok.Offset(i);
+                                dollarGams = null;
+                                if (tok3.subnodes != null)
+                                {
+                                    dollarGams = tok3.subnodes.ToString();
+                                }
+
                                 if (tok3.SubnodesTypeParenthesisStart())
                                 {
 
@@ -17798,12 +17845,12 @@ namespace Gekko
                                     WalkTokensHandleParentheses(list);
                                     WalkTokens(list);
 
-                                    dollarGams = list.ToStringTrim();                                        
+                                    dollar = list.ToStringTrim();                                        
 
-                                    if (dollarGams.StartsWith("(") && dollarGams.EndsWith(")"))
+                                    if (dollar.StartsWith("(") && dollar.EndsWith(")"))
                                     {
-                                        dollarGams = dollarGams.Substring(1, dollarGams.Length - 2).Trim();
-                                        if (dollarGams.StartsWith("and ")) dollarGams = dollarGams.Substring("and ".Length).Trim();
+                                        dollar = dollar.Substring(1, dollar.Length - 2).Trim();
+                                        if (dollar.StartsWith("and ")) dollar = dollar.Substring("and ".Length).Trim();
                                     }
 
                                     i++;
@@ -17928,15 +17975,15 @@ namespace Gekko
                             }
                             else
                             {
-                                string dollarGams2 = null;
-                                if (dollarGams != null && dollarGams.Trim() != "" && dollarGams.Trim() != "()")
+                                string dollar2 = null;
+                                if (dollar != null && dollar.Trim() != "" && dollar.Trim() != "()")
                                 {
-                                    dollarGams2 = dollarGams.Trim();
+                                    dollar2 = dollar.Trim();
                                 }
 
-                                if (dollarGams2 != null)
+                                if (dollar2 != null)
                                 {
-                                    sb.Append(lhs + " $ (" + dollarGams2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                                    sb.Append(lhs + " $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
                                 }
                                 else
                                 {
@@ -17949,6 +17996,7 @@ namespace Gekko
                         {
                             e.lhs = lhs;
                             e.rhs = rhs;
+                            e.conditionals = dollar;                            
                         }
 
                         string varname = null;

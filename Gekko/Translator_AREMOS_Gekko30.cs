@@ -114,6 +114,7 @@ namespace Gekko
                 //Takes care of the first part of the line,
                 //option field etc.
                 //Records names of assigns, lists and matrices
+                HandleExpressionsRecursiveBefore(line);
                 HandleCommandName(line);
                 HandleExpressionsRecursive(line);
             }            
@@ -144,6 +145,32 @@ namespace Gekko
             }
         }
 
+        public static void HandleExpressionsRecursiveBefore(List<TokenHelper> line)
+        {
+            for (int i = 0; i < line.Count; i++)
+            {
+                if (line[i].HasChildren())
+                {
+                    HandleExpressionsRecursiveBefore(line[i].subnodes.storage);
+                    continue;
+                }
+
+                if (Equal(line, i - 1, "listfile") && GetType(line, i) == ETokenType.Word)
+                {
+                    // listfile a --> (listfile a), where a has a blank after
+                    //   -1     0
+                    if (!Equal(line, i - 2, "("))
+                    {
+                        line[i - 1].leftblanks = 0;  //no blanks before 'listfile'
+                        line.Insert(i - 1, new TokenHelper(0, "(", ETokenType.Symbol));
+                        line.Insert(i - 1, new TokenHelper(1, "#", ETokenType.Symbol));
+                        line.Insert(i + 3, new TokenHelper(0, ")", ETokenType.Symbol));
+                    }
+                }
+
+            }
+        }
+
         public static void HandleExpressionsRecursive(List<TokenHelper> line)
         {
             for (int i = 0; i < line.Count; i++)
@@ -158,8 +185,10 @@ namespace Gekko
 
                 // ------------- start of real stuff ---------------------------
 
-                SetCurliesAroundNakedHash(line, i);
+                
 
+                SetCurliesAroundNakedHash(line, i);
+                
                 if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
                 {
                     if (!(matrixMemory.ContainsKey(line[i + 1].s) || listMemory.ContainsKey(line[i + 1].s)))
@@ -362,6 +391,9 @@ namespace Gekko
                         SetNull(line, i); ;  //last token is just before the ';', for instance ...+a%s|;
                     }
                 }
+
+                
+                
             }
         }
 
@@ -667,7 +699,7 @@ namespace Gekko
                 AddBracesAroundWildcard(line, start, end);
 
                 AddToOptionField(line, 1, "showbank=no showfreq=no");
-                
+
             }
 
             else if (G.Equal(line[pos].s, FromTo("lis", "list")) != null)
@@ -767,8 +799,7 @@ namespace Gekko
             else if (G.Equal(line[pos].s, FromTo("ser", "series")) != null)
             {
                 line[pos].meta.aremosCommandName = "series";
-                line[pos].s = ""; //not needed
-                line[pos + 1].leftblanks = 0;
+                
 
                 int count1 = 0;
                 int count2 = 0;
@@ -781,6 +812,26 @@ namespace Gekko
                 if (count1 > 0 && count2 > 0)
                 {
                     AddComment(line, "Please use iif() function");
+                }
+
+                bool optionField = false;
+                int i = FindS(line, "=");
+                if (i != -12345 && line[i - 1].type == ETokenType.QuotedString)
+                {
+                    //SERIES y 'label' = ... --> <label = 'label'> y = ...
+                    string label = line[i - 1].s;
+                    SetNull(line, i - 1);
+                    AddToOptionField(line, 1, "label = " + label);
+                    optionField = true;
+                }
+
+                if (optionField)
+                {                    
+                }
+                else
+                {
+                    line[pos].s = ""; //not needed
+                    line[pos + 1].leftblanks = 0;
                 }
             }
 
@@ -887,6 +938,20 @@ namespace Gekko
             }
 
             SetLineStartRecursive(line, line);
+        }
+
+        private static int FindS(List<TokenHelper> line, string s)
+        {
+            int rv = -12345;
+            for (int i = 1; i < line.Count; i++)
+            {
+                if (Equal(line, i, s))
+                {
+                    rv = i;
+                    break;
+                }
+            }
+            return rv;
         }
 
         private static void AddBracesAroundWildcard(List<TokenHelper> line, int start, int end)

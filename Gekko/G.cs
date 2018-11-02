@@ -285,6 +285,12 @@ namespace Gekko
             return varnameWithFreq;
         }
 
+        public static string S(int i)
+        {
+            if (i <= 1) return "";
+            else return "s";
+        }
+
         public static string AddFreqToName(string varName, string freq)
         {
             //Only used internally, when dealing with databanks. Not relevant for
