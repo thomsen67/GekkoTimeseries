@@ -7925,7 +7925,7 @@ namespace UnitTests
             // b pV040000
             // b pV050000
             //I("string sum=''; list erha = V010000,V020000,V030000; list erhb = V040000,V050000; for i = a, b; string xx = 'erh%i'; list xxx = #(%xx) prefix=p; string sum = %sum + string(#xxx[2]); end;");
-            I("string %sum=''; list #erha = V010000,V020000,V030000; list #erhb = V040000,V050000; for %i = a, b; string %xx = 'erh{%i}'; list #xxx = #{%xx}.prefix('p'); string %sum = %sum + #xxx[2]; end;");
+            I("string %sum=''; list #erha = V010000,V020000,V030000; list #erhb = V040000,V050000; for string %i = a, b; string %xx = 'erh{%i}'; list #xxx = #{%xx}.prefix('p'); string %sum = %sum + #xxx[2]; end;");
             _AssertScalarString(First(), "%sum", "pV020000pV050000");
 
             // ----------------- First we use % ----------------------------------------------
@@ -15844,7 +15844,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__Doc()
+        public void _Test_Doc()
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
@@ -15875,8 +15875,12 @@ namespace UnitTests
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("import<tsd>meta;");
-            I("SERIES y 'a' = 5;");
+            FAIL("SERIES y 'a' = 5;");
+            I("SERIES <label='a' source='b' units='c' stamp='d'> y = 5;");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "a");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "b");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.units, "c");
+            Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "d");
         }
 
         [TestMethod]
