@@ -431,11 +431,16 @@ namespace UnitTests
             I("%s1 = 'abcABC';");
             I("%s2 = %s1.replace('ab', 'X');");
             _AssertScalarString(First(), "%s2", "XcXC");
+            I("%s2 = %s1.replace('a', 'X');");
+            _AssertScalarString(First(), "%s2", "XbcXBC");
+            I("%s2 = %s1.replace('a', 'X', 1);");
+            _AssertScalarString(First(), "%s2", "XbcABC");
 
             I("reset;");
             I("#m1 = a, b, c, b;");
             I("#m = #m1.replace('b', 'x');");
             _AssertListString(First(), "#m", new StringOrList("a", "x", "c", "x"));
+            FAIL("#m = #m1.replace('b', 'x', 1);");
 
             //-------------------------------------------------------------------------
             //-----------  length()
@@ -11748,8 +11753,8 @@ namespace UnitTests
             I("list #a4 = #a.sort();                                       //sort");
             _AssertHelperList("a4", new List<string>() { "a1", "a2", "a3", "a4" });
             I("list #a5 = #a.prefix('pf').suffix('sf');                    //pre/suffix");
-            _AssertHelperList("a5", new List<string>() { "pfa4sf", "pfa2sf", "pfa3sf", "pfa1sf" });
-            I("list #a6 = #a5.replace('pf', '', 'inside');                              ");  //without 'inside' it will look for a whole string
+            _AssertHelperList("a5", new List<string>() { "pfa4sf", "pfa2sf", "pfa3sf", "pfa1sf" });            
+            I("list #a6 = #a5.replaceinside('pf', '');"); //without 'inside' it will look for a whole string
             _AssertHelperList("a6", new List<string>() { "a4sf", "a2sf", "a3sf", "a1sf" });
             I("list #a7 = #a['a2'..'a3'];                                 //sublist with alphabetical range");
             _AssertHelperList("a7", new List<string>() { "a2", "a3" });

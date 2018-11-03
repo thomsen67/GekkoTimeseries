@@ -2753,29 +2753,42 @@ namespace Gekko
             return v;
         }
 
-        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
+        public static IVariable replaceinside(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, IVariable max)
         {
-            return replace(smpl, ths, x2, x3, null);
+            return replace(smpl, ths, x2, x3, true, max);
         }
 
-        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, IVariable inside)
+        public static IVariable replaceinside(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
+        {            
+            return replace(smpl, ths, x2, x3, true, Globals.scalarVal0);
+        }
+
+        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, IVariable max)
         {
-            //does not exist in AREMOS
+            return replace(smpl, ths, x2, x3, false, max);
+        }
 
-            bool isInside = false;
-            if (inside != null && G.Equal(O.ConvertToString(inside), "inside")) isInside = true;
+        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
+        {
+            return replace(smpl, ths, x2, x3, false, Globals.scalarVal0);
+        }
 
+        public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, bool isInside, IVariable max)
+        {
+            int imax = O.ConvertToInt(max);
+            
             if (ths.Type() == EVariableType.String)
             {
                 if (isInside)
                 {
-                    G.Writeln2("*** ERROR: 'inside' is for list argument only");
+                    G.Writeln2("*** ERROR: replaceinside() is for list argument only");
                     throw new GekkoException();
                 }
                 string s1 = O.ConvertToString(ths);
                 string s2 = O.ConvertToString(x2);
                 string s3 = O.ConvertToString(x3);
-                string s4 = Regex.Replace(s1, s2, s3, RegexOptions.IgnoreCase);
+                string s4 = G.Replace(s1, s2, s3, StringComparison.OrdinalIgnoreCase, imax);
+                //string s4 = Regex.Replace(s1, s2, s3, RegexOptions.IgnoreCase);
                 return new ScalarString(s4);
             }
             else if (ths.Type() == EVariableType.List)
@@ -2795,11 +2808,21 @@ namespace Gekko
                             if (G.Contains(s, s2))
                             {
                                 hit = true;
-                                tmp.Add(new ScalarString(Regex.Replace(s, s2, s3, RegexOptions.IgnoreCase)));
+                                tmp.Add(new ScalarString(G.Replace(s, s2, s3, StringComparison.OrdinalIgnoreCase, imax)));
+                                //tmp.Add(new ScalarString(Regex.Replace(s, s2, s3, RegexOptions.IgnoreCase)));                                
                             }
                         }
                         else
                         {
+                            if (imax <= 0 || imax == int.MaxValue)
+                            {
+                                //good
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: You cannot use max argument with replace() on a list");
+                                throw new GekkoException();
+                            }
                             if (G.Equal(s, s2))
                             {
                                 hit = true;
