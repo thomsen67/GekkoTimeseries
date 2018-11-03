@@ -232,7 +232,7 @@ namespace Gekko
                     {
                         if (GetS(line, i + 1) != "(")
                         {
-                            AddComment(topline, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'inside')");
+                            AddComment(topline, "For #m1 = #m2 strip %s, use #m1 = #m2.replaceinside(%s, '', 1)");
                         }
                     }
                 }
