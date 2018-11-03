@@ -2284,13 +2284,10 @@ namespace Gekko
 
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
-                string fileName = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-                List<string> temp = Program.GetListOfStringsFromList(rhs);
-                Program.WriteExternalListFile(fileName, temp);
+                WriteExternalListFile(varnameWithFreq, rhs);
             }
             else
             {
-
                 IVariable lhs = null;
                 if (ib != null)
                 {
@@ -3129,6 +3126,18 @@ namespace Gekko
             return;
 
         }
+
+        public static void WriteExternalListFile(string varnameWithFreq, IVariable rhs)
+        {
+            string fileName = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+            List<string> temp = Program.GetListOfStringsFromList(rhs);
+            Program.WriteExternalListFile(fileName, temp);
+
+            string listfileName = G.TransformListfileName(varnameWithFreq);
+
+            G.ServiceMessage("LIST " + listfileName + " updated ", null);
+        }
+
 
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
         {
@@ -8036,7 +8045,7 @@ namespace Gekko
                     }
                     O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
 
-                    G.Writeln2("Put " + names.Count + " matching items into list " + dest[0]);
+                    G.Writeln2("Put " + names.Count + " matching items into list " + G.TransformListfileName(dest[0]));
                 }                
                 else
                 {

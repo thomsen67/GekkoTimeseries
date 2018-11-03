@@ -116,7 +116,7 @@ namespace Gekko
                 //Records names of assigns, lists and matrices
                 HandleExpressionsRecursiveBefore(line);
                 HandleCommandName(line);
-                HandleExpressionsRecursive(line);
+                HandleExpressionsRecursive(line, line);
             }            
 
             foreach (List<TokenHelper> line in temp)
@@ -171,13 +171,13 @@ namespace Gekko
             }
         }
 
-        public static void HandleExpressionsRecursive(List<TokenHelper> line)
+        public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline)
         {
             for (int i = 0; i < line.Count; i++)
             {
                 if (line[i].HasChildren())
                 {
-                    HandleExpressionsRecursive(line[i].subnodes.storage);
+                    HandleExpressionsRecursive(line[i].subnodes.storage, topline);
                     continue;
                 }
 
@@ -186,8 +186,7 @@ namespace Gekko
                 // ------------- start of real stuff ---------------------------
 
                 
-
-                SetCurliesAroundNakedHash(line, i);
+                SetCurliesAroundNakedHash(line, i, topline[0].meta.aremosCommandName);
                 
                 if (GetS(line, i) == "#" && GetLeftblanks(line, i + 1) == 0 && GetType(line, i + 1) == ETokenType.Word)
                 {
@@ -229,11 +228,11 @@ namespace Gekko
 
                 if (Equal(line, i, FromTo("strip", "strip")))
                 {
-                    if (GetAremosCommandName(line) == "list")
+                    if (topline[0].meta.aremosCommandName == "list")
                     {
                         if (GetS(line, i + 1) != "(")
                         {
-                            AddComment(line, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'inside')");
+                            AddComment(topline, "For #m1 = #m2 strip %s, use #m1 = #m2.replace(%s, '', 'inside')");
                         }
                     }
                 }
@@ -330,7 +329,7 @@ namespace Gekko
                 }
                 if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
-                    AddComment(line, "Please note that ##x in Gekko is %{%x} or #{%x}");
+                    AddComment(topline, "Please note that ##x in Gekko is %{%x} or #{%x}");
                 }
 
                 if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
@@ -397,7 +396,7 @@ namespace Gekko
             }
         }
 
-        private static void SetCurliesAroundNakedHash(List<TokenHelper> line, int i)
+        private static void SetCurliesAroundNakedHash(List<TokenHelper> line, int i, string command)
         {
             if (IsNamePartStart(line, i))
             {
@@ -423,7 +422,7 @@ namespace Gekko
                     commands.Add("series");
                     commands.Add("open");
                     commands.Add("close");
-                    if (!IsInsideOptionField(line, i) && commands.Contains(GetAremosCommandName(line)))
+                    if (!IsInsideOptionField(line, i) && commands.Contains(command))
                     {
                         setCurlies = true;
                     }
@@ -938,6 +937,9 @@ namespace Gekko
             }
 
             SetLineStartRecursive(line, line);
+
+            
+
         }
 
         private static int FindS(List<TokenHelper> line, string s)
@@ -987,9 +989,9 @@ namespace Gekko
             return true;                
         }
 
-        private static void AddComment(List<TokenHelper> line2, string s)
+        private static void AddComment(List<TokenHelper> line, string s)
         {
-            List<TokenHelper> line = GetCommandLine(line2);
+            
             string s2 = " /* " + s + " */";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
@@ -1067,15 +1069,7 @@ namespace Gekko
 
         private static List<TokenHelper> GetCommandLine(List<TokenHelper> line)
         {
-            TokenHelper startNode = line[0];            
-            while (true)
-            {                
-                if (startNode.parent == null) return line;
-                if (startNode.parent.artificialTopNode) return line;
-                startNode = startNode.parent;
-                line = startNode.subnodes.storage;
-            }
-            return null;
+            return line;
         }
 
 

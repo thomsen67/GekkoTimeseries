@@ -1746,26 +1746,42 @@ namespace Gekko
             return version;
         }
 
+        public static string TransformListfileName(string varnameWithFreq)
+        {
+            if (!varnameWithFreq.Contains("___")) return varnameWithFreq;
+            string fileName2 = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+            string listfileName = Globals.symbolCollection + "(" + "listfile" + " " + fileName2 + ")";
+            return listfileName;
+        }
+
         public static void ServiceMessage(string s, P p)
-        {            
-            if (p.IsSimple())
+        {
+            if (p == null)
             {
-                if (p.numberOfServiceMessages < 4)
+                G.Write2(s);
+                G.Writeln(Globals.serviceMessage, Color.LightGray);
+            }
+            else
+            {
+                if (p.IsSimple())
                 {
-                    G.Write2(s);
-                    G.Writeln(Globals.serviceMessage, Color.LightGray);
-                    p.numberOfServiceMessages++;
+                    if (p.numberOfServiceMessages < 4)
+                    {
+                        G.Write2(s);
+                        G.Writeln(Globals.serviceMessage, Color.LightGray);
+                        p.numberOfServiceMessages++;
+                    }
+                    else if (p.numberOfServiceMessages == 4)
+                    {
+                        G.Write2(s);
+                        G.Writeln(Globals.serviceMessageTruncated, Color.LightGray);
+                        p.numberOfServiceMessages++;
+                    }
+                    else
+                    {
+                        //do nothing
+                    }
                 }
-                else if (p.numberOfServiceMessages == 4)
-                {
-                    G.Write2(s);
-                    G.Writeln(Globals.serviceMessageTruncated, Color.LightGray);
-                    p.numberOfServiceMessages++;
-                }
-                else 
-                {                    
-                    //do nothing
-                }                
             }
         }
 

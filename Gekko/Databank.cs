@@ -186,16 +186,24 @@ namespace Gekko
 
         public void AddIVariableWithOverwrite(string name, IVariable x)
         {
-            if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
-            if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
+            if (name != null && name.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
-                throw new GekkoException(); //only intended for non-series
+                O.WriteExternalListFile(name, x);
             }
-            if (this.ContainsIVariable(name))
+            else
             {
-                this.RemoveIVariable(name);                
+
+                if (!this.editable) Program.ProtectError("You cannot add a variable to a non-editable databank, see OPEN<edit> or UNLOCK");
+                if (x.Type() == EVariableType.Series && ((Series)x).type == ESeriesType.Light)
+                {
+                    throw new GekkoException(); //only intended for non-series
+                }
+                if (this.ContainsIVariable(name))
+                {
+                    this.RemoveIVariable(name);
+                }
+                this.AddIVariable(name, x);
             }
-            this.AddIVariable(name, x);
         }
 
         public void AddIVariableWithOverwrite(IVariable x)

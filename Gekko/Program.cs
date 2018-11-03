@@ -16323,9 +16323,10 @@ namespace Gekko
 
                 bool hasExplicitBank = bankLhs != null;
 
-                if (lhsHasStarOrQuestion)
+                if (lhsHasStarOrQuestion || type == EWildcardSearchType.Search)
                 {
                     //There is a star or question in bank, name or freq, or a range in name
+                    //OR: it is an INDEX command without stars, here we must find out if the single non-wildcard item exists
 
                     List<string> listOfAllOpenBanks = GetListOfAllBanks();
                     List<string> db_banks = new List<string>();
