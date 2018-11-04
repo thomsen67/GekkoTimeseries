@@ -9751,10 +9751,7 @@ namespace Gekko
                     else
                     {
                         string[] ss = data.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (Program.scalars.ContainsKey(Globals.symbolCollection + name))
-                        {
-                            Program.scalars.Remove(Globals.symbolCollection + name);
-                        }
+                        
                         Matrix m = new Matrix(rows, cols);
 
                         int cnt = -1;
@@ -9765,7 +9762,8 @@ namespace Gekko
                             if (s2 != "NA") d = double.Parse(s2);
                             m.data[cnt / cols, cnt % cols] = d;
                         }
-                        Program.scalars.Add(Globals.symbolCollection + name, m);
+
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name, m);
 
                         data = null;
                         name = null;
@@ -18197,7 +18195,11 @@ namespace Gekko
             {
                 if (Globals.pipe == false)
                 {
-                    if (!mute) G.Writeln("+++ WARNING: you are not currently piping output to a file. Command ignored.");
+                    if (!mute)
+                    {
+                        G.Writeln("+++ WARNING: you are not currently piping output to a file. Command ignored.");
+                        if (G.Equal(fileName, "con")) G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
+                    }
                 }
                 else
                 {
@@ -18209,6 +18211,7 @@ namespace Gekko
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
                     if (!mute) G.Writeln2("Directing output to main window");
+                    if (G.Equal(fileName, "con")) G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
                 }
             }
             else if(pause)

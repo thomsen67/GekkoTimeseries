@@ -196,6 +196,11 @@ namespace Gekko
                     }
                 }
 
+                if (Equal(line, i, "average") && topline[0].meta.aremosCommandName == "collapse")
+                {
+                    line[i].s = "avg";
+                }
+
                 if (Equal(line, i, "sum") && line[i + 1].SubnodesType() == "(")
                 {
                     if (Equal(line[i + 1].subnodes.storage, 1, "0") && Equal(line[i + 1].subnodes.storage, 2, ","))

@@ -9261,12 +9261,14 @@ namespace Gekko
                 List<string> r_exportItems = Restrict(names, true, true, false, false);  //only matrices, #x
                 foreach (string s in r_exportItems)
                 {
+                    string rawS = G.Chop_RemoveBank(s).Replace(Globals.symbolCollection.ToString(), "");
+                    
                     IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError, true);
                     //IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + s, out iv);
                     if (iv != null && iv.Type() == EVariableType.Matrix)
                     {
                         Matrix m = (Matrix)iv;
-                        string xxx = Program.MatrixFromGekkoToR<double>(s, m.data);
+                        string xxx = Program.MatrixFromGekkoToR<double>(rawS, m.data);
                         all += xxx + G.NL;
                     }
                     else
