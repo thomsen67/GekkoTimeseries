@@ -5113,7 +5113,7 @@ namespace Gekko.Parser.Gek
                             else if (node.ChildrenCount() == 3) {
                                 node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
                                 node.Code.A(tempName + ".to = O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict);" + G.NL);
-                                node.Code.A(tempName + ".step = O.ConvertToDate(" + node[2].Code + ");" + G.NL);
+                                node.Code.A(tempName + ".step = O.ConvertToInt(" + node[2].Code + ");" + G.NL);
                             }
                             node.Code.A("o" + Num(node) + ".timeFilterPeriods.Add(" + tempName + ");" + G.NL);
                         }
