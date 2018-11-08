@@ -783,13 +783,21 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Empty list");
                         throw new GekkoException();
                     }
-                    ScalarString xx = start_list.list[0] as ScalarString;
-                    if (xx == null)
+                    if (false)
                     {
-                        G.Writeln2("*** ERROR: list element 1 is not a STRING");
-                        throw new GekkoException();
+                        ScalarString xx = start_list.list[0] as ScalarString;
+                        if (xx == null)
+                        {
+                            G.Writeln2("*** ERROR: list element 1 is not a STRING");
+                            throw new GekkoException();
+                        }
+                        x = new Gekko.ScalarString(xx.string2);
                     }
-                    x = new Gekko.ScalarString(xx.string2);
+                    else
+                    {
+                        x = start_list.list[0].DeepClone(null);
+                    }
+                    
                     //x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
                 }
                 else throw new GekkoException();

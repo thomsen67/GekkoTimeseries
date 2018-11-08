@@ -5020,6 +5020,15 @@ namespace UnitTests
         [TestMethod]
         public void _Test_For()
         {
+            I("reset; for string %i = ('a', 'b'); tell '' + %i; end;");
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("reset; for val %i = (1, 2); tell '' + %i; end;");
+                I("reset; for date %i = (2001q1, 2001q3); tell '' + %i; end;");
+                I("reset; series a = 100, series b = 200; for series %i = (a, b); prt %i; end;");
+                I("reset; series a = 100, series b = 200; for string %i = ('a', 'b'); prt {%i}; end;");
+            }
+
             //parallel for loop
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
@@ -5542,16 +5551,19 @@ namespace UnitTests
             I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
             I("index ref:fx..ref:fy to #mylist;                                //range");
             I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
-                        
-            //Now with {}-names.
-            I("index {'f'}* to #mylist;                                      //finds all series in Work and puts them in #mylist");
-            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
-            I("index {'ref'}:{'f'}* to #mylist;                                 //same, for another bank");
-            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
-            I("index {'fx'}..{'fy'} to #mylist;                                //range");
-            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
-            I("index {'ref'}:{'fx'}..{'ref'}:{'fy'} to #mylist;                                //range");
-            I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                //Now with {}-names.
+                I("index {'f'}* to #mylist;                                      //finds all series in Work and puts them in #mylist");
+                I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
+                I("index {'ref'}:{'f'}* to #mylist;                                 //same, for another bank");
+                I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 631);
+                I("index {'fx'}..{'fy'} to #mylist;                                //range");
+                I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
+                I("index {'ref'}:{'fx'}..{'ref'}:{'fy'} to #mylist;                                //range");
+                I("VAL %n = #mylist.len();"); _AssertScalarVal(First(), "%n", 31);
+            }
 
             I("RESET;");
             I("TIME 2001 2003;");
@@ -12506,8 +12518,6 @@ namespace UnitTests
             // ---------------------------------------------------------------------------
 
             I("reset;");
-            I("#sq = (%type = 'square', %size = 2, %color = 'red');");
-            I("#bx = (%type = 'box', %size = 3, %color = 'green');");
             I("function val volume(map #m);"
             + "  %volume = 0;"
             + "  if (#m.%type == 'square');"
@@ -12517,11 +12527,12 @@ namespace UnitTests
             + "    %volume = #m.%size * #m.%size * #m.%size;"
             + "  end; end;"
             + "  return %volume;"
-            + "end;");
-
+            + "end;");                        
+            I("#sq = (%type = 'square', %size = 2, %color = 'red');");
+            I("#bx = (%type = 'box', %size = 3, %color = 'green');");
             I("tell'';");
             I("tell'Type ' + #sq.%type + ': size = ' + #sq.%size + ', volume = ' + #sq.volume() + ', color = ' + #sq.%color;");
-            I("tell'Type ' + #bx.%type + ': size = ' + #bx.%size + ', volume = ' + volume(#bx) + ', color = ' + #bx.%color;");
+            I("tell'Type ' + #bx.%type + ': size = ' + #bx.%size + ', volume = ' + #bx.volume() + ', color = ' + #bx.%color;");
 
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Type square: size = 2, volume = 4, color = red"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Type box: size = 3, volume = 27, color = green"));

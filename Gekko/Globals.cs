@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string versionInternal = "d33";
+        public static string versionInternal = "";
 
         public static bool fixLookup = true;
 
@@ -168,8 +168,8 @@ namespace Gekko
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
-        public static bool isAlphaVersion = true;
-        public static bool isBetaVersion = false; 
+        public static bool isAlphaVersion = false;
+        public static bool isBetaVersion = true; 
         public static bool isGammaVersion = false; 
         public static bool isPreviewVersion = false; //for preview of 2.0        
         

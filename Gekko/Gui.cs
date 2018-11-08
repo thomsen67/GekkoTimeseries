@@ -319,10 +319,11 @@ namespace Gekko
             if (Globals.isBetaVersion)
             {
                 G.Writeln();
-                G.Writeln("+-------------------------------------------+", Color.Red);
-                G.Writeln("|  This is a not fully tested BETA VERSION  |", Color.Red);
-                G.Writeln("| Please do not use it for serious purposes |", Color.Red);
-                G.Writeln("+-------------------------------------------+", Color.Red);
+                G.Writeln("  +--------------------------------------------+", Color.Red);
+                G.Writeln("  |       This is a not fully tested           |", Color.Red);
+                G.Writeln("  |   BETA VERSION of the up-coming Gekko 3.0. |", Color.Red);
+                G.Writeln("  |  Please do not use it for serious purposes |", Color.Red);
+                G.Writeln("  +--------------------------------------------+", Color.Red);
                 G.Writeln();
                 //Program.Pause("This is an untested BETA VERSION" + G.NL + "Please do not use it for serious purposes");
                 if (Globals.runningOnTTComputer)

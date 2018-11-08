@@ -28990,7 +28990,7 @@ namespace Gekko
                 //TODO filter and skip, see below
                 double var1 = double.NaN;
                 double varPch = double.NaN;
-                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, logTransform, false);
+                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, logTransform, false, sumOver);
                 return var1;
             }
             else
@@ -32427,7 +32427,7 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable, int sumOver)
         {
             string printCode = printCode2.Trim();  //when it comes from for instance a table
 
