@@ -1712,15 +1712,17 @@ namespace Gekko
         //1.4.9 stuff
         public static string PrintVersion(string version, bool patch)
         {
-
+            string start = "";
+            string middle = "";
+            string end = "";
             try
             {
                 string[] versionSplit = version.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
                 if (versionSplit.Length == 3)
                 {
-                    string start = versionSplit[0];
-                    string middle = versionSplit[1];
-                    string end = versionSplit[2];
+                    start = versionSplit[0];
+                    middle = versionSplit[1];
+                    end = versionSplit[2];
                     int number0 = int.Parse(start);
                     int number1 = int.Parse(middle);
                     int number2 = int.Parse(end);
@@ -1739,10 +1741,12 @@ namespace Gekko
             {
                 version = Globals.gekkoVersion;
             };  //fail silently
-            if (Globals.isAlphaVersion) version += " ALPHA VERSION - NO GUARANTEES!";
-            if (Globals.isBetaVersion) version += " BETA VERSION - NO GUARANTEES!";
-            if (Globals.isGammaVersion) version += " GAMMA VERSION - NO GUARANTEES!";
-            if (Globals.isPreviewVersion) version += " BETA VERSION - NO GUARANTEES!";
+            
+            if (Globals.isBetaVersion)
+            {
+                version += " (version 3.0 beta #" + end + ") - NO GUARANTEES!";
+            }
+                        
             return version;
         }
 

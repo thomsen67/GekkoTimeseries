@@ -478,19 +478,26 @@ namespace Gekko
                 //It should not be run just because af RESET/RESTART or change of working folder location.
 
                 //At start, Globals.remoteFileStamp is = new DateTime(0l), kind of like = null.
-
-                //if (true)
-                //{
-                //    Gui.gui.StartThread("RUN remote.gcm", false);
-                //    return;
-                //}
-
+                
                 if (Program.options.interface_remote && Globals.remoteIsInvestigating == false)
                 {
+                    bool abort = false;
                     Globals.remoteIsInvestigating = true;
                     try
-                    {                        
+                    {
                         string remoteFile = Program.options.folder_working + "\\remote.gcm";
+
+                        if (Program.options.interface_remote_file != "")
+                        {
+                            if (G.NullOrEmpty(Path.GetFileName(Program.options.interface_remote_file)))
+                            {
+                                //#89743298473
+                                G.Writeln2("*** ERROR: You must indicate a filename in OPTION interface remote file = ...");
+                                abort = true;
+                            }
+                            remoteFile = Program.options.interface_remote_file;
+                        }
+
                         //see if there is new stuff from the remote
                         if (File.Exists(remoteFile))
                         {
@@ -501,7 +508,7 @@ namespace Gekko
                                 //suddently pops into existence, then it MUST be run no matter stamps
                                 Globals.remoteFileStamp = dt;
                                 //Program.Run(remoteFile, new P());
-                                Gui.gui.StartThread("RUN " + Program.options.folder_working + "\\remote.gcm;", true);
+                                Gui.gui.StartThread("RUN " + remoteFile + "; ", true);
 
                             }
                             else {
@@ -513,7 +520,7 @@ namespace Gekko
                                     //run it
                                     Globals.remoteFileStamp = dt;
                                     //Program.Run(remoteFile, new P());
-                                    Gui.gui.StartThread("RUN " + Program.options.folder_working + "\\remote.gcm;", true);
+                                    Gui.gui.StartThread("RUN " + remoteFile + "; ", true);
                                 }
                                 else
                                 {
@@ -528,10 +535,18 @@ namespace Gekko
                             Globals.remoteExists = 0;
                         }
                     }
-                    catch { } //do not let an error crash the whole thing.
+                    catch
+                    {
+
+                    } //do not let an error crash the whole thing.
                     finally
                     {
-                        Globals.remoteIsInvestigating = false;  //make sure it is false on exit no matter what happens
+                        Globals.remoteIsInvestigating = false;  //make sure it is false on exit no matter what happens                        
+                    }
+                    if (abort)
+                    {
+                        Globals.guiTimer2.Stop();  //without this, we get infinite many error messages, #89743298473
+                        throw new GekkoException();
                     }
                 }
             }

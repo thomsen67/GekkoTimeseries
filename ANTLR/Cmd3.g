@@ -799,6 +799,7 @@ ASTOPT_STRING_Y2;
 	MAP = 'MAP';
 	STRING2 = 'STRING';
 		     REMOTE = 'REMOTE';
+			 ALIAS = 'ALIAS';
 			 OFFSET = 'OFFSET';
 			 DETECT = 'DETECT';
 			 GRIDSTYLE = 'GRIDSTYLE';
@@ -1361,6 +1362,7 @@ Y2                    = 'Y2'                       ;
 										// --- tokens2 start ---
             			
 d.Add("REMOTE", REMOTE);
+d.Add("ALIAS", ALIAS);
             d.Add("GRIDSTYLE", GRIDSTYLE);
             d.Add("BOLD", BOLD);
             d.Add("ITALIC", ITALIC);
@@ -2248,6 +2250,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | assignment           SEMICOLON!
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
+						  | checkoff             SEMICOLON!	
 			              | clear                SEMICOLON!		
 						  | clone                SEMICOLON!
 						  | close                SEMICOLON!
@@ -2275,6 +2278,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | index                SEMICOLON!
 						  | ini                  SEMICOLON!
 						  | interpolate          SEMICOLON!
+						  | itershow             SEMICOLON!	
 						  | local                SEMICOLON!
 						  | lock_                SEMICOLON!
 						  | mem                  SEMICOLON!
@@ -2298,6 +2302,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | restart              SEMICOLON!
 						  | return2              SEMICOLON!
 						  | run                  SEMICOLON!
+						  | sign                 SEMICOLON!	
+						  | sim                  SEMICOLON!	
 						  | smooth               SEMICOLON!
 						  | splice               SEMICOLON!
 						  | stop                 SEMICOLON!
@@ -2407,6 +2413,14 @@ analyzeOpt1:                ISNOTQUAL
 						    ;
 analyzeOpt1h:               LAG EQUAL expression -> ^(ASTOPT_VAL_LAG expression)
 						    ;		
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CHECKOFF
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+checkoff:				    CHECKOFF seqOfBankvarnames -> ^({token("ASTCHECKOFF", ASTCHECKOFF, input.LT(1).Line)} seqOfBankvarnames)
+						  | CHECKOFF '?' -> ^({token("ASTCHECKOFF", ASTCHECKOFF, input.LT(1).Line)} '?')
+						  | CHECKOFF -> ^({token("ASTCHECKOFF", ASTCHECKOFF, input.LT(1).Line)})
+						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CLEAR
@@ -2643,6 +2657,12 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 
 interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
 interpolateMethod:			REPEAT | PRORATE;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// ITERSHOW
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+itershow:				     ITERSHOW  (leftAngle dates? RIGHTANGLE)? seqOfBankvarnames -> ^({token("ASTITERSHOW", ASTITERSHOW, input.LT(1).Line)} ^(ASTDATES dates?) seqOfBankvarnames);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // LOCAL/GLOBAL
@@ -3063,6 +3083,27 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 						  ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SIGN
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+sign:					    SIGN -> ^({token("ASTSIGN", ASTSIGN, input.LT(1).Line)});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SIM
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+sim:                        SIM simOpt1? -> ^({token("ASTSIM", ASTSIM, input.LT(1).Line)} simOpt1?);
+simOpt1:                    ISNOTQUAL
+						  | leftAngle2          simOpt1h* RIGHTANGLE -> ^(ASTOPT1 simOpt1h*)							
+						  | leftAngleNo2 dates? simOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) simOpt1h*)
+                            ;
+simOpt1h:                   FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
+						  | STATIC (EQUAL yesNo)? -> ^(ASTOPT_STRING_STATIC yesNo?)
+						  | AFTER (EQUAL yesNo)? -> ^(ASTOPT_STRING_AFTER yesNo?)
+						  | RES (EQUAL yesNo)? -> ^(ASTOPT_STRING_RES yesNo?)
+						    ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SMOOTH
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -3322,6 +3363,7 @@ optionType:
 			 | GAMS TIME SET '='? expression -> GAMS TIME SET ^(ASTSTRINGSIMPLE expression)			 
 
 			 | INTERFACE question -> INTERFACE question
+			 | INTERFACE ALIAS '='? yesNoSimple -> INTERFACE ALIAS ^(ASTBOOL yesNoSimple)			 
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			
@@ -3332,6 +3374,7 @@ optionType:
              | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)
 			 | INTERFACE LAGFIX '='? yesNoSimple -> INTERFACE LAGFIX ^(ASTBOOL yesNoSimple)
 			 | INTERFACE REMOTE '='? yesNoSimple -> INTERFACE REMOTE ^(ASTBOOL yesNoSimple)
+			 | INTERFACE REMOTE FILE '='? fileName -> INTERFACE REMOTE FILE ^(ASTSTRINGSIMPLE fileName)
              | INTERFACE SOUND '='? yesNoSimple -> INTERFACE SOUND ^(ASTBOOL yesNoSimple)
              | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
              | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
@@ -4039,6 +4082,7 @@ ident2: 					Ident |
   REF|
   REL|
   REMOTE|
+  ALIAS|
   REORDER|
   REPLACE|
   REP|
@@ -4455,6 +4499,7 @@ ident3: 					Ident |
   REF|
   REL|
   REMOTE|
+  ALIAS|
   REORDER|
   REPLACE|
   REP|

@@ -15654,7 +15654,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ModelQuarterly()
+        public void _Test_ModelQuarterly()
         {
             //-----------------------------------------------------------
             //----------------- testing quarterly model -----------------
@@ -15662,9 +15662,7 @@ namespace UnitTests
             //-----------------------------------------------------------
             I("RESET;");
             I("OPTION freq q;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
-            I("reset;");
-            I("option freq q;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");            
             I("model lilleq;");
             I("read lilleq;");
             I("time 2000q1 2001q1;");
@@ -16855,7 +16853,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ModelJul05()
+        public void _Test_ModelJul05()
         {
             //-----------------------------------------------------------
             //----------------- testing jul05 ---------------------------
@@ -16863,7 +16861,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("RUN jul05.cmd;");
+            I("RUN jul05.gcm;");
             double[] limits = new double[3];
             limits[0] = 0.001d; //%
             limits[1] = 0.001d; //%
@@ -16875,7 +16873,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ModelApr07()
+        public void _Test_ModelApr07()
         {
             //-----------------------------------------------------------
             //----------------- testing apr07 ---------------------------
@@ -16883,7 +16881,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("RUN apr07.cmd;");
+            I("RUN apr07.gcm;");
             double[] limits = new double[3];
             limits[0] = 0.001d; //%
             limits[1] = 0.001d; //%
@@ -16895,7 +16893,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ModelApr08()
+        public void _Test_ModelApr08()
         {
             //-----------------------------------------------------------
             //----------------- testing apr08 ---------------------------
@@ -16904,7 +16902,7 @@ namespace UnitTests
             //TODO: why do we have to set reorder=no to get the model running??
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("RUN apr08.cmd;");
+            I("RUN apr08.gcm;");
             double[] limits = new double[3];
             limits[0] = 0.001d; //%
             limits[1] = 0.002d; //%
@@ -17709,23 +17707,23 @@ namespace UnitTests
 
         private static void CheckDatabankSample(double[] limits, int t1, int t2, bool useBank)
         {
-            Series fy = First().GetIVariable("fy") as Series;
-            Series cp = First().GetIVariable("cp") as Series;
-            Series enl = First().GetIVariable("enl") as Series;
+            Series fy = First().GetIVariable("fy!a") as Series;
+            Series cp = First().GetIVariable("cp!a") as Series;
+            Series enl = First().GetIVariable("enl!a") as Series;
             Series xx_fy = null;
             Series xx_cp = null;
             Series xx_enl = null;
             if (useBank)
             {
-                xx_fy = Program.databanks.GetRef().GetIVariable("fy") as Series;
-                xx_cp = Program.databanks.GetRef().GetIVariable("cp") as Series;
-                xx_enl = Program.databanks.GetRef().GetIVariable("enl") as Series;
+                xx_fy = Program.databanks.GetRef().GetIVariable("fy!a") as Series;
+                xx_cp = Program.databanks.GetRef().GetIVariable("cp!a") as Series;
+                xx_enl = Program.databanks.GetRef().GetIVariable("enl!a") as Series;
             }
             else
             {
-                xx_fy = First().GetIVariable("xx_fy") as Series;
-                xx_cp = First().GetIVariable("xx_cp") as Series;
-                xx_enl = First().GetIVariable("xx_enl") as Series;
+                xx_fy = First().GetIVariable("xx_fy!a") as Series;
+                xx_cp = First().GetIVariable("xx_cp!a") as Series;
+                xx_enl = First().GetIVariable("xx_enl!a") as Series;
             }
             for (int t = t1; t <= t2; t++)
             {

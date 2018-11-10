@@ -806,6 +806,8 @@ namespace Gekko
         /// </summary>
         public static Options options = new Options();
 
+        public static GekkoDictionary<string, string> alias = null;
+
         /// <summary>
         /// Container for all the stuff related to the current model
         /// </summary>
@@ -10196,7 +10198,7 @@ namespace Gekko
             }
             try
             {
-                Series ts = Program.databanks.GetFirst().GetIVariable(variableNameWithoutLag + "!a") as Series;
+                Series ts = Program.databanks.GetFirst().GetIVariable(variableNameWithoutLag + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
                 if (ts != null)
                 {
                     string label = ts.meta.label;
@@ -11780,7 +11782,7 @@ namespace Gekko
                         }
                         else
                         {
-                            yDatabank = (databank.GetIVariable(leftSideVariable + "!a") as Series).GetData(null, t);
+                            yDatabank = (databank.GetIVariable(leftSideVariable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t);
                         }
 
                         foreach (string variableWithLag in p2)
@@ -11789,9 +11791,9 @@ namespace Gekko
                             int lag = -12345;
                             G.ExtractVariableAndLag(variableWithLag, out variable, out lag);
 
-                            double before = (databank.GetIVariable(variable + "!a") as Series).GetData(null, t.Add(lag));
+                            double before = (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(lag));
                             double after = before + delta;
-                            (databank.GetIVariable(variable + "!a") as Series).SetData(t.Add(lag), after);
+                            (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).SetData(t.Add(lag), after);
                             double y1 = double.NaN;
                             try
                             {
@@ -11800,7 +11802,7 @@ namespace Gekko
                             finally
                             {
                                 //to make 100% sure it is always reset
-                                (databank.GetIVariable(variable + "!a") as Series).SetData(t.Add(lag), before);
+                                (databank.GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).SetData(t.Add(lag), before);
                             }
 
                             DecompHelper dh = new DecompHelper();
@@ -18653,7 +18655,7 @@ namespace Gekko
 
                 foreach (string s in onlyDatabankNotModel)
                 {
-                    if (bank.ContainsIVariable(s + "!a"))
+                    if (bank.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                     {
                         bank.RemoveIVariable(s);
                     }
@@ -19329,7 +19331,7 @@ namespace Gekko
                 }
                 varNamePointers[value.bNumber] = value.variable;
                 //TODO: should make a check here that all slots are filled in from b[min] to b[max]
-                Series ts = work.GetIVariable(value.variable + "!a") as Series;  //may be null
+                Series ts = work.GetIVariable(value.variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //may be null
                 timeSeriesPointers[value.bNumber] = ts;
                 lagPointers[value.bNumber] = value.lag;
                 aNumberPointers[value.bNumber] = value.aNumber;
@@ -20551,7 +20553,8 @@ namespace Gekko
                         {
                             val = 0d;  //DJZ set to 0 --> will end up in b[]
                             //J-factor or D or Z variable
-                            Series tsNew = new Series(Program.options.freq, variable);
+                            //see also #7235432894539
+                            Series tsNew = new Series(Program.options.freq, variable + Globals.freqIndicator + G.GetFreq(Program.options.freq));
                             work.AddIVariable(tsNew.name, tsNew);
                             timeSeriesPointers[i] = tsNew;
                             extraWritebackPointers[i] = 1;  //to make sure it gets written back from b[] to a[,] array
@@ -20714,7 +20717,7 @@ namespace Gekko
                 {
                     //This does not run fast, but is seldom used
                     //is also done for exogenous, maybe more safe only for lagged endo.
-                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name + "!a") as Series;
+                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
                     //overrides the value -- takes it from the undoBank -- if exo there should be no change
                     val = tsUndoBank.GetData(null, t.Add(lagPointers[i]));
                 }
@@ -20802,7 +20805,7 @@ namespace Gekko
                 int index1 = -12345;
                 int index2 = -12345;
                 double[] x_beware_do_not_change = null;
-                Series ts = work.GetIVariable(var + "!a") as Series;  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
                 if (ts == null)
                 {
                     if (IsDjz(var))
@@ -20852,7 +20855,16 @@ namespace Gekko
             {
                 string var = atd.varName;
                 int id = atd.aNumber;
-                Series ts = work.GetIVariable(var + "!a") as Series;  //Could have an A-array with Series...
+                Series ts = work.GetIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //Could have an A-array with Series...
+
+                if (ts == null && IsDjz(var))
+                {
+                    //can be autocreated, this probably will never happen, since it is already created,
+                    //see #7235432894539
+                    ts = new Series(Program.options.freq, var + Globals.freqIndicator + G.GetFreq(Program.options.freq));
+                    work.AddIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq), ts);
+                }
+
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
@@ -21992,7 +22004,7 @@ namespace Gekko
 
         private static void CreateXxVariableOrIssueError(Databank work, string var)
         {
-            if (!work.ContainsIVariable(var + "!a"))
+            if (!work.ContainsIVariable(var + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (var.ToLower().StartsWith("xx", true, null))
                 {
@@ -22930,7 +22942,7 @@ namespace Gekko
                 bool ok = true;
                 foreach (string s in Program.model.endogenousOriginallyInModel.Keys)
                 {
-                    if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+                    if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                     {
                         ok = false;
                         break;
@@ -23962,7 +23974,7 @@ namespace Gekko
             Globals.detectedRPath = null;  //we reset this, too
             Globals.r_fileContent = null;
 
-
+            Program.alias = null;
 
             if (workingFolder != null && workingFolder != "")
             {
@@ -25210,7 +25222,7 @@ namespace Gekko
         public static double Level(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + "!a"))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25221,13 +25233,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetIVariable(s + "!a") as Series).GetData(null, t);  //#getvar
+            return (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t);  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulLevel(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25238,7 +25250,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25249,7 +25261,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            return (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t);  //#getvar
+            return (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t);  //#getvar
         }
         public static void RevertSmpl(GekkoSmpl2 smplRemember, GekkoSmpl smpl)
         {
@@ -25264,7 +25276,7 @@ namespace Gekko
         public static double Pch(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + "!a"))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25275,13 +25287,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return ((db.GetIVariable(s + "!a") as Series).GetData(null, t) / (db.GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            return ((db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) / (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulPch(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25292,7 +25304,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25303,8 +25315,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double pch_base = ((Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t) / (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
-            double pch_work = ((Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) / (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_base = ((Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) / (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
+            double pch_work = ((Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) / (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1)) - 1) * 100;  //#getvar
             return pch_work - pch_base;
         }
 
@@ -25558,7 +25570,7 @@ namespace Gekko
         public static double Dif(string db2, string s, GekkoTime t)
         {
             Databank db = Program.databanks.GetDatabank(db2);
-            if (!db.ContainsIVariable(s + "!a"))
+            if (!db.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25569,13 +25581,13 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + db2 + " databank");
                 }
             }
-            return (db.GetIVariable(s + "!a") as Series).GetData(null, t) - (db.GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1));  //#getvar
+            return (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) - (db.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1));  //#getvar
         }
 
         //Used for tables, don't use for other stuff!
         public static double MulDif(string s, GekkoTime t)
         {
-            if (!Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25586,7 +25598,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in Work databank");
                 }
             }
-            if (!Program.databanks.GetRef().ContainsIVariable(s + "!a"))
+            if (!Program.databanks.GetRef().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
             {
                 if (Program.options.series_normal_table_missing == ESeriesMissing.M)
                 {
@@ -25597,8 +25609,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: could not find variable " + s + " in " + Globals.Ref + " databank");
                 }
             }
-            double dif_base = (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)); //#getvar
-            double dif_work = (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t) - (Program.databanks.GetFirst().GetIVariable(s + "!a") as Series).GetData(null, t.Add(-1)); //#getvar
+            double dif_base = (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) - (Program.databanks.GetRef().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1)); //#getvar
+            double dif_work = (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t) - (Program.databanks.GetFirst().GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t.Add(-1)); //#getvar
             return dif_work - dif_base;
         }
 
@@ -36530,7 +36542,7 @@ namespace Gekko
             foreach (string s in Program.model.varsAType.Keys)
             {
                 if (Program.model.varsDTypeAutoGenerated.ContainsKey(s) || Program.model.varsJTypeAutoGenerated.ContainsKey(s) || Program.model.varsZTypeAutoGenerated.ContainsKey(s)) continue;
-                if (Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                 {
                 }
                 else
@@ -36550,7 +36562,7 @@ namespace Gekko
 
             foreach (string s in varlist.Keys)
             {
-                if (Program.databanks.GetFirst().ContainsIVariable(s + "!a"))
+                if (Program.databanks.GetFirst().ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
                 {
                 }
                 else
@@ -36715,7 +36727,7 @@ namespace Gekko
             {
                 foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
                 {
-                    double value = (work.GetIVariable(s + "!a") as Series).GetData(null, t);
+                    double value = (work.GetIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series).GetData(null, t);
                     if (G.isNumericalError(value))
                     {
                         varsWithMissingValues.Add(s);
@@ -37706,7 +37718,7 @@ namespace Gekko
             Dictionary<string, string> precedents = eh.precedentsWithLagIndicator;
             string period = t.ToString();
 
-            Series tsls = Program.databanks.GetFirst().GetIVariable(lhs + "!a") as Series;  //#getvar
+            Series tsls = Program.databanks.GetFirst().GetIVariable(lhs + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;  //#getvar
 
             if (tsls == null)
             {
@@ -37742,7 +37754,7 @@ namespace Gekko
                     var2 = variable;
                 }
                 G.Write(var2 + G.Blanks(14 - var2.Length));
-                Series ts = Program.databanks.GetFirst().GetIVariable(variable + "!a") as Series;
+                Series ts = Program.databanks.GetFirst().GetIVariable(variable + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
 
                 if (variable == null)
                 {

@@ -86,6 +86,8 @@ Additionally, there are model, solve, equation options.
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
 
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
+        public bool interface_alias = false;  //reacts to globals.#alias list
+        //public string interface_alias_file = "";
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
         public bool interface_databank_swap = false; //a bit dangerous...
@@ -96,6 +98,7 @@ Additionally, there are model, solve, equation options.
         public bool interface_lagfix = true;
         public string interface_mode = "data";  //sim, data, mixed
         public bool interface_remote = false;  //remote control via remote.gcm
+        public string interface_remote_file = "";
         public bool interface_sound = false;  //overall sound switch
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring
         public int interface_sound_wait = 60; //seconds command files run to get a sound        

@@ -1265,6 +1265,71 @@ namespace Gekko
 
             //only adds freq if not there. No sigil is added for lhs vars here.
             string varnameWithFreq = G.AddFreq(varname, freq, type, settings.type);
+                        
+            if (Program.options.interface_alias)
+            {
+                bool foundAlias = true;
+                if (Program.alias == null)
+                {
+                    IVariable alias2 = Program.databanks.GetGlobal().GetIVariable("#alias");
+
+                    if (alias2 == null)
+                    {
+                        foundAlias = false;
+                    }
+                    else
+                    {
+
+                        if (alias2 == null || alias2.Type() != EVariableType.List)
+                        {
+                            G.Writeln2("*** ERROR: No global:#alias list was found, even though");
+                            G.Writeln("           OPTION interface alias = yes.", Color.Red);
+                            throw new GekkoException();
+                        }
+
+                        GekkoDictionary<string, string> alias3 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                        List<IVariable> alias_list = (alias2 as List).list;
+                        foreach (IVariable iv in alias_list)
+                        {
+                            if (iv.Type() != EVariableType.List)
+                            {
+                                G.Writeln2("*** ERROR: global:#alias must be a list of lists");
+                                throw new GekkoException();
+                            }
+                            List<IVariable> element_list = (iv as List).list;
+                            if (element_list.Count != 2)
+                            {
+                                G.Writeln2("*** ERROR: the elements of global:#alias must contain two strings");
+                                throw new GekkoException();
+                            }
+                            string s1 = G.Chop_FreqAdd(O.ConvertToString(element_list[0]), Program.options.freq);
+                            string s2 = G.Chop_FreqAdd(O.ConvertToString(element_list[1]), Program.options.freq);
+                            
+                            if (alias3.ContainsKey(s1))
+                            {
+                                G.Writeln2("*** ERROR: the string " + s1 + " appears several times in global:#alias");
+                                throw new GekkoException();
+                            }
+                            alias3.Add(s1, s2);
+                        }
+                        Program.alias = alias3;  //we wait until global:#alias has finished looping, so that only if global:#alias is ok, will Program.alias be != null
+                    }
+                }
+                if (foundAlias)
+                {
+                    //use the dict
+                    string var2 = null; Program.alias.TryGetValue(varnameWithFreq, out var2);
+                    if (var2 != null)
+                    {
+                        varnameWithFreq = var2;
+                        //varname = G.Chop_RemoveFreq(varnameWithFreq);
+
+                        return O.Lookup(smpl, map, new ScalarString(varnameWithFreq), rhsExpression, settings, type, options);
+
+                    }
+                }
+                
+            }
 
             if (settings.type == ELookupType.LeftHandSide)
             {
