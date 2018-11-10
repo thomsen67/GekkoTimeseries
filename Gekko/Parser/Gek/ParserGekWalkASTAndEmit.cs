@@ -1328,7 +1328,8 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                node.Code.A(node[0].Code);
+                                //node.Code.A(node[0].Code);
+                                node.Code.A("o" + Num(node) + ".names = " + node[0].Code + ";" + G.NL);
                             }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;
@@ -5490,10 +5491,18 @@ namespace Gekko.Parser.Gek
 
                     case "ASTITERSHOW":
                         {
+                            //node.Code.A("O.Itershow o" + Num(node) + " = new O.Itershow();" + G.NL);
+                            //node.Code.A(node[0].Code);  //dates
+                            //node.Code.A(node[1].Code);  //list                            
+                            //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+
                             node.Code.A("O.Itershow o" + Num(node) + " = new O.Itershow();" + G.NL);
                             node.Code.A(node[0].Code);  //dates
-                            node.Code.A(node[1].Code);  //list                            
+                            node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            break;
+
                         }
                         break;
                     case "ASTDISPSEARCH":

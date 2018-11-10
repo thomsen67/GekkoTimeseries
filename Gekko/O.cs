@@ -517,106 +517,129 @@ namespace Gekko
 
             int count = 0;
 
+            bool simMode = G.Equal(Program.options.interface_mode, "sim");
+            List<string> simModeVariables = new List<string>();  //only for sim-mode
+
             foreach (HandleEndoHelper h in helper)
             {
-                count++; //array-series updates like x[#i, #j] will only count as 1.
+                List<string> vars = Program.GetListOfStringsFromList(h.varname);  //emits error if not string or list
 
-                string s = h.varname.ConvertToString();
-                if (!G.IsSimpleToken(s))
+                foreach (string s in vars)
                 {
-                    G.Writeln2("*** ERROR: The name '" + s + "' is not a simple series name");
-                    throw new GekkoException();
-                }
-                
-                List<List<string>> ss = new List<List<string>>();
 
-                if (h.indices != null)
-                {                    
-                    int depth = 0;
-                    Stack<string> stack = new Stack<string>();
-                    // [a, #i, b, #j] is unfolded/combined into many items in ss
-                    Program.Combine(h.indices, ss, depth, stack);
-                }
+                    count++; //array-series updates like x[#i, #j] will only count as 1.                       
+                    if (!G.IsSimpleToken(s))
+                    {
+                        G.Writeln2("*** ERROR: The name '" + s + "' is not a simple series name");
+                        throw new GekkoException();
+                    }
 
-                string varNameWithoutFreq = endoOrExoPrefix + "_" + s;
-                string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                    if (simMode)
+                    {
+                        simModeVariables.Add(s);
+                    }
+                    else
+                    {
 
-                GekkoTimes gts = global;
-                if (h.local != null) gts = h.local;
+                        List<List<string>> ss = new List<List<string>>();
 
-                if (gts == null)
-                {
-                    G.Writeln2("*** ERROR: No time period given for variable '" + s + "'");
-                    throw new GekkoException();
-                }
-
-                Series ts2 = null;
-
-                Series ts = databank.GetIVariable(varNameWithFreq) as Series;
-
-                if (ss.Count > 0)
-                {
-                    foreach (List<string> ss2 in ss)
-                    {                        
-
-                        if (!Program.options.databank_create_auto)
+                        if (h.indices != null)
                         {
-                            //The following xx is not used, just used to check existence
-                            //IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
-                            IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+                            int depth = 0;
+                            Stack<string> stack = new Stack<string>();
+                            // [a, #i, b, #j] is unfolded/combined into many items in ss
+                            Program.Combine(h.indices, ss, depth, stack);
                         }
 
-                        //Multi-dim timeseries
-                        //What about timeless??                        
+                        string varNameWithoutFreq = endoOrExoPrefix + "_" + s;
+                        string varNameWithFreq = varNameWithoutFreq + Globals.freqIndicator + G.GetFreq(Program.options.freq);
 
-                        if (ts == null)
+                        GekkoTimes gts = global;
+                        if (h.local != null) gts = h.local;
+
+                        if (gts == null)
                         {
-                            ts = new Series(Program.options.freq, varNameWithFreq);
-                            ts.SetArrayTimeseries(ss2.Count + 1, true);
-                            databank.AddIVariable(ts.name, ts);
+                            G.Writeln2("*** ERROR: No time period given for variable '" + s + "'");
+                            throw new GekkoException();
                         }
 
-                        MapMultidimItem mmi = new MapMultidimItem(ss2.ToArray(), ts);
-                        IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
-                        if (iv == null)
+                        Series ts2 = null;
+
+                        Series ts = databank.GetIVariable(varNameWithFreq) as Series;
+
+                        if (ss.Count > 0)
                         {
-                            ts2 = new Series(Program.options.freq, null);
-                            ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
+                            foreach (List<string> ss2 in ss)
+                            {
+
+                                if (!Program.options.databank_create_auto)
+                                {
+                                    //The following xx is not used, just used to check existence
+                                    //IVariable xx = O.GetIVariableFromString(null, s, null, ss2.ToArray(), ECreatePossibilities.NoneReportError);
+                                    IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+                                }
+
+                                //Multi-dim timeseries
+                                //What about timeless??                        
+
+                                if (ts == null)
+                                {
+                                    ts = new Series(Program.options.freq, varNameWithFreq);
+                                    ts.SetArrayTimeseries(ss2.Count + 1, true);
+                                    databank.AddIVariable(ts.name, ts);
+                                }
+
+                                MapMultidimItem mmi = new MapMultidimItem(ss2.ToArray(), ts);
+                                IVariable iv = null; ts.dimensionsStorage.TryGetValue(mmi, out iv);
+                                if (iv == null)
+                                {
+                                    ts2 = new Series(Program.options.freq, null);
+                                    ts.dimensionsStorage.AddIVariableWithOverwrite(mmi, ts2);
+                                }
+                                else
+                                {
+                                    ts2 = iv as Series;
+                                }
+                                foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
+                                {
+                                    ts2.SetData(t, 1d);
+                                }
+                            }
                         }
                         else
                         {
-                            ts2 = iv as Series;
-                        }
-                        foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
-                        {
-                            ts2.SetData(t, 1d);
-                        }
-                    }
-                }
-                else
-                {
-                    //Normal 0-dim timeseries
-                    //What about timeless??
-                                       
+                            //Normal 0-dim timeseries
+                            //What about timeless??
 
-                    //The following xx is not used, just used to check existence
-                    //IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
-                    IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
-                    ts2 = ts;
-                    if (ts2 == null)
-                    {
-                        ts2 = new Series(Program.options.freq, varNameWithFreq);
-                        databank.AddIVariable(ts2.name, ts2);
-                    }
-                    foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
-                    {
-                        ts2.SetData(t, 1d);
+                            //The following xx is not used, just used to check existence
+                            //IVariable xx = O.GetIVariableFromString(null, s, null, null, ECreatePossibilities.NoneReportError);
+                            IVariable xx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+
+                            ts2 = ts;
+                            if (ts2 == null)
+                            {
+                                ts2 = new Series(Program.options.freq, varNameWithFreq);
+                                databank.AddIVariable(ts2.name, ts2);
+                            }
+                            foreach (GekkoTime t in new GekkoTimeIterator(gts.t1, gts.t2))
+                            {
+                                ts2.SetData(t, 1d);
+                            }
+                        }
                     }
                 }                
             }
 
-            G.Writeln2("Set " + count + " " + endoOrExoPrefix + "_... variables");
+            if (simMode)
+            {
+                if (type) Program.Endo(simModeVariables);
+                else Program.Exo(simModeVariables);
+            }
+            else
+            {
+                G.Writeln2("Set " + count + " " + endoOrExoPrefix + "_... variables");
+            }
         }
 
         
@@ -7784,11 +7807,11 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
+            public List names = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Itershow(this.listItems, this.t1, this.t2);
+                Program.Itershow(Program.GetListOfStringsFromList(this.names), this.t1, this.t2);
             }
         }
 
@@ -7805,11 +7828,13 @@ namespace Gekko
 
         public class Checkoff
         {
-            public List<string> listItems = null;
+            public List names = null;
             public string type = null;
             public void Exe()
             {
-                Program.Checkoff(this.listItems, type);
+                List<string> names2 = null;
+                if (this.names != null) names2 = Program.GetListOfStringsFromList(this.names);
+                Program.Checkoff(names2, type);
             }
         }
 

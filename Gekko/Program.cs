@@ -8414,7 +8414,7 @@ namespace Gekko
 
         public static void Unfix()  //formerly ClearGoals()
         {
-            if (true)
+            if (!G.Equal(Program.options.interface_mode, "sim"))
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");
@@ -16771,28 +16771,33 @@ namespace Gekko
                 Globals.checkoff.Clear();
                 G.Writeln();
                 G.Writeln("CHECKOFF variables cleared");
-            }
-            else if (type == "?")
+            }            
+            else
             {
-                G.Writeln();
-                if (Globals.checkoff.Count == 0)
+
+                if (vars2.Count == 1 && vars2[0] == "?")
                 {
                     G.Writeln();
-                    G.Writeln("There are 0 variables not checked for convergence in the Gauss algorithm.");
+                    if (Globals.checkoff.Count == 0)
+                    {
+                        G.Writeln();
+                        G.Writeln("There are 0 variables not checked for convergence in the Gauss algorithm.");
+                    }
+                    else
+                    {
+                        G.Writeln();
+                        CheckoffHelper();
+                    }
                 }
                 else
                 {
+
+                    List<string> vars3 = vars2;
+                    Globals.checkoff.Clear();
+                    Globals.checkoff.AddRange(vars3);
                     G.Writeln();
                     CheckoffHelper();
                 }
-            }
-            else
-            {
-                List<string> vars3 = vars2;
-                Globals.checkoff.Clear();
-                Globals.checkoff.AddRange(vars3);
-                G.Writeln();
-                CheckoffHelper();
             }
             return;
         }
@@ -16834,6 +16839,7 @@ namespace Gekko
                 else Program.model.endogenized.Add(var, "");
 
             }
+            G.Writeln2("Endogenized " + vars.Count + " variables");
             return;
         }
 
@@ -16894,6 +16900,7 @@ namespace Gekko
                 }
                 else Program.model.exogenized.Add(var, "");
             }
+            G.Writeln2("Endogenized " + vars.Count + " variables");
             return;
         }
 
