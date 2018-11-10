@@ -15781,6 +15781,16 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Alias()
+        {            
+            I("option interface alias = yes;");
+            I("global:#alias = (('fy', 'c[a]'), ('fe', 'c[b]'));");
+            I("c = series(1); c[a] = 100; c[b] = 200;");
+            I("prt fy, fe;");
+            I("prt c[a], c[b];");
+        }
+
+        [TestMethod]
         public void Test__Meta()
         {
             I("reset;");
