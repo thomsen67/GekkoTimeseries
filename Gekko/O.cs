@@ -678,68 +678,68 @@ namespace Gekko
             Program.options.series_normal_print_missing = r2;
         }
 
-        public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
-        {
-            //Returns the IVariable it finds here (or creates)
-            string name2 = name.ConvertToString();
-            string value = rhs.ConvertToString();
-            IVariable lhs = null;
-            if (Program.scalars.TryGetValue(name2, out lhs))
-            {
-                //Scalar is already existing                
-                if (lhs.Type() == EVariableType.String)
-                {
-                    //Already existing lhs is a STRING, inject into it. Injecting is faster than recreating an object.                    
-                    ((ScalarString)lhs).string2 = value;
-                    //((ScalarString)lhs)._isName = isName;
-                }
-                else
-                {
-                    //The object has to die and be recreated, since it is of a wrong type.                                
-                    Program.scalars.Remove(name2);
-                    lhs = new ScalarString(value);
-                    Program.scalars.Add(name2, lhs);
-                }
-            }
-            else
-            {
-                //Scalar does not exist beforehand  
-                lhs = new ScalarString(value);
-                Program.scalars.Add(name2, lhs);
-            }
-            return (ScalarString)lhs;
-        }
+        //public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
+        //{
+        //    //Returns the IVariable it finds here (or creates)
+        //    string name2 = name.ConvertToString();
+        //    string value = rhs.ConvertToString();
+        //    IVariable lhs = null;
+        //    if (Program.scalars.TryGetValue(name2, out lhs))
+        //    {
+        //        //Scalar is already existing                
+        //        if (lhs.Type() == EVariableType.String)
+        //        {
+        //            //Already existing lhs is a STRING, inject into it. Injecting is faster than recreating an object.                    
+        //            ((ScalarString)lhs).string2 = value;
+        //            //((ScalarString)lhs)._isName = isName;
+        //        }
+        //        else
+        //        {
+        //            //The object has to die and be recreated, since it is of a wrong type.                                
+        //            Program.scalars.Remove(name2);
+        //            lhs = new ScalarString(value);
+        //            Program.scalars.Add(name2, lhs);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //Scalar does not exist beforehand  
+        //        lhs = new ScalarString(value);
+        //        Program.scalars.Add(name2, lhs);
+        //    }
+        //    return (ScalarString)lhs;
+        //}
 
-        public static ScalarDate SetDateData(IVariable name, IVariable rhs)
-        {
-            //Returns the IVariable it finds here (or creates)
-            string name2 = name.ConvertToString();
-            GekkoTime value = O.ConvertToDate(rhs);
-            IVariable lhs = null;
-            if (Program.scalars.TryGetValue(name2, out lhs))
-            {
-                //Scalar is already existing                
-                if (lhs.Type() == EVariableType.Date)
-                {
-                    //Already existing lhs is a DATE, inject into it. Injecting is faster than recreating an object.
-                    ((ScalarDate)lhs).date = value;
-                }
-                else
-                {
-                    //The object has to die and be recreated, since it is of a wrong type.                                
-                    Program.scalars.Remove(name2);
-                    lhs = new ScalarDate(value);
-                    Program.scalars.Add(name2, lhs);
-                }
-            }
-            else
-            {
-                //Scalar does not exist beforehand            
-                lhs = new ScalarDate(value);
-                Program.scalars.Add(name2, lhs);
-            }
-            return (ScalarDate)lhs;
-        }
+        //public static ScalarDate SetDateData(IVariable name, IVariable rhs)
+        //{
+        //    //Returns the IVariable it finds here (or creates)
+        //    string name2 = name.ConvertToString();
+        //    GekkoTime value = O.ConvertToDate(rhs);
+        //    IVariable lhs = null;
+        //    if (Program.scalars.TryGetValue(name2, out lhs))
+        //    {
+        //        //Scalar is already existing                
+        //        if (lhs.Type() == EVariableType.Date)
+        //        {
+        //            //Already existing lhs is a DATE, inject into it. Injecting is faster than recreating an object.
+        //            ((ScalarDate)lhs).date = value;
+        //        }
+        //        else
+        //        {
+        //            //The object has to die and be recreated, since it is of a wrong type.                                
+        //            Program.scalars.Remove(name2);
+        //            lhs = new ScalarDate(value);
+        //            Program.scalars.Add(name2, lhs);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //Scalar does not exist beforehand            
+        //        lhs = new ScalarDate(value);
+        //        Program.scalars.Add(name2, lhs);
+        //    }
+        //    return (ScalarDate)lhs;
+        //}
 
         public static void IterateStep(IVariable x, IVariable start, IVariable step, int counter)
         {
@@ -3840,22 +3840,22 @@ namespace Gekko
         //======================================== Z() variants start
         //========================================
 
-        public static IVariable ZScalar(string name)
-        {
-            IVariable a = null;
-            if (Program.scalars.TryGetValue(name, out a))
-            {
+        //public static IVariable ZScalar(string name)
+        //{
+        //    IVariable a = null;
+        //    if (Program.scalars.TryGetValue(name, out a))
+        //    {
 
-                //VAL y = %x; <-- %x is a VAL
-                //expected to be of VAL or DATE type (dates can have periods added/subtracted)
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
-                throw new GekkoException();
-            }
-            return a;
-        }
+        //        //VAL y = %x; <-- %x is a VAL
+        //        //expected to be of VAL or DATE type (dates can have periods added/subtracted)
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
+        //        throw new GekkoException();
+        //    }
+        //    return a;
+        //}
 
         public static IVariable ZListFile(string fileName)
         {
@@ -3981,20 +3981,20 @@ namespace Gekko
             return;
         }
 
-        public static IVariable ZList(IVariable iv)
-        {
-            string name = ConvertToString(iv);
-            IVariable a = null;
-            if (Program.scalars.TryGetValue(Globals.symbolCollection + name, out a))
-            {
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: List '" + Globals.symbolCollection + name + "' was not found");
-                throw new GekkoException();
-            }
-            return a;
-        }
+        //public static IVariable ZList(IVariable iv)
+        //{
+        //    string name = ConvertToString(iv);
+        //    IVariable a = null;
+        //    if (Program.scalars.TryGetValue(Globals.symbolCollection + name, out a))
+        //    {
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: List '" + Globals.symbolCollection + name + "' was not found");
+        //        throw new GekkoException();
+        //    }
+        //    return a;
+        //}
 
         //public static IVariable ZGenr(string name)
         //{            
@@ -4022,247 +4022,247 @@ namespace Gekko
         //    return a;
         //}        
 
-        public static IVariable CreateValFromCache(ref IVariable a, string originalName)
-        {
-            //stuff like VAL x = ...
-            IVariable x = null;
-            if (Globals.useCache && a != null)
-            {
-                //fast pointer is available (scalar with that name should always point to the same object).
-                x = a;
-            }
-            else
-            {
-                //we do not have a fast pointer to the scalar
-                Program.scalars.TryGetValue(originalName, out x);
-                if (x == null)
-                {
-                    //create it
-                    //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Created in scalar Dict: " + originalName);
-                    //no fast pointer, and not available among scalars
-                    x = new ScalarVal(double.NaN);  //create the object
-                    Program.scalars.Add(originalName, x);  //add it to the scalars (it will get a value later on)
-                    a = x; //point the fast pointer to the new object
-                }
-                else
-                {
-                    //no fast pointer, but available among scalars
-                    //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Found in scalar Dict: " + originalName);
-                    a = x;  //point the fast pointer to the found object
-                }
-            }
-            if (x.Type() != EVariableType.Val)
-            {
-                G.Writeln2("*** ERROR: Type change of scalars not yet allowed");
-                throw new GekkoException();
-            }
-            return x;
-        }
+        //public static IVariable CreateValFromCache(ref IVariable a, string originalName)
+        //{
+        //    //stuff like VAL x = ...
+        //    IVariable x = null;
+        //    if (Globals.useCache && a != null)
+        //    {
+        //        //fast pointer is available (scalar with that name should always point to the same object).
+        //        x = a;
+        //    }
+        //    else
+        //    {
+        //        //we do not have a fast pointer to the scalar
+        //        Program.scalars.TryGetValue(originalName, out x);
+        //        if (x == null)
+        //        {
+        //            //create it
+        //            //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Created in scalar Dict: " + originalName);
+        //            //no fast pointer, and not available among scalars
+        //            x = new ScalarVal(double.NaN);  //create the object
+        //            Program.scalars.Add(originalName, x);  //add it to the scalars (it will get a value later on)
+        //            a = x; //point the fast pointer to the new object
+        //        }
+        //        else
+        //        {
+        //            //no fast pointer, but available among scalars
+        //            //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Found in scalar Dict: " + originalName);
+        //            a = x;  //point the fast pointer to the found object
+        //        }
+        //    }
+        //    if (x.Type() != EVariableType.Val)
+        //    {
+        //        G.Writeln2("*** ERROR: Type change of scalars not yet allowed");
+        //        throw new GekkoException();
+        //    }
+        //    return x;
+        //}
 
-        public static void SetStringFromCache(ref IVariable a, string originalName, string s, bool isName)
-        {
-            //stuff like VAL x = ...
-            bool createNew = false;
-            if (Globals.useCache && a != null)
-            {
-                //The 'x' scalar has a fast pointer already
-                if (a.Type() == EVariableType.String)
-                {
-                    ((ScalarString)a).string2 = s;
-                    //((ScalarString)a)._isName = isName;
-                }
-                else
-                {
-                    //wrong type, does not happen often
-                    Program.scalars.Remove(originalName);
-                    createNew = true;
-                }
-            }
-            else
-            {
-                //we do not have a fast pointer to it: ask the dictionary
-                IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-                if (x == null)
-                {
-                    //does not exist beforehand
-                    createNew = true;
-                }
-                else
-                {
-                    //does exist in the dictionary
-                    if (x.Type() == EVariableType.String)
-                    {
-                        ((ScalarString)x).string2 = s;
-                        //((ScalarString)x)._isName = isName;
-                        a = x;
-                    }
-                    else
-                    {
-                        //does exist in the dictionary, but has wrong type
-                        Program.scalars.Remove(originalName);
-                        createNew = true;
-                    }
-                }
-            }
-            if (createNew)
-            {
-                ScalarString a2 = new ScalarString(s, isName);
-                Program.scalars.Add(originalName, a2);
-                a = a2;
-            }
-        }
+        //public static void SetStringFromCache(ref IVariable a, string originalName, string s, bool isName)
+        //{
+        //    //stuff like VAL x = ...
+        //    bool createNew = false;
+        //    if (Globals.useCache && a != null)
+        //    {
+        //        //The 'x' scalar has a fast pointer already
+        //        if (a.Type() == EVariableType.String)
+        //        {
+        //            ((ScalarString)a).string2 = s;
+        //            //((ScalarString)a)._isName = isName;
+        //        }
+        //        else
+        //        {
+        //            //wrong type, does not happen often
+        //            Program.scalars.Remove(originalName);
+        //            createNew = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //we do not have a fast pointer to it: ask the dictionary
+        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
+        //        if (x == null)
+        //        {
+        //            //does not exist beforehand
+        //            createNew = true;
+        //        }
+        //        else
+        //        {
+        //            //does exist in the dictionary
+        //            if (x.Type() == EVariableType.String)
+        //            {
+        //                ((ScalarString)x).string2 = s;
+        //                //((ScalarString)x)._isName = isName;
+        //                a = x;
+        //            }
+        //            else
+        //            {
+        //                //does exist in the dictionary, but has wrong type
+        //                Program.scalars.Remove(originalName);
+        //                createNew = true;
+        //            }
+        //        }
+        //    }
+        //    if (createNew)
+        //    {
+        //        ScalarString a2 = new ScalarString(s, isName);
+        //        Program.scalars.Add(originalName, a2);
+        //        a = a2;
+        //    }
+        //}
 
-        public static void SetDateFromCache(ref IVariable a, string originalName, GekkoTime gt)
-        {
-            //stuff like DATE d = ...
-            bool createNew = false;
-            if (Globals.useCache && a != null)
-            {
-                //The 'x' scalar has a fast pointer already
-                if (a.Type() == EVariableType.Date)
-                {
-                    ((ScalarDate)a).date = gt;
-                }
-                else
-                {
-                    //wrong type, does not happen often
-                    Program.scalars.Remove(originalName);
-                    createNew = true;
-                }
-            }
-            else
-            {
-                //we do not have a fast pointer to it: ask the dictionary
-                IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-                if (x == null)
-                {
-                    //does not exist beforehand
-                    createNew = true;
-                }
-                else
-                {
-                    //does exist in the dictionary
-                    if (x.Type() == EVariableType.Date)
-                    {
-                        ((ScalarDate)x).date = gt;
-                        a = x;
-                    }
-                    else
-                    {
-                        //does exist in the dictionary, but has wrong type
-                        Program.scalars.Remove(originalName);
-                        createNew = true;
-                    }
-                }
-            }
-            if (createNew)
-            {
-                ScalarDate a2 = new ScalarDate(gt);
-                Program.scalars.Add(originalName, a2);
-                a = a2;
-            }
-        }
+        //public static void SetDateFromCache(ref IVariable a, string originalName, GekkoTime gt)
+        //{
+        //    //stuff like DATE d = ...
+        //    bool createNew = false;
+        //    if (Globals.useCache && a != null)
+        //    {
+        //        //The 'x' scalar has a fast pointer already
+        //        if (a.Type() == EVariableType.Date)
+        //        {
+        //            ((ScalarDate)a).date = gt;
+        //        }
+        //        else
+        //        {
+        //            //wrong type, does not happen often
+        //            Program.scalars.Remove(originalName);
+        //            createNew = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //we do not have a fast pointer to it: ask the dictionary
+        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
+        //        if (x == null)
+        //        {
+        //            //does not exist beforehand
+        //            createNew = true;
+        //        }
+        //        else
+        //        {
+        //            //does exist in the dictionary
+        //            if (x.Type() == EVariableType.Date)
+        //            {
+        //                ((ScalarDate)x).date = gt;
+        //                a = x;
+        //            }
+        //            else
+        //            {
+        //                //does exist in the dictionary, but has wrong type
+        //                Program.scalars.Remove(originalName);
+        //                createNew = true;
+        //            }
+        //        }
+        //    }
+        //    if (createNew)
+        //    {
+        //        ScalarDate a2 = new ScalarDate(gt);
+        //        Program.scalars.Add(originalName, a2);
+        //        a = a2;
+        //    }
+        //}
 
-        public static void SetValFromCache(ref IVariable a, string originalName, double v)
-        {
-            //stuff like VAL x = ...
-            bool createNew = false;
-            if (Globals.useCache && a != null)
-            {
-                //The 'x' scalar has a fast pointer already
-                if (a.Type() == EVariableType.Val)
-                {
-                    ((ScalarVal)a).val = v;
-                }
-                else
-                {
-                    //wrong type, does not happen often
-                    Program.scalars.Remove(originalName);
-                    createNew = true;
-                }
-            }
-            else
-            {
-                //we do not have a fast pointer to it: ask the dictionary
-                IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-                if (x == null)
-                {
-                    //does not exist beforehand
-                    createNew = true;
-                }
-                else
-                {
-                    //does exist in the dictionary
-                    if (x.Type() == EVariableType.Val)
-                    {
-                        ((ScalarVal)x).val = v;
-                        a = x;
-                    }
-                    else
-                    {
-                        //does exist in the dictionary, but has wrong type
-                        Program.scalars.Remove(originalName);
-                        createNew = true;
-                    }
-                }
-            }
-            if (createNew)
-            {
-                ScalarVal a2 = new ScalarVal(v);
-                Program.scalars.Add(originalName, a2);
-                a = a2;
-            }
-        }
+        //public static void SetValFromCache(ref IVariable a, string originalName, double v)
+        //{
+        //    //stuff like VAL x = ...
+        //    bool createNew = false;
+        //    if (Globals.useCache && a != null)
+        //    {
+        //        //The 'x' scalar has a fast pointer already
+        //        if (a.Type() == EVariableType.Val)
+        //        {
+        //            ((ScalarVal)a).val = v;
+        //        }
+        //        else
+        //        {
+        //            //wrong type, does not happen often
+        //            Program.scalars.Remove(originalName);
+        //            createNew = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        //we do not have a fast pointer to it: ask the dictionary
+        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
+        //        if (x == null)
+        //        {
+        //            //does not exist beforehand
+        //            createNew = true;
+        //        }
+        //        else
+        //        {
+        //            //does exist in the dictionary
+        //            if (x.Type() == EVariableType.Val)
+        //            {
+        //                ((ScalarVal)x).val = v;
+        //                a = x;
+        //            }
+        //            else
+        //            {
+        //                //does exist in the dictionary, but has wrong type
+        //                Program.scalars.Remove(originalName);
+        //                createNew = true;
+        //            }
+        //        }
+        //    }
+        //    if (createNew)
+        //    {
+        //        ScalarVal a2 = new ScalarVal(v);
+        //        Program.scalars.Add(originalName, a2);
+        //        a = a2;
+        //    }
+        //}
 
-        public static IVariable GetScalarFromCache(ref IVariable a, string originalName)
-        {
-            return GetScalarFromCache(ref a, originalName, true);
-        }
+        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName)
+        //{
+        //    return GetScalarFromCache(ref a, originalName, true);
+        //}
 
-        public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed)
-        {
-            return GetScalarFromCache(ref a, originalName, transformationAllowed, false);
-        }
+        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed)
+        //{
+        //    return GetScalarFromCache(ref a, originalName, transformationAllowed, false);
+        //}
 
         //see also RemoveScalar()
-        public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed, bool stringify)
-        {
+        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed, bool stringify)
+        //{
 
-            //stuff like ... + %x + ...
-            if (Globals.useCache && a != null)
-            {
-                //The typical case, so we try it first.
-                return a;
-            }
-            else
-            {
-                //we do not have a fast pointer to it
-                IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-                if (x == null)
-                {
-                    if (originalName.StartsWith(char.ToString(Globals.symbolCollection)))
-                    {
-                        G.Writeln2("*** ERROR: Could not find list or matrix '" + originalName + "'");
-                        if (Program.scalars.ContainsKey(originalName.Substring(1)))
-                        {
-                            G.Writeln("    Did you intend to refer to the scalar '" + Globals.symbolScalar + originalName.Substring(1) + "'", Color.Red);
-                        }
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Could not find scalar '" + originalName + "'");
-                    }
-                    throw new GekkoException();
-                }
-                //bool didTransform = false;
-                //a = x;
-                //x = MaybeStringify(x, stringify); //must be after fast pointer, so that a itself is not stringifyed
-                //x = MaybeTransform(ref didTransform, x, transformationAllowed);
-                //if (didTransform) a = x; //fast pointer to that object              
-                //return x;
-                return x;
-            }
-        }
+        //    //stuff like ... + %x + ...
+        //    if (Globals.useCache && a != null)
+        //    {
+        //        //The typical case, so we try it first.
+        //        return a;
+        //    }
+        //    else
+        //    {
+        //        //we do not have a fast pointer to it
+        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
+        //        if (x == null)
+        //        {
+        //            if (originalName.StartsWith(char.ToString(Globals.symbolCollection)))
+        //            {
+        //                G.Writeln2("*** ERROR: Could not find list or matrix '" + originalName + "'");
+        //                if (Program.scalars.ContainsKey(originalName.Substring(1)))
+        //                {
+        //                    G.Writeln("    Did you intend to refer to the scalar '" + Globals.symbolScalar + originalName.Substring(1) + "'", Color.Red);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Could not find scalar '" + originalName + "'");
+        //            }
+        //            throw new GekkoException();
+        //        }
+        //        //bool didTransform = false;
+        //        //a = x;
+        //        //x = MaybeStringify(x, stringify); //must be after fast pointer, so that a itself is not stringifyed
+        //        //x = MaybeTransform(ref didTransform, x, transformationAllowed);
+        //        //if (didTransform) a = x; //fast pointer to that object              
+        //        //return x;
+        //        return x;
+        //    }
+        //}
 
         //public static IVariable MaybeTransform(ref bool didTransform, IVariable x, bool transformationAllowed)
         //{
@@ -4342,15 +4342,15 @@ namespace Gekko
         }
 
         //see also GetScalarFromCache()
-        public static void RemoveScalar(string originalName)
-        {
-            //If a pointer also needs to be cleared, put that as second argument (else null)
-            if (Program.scalars.ContainsKey(originalName))
-            {
-                Program.scalars.Remove(originalName);
-            }
-            //if (a != null) a = null;
-        }
+        //public static void RemoveScalar(string originalName)
+        //{
+        //    //If a pointer also needs to be cleared, put that as second argument (else null)
+        //    if (Program.scalars.ContainsKey(originalName))
+        //    {
+        //        Program.scalars.Remove(originalName);
+        //    }
+        //    //if (a != null) a = null;
+        //}
 
         public static List GetList(IVariable a)
         {
@@ -5223,32 +5223,32 @@ namespace Gekko
         //    return ats;
         //}
 
-        public static IVariable GetScalar(string name)
-        {
-            return GetScalar(name, true);
-        }
+        //public static IVariable GetScalar(string name)
+        //{
+        //    return GetScalar(name, true);
+        //}
 
-        public static IVariable GetScalar(string name, bool transformationAllowed)
-        {
-            return GetScalar(name, transformationAllowed, false);
-        }
+        //public static IVariable GetScalar(string name, bool transformationAllowed)
+        //{
+        //    return GetScalar(name, transformationAllowed, false);
+        //}
 
-        public static IVariable GetScalar(string name, bool transformationAllowed, bool dollarStringify)
-        {
-            IVariable a = null;
-            if (Program.scalars.TryGetValue(name, out a))
-            {
-                //bool didTransform = false;
-                //a = MaybeStringify(a, dollarStringify);
-                //a = MaybeTransform(ref didTransform, a, transformationAllowed);
-                return a;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
-                throw new GekkoException();
-            }
-        }
+        //public static IVariable GetScalar(string name, bool transformationAllowed, bool dollarStringify)
+        //{
+        //    IVariable a = null;
+        //    if (Program.scalars.TryGetValue(name, out a))
+        //    {
+        //        //bool didTransform = false;
+        //        //a = MaybeStringify(a, dollarStringify);
+        //        //a = MaybeTransform(ref didTransform, a, transformationAllowed);
+        //        return a;
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
+        //        throw new GekkoException();
+        //    }
+        //}
 
         public static GekkoTime GetDate(GekkoTime x)
         {
@@ -6609,179 +6609,179 @@ namespace Gekko
             }
         }
 
-        public class Val
-        {
-            public static void Q(string s)
-            {
-                IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.Val)
-                {
-                    G.Writeln2("*** ERROR: VAL " + Globals.symbolScalar.ToString() + s + " was not found");
-                    throw new GekkoException();
-                }
-                string ss = a.GetValOLD(null).ToString();
-                if (ss == "NaN") ss = "M";
-                G.Writeln2("VAL " + s + " = " + ss);
-            }
-            public static void Q()
-            {
-                Program.Mem("val");
-            }
-        }
+        //public class Val
+        //{
+        //    public static void Q(string s)
+        //    {
+        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
+        //        if (a == null || a.Type() != EVariableType.Val)
+        //        {
+        //            G.Writeln2("*** ERROR: VAL " + Globals.symbolScalar.ToString() + s + " was not found");
+        //            throw new GekkoException();
+        //        }
+        //        string ss = a.GetValOLD(null).ToString();
+        //        if (ss == "NaN") ss = "M";
+        //        G.Writeln2("VAL " + s + " = " + ss);
+        //    }
+        //    public static void Q()
+        //    {
+        //        Program.Mem("val");
+        //    }
+        //}
 
-        public class String2
-        {
-            public static void Q(string s)
-            {
-                IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.String)
-                {
-                    G.Writeln2("*** ERROR: STRING " + Globals.symbolScalar.ToString() + s + " was not found");
-                    throw new GekkoException();
-                }
-                G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
-            }
-            public static void Q()
-            {
-                Program.Mem("string");
-            }
-        }
+        //public class String2
+        //{
+        //    public static void Q(string s)
+        //    {
+        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
+        //        if (a == null || a.Type() != EVariableType.String)
+        //        {
+        //            G.Writeln2("*** ERROR: STRING " + Globals.symbolScalar.ToString() + s + " was not found");
+        //            throw new GekkoException();
+        //        }
+        //        G.Writeln2("STRING " + s + " = '" + a.ConvertToString() + "'");
+        //    }
+        //    public static void Q()
+        //    {
+        //        Program.Mem("string");
+        //    }
+        //}
 
-        public class Matrix2
-        {
-            public List<string> opt_rownames = null;
-            public List<string> opt_colnames = null;
+        //public class Matrix2
+        //{
+        //    public List<string> opt_rownames = null;
+        //    public List<string> opt_colnames = null;
 
-            public void Exe(IVariable name, IVariable rhs)
-            {
-                if (rhs == null && opt_rownames == null && opt_colnames == null)
-                {
-                    G.Writeln2("*** ERROR: You must indicate either <rownames=...> or <colnames=...>");
-                    throw new GekkoException();
-                }
+        //    public void Exe(IVariable name, IVariable rhs)
+        //    {
+        //        if (rhs == null && opt_rownames == null && opt_colnames == null)
+        //        {
+        //            G.Writeln2("*** ERROR: You must indicate either <rownames=...> or <colnames=...>");
+        //            throw new GekkoException();
+        //        }
 
-                Matrix value = null;
-                if (rhs != null) value = O.ConvertToMatrix(rhs);
+        //        Matrix value = null;
+        //        if (rhs != null) value = O.ConvertToMatrix(rhs);
 
-                if (value != null)
-                {
-                    if (opt_rownames != null) value.rownames = opt_rownames;
-                    if (opt_colnames != null) value.colnames = opt_colnames;
-                }
+        //        if (value != null)
+        //        {
+        //            if (opt_rownames != null) value.rownames = opt_rownames;
+        //            if (opt_colnames != null) value.colnames = opt_colnames;
+        //        }
 
-                IVariable lhs = null;
+        //        IVariable lhs = null;
 
-                string name2 = name.ConvertToString();
-                if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
-                {
-                    //Matrix is already existing, may inherit the row/columnames               
-                    if (lhs.Type() == EVariableType.Matrix)
-                    {
-                        if (value == null)
-                        {
-                            //do not touch the .data
-                        }
-                        else
-                        {
-                            //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object in the dictionary
-                            ((Matrix)lhs).data = value.data;
-                        }
-                        if (opt_rownames != null) ((Matrix)lhs).rownames = opt_rownames;
-                        if (opt_colnames != null) ((Matrix)lhs).colnames = opt_colnames;
-                    }
-                    else
-                    {
-                        if (value == null)
-                        {
-                            G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
-                            throw new GekkoException();
-                        }
-                        //The object has to die and be recreated, since it is of a wrong type.                                
-                        Program.scalars.Remove(Globals.symbolCollection + name2);
-                        //lhs = new ScalarDate(value);
-                        Program.scalars.Add(Globals.symbolCollection + name2, value);
-                    }
-                }
-                else
-                {
-                    if (value == null)
-                    {
-                        G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
-                        throw new GekkoException();
-                    }
-                    //Scalar does not exist beforehand            
-                    //lhs = new ScalarDate(value);
-                    Program.scalars.Add(Globals.symbolCollection + name2, value);
-                }
-                //return (Matrix)lhs;
-            }
+        //        string name2 = name.ConvertToString();
+        //        if (Program.scalars.TryGetValue(Globals.symbolCollection + name2, out lhs))
+        //        {
+        //            //Matrix is already existing, may inherit the row/columnames               
+        //            if (lhs.Type() == EVariableType.Matrix)
+        //            {
+        //                if (value == null)
+        //                {
+        //                    //do not touch the .data
+        //                }
+        //                else
+        //                {
+        //                    //Already existing lhs is a MATRIX, inject into it. Injecting is faster than recreating an object in the dictionary
+        //                    ((Matrix)lhs).data = value.data;
+        //                }
+        //                if (opt_rownames != null) ((Matrix)lhs).rownames = opt_rownames;
+        //                if (opt_colnames != null) ((Matrix)lhs).colnames = opt_colnames;
+        //            }
+        //            else
+        //            {
+        //                if (value == null)
+        //                {
+        //                    G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
+        //                    throw new GekkoException();
+        //                }
+        //                //The object has to die and be recreated, since it is of a wrong type.                                
+        //                Program.scalars.Remove(Globals.symbolCollection + name2);
+        //                //lhs = new ScalarDate(value);
+        //                Program.scalars.Add(Globals.symbolCollection + name2, value);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (value == null)
+        //            {
+        //                G.Writeln2("*** ERROR: No matrix with name '" + Globals.symbolCollection + name2 + "' exists");
+        //                throw new GekkoException();
+        //            }
+        //            //Scalar does not exist beforehand            
+        //            //lhs = new ScalarDate(value);
+        //            Program.scalars.Add(Globals.symbolCollection + name2, value);
+        //        }
+        //        //return (Matrix)lhs;
+        //    }
 
-            public static void Q(string s)
-            {
-                Show ss = new Show();
-                IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection.ToString() + s, out iv);
-                if (iv == null)
-                {
-                    G.Writeln2("Matrix " + Globals.symbolCollection.ToString() + s + " not found");
-                    return;
-                }
-                ss.input = iv;
-                ss.label = Globals.symbolCollection.ToString() + s;
-                ss.Exe();
-            }
-            public static void Q()
-            {
-                bool first = true;
-                int count = 0;
-                foreach (string s in Program.scalars.Keys)
-                {
-                    IVariable a = Program.scalars[s];  //no need for tryget                    
-                    if (a.Type() == EVariableType.Matrix)
-                    {
-                        Matrix m = (Matrix)a;
-                        if (first) G.Writeln();
-                        G.Writeln("MATRIX " + s + " with dimension " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
-                        first = false;
-                        count++;
-                    }
-                }
-                if (count == 0) G.Writeln2("Did not find any matrices");
-            }
-        }
+        //    public static void Q(string s)
+        //    {
+        //        Show ss = new Show();
+        //        IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection.ToString() + s, out iv);
+        //        if (iv == null)
+        //        {
+        //            G.Writeln2("Matrix " + Globals.symbolCollection.ToString() + s + " not found");
+        //            return;
+        //        }
+        //        ss.input = iv;
+        //        ss.label = Globals.symbolCollection.ToString() + s;
+        //        ss.Exe();
+        //    }
+        //    public static void Q()
+        //    {
+        //        bool first = true;
+        //        int count = 0;
+        //        foreach (string s in Program.scalars.Keys)
+        //        {
+        //            IVariable a = Program.scalars[s];  //no need for tryget                    
+        //            if (a.Type() == EVariableType.Matrix)
+        //            {
+        //                Matrix m = (Matrix)a;
+        //                if (first) G.Writeln();
+        //                G.Writeln("MATRIX " + s + " with dimension " + m.data.GetLength(0) + " x " + m.data.GetLength(1));
+        //                first = false;
+        //                count++;
+        //            }
+        //        }
+        //        if (count == 0) G.Writeln2("Did not find any matrices");
+        //    }
+        //}
 
-        public class Name
-        {
-            public static void Q(string s)
-            {
-                IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.String)
-                {
-                    G.Writeln2("*** ERROR: NAME " + Globals.symbolScalar.ToString() + s + " was not found");
-                }
-                G.Writeln2("NAME " + s + " = '" + a.ConvertToString() + "'");
-            }
-            public static void Q()
-            {
-                Program.Mem("name");
-            }
-        }
+        //public class Name
+        //{
+        //    public static void Q(string s)
+        //    {
+        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
+        //        if (a == null || a.Type() != EVariableType.String)
+        //        {
+        //            G.Writeln2("*** ERROR: NAME " + Globals.symbolScalar.ToString() + s + " was not found");
+        //        }
+        //        G.Writeln2("NAME " + s + " = '" + a.ConvertToString() + "'");
+        //    }
+        //    public static void Q()
+        //    {
+        //        Program.Mem("name");
+        //    }
+        //}
 
-        public class Date
-        {
-            public static void Q(string s)
-            {
-                IVariable a = null; Program.scalars.TryGetValue(s, out a);
-                if (a == null || a.Type() != EVariableType.Date)
-                {
-                    G.Writeln2("*** ERROR: DATE " + Globals.symbolScalar.ToString() + s + " was not found");
-                }
-                G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.ConvertToDate(a)));
-            }
-            public static void Q()
-            {
-                Program.Mem("date");
-            }
-        }
+        //public class Date
+        //{
+        //    public static void Q(string s)
+        //    {
+        //        IVariable a = null; Program.scalars.TryGetValue(s, out a);
+        //        if (a == null || a.Type() != EVariableType.Date)
+        //        {
+        //            G.Writeln2("*** ERROR: DATE " + Globals.symbolScalar.ToString() + s + " was not found");
+        //        }
+        //        G.Writeln2("DATE " + s + " = " + G.FromDateToString(O.ConvertToDate(a)));
+        //    }
+        //    public static void Q()
+        //    {
+        //        Program.Mem("date");
+        //    }
+        //}
 
         public class Restart
         {

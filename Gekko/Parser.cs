@@ -1123,14 +1123,15 @@ namespace Gekko
                 ArrayList al = new ArrayList(Program.model.varsAType.Keys);
                 al.Sort(StringComparer.InvariantCulture);
 
-                List<string> exod = GetList("exod");
-                List<string> exoj = GetList("exoj");
-                List<string> exoz = GetList("exoz");
-                List<string> exodjz = GetList("exodjz");
-                List<string> exo = GetList("exo");
-                List<string> exotrue = GetList("exotrue");
-                List<string> endo = GetList("endo");
-                List<string> all = GetList("all");
+                
+                List<string> exod = new List<string>();
+                List<string> exoj = new List<string>();
+                List<string> exoz = new List<string>();
+                List<string> exodjz = new List<string>();
+                List<string> exo = new List<string>();
+                List<string> exotrue = new List<string>();
+                List<string> endo = new List<string>();
+                List<string> all = new List<string>();
 
                 foreach (string var in al)
                 {
@@ -1190,7 +1191,16 @@ namespace Gekko
                 exotrue.Sort(StringComparer.InvariantCulture);
                 endo.Sort(StringComparer.InvariantCulture);
                 all.Sort(StringComparer.InvariantCulture);
-
+                                
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(exod.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(exoj.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(exoz.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(exodjz.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(exo.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(exotrue.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(endo.ToArray())));
+                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(all.ToArray())));
+                
                 List<string> files = new List<string>();
                 files.Add("exod");
                 files.Add("exoj");
@@ -1240,23 +1250,23 @@ namespace Gekko
         }
 
 
-        private static List<string> GetList(string listName)
-        {
-            IVariable storedList = null;
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + listName))
-            {
-                //use tryget...: faster
-                storedList = Program.scalars[Globals.symbolCollection + listName];
-                List x = O.GetList(storedList);
-                x.list.Clear();
-            }
-            else
-            {
-                storedList = new List(new List<string>());
-                Program.scalars.Add(Globals.symbolCollection + listName, storedList);
-            }
-            return Program.GetListOfStringsFromList((List)storedList);
-        }
+        //private static List<string> GetList(string listName)
+        //{
+        //    IVariable storedList = null;
+        //    if (Program.scalars.ContainsKey(Globals.symbolCollection + listName))
+        //    {
+        //        //use tryget...: faster
+        //        storedList = Program.scalars[Globals.symbolCollection + listName];
+        //        List x = O.GetList(storedList);
+        //        x.list.Clear();
+        //    }
+        //    else
+        //    {
+        //        storedList = new List(new List<string>());
+        //        Program.scalars.Add(Globals.symbolCollection + listName, storedList);
+        //    }
+        //    return Program.GetListOfStringsFromList((List)storedList);
+        //}
 
         private static void EmitCsCodeAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement)
         {

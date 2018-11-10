@@ -2922,43 +2922,43 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.GetMatrixFromString(" + node[0].Code + ").SetData(" + node[1].Code + ", " + node[2].Code + ", " + node[3].Code + ");" + G.NL);
                         }
                         break;                    
-                    case "ASTMATRIX":
-                        {
-                            //MATRIX a = matrix(100, 100);  etc.
-                            //node.Code.A("O.SetMatrix(" + node[0].Code + ", " + node[1].Code + ");" + G.NL;
+                    //case "ASTMATRIX":
+                    //    {
+                    //        //MATRIX a = matrix(100, 100);  etc.
+                    //        //node.Code.A("O.SetMatrix(" + node[0].Code + ", " + node[1].Code + ");" + G.NL;
 
-                            if (node[1].Text == "?")
-                            {
+                    //        if (node[1].Text == "?")
+                    //        {
 
-                                if (node.ChildrenCount() > 2)
-                                {
-                                    node.Code.A("O.Matrix2.Q(" + Globals.QT + node[2].Text + Globals.QT + ");" + G.NL);
-                                }
-                                else
-                                {
-                                    node.Code.A("O.Matrix2.Q();" + G.NL);
-                                }
-                            }
-                            else
-                            {
-                                string s = "null";
+                    //            if (node.ChildrenCount() > 2)
+                    //            {
+                    //                node.Code.A("O.Matrix2.Q(" + Globals.QT + node[2].Text + Globals.QT + ");" + G.NL);
+                    //            }
+                    //            else
+                    //            {
+                    //                node.Code.A("O.Matrix2.Q();" + G.NL);
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            string s = "null";
 
-                                if (node.ChildrenCount() > 2)
-                                {
-                                    s = node[2].Code.ToString();
-                                }
+                    //            if (node.ChildrenCount() > 2)
+                    //            {
+                    //                s = node[2].Code.ToString();
+                    //            }
 
-                                node.Code.A("O.Matrix2 o" + Num(node) + " = new O.Matrix2();" + G.NL);
-                                if (node[0].ChildrenCount() > 0)
-                                {
-                                    GetCodeFromAllChildren(node[0]); //options  
-                                    node.Code.A(node[0].Code);
-                                }                                
+                    //            node.Code.A("O.Matrix2 o" + Num(node) + " = new O.Matrix2();" + G.NL);
+                    //            if (node[0].ChildrenCount() > 0)
+                    //            {
+                    //                GetCodeFromAllChildren(node[0]); //options  
+                    //                node.Code.A(node[0].Code);
+                    //            }                                
                                                                                               
-                                node.Code.A("o" + Num(node) + ".Exe(" + node[1].Code + ", " + s + ");" + G.NL);
-                            }
-                        }
-                        break;
+                    //            node.Code.A("o" + Num(node) + ".Exe(" + node[1].Code + ", " + s + ");" + G.NL);
+                    //        }
+                    //    }
+                    //    break;
                     case "ASTGENRLISTINDEXER":
                         {
                             node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), "O.GetTimeSeriesFromList(smpl, " + node[1].Code + ", " + node[2].Code + ", 1)", node[3].Code.ToString(), w, null));

@@ -410,7 +410,7 @@ namespace Gekko
                 {
                     bool exist = false;
                     bool isAllEndoExo = false;
-                    if (Program.scalars != null && Program.scalars.ContainsKey(all3[i + 1].Trim())) exist = true;
+                    //if (Program.scalars != null && Program.scalars.ContainsKey(all3[i + 1].Trim())) exist = true;
                     foreach (string ss in new string[] { "all", "endo", "exo", "exod", "exodjz", "exoj", "exotrue", "exoz" })
                     {
                         if (all3[i + 1].Trim().ToLower() == ss) isAllEndoExo = true;

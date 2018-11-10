@@ -825,7 +825,7 @@ namespace Gekko
         //going to be obsolete
         //public static Dictionary<string, Assigns> assigns = new Dictionary<string, Assigns>(StringComparer.OrdinalIgnoreCase);  //keys: assign-vars without the '#'
 
-        public static GekkoDictionary<string, IVariable> scalars = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);  //keys: assign-vars without the '%'
+        //public static GekkoDictionary<string, IVariable> scalars = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);  //keys: assign-vars without the '%'
         //public static GekkoDictionary<string, List<string>> lists = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);  //lists generated in .cmd files -- contain strings of variables
         //public static CaseInsensitiveHashtable macros = new CaseInsensitiveHashtable();  //macros -- contain strings of anything
         public static Dictionary<string, Table> tables = new Dictionary<string, Table>(StringComparer.OrdinalIgnoreCase);
@@ -2011,49 +2011,49 @@ namespace Gekko
         //    }
         //}
 
-        public static void Index(string listName, string wildCard)
-        {
-            string bank = Program.databanks.GetFirst().name;
-            if (wildCard.StartsWith(Globals.Work.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
-            {
-                bank = Globals.Work;
-                wildCard = wildCard.Substring(Globals.Work.Length + 1);
-                wildCard = wildCard.Trim();
-            }
-            if (wildCard.StartsWith(Globals.Ref.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
-            {
-                bank = Globals.Ref;
-                wildCard = wildCard.Substring(Globals.Ref.Length + 1);
-                wildCard = wildCard.Trim();
-            }
+        //public static void Index(string listName, string wildCard)
+        //{
+        //    string bank = Program.databanks.GetFirst().name;
+        //    if (wildCard.StartsWith(Globals.Work.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        bank = Globals.Work;
+        //        wildCard = wildCard.Substring(Globals.Work.Length + 1);
+        //        wildCard = wildCard.Trim();
+        //    }
+        //    if (wildCard.StartsWith(Globals.Ref.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        bank = Globals.Ref;
+        //        wildCard = wildCard.Substring(Globals.Ref.Length + 1);
+        //        wildCard = wildCard.Trim();
+        //    }
 
-            Databank databank = Program.databanks.GetDatabank(bank);
+        //    Databank databank = Program.databanks.GetDatabank(bank);
 
-            G.Writeln();
+        //    G.Writeln();
 
-            if (databank.storage.Keys.Count == 0)
-            {
-                G.Writeln("+++ WARNING: the " + bank + " databank is empty -- did you forget to READ a databank?");
-            }
+        //    if (databank.storage.Keys.Count == 0)
+        //    {
+        //        G.Writeln("+++ WARNING: the " + bank + " databank is empty -- did you forget to READ a databank?");
+        //    }
 
-            List<string> found = GetListFromWildcards(wildCard, databank);
-            {
-                if (found.Count == 0) G.Writeln("No series were found in " + bank + " databank matching '" + wildCard + "'");
-                else
-                {
-                    G.Writeln(found.Count + " variables were found in " + bank + " databank matching '" + wildCard + "'");
-                    found.Sort(StringComparer.InvariantCulture);
-                    G.PrintListWithCommas(found, false);
-                }
-                if (listName != "")
-                {
-                    if (Program.scalars.ContainsKey(Globals.symbolCollection + listName)) Program.scalars.Remove(Globals.symbolCollection + listName);
-                    Program.scalars.Add(Globals.symbolCollection + listName, new List(found));
-                    if (found.Count == 0) G.Writeln("+++ NOTE: The list #" + listName + " contains zero elements");
-                    else G.Writeln("The list #" + listName + " contains the above list of variables");
-                }
-            }
-        }
+        //    List<string> found = GetListFromWildcards(wildCard, databank);
+        //    {
+        //        if (found.Count == 0) G.Writeln("No series were found in " + bank + " databank matching '" + wildCard + "'");
+        //        else
+        //        {
+        //            G.Writeln(found.Count + " variables were found in " + bank + " databank matching '" + wildCard + "'");
+        //            found.Sort(StringComparer.InvariantCulture);
+        //            G.PrintListWithCommas(found, false);
+        //        }
+        //        if (listName != "")
+        //        {
+        //            if (Program.scalars.ContainsKey(Globals.symbolCollection + listName)) Program.scalars.Remove(Globals.symbolCollection + listName);
+        //            Program.scalars.Add(Globals.symbolCollection + listName, new List(found));
+        //            if (found.Count == 0) G.Writeln("+++ NOTE: The list #" + listName + " contains zero elements");
+        //            else G.Writeln("The list #" + listName + " contains the above list of variables");
+        //        }
+        //    }
+        //}
 
         private static List<string> GetListFromWildcards(string w, Databank databank)
         {
@@ -2869,7 +2869,7 @@ namespace Gekko
             if (G.Equal(o.opt_cols, "yes"))
             {
                 transpose = true;
-                if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix #" + matrixName + " is transposed");
+                if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix " + matrixName + " is transposed");
             }
 
             if (transpose)
@@ -2942,12 +2942,15 @@ namespace Gekko
                         mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
                     }
                 }
-                if (Program.scalars.ContainsKey(Globals.symbolCollection + matrixName))
-                {
-                    Program.scalars.Remove(Globals.symbolCollection + matrixName);
-                }
-                Program.scalars.Add(Globals.symbolCollection + matrixName, mm);
-                G.Writeln2("Matrix #" + matrixName + " imported (" + rr + "x" + cc + ")");
+
+                //Program.databanks.GetFirst().AddIVariableWithOverwrite(matrixName, mm);
+
+                //if (Program.scalars.ContainsKey(Globals.symbolCollection + matrixName))
+                //{
+                //    Program.scalars.Remove(Globals.symbolCollection + matrixName);
+                //}
+                //Program.scalars.Add(Globals.symbolCollection + matrixName, mm);
+                G.Writeln2("Matrix " + matrixName + " imported (" + rr + "x" + cc + ")");
             }
         }
 
@@ -13056,7 +13059,7 @@ namespace Gekko
 
                         int min = int.MaxValue;
                         int max = int.MinValue;
-                        List<string> list = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "endo"]);
+                        List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
                         int x = list.Count;
                         G.Writeln("Testing " + x + " endogenous vars");
                         for (int i = 0; i < x; i += n)
@@ -13203,50 +13206,50 @@ namespace Gekko
 
                 if (s2.Length == 6)
                 {
-                    string sub = s2;
-                    if (G.Equal(sub, "speed1"))
-                    {
-                        double n = 10000000d;
-                        string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
-                        DateTime t0 = DateTime.Now;
-                        obeyCommandCalledFromGUI(s, new P());
-                        DateTime t1 = DateTime.Now;
-                        double ms = (t1 - t0).TotalMilliseconds;
-                        G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        double x = Program.scalars["m"].GetValOLD(null);
-                        G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                    else if (G.Equal(sub, "speed2"))
-                    {
-                        DateTime t0 = DateTime.Now;
+                    //string sub = s2;
+                    //if (G.Equal(sub, "speed1"))
+                    //{
+                    //    double n = 10000000d;
+                    //    string s = "val k   = 0; val m   = 0; val k1  = 1; val k2  = " + n + "; for val k=%k1 to %k2; val m=%m+%k; end;";
+                    //    DateTime t0 = DateTime.Now;
+                    //    obeyCommandCalledFromGUI(s, new P());
+                    //    DateTime t1 = DateTime.Now;
+                    //    double ms = (t1 - t0).TotalMilliseconds;
+                    //    G.Writeln2("Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                    //    double x = Program.scalars["m"].GetValOLD(null);
+                    //    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
+                    //    return "";  //no need for the parser to chew on this afterwards!
+                    //}
+                    //else if (G.Equal(sub, "speed2"))
+                    //{
+                    //    DateTime t0 = DateTime.Now;
 
-                        //runs 2-3 x faster as integer loop, but never mind
-                        double n = 100000000d;
-                        double sum = 0;
-                        for (double i = 1; i <= n; i++)
-                        {
-                            sum += i;
-                        }
+                    //    //runs 2-3 x faster as integer loop, but never mind
+                    //    double n = 100000000d;
+                    //    double sum = 0;
+                    //    for (double i = 1; i <= n; i++)
+                    //    {
+                    //        sum += i;
+                    //    }
 
-                        DateTime t1 = DateTime.Now;
-                        double ms = (t1 - t0).TotalMilliseconds;
-                        G.Writeln2("C# Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        double x = sum;
-                        G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
-                    else if (G.Equal(sub, "speed3"))
-                    {
-                        double n = 100000d;
-                        string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
-                        DateTime t0 = DateTime.Now;
-                        obeyCommandCalledFromGUI(s, new P());
-                        DateTime t1 = DateTime.Now;
-                        double ms = (t1 - t0).TotalMilliseconds;
-                        G.Writeln2("Speed3 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
-                        return "";  //no need for the parser to chew on this afterwards!
-                    }
+                    //    DateTime t1 = DateTime.Now;
+                    //    double ms = (t1 - t0).TotalMilliseconds;
+                    //    G.Writeln2("C# Speed1 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                    //    double x = sum;
+                    //    G.Writeln("Difference from true: " + (x - (n * (n + 1) / 2)));
+                    //    return "";  //no need for the parser to chew on this afterwards!
+                    //}
+                    //else if (G.Equal(sub, "speed3"))
+                    //{
+                    //    double n = 100000d;
+                    //    string s = "time 95 2020; create y1, y2, y3, x1; upd <95 2020> y1 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y2 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> y3 = 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260; upd <95 2020> x1 = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26; val k = 0; val x  = 1; val k1 = 0; val k2 = " + n + "; for val k = %k1 to %k2; GENR <2000 2020> x1 = y1 + y1[-1] + y2 + y2[-1] + y3[2000] + %x + 1 + 2; end;";
+                    //    DateTime t0 = DateTime.Now;
+                    //    obeyCommandCalledFromGUI(s, new P());
+                    //    DateTime t1 = DateTime.Now;
+                    //    double ms = (t1 - t0).TotalMilliseconds;
+                    //    G.Writeln2("Speed3 = " + Math.Round((n / 1000d) / (ms / 1000d), 2) + " kcalc/s, n = " + n / 1000000d + " mio, " + Math.Round(ms / 1000d, 2) + " s");
+                    //    return "";  //no need for the parser to chew on this afterwards!
+                    //}
                 }
 
                 if (s2.Length == 5)
@@ -17000,7 +17003,7 @@ namespace Gekko
                     try
                     {
                         string m = type.Substring(2);
-                        List<string> a1 = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + m]);
+                        List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
                         bool showList = true;
                         if (a1.Count > 5000)
                         {
@@ -17031,7 +17034,7 @@ namespace Gekko
                 {
                     bool hasLargeModel = IsLargeModel();
                     List<string> a4 = new List<string>();
-                    foreach (KeyValuePair<string, IVariable> kvp in Program.scalars)
+                    foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
                     {
                         if (kvp.Value.Type() == EVariableType.List)
                         {
@@ -17092,7 +17095,7 @@ namespace Gekko
                         {
                             if (hasLargeModel)
                             {
-                                List<string> a1 = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + m]);                                
+                                List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
                                 G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
                                 G.Writeln();
                             }
@@ -17134,25 +17137,28 @@ namespace Gekko
                     else
                     {
 
-                        if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
-                        {
-                            Program.scalars.Remove(Globals.symbolCollection + leftSide);
-                        }
-                        Program.scalars.Add(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
+
+                        //if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
+                        //{
+                        //    Program.scalars.Remove(Globals.symbolCollection + leftSide);
+                        //}
+                        //Program.scalars.Add(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
                     }
                 }
                 else if (type == "-")
                 {
-                    if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
+                    if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + leftSide))
                     {
-                        Program.scalars.Remove(Globals.symbolCollection + leftSide);
+                        Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + leftSide);
+                        //Program.scalars.Remove(Globals.symbolCollection + leftSide);
                         G.Writeln("List #" + leftSide + " removed");
                     }
                     else
                     {
                         G.Writeln2("*** ERROR: list #" + leftSide + " does not exist");
                         throw new GekkoException();
-                    }
+                    }                    
                 }
             }
             return;
@@ -17161,16 +17167,18 @@ namespace Gekko
         private static bool IsLargeModel()
         {
             bool hasLargeModel = false;
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "all"))
+            IVariable all = Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all");
+            if (all != null && all.Type() == EVariableType.List)
             {
-                if ((O.GetList(Program.scalars[Globals.symbolCollection + "all"])).list.Count > 100) hasLargeModel = true;  //more then 100 vars --> no printing of model lists here
-            }
+                if ((all as List).list.Count > 100) hasLargeModel = true; //more then 100 vars --> no printing of model lists here
+            }            
             return hasLargeModel;
         }
 
         public static void WriteListItems(string m)
         {
-            IVariable iv = null; Program.scalars.TryGetValue(Globals.symbolCollection + m, out iv);
+            IVariable iv = null; Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m);
+            //Program.scalars.TryGetValue(Globals.symbolCollection + m, out iv);
             if (iv == null)
             {
                 G.Writeln2("*** ERROR: List " + Globals.symbolCollection + m + " was not found");
@@ -18107,14 +18115,16 @@ namespace Gekko
         private static void PutListsIntoModelListHelper()
         {
             ModelListHelper modelListHelper = new ModelListHelper();
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "all")) modelListHelper.all = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "all"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "endo")) modelListHelper.endo = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "endo"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exo")) modelListHelper.exo = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exo"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exod")) modelListHelper.exod = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exod"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exodjz"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exoj"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exotrue"]);
-            if (Program.scalars.ContainsKey(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exoz"]);
+            
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "all")) modelListHelper.all = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "endo")) modelListHelper.endo = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exo")) modelListHelper.exo = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exo"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exod")) modelListHelper.exod = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exod"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exodjz")) modelListHelper.exodjz = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exodjz"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exoj")) modelListHelper.exoj = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoj"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exotrue")) modelListHelper.exotrue = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exotrue"));
+            if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + "exoz")) modelListHelper.exoz = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoz"));
+
             Program.model.modelInfo.modelListHelper = modelListHelper;
         }
 
@@ -18123,20 +18133,20 @@ namespace Gekko
             string[] lists = new string[] { "all", "endo", "exo", "exod", "exodjz", "exoj", "exotrue", "exoz" };
             foreach (string s in lists)
             {
-                if (Program.scalars.ContainsKey(Globals.symbolCollection + s)) Program.scalars.Remove(Globals.symbolCollection + s);
+                if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + s);
             }
             foreach (string s in lists)
             {
-                Program.scalars.Add(Globals.symbolCollection + s, new List(new List<string>()));
+                Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + s, new List(new List<string>()));
             }
-            if (Program.model.modelInfo.modelListHelper.all != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "all"]).AddRange(Program.model.modelInfo.modelListHelper.all);
-            if (Program.model.modelInfo.modelListHelper.endo != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "endo"]).AddRange(Program.model.modelInfo.modelListHelper.endo);
-            if (Program.model.modelInfo.modelListHelper.exo != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exo"]).AddRange(Program.model.modelInfo.modelListHelper.exo);
-            if (Program.model.modelInfo.modelListHelper.exod != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exod"]).AddRange(Program.model.modelInfo.modelListHelper.exod);
-            if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exodjz"]).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
-            if (Program.model.modelInfo.modelListHelper.exoj != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exoj"]).AddRange(Program.model.modelInfo.modelListHelper.exoj);
-            if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exotrue"]).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
-            if (Program.model.modelInfo.modelListHelper.exoz != null) Program.GetListOfStringsFromList(Program.scalars[Globals.symbolCollection + "exoz"]).AddRange(Program.model.modelInfo.modelListHelper.exoz);
+            if (Program.model.modelInfo.modelListHelper.all != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all")).AddRange(Program.model.modelInfo.modelListHelper.all);
+            if (Program.model.modelInfo.modelListHelper.endo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo")).AddRange(Program.model.modelInfo.modelListHelper.endo);
+            if (Program.model.modelInfo.modelListHelper.exo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exo")).AddRange(Program.model.modelInfo.modelListHelper.exo);
+            if (Program.model.modelInfo.modelListHelper.exod != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exod")).AddRange(Program.model.modelInfo.modelListHelper.exod);
+            if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exodjz")).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
+            if (Program.model.modelInfo.modelListHelper.exoj != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoj")).AddRange(Program.model.modelInfo.modelListHelper.exoj);
+            if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exotrue")).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
+            if (Program.model.modelInfo.modelListHelper.exoz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoz")).AddRange(Program.model.modelInfo.modelListHelper.exoz);
             Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
@@ -20211,8 +20221,8 @@ namespace Gekko
                     Matrix m = new Matrix();
                     m.data = dump;
                     //m.data = Transpose(m.data);  //easier for humans to understand this orientation, and also without 1 subtracted on the diagonal
-                    if (Program.scalars.ContainsKey("#ft_" + ft)) Program.scalars.Remove("#ft_" + ft);
-                    Program.scalars.Add("#ft_" + ft, m);
+
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite("#ft_" + ft, m);
                 }
 
                 for (int i = 0; i < helper.jacobi.GetLength(0); i++)
@@ -22508,7 +22518,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: EXPORT<r>: expected all list items to start with '#'");
                         throw new GekkoException();
                     }
-                    IVariable iv = null; Program.scalars.TryGetValue(s, out iv);
+                    IVariable iv = null; iv = Program.databanks.GetFirst().GetIVariable(s);
                     if (iv == null)
                     {
                         G.Writeln2("*** ERROR: " + s + " does not exist");
@@ -23946,7 +23956,7 @@ namespace Gekko
             w2.FileNameWithPath = null;
             b2.FileNameWithPath = null;
             Globals.createdVariables.Clear();  //these should maybe live inside work databank
-            Program.scalars.Clear();
+            //Program.scalars.Clear();
             //Program.lists.Clear();
             //Program.macros.Clear();
             Globals.commandMemory = new CommandMemory();  //these commands are only remembered up to last clearing of workspace

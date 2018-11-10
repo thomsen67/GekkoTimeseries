@@ -8736,7 +8736,7 @@ namespace UnitTests
         private static int CountListOfStrings()
         {
             int count = 0;
-            foreach (KeyValuePair<string, IVariable> kvp in Program.scalars)
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
             {
                 if (kvp.Value.Type() == EVariableType.List)
                 {
@@ -8753,7 +8753,7 @@ namespace UnitTests
 
         private static void AssertHelperMatrix(string s, int i, int j, double d, double delta)
         {
-            Matrix m = (Matrix)Program.scalars[Globals.symbolCollection + s];
+            Matrix m = (Matrix)Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + s);
             Assert.AreEqual(m.data[i - 1, j - 1], d, delta);
         }
 
@@ -8763,26 +8763,26 @@ namespace UnitTests
             if (dim == "cols") dim2 = 1;
             else if (dim == "rows") ;
             else throw new GekkoException();
-            Matrix m = (Matrix)Program.scalars[Globals.symbolCollection + s];
+            Matrix m = (Matrix)Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + s);
             Assert.AreEqual(m.data.GetLength(dim2), i);
         }
 
         private static void AssertHelperScalarVal(string s, double d, double delta)
         {
-            double d2 = ((ScalarVal)Program.scalars[s]).val;
+            double d2 = ((ScalarVal)Program.databanks.GetFirst().GetIVariable(s)).val;
             _AssertHelperTwoDoubles(d2, d, delta);
         }
 
         private static void AssertHelperScalarDate(string s, EFreq freq, int super, int sub)
         {
-            Assert.AreEqual(((ScalarDate)Program.scalars[s]).date.freq, freq);
-            Assert.AreEqual(((ScalarDate)Program.scalars[s]).date.super, super);
-            Assert.AreEqual(((ScalarDate)Program.scalars[s]).date.sub, sub);
+            Assert.AreEqual(((ScalarDate)Program.databanks.GetFirst().GetIVariable(s)).date.freq, freq);
+            Assert.AreEqual(((ScalarDate)Program.databanks.GetFirst().GetIVariable(s)).date.super, super);
+            Assert.AreEqual(((ScalarDate)Program.databanks.GetFirst().GetIVariable(s)).date.sub, sub);            
         }
 
         private static void AssertHelperScalarString(string s, string s2)
         {
-            Assert.AreEqual(((ScalarString)Program.scalars[s]).string2, s2);
+            Assert.AreEqual(((ScalarString)Program.databanks.GetFirst().GetIVariable(s)).string2, s2);
         }
 
         [TestMethod]
