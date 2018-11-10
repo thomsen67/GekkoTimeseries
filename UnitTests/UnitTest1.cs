@@ -5708,7 +5708,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Analyze()
+        public void _Test_Analyze()
         {
             //See details on this example in the analyze code            
             I("reset;");
@@ -5717,17 +5717,17 @@ namespace UnitTests
             I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
             I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
             I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
-            I("analyze x1,x2,x3;");
+            I("analyze (x1, x2, x3);");
             double d = 0.00000001;  //very precise!
-            _AssertMatrix(First(), "corr", 1, 1, 1d, d);
-            _AssertMatrix(First(), "corr", 1, 2, 0.21295885d, d);
-            _AssertMatrix(First(), "corr", 1, 3, 0.31237800d, d);
-            _AssertMatrix(First(), "corr", 2, 1, 0.21295885d, d);
-            _AssertMatrix(First(), "corr", 2, 2, 1d, d);
-            _AssertMatrix(First(), "corr", 2, 3, 0.30733932d, d);
-            _AssertMatrix(First(), "corr", 3, 1, 0.31237800d, d);
-            _AssertMatrix(First(), "corr", 3, 2, 0.30733932d, d);
-            _AssertMatrix(First(), "corr", 3, 3, 1d, d);
+            _AssertMatrix(First(), "#corr", 1, 1, 1d, d);
+            _AssertMatrix(First(), "#corr", 1, 2, 0.21295885d, d);
+            _AssertMatrix(First(), "#corr", 1, 3, 0.31237800d, d);
+            _AssertMatrix(First(), "#corr", 2, 1, 0.21295885d, d);
+            _AssertMatrix(First(), "#corr", 2, 2, 1d, d);
+            _AssertMatrix(First(), "#corr", 2, 3, 0.30733932d, d);
+            _AssertMatrix(First(), "#corr", 3, 1, 0.31237800d, d);
+            _AssertMatrix(First(), "#corr", 3, 2, 0.30733932d, d);
+            _AssertMatrix(First(), "#corr", 3, 3, 1d, d);
                         
             I("reset;");
             I("option freq q;");
@@ -5736,16 +5736,16 @@ namespace UnitTests
             I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
             I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
             I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
-            I("analyze x1,x2,x3;");            
-            _AssertMatrix(First(), "corr", 1, 1, 1d, d);
-            _AssertMatrix(First(), "corr", 1, 2, 0.21295885d, d);
-            _AssertMatrix(First(), "corr", 1, 3, 0.31237800d, d);
-            _AssertMatrix(First(), "corr", 2, 1, 0.21295885d, d);
-            _AssertMatrix(First(), "corr", 2, 2, 1d, d);
-            _AssertMatrix(First(), "corr", 2, 3, 0.30733932d, d);
-            _AssertMatrix(First(), "corr", 3, 1, 0.31237800d, d);
-            _AssertMatrix(First(), "corr", 3, 2, 0.30733932d, d);
-            _AssertMatrix(First(), "corr", 3, 3, 1d, d);
+            I("analyze (x1, x2, x3);");            
+            _AssertMatrix(First(), "#corr", 1, 1, 1d, d);
+            _AssertMatrix(First(), "#corr", 1, 2, 0.21295885d, d);
+            _AssertMatrix(First(), "#corr", 1, 3, 0.31237800d, d);
+            _AssertMatrix(First(), "#corr", 2, 1, 0.21295885d, d);
+            _AssertMatrix(First(), "#corr", 2, 2, 1d, d);
+            _AssertMatrix(First(), "#corr", 2, 3, 0.30733932d, d);
+            _AssertMatrix(First(), "#corr", 3, 1, 0.31237800d, d);
+            _AssertMatrix(First(), "#corr", 3, 2, 0.30733932d, d);
+            _AssertMatrix(First(), "#corr", 3, 3, 1d, d);
         }
 
            
@@ -8821,7 +8821,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Itershow()
+        public void _Test_Itershow()
         {
             //Does not test the result, just that it parses
             I("RESET;");
@@ -9403,27 +9403,27 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__EndoExo()
+        public void _Test_EndoExo2()
         {
             //Checks ENDO, EXO and UNFIX
             //Does not test the result of a simulation, only the commands
-            I("RESET;");
+            I("RESET; MODE sim;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
             I("MODEL jul05;");  //otherwise ENDO/EXO will refuse to work
             I("ENDO a, b, c, d;");
             I("EXO x, y, z;");
             Assert.AreEqual(Program.model.endogenized.Count, 4);
             Assert.AreEqual(Program.model.exogenized.Count, 3);
-            I("ENDO;");
-            Assert.AreEqual(Program.model.endogenized.Count, 0);
-            Assert.AreEqual(Program.model.exogenized.Count, 3);
-            I("EXO;");
-            Assert.AreEqual(Program.model.endogenized.Count, 0);
-            Assert.AreEqual(Program.model.exogenized.Count, 0);
-            I("EXO?;");
-            I("EXO ?;");
-            I("ENDO?;");
-            I("ENDO ?;");
+            //I("ENDO;");
+            //Assert.AreEqual(Program.model.endogenized.Count, 0);
+            //Assert.AreEqual(Program.model.exogenized.Count, 3);
+            //I("EXO;");
+            //Assert.AreEqual(Program.model.endogenized.Count, 0);
+            //Assert.AreEqual(Program.model.exogenized.Count, 0);
+            //I("EXO?;");
+            //I("EXO ?;");
+            //I("ENDO?;");
+            //I("ENDO ?;");
             I("ENDO a, b, c, d;");
             I("EXO x, y, z;");
             Assert.AreEqual(Program.model.endogenized.Count, 4);
@@ -10749,12 +10749,12 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Checkoff()
+        public void _Test_Checkoff()
         {
             I("RESET;");
-            I("LIST xx = x, y;");
-            I("STRING ww = 'w';");
-            I("CHECKOFF a, b, #xx, {ww}, c;");
+            I("#xx = x, y;");
+            I("%ww = 'w';");
+            I("CHECKOFF a, b, {#xx}, {%ww}, c;");
             Assert.AreEqual(Globals.checkoff.Count, 6);
             Assert.AreEqual(Globals.checkoff[0], "a");
             Assert.AreEqual(Globals.checkoff[1], "b");
@@ -10767,12 +10767,7 @@ namespace UnitTests
             I("CHECKOFF;");
             Assert.AreEqual(Globals.checkoff.Count, 0);
         }
-
-        // ------------------------- older ----------------------
-        // ------------------------- older ----------------------
-        // ------------------------- older ----------------------
-        // ------------------------- older ----------------------
-        // ------------------------- older ----------------------
+        
 
         [TestMethod]
         public void _Test_Interpolate()
@@ -15539,7 +15534,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Res()
+        public void _Test_Res()
         {
             //-----------------------------------------------------------
             //----------------- testing RES -----------------------------
@@ -15552,7 +15547,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Efter()
+        public void _Test_Efter()
         {
             //-----------------------------------------------------------
             //----------------- testing EFTER ---------------------------

@@ -20724,7 +20724,7 @@ namespace Gekko
                 {
                     //This does not run fast, but is seldom used
                     //is also done for exogenous, maybe more safe only for lagged endo.
-                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name + Globals.freqIndicator + G.GetFreq(Program.options.freq)) as Series;
+                    Series tsUndoBank = Globals.undoBank.GetIVariable(ts.name) as Series;
                     //overrides the value -- takes it from the undoBank -- if exo there should be no change
                     val = tsUndoBank.GetData(null, t.Add(lagPointers[i]));
                 }
@@ -26724,8 +26724,8 @@ namespace Gekko
                 alglib.pearsoncorrm(tsData, out y);
                 Matrix m = new Matrix();
                 m.data = y;
-                if (Program.scalars.ContainsKey(Globals.symbolCollection + "corr")) Program.scalars.Remove(Globals.symbolCollection + "corr");
-                Program.scalars.Add(Globals.symbolCollection + "corr", m);
+
+                Program.databanks.GetFirst().AddIVariableWithOverwrite("#corr", m);
 
                 G.Writeln2("Cross correlation based on " + k + " variables and " + n + " observations");
                 counter = 0;
