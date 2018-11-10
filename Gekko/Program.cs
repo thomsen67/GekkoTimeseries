@@ -18135,18 +18135,25 @@ namespace Gekko
             {
                 if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + s);
             }
-            foreach (string s in lists)
-            {
-                Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + s, new List(new List<string>()));
-            }
-            if (Program.model.modelInfo.modelListHelper.all != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all")).AddRange(Program.model.modelInfo.modelListHelper.all);
-            if (Program.model.modelInfo.modelListHelper.endo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo")).AddRange(Program.model.modelInfo.modelListHelper.endo);
-            if (Program.model.modelInfo.modelListHelper.exo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exo")).AddRange(Program.model.modelInfo.modelListHelper.exo);
-            if (Program.model.modelInfo.modelListHelper.exod != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exod")).AddRange(Program.model.modelInfo.modelListHelper.exod);
-            if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exodjz")).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
-            if (Program.model.modelInfo.modelListHelper.exoj != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoj")).AddRange(Program.model.modelInfo.modelListHelper.exoj);
-            if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exotrue")).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
-            if (Program.model.modelInfo.modelListHelper.exoz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoz")).AddRange(Program.model.modelInfo.modelListHelper.exoz);
+            
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.all.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.endo.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exo.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exod.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exodjz.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoj.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exotrue.ToArray())));
+            Program.databanks.GetFirst().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoz.ToArray())));
+                        
+            //if (Program.model.modelInfo.modelListHelper.all != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all")).AddRange(Program.model.modelInfo.modelListHelper.all);
+            //if (Program.model.modelInfo.modelListHelper.endo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo")).AddRange(Program.model.modelInfo.modelListHelper.endo);
+            //if (Program.model.modelInfo.modelListHelper.exo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exo")).AddRange(Program.model.modelInfo.modelListHelper.exo);
+            //if (Program.model.modelInfo.modelListHelper.exod != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exod")).AddRange(Program.model.modelInfo.modelListHelper.exod);
+            //if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exodjz")).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
+            //if (Program.model.modelInfo.modelListHelper.exoj != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoj")).AddRange(Program.model.modelInfo.modelListHelper.exoj);
+            //if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exotrue")).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
+            //if (Program.model.modelInfo.modelListHelper.exoz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoz")).AddRange(Program.model.modelInfo.modelListHelper.exoz);
+
             Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 
@@ -22320,7 +22327,7 @@ namespace Gekko
             {
                 //special treatment for the time being
                 ExportR(o);
-                return o.listItems.Count();
+                return o.list1.Count();
             }
             else if (writeAllVariables)  //writing the whole first databank
             {
@@ -22511,8 +22518,10 @@ namespace Gekko
             using (FileStream fs = WaitForFileStream(fullFileName, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
-                foreach (string s in o.listItems)
+                foreach(IVariable iv2 in o.list1.list)
+                //foreach (string s in o.listItems)
                 {
+                    string s = iv2.ConvertToString();
                     if (!s.StartsWith(Globals.symbolCollection.ToString()))
                     {
                         G.Writeln2("*** ERROR: EXPORT<r>: expected all list items to start with '#'");
@@ -22535,7 +22544,7 @@ namespace Gekko
                 }
                 file.Flush();
             }
-            G.Writeln2("R export of " + o.listItems.Count() + " matrices, " + fullFileName);
+            G.Writeln2("R export of " + o.list1.Count() + " matrices, " + fullFileName);
         }
 
         //private static List<BankNameVersion> GetInfoFromListOfWildcards(List<string> list)

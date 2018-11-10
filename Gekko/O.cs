@@ -6334,8 +6334,10 @@ namespace Gekko
             {
                 List<string> onlyDatabankNotModel = new List<string>();
                 List<string> onlyModelNotDatabank = new List<string>();
-                foreach (string s in Program.databanks.GetFirst().storage.Keys)
+                foreach ( KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
                 {
+                    string s = kvp.Key;
+                    if (kvp.Value.Type() != EVariableType.Series) continue;  //only series
                     if (G.GetFreqFromName(s) != Program.options.freq) continue;
                     string s2 = G.Chop_RemoveFreq(s);
                     if (!Program.model.varsAType.ContainsKey(s2)) onlyDatabankNotModel.Add(s2);
@@ -9470,7 +9472,7 @@ namespace Gekko
             public string fileName = null;
             public List list1 = null;
             public List list2 = null;
-            public List<string> listItems = null;
+            //public List<string> listItems = null;
             
             public string opt_tsd = null;
             public string opt_tsdx = null;
