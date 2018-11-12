@@ -1502,7 +1502,7 @@ namespace Gekko
                         {
                             //special case: #(listfile m)
 
-                            List ml = HandleListfile(varname);
+                            List ml = ReadExternalListFile(varname);
                             return ml;
                         }
                         else
@@ -1613,7 +1613,7 @@ namespace Gekko
             return rv;
         }
 
-        private static List HandleListfile(string varname)
+        private static List ReadExternalListFile(string varname)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = Program.AddExtension(fileName, "." + "lst");

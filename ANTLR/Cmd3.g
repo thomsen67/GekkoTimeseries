@@ -2259,6 +2259,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | compare              SEMICOLON!
 						  | copy                 SEMICOLON!
 						  | create               SEMICOLON!
+						  | decomp               SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | doc                  SEMICOLON!
@@ -2502,6 +2503,14 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// DECOMP
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+decomp:						DECOMP (leftAngle dates? RIGHTANGLE)? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTDATES dates?) ^(ASTDECOMPITEMS decompElement));
+
+decompElement:              expression -> expression;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DELETE

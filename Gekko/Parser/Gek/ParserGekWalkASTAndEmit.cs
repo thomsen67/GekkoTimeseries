@@ -5144,7 +5144,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMPITEMS":
                         {                            
                             ASTNode child = node[0];
-                            if (child.Text == "ASTNAMEWITHBANK")
+                            if (child.Text == "ASTBANKVARNAME")
                             {
                                 //Same logic as ASTLISTITEMS, where "LIST a" is parsed as an expression but translated into 'a' in the parser.
                                 //node.Code.A("o" + Num(node) + ".variable = O.ConvertToString(" + AstBankHelper(child, w, 1) + ");" + G.NL);
@@ -5154,7 +5154,7 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: Sorry, decomposition of expressions not yet implemented in Gekko 2.0");
+                                G.Writeln2("*** ERROR: Sorry, decomposition of expressions not yet implemented in Gekko 3.0");
                                 throw new GekkoException();
                                 //node.Code.A("o" + Num(node) + ".expressionCs = " + Globals.QT + child.Code.ToString().Replace("\"", "\\\"") + Globals.QT + ";" + G.NL);
                                 string sss = child.Code.ToString();
