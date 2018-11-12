@@ -177,6 +177,21 @@ namespace Gekko
             else return this.name;
         }
 
+        public Databank GetParentDatabank()
+        {
+            //also works for array-subseries
+            if (this.name == null && Globals.runningOnTTComputer)
+            {
+                G.Writeln2("*** ERROR: Parent db error");
+                throw new GekkoException();
+            }
+            if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
+            {
+                return this.mmi.parent.meta.parentDatabank;
+            }
+            else return this.meta.parentDatabank;
+        }
+
         public string GetNameWithoutCurrentFreq(bool onlyRemoveCurrentFreq)
         {
             if (onlyRemoveCurrentFreq)
@@ -2260,6 +2275,7 @@ namespace Gekko
         {
             this.isDirty = b1;
         }
+        
 
         //public void SetGhost(bool b2)
         //{

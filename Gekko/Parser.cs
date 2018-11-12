@@ -1893,6 +1893,12 @@ namespace Gekko
         {
             bool visitChildren = true;
             int numberOfRightParentheses = 0;
+
+            if(equationNode==null || equationNode.Text == null)
+            {
+
+            }
+
             switch (equationNode.Text)
             {
                 case "ASTFRMLCODE":

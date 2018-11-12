@@ -1280,6 +1280,9 @@ namespace Gekko
 
         public static TableLight ReadCsvPrn(EDataFormat type, string file)
         {
+            //everything is stored as strings, no parsing into values... (probably because it is not that simple, comma vs. dot, NaN, etc.)
+            //will remove quotes on cells
+            //does not handle ';' inside a quoted string
 
             char delimiter = ';';
                         
@@ -1308,6 +1311,7 @@ namespace Gekko
                 foreach (string s in lines)
                 {
                     if (s.Trim() == "") continue;  //ignore empty lines
+                    if (s.StartsWith("//")) continue;  //ignore //
                     string[] split = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);  //could be variable name with blank such as "ab cd" or something to trim like " abcd", but that is strange/wrong anyway!
                     string line2 = null;
                     foreach (string ss in split)
@@ -1339,11 +1343,16 @@ namespace Gekko
             int row = 0;
             foreach (string line in lines)
             {
+                if (line.Trim() == "") continue;  //ignore blank line
+                if (line.StartsWith("//")) continue;  //ignore //
                 row++;
                 string[] chunks = line.Split(delimiter);
                 int col = 0;
-                foreach (string s in chunks)
+                foreach (string s2 in chunks)
                 {
+                    string s = s2.Trim();
+                    if (s.StartsWith("'") && s.EndsWith("'")) s = s.Substring(1, s.Length - 2);
+                    if (s.StartsWith("\"") && s.EndsWith("\"")) s = s.Substring(1, s.Length - 2);
                     col++;
                     CellLight cell = new CellLight(s);
                     if (s != "") matrix.Add(row, col, cell);  //no need to keep empty cells in matrix (there can be many such)
@@ -12809,61 +12818,46 @@ namespace Gekko
         //    return h;
         //}
 
-        public static void PutListIntoListOrListfile(List<string> listItems, string name, string listFile)
-        {
-            List<string> newList = new List<string>();
+        //public static void PutListIntoListOrListfile(List<string> listItems, string name, string listFile)
+        //{
+        //    List<string> newList = new List<string>();
 
-            if (name != null && listFile == null)
-            {
-                //newList = Program.CreateNewList(listItems, name);
-                List xxx = new List(listItems);
-                O.AddIVariableWithOverwriteFromString(name, xxx);
-            }
-            else if (name == null && listFile != null)
-            {
-                string file = listFile;
-                Program.WriteExternalListFile(file, listItems);
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Unexpected error #87230944 related to list name/listfile");
-                throw new GekkoException();
-            }
+        //    if (name != null && listFile == null)
+        //    {
+        //        //newList = Program.CreateNewList(listItems, name);
+        //        List xxx = new List(listItems);
+        //        O.AddIVariableWithOverwriteFromString(name, xxx);
+        //    }
+        //    else if (name == null && listFile != null)
+        //    {
+        //        string file = listFile;
+        //        Program.WriteExternalListFile(file, listItems);
+        //    }
+        //    else
+        //    {
+        //        G.Writeln2("*** ERROR: Unexpected error #87230944 related to list name/listfile");
+        //        throw new GekkoException();
+        //    }
 
-            //Remove null element, if only one (used for "LIST xx = null")                
-            for (int i = 0; i < newList.Count; i++)
-            {
-                if (G.Equal(newList[i], "null"))
-                {
-                    if (newList.Count == 1)
-                    {
-                        newList.Clear();  //remove the null element
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Null element is only allowed if it is the first and only list element");
-                        throw new GekkoException();
-                    }
-                }
-            }
-        }
+        //    //Remove null element, if only one (used for "LIST xx = null")                
+        //    for (int i = 0; i < newList.Count; i++)
+        //    {
+        //        if (G.Equal(newList[i], "null"))
+        //        {
+        //            if (newList.Count == 1)
+        //            {
+        //                newList.Clear();  //remove the null element
+        //            }
+        //            else
+        //            {
+        //                G.Writeln2("*** ERROR: Null element is only allowed if it is the first and only list element");
+        //                throw new GekkoException();
+        //            }
+        //        }
+        //    }
+        //}
 
-        public static void WriteExternalListFile(string file, List<string> listItems)
-        {
-
-            file = Program.AddExtension(file, "." + "lst");
-            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
-            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
-            using (StreamWriter res = G.GekkoStreamWriter(fs))
-            {
-                foreach (string s in listItems)
-                {
-                    res.WriteLine(s);
-                }
-                res.Flush();
-                res.Close();
-            }
-        }
+        
         
 
         public static string HandleOneLiners(string text)
@@ -15143,6 +15137,8 @@ namespace Gekko
 
             int seriesCounter = 0;
 
+            List<string> names = null;
+
             List<IVariable> m = new List<IVariable>();
             if (list != null)
             {
@@ -15156,39 +15152,23 @@ namespace Gekko
             else
             {
 
-                List<string> names = Program.Search(o.iv, null, EVariableType.Var);
-
-                //List <TwoStrings> matches = Program.SearchFromTo(o.iv, null, null, null, EWildcardSearchType.Search);
+                names = Program.Search(o.iv, null, EVariableType.Var);
                 
-                //List rv = new List();
-                //List<string> names = new List<string>();
-                
-                //foreach (TwoStrings two in matches)
-                //{
-                //    if (type != EVariableType.Var)
-                //    {
-                //        //a bit of double work here, but maybe it does not need to be super fast anyway
-                //        IVariable iv = O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError);
-                //        if (type != EVariableType.Var && type != iv.Type())
-                //        {
-                //            PrintNonSeries(iv, null);
-                //            nonSeries = true;
-                //            continue; //skip it
-                //        }
-                //    }
-                //    m.Add(O.GetIVariableFromString(two.s1, O.ECreatePossibilities.NoneReportError));
-                //}
-
                 foreach(string s in names)
                 {
                     m.Add(O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError, true));
                 }
 
             }
-
-            foreach (IVariable x in m)
+                        
+            for (int i5 = 0;i5<m.Count;i5++)
             {
-                
+
+                IVariable x = m[i5];
+                string name = null;
+                if (names != null) name = names[i5];
+                else name = list[i5];
+
                 //one listitem could be obk:fx*, fy, #m, obk:#m, @fy
                 
                 //IVariable x = O.Lookup(smpl, null, new ScalarString(listItem), null, false, EVariableType.Var);
@@ -15196,24 +15176,7 @@ namespace Gekko
                 Series ts = x as Series;
 
                 if (ts == null)
-                {
-                    //ScalarString ss = x as ScalarString;
-
-                    //if (ss != null)
-                    //{
-                    //    IVariable iv2 = O.Lookup(smpl, null, ss, null, O.ELookupType.RightHandSide, EVariableType.Var, null);
-                    //    ts = iv2 as Series;
-                    //    if (ts == null)
-                    //    {
-                    //        G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
-                    //        throw new GekkoException();
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    G.Writeln2("*** ERROR in DISP, type " + G.GetTypeString(x) + " not allowed");
-                    //    throw new GekkoException();
-                    //}
+                {                    
                     PrintNonSeries(x, null);
                     nonSeries++;
                     continue;
@@ -15223,10 +15186,20 @@ namespace Gekko
 
                     seriesCounter++;
 
-                    string var = ts.name;
-                    string bank = ts.meta.parentDatabank.name;
+                    string var = null;
+                    string bank = null;
+                    if (name == null)
+                    {
+                        var = ts.GetName();
+                        bank = ts.GetParentDatabank().name;
+                    }
+                    else
+                    {
+                        var = name;
+                        bank = ts.GetParentDatabank().name;
+                    }
 
-                    string varnameWithoutFreq = G.Chop_RemoveFreq(ts.name);
+                    string varnameWithoutFreq = G.Chop_RemoveFreq(var);
 
                     if (gamsStyle)
                     {

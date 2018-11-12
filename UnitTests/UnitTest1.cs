@@ -5246,7 +5246,7 @@ namespace UnitTests
             I("RESET; MODE data;");            
             I("OPTION freq a;");                        
             I("CREATE x; SER <2006 2013> x = (-.89, .33, -3.8, 4.32, 2, 3, 4, 5);");  //first 3 values are only used for some of the last tests in the following
-            I("FOR val %i = 1 to 4; CREATE y{i}; END;");
+            I("FOR val %i = 1 to 4; CREATE y{%i}; END;");
             I("TIME 2013 2013;");
 
             I("SERIES y1 = movavg(0.5 * x + 0.5 * x, 2);");
@@ -15784,10 +15784,10 @@ namespace UnitTests
         public void _Test_Alias()
         {            
             I("option interface alias = yes;");
-            I("global:#alias = (('fy', 'c[a]'), ('fe', 'c[b]'));");
+            I("#(listfile m) = (('fy', 'c[a]'), ('fe', 'c[b]'));");            
+            I("global:#alias = #(listfile m);");
             I("c = series(1); c[a] = 100; c[b] = 200;");
-            I("prt fy, fe;");
-            I("prt c[a], c[b];");
+            I("prt fy, fe;");            
         }
 
         [TestMethod]

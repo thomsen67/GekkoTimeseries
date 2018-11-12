@@ -1629,13 +1629,13 @@ namespace Gekko
 
             List<string> result = new List<string>();
 
-            GetRawListElements(fileName, input, result);
-            if (result.Count == 1 && G.Equal(result[0], "null"))
-            {
-                //LIST mylist = null; ---> empty list
-                result = new List<string>();
-            }
-            List ml = new List(result);
+            List ml = GetRawListElements(fileName);
+            //if (result.Count == 1 && G.Equal(result[0], "null"))
+            //{
+            //    //LIST mylist = null; ---> empty list
+            //    result = new List<string>();
+            //}
+            //List ml = new List(result);
             return ml;
         }
 
@@ -3225,9 +3225,71 @@ namespace Gekko
 
         public static void WriteExternalListFile(string varnameWithFreq, IVariable rhs)
         {
-            string fileName = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
-            List<string> temp = Program.GetListOfStringsFromList(rhs);
-            Program.WriteExternalListFile(fileName, temp);
+            string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
+            //List<string> temp = Program.GetListOfStringsFromList(rhs);
+            
+            file = Program.AddExtension(file, "." + "lst");
+            string pathAndFilename = Program.CreateFullPathAndFileNameFromFolder(file, null);
+
+            List rhs_list = rhs as List;
+            if (rhs_list == null)
+            {
+                G.Writeln2("*** ERROR: Listfile writing: expected list input");
+                throw new GekkoException();
+            }
+
+
+            using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+                foreach (IVariable iv in rhs_list.list)
+                {
+                    if (iv.Type() == EVariableType.List)
+                    {
+                        foreach (IVariable sub in (iv as List).list)
+                        {
+                            if (sub.Type() == EVariableType.String)
+                            {
+                                res.Write(sub.ConvertToString() + "; ");
+                            }
+                            else if (sub.Type() == EVariableType.Date)
+                            {
+                                res.Write(sub.ConvertToDate(GetDateChoices.Strict) + "; ");
+                            }
+                            else if (sub.Type() == EVariableType.Val)
+                            {
+                                res.Write(sub.ConvertToVal() + "; ");
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Expected sub-list elements to be string, date, or val");
+                                throw new GekkoException();
+                            }
+                        }
+                    }
+                    else if (iv.Type() == EVariableType.String)
+                    {
+                        res.Write(iv.ConvertToString());
+                    }
+                    else if (iv.Type() == EVariableType.Date)
+                    {
+                        res.Write(iv.ConvertToDate(GetDateChoices.Strict));
+                    }
+                    else if (iv.Type() == EVariableType.Val)
+                    {
+                        res.Write(iv.ConvertToVal());
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected list elements to be string, date, val, or list");
+                        throw new GekkoException();
+                    }
+                    res.WriteLine();
+
+                }
+                res.Flush();
+                res.Close();
+            }
 
             string listfileName = G.TransformListfileName(varnameWithFreq);
 
@@ -3857,34 +3919,34 @@ namespace Gekko
         //    return a;
         //}
 
-        public static IVariable ZListFile(string fileName)
-        {
-            fileName = Program.AddExtension(fileName, "." + "lst");
-            List<string> folders = new List<string>();
-            string fileNameTemp = Program.FindFile(fileName, folders);
-            if (fileNameTemp == null)
-            {
-                G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
-                throw new GekkoException();
-            }
-            string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
-            List<string> input = G.ExtractLinesFromText(listFile);
+        //public static IVariable ZListFile(string fileName)
+        //{
+        //    fileName = Program.AddExtension(fileName, "." + "lst");
+        //    List<string> folders = new List<string>();
+        //    string fileNameTemp = Program.FindFile(fileName, folders);
+        //    if (fileNameTemp == null)
+        //    {
+        //        G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
+        //        throw new GekkoException();
+        //    }
+        //    string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
+        //    List<string> input = G.ExtractLinesFromText(listFile);
 
-            List<string> rhs = new List<string>();
-            List<string> result = new List<string>();
+        //    List<string> rhs = new List<string>();
+        //    List<string> result = new List<string>();
 
-            GetRawListElements(fileName, input, result);
-            if (result.Count == 1 && G.Equal(result[0], "null"))
-            {
-                //LIST mylist = null; ---> empty list
-                result = new List<string>();
-            }
-            List ml = new List(result);
-            ml.isNameList = true;
-            return ml;
-        }
+        //    GetRawListElements(fileName, input, result);
+        //    if (result.Count == 1 && G.Equal(result[0], "null"))
+        //    {
+        //        //LIST mylist = null; ---> empty list
+        //        result = new List<string>();
+        //    }
+        //    List ml = new List(result);
+        //    ml.isNameList = true;
+        //    return ml;
+        //}
 
-        private static void GetRawListElements(string fileName, List<string> input, List<string> result)
+        private static void GetRawListElementsOLD(string fileName, List<string> input, List<string> result)
         {
             //quoted elements are not allowed, too
             //also out-commented items, and items with minus are ok
@@ -3979,6 +4041,168 @@ namespace Gekko
                 result.Add(s);
             }
             return;
+        }
+
+        private static List GetRawListElements(string fileName)
+        {
+
+            TableLight table = Program.ReadCsvPrn(EDataFormat.Csv, fileName);
+            
+            int iMax = table.GetRowMaxNumber();
+            int jMax = table.GetColMaxNumber();
+
+            List m = new List();
+
+            for (int i = 1; i <= iMax; i++)
+            {
+
+                List m2 = new List();
+
+                bool emptyFound = false;
+                bool problem = false;
+                for (int j = 1; j <= jMax; j++)
+                {
+                    
+                    CellLight cell = table.Get(i, j);
+                    if (cell.type == ECellLightType.String)
+                    {
+                        if (emptyFound) problem = true;
+
+                        double d;
+                        if (double.TryParse(cell.text, out d))
+                        {
+                            m2.Add(new ScalarVal(d));
+                        }
+                        else
+                        {
+                            m2.Add(new ScalarString(cell.text));
+                        }
+                    }
+                    else if (cell.type == ECellLightType.Double)
+                    {
+                        if (emptyFound) problem = true;
+                        m2.Add(new ScalarVal(cell.data));
+                    }
+                    else if (cell.type == ECellLightType.None)
+                    {
+                        //skip                                      
+                        emptyFound = true;          
+                    }                    
+                }
+                if (problem)
+                {
+                    G.Writeln2("*** ERROR: Empty cell found in middle of row elements");
+                    throw new GekkoException();
+                }
+                if (m2.Count() == 0)
+                {
+                    //skip
+                }
+                else if (m2.Count() == 1)
+                {
+                    m.Add(m2.list[0]);
+                }
+                else
+                {
+                    m.Add(m2);
+                }
+            }
+            return m;
+
+
+            ////quoted elements are not allowed, too
+            ////also out-commented items, and items with minus are ok
+            //int counter = 0;
+            //foreach (string ss in input)
+            //{
+            //    counter++;
+            //    string s = ss.Trim();  //will also remove any newline characters!
+
+            //    bool quotes = false;
+            //    string s2 = G.StripQuotes(s);
+            //    if (s2.Length != s.Length)
+            //    {
+            //        s = s2;
+            //        quotes = true;
+            //    }
+
+            //    if (fileName != null && s == "")
+            //    {
+            //        G.Writeln2("*** ERROR in listfile '" + fileName + "': empty line [" + counter + "]");
+            //        G.Writeln("    Note: you may use comments (//), but not completely empty lines. This is to");
+            //        G.Writeln("    keep the list files reasonably tidy.");
+            //        throw new GekkoException();
+            //    }
+
+            //    //if (s.StartsWith("//")) continue;  //allow comments, /* ... */ not supported though
+            //    int idx = s.IndexOf("//");
+            //    if (idx >= 0)
+            //    {
+            //        s = s.Substring(0, idx);
+            //        s = s.Trim();
+            //    }
+
+            //    if (s == null || s == "")
+            //    {
+            //        if (fileName == null)
+            //        {
+            //            G.Writeln2("*** ERROR in <direct> list: empty element");
+            //            throw new GekkoException();
+            //        }
+            //        else
+            //        {
+            //            continue;  //ignore a comment
+            //        }
+            //    }
+
+            //    if (quotes == false)  //with quotes, anything is accepted
+            //    {
+
+            //        int colonCounter = 0;
+            //        for (int i = 0; i < s.Length; i++)
+            //        {
+            //            char c = s[i];
+            //            if (i == 0 && (c == '-'))  //starting with # not considered ok, only simple elements (perhaps with minus) allowed
+            //            {
+            //                //ok
+            //            }
+            //            else
+            //            {
+            //                if (G.IsLetterOrDigitOrUnderscore(c))
+            //                {
+            //                    //ok
+            //                }
+            //                else if (c.ToString() == Globals.symbolBankColon)
+            //                {
+            //                    colonCounter++;
+            //                    if (colonCounter > 1)
+            //                    {
+            //                        //probably very rare, but we check here
+            //                        G.Writeln2("*** ERROR in list: at most 1 colon allowed: '" + s + "'");
+            //                        throw new GekkoException();
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    if (fileName == null)
+            //                    {
+            //                        G.Writeln2("*** ERROR in <direct> list, item = '" + s + "'");
+            //                        G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
+            //                        throw new GekkoException();
+            //                    }
+            //                    else
+            //                    {
+            //                        G.Writeln2("*** ERROR in listfile '" + fileName + "', line [" + counter + "], item = '" + s + "'");
+            //                        G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
+            //                        throw new GekkoException();
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //    result.Add(s);
+            //}
+            //return;
         }
 
         //public static IVariable ZList(IVariable iv)
@@ -7885,96 +8109,96 @@ namespace Gekko
         }
 
 
-        public class ListDef
-        {
-            public string name = null;
-            public string listFile = null;
-            public List<string> listItems = null;
-            public string listPrefix = null;
-            public string listSuffix = null;
-            public string listStrip = null;
-            public string listSort = null;
-            public string listTrim = null;
-            public bool direct = false;
-            public string rawfood = null;
-            public P p = null;
-            public void Exe()
-            {
-                if (this.direct)
-                {
-                    //Here, we get the elements from the raw text ('rawfood'), and handle them a bit like
-                    //listfiles, #(listfile ...).
-                    //If needed, LIST<direct> could be made more general, allowing all sorts of characters.
-                    List<string> input = new List<string>();
-                    string[] ss = rawfood.Split(',');
-                    input.AddRange(ss);
-                    List<string> result = new List<string>();
-                    GetRawListElements(null, input, result);
-                    this.listItems = result;
-                }
+        //public class ListDef
+        //{
+        //    public string name = null;
+        //    public string listFile = null;
+        //    public List<string> listItems = null;
+        //    public string listPrefix = null;
+        //    public string listSuffix = null;
+        //    public string listStrip = null;
+        //    public string listSort = null;
+        //    public string listTrim = null;
+        //    public bool direct = false;
+        //    public string rawfood = null;
+        //    public P p = null;
+        //    public void Exe()
+        //    {
+        //        if (this.direct)
+        //        {
+        //            //Here, we get the elements from the raw text ('rawfood'), and handle them a bit like
+        //            //listfiles, #(listfile ...).
+        //            //If needed, LIST<direct> could be made more general, allowing all sorts of characters.
+        //            List<string> input = new List<string>();
+        //            string[] ss = rawfood.Split(',');
+        //            input.AddRange(ss);
+        //            List<string> result = new List<string>();
+        //            GetRawListElements(null, input, result);
+        //            this.listItems = result;
+        //        }
 
-                if (listPrefix != null)
-                {
-                    for (int i = 0; i < this.listItems.Count; i++)
-                    {
-                        this.listItems[i] = listPrefix + this.listItems[i];
-                    }
-                }
-                if (listSuffix != null)
-                {
-                    for (int i = 0; i < this.listItems.Count; i++)
-                    {
-                        this.listItems[i] = this.listItems[i] + listSuffix;
-                    }
-                }
-                if (listStrip != null)
-                {
-                    //Maybe a STRIPPREFIX, STRIPSUFFIX could be practical, using StartsWith()/EndsWith()
-                    for (int i = 0; i < this.listItems.Count; i++)
-                    {
-                        //Case-insensitive replacing
-                        this.listItems[i] = G.ReplaceString(this.listItems[i], listStrip, "", false);
-                    }
-                }
+        //        if (listPrefix != null)
+        //        {
+        //            for (int i = 0; i < this.listItems.Count; i++)
+        //            {
+        //                this.listItems[i] = listPrefix + this.listItems[i];
+        //            }
+        //        }
+        //        if (listSuffix != null)
+        //        {
+        //            for (int i = 0; i < this.listItems.Count; i++)
+        //            {
+        //                this.listItems[i] = this.listItems[i] + listSuffix;
+        //            }
+        //        }
+        //        if (listStrip != null)
+        //        {
+        //            //Maybe a STRIPPREFIX, STRIPSUFFIX could be practical, using StartsWith()/EndsWith()
+        //            for (int i = 0; i < this.listItems.Count; i++)
+        //            {
+        //                //Case-insensitive replacing
+        //                this.listItems[i] = G.ReplaceString(this.listItems[i], listStrip, "", false);
+        //            }
+        //        }
 
-                if (G.Equal(listSort, "yes"))  //listSort = null is okay in G.equal()
-                {
-                    //TODO: What about strings starting with "-"?
-                    //TODO: What about æøå strings, what happens??
-                    this.listItems.Sort(StringComparer.OrdinalIgnoreCase);
-                }
+        //        if (G.Equal(listSort, "yes"))  //listSort = null is okay in G.equal()
+        //        {
+        //            //TODO: What about strings starting with "-"?
+        //            //TODO: What about æøå strings, what happens??
+        //            this.listItems.Sort(StringComparer.OrdinalIgnoreCase);
+        //        }
 
-                if (G.Equal(listTrim, "yes"))  //listTrim = null is okay in G.equal()
-                {
-                    //Todo: if it has just been sorted, trimming is easy. But we do it the general way here.
-                    GekkoDictionary<string, bool> xx = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-                    List<string> newList = new List<string>();
-                    foreach (string s in this.listItems)
-                    {
-                        if (xx.ContainsKey(s))
-                        {
-                            //ignore
-                        }
-                        else
-                        {
-                            newList.Add(s);
-                            xx.Add(s, true);
-                        }
-                    }
-                    this.listItems = newList;
-                }
+        //        if (G.Equal(listTrim, "yes"))  //listTrim = null is okay in G.equal()
+        //        {
+        //            //Todo: if it has just been sorted, trimming is easy. But we do it the general way here.
+        //            GekkoDictionary<string, bool> xx = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        //            List<string> newList = new List<string>();
+        //            foreach (string s in this.listItems)
+        //            {
+        //                if (xx.ContainsKey(s))
+        //                {
+        //                    //ignore
+        //                }
+        //                else
+        //                {
+        //                    newList.Add(s);
+        //                    xx.Add(s, true);
+        //                }
+        //            }
+        //            this.listItems = newList;
+        //        }
 
-                Program.PutListIntoListOrListfile(this.listItems, this.name, this.listFile);
+        //        Program.PutListIntoListOrListfile(this.listItems, this.name, this.listFile);
 
-            }
+        //    }
 
 
 
-            public static void Q(string s)
-            {
-                Program.WriteListItems(s);
-            }
-        }
+        //    public static void Q(string s)
+        //    {
+        //        Program.WriteListItems(s);
+        //    }
+        //}
 
         public class Genr
         {
@@ -9567,3 +9791,4 @@ namespace Gekko
         }        
     }
 }
+
