@@ -177,8 +177,17 @@ namespace Gekko.Parser.Gek
             string csCode = s.ToString();
             string csMethods = null;
 
+            DateTime dt = DateTime.Now;
             //#8750932875984325
-            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods);
+            if (Program.options.system_code_split > 0) CodeSplit(ref csCode, ref csMethods, "C");
+
+            string csCode2 = wh2.headerCs.ToString(); string csMethods2 = "";
+            if (Program.options.system_code_split > 0) CodeSplit(ref csCode2, ref csMethods2, "CC");
+
+            if (Program.options.system_code_split > 0 && Globals.showTimings && !G.IsUnitTesting())
+            {
+                G.Writeln("Splitting took " + (DateTime.Now - dt).TotalMilliseconds / 1000d + "s", Color.Gray);
+            }
 
             StringBuilder s2 = new StringBuilder();
             s2.AppendLine("using System;");
@@ -189,24 +198,18 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
             s2.AppendLine("namespace Gekko");
             s2.AppendLine("{");
-
+            
             s2.AppendLine("public class TranslatedCode");
             s2.AppendLine("{");
 
             s2.AppendLine("public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;");
             s2.AppendLine("public static int " + Globals.labelCounter + ";");
-            s2.Append(wh2.headerCs);
-
-            s2.AppendLine("public static void ClearTS(P p) {");
-            s2.Append(wh2.headerMethodTsCs);
-            s2.AppendLine("}");
-
-            s2.AppendLine("public static void ClearScalar(P p) {");
-            s2.Append(wh2.headerMethodScalarCs);
-            s2.AppendLine("}");
 
             s2.AppendLine(csMethods);  //definitions of C1(), C2(), etc. -- may be empty
+            s2.AppendLine(csMethods2);  //definitions of CC1(), CC2(), etc. -- may be empty
 
+            s2.AppendLine(csCode2);
+            
             s2.Append(wh2.headerExpressions);  //definitions of GekkoExpression1(), ...
 
             s2.AppendLine("public static void CodeLines(P p)");
@@ -214,10 +217,9 @@ namespace Gekko.Parser.Gek
             s2.AppendLine(Globals.gekkoSmplInit);
             //The generated code, but much of it may be in codeCi
             s2.AppendLine(csCode);
-
+            
             s2.AppendLine("}");  //method CodeLines()
             s2.AppendLine("}");  //class TranslatedCode
-
             s2.AppendLine("}");  //namespace Gekko            
 
             ch2.code = s2.ToString().Replace("`", Globals.QT);
@@ -467,106 +469,209 @@ namespace Gekko.Parser.Gek
         //    return ch2;
         //}
 
-        private static void CodeSplit(ref string csCode, ref string csMethods)
+        private static int FindEndMarker(List<string> lines, int i, GekkoDictionary<string, string> controlVars, List<string> markers)
         {
-            List<string> csLines = G.ExtractLinesFromText(csCode);
+            //findes suitable end marker if it exists for the command
+            string id = lines[i].Substring(Globals.splitStart.Length);                        
+            for (int j = i + 1; j < lines.Count; j++)
+            {                                
+                FindEndMarkerHelper(lines, controlVars, j, markers);
+                
+                if (lines[j].StartsWith(Globals.splitEnd))
+                {
+                    string id2 = lines[j].Substring(Globals.splitEnd.Length);
+                    if (id == id2) return j;
+                    else return -12345;
+                }
+                if (lines[j].StartsWith(Globals.splitBit))
+                {
+                    return -12345;
+                }
+            }
+            return -12345;
+        }
+
+        private static void FindEndMarkerHelper(List<string> lines, GekkoDictionary<string, string> controlVars, int j, List<string> markers)
+        {
+            //Looks for control variables that must be used as args in C() and CC() methods
+                        
+            foreach (string s in markers)
+            {
+                int ii = 0;
+                while (ii != -1)
+                {
+                    ii = lines[j].IndexOf(s, ii, StringComparison.Ordinal);
+                    if (ii != -1)
+                    {
+                        //this is a bit slow, but control vars are rare
+                        for (int ii2 = ii + s.Length; ii2 < lines[j].Length + 1; ii2++)
+                        {
+                            if (ii2 == lines[j].Length)
+                            {
+                                //if ii2 == lines[j].Length, the number ends with a newline
+                                //see below
+                                string sub = lines[j].Substring(ii, ii2 - ii);
+                                if (!controlVars.ContainsKey(sub)) controlVars.Add(sub, "");                                
+                                break;
+                            }
+                            else if (!char.IsNumber(lines[j][ii2]))
+                            {
+                                //see above
+                                string sub = lines[j].Substring(ii, ii2 - ii);
+                                if (!controlVars.ContainsKey(sub)) controlVars.Add(sub, "");
+                                break;
+                            }
+                        }
+                        ii++;  //to get it moving, in principle it could move further but oh well: IndexOf is fast anyway
+                    }
+                }
+            }
+        }
+
+        private static void CodeSplit(ref string csCode, ref string csMethods, string type)
+        {
+            //Experiment (seconds/lines), using this kind of file:
+            //
+            //------------------------------------------
+            //time 2000 2020;
+            //x = 0;
+            //tell'Start';
+            //x = x + x - x + x - x + x - x + 1;
+            // ...
+            // ...
+            //x = x + x - x + x - x + x - x + 1;
+            //p < 2010 2011 > x;
+            //------------------------------------------
+            //
+            //There is about 1s deadweight.
+            //
+            //Using split = 10, we get --> 3.67 (1000), 5.59 (2000), 10.64 (4000), 20.76 (8000)
+            //Using split =  0, we get --> 4.69 (1000), 11.22 (2000), 36.30 (4000), 171.12 (8000)
+            //
+            //Both are out of RAM on 16000 lines
+            //
+            List<string> lines = G.ExtractLinesFromText(csCode);
+            int nGoal = lines.Count;  //check that no lines are forgotten
+            int nExtra = 0;
             List<string> tempHelperForMethodsCs = new List<string>();  //temp storage  
             List<string> mainCs = new List<string>();  //this is the rest                      
-            List<string> methodsCs = new List<string>();  //this is the rest                      
+            List<string> methodsCs = new List<string>();  //this is the rest
 
-            int state = 0;            
-            int nCi = 0; //The Ci number            
-            int counterComments = 0; //These are skipped and counted           
-            int counterExtra = 0;  //This is extra lines in Ci-definitions etc.
+            List<string> markers = new List<string>(); markers.Add(Globals.forLoopName); markers.Add(Globals.functionArgName);
 
-            int commandCounter = 0;
-            int commandState = 0;
+            //a valid block is like this:
+            //    [[commandStart]]117, where 117 is a number
+            //        ......
+            //    [[commandEnd]]117, where 117 is a number
+            //    [[commandStart]]118, where 118 is a number
+            //        ......
+            //    [[commandEnd]]118, where 118 is a number
+            //Between Start and End there can be no lines starting with "[[command"            
+            //This may go on, until the above rule breaks, or for instance 126, that is, 10 commands. Then there is a FLUSH
+            //
 
-            //int i = 0;
-            foreach (string line in csLines)
+            int ciCounter = 0;
+            
+            for (int i = 0; i < lines.Count; i++)
             {
-                //i++;
-                //if (i == 120)
-                //{
+                string line = lines[i];
 
-                //}
-                if (line.StartsWith(Globals.splitSTART2))
+                if (lines[i].StartsWith(Globals.splitStart))
                 {
-                    if (state == 1)  //should alternate
+                    GekkoDictionary<string, string> controlVars = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    int j = FindEndMarker(lines, i, controlVars, markers);
+                    if (j != -12345)
                     {
-                        G.Writeln2("*** ERROR: Codesplitting, state 1");
-                        throw new GekkoException();
-                    }
-                    state = 1;
-                    counterComments++;
-                    continue;
-                }
-                else if (line.StartsWith(Globals.splitSTOP2))
-                {
-                    if (state == 2)  //should alternate
-                    {
-                        G.Writeln2("*** ERROR: Codesplitting, state 2");
-                        throw new GekkoException();
-                    }
-                    state = 2;
-                    //adds a Ci() line instead of the comment, so counterComments is not touched
-                    CodeSplitFlush(tempHelperForMethodsCs, mainCs, methodsCs, ref nCi, ref counterExtra);
-                    continue;
-                }
-                else if (line.StartsWith(Globals.splitCommandBlockStart))
-                {
-                    if (commandState == 100)  //should alternate
-                    {
-                        G.Writeln2("*** ERROR: Codesplitting, state 100");
-                        throw new GekkoException();
-                    }
-                    commandState = 100;
-                    commandCounter++;
-                    
-                    if (commandCounter >= Program.options.system_code_split)  //this will put at most that amount of commands inside each Ci()
-                    {
-                        //adds a Ci() line instead of the comment, so counterComments is not touched
-                        CodeSplitFlush(tempHelperForMethodsCs, mainCs, methodsCs, ref nCi, ref counterExtra);
-                        commandCounter = 0;
-                    }
-                    else
-                    {
-                        counterComments++;
+                        //now we know that there is an ok command starting at i and ending at j
+                        //see if we can find more of these
+                                                
+                        for (int k = 0; k < Program.options.system_code_split; k++)
+                        {
+                            int j6 = j;
+                            for (int i6 = j + 1; i6 < lines.Count; i6++)
+                            {
+                                string temp = lines[i6].Trim();
+                                if (temp == "" || temp == ";" || temp.StartsWith("//"))
+                                {
+                                    //fine
+                                    j6 = i6;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            
+                            if (j6 < lines.Count &&  lines[j6].StartsWith(Globals.splitStart))
+                            {
+                                int j2 = FindEndMarker(lines, j6, controlVars, markers);
+                                if (j2 == -12345) break;
+                                else j = j2;
+                            }
+                            else break;
+                        }
+
+                        //now j is pointing to the end of a valid block of max commands, without control variables
+                        if (true)
+                        {
+                            string s1 = null;
+                            string s2 = null;
+                            foreach (string s in controlVars.Keys)
+                            {                                
+                                s1 = s1 + ", ref " + s; //must allow a new object to be returned via an argument
+                                s2 = s2 + ", ref " + "IVariable " + "x" + s; //must allow a new object to be returned via an argument
+                            }
+                            
+                            methodsCs.Add("public static void " + type + "" + ciCounter + "(GekkoSmpl smpl, P p" + s2 + ") {");
+
+                            foreach (string s in controlVars.Keys)
+                            {
+                                //Otherwise you get this error: CS1628: Cannot use in ref or out parameter 'parameter' inside an anonymous method, lambda expression, or query expression
+                                methodsCs.Add("IVariable " + s + " = " + "x" + s + ";" + G.NL);
+                                nExtra++;                          
+                            }
+
+                            nExtra++;
+                            for (int ii = i; ii <= j; ii++)
+                            {
+                                methodsCs.Add(lines[ii]);                                
+                            }
+
+                            foreach (string s in controlVars.Keys)
+                            {
+                                //Otherwise you get this error: CS1628: Cannot use in ref or out parameter 'parameter' inside an anonymous method, lambda expression, or query expression
+                                methodsCs.Add("x" + s + " = " + s + ";" + G.NL);
+                                nExtra++;
+                            }
+
+                            methodsCs.Add("}");
+                            nExtra++;
+                            mainCs.Add("" + type + "" + ciCounter + "(smpl, p" + s1 + ");");
+                            nExtra++;
+                            i = j; ciCounter++;
+                            continue;
+                        }
                     }                    
-                    continue;
-                }
-                else if (line.StartsWith(Globals.splitCommandBlockEnd))
-                {
-                    if (commandState == 200)  //should alternate
-                    {
-                        G.Writeln2("*** ERROR: Codesplitting, state 200");
-                        throw new GekkoException();
-                    }
-                    commandState = 200;                    
-                    counterComments++;
-                    continue;
-                }
-                else
-                {
-                    if (state == 0 || state == 2)
-                    {
-                        //Not allowed to put into Ci()
-                        mainCs.Add(line);
-                    }
-                    else if (state == 1)
-                    {
-                        //Allowed to put into Ci()
-                        tempHelperForMethodsCs.Add(line);
-                    }
-                }
+                }                
+                mainCs.Add(lines[i]);                
             }
-            if (csLines.Count + counterExtra - counterComments - mainCs.Count - methodsCs.Count  != 0)
+
+            if (nGoal != mainCs.Count + methodsCs.Count - nExtra)
             {
-                G.Writeln2("*** ERROR: Codesplitting");
+                //Sanity check that nothing is forgotten
+                G.Writeln2("*** ERROR: Technical issue with code-splitting, please use OPTION system code split = 0");
                 throw new GekkoException();
             }
+
             csCode = G.ExtractTextFromLines(mainCs).ToString();
-            csMethods = G.ExtractTextFromLines(methodsCs).ToString();            
+            csMethods = G.ExtractTextFromLines(methodsCs).ToString();
+
+            // -------------------------------------
+            // -------------------------------------
+            // -------------------------------------
+
+            
+            
         }
 
         private static void CodeSplitFlush(List<string> tempHelperForMethodsCs, List<string> mainCs, List<string> methodsCs, ref int nCi, ref int counterExtra)

@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "";
 
+        public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTFUNCTIONNAKED", "" }, { "ASTPROCEDURE", "" }, { "ASTDOTORINDEXER", "" }, { "ASTFUNCTION", "" } };
+        
         public static bool fixLookup = true;
 
         public static bool useIndexerAlone = false;
@@ -94,13 +96,18 @@ namespace Gekko
         public static Dictionary<string, string> parenthesesInvert = new Dictionary<string, string> { { ")", "(" }, { "]", "[" }, { "}", "{" } };
         public static string comma = ";";
 
+        public static string splitStart = "//[[commandStart]]";
+        public static string splitBit = "//[[command";
+        public static string splitSpecial = "//[[commandSpecial]]";
+        public static string splitEnd = "//[[commandEnd]]";
+
         public static string artificial = "artificial_parent_at_the_top_of_the_node_tree";
 
         public static bool newSplit = true;
-        public static string splitSTART2 = "//[[splitSTART]]";
-        public static string splitSTOP2 = "//[[splitSTOP]]";
-        public static string splitSTART = G.NL + splitSTART2 + G.NL;        
-        public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
+        //public static string splitSTART2 = "//[[splitSTART]]";
+        //public static string splitSTOP2 = "//[[splitSTOP]]";
+        //public static string splitSTART = G.NL + splitSTART2 + G.NL;        
+        //public static string splitSTOP = G.NL + splitSTOP2 + G.NL;
         public static string functionParameterCode = "param_";
 
         public static Func<double, double, double>[] arithmentics = new Func<double, double, double>[20];
@@ -131,15 +138,15 @@ namespace Gekko
 
         public static int graphBackground = 255; //221 before
         
-        public static string splitCommandBlockStart = "//[[commandStart]]";
-        public static string splitCommandBlockEnd = "//[[commandEnd]]";
+        //public static string splitCommandBlockStart = "//[[commandStart]]";
+        //public static string splitCommandBlockEnd = "//[[commandEnd]]";
 
         public const string brandNewFile = "brand new file";
 
         public const string bankNumberiName = "bankNumber";
         public const string bankNumberiMax = "1";
 
-        public static bool showTimings = false;  //use comand TIMINGS
+        public static bool showTimings = true;  //use comand TIMINGS
 
         
         
@@ -233,10 +240,13 @@ namespace Gekko
         //public static bool useTestParser = true;  //for debugging, use trial parser        
         public static bool substituteAssignVars = false;
 
-        public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
+        public const string forLoopName = "forloop_xe7dke6cj_";  //collision probability = 0
+        public const string functionArgName = "functionarg_xf7dke8cj_";  //collision probability = 0
+
+        //public static string clearTsCsCode = "ClearTS(p);";  //so it is easier to track the location of these
 
         //Must be near the top of Globals.cs
-        
+
         public static int counter = 0;  //used when emitting C# code to avoid name collisions
                 
         public static string startGekkoTimeIteratorCode = "{" + G.NL + "  t = t2; " + G.NL;

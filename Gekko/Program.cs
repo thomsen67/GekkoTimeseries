@@ -17292,8 +17292,15 @@ namespace Gekko
                     }
                     catch
                     {
-                        //do nothing, we then have to parse the file
-                        Program.model.modelInfo.loadedFromMdlFile = false;
+                        if (G.IsUnitTesting())
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            //do nothing, we then have to parse the file
+                            Program.model.modelInfo.loadedFromMdlFile = false;
+                        }
                     }
                 }
             }

@@ -17778,6 +17778,7 @@ namespace UnitTests
             //Remember that the check is < deltaAbs OR < deltaRel.
             foreach (string s in First().storage.Keys)
             {
+                if (G.Chop_HasSigil(s)) continue;
                 foreach (string ss in ignore)
                 {
                     if (G.Equal(s, ss)) goto Flag;

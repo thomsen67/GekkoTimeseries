@@ -1192,14 +1192,14 @@ namespace Gekko
                 endo.Sort(StringComparer.InvariantCulture);
                 all.Sort(StringComparer.InvariantCulture);
                                 
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(exod.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(exoj.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(exoz.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(exodjz.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(exo.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(exotrue.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(endo.ToArray())));
-                Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(all.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(exod.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(exoj.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(exoz.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(exodjz.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(exo.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(exotrue.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(endo.ToArray())));
+                Program.databanks.GetGlobal().AddIVariableWithOverwrite(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(all.ToArray())));
                 
                 List<string> files = new List<string>();
                 files.Add("exod");
