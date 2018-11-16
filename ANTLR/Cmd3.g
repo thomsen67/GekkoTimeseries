@@ -1226,6 +1226,7 @@ Y2                    = 'Y2'                       ;
     SIMPLE = 'SIMPLE';
     SKIP            = 'SKIP';
 	NAN            = 'NAN';
+	ENGINE = 'ENGINE';
 	NORMAL            = 'NORMAL';
     SMOOTH = 'SMOOTH';
     SOLVE            = 'SOLVE'           ;
@@ -1803,6 +1804,7 @@ d.Add("Y" ,Y);
                                         d.Add("SIMPLE" ,SIMPLE);
                                         d.Add("skip"          , SKIP      );
 										d.Add("nan"          , NAN      );
+										d.Add("engine"          , ENGINE      );
 										d.Add("normal"          , NORMAL      );
                                         d.Add("smooth", SMOOTH);
                                         d.Add("solve"   , SOLVE     );
@@ -3078,7 +3080,7 @@ run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, input
                           // This is SHEET<import> or SHEET<2010 2015 import>.
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
 						  // We also have a SHEET without import, see the prt rule
-sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^({token("ASTSHEETIMPORT", ASTSHEETIMPORT, input.LT(1).Line)} sheetImportOpt1 ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
+sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^({token("ASTSHEETIMPORT", ASTSHEETIMPORT, input.LT(1).Line)} ^(ASTPLACEHOLDER sheetImportOpt1) ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
 sheetImportOpt1           : ISNOTQUAL
 						  | leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
 						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
@@ -3361,7 +3363,7 @@ optionType:
              | FOLDER WORKING '='? fileName ->  FOLDER WORKING ^(ASTSTRINGSIMPLE fileName)
 
 			 | FREQ question -> FREQ question
-             | FREQ '='? optionFreq -> FREQ ^(ASTSTRINGSIMPLE optionFreq)
+             | FREQ '='? name -> FREQ ^(ASTSTRINGSIMPLE name)
 
 			 | GAMS TIME DETECT AUTO '='? yesNoSimple -> GAMS TIME DETECT AUTO ^(ASTBOOL yesNoSimple)
 			 | GAMS EXE FOLDER '='? fileName -> GAMS EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
@@ -3450,6 +3452,7 @@ optionType:
 			 | SERIES DATA TABLE MISSING '=' optionSeriesMissing -> SERIES DATA TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
 			 			 
 			 | SHEET question -> SHEET question
+			 | SHEET ENGINE '='? optionSheetEngine -> SHEET ENGINE ^(ASTSTRINGSIMPLE optionSheetEngine)
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT LEV '='? yesNoSimple -> SHEET MULPRT LEV ^(ASTBOOL yesNoSimple)
@@ -3562,6 +3565,7 @@ optionSolveForwardMethodOptions : STACKED | FAIR | NFAIR | NONE ;
 optionSolveForwardTerminalOptions : EXO | CONST | GROWTH ;
 optionSolveForwardTerminalfeedOptions : INTERNAL | EXTERNAL;
 optionSeriesMissing : ERROR | M | ZERO | SKIP;
+optionSheetEngine: EXCEL | INTERNAL;
 
 
 // ------------------------------------------------------------------------------------------------------------------
@@ -4127,6 +4131,7 @@ ident2: 					Ident |
   SIZE|
   SKIP|
   NAN|
+  ENGINE|
   NORMAL|
   SOLVE|
   SOME|
@@ -4544,6 +4549,7 @@ ident3: 					Ident |
   SIZE|
   SKIP|
   NAN|
+  ENGINE|
   NORMAL|
   SOLVE|
   SOME|

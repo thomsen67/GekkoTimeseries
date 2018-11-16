@@ -14608,28 +14608,35 @@ namespace UnitTests
                     ReadFormatsHelper("a", bank);
                 }
                 // ------ xlsx
-                if (bank == null)
+                for (int i = 0; i < 2; i++)
                 {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<xlsx>temp;");
-                    I("RESET;");
-                    I("READ<xlsx>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                // ------ xlsx, selection
-                {
-                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET;");
-                    I("READ<xlsx>temp;");
-                    ReadFormatsHelper("a", bank);
-                }
-                if (Globals.UNITTESTFOLLOWUP_important)
-                {
+                    if (bank == null)
+                    {
+                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx>temp;");
+                        I("RESET;");
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+                    // ------ xlsx, selection
+                    {
+                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                        I("RESET;");
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("a", bank);
+                    }
+
                     // ------ xlsx cells with SHEET                
                     {
                         I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
                         if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
                         I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
                         I("RESET;");

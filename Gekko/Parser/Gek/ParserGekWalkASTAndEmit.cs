@@ -5256,12 +5256,11 @@ namespace Gekko.Parser.Gek
                     case "ASTSHEETIMPORT":
                         {
                             node.Code.A("O.SheetImport o" + Num(node) + " = new O.SheetImport();" + G.NL);
-                            node.Code.A(node.GetChildCode(0).ToString());
-                            node.Code.A(node.GetChildCode(1).ToString());
-                            node.Code.A(node.GetChildCode(2).ToString());
-                            node.Code.A(node.GetChildCode(3).ToString());
-                            node.Code.A(node.GetChildCode(4).ToString());
-                            node.Code.A("o" + Num(node) + ".names = " + node[5].Code + ";" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);
+                            //GetCodeFromAllChildren(node, node[1]);
+                            //node.Code.A("o" + Num(node) + ".fileName = " + node[1].Code + ";" + G.NL);
+                            node.Code.A(node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names = " + node[2].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

@@ -166,6 +166,7 @@ Additionally, there are model, solve, equation options.
 
         // -------- new options regarding missings end ---------------------
 
+        public string sheet_engine = "internal";
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
         public bool sheet_mulprt_pch = false;  //q
@@ -229,7 +230,7 @@ Additionally, there are model, solve, equation options.
         public bool solve_print_details = false;
         public bool solve_print_iter = false;
         public bool solve_static = false;
-        public int system_code_split = 2; //20 seems good
+        public int system_code_split = 20; //20 seems good
 
         public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
         public string table_decimalseparator = "period";  //comma|period
