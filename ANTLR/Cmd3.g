@@ -937,6 +937,7 @@ Y2                    = 'Y2'                       ;
 	PX = 'PX';
 	ARRAY = 'ARRAY';
 	BUGFIX = 'BUGFIX';
+	GCM = 'GCM';
     COLORS           = 'COLORS'          ;
     COLS             = 'COLS';
     COMMA            = 'COMMA';
@@ -1510,6 +1511,7 @@ d.Add("Y" ,Y);
 										d.Add("px"  , PX );
 										d.Add("array"  , ARRAY );
 										d.Add("bugfix"  , BUGFIX );
+										d.Add("gcm"  , GCM );
                                         d.Add("collapse"  , COLLAPSE );										
                                         d.Add("colors"  , COLORS );
                                         d.Add("cols"  , COLS );
@@ -3267,9 +3269,10 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
-						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
-						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
-						    ;
+						  | GCM EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
+						  | GCM -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
+						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // RESET
@@ -3864,6 +3867,7 @@ ident2: 					Ident |
   BOXGAP|
   BOXWIDTH|
   BUGFIX|
+  GCM|
   BY|
   CACHE|
   CALC|
@@ -4286,6 +4290,7 @@ ident3: 					Ident |
   BOXGAP|
   BOXWIDTH|
   BUGFIX|
+  GCM|
   BY|
   CACHE|
   CALC|

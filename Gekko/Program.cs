@@ -22401,7 +22401,7 @@ namespace Gekko
                 if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                 else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
-                return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format);
+                return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"));
             }
             else if (G.Equal(o.opt_gnuplot, "yes"))
             {
@@ -22422,7 +22422,7 @@ namespace Gekko
                 WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq);
                 return 0;
             }
-            else if (o.opt_series != null)
+            else if (o.opt_gcm != null)
             {
                 //RECORDS
                 if (fileName == null || fileName.Trim() == "")
@@ -22431,7 +22431,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
-                Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_series, fileName);
+                Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_gcm, fileName);
                 return 0;
             }
             else if (o.opt_gdx != null)
@@ -22490,7 +22490,7 @@ namespace Gekko
             else if (G.Equal(o.opt_gnuplot, "yes")) writeType = EWriteType.Gnuplot;
             else if (G.Equal(o.opt_prn, "yes")) writeType = EWriteType.Prn;
             else if (G.Equal(o.opt_r, "yes")) writeType = EWriteType.R;
-            else if (G.Equal(o.opt_series, "yes")) writeType = EWriteType.Series;
+            else if (G.Equal(o.opt_gcm, "yes")) writeType = EWriteType.Series;
             else if (G.Equal(o.opt_tsd, "yes")) writeType = EWriteType.Tsd;
             else if (G.Equal(o.opt_tsdx, "yes")) writeType = EWriteType.Tsdx;
             else if (G.Equal(o.opt_tsp, "yes")) writeType = EWriteType.Tsp;
@@ -23463,7 +23463,285 @@ namespace Gekko
             return;
         }
 
-        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
+        private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format, bool cols)
+        {
+            int prnWidth = 18;
+            //Databank first = Program.databanks.GetFirst();
+
+            int i = 1;
+            int j = 1;
+            TableLight tab = new TableLight();
+
+            if (format == EdataFormat.Csv)
+            {
+                G.Writeln2("Writing csv file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
+                filename = AddExtension(filename, ".csv");
+            }
+            else if (format == EdataFormat.Prn)
+            {
+                G.Writeln2("Writing prn file for the period " + G.FromDateToString(per1) + "-" + G.FromDateToString(per2));
+                filename = AddExtension(filename, ".prn");
+            }
+
+            string pathAndFilename = CreateFullPathAndFileName(filename);
+            int counter = 0;
+            if (true)
+            {
+                //Writing to csv/prn file                              
+
+                if (format == EdataFormat.Prn)
+                {
+                    //file.Write(G.varFormat("name", prnWidth));
+
+                    if (cols)
+                    {
+                        tab.Add(i, j, new CellLight(G.varFormat("date", prnWidth))); j++;
+                    }
+                    else
+                    {
+                        tab.Add(i, j, new CellLight(G.varFormat("name", prnWidth))); j++;
+                    }
+                }
+                else
+                {
+                    tab.Add(i, j, new CellLight("")); j++;  //empty cell
+                }
+                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                {
+                    if (format == EdataFormat.Csv)
+                    {
+                        //file.Write(";" + t.ToString());
+                        tab.Add(i, j, new CellLight(t.ToString())); j++;
+                    }
+                    else
+                    {
+                        //file.Write(G.varFormat(" " + t.ToString(), prnWidth));  //both prn and gnuplot
+                        tab.Add(i, j, new CellLight(G.varFormat(" " + t.ToString(), prnWidth))); j++;
+                    }
+                }
+                //file.WriteLine();
+                i++;
+
+                               
+
+
+                //foreach (ToFrom var in vars)
+                //{
+                //    j = 1;
+                //    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                //    Series ts = iv as Series;
+                //    if (ts == null)
+                //    {
+                //        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
+                //        G.Writeln2("*** ERROR: Variable " + var.s1 + " of wrong type");
+                //        throw new GekkoException();
+                //    }
+
+                //    GekkoTime tsStart = ts.GetPeriodFirst();
+                //    GekkoTime tsEnd = ts.GetPeriodLast();
+
+                //    counter++;
+                //    string temp = G.Chop_GetName(var.s2);
+                //    if (format == EdataFormat.Csv) file.Write(temp);
+                //    else file.Write(G.varFormat(temp, prnWidth));  //prn and gnuplot
+                //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                //    {
+                //        if (format == EdataFormat.Csv) file.Write(";");
+                //        double data = ts.GetData(null, t);
+                //        if (G.isNumericalError(data))
+                //        {
+                //            if (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd))
+                //            {
+                //                if (format == EdataFormat.Csv) file.Write(""); //write nothing, indicates out-of-sample
+                //                else file.Write(G.varFormat(" \"\"", prnWidth)); //write "", indicates out-of-sample
+                //            }
+                //            else
+                //            {
+                //                string s = HandleFunnyNumbers(format == EdataFormat.Csv);
+                //                if (format == EdataFormat.Csv) file.Write(s);
+                //                else file.Write(G.varFormat(s, prnWidth));
+                //            }
+                //        }
+                //        else
+                //        {
+                //            string s = null;
+                //            if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+                //            {
+                //                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
+                //            }
+                //            else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                //            {
+                //                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
+                //            }
+                //            else
+                //            {
+                //                G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
+                //                throw new GekkoException();
+                //            }
+                //            if (format == EdataFormat.Csv)
+                //            {
+                //                if (data < 0) file.Write(s);
+                //                else file.Write(" " + s);
+                //            }
+                //            else
+                //            {
+                //                //prn and gnuplot
+                //                if (data < 0) file.Write(G.varFormat(s, prnWidth));
+                //                else file.Write(G.varFormat(" " + s, prnWidth));
+                //            }
+                //        }
+                //    }
+                //    file.WriteLine();
+                //}
+
+                
+
+
+                foreach (ToFrom var in vars)
+                {
+                    j = 1;
+                    string s3 = G.Chop_GetName(var.s2);
+                    
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                    Series ts = iv as Series;
+                    
+                    GekkoTime tsStart = ts.GetPeriodFirst();
+                    GekkoTime tsEnd = ts.GetPeriodLast();
+
+                    counter++;
+                    if (format == EdataFormat.Csv)
+                    {
+                        //file.Write(s3);
+                        tab.Add(i, j, new CellLight(s3)); j++;
+                    }
+                    else
+                    {
+                        //file.Write(G.varFormat(s3, prnWidth));  //prn and gnuplot
+                        tab.Add(i, j, new CellLight(G.varFormat(s3, prnWidth))); j++;
+                    }
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        //if (format == EdataFormat.Csv) file.Write(";");
+                        double data = ts.GetData(null, t);  //no lag or anything here, smpl can be null...?
+                        if (G.isNumericalError(data))
+                        {
+                            if (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd))
+                            {
+                                if (format == EdataFormat.Csv)
+                                {
+                                    //file.Write(""); //write nothing, indicates out-of-sample
+                                    tab.Add(i, j, new CellLight("")); j++;
+                                }
+                                else
+                                {
+                                    //file.Write(G.varFormat(" \"\"", prnWidth)); //write "", indicates out-of-sample
+                                    tab.Add(i, j, new CellLight(G.varFormat(" \"\"", prnWidth))); j++;
+                                }
+                            }
+                            else
+                            {
+                                string s = HandleFunnyNumbers(format == EdataFormat.Csv);
+                                if (format == EdataFormat.Csv)
+                                {
+                                    tab.Add(i, j, new CellLight(s)); j++;
+                                    //file.Write(s);
+                                }
+                                else
+                                {
+                                    //file.Write(G.varFormat(s, prnWidth));
+                                    tab.Add(i, j, new CellLight(G.varFormat(s, prnWidth))); j++;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string s = null;
+                            if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+                            {
+                                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
+                            }
+                            else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                            {
+                                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
+                                throw new GekkoException();
+                            }
+                            if (format == EdataFormat.Csv)
+                            {
+                                if (data < 0)
+                                {
+                                    //file.Write(s);
+                                    tab.Add(i, j, new CellLight(s)); j++;
+                                }
+                                else
+                                {
+                                    //file.Write(" " + s);
+                                    tab.Add(i, j, new CellLight(" " + s)); j++;
+                                }
+                            }
+                            else
+                            {
+                                //prn and gnuplot
+                                if (data < 0)
+                                {
+                                    //file.Write(G.varFormat(s, prnWidth));
+                                    tab.Add(i, j, new CellLight(G.varFormat(s, prnWidth))); j++;
+                                }
+                                else
+                                {
+                                    //file.Write(G.varFormat(" " + s, prnWidth));
+                                    tab.Add(i, j, new CellLight(G.varFormat(" " + s, prnWidth))); j++;
+                                }
+                            }
+                        }
+                    }
+                    //file.WriteLine();
+                    i++;
+                }
+
+                //file.Flush();
+            }
+
+            if (cols)
+            {
+                tab = tab.Transpose();
+            }
+
+            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (StreamWriter file = G.GekkoStreamWriter(fs))
+            {
+                for (int ii = 1; ii <= tab.GetRowMaxNumber(); ii++)
+                {
+                    if (ii == 1 && cols && format == EdataFormat.Prn) file.Write(" ");  //strange that this is necessary
+                    for (int jj = 1; jj <= tab.GetColMaxNumber(); jj++)
+                    {
+                        CellLight c = tab.Get(ii, jj);
+                        if (c.type == ECellLightType.None) continue;  //skip
+                        if (format == EdataFormat.Csv)
+                        {
+                            if (jj > 1) file.Write(";");
+                            file.Write(c.text);
+                        }
+                        else
+                        {
+                            file.Write(c.text);
+                        }
+                    }
+                    file.WriteLine();
+                }
+                file.Flush();
+            }
+
+            G.Writeln("Wrote " + counter + " variables to " + pathAndFilename);
+
+            return counter;
+        }
+
+
+        private static int CsvPrnWriteOLD(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat format)
         {
             int prnWidth = 18;
             //Databank first = Program.databanks.GetFirst();
