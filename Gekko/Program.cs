@@ -2861,7 +2861,16 @@ namespace Gekko
 
         public static void SheetImport(O.SheetImport o)
         {
-            List<string> listItems = O.Restrict(o.names, true, false, true, false);
+            List<string> listItems = null;
+
+            if (G.Equal(o.opt_matrix, "yes"))
+            {
+                listItems = O.Restrict(o.names, true, true, false, false);                
+            }
+            else
+            {
+                listItems = O.Restrict(o.names, true, false, true, false);
+            }
 
             string matrixName = null;
             if (G.Equal(o.opt_matrix, "yes"))
@@ -2964,13 +2973,8 @@ namespace Gekko
                     }
                 }
 
-                //Program.databanks.GetFirst().AddIVariableWithOverwrite(matrixName, mm);
+                O.AddIVariableWithOverwriteFromString(matrixName, mm);
 
-                //if (Program.scalars.ContainsKey(Globals.symbolCollection + matrixName))
-                //{
-                //    Program.scalars.Remove(Globals.symbolCollection + matrixName);
-                //}
-                //Program.scalars.Add(Globals.symbolCollection + matrixName, mm);
                 G.Writeln2("Matrix " + matrixName + " imported (" + rr + "x" + cc + ")");
             }
         }
@@ -27317,31 +27321,7 @@ namespace Gekko
 
             //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
 
-            // 1. 2003 (label)       
-            // 2. 2003q1            Q         
-            // 3. 2003m1                 M
-            // 4. 2003m2                 M      
-            // 5. 2003m3                 M
-            // 6. SUM3M                  Msum (only when 3 M above else empty)
-            // 7. 2003q2            Q           
-            // 8. 2003m4                 M
-            // 9. 2003m5                 M
-            //10. 2003m6                 M
-            //11. SUM3M                  Msum           
-            //12. 2003q3            Q
-            //13. 2003m7                 M
-            //14. 2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
-            //15. 2003m9                 M                            Msum is only shown if not touched by timefilter
-            //16. SUM3M                  Msum           
-            //17. 2003q4            Q          
-            //18. 2003m10                M
-            //19. 2003m11                M
-            //20. 2003m12                M
-            //21. SUM3M                  Msum
-            //22. SUM12M                 Msum                                 
-            //23. SUM4Q             Qsum           
-            //24. ANNUAL     A
-
+            
             //double[] dataMin = new double[containerExplode.Count];
             //double[] dataMax = new double[containerExplode.Count];
 
@@ -27459,6 +27439,33 @@ namespace Gekko
 
                 if (type == EPrintTypes.Plot) i++;
 
+                bool showAllFreqsEachYear = true;
+                if (type == EPrintTypes.Sheet) showAllFreqsEachYear = false;  //SHEET <2010q2 2010q3> should not show q1 and q3
+
+                // 1. 2003 (label)       
+                // 2. 2003q1            Q         
+                // 3. 2003m1                 M
+                // 4. 2003m2                 M      
+                // 5. 2003m3                 M
+                // 6. SUM3M                  Msum (only when 3 M above else empty)
+                // 7. 2003q2            Q           
+                // 8. 2003m4                 M
+                // 9. 2003m5                 M
+                //10. 2003m6                 M
+                //11. SUM3M                  Msum           
+                //12. 2003q3            Q
+                //13. 2003m7                 M
+                //14. 2003m8                 M                 <--------- if timefilter is 2003m2..2003m7, we consolidate in 2003m8:  "2003m2-2003m8    123.45"
+                //15. 2003m9                 M                            Msum is only shown if not touched by timefilter
+                //16. SUM3M                  Msum           
+                //17. 2003q4            Q          
+                //18. 2003m10                M
+                //19. 2003m11                M
+                //20. 2003m12                M
+                //21. SUM3M                  Msum
+                //22. SUM12M                 Msum                                 
+                //23. SUM4Q             Qsum           
+                //24. ANNUAL     A
 
 
                 //remember there is a label column which gets number 1

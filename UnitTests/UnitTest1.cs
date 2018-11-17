@@ -14509,7 +14509,7 @@ namespace UnitTests
             //tsd
             //csv
             //prn
-            //xls(x), also via SHEET            
+            //xls(x), also via SHEET (includes importing matrix)            
             //gnplot (only writing)
             //tsp... hmmm not done...
             //px (only reading)
@@ -14632,7 +14632,7 @@ namespace UnitTests
                         ReadFormatsHelper("a", bank);
                     }
 
-                    // ------ xlsx cells with SHEET                
+                    // ------ xlsx cells with SHEET and SHEET<import>               
                     {
                         I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
                         if (i == 0) I("OPTION sheet engine = internal;");
@@ -14642,6 +14642,14 @@ namespace UnitTests
                         I("RESET;");
                         I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
                         ReadFormatsHelper("a", bank);
+                        //
+                        // test matrix import
+                        //
+                        I("SHEET <2001 2002 IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
+                        _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
+                        _AssertMatrix(First(), "#m", 1, 2, 1002, sharedDelta);
+                        _AssertMatrix(First(), "#m", 2, 1, 3001, sharedDelta);
+                        _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
                     }
                 }
                 // ------ gnuplot (not actually testing the file)     
@@ -14740,33 +14748,43 @@ namespace UnitTests
                     ReadFormatsHelper("q", bank);
                 }
                 // ------ xlsx
-                if (bank == null)
+                for (int i = 0; i < 2; i++)
                 {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    I("WRITE<xlsx>temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<xlsx>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                // ------ xlsx, selection
-                {
-                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                    I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
-                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                    I("READ<xlsx>temp;");
-                    ReadFormatsHelper("q", bank);
-                }
-                if (Globals.UNITTESTFOLLOWUP_important)
-                {
-                    // ------ xlsx cells with SHEET
+                    if (bank == null)
                     {
                         I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                        I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx>temp;");
                         I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                        I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                        I("READ<xlsx>temp;");
                         ReadFormatsHelper("q", bank);
+                    }
+                    // ------ xlsx, selection
+                    {
+                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("q", bank);
+                    }
+
+                    // ------ xlsx cells with SHEET and SHEET<import>
+                    {
+                        if (Globals.UNITTESTFOLLOWUP_important)
+                        {
+                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                            if (i == 0) I("OPTION sheet engine = internal;");
+                            else I("OPTION sheet engine = excel;");
+                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                            I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                            I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                            ReadFormatsHelper("q", bank);
+                        }
                     }
                 }
                 // ------ gnuplot (not actually testing the file)
