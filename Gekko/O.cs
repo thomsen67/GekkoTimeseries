@@ -6330,7 +6330,7 @@ namespace Gekko
             public string opt_first = null;
             public string opt_ref = null;
             public string opt_array = null;
-            public string opt_ser = null;
+            public string opt_flat = null;
             public string type = null;  //read or import
 
             public P p = null;
@@ -6386,7 +6386,7 @@ namespace Gekko
                 if (G.Equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
                 if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
                 if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
-                if (G.Equal(this.opt_ser, "yes")) hlp.Type = EDataFormat.Ser;
+                if (G.Equal(this.opt_flat, "yes")) hlp.Type = EDataFormat.Flat;
                 if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
                 hlp.gdxopt = this.opt_gdxopt;
@@ -9712,6 +9712,7 @@ namespace Gekko
             public string opt_gnuplot= null;            
             public string opt_caps = null;
             public string opt_gcm = null;
+            public string opt_flat = null;
             public string opt_cols = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()

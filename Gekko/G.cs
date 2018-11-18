@@ -1861,6 +1861,18 @@ namespace Gekko
             return listfileName;
         }
 
+        public static int CountLines(string str)
+        {
+            //Just counting lines, fast, no splitting etc.
+            if (str == null) return 0;
+            if (str == string.Empty) return 0;
+            int index = -1;
+            int count = 0;
+            while (-1 != (index = str.IndexOf(G.NL, index + 1)))
+                count++;
+            return count + 1;
+        }
+
         public static void ServiceMessage(string s, P p)
         {
             if (p == null)

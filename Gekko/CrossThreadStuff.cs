@@ -507,8 +507,7 @@ namespace Gekko
                                 Globals.remoteExists = 1;
                                 //suddently pops into existence, then it MUST be run no matter stamps
                                 Globals.remoteFileStamp = dt;
-                                //Program.Run(remoteFile, new P());
-                                Gui.gui.StartThread("RUN " + remoteFile + "; ", true);
+                                RunRemoteFile(remoteFile);
 
                             }
                             else {
@@ -520,7 +519,7 @@ namespace Gekko
                                     //run it
                                     Globals.remoteFileStamp = dt;
                                     //Program.Run(remoteFile, new P());
-                                    Gui.gui.StartThread("RUN " + remoteFile + "; ", true);
+                                    RunRemoteFile(remoteFile);                                    
                                 }
                                 else
                                 {
@@ -550,6 +549,16 @@ namespace Gekko
                     }
                 }
             }
+        }
+
+        private static void RunRemoteFile(string remoteFile)
+        {
+            string s = Program.GetTextFromFileWithWait(remoteFile);
+            s = s.Trim();
+            //int i = G.CountLines(s);
+            //if (i == 1 && s.EndsWith(G.NL)) s = s.Substring(0, s.Length - G.NL.Length);
+            Gui.gui.StartThread(s, true);
+            //Gui.gui.StartThread("RUN " + remoteFile + "; ", true);
         }
 
         //weird delegate pattern, but it works!

@@ -146,7 +146,7 @@ namespace Gekko
         public const string bankNumberiName = "bankNumber";
         public const string bankNumberiMax = "1";
 
-        public static bool showTimings = true;  //use comand TIMINGS
+        public static bool showTimings = false;  //use comand TIMINGS
 
         
         

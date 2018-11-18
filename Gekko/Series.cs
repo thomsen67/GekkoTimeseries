@@ -501,6 +501,7 @@ namespace Gekko
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
+        //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
             double rv = double.NaN;
@@ -537,7 +538,10 @@ namespace Gekko
                 {
                     if (this.type == ESeriesType.Light)
                     {
-                        if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                        if (smpl != null)
+                        {
+                            if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
+                        }
                     }
                     goto End;  //out of bounds, we return a missing value (NaN)                    
                 }

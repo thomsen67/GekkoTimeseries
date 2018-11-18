@@ -594,7 +594,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_WINDOW;
     ASTOPT_STRING_XLS;
     ASTOPT_STRING_XLSX;
-	
+	ASTOPT_STRING_FLAT;
 	ASTOPT_VAL_WIDTH;
 	ASTOPT_VAL_DEC;
 	ASTOPT_VAL_NWIDTH;
@@ -3060,6 +3060,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
+						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
 						    ;
 
 							
@@ -3271,6 +3272,7 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
 						  | GCM EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
 						  | GCM -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
+						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
 						  ;						  
 

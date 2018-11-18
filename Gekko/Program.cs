@@ -299,6 +299,7 @@ namespace Gekko
     public enum EWriteType
     {
         Tsdx,
+        Flat,
         Gbk,
         Gdx,
         Gnuplot,
@@ -2195,9 +2196,9 @@ namespace Gekko
                     extension = "prn";
                     isGbk = false;
                 }
-                if (oRead.Type == EDataFormat.Ser)
+                if (oRead.Type == EDataFormat.Flat)
                 {
-                    extension = "ser";
+                    extension = "flat";
                     isGbk = false;
                 }
                 if (oRead.Type == EDataFormat.Xls)
@@ -2713,9 +2714,9 @@ namespace Gekko
             {
                 Program.ReadPxHelper(databankTemp, oRead, readInfo, file);
             }
-            else if (oRead.Type == EDataFormat.Ser)
+            else if (oRead.Type == EDataFormat.Flat)
             {
-                Program.ReadSer(databankTemp, readInfo, file);
+                Program.ReadFlat(databankTemp, readInfo, file);
             }
             else
             {
@@ -3945,7 +3946,7 @@ namespace Gekko
             }
         }
 
-        public static void ReadSer(Databank databank, ReadInfo readInfo, string fileLocal)
+        public static void ReadFlat(Databank databank, ReadInfo readInfo, string fileLocal)
         {
             
             // x1 2001 2004 10 m -20 30.0
@@ -6303,6 +6304,19 @@ namespace Gekko
             res.WriteLine();
         }
 
+        private static void WriteFlatRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, StringBuilder sb)
+        {
+            sb.Clear();
+            sb.Append(name).Append(" ").Append(per1.ToString()).Append(" ").Append(per2.ToString()).Append(" ");            
+            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+            {
+                double d = ts.GetData(null, t);
+                string s = d.ToString();
+                if (G.isNumericalError(d)) s = "m";
+                sb.Append(s).Append(" ");
+            }
+            res.WriteLine(sb);
+        }
 
         private static void WriteTspRecord(GekkoTime per1, GekkoTime per2, StreamWriter res, Series ts, string name, bool isCaps)
         {
@@ -22347,7 +22361,7 @@ namespace Gekko
             }
             
 
-            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes");
+            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes");
 
             //TODO TODO TODO
             //TODO TODO TODO
@@ -22419,7 +22433,7 @@ namespace Gekko
             {
                 //2D format
                 CheckSomethingToWrite(listFilteredForCurrentFreq);
-                WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq);
+                WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"));
                 return 0;
             }
             else if (o.opt_gcm != null)
@@ -22469,6 +22483,10 @@ namespace Gekko
                 {
                     return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
                 }
+                else if (writeType == EWriteType.Flat)
+                {
+                    return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                }
                 else
                 {
                     G.Writeln2("*** ERROR: Unknown databank format");
@@ -22496,6 +22514,7 @@ namespace Gekko
             else if (G.Equal(o.opt_tsp, "yes")) writeType = EWriteType.Tsp;
             else if (G.Equal(o.opt_xls, "yes")) writeType = EWriteType.Xls;
             else if (G.Equal(o.opt_xlsx, "yes")) writeType = EWriteType.Xlsx;
+            else if (G.Equal(o.opt_flat, "yes")) writeType = EWriteType.Flat;
             return writeType;
         }
 
@@ -22563,7 +22582,7 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> newList)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> newList, bool isCols)
         {
             G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
             //TODO: variables and time                
@@ -22575,6 +22594,7 @@ namespace Gekko
             eo.excelData = new double[numberOfRows, numberOfCols];
             eo.excelRowLabels = new string[numberOfRows, 1];
             eo.excelColumnLabels = new string[1, numberOfCols];
+            eo.transpose = "no"; if (isCols) eo.transpose = "yes"; //kind of a workaround
 
             for (int i = 0; i < newList.Count; i++)
             {
@@ -22908,6 +22928,76 @@ namespace Gekko
             }
             return count;
         }
+
+        public static int WriteFlat(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
+        {
+            if (databank.storage.Count == 0)
+            {
+                G.Writeln2("*** ERROR: Databank is empty");
+                throw new GekkoException();
+            }
+
+            file = G.StripQuotes(file);
+            bool isUsingOptionFolderBank = false;
+            if (Program.options.folder && Program.options.folder_bank != "") isUsingOptionFolderBank = true;
+                        
+            string extension = "flat";
+            DateTime t = DateTime.Now;
+            file = AddExtension(file, "." + extension);
+
+            string path = null;
+            if (isUsingOptionFolderBank)
+            {
+                path = Program.options.folder_bank;
+            }
+            string pathAndFilename = CreateFullPathAndFileNameFromFolder(file, path);
+
+            string pathAndFileNameResultingFile = pathAndFilename;
+
+            int count = 0;
+
+            DateTime dt0 = DateTime.Now;
+            WriteFlatRecords(ref yr1, ref yr2, isCaps, list, databank, pathAndFilename, ref count);
+
+            if (!Globals.setPrintMute)
+            {
+                G.Writeln();
+                G.Writeln("Wrote " + count + " variables to " + pathAndFileNameResultingFile + " in " + G.Seconds(t));
+                if (isUsingOptionFolderBank)
+                {
+                    if (!file.Contains(":"))  //Don't write this message if it is a absolute path, for instance c:\mybank\myfile. Relative paths will get the message (that must be ok)
+                    {
+                        G.Writeln("+++ NOTE: Wrote to user-indicated folder (see 'option folder bank = ...')");
+                    }
+                }
+            }
+            return count;
+        }
+
+        private static void WriteFlatRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, string pathAndFilename, ref int count)
+        {
+            StringBuilder sb = new StringBuilder();
+            
+            using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+                foreach (ToFrom var in list)
+                {
+                    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
+                    
+                    Series ts = iv as Series;
+                    {
+                        if (ts == null) continue; //skip  
+                        if (ts.type != ESeriesType.Normal) continue; //skip  
+                        count++;
+                        WriteFlatRecord(yr1, yr2, res, ts, G.Chop_GetName(var.s2), sb);
+                    }
+                }
+                res.Flush();
+            }
+        }
+
+        
 
         private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
         {
@@ -23854,8 +23944,8 @@ namespace Gekko
         {
             //Databank first = Program.databanks.GetFirst();
             //vars: annual is fy, quarterly is fy%q, monthly is fy%m, undated is fy%u
-            int start = -12345;
-            int end = -12345;
+            int start = int.MaxValue;
+            int end = int.MinValue;
             foreach (ToFrom s in vars)
             {
                 IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);
@@ -23875,10 +23965,11 @@ namespace Gekko
                 //{
                 //    G.Writeln2("*** ERROR: Could not find variable '" + name2 + "' in databank '" + s.bank + "'");
                 //}
-                if (iv.Type() != EVariableType.Series) continue;  //should never happen
+                if (iv.Type() != EVariableType.Series) continue;  //should never happen                
                 Series ts = (Series)iv;
+                if (ts.type != ESeriesType.Normal) continue;
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
-                end = G.GekkoMax(end, ts.GetPeriodLast().super);
+                end = G.GekkoMax(end, ts.GetPeriodLast().super);                
             }
             GetQuartersOrMonthsFromYears(ref per1, ref per2, start, end);
         }
@@ -35941,11 +36032,15 @@ namespace Gekko
                     bool isColors = true; if (oPrt != null && G.Equal(oPrt.opt_colors, "no")) isColors = false;
 
                     string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
+                    
                     bool isRows;
                     bool isCols;
                     HandleRowsCols(oPrt, out isRows, out isCols);
+
                     bool isTranspose = false;
                     if (isCols) isTranspose = true;  //Normally, SHEET has timeseries running in rows, unlike PRT default. So isTranspose means running in rows.
+                    if (G.Equal(eo.transpose, "yes")) isTranspose = true;  //for WRITE<xlsx cols>
+                    
                     //string startCell = "a1"; if (oPrt != null && oPrt.opt_cell != null) startCell = oPrt.opt_cell;
                     int datesInt = 0; if (isDates) datesInt++;
                     int namesInt = 0; if (isNames) namesInt++;
@@ -36321,6 +36416,7 @@ namespace Gekko
 
             bool isTranspose = false;
             if (isCols) isTranspose = true;  //Normally, SHEET has timeseries running in rows, unlike PRT default. So isTranspose means running in rows.
+            if (G.Equal(eo.transpose, "yes")) isTranspose = true;  //for WRITE<xlsx cols>
 
             string startCell = "a1"; if (oPrt != null && oPrt.opt_cell != null) startCell = oPrt.opt_cell;
 
@@ -39584,7 +39680,7 @@ namespace Gekko
         Prn,
         Pcim,
         Px,
-        Ser,
+        Flat,
         Xls,
         Xlsx,
         Gdx

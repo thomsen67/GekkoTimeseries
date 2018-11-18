@@ -14510,6 +14510,7 @@ namespace UnitTests
             //csv
             //prn
             //xls(x), also via SHEET (includes importing matrix)            
+            //flat
             //gnplot (only writing)
             //tsp... hmmm not done...
             //px (only reading)
@@ -14579,6 +14580,14 @@ namespace UnitTests
                     I("RESET;");
                     I("READ<csv>temp;");
                     ReadFormatsHelper("a", bank);
+
+                    //cols
+                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001 2002 csv cols>temp;");
+                    I("RESET;");
+                    I("READ<csv cols>temp;");
+                    ReadFormatsHelper("a", bank);
+
                 }
                 // ------ csv, selection
                 {
@@ -14596,6 +14605,13 @@ namespace UnitTests
                     I("WRITE<2001 2002 prn>temp;");
                     I("RESET;");
                     I("READ<prn>temp;");
+                    ReadFormatsHelper("a", bank);
+
+                    //cols
+                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001 2002 prn cols>temp;");
+                    I("RESET;");
+                    I("READ<prn cols>temp;");
                     ReadFormatsHelper("a", bank);
                 }
                 // ------ prn, selection
@@ -14618,6 +14634,15 @@ namespace UnitTests
                         I("WRITE<xlsx>temp;");
                         I("RESET;");
                         I("READ<xlsx>temp;");
+                        ReadFormatsHelper("a", bank);
+
+                        //cols
+                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx cols>temp;");
+                        I("RESET;");
+                        I("READ<xlsx cols>temp;");
                         ReadFormatsHelper("a", bank);
                     }
                     // ------ xlsx, selection
@@ -14642,14 +14667,25 @@ namespace UnitTests
                         I("RESET;");
                         I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
                         ReadFormatsHelper("a", bank);
+
+                        //cols
+                        I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("SHEET <2001 2002 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no cols> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET;");
+                        I("SHEET <2001 2002 IMPORT SHEET='test' CELL='C5' cols> xx1, xx3 file=temp;");  //import            
+                        ReadFormatsHelper("a", bank);
+
                         //
                         // test matrix import
                         //
                         I("SHEET <2001 2002 IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
                         _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
-                        _AssertMatrix(First(), "#m", 1, 2, 1002, sharedDelta);
-                        _AssertMatrix(First(), "#m", 2, 1, 3001, sharedDelta);
-                        _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
+                        _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
+                        _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);                        
+                        _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);                        
                     }
                 }
                 // ------ gnuplot (not actually testing the file)     
@@ -14663,6 +14699,15 @@ namespace UnitTests
                     I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
                     if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
                     I("WRITE<2001 2002 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                }
+                // ------ flat
+                if (bank == null)
+                {
+                    I("RESET; TIME 2001 2002; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001 2002 flat>temp;");
+                    I("RESET;");
+                    I("READ<flat>temp;");
+                    ReadFormatsHelper("a", bank);
                 }
 
                 // ---------- Testing on quarters
@@ -14719,6 +14764,13 @@ namespace UnitTests
                     I("RESET; OPTION freq q;");  //must tell Gekko what freq
                     I("READ<csv>temp;");
                     ReadFormatsHelper("q", bank);
+
+                    //cols
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001q1 2001q2 csv cols>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<csv cols>temp;");
+                    ReadFormatsHelper("q", bank);
                 }
                 // ------ csv, selection
                 {
@@ -14736,6 +14788,13 @@ namespace UnitTests
                     I("WRITE<2001q1 2001q2 prn>temp;");
                     I("RESET; OPTION freq q;");  //must tell Gekko what freq
                     I("READ<prn>temp;");
+                    ReadFormatsHelper("q", bank);
+
+                    //cols
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001q1 2001q2 prn cols>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<prn cols>temp;");
                     ReadFormatsHelper("q", bank);
                 }
                 // ------ prn, selection
@@ -14758,6 +14817,15 @@ namespace UnitTests
                         I("WRITE<xlsx>temp;");
                         I("RESET; OPTION freq q;");  //must tell Gekko what freq
                         I("READ<xlsx>temp;");
+                        ReadFormatsHelper("q", bank);
+
+                        //cols
+                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx cols>temp;");
+                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                        I("READ<xlsx cols>temp;");
                         ReadFormatsHelper("q", bank);
                     }
                     // ------ xlsx, selection
@@ -14784,6 +14852,8 @@ namespace UnitTests
                             I("RESET; OPTION freq q;");  //must tell Gekko what freq
                             I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
                             ReadFormatsHelper("q", bank);
+
+                            //TODO: <cols>
                         }
                     }
                 }
@@ -14799,7 +14869,18 @@ namespace UnitTests
                     if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
                     I("WRITE<2001q1 2001q2 gnuplot>xx1, " + bank + "xx3 file=temp;");
                 }
+
+                // ------ flat
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001q1 2001q2 flat>temp;");
+                    I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                    I("READ<flat>temp;");
+                    ReadFormatsHelper("q", bank);                    
+                }
             }
+
 
             // ----------------------------- testing px reading ---------------------
             // this downloads the px:             //I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
