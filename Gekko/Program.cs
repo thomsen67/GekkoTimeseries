@@ -8196,7 +8196,16 @@ namespace Gekko
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
             }
 
-
+            int i = 0;
+            foreach (Graph g in Globals.windowsGraph)
+            {
+                i++;
+            }
+            foreach (Window1 g in Globals.windowsDecomp)
+            {
+                i++;
+            }            
+            CrossThreadStuff.CutButtonEnabled(i > 0);
         }
 
         private static string GetDatabankFileNameWithPath(string bank)

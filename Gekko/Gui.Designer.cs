@@ -50,6 +50,7 @@ namespace Gekko
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.setWorkingDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -370,7 +371,7 @@ namespace Gekko
             this.toolStripButton2,
             this.toolStripButton5,
             this.toolStripButton3,
-            this.toolStripButton4});
+            this.toolStripButton4,this.toolStripButton6});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(649, 25);
@@ -419,6 +420,7 @@ namespace Gekko
             this.toolStripButton3.Enabled = false;
             this.toolStripButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton3.Image")));
             this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton3.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton3.Name = "toolStripButton3";
             this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton3.Text = "Stop current job";
@@ -430,10 +432,27 @@ namespace Gekko
             this.toolStripButton4.Enabled = false;
             this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
             this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton4.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton4.Name = "toolStripButton4";
             this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton4.Text = "Copy last PRT/MULPRT, SHOW or table to clipboard (for spreadsheet pasting)";
             this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
+
+            // 
+            // toolStripButton6
+            // 
+            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
+            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton6.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
+            this.toolStripButton6.Name = "toolStripButton6";
+            this.toolStripButton6.Size = new System.Drawing.Size(28, 28);
+            this.toolStripButton6.Text = "toolStripButton6";
+            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
+            // 
+            // menuStrip1
+            // 
+
             // 
             // menuStrip1
             // 
@@ -1783,6 +1802,7 @@ namespace Gekko
         private ToolStripMenuItem toolStripMenuItem22;
         private ToolStripMenuItem toolStripMenuItem23;
         public ToolStripButton toolStripButton4;
+        public ToolStripButton toolStripButton6;
         private ToolStripSeparator toolStripSeparator7;
         private ToolStripMenuItem deleteTempFilesToolStripMenuItem;
         public ToolStripButton toolStripButton5;

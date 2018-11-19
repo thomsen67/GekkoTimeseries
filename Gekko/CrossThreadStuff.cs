@@ -336,6 +336,20 @@ namespace Gekko
             }
         }
 
+        delegate void CutCallback();
+        public static void Cut()
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new CutCallback(Cut), new object[] { });
+            }
+            else
+            {
+                Program.Cut();
+            }
+        }
+
         //weird delegate pattern, but it works!
         delegate void CloseGraphCallback(Graph g);
         public static void CloseGraph(Graph g)
@@ -353,7 +367,7 @@ namespace Gekko
                     g.Invoke(new CloseDelegate(g.Close));  //Why not just g.Close() ??
                 }
             }
-            catch { };  //fail silently
+            catch {  };  //fail silently
         }
 
         //weird delegate pattern, but it works!
@@ -453,7 +467,7 @@ namespace Gekko
             }
             else
             {
-                //Gui.gui.toolStripButton6.Enabled = status;
+                Gui.gui.toolStripButton6.Enabled = status;
             }
         }
 

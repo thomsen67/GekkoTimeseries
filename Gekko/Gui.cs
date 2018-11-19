@@ -2665,7 +2665,9 @@ namespace Gekko
                 if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
                 if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
             }
+            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
+                
 
         private void allPPLOTToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2678,6 +2680,7 @@ namespace Gekko
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
             }            
             if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
 
         private void allUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2692,6 +2695,7 @@ namespace Gekko
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
             }            
             if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
 
         private void allPPLOTAndUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2805,6 +2809,12 @@ namespace Gekko
         private void toolStripButton4_Click(object sender, EventArgs e)
         {
             Program.PrtClipboard(Globals.lastPrtOrMulprtTable, true);
+        }
+
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {            
+            //CrossThreadStuff.Cut();
+            Program.Cut();            
         }
 
         private void deleteTempFilesToolStripMenuItem_Click(object sender, EventArgs e)
