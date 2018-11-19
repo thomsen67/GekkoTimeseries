@@ -24195,6 +24195,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public static void Cut()
+        {
+            Gui.CloseAllDecompUdvalg();
+        }
+
         public static void Pause(string arg)
         {
             if (arg.Length > 0)

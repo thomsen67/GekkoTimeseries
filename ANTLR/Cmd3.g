@@ -146,7 +146,7 @@ ASTCOMPARE2;
     ASTPROCEDUREDEFARGS;
     ASTPROCEDUREDEFRHSSIMPLE;
     ASTPROCEDUREDEFARG;
-
+	ASTCUT;
 	ASTLEFTBRACKETGLUE;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
@@ -1160,6 +1160,7 @@ Y2                    = 'Y2'                       ;
     PIPE             = 'PIPE'            ;
     PLOT            = 'PLOT'           ;
     PLOTCODE = 'PLOTCODE';
+	CUT = 'CUT';
     POINTS           = 'POINTS';
 	POS           = 'POS';
     PREFIX = 'PREFIX';
@@ -1735,6 +1736,7 @@ d.Add("Y" ,Y);
                                         d.Add("period"  , PERIOD    );
                                         d.Add("pipe"    , PIPE      );
                                         d.Add("plot"   , PLOT     );
+										d.Add("cut"   , CUT     );
                                         d.Add("PLOTCODE" ,PLOTCODE);
                                         d.Add("points"    , POINTS   );
 										d.Add("pos"    , POS   );
@@ -2263,6 +2265,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | compare              SEMICOLON!
 						  | copy                 SEMICOLON!
 						  | create               SEMICOLON!
+						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -2507,6 +2510,12 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 create:					    CREATE seqOfBankvarnames -> ^({token("ASTCREATE", ASTCREATE, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// CUT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DECOMP
@@ -3752,6 +3761,7 @@ ident2: 					Ident |
   COPY|
   COUNT|
   CREATE|
+  CUT|
   DATE|
   DECOMP|
   DELETE|
@@ -4250,6 +4260,7 @@ ident2: 					Ident |
 
 
 
+//ident3 excludes command names (for the procedure logic)
 ident3: 					Ident |
 					        // --- tokens4 start ---		
 						

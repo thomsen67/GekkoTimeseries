@@ -442,6 +442,22 @@ namespace Gekko
         }
 
         //weird delegate pattern, but it works!
+        delegate void CutButtonCallbackEnabled(bool status);
+        public static void CutButtonEnabled(bool status)
+        {
+            if (G.IsUnitTesting()) return;
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new CutButtonCallbackEnabled(CutButtonEnabled), new object[] { status });
+            }
+            else
+            {
+                //Gui.gui.toolStripButton6.Enabled = status;
+            }
+        }
+
+        //weird delegate pattern, but it works!
         delegate void BlinkCallback();
         public static void Blink()
         {

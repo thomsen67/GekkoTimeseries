@@ -1257,6 +1257,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
+                    case "ASTCUT":
+                        {
+                            node.Code.A("Program.Cut();" + G.NL);
+                        }
+                        break;
                     case "ASTEXIT":  // <command>
                         {
                             node.Code.A("Program.Exit();" + G.NL);

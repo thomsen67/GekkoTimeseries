@@ -2651,16 +2651,20 @@ namespace Gekko
             for (int i = 0; i < windowsGraphTemp.Count; i++)
             {
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-            }            
+            }
             List<Window1> windowsDecompTemp = new List<Window1>();
             windowsDecompTemp.AddRange(Globals.windowsDecomp);
             for (int i = 0; i < windowsDecompTemp.Count; i++)
             {
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-            }            
-            G.Writeln();
-            G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-            G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+            }
+
+            if (Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
+            {
+                G.Writeln();
+                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+            }
         }
 
         private void allPPLOTToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2672,8 +2676,8 @@ namespace Gekko
             for (int i = 0; i < windowsGraphTemp.Count; i++)
             {
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-            }
-            G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+            }            
+            if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
         }
 
         private void allUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2686,8 +2690,8 @@ namespace Gekko
             for (int i = 0; i < windowsDecompTemp.Count; i++)
             {
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-            }
-            G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+            }            
+            if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
         }
 
         private void allPPLOTAndUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2840,6 +2844,11 @@ namespace Gekko
         {
             CrossThreadStuff.SetTab("menu", true);
             CrossThreadStuff.RestartMenuBrowser();
+        }
+        
+        private void toolStripButton6_Click_1(object sender, EventArgs e)
+        {
+            Gui.CloseAllDecompUdvalg();
         }
     }
 }
