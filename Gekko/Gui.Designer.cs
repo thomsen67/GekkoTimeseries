@@ -447,7 +447,7 @@ namespace Gekko
             this.toolStripButton6.Margin = new System.Windows.Forms.Padding(10, 1, 0, 2);
             this.toolStripButton6.Name = "toolStripButton6";
             this.toolStripButton6.Size = new System.Drawing.Size(28, 28);
-            this.toolStripButton6.Text = "toolStripButton6";
+            this.toolStripButton6.Text = "Close all PLOT and DECOMP windows";
             this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
             // 
             // menuStrip1

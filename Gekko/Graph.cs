@@ -580,6 +580,7 @@ namespace Gekko
             Globals.guiGraphWindowLeftDistance = Math.Max(1, this.Left);
             Globals.windowsGraph.Remove(this);
             //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            //CrossThreadStuff.ShowPeriodInStatusField();
         }
     }
 

@@ -336,17 +336,18 @@ namespace Gekko
             }
         }
 
-        delegate void CutCallback();
-        public static void Cut()
+        
+        delegate void ShowPeriodInStatusFieldCallback();
+        public static void ShowPeriodInStatusField()
         {
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new CutCallback(Cut), new object[] { });
+                Gui.gui.Invoke(new ShowPeriodInStatusFieldCallback(ShowPeriodInStatusField), new object[] { });
             }
             else
             {
-                Program.Cut();
+                Program.ShowPeriodInStatusField("");
             }
         }
 
@@ -578,6 +579,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
+                Program.ShowPeriodInStatusField("");
             }
         }
 

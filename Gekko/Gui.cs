@@ -2665,7 +2665,7 @@ namespace Gekko
                 if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
                 if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
             }
-            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
                 
 
@@ -2680,7 +2680,7 @@ namespace Gekko
                 CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
             }            
             if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
 
         private void allUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2695,7 +2695,7 @@ namespace Gekko
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
             }            
             if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
-            if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
 
         private void allPPLOTAndUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
