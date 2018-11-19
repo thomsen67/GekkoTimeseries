@@ -31971,12 +31971,51 @@ namespace Gekko
             if (!o.guiGraphIsRefreshing)
             {
                 PrtOptionsHelper po = new PrtOptionsHelper();
-                po.isLevel = true;
+
+                string code = null;
+                List<OptString> codes = o.printCodes;
+                if (codes.Count == 1 && G.Equal(codes[0].s2, "yes")) code = codes[0].s1;
+
+                if (code != null)
+                {
+                    if (G.Equal(code, "m"))
+                    {
+                        po.isLevel = false;
+                        po.isDiff = true;
+                        po.isPch = false;
+                        po.isMultiplier = true;
+                    }
+                    else if (G.Equal(code, "q"))
+                    {
+                        po.isLevel = false;
+                        po.isDiff = false;
+                        po.isPch = true;
+                        po.isMultiplier = true;
+                    }
+                    else if (G.Equal(code, "d") || G.Equal(code, "rd"))
+                    {
+                        po.isLevel = false;
+                        po.isDiff = true;
+                        po.isPch = false;
+                        po.isMultiplier = false;
+                    }
+                    else if (G.Equal(code, "p") || G.Equal(code, "rp"))
+                    {
+                        po.isLevel = false;
+                        po.isDiff = false;
+                        po.isPch = true;
+                        po.isMultiplier = false;
+                    }
+                }
+                else
+                {
+                    po.isLevel = true;                    
+                    po.isDiff = false;
+                    po.isPch = false;                    
+                    po.isMultiplier = true;
+                }
                 po.isLog = false;
-                po.isDiff = false;
-                po.isPch = false;
                 po.isDlog = false;
-                po.isMultiplier = false;
 
                 GraphOptions graphOptions = new GraphOptions();
                 graphOptions.counter = o.counter;
