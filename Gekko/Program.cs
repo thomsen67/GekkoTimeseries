@@ -8185,8 +8185,9 @@ namespace Gekko
                 workingFolder = Program.options.folder_working;
 
             }
+            string ss = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
 
-            Gui.gui.toolStripStatusLabel1.ToolTipText = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
+            if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
             if (Globals.workerThread != null)
             {
