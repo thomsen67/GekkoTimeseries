@@ -6545,7 +6545,7 @@ namespace Gekko
 
                 try
                 {
-                    Program.ShowPeriodInStatusField("");
+                    //Program.ShowPeriodInStatusField("");
                 }
                 catch (Exception e)
                 {

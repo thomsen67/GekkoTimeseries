@@ -207,7 +207,7 @@ namespace Gekko
                 if (e.ItemsSource[lowerIdx] == null ||
                     e.ItemsSource[higherIdx] == null)
                 {
-                    Program.ShowPeriodInStatusField("");
+                    //Program.ShowPeriodInStatusField("");
                     return;
                 }
 
@@ -260,7 +260,7 @@ namespace Gekko
             //unswap.IsEnabled = true;  //fixme
 
             yellow.Text = "Databanks were swapped. " + s;
-            Program.ShowPeriodInStatusField("");            
+            //Program.ShowPeriodInStatusField("");            
 		}
 
         private static string MaybeAddStuffToAliasDatabankName(string s)
@@ -344,7 +344,7 @@ namespace Gekko
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {            
-            Program.ShowPeriodInStatusField("");
+            //Program.ShowPeriodInStatusField("");
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

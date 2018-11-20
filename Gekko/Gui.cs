@@ -604,7 +604,7 @@ namespace Gekko
             Globals.globalPeriodTimeSpans.data.Add(new GekkoTimeSpan(Globals.globalPeriodStart, Globals.globalPeriodEnd));  //starts out with same TimeSpan as Time period
 
             if (track) MessageBox.Show("22");
-            Program.ShowPeriodInStatusField("");
+            //Program.ShowPeriodInStatusField("");
             if (track) MessageBox.Show("23");
             G.SetWorkingFolder();
             if (track) MessageBox.Show("24");
@@ -2639,10 +2639,10 @@ namespace Gekko
 
         private void allPPLOTUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            CloseAllDecompUdvalg();
+            CloseAllDecompUdvalg(true);
         }
 
-        public static void CloseAllDecompUdvalg()
+        public static void CloseAllDecompUdvalg(bool print)
         {
             //close all PPLOT+UDVALG
             List<Graph> windowsGraphTemp = new List<Graph>();
@@ -2659,7 +2659,7 @@ namespace Gekko
                 CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
             }
 
-            if (Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
+            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
             {
                 G.Writeln();
                 if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
@@ -2858,7 +2858,7 @@ namespace Gekko
         
         private void toolStripButton6_Click_1(object sender, EventArgs e)
         {
-            Gui.CloseAllDecompUdvalg();
+            Gui.CloseAllDecompUdvalg(true);
         }
     }
 }

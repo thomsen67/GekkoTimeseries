@@ -1380,7 +1380,7 @@ namespace Gekko
                     Globals.startOfLinePositionWhenLastEnterPressed = -12345;
                     Globals.endOfLinePositionWhenLastEnterPressed = -12345;
 
-                    Program.ShowPeriodInStatusField("");
+                    //Program.ShowPeriodInStatusField("");
 
                     string s2 = null;
 
@@ -1452,7 +1452,7 @@ namespace Gekko
                         //{
                         //    Program.PrintExceptionAndFinishThread(e2, s2, null);
                         //}
-                        Program.ShowPeriodInStatusField("");
+                        //Program.ShowPeriodInStatusField("");
                     }
                     else
                     {

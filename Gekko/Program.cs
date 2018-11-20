@@ -7648,7 +7648,7 @@ namespace Gekko
 
                 break;  //if we get to here, everything is ok so break the file-trying loop
             }
-            if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
+            //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
         public static void PrintOptions(string path)
@@ -24207,7 +24207,12 @@ namespace Gekko
 
         public static void Cut()
         {
-            Gui.CloseAllDecompUdvalg();
+            Cut(true);
+        }
+
+        public static void Cut(bool print)
+        {
+            Gui.CloseAllDecompUdvalg(print);
         }
 
         public static void Pause(string arg)
@@ -24393,7 +24398,7 @@ namespace Gekko
             G.Writeln("Clearing options, databanks, models, lists, scalars and matrices");
             if (ini) G.Writeln("INI files ('" + Globals.autoExecCmdFileName + "') will be run");
             else G.Writeln("No INI files ('" + Globals.autoExecCmdFileName + "') will be run");
-            G.Writeln("You may use 'CLS' to clear the output window.");
+            G.Writeln("Use CLS to clear the output window, and CUT to close plot/decomp windows.");
             if (ini)
             {
                 G.Writeln();
@@ -24411,6 +24416,8 @@ namespace Gekko
             Program.guiBrowseHistory.Clear();
             Program.guiBrowseNumber = 0;
             Globals.guiHomeMenuEnabled = false;
+
+            //Program.Cut(false);
 
             RemoteInit();
 
@@ -26028,7 +26035,7 @@ namespace Gekko
         {            
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
             Program.EmitCodeFromANTLR(s, "", false, p);
-            if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
+            //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 
         public static void Create(List varsInput, bool questionMark, O.Create o)

@@ -2020,7 +2020,7 @@ namespace Gekko
                     Program.options.print_filewidth = fileWidthRemember;
                 }
 
-                Program.ShowPeriodInStatusField("");                
+                //Program.ShowPeriodInStatusField("");                
             }
             return sb;
         }
