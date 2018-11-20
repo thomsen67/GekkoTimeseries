@@ -367,7 +367,7 @@ namespace Gekko
             _EndDate = endDate;
             if (startDate.freq != endDate.freq)
             {
-                G.Writeln2("*** ERROR: Internal error, mismatch of frequencies");
+                G.Writeln2("*** ERROR: Mismatch of frequencies in time iterator");
                 throw new GekkoException();
             }
             _freq = startDate.freq;

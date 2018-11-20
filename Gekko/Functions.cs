@@ -2204,19 +2204,37 @@ namespace Gekko
 
         public static IVariable seq(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
-            int i1 = O.ConvertToInt(x1);
-            int i2 = O.ConvertToInt(x2);
-            //List m = new List()
             List<IVariable> mm = new List<IVariable>();
-            for (int i = i1; i <= i2; i++)
+            if (x1.Type() == EVariableType.Val && x2.Type() == EVariableType.Val)
             {
-                ScalarVal d = new ScalarVal(i);
-                mm.Add(d);
+                int i1 = O.ConvertToInt(x1);
+                int i2 = O.ConvertToInt(x2);
+                //List m = new List()                
+                for (int i = i1; i <= i2; i++)
+                {
+                    ScalarVal d = new ScalarVal(i);
+                    mm.Add(d);
+                }
+            }
+            else if (x1.Type() == EVariableType.Date && x2.Type() == EVariableType.Date)
+            {
+                GekkoTime i1 = O.ConvertToDate(x1);
+                GekkoTime i2 = O.ConvertToDate(x2);
+                if (GekkoTime.Observations(i1, i2) > 0)
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(i1, i2))  //fails with error if different freqs
+                    {
+                        mm.Add(new ScalarDate(t));
+                    }
+                }
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: seq() must be fed with two values or two dates");
+                throw new GekkoException();
             }
             return new List(mm);
         }
-
-        
 
         [MyCustom(Lag = "lag=1")]
         public static IVariable dlog(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
