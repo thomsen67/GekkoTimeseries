@@ -4108,406 +4108,26 @@ namespace Gekko
                     m.Add(m2);
                 }
             }
-            return m;
-
-
-            ////quoted elements are not allowed, too
-            ////also out-commented items, and items with minus are ok
-            //int counter = 0;
-            //foreach (string ss in input)
-            //{
-            //    counter++;
-            //    string s = ss.Trim();  //will also remove any newline characters!
-
-            //    bool quotes = false;
-            //    string s2 = G.StripQuotes(s);
-            //    if (s2.Length != s.Length)
-            //    {
-            //        s = s2;
-            //        quotes = true;
-            //    }
-
-            //    if (fileName != null && s == "")
-            //    {
-            //        G.Writeln2("*** ERROR in listfile '" + fileName + "': empty line [" + counter + "]");
-            //        G.Writeln("    Note: you may use comments (//), but not completely empty lines. This is to");
-            //        G.Writeln("    keep the list files reasonably tidy.");
-            //        throw new GekkoException();
-            //    }
-
-            //    //if (s.StartsWith("//")) continue;  //allow comments, /* ... */ not supported though
-            //    int idx = s.IndexOf("//");
-            //    if (idx >= 0)
-            //    {
-            //        s = s.Substring(0, idx);
-            //        s = s.Trim();
-            //    }
-
-            //    if (s == null || s == "")
-            //    {
-            //        if (fileName == null)
-            //        {
-            //            G.Writeln2("*** ERROR in <direct> list: empty element");
-            //            throw new GekkoException();
-            //        }
-            //        else
-            //        {
-            //            continue;  //ignore a comment
-            //        }
-            //    }
-
-            //    if (quotes == false)  //with quotes, anything is accepted
-            //    {
-
-            //        int colonCounter = 0;
-            //        for (int i = 0; i < s.Length; i++)
-            //        {
-            //            char c = s[i];
-            //            if (i == 0 && (c == '-'))  //starting with # not considered ok, only simple elements (perhaps with minus) allowed
-            //            {
-            //                //ok
-            //            }
-            //            else
-            //            {
-            //                if (G.IsLetterOrDigitOrUnderscore(c))
-            //                {
-            //                    //ok
-            //                }
-            //                else if (c.ToString() == Globals.symbolBankColon)
-            //                {
-            //                    colonCounter++;
-            //                    if (colonCounter > 1)
-            //                    {
-            //                        //probably very rare, but we check here
-            //                        G.Writeln2("*** ERROR in list: at most 1 colon allowed: '" + s + "'");
-            //                        throw new GekkoException();
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    if (fileName == null)
-            //                    {
-            //                        G.Writeln2("*** ERROR in <direct> list, item = '" + s + "'");
-            //                        G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
-            //                        throw new GekkoException();
-            //                    }
-            //                    else
-            //                    {
-            //                        G.Writeln2("*** ERROR in listfile '" + fileName + "', line [" + counter + "], item = '" + s + "'");
-            //                        G.Writeln("    Items should only contain numbers, digits, '_', ':' (or start with '-', or be enclosed in quotes).", Color.Red);
-            //                        throw new GekkoException();
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //    result.Add(s);
-            //}
-            //return;
+            return m;                       
         }
 
-        //public static IVariable ZList(IVariable iv)
-        //{
-        //    string name = ConvertToString(iv);
-        //    IVariable a = null;
-        //    if (Program.scalars.TryGetValue(Globals.symbolCollection + name, out a))
-        //    {
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: List '" + Globals.symbolCollection + name + "' was not found");
-        //        throw new GekkoException();
-        //    }
-        //    return a;
-        //}
+        public static List<string> GetListOfStringsFromIVariable(IVariable x)
+        {
+            if (x.Type() == EVariableType.String)
+            {
+                return new List<string>() { x.ConvertToString() };
+            }
+            else if (x.Type() == EVariableType.List)
+            {
+                return Program.GetListOfStringsFromList(x);
+            }
+            else
+            {
+                G.Writeln2("*** Expected string of list of strings");
+                throw new GekkoException();
+            }
+        }
 
-        //public static IVariable ZGenr(string name)
-        //{            
-        //    IVariable a = null;
-        //    if (Program.scalars.TryGetValue(name, out a))
-        //    {
-        //        if (a.Type() == EVariableType.String)
-        //        {
-        //            //GENR y = %s; <-- %s is a STRING
-        //            Series ts = Program.databanks.GetFirst().GetVariable(((ScalarString)a).string2);
-        //            //a = new MetaTimeSeries(ts, null, null);
-        //            a = ts;
-        //        }
-        //        else
-        //        {
-        //            //GENR y = %x; <-- %x is a VAL
-        //            //expected to be of VAL type, 
-        //        }
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: Memory variable '" + Globals.symbolScalar + name + "' was not found");
-        //        throw new GekkoException();
-        //    }
-        //    return a;
-        //}        
-
-        //public static IVariable CreateValFromCache(ref IVariable a, string originalName)
-        //{
-        //    //stuff like VAL x = ...
-        //    IVariable x = null;
-        //    if (Globals.useCache && a != null)
-        //    {
-        //        //fast pointer is available (scalar with that name should always point to the same object).
-        //        x = a;
-        //    }
-        //    else
-        //    {
-        //        //we do not have a fast pointer to the scalar
-        //        Program.scalars.TryGetValue(originalName, out x);
-        //        if (x == null)
-        //        {
-        //            //create it
-        //            //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Created in scalar Dict: " + originalName);
-        //            //no fast pointer, and not available among scalars
-        //            x = new ScalarVal(double.NaN);  //create the object
-        //            Program.scalars.Add(originalName, x);  //add it to the scalars (it will get a value later on)
-        //            a = x; //point the fast pointer to the new object
-        //        }
-        //        else
-        //        {
-        //            //no fast pointer, but available among scalars
-        //            //if (Globals.runningOnTTComputer) G.Writeln("CreateValFromCache: Found in scalar Dict: " + originalName);
-        //            a = x;  //point the fast pointer to the found object
-        //        }
-        //    }
-        //    if (x.Type() != EVariableType.Val)
-        //    {
-        //        G.Writeln2("*** ERROR: Type change of scalars not yet allowed");
-        //        throw new GekkoException();
-        //    }
-        //    return x;
-        //}
-
-        //public static void SetStringFromCache(ref IVariable a, string originalName, string s, bool isName)
-        //{
-        //    //stuff like VAL x = ...
-        //    bool createNew = false;
-        //    if (Globals.useCache && a != null)
-        //    {
-        //        //The 'x' scalar has a fast pointer already
-        //        if (a.Type() == EVariableType.String)
-        //        {
-        //            ((ScalarString)a).string2 = s;
-        //            //((ScalarString)a)._isName = isName;
-        //        }
-        //        else
-        //        {
-        //            //wrong type, does not happen often
-        //            Program.scalars.Remove(originalName);
-        //            createNew = true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //we do not have a fast pointer to it: ask the dictionary
-        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-        //        if (x == null)
-        //        {
-        //            //does not exist beforehand
-        //            createNew = true;
-        //        }
-        //        else
-        //        {
-        //            //does exist in the dictionary
-        //            if (x.Type() == EVariableType.String)
-        //            {
-        //                ((ScalarString)x).string2 = s;
-        //                //((ScalarString)x)._isName = isName;
-        //                a = x;
-        //            }
-        //            else
-        //            {
-        //                //does exist in the dictionary, but has wrong type
-        //                Program.scalars.Remove(originalName);
-        //                createNew = true;
-        //            }
-        //        }
-        //    }
-        //    if (createNew)
-        //    {
-        //        ScalarString a2 = new ScalarString(s, isName);
-        //        Program.scalars.Add(originalName, a2);
-        //        a = a2;
-        //    }
-        //}
-
-        //public static void SetDateFromCache(ref IVariable a, string originalName, GekkoTime gt)
-        //{
-        //    //stuff like DATE d = ...
-        //    bool createNew = false;
-        //    if (Globals.useCache && a != null)
-        //    {
-        //        //The 'x' scalar has a fast pointer already
-        //        if (a.Type() == EVariableType.Date)
-        //        {
-        //            ((ScalarDate)a).date = gt;
-        //        }
-        //        else
-        //        {
-        //            //wrong type, does not happen often
-        //            Program.scalars.Remove(originalName);
-        //            createNew = true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //we do not have a fast pointer to it: ask the dictionary
-        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-        //        if (x == null)
-        //        {
-        //            //does not exist beforehand
-        //            createNew = true;
-        //        }
-        //        else
-        //        {
-        //            //does exist in the dictionary
-        //            if (x.Type() == EVariableType.Date)
-        //            {
-        //                ((ScalarDate)x).date = gt;
-        //                a = x;
-        //            }
-        //            else
-        //            {
-        //                //does exist in the dictionary, but has wrong type
-        //                Program.scalars.Remove(originalName);
-        //                createNew = true;
-        //            }
-        //        }
-        //    }
-        //    if (createNew)
-        //    {
-        //        ScalarDate a2 = new ScalarDate(gt);
-        //        Program.scalars.Add(originalName, a2);
-        //        a = a2;
-        //    }
-        //}
-
-        //public static void SetValFromCache(ref IVariable a, string originalName, double v)
-        //{
-        //    //stuff like VAL x = ...
-        //    bool createNew = false;
-        //    if (Globals.useCache && a != null)
-        //    {
-        //        //The 'x' scalar has a fast pointer already
-        //        if (a.Type() == EVariableType.Val)
-        //        {
-        //            ((ScalarVal)a).val = v;
-        //        }
-        //        else
-        //        {
-        //            //wrong type, does not happen often
-        //            Program.scalars.Remove(originalName);
-        //            createNew = true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //we do not have a fast pointer to it: ask the dictionary
-        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-        //        if (x == null)
-        //        {
-        //            //does not exist beforehand
-        //            createNew = true;
-        //        }
-        //        else
-        //        {
-        //            //does exist in the dictionary
-        //            if (x.Type() == EVariableType.Val)
-        //            {
-        //                ((ScalarVal)x).val = v;
-        //                a = x;
-        //            }
-        //            else
-        //            {
-        //                //does exist in the dictionary, but has wrong type
-        //                Program.scalars.Remove(originalName);
-        //                createNew = true;
-        //            }
-        //        }
-        //    }
-        //    if (createNew)
-        //    {
-        //        ScalarVal a2 = new ScalarVal(v);
-        //        Program.scalars.Add(originalName, a2);
-        //        a = a2;
-        //    }
-        //}
-
-        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName)
-        //{
-        //    return GetScalarFromCache(ref a, originalName, true);
-        //}
-
-        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed)
-        //{
-        //    return GetScalarFromCache(ref a, originalName, transformationAllowed, false);
-        //}
-
-        //see also RemoveScalar()
-        //public static IVariable GetScalarFromCache(ref IVariable a, string originalName, bool transformationAllowed, bool stringify)
-        //{
-
-        //    //stuff like ... + %x + ...
-        //    if (Globals.useCache && a != null)
-        //    {
-        //        //The typical case, so we try it first.
-        //        return a;
-        //    }
-        //    else
-        //    {
-        //        //we do not have a fast pointer to it
-        //        IVariable x = null; Program.scalars.TryGetValue(originalName, out x);
-        //        if (x == null)
-        //        {
-        //            if (originalName.StartsWith(char.ToString(Globals.symbolCollection)))
-        //            {
-        //                G.Writeln2("*** ERROR: Could not find list or matrix '" + originalName + "'");
-        //                if (Program.scalars.ContainsKey(originalName.Substring(1)))
-        //                {
-        //                    G.Writeln("    Did you intend to refer to the scalar '" + Globals.symbolScalar + originalName.Substring(1) + "'", Color.Red);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                G.Writeln2("*** ERROR: Could not find scalar '" + originalName + "'");
-        //            }
-        //            throw new GekkoException();
-        //        }
-        //        //bool didTransform = false;
-        //        //a = x;
-        //        //x = MaybeStringify(x, stringify); //must be after fast pointer, so that a itself is not stringifyed
-        //        //x = MaybeTransform(ref didTransform, x, transformationAllowed);
-        //        //if (didTransform) a = x; //fast pointer to that object              
-        //        //return x;
-        //        return x;
-        //    }
-        //}
-
-        //public static IVariable MaybeTransform(ref bool didTransform, IVariable x, bool transformationAllowed)
-        //{
-        //    if (x == null)
-        //    {
-        //        G.Writeln2("*** ERROR: Illegal transformation of variable");
-        //        throw new GekkoException();
-        //    }
-        //    if (transformationAllowed && x.Type() == EVariableType.String)
-        //    {
-        //        ScalarString ss = (ScalarString)x;
-        //        if (ss._isName)
-        //        {
-        //            MetaTimeSeries mts = O.GetTimeSeries(ss._string2, 1);
-        //            x = mts;
-        //            didTransform = true;
-        //        }
-        //    }
-        //    return x;
-        //}
 
         private static IVariable MaybeStringify(IVariable x, bool dollarStringify)
         {
@@ -9234,14 +8854,17 @@ namespace Gekko
                 }
             }
 
+
+
             public class Element
             {
                 public List<O.RecordedPieces> labelRecordedPieces = null;
-                public List<string> labelGiven = null;                   
-                public List<string> labelOLD = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.
-                
-                public IVariable[] variable = new IVariable[2];  //first and ref
 
+                //public List labelGiven2 = null;  //this one is inputted                 
+                public List<string> labelGiven = null;  //this one is created from the one above
+                
+                public List<string> labelOLD = null;  //unfolded labels, for instance x{#m} unfolded into xa and xb.                
+                public IVariable[] variable = new IVariable[2];  //first and ref
                 public string endoExoIndicator = null;
                 //-- layout
                 public List<OptString> printCodes = new List<OptString>();

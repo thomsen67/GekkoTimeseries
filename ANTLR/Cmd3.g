@@ -2828,9 +2828,9 @@ print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^({token(
 prtHelper:				    P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
 prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS prtElement+);
 prtElement:                 expression
-                            gekkoLabel?
+                            expression2?
 							prtElementOptionField?
-							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) gekkoLabel? prtElementOptionField?)
+							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER prtElementOptionField?))
 						    ;
 
 

@@ -4945,16 +4945,20 @@ namespace Gekko.Parser.Gek
                             {
                                 freelists = freelists.Substring(0, freelists.Length - ", ".Length);
                                 freelists = Globals.freelists + freelists + Globals.freelists;
-                            }                            
+                            }
 
-                            node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
+                            string label = "new List<string>() { `" + freelists + ReportLabelHelper(node) + "`}";
+                            if (node[1][0] != null) label = "O.GetListOfStringsFromIVariable(" + node[1][0].Code.ToString() + ")";
+
+                            node.Code.A("ope" + Num(node) + ".labelGiven = " + label + ";" + G.NL);
                             if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
                                                                                                //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 
                             //node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); smpl.t0 = smpl.t0.Add(-2);" + G.NL);
 
-                            ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
+                            ASTNode child = null;
+                            if (node[2] != null) child = node[2].GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
                             
                             if (node.Text == "ASTPRTELEMENT")
