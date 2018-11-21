@@ -835,13 +835,17 @@ namespace Gekko
             foreach (char c in source)
                 if (c == cc[0]) count++;
             return count;
-        }        
+        }
 
-        public static string updprtFormat(double level1, int decimals)
+        public static string UpdprtFormat(double level1, int decimals, bool missFunction)
         {
             string z = new string('0', decimals);
             string levelFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0." + z + "}", level1);
-            if (double.IsNaN(level1)) levelFormatted = "M";
+            if (G.isNumericalError(level1))
+            {
+                if (missFunction) levelFormatted = "m()";
+                else levelFormatted = "M";
+            }
             return levelFormatted;
         }
         

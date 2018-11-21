@@ -254,6 +254,7 @@ namespace Gekko.Parser.Gek
                 //if (node?[1]?[0]?[0].Text != "ASTHASH") throw new GekkoException();  //must be a list
                 ASTNode name = node[1][1][0];
 
+                //#895943275
                 if (name[0].Text == "ASTIDENT")
                 {
                     // ASTBANKVARNAME

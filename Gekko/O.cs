@@ -1502,7 +1502,7 @@ namespace Gekko
                         {
                             //special case: #(listfile m)
 
-                            List ml = ReadExternalListFile(varname);
+                            List ml = ReadListFile(varname);
                             return ml;
                         }
                         else
@@ -1613,7 +1613,7 @@ namespace Gekko
             return rv;
         }
 
-        private static List ReadExternalListFile(string varname)
+        private static List ReadListFile(string varname)
         {
             string fileName = varname.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             fileName = Program.AddExtension(fileName, "." + "lst");
@@ -2822,6 +2822,7 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ".");
                             G.Writeln("           You may change the settings with the following option:", Color.Red);
                             G.Writeln("           OPTION databank create auto = yes;", Color.Red);
+                            G.Writeln("           Alternatively, use 'MODE data;' or 'MODE mixed;'.", Color.Red);
                             throw new GekkoException();
                         }
                     }

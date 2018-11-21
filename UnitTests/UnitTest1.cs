@@ -9399,7 +9399,7 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("SYS'del exportseries." + Globals.extensionCommand + "';");
-            I("EXPORT<2005 2010 series='='> fy, fe file=exportseries;");
+            I("EXPORT<2005 2010 gcm='='> fy, fe file=exportseries;");
         }
 
         [TestMethod]
@@ -11606,8 +11606,11 @@ namespace UnitTests
             I("time 2000 2000;");
             I("#(listfile i) = a, b;");
             I("x = series(1); x[a] = 1; x[b] = 2;");
-            I("y = sum(#(listfile i), x[#(listfile i)]);");  //using listfile in sum(), only simple i accepted.
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("y = sum(#(listfile i), x[#(listfile i)]);");  //using listfile in sum(), only simple i accepted.            
             _AssertSeries(First(), "y", 2000, 3, sharedDelta);
+            }
             FAIL("y = sum(#(listfile {'i'}), x[#(listfile {'i'})]);");  //using listfile in sum(), only simple i accepted.
 
 

@@ -21803,8 +21803,18 @@ namespace Gekko
                     //for instance fy%q for fy in quarter freq
 
                     StringBuilder sb = new StringBuilder();
-                    if (type == 1) sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + "  ");
-                    else sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> " + var + " =  ");
+                    if (type == 1)
+                    {
+                        if (op == "=")
+                        {
+                            sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + " (");
+                        }
+                        else
+                        {
+                            sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + "= (");
+                        }
+                    }
+                    else sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> " + var + " = (");
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
                         double val = double.NaN;
@@ -21847,12 +21857,13 @@ namespace Gekko
 
                         int decimals = 6;
                         if (op == "*") decimals = 8;
-                        string valstring = G.updprtFormat(val, decimals); //6 decimals, must be enough also for interest rates etc.
+                        string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
 
                         valstring = valstring.Trim();  //necesssary?
-                        sb.Append(valstring + "  ");
+                        sb.Append(valstring);
+                        if (GekkoTime.Observations(t, tEnd) > 1) sb.Append(", ");
                     }
-                    sb.Append(";");
+                    sb.Append(");");
                     sw.WriteLine(sb);
                 }
             }

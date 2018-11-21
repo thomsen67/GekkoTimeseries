@@ -159,6 +159,7 @@ ASTCOMPARE2;
 	ASTOPT_STRING_BOLD;
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
+	ASTOPT_STRING_GCM;
 	ASTOPT_STRING_PREFIX;
 	ASTOPT_STRING_GDX;
 	ASTOPT_STRING_GDXOPT;
@@ -3279,8 +3280,8 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
 						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
-						  | GCM EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
-						  | GCM -> ^(ASTOPT_STRING_SERIES ASTOPN)												  				
+						  | GCM EQUAL exportType -> ^(ASTOPT_STRING_GCM exportType)												
+						  | GCM -> ^(ASTOPT_STRING_GCM ASTOPN)												  				
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
 						  ;						  

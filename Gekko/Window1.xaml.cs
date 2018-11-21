@@ -367,7 +367,7 @@ namespace Gekko
                         }
                         else if (c.cellType == CellType.Number)
                         {
-                            s = G.updprtFormat(c.number, xx);
+                            s = G.UpdprtFormat(c.number, xx, false);
                         }
                         else if (c.cellType == CellType.Date) s = c.date;
 
