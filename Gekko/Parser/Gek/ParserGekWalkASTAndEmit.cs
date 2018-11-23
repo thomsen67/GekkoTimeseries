@@ -3435,7 +3435,17 @@ namespace Gekko.Parser.Gek
                                 }
                                 else if (node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
                                 {
-                                    node.Code.A(node[0].Code).A(node[1][0].Code).A(";" + G.NL);
+                                    //node.Code.A(node[0].Code).A(node[1][0].Code).A(";" + G.NL);
+
+                                    string s = node[1][0].Code.ToString();
+                                    string[] ss = s.Split(new string[] { Globals.objFunctionPlaceholder }, StringSplitOptions.None);
+                                    if (ss.Length != 2)
+                                    {
+                                        G.Writeln2("*** ERROR: Unexpected function error");
+                                        throw new GekkoException();
+                                    }
+                                    string s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());
+                                    node.Code.A(s2);
                                 }
                                 else
                                 {
