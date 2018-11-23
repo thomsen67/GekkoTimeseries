@@ -4955,7 +4955,14 @@ namespace Gekko.Parser.Gek
                                 freelists = Globals.freelists + freelists + Globals.freelists;
                             }
 
-                            node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
+                            string label5 = "`" + freelists + ReportLabelHelper(node) + "`";
+                            ASTNode labelInHyphens = node.GetChild("ASTGEKKOLABEL");
+                            if (labelInHyphens != null)
+                            {
+                                label5 = "O.ConvertToString(" + labelInHyphens[0].Code + ")";
+                            }
+
+                            node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() {" + label5 + "};" + G.NL);
                             if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
                                                                                                //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 

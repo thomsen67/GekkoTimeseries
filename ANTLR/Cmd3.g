@@ -3604,7 +3604,7 @@ integer:                    Integer -> ^(ASTINTEGER Integer);
 numberIntegerOrDouble:      integer
 						  | double2;
 
-gekkoLabel:                 StringInQuotes -> ^(ASTGEKKOLABEL StringInQuotes);
+gekkoLabel:                 expression -> ^(ASTGEKKOLABEL expression);
 
 yesNoAppend:			    yesNo
 						  | append
