@@ -3191,7 +3191,9 @@ table:					    TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE na
 			              | tableCurrow MERGECOLS leftParenGlue expression ',' expression ')'  -> ^(ASTTABLEMERGECOLS tableCurrow CURROW expression expression)						
 						  | tableCurrow SETDATES leftParenGlue expression ',' expression ',' expression ')'  -> ^(ASTTABLESETDATES tableCurrow CURROW  expression expression expression)						
 						    //col, t1, t2, expression, printcode, scale, format
-						  | tableCurrow SETVALUES leftParenGlue expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression) expression expression expression)
+						  						  
+						  | tableCurrow SETVALUES leftParenGlue expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression ASTPLACEHOLDER ASTPLACEHOLDER) expression expression expression)
+						  
 						  | TABLE     tableOpt1? fileName -> ^(ASTTABLE     tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line below
 						  | MENUTABLE tableOpt1? fileName -> ^(ASTMENUTABLE tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line above
 						    ;

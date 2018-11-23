@@ -52,7 +52,7 @@ namespace Gekko
 
         public static bool JOrderFix = true;
 
-        public static string xxx = "[obj-function-placeholder]";
+        public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
         public static string isAProto = "Is_a_protobuffer_file";
 

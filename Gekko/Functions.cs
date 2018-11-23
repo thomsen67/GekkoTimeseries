@@ -1584,9 +1584,8 @@ namespace Gekko
             }
             return Globals.scalarVal0;
         }
-
-
-        public static IVariable setdomains(GekkoSmpl smpl, IVariable x, IVariable m)
+        
+        public static void setdomains(GekkoSmpl smpl, IVariable x, IVariable m)
         {
             Series x_series = x as Series;
             if (x_series == null || x_series.type != ESeriesType.ArraySuper)
@@ -1601,8 +1600,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             string[] ss = Program.GetListOfStringsFromListOfIvariables(m_list.list.ToArray());
-            x_series.meta.domains = ss;
-            return new ScalarVal(1d);  //fix this!
+            x_series.meta.domains = ss;            
         }
 
         public static List getdomains(GekkoSmpl smpl, IVariable x)

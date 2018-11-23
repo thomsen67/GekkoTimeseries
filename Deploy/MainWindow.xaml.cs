@@ -148,10 +148,15 @@ namespace Deploy
 
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\editbin.exe", @"/LARGEADDRESSAWARE c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe");
 
+                System.Diagnostics.Process.Start(@"c:\Tools\ramaware.lnk");
+
                 //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
-                MessageBox.Show(@"RAM aware ok -- COPY from c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe   TO c:\Program Files (x86)\Gekko\Gekko.exe");
+                
+                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
+                                
+                MessageBox.Show(@"RAM aware ok -- has copied from c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe   TO c:\Program Files (x86)\Gekko\Gekko.exe");
             }
-            catch
+            catch (Exception error)
             {
                 MessageBox.Show(" * ** ERROR: RAM aware failed");
             }
@@ -183,7 +188,9 @@ namespace Deploy
                 File.Copy(@"c:\tmp\Gekko_files\Setup.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Setup.exe", true);
                 File.Copy(@"c:\tmp\Gekko_files\Gekko.zip", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip", true);
 
-                MessageBox.Show(@"Go to c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\ and run sha.bat now");
+                System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
+
+                //MessageBox.Show(@"Go to c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\ and run sha.bat now");
 
                 //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\fciv.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi -sha1 > sha1.txt");
                 //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\fciv.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\setup.exe -sha1 > sha2.txt");
@@ -191,11 +198,34 @@ namespace Deploy
 
                 //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
 
-                string s = File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
-                System.IO.File.WriteAllText(@"c:\tmp\Gekko_files\sha.txt", s);
+                //string ss = File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt") + " " + File.ReadAllText(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
+
+
+                string[] ss1 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha1.txt");
+                string[] ss2 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha2.txt");
+                string[] ss3 = File.ReadAllLines(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha3.txt");
+
+                string[] filtered1 = ss1.Where(s => !s.Trim().StartsWith("//")).ToArray();
+                string[] filtered2 = ss2.Where(s => !s.Trim().StartsWith("//")).ToArray();
+                string[] filtered3 = ss3.Where(s => !s.Trim().StartsWith("//")).ToArray();
+
+                string t1 = filtered1[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
+                string t2 = filtered2[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
+                string t3 = filtered3[0].Replace(@" c:\thomas\gekko\gekkocs\diverse\sha1\", "    ");
+
+                string txt = null;
+
+                txt += "<strong>Gekko " + GetVersion() + " </strong>" + "\r\n";
+                txt += "<ul>" + "\r\n";
+                txt += "  <li>" + t1 + "</li>" + "\r\n";
+                txt += "  <li>" + t2 + "</li>" + "\r\n";
+                txt += "  <li>" + t3 + "</li>" + "\r\n";
+                txt += "</ul>" + "\r\n";
+
+                System.IO.File.WriteAllText(@"c:\tmp\Gekko_files\sha.txt", t1 + t2 + t3);
                 MessageBox.Show(@"SHA ok, copied to c:\tmp\Gekko_files");
             }
-            catch
+            catch (Exception exception)
             {
                 MessageBox.Show("*** ERROR: SHA failed");
             }
@@ -314,6 +344,21 @@ namespace Deploy
             output.AddRange(output3);
 
             File.WriteAllLines(@"c:\Thomas\Gekko\GekkoCS\ANTLR\extra.g", output, Encoding.UTF8);
+        }
+
+        private void button8_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(@"c:\Tools\uninstall_gekko.bat");
+        }
+
+        private void textBox2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void textBox12_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }

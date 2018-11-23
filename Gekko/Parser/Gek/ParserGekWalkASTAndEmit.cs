@@ -2619,6 +2619,8 @@ namespace Gekko.Parser.Gek
                                 string meta = null;
                                 if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
+                                    //Inbuilt function
+
                                     string extra = null;
                                     int lagIndex = -12345;
                                     int lagIndexOffset = 0;
@@ -2687,19 +2689,25 @@ namespace Gekko.Parser.Gek
                                     int numberOfArguments = node.ChildrenCount() - 1;
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {                                     
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.xxx + "").A(args).A(")");
+                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
-                                        node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.xxx + "").A(args).A(")");
+                                        node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
                                         node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
                                     }
+                                    if (node.Text == "ASTFUNCTIONNAKED")
+                                    {
+                                        node.Code.A(";" + G.NL);
+                                    }
                                 }
                                 else
                                 {
+                                    //User defined function or procedure
+
                                     string args = null;
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
@@ -2712,18 +2720,18 @@ namespace Gekko.Parser.Gek
                                     //
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.xxx + "").A(args).A(")");
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {                                        
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.xxx + "").A(args).A(")");
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
                                         node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
                                     }
                                     
-                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
@@ -3416,13 +3424,13 @@ namespace Gekko.Parser.Gek
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION")
                                 {                                    
                                     string s = node[1][0].Code.ToString();
-                                    string[] ss = s.Split(new string[] { Globals.xxx }, StringSplitOptions.None);
+                                    string[] ss = s.Split(new string[] { Globals.objFunctionPlaceholder }, StringSplitOptions.None);
                                     if (ss.Length != 2)
                                     {
                                         G.Writeln2("*** ERROR: Unexpected function error");
                                         throw new GekkoException();
                                     }
-                                    string s2 = s.Replace(Globals.xxx, node[0].Code.ToString());
+                                    string s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());
                                     node.Code.A(s2);
                                 }
                                 else if (node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")

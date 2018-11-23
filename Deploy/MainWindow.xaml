@@ -5,33 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Deploy"
         mc:Ignorable="d"
-        Title="MainWindow" Height="990.85" Width="696.333">
+        Title="MainWindow" Height="703.517" Width="696.333">
     <Grid>
-        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="51" Margin="291,510,0,0" VerticalAlignment="Top" Width="254"/>
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="44" Margin="291,493,0,0" VerticalAlignment="Top" Width="254"/>
 
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,15,0,0" TextWrapping="Wrap" Text="Deployment of Gekko" VerticalAlignment="Top" Width="317" FontWeight="Bold" BorderThickness="0"/>
         <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="14,91,0,0" TextWrapping="Wrap" Text="Compile help files (Help+Manual)" VerticalAlignment="Top" Width="359" BorderThickness="0"/>
         <Button x:Name="button" Content="Copy chm file" HorizontalAlignment="Left" Margin="392,93,0,0" VerticalAlignment="Top" Width="108" Click="button_Click"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="14,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="31" Width="364"><Run FontSize="12.6666666666667" Text="Set to Release 32 bit + x86 in Build -&gt; config manager. Open VCB"/><Run FontSize="12.6666666666667" Text=", mark all, to next version, "/><Run FontSize="12.6666666666667" FontFamily="Consolas" Text="rebuild all"/><Run FontSize="12.6666666666667" FontFamily="Consolas" Text=" "/></TextBlock>
-        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="23" Margin="392,51,0,0" TextWrapping="Wrap" Text="input version number, eg. 2.2.3" VerticalAlignment="Top" Width="196" BorderThickness="2"/>
+        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="23" Margin="392,310,0,0" TextWrapping="Wrap" Text="set version x.y.z" VerticalAlignment="Top" Width="151" BorderThickness="2" TextChanged="textBox2_TextChanged"/>
         <TextBox x:Name="textBox3" HorizontalAlignment="Left" Height="23" Margin="14,150,0,0" TextWrapping="Wrap" Text="Right-click InstallerForGekko and choose Rebuild" VerticalAlignment="Top" Width="343"/>
-        <TextBox x:Name="textBox4" HorizontalAlignment="Left" Height="36" Margin="14,178,0,0" TextWrapping="Wrap" Text="Close all Gekkos and uninstall Gekko (Control panel --&gt; Remove a program)." VerticalAlignment="Top" Width="313"/>
+        <TextBox x:Name="textBox4" HorizontalAlignment="Left" Height="20" Margin="14,184,0,0" TextWrapping="Wrap" Text="Close all Gekkos and uninstall Gekko" VerticalAlignment="Top" Width="313"/>
         <TextBox x:Name="textBox5" HorizontalAlignment="Left" Height="23" Margin="14,231,0,0" TextWrapping="Wrap" Text="Run installer" VerticalAlignment="Top" Width="359"/>
         <Button x:Name="button1" Content="Run installer" HorizontalAlignment="Left" Margin="392,233,0,0" VerticalAlignment="Top" Width="120" Click="button1_Click"/>
-        <TextBox x:Name="textBox6" HorizontalAlignment="Left" Height="23" Margin="14,349,0,0" TextWrapping="Wrap" Text="Copy files to c:\tmp\Gekko_files for upload" VerticalAlignment="Top" Width="359"/>
-        <Button x:Name="button2" Content="Prepare for upload" HorizontalAlignment="Left" Margin="392,352,0,0" VerticalAlignment="Top" Width="185" Click="button2_Click"/>
+        <TextBox x:Name="textBox6" HorizontalAlignment="Left" Height="22" Margin="14,394,0,0" TextWrapping="Wrap" Text="Copy files to c:\tmp\Gekko_files for upload" VerticalAlignment="Top" Width="359"/>
+        <Button x:Name="button2" Content="Prepare for upload" HorizontalAlignment="Left" Margin="392,396,0,0" VerticalAlignment="Top" Width="185" Click="button2_Click" Height="20"/>
         <TextBox x:Name="textBox8" HorizontalAlignment="Left" Height="23" Margin="14,268,0,0" TextWrapping="Wrap" Text="Set RAM aware" VerticalAlignment="Top" Width="359"/>
         <Button x:Name="button3" Content="RAM aware" HorizontalAlignment="Left" Margin="392,268,0,0" VerticalAlignment="Top" Width="75" Click="button3_Click"/>
-        <TextBox x:Name="textBox9" HorizontalAlignment="Left" Height="23" Margin="14,377,0,0" TextWrapping="Wrap" Text="Zip a Gekko.zip file from \Program files" VerticalAlignment="Top" Width="359" TextChanged="textBox9_TextChanged"/>
-        <Button x:Name="button4" Content="Zip" HorizontalAlignment="Left" Margin="392,380,0,0" VerticalAlignment="Top" Width="75" Click="button4_Click"/>
-        <TextBox x:Name="textBox10" HorizontalAlignment="Left" Height="23" Margin="14,420,0,0" TextWrapping="Wrap" Text="SHA1 of 3 files" VerticalAlignment="Top" Width="359"/>
-        <Button x:Name="button5" Content="SHA1" HorizontalAlignment="Left" Margin="392,423,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click"/>
-        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="23" Margin="14,467,0,0" TextWrapping="Wrap" Text="Zip source code" VerticalAlignment="Top" Width="359"/>
-        <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="392,467,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click"/>
-        <TextBox x:Name="textBox7" HorizontalAlignment="Left" Height="23" Margin="14,309,0,0" TextWrapping="Wrap" Text="Test the new Gekko a bit, including help files" VerticalAlignment="Top" Width="359"/>
-        <TextBox x:Name="textBox12" HorizontalAlignment="Left" Height="43" Margin="14,512,0,0" TextWrapping="Wrap" Text="Git commit, and put on web etc." VerticalAlignment="Top" Width="220"/>
-        <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="23" Margin="312,525,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="452,524,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click"/>
+        <TextBox x:Name="textBox9" HorizontalAlignment="Left" Height="22" Margin="14,420,0,0" TextWrapping="Wrap" Text="Zip a Gekko.zip file from \Program files" VerticalAlignment="Top" Width="359" TextChanged="textBox9_TextChanged"/>
+        <Button x:Name="button4" Content="Zip" HorizontalAlignment="Left" Margin="392,423,0,0" VerticalAlignment="Top" Width="75" Click="button4_Click" Height="19"/>
+        <TextBox x:Name="textBox10" HorizontalAlignment="Left" Height="21" Margin="14,347,0,0" TextWrapping="Wrap" Text="SHA1 of 3 files" VerticalAlignment="Top" Width="359"/>
+        <Button x:Name="button5" Content="SHA1" HorizontalAlignment="Left" Margin="392,349,0,0" VerticalAlignment="Top" Width="75" Click="button5_Click" Height="19"/>
+        <TextBox x:Name="textBox11" HorizontalAlignment="Left" Height="20" Margin="14,456,0,0" TextWrapping="Wrap" Text="Zip source code" VerticalAlignment="Top" Width="359"/>
+        <Button x:Name="button6" Content="Zip source" HorizontalAlignment="Left" Margin="392,456,0,0" VerticalAlignment="Top" Width="75" Click="button6_Click" Height="17"/>
+        <TextBox x:Name="textBox7" HorizontalAlignment="Left" Height="23" Margin="14,310,0,0" TextWrapping="Wrap" Text="Test the new Gekko a bit, including help files" VerticalAlignment="Top" Width="359"/>
+        <TextBox x:Name="textBox12" HorizontalAlignment="Left" Height="162" Margin="14,494,0,0" TextWrapping="Wrap" Text="Git commit. Goto t-t.dk/gekko/admin, and update 3 pages:&#xD;&#xA;&#xD;&#xA;1. Installer - signature/checksums:&#xD;&#xA;  copy sha.txt into txt version of page&#xD;&#xA;2. Change-log: Update from git show log&#xD;&#xA;3. Download - devel versions: condensate changelog into version on devel page&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" VerticalAlignment="Top" Width="220" TextChanged="textBox12_TextChanged"/>
+        <TextBox x:Name="textBox13" HorizontalAlignment="Left" Height="20" Margin="312,505,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="button7" Content="TOKEN" HorizontalAlignment="Left" Margin="452,505,0,0" VerticalAlignment="Top" Width="75" Click="button7_Click" Height="17"/>
+        <Button x:Name="button8" Content="Uninstall Gekko" HorizontalAlignment="Left" Margin="392,184,0,0" VerticalAlignment="Top" Width="135" Click="button8_Click"/>
 
     </Grid>
 </Window>

@@ -8331,18 +8331,101 @@ namespace UnitTests
             I("PIPE 'c:\\Thomas\\Desktop\\gek' + 'ko\\testing\\sletmig';"); I("PIPE con;");
         }
 
+        [TestMethod]
+        public void _Test_FunctionAndProcedureVariants()
+        {
+            // ----------- user defined functions
+
+            //0 arg, 0 return
+            I("RESET; CLS;");
+            I("FUNCTION void f(); TELL 'a1y'; END; f();");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a1y"));
+
+            //1 arg, 0 return
+            I("RESET; CLS;");
+            I("FUNCTION void f(val %v); TELL 'a2y' + %v; END; f(1);");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a2y1"));
+
+            //0 arg, 1 return
+            I("RESET; CLS;");
+            I("FUNCTION string f(); TELL 'a3y'; RETURN 'a3y'; END; %s = f();");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
+            _AssertScalarString(First(), "%s", "a3y");
+            I("CLS; f();"); //discards return value
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
+
+            //1 arg, 1 return
+            I("RESET; CLS;");
+            I("FUNCTION string f(val %v); TELL 'a4y' + %v; RETURN 'a4y' + %v; END; %s = f(1);");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
+            _AssertScalarString(First(), "%s", "a4y1");
+            I("CLS; f(1);"); //discards return value
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
+
+            // ----------- user defined procedures
+
+            //0 arg, 0 return
+            I("RESET; CLS;");
+            I("PROCEDURE f; TELL 'a5y'; END; f;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a5y"));
+
+            //1 arg, 0 return
+            I("RESET; CLS;");
+            I("PROCEDURE f val %v; TELL 'a6y' + %v; END; f 1;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a6y1"));
+
+            // ----------- user defined, as object functions
 
 
 
+            //1 arg, 0 return
+            I("RESET; CLS;");
+            I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+
+            //1 arg, 1 return
+            I("RESET; CLS;");
+            I("FUNCTION string f(val %v); TELL 'a8y' + %v; RETURN 'a8y' + %v; END; %x = 1; %s = %x.f();");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
+            _AssertScalarString(First(), "%s", "a8y1");
+            I("CLS; 1.f();"); //discards return value
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
 
 
+            // ----------- inbuilt functions
+
+            //0 arg, 0 return
+            //hmmm, no current like that, but it does work!
+
+            //0 arg, 1 return
+            I("reset;");
+            I("%v = runif();");
+            I("runif();");
+
+            //2 arg, 0 return
+            I("reset;");
+            I("a = series(1);");
+            I("setdomains(a, ('#s',));");
+
+            //1 arg, 1 return
+            I("reset;");
+            I("%v = log(1);");
+            I("log(1);");
+
+            // ----------- inbuilt functions, as object functions
+
+            //2 arg, 0 return
+            I("reset;");
+            I("a = series(1);");
+            I("a.setdomains(('#s',));");
+
+            //1 arg, 1 return
+            I("reset;");
+            I("%v = 1.log();");
+            I("1.log();");
 
 
-
-
-
-
-
+        }
 
         [TestMethod]
         public void _Test_DefaultDomains()
@@ -8355,20 +8438,37 @@ namespace UnitTests
             I("x[a] = 100; p[a] = 2;");
             I("x[b] = 110; p[b] = 3;");
             I("#i = a, b;");  //not actually used
-            I("%v = x.setdomains(('#i',));");
-            I("%v = p.setdomains(('#i',));");            
+            I("x.setdomains(('#i',));");
+            I("p.setdomains(('#i',));");
             I("p<n> x;");
-            Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);            
+            Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
             I("p<n> p*x;");
             table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
             I("#default = map();");
-            I("#default.#i = list('b');");            
+            I("#default.#i = list('b');");
             I("p<n> x;");
-            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);            
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
             I("p<n> p*x;");
             table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
             I("p<n> x*p;");
             table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
+
+            // -----------------------------
+
+            I("reset;");
+            I("#s = ('e1', 'e2');");
+            I("a = series(1);");
+            I("@a = series(1);");
+            I("a[#s] = 1;");
+            I("@a[e1] = 2;");
+            FAIL("p <q> a;  //fejler");
+            I("a.setdomains(('#s',));");            
+            I("@a.setdomains(('#s',));");
+            FAIL("p <q> a;  //fejler");
+            I("global:#default = map();");
+            I("global:#default.#s = ('e1',); ");
+            I("p <q> a;");
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);            
 
         }
 

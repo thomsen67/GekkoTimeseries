@@ -13060,13 +13060,15 @@ namespace Gekko
                 {
                     string sub = s2;
                     if (G.Equal(sub, "deploy"))
-                    {
+                    {                        
                         //Deploy
                         if (Globals.runningOnTTComputer)
                         {
-                            Deploy.MainWindow w = new Deploy.MainWindow();
-                            w.SetStartupPath(Application.StartupPath);
-                            w.ShowDialog();
+                            G.Writeln2("Use 'deploy' from Total Commander prompt");
+                            G.Writeln(@"Also see c:\Thomas\Gekko\GekkoCS\Deploy\!seher");
+                            //Deploy.MainWindow w = new Deploy.MainWindow();
+                            //w.SetStartupPath(Application.StartupPath);
+                            //w.ShowDialog();
                         }
                         return "";   //no need for the parser to chew on this afterwards!
                     }
@@ -27644,7 +27646,7 @@ namespace Gekko
                         int lines = -12345;
                         int widthHere = -12345;
 
-                        if (type == EPrintTypes.Plot || rows)
+                        if (type == EPrintTypes.Plot || type == EPrintTypes.Sheet || rows)
                         {
                             lines = 1;
                             widthHere = int.MaxValue;
@@ -28604,9 +28606,8 @@ namespace Gekko
                 CallGnuplotNew2(table, o, containerExplode, freqs);
             }
             else if(type == EPrintTypes.Sheet)
-            {
-                
-                    //tab2 = tab.Transpose();
+            {   
+                //tab2 = tab.Transpose();
                     //TODO: we need a counter regarding the first rows/cols of the table, how many??
 
                     //TODO: fill with NaN!!!
