@@ -2827,10 +2827,16 @@ procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*)
 print:                      prtHelper prtOpt1? prtElements prtOpt2? -> ^({token("ASTPRT", ASTPRT, input.LT(1).Line)} ^(ASTPRTTYPE prtHelper) ^(ASTPLACEHOLDER prtOpt1?) ^(ASTPLACEHOLDER prtOpt2?) prtElements);
 prtHelper:				    P | PRT | PRI | PRINT | MULPRT | GMULPRT | SHEET | CLIP | PLOT;
 prtElements:                prtElement (COMMA2 prtElement)* -> ^(ASTPRTELEMENTS prtElement+);
+//prtElement:                 expression
+//                            expression2?
+//							prtElementOptionField?
+//							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER prtElementOptionField?))
+//						    ;
+
 prtElement:                 expression
-                            expression2?
+                            gekkoLabel?
 							prtElementOptionField?
-							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) ^(ASTPLACEHOLDER expression2?) ^(ASTPLACEHOLDER prtElementOptionField?))
+							-> ^({token("ASTPRTELEMENT¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTPRTELEMENT, 0)} ^(ASTEXPRESSION expression) gekkoLabel? prtElementOptionField?)
 						    ;
 
 

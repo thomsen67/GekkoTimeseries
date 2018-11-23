@@ -8376,19 +8376,23 @@ namespace UnitTests
 
             // ----------- user defined, as object functions
 
-
-
-            //1 arg, 0 return
-            I("RESET; CLS;");
-            I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                //1 arg, 0 return
+                I("RESET; CLS;");
+                I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+            }
 
             //1 arg, 1 return
             I("RESET; CLS;");
             I("FUNCTION string f(val %v); TELL 'a8y' + %v; RETURN 'a8y' + %v; END; %x = 1; %s = %x.f();");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
             _AssertScalarString(First(), "%s", "a8y1");
-            I("CLS; 1.f();"); //discards return value
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("CLS; 1.f();"); //discards return value
+            }
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
 
 
@@ -8417,12 +8421,18 @@ namespace UnitTests
             //2 arg, 0 return
             I("reset;");
             I("a = series(1);");
-            I("a.setdomains(('#s',));");
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("a.setdomains(('#s',));");
+            }
 
             //1 arg, 1 return
             I("reset;");
             I("%v = 1.log();");
-            I("1.log();");
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("1.log();");
+            }
 
 
         }
@@ -8438,8 +8448,8 @@ namespace UnitTests
             I("x[a] = 100; p[a] = 2;");
             I("x[b] = 110; p[b] = 3;");
             I("#i = a, b;");  //not actually used
-            I("x.setdomains(('#i',));");
-            I("p.setdomains(('#i',));");
+            I("setdomains(x, ('#i',));");
+            I("setdomains(p, ('#i',));");
             I("p<n> x;");
             Table table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 3);
             I("p<n> p*x;");
@@ -8462,8 +8472,8 @@ namespace UnitTests
             I("a[#s] = 1;");
             I("@a[e1] = 2;");
             FAIL("p <q> a;  //fejler");
-            I("a.setdomains(('#s',));");            
-            I("@a.setdomains(('#s',));");
+            I("setdomains(a, ('#s',));");            
+            I("setdomains(@a, ('#s',));");
             FAIL("p <q> a;  //fejler");
             I("global:#default = map();");
             I("global:#default.#s = ('e1',); ");

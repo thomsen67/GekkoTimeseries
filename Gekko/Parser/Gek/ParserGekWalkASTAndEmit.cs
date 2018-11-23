@@ -4897,16 +4897,16 @@ namespace Gekko.Parser.Gek
                     case "ASTPRTELEMENT":
                     case "ASTTABLESETVALUESELEMENT":
                         {
-                            
+
                             w.expressionCounter++;
                             node.Code.A("{" + G.NL);  //avoid scope collisions                            
                             if (node.Text == "ASTTABLESETVALUESELEMENT")
                             {
-                                node.Code.A("List<int> bankNumbers = O.Prt.CreateBankHelper(1);" + G.NL);                                
+                                node.Code.A("List<int> bankNumbers = O.Prt.CreateBankHelper(1);" + G.NL);
                             }
                             else if (node.Text == "ASTOLSELEMENT")
                             {
-                                node.Code.A("List<int> bankNumbers = O.Prt.CreateBankHelper(1);" + G.NL);                                
+                                node.Code.A("List<int> bankNumbers = O.Prt.CreateBankHelper(1);" + G.NL);
                             }
                             else  //prt
                             {
@@ -4922,8 +4922,8 @@ namespace Gekko.Parser.Gek
                                     givenLabel = G.StripQuotes(givenLabel);
                                     givenLabel = Globals.labelCheatString + givenLabel;
                                 }
-                                else givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);                            
-                            }                            
+                                else givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);
+                            }
                             node.Code.A("O.Prt.Element ope" + Num(node) + " = new O.Prt.Element();" + G.NL);  //this must be after the list start iterator code
 
                             //if (true)
@@ -4955,20 +4955,16 @@ namespace Gekko.Parser.Gek
                                 freelists = Globals.freelists + freelists + Globals.freelists;
                             }
 
-                            string label = "new List<string>() { `" + freelists + ReportLabelHelper(node) + "`}";
-                            if (node[1][0] != null) label = "O.GetListOfStringsFromIVariable(" + node[1][0].Code.ToString() + ")";
-
-                            node.Code.A("ope" + Num(node) + ".labelGiven = " + label + ";" + G.NL);
+                            node.Code.A("ope" + Num(node) + ".labelGiven = new List<string>() { `" + freelists + ReportLabelHelper(node) + "`};" + G.NL);
                             if (givenLabel != null) givenLabel = givenLabel.Replace(G.NL, ""); //remove any newlines, else C# code will become invalid.
                                                                                                //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 
                             //node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
                             node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); smpl.t0 = smpl.t0.Add(-2);" + G.NL);
 
-                            ASTNode child = null;
-                            if (node[2] != null) child = node[2].GetChild("ASTPRTELEMENTOPTIONFIELD");
+                            ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
-                            
+
                             if (node.Text == "ASTPRTELEMENT")
                             {
                                 node.Code.A("ope" + Num(node) + ".printCodesFinal = Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + ");");
@@ -4987,20 +4983,20 @@ namespace Gekko.Parser.Gek
                             node.Code.A("int bankNumber = bankNumbers[bankNumberI];" + G.NL);
                             node.Code.A("smpl.bankNumber = bankNumber;" + G.NL);
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
-                                                        
+
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
-                            
+
                             node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
                             //node.Code.A("O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
 
                             node.Code.A("}" + G.NL);  //end of bankNumbers
                             node.Code.A("smpl.bankNumber = 0;" + G.NL);  //resetting, probably superfluous
-                            node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);
                             node.Code.A("}" + G.NL);  //avoid scope collisions
 
                             //node.Code.A(Globals.GekkoSmplNull);
-                            
+
                         }
                         break;
                     case "ASTOLSELEMENTS":
