@@ -15220,7 +15220,7 @@ namespace Gekko
 
                 if (ts == null)
                 {                    
-                    PrintNonSeries(x, null);
+                    PrintNonSeries(x, null, 0);
                     nonSeries++;
                     continue;
                 }
@@ -23550,11 +23550,11 @@ namespace Gekko
                     success = false;
                     if (type == "copy")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked for copying. Retrying... (" + (i * gap) + " seconds)");
+                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' or '" + pathAndFilenameDestination + "'seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     else if (type == "delete")
                     {
-                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' seems blocked for deleting. Retrying... (" + (i * gap) + " seconds)");
+                        G.Writeln("+++ WARNING: File '" + pathAndFilenameSource + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
                     }
                     System.Threading.Thread.Sleep(gap * 1000);  //2 seconds
                     continue;
@@ -27314,66 +27314,75 @@ namespace Gekko
         //    }
         //}
 
-        public static bool AllSeriesCheck(O.Prt oPrt, EPrintTypes type)
+        public static void AllSeriesCheckRecursive(IVariable x, ref bool fail, ref int seriesCounter)
         {
-
-            //all are val or series
-            //at least one series            
-
-            int seriesCounter = 0;
-            if (type == EPrintTypes.Print)
+            if (x.Type() == EVariableType.List)
             {
-                //check if elements are non-series, or lists with non-series
-                foreach (O.Prt.Element element in oPrt.prtElements)
+                foreach (IVariable iv in (x as List).list)
                 {
-                    //if(element.variable[0]!=null && element.variable[0].Type()==EVariableType.Series)
-                    if (element.variable[0] != null)
-                    {
-                        List temp = element.variable[0] as List;
-                        if (temp != null)
-                        {                            
-                            foreach (IVariable iv in temp.list)
-                            {
-                                if (!IsSeriesType(iv)) return false;
-                                if (iv.Type() == EVariableType.Series || G.IsGekkoNull(iv)) seriesCounter++;
-                            }
-                        }
-                        else
-                        {
-                            if (!IsSeriesType(element.variable[0])) return false;
-                            if (element.variable[0].Type() == EVariableType.Series || G.IsGekkoNull(element.variable[0])) seriesCounter++;
-                        }
-                    }
-
-                    if (element.variable[1] != null)
-                    {
-                        List temp = element.variable[1] as List;
-                        if (temp != null)
-                        {
-                            foreach (IVariable iv in temp.list)
-                            {
-                                if (!IsSeriesType(iv)) return false;
-                                if (iv.Type() == EVariableType.Series || G.IsGekkoNull(iv)) seriesCounter++;
-                            }
-                        }
-                        else
-                        {
-                            if (!IsSeriesType(element.variable[1])) return false;
-                            if (element.variable[1].Type() == EVariableType.Series || G.IsGekkoNull(element.variable[1])) seriesCounter++;
-                        }
-                    }                 
-                    
+                    AllSeriesCheckRecursive(iv, ref fail, ref seriesCounter);
+                    if (fail) break;  //no need to carry on
                 }
-                if (seriesCounter == 0) return false;  //seriesCounter also includes GekkoNull objects
             }
             else
             {
-                //not prt
-                return true;
+                if (!IsSeriesType(x)) fail = true;
+                if (x.Type() == EVariableType.Series || G.IsGekkoNull(x)) seriesCounter++;
             }
-            return true;
         }
-        
+
+        //public static bool AllSeriesCheck(O.Prt oPrt, EPrintTypes type)
+        //{
+
+        //    //all are val or series
+        //    //at least one series            
+
+        //    int seriesCounter = 0;
+        //    if (type == EPrintTypes.Print)
+        //    {
+        //        //check if elements are non-series, or lists with non-series
+        //        foreach (O.Prt.Element element in oPrt.prtElements)
+        //        {
+        //            for (int i = 0; i < 2; i++)
+        //            {
+        //                IVariable x = element.variable[i];
+        //                bool fail = false;
+        //                if (x != null)
+        //                {
+        //                    List temp = x as List;
+        //                    if (temp != null)
+        //                    {
+        //                        foreach (IVariable iv in temp.list)
+        //                        {
+        //                            AllSeriesHelper(ref seriesCounter, ref fail, iv);
+        //                            if (fail) break;
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+
+        //                        AllSeriesHelper(ref seriesCounter, ref fail, x);
+        //                    }
+        //                }
+        //                if (fail) return false;                   
+        //            }                 
+                    
+        //        }
+        //        if (seriesCounter == 0) return false;  //seriesCounter also includes GekkoNull objects
+        //    }
+        //    else
+        //    {
+        //        //not prt
+        //        return true;
+        //    }
+        //    return true;
+        //}
+
+        //private static void AllSeriesHelper(ref int seriesCounter, ref bool fail, IVariable iv)
+        //{
+        //    if (!IsSeriesType(iv)) fail = true;
+        //    if (iv.Type() == EVariableType.Series || G.IsGekkoNull(iv)) seriesCounter++;
+        //}
 
         private static bool IsSeriesType(IVariable iv)
         {
@@ -27382,19 +27391,7 @@ namespace Gekko
             if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val && iv.Type() != EVariableType.GekkoNull)
             {
                 b = false;
-            }
-            else
-            {
-                //Series ts = iv as Series;
-                //if (ts != null)
-                //{
-                //    if (ts.type == ESeriesType.ArraySuper)
-                //    {
-                //        b = false;
-                //    }
-                //}
-            }
-
+            }            
             return b;
         }
 
@@ -29009,19 +29006,20 @@ namespace Gekko
                 string[] w = RemoveSplitter(element.labelGiven[0]).Split('|');  //raw label   
                 string labelGiven = G.ReplaceGlueNew(w[0]);
 
-                PrintNonSeries(element.variable[0], labelGiven);
+                PrintNonSeries(element.variable[0], labelGiven, 0);
             }
         }
 
-        private static void PrintNonSeries(IVariable var, string labelGiven)
+        private static void PrintNonSeries(IVariable x, string labelGiven, int depth)
         {
             string pling = "'";
             
-            List temp = var as List;
-            if (temp != null)
+            List x_list = x as List;
+            if (x_list != null)
             {
+                //is a list
                 string s = null;
-                foreach (IVariable iv in temp.list)
+                foreach (IVariable iv in x_list.list)
                 {
                     if (iv.Type() == EVariableType.String)
                     {
@@ -29035,6 +29033,10 @@ namespace Gekko
                     {
                         s += ((ScalarVal)iv).val.ToString() + ", ";
                     }
+                    else if (iv.Type() == EVariableType.List)
+                    {
+                        PrintNonSeries(iv, labelGiven, depth + 1);
+                    }
                     else
                     {
                         s += "[" + iv.Type().ToString() + "]" + ", ";
@@ -29042,7 +29044,7 @@ namespace Gekko
                 }
                 PrintLabel(labelGiven);
 
-                if (temp.list.Count > 0)
+                if (x_list.list.Count > 0)
                 {
                     s = s.Substring(0, s.Length - ", ".Length);
                     G.Writeln(s);
@@ -29054,29 +29056,29 @@ namespace Gekko
             }
             else
             {
-                if (var.Type() == EVariableType.Matrix)
+                if (x.Type() == EVariableType.Matrix)
                 {
-                    Program.ShowMatrix((Matrix)var, labelGiven);
+                    Program.ShowMatrix((Matrix)x, labelGiven);
                 }
-                else if (var.Type() == EVariableType.String)
+                else if (x.Type() == EVariableType.String)
                 {
                     PrintLabel(labelGiven);
-                    G.Writeln(pling + ((ScalarString)var).string2 + pling);
+                    G.Writeln(pling + ((ScalarString)x).string2 + pling);
                 }
-                else if (var.Type() == EVariableType.Val)
+                else if (x.Type() == EVariableType.Val)
                 {
                     PrintLabel(labelGiven);
-                    G.Writeln(((ScalarVal)var).val.ToString());
+                    G.Writeln(((ScalarVal)x).val.ToString());
                 }
-                else if (var.Type() == EVariableType.Date)
+                else if (x.Type() == EVariableType.Date)
                 {
                     PrintLabel(labelGiven);
-                    G.Writeln(((ScalarDate)var).date.ToString());
+                    G.Writeln(((ScalarDate)x).date.ToString());
                 }
-                else if (var.Type() == EVariableType.Map)
+                else if (x.Type() == EVariableType.Map)
                 {
                     PrintLabel(labelGiven);
-                    Map map = var as Map;
+                    Map map = x as Map;
 
                     if (map.storage.Count == 0)
                     {
@@ -30545,103 +30547,103 @@ namespace Gekko
             return s2;
         }
 
-        private static void Cplot(string transpose, string dates, string labels, ExcelDataForClip ed)
-        {
-            int rows = ed.data.GetLength(0);
-            int cols = ed.data.GetLength(1);
-            string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
+        //private static void Cplot(string transpose, string dates, string labels, ExcelDataForClip ed)
+        //{
+        //    int rows = ed.data.GetLength(0);
+        //    int cols = ed.data.GetLength(1);
+        //    string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
 
-            bool hasDates = true;
-            if (G.Equal(dates, "no"))
-            {
-                hasDates = false;
-            }
+        //    bool hasDates = true;
+        //    if (G.Equal(dates, "no"))
+        //    {
+        //        hasDates = false;
+        //    }
 
-            bool hasLabels = true;
-            if (G.Equal(labels, "no"))
-            {
-                hasLabels = false;
-            }
+        //    bool hasLabels = true;
+        //    if (G.Equal(labels, "no"))
+        //    {
+        //        hasLabels = false;
+        //    }
 
-            bool isTranspose = false;
-            if (G.Equal(transpose, "yes"))
-            {
-                isTranspose = true;
-            }
+        //    bool isTranspose = false;
+        //    if (G.Equal(transpose, "yes"))
+        //    {
+        //        isTranspose = true;
+        //    }
 
-            x[0, 0] = "";
+        //    x[0, 0] = "";
 
-            if (isTranspose)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    if (hasLabels) x[0, col + 1] = ed.varnames[0, col];
-                }
-                for (int row = 0; row < rows; row++)
-                {
-                    if (hasDates) x[row + 1, 0] = ed.dates[row, 0];
-                }
-            }
-            else
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    if (hasDates) x[0, col + 1] = ed.dates[0, col];
-                }
-                for (int row = 0; row < rows; row++)
-                {
-                    if (hasLabels) x[row + 1, 0] = ed.varnames[row, 0];
-                }
-            }
+        //    if (isTranspose)
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            if (hasLabels) x[0, col + 1] = ed.varnames[0, col];
+        //        }
+        //        for (int row = 0; row < rows; row++)
+        //        {
+        //            if (hasDates) x[row + 1, 0] = ed.dates[row, 0];
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            if (hasDates) x[0, col + 1] = ed.dates[0, col];
+        //        }
+        //        for (int row = 0; row < rows; row++)
+        //        {
+        //            if (hasLabels) x[row + 1, 0] = ed.varnames[row, 0];
+        //        }
+        //    }
 
-            for (int row = 0; row < rows; row++)
-            {
-                for (int col = 0; col < cols; col++)
-                {
-                    x[row + 1, col + 1] = PrepareDataForClipboard(ed.data[row, col]);
-                }
-            }
+        //    for (int row = 0; row < rows; row++)
+        //    {
+        //        for (int col = 0; col < cols; col++)
+        //        {
+        //            x[row + 1, col + 1] = PrepareDataForClipboard(ed.data[row, col]);
+        //        }
+        //    }
 
-            int rowStart = 0;
-            int colStart = 0;
+        //    int rowStart = 0;
+        //    int colStart = 0;
 
-            if (isTranspose)
-            {
-                if (!hasLabels) rowStart = 1;
-                if (!hasDates) colStart = 1;
-            }
-            else
-            {
-                if (!hasLabels) colStart = 1;
-                if (!hasDates) rowStart = 1;
-            }
+        //    if (isTranspose)
+        //    {
+        //        if (!hasLabels) rowStart = 1;
+        //        if (!hasDates) colStart = 1;
+        //    }
+        //    else
+        //    {
+        //        if (!hasLabels) colStart = 1;
+        //        if (!hasDates) rowStart = 1;
+        //    }
 
-            StringBuilder s = new StringBuilder();
-            if (ed.stamp != null)
-            {
-                s.Append(ed.stamp);
-                s.Append("\n");
-            }
+        //    StringBuilder s = new StringBuilder();
+        //    if (ed.stamp != null)
+        //    {
+        //        s.Append(ed.stamp);
+        //        s.Append("\n");
+        //    }
 
-            if (ed.heading != null)
-            {
-                s.Append(ed.heading);
-                s.Append("\n");
-            }
+        //    if (ed.heading != null)
+        //    {
+        //        s.Append(ed.heading);
+        //        s.Append("\n");
+        //    }
 
-            for (int i = rowStart; i < rows + 1; i++)
-            {
-                for (int j = colStart; j < cols + 1; j++)
-                {
-                    if (j - colStart > 0) s.Append("\t");
-                    string s2 = x[i, j];
-                    s.Append(s2);
-                }
-                if (i < rows) s.Append("\n");
-            }
-            System.Windows.Forms.Clipboard.SetText(s.ToString(), System.Windows.Forms.TextDataFormat.Text);
-            G.Writeln2("CSHEET: You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
-        }
+        //    for (int i = rowStart; i < rows + 1; i++)
+        //    {
+        //        for (int j = colStart; j < cols + 1; j++)
+        //        {
+        //            if (j - colStart > 0) s.Append("\t");
+        //            string s2 = x[i, j];
+        //            s.Append(s2);
+        //        }
+        //        if (i < rows) s.Append("\n");
+        //    }
+        //    System.Windows.Forms.Clipboard.SetText(s.ToString(), System.Windows.Forms.TextDataFormat.Text);
+        //    G.Writeln2("CSHEET: You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
+        //}
 
         private static void GraphThreadFunction(Object o)
         {

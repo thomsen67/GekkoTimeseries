@@ -2693,13 +2693,14 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
-                                        node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
                                         node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(args).A(")");
                                     }
-                                    if (node.Text == "ASTFUNCTIONNAKED")
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
@@ -2724,14 +2725,15 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {                                        
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
                                         node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
                                     }
                                     
-                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }

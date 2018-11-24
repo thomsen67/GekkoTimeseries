@@ -8017,14 +8017,14 @@ namespace UnitTests
             FAIL("PRT g{j};");  //same
             FAIL("PRT g {j};");
             I("PRT g%j;");  //gdp
-            FAIL("PRT g %j;");  //gdp
+            I("PRT g %j;");  //gdp --------------> before FAIL, but %j is now in 3.0 interpreted as a label
             FAIL("PRT %j|g;");  //dpg
             I("PRT {%j}g;");  //dpg
             FAIL("PRT %j |g;");
             FAIL("PRT %j| g;");
             FAIL("PRT %j g;");
             FAIL("PRT %i%j;");  //gdp
-            FAIL("PRT %i %j;");  //gdp
+            I("PRT %i %j;");  //gdp  --------------> before FAIL, but %j is now in 3.0 interpreted as a label
             I("PRT %j;");  //'dp'
             I("PRT {%j};");  //dp
             FAIL("PRT {j};");  //dp
@@ -8376,23 +8376,21 @@ namespace UnitTests
 
             // ----------- user defined, as object functions
 
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                //1 arg, 0 return
-                I("RESET; CLS;");
-                I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
-                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
-            }
+
+            //1 arg, 0 return
+            I("RESET; CLS;");
+            I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+
 
             //1 arg, 1 return
             I("RESET; CLS;");
             I("FUNCTION string f(val %v); TELL 'a8y' + %v; RETURN 'a8y' + %v; END; %x = 1; %s = %x.f();");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
             _AssertScalarString(First(), "%s", "a8y1");
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                I("CLS; 1.f();"); //discards return value
-            }
+
+            I("CLS; %zz = 1; %zz.f();"); //discards return value
+
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
 
 
@@ -8421,19 +8419,12 @@ namespace UnitTests
             //2 arg, 0 return
             I("reset;");
             I("a = series(1);");
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                I("a.setdomains(('#s',));");
-            }
+            I("a.setdomains(('#s',));");
 
             //1 arg, 1 return
             I("reset;");
             I("%v = 1.log();");
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                I("1.log();");
-            }
-
+            I("%zz = 1; %zz.log();");
 
         }
 
@@ -14622,7 +14613,7 @@ namespace UnitTests
             //tsd
             //csv
             //prn
-            //xls(x), also via SHEET (includes importing matrix)            
+            //xls(x), also via SHEET (includes importing matrix), both internal and excel engine            
             //flat
             //gnplot (only writing)
             //tsp... hmmm not done...

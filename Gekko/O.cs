@@ -8381,27 +8381,8 @@ namespace Gekko
 
             public void Exe()
             {
-                G.CheckLegalPeriod(this.t1, this.t2);
-
-                
-                //try
-                //{
-                //    if (this.opt_missing != null)
-                //    {
-                //        Program.options.series_array_print_missing = G.GetMissing(this.opt_missing);
-                //        Program.options.series_normal_print_missing = G.GetMissing(this.opt_missing);
-                //    }
-                    OprintStart();
-                //}
-                //finally
-                //{
-                //    if (this.opt_missing != null)
-                //    {
-                //        //revert
-                        
-                //    }
-                //}
-
+                G.CheckLegalPeriod(this.t1, this.t2);                
+                OprintStart();
             }
 
             private void OprintStart()
@@ -8415,7 +8396,6 @@ namespace Gekko
                 //.labels2 will contain list('a', 'b'). The print could be:
                 //.variable[0] will contain list(a, b).
                 //a[i1], a[i2], b[j1], b[j2], b[j3]
-
 
                 //Explode(): only lists at top-most level are preserved -- others are eliminated 
                 //so for a prtElement, either the element is a non-List or a List (with only non-List items)
@@ -8434,10 +8414,11 @@ namespace Gekko
                 //      c[i2]
                 //      c[i3]
 
-                Explode();  //unfolds any lists in the prtElements
+                bool allSeries = AllSeries();
+
+                if (allSeries) Explode(); //unfolds any lists in the prtElements
 
                 List<string> labelOriginal = new List<string>();
-
 
                 // ---------------------------------------------------------------------------------------------
                 // ----- Unfolding of array-series start -------------------------------------------------------             
@@ -8534,7 +8515,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !Program.AllSeriesCheck(this, EPrintTypes.Print))
+                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries)
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
@@ -8545,7 +8526,7 @@ namespace Gekko
                         this.prtElements = new List<Element>();
                         this.prtElements.Add(prtElementsRemember[i]); //seen from Oprint(), it looks like there is only 1 variable to print
 
-                        if (Program.AllSeriesCheck(this, EPrintTypes.Print))  //note that here, this.prtElements contains only 1 element (the current)!
+                        if (AllSeries())  //note that here, this.prtElements contains only 1 element (the current)!
                         {
                             Program.OPrint(this, null, labelOriginal);
                         }
@@ -8573,12 +8554,33 @@ namespace Gekko
                 {
                     //All vars are series or val (series may be x[#i] or x[%i]).
                     Program.OPrint(this, null, labelOriginal);
-                }                
+                }
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
                     G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                 }
+            }
+
+            private bool AllSeries()
+            {
+                bool nonSeries = false;
+                int seriesCounter = 0;
+                foreach (O.Prt.Element element in this.prtElements)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        IVariable x = element.variable[i];
+                        if (x != null)
+                        {
+                            Program.AllSeriesCheckRecursive(x, ref nonSeries, ref seriesCounter);
+                            if (nonSeries) break;
+                        }
+                    }
+                }
+                bool allSeries = false;
+                if (!nonSeries && seriesCounter > 0) allSeries = true;
+                return allSeries;
             }
 
             private void Explode()
