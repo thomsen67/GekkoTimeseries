@@ -29008,115 +29008,7 @@ namespace Gekko
 
                 PrintNonSeries(element.variable[0], labelGiven, 0);
             }
-        }
-
-        private static string PrintNonSeriesSLET(IVariable x, string labelGiven, int depth)
-        {
-            //for depth > 0, we could return a string "(... , ... , ... )" and add it to s
-
-            string pling = "'";
-            
-            List x_list = x as List;
-            if (x_list != null || depth > 0)
-            {
-                //is a list, or we are at depth > 0
-                string s = null;
-                for (int i = 0; i < x_list.list.Count; i++)
-                {
-                    IVariable iv = x_list.list[i];
-                    if (iv.Type() == EVariableType.String)
-                    {
-                        s += pling + ((ScalarString)iv).string2 + pling;
-                    }
-                    else if (iv.Type() == EVariableType.Date)
-                    {
-                        s += ((ScalarDate)iv).date.ToString();
-                    }
-                    else if (iv.Type() == EVariableType.Val)
-                    {
-                        s += ((ScalarVal)iv).val.ToString();
-                    }
-                    else if (iv.Type() == EVariableType.List)
-                    {
-                        string s2 = PrintNonSeries(iv, labelGiven, depth + 1);
-                        if ((iv as List).Count() == 1)
-                        {
-                            s += "(" + s2 + ",)";
-                        }
-                        else
-                        {
-                            s += "(" + s2 + ")";
-                        }
-                    }
-                    else
-                    {
-                        s += "[" + iv.Type().ToString().ToLower() + "]";
-                    }
-                    if (i < x_list.list.Count - 1) s += ", ";
-                }
-
-                if (x_list.list.Count == 0)
-                {
-                    s = "[empty list]";
-                }
-
-                PrintLabel(labelGiven);
-                if (x_list != null && depth == 0)
-                {
-                    if (x_list.Count() == 1)
-                    {
-                        G.Write(s);
-                        G.Writeln("   [1 element]", Color.LightGray);
-                    }
-                    else
-                    {
-                        G.Write(s);                        
-                        G.Writeln("   [" + x_list.Count() + " elements]", Color.LightGray);
-                    }
-                }
-                
-                return s;
-            }
-            else
-            {
-                //not a list, and we are at depth == 0
-                if (x.Type() == EVariableType.Matrix)
-                {
-                    Program.ShowMatrix((Matrix)x, labelGiven);
-                }
-                else if (x.Type() == EVariableType.String)
-                {
-                    PrintLabel(labelGiven);
-                    G.Writeln(pling + ((ScalarString)x).string2 + pling);
-                }
-                else if (x.Type() == EVariableType.Val)
-                {
-                    PrintLabel(labelGiven);
-                    G.Writeln(((ScalarVal)x).val.ToString());
-                }
-                else if (x.Type() == EVariableType.Date)
-                {
-                    PrintLabel(labelGiven);
-                    G.Writeln(((ScalarDate)x).date.ToString());
-                }
-                else if (x.Type() == EVariableType.Map)
-                {
-                    PrintLabel(labelGiven);
-                    Map map = x as Map;
-
-                    if (map.storage.Count == 0)
-                    {
-                        G.Writeln("[empty map]");
-                    }
-                    else
-                    {
-                        G.Writeln("MAP printing not implemented yet. But individual elements can");
-                        G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
-                    }
-                }
-                return null;
-            }
-        }
+        }        
 
         private static string PrintNonSeries(IVariable x, string labelGiven, int depth)
         {
@@ -29142,7 +29034,7 @@ namespace Gekko
                         }
                     }
                     G.Write(s);
-                    G.Writeln("   [" + x_list.Count() + " items]", Color.LightGray);
+                    G.Writeln("   [" + x_list.Count() + " item" + G.S(x_list.Count()) + "]", Color.LightGray);
                 }
                 else if (x.Type() == EVariableType.Matrix)
                 {

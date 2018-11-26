@@ -2147,13 +2147,17 @@ namespace Gekko
                 }
                 tsCopy.data.anchorPeriod = this.data.anchorPeriod;
                 tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
-
-                tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
-                tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
-                tsCopy.meta.label = this.meta.label;
-                tsCopy.meta.source = this.meta.source;
-                tsCopy.meta.stamp = this.meta.stamp;
-                tsCopy.meta.units = this.meta.units;
+                
+                //tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
+                //tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
+                //tsCopy.meta.label = this.meta.label;
+                //tsCopy.meta.source = this.meta.source;
+                //tsCopy.meta.units = this.meta.units;
+                //tsCopy.meta.stamp = this.meta.stamp;
+                //if (this.meta.domains != null)
+                //{
+                //    tsCopy.meta.domains = new string[this.meta.domains.Length]; this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
+                //}
 
                 if (truncate != null)
                 {
@@ -2181,9 +2185,13 @@ namespace Gekko
                 if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
                 if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
                 if (this.meta.units != null) tsCopy.meta.source = this.meta.units;
-                if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
-                //tsCopy.SetGhost(this.IsArrayTimeseries());           
-                if (this.mmi != null) tsCopy.mmi = this.mmi;  //for sub-series     
+                if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;                                      
+                if (this.meta.domains != null)
+                {
+                    tsCopy.meta.domains = new string[this.meta.domains.Length];
+                    this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
+                }
+                if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
             return tsCopy;
         }
