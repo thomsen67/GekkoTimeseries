@@ -2128,44 +2128,30 @@ namespace Gekko
         /// </summary>
         /// <returns>The cloned Series object.</returns>
         public IVariable DeepClone(GekkoSmplSimple truncate)
-        {            
+        {
             //Always make sure new fields are remembered in the DeepClone() method
-            Series tsCopy = new Series(this.freq, this.name);
+
+            //.isNotFoundArraySub... field is not cloned
+            //the .isDirty and .parentDatabank fields are not cloned
+
+            Series tsCopy = new Series(this.freq, this.name);  //this will create the .meta object - the .data object is always there
+
             tsCopy.type = this.type;
             tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases
 
-            if (this.data != null)
+            //.data field is always there
+            if (this.data.dataArray == null)
             {
-                if (this.data.dataArray == null)
-                {
-                    tsCopy.data.dataArray = null;
-                }
-                else
-                {
-                    tsCopy.data.dataArray = new double[this.data.dataArray.Length];
-                    System.Array.Copy(this.data.dataArray, tsCopy.data.dataArray, this.data.dataArray.Length);
-                }
-                tsCopy.data.anchorPeriod = this.data.anchorPeriod;
-                tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
-                
-                //tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
-                //tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
-                //tsCopy.meta.label = this.meta.label;
-                //tsCopy.meta.source = this.meta.source;
-                //tsCopy.meta.units = this.meta.units;
-                //tsCopy.meta.stamp = this.meta.stamp;
-                //if (this.meta.domains != null)
-                //{
-                //    tsCopy.meta.domains = new string[this.meta.domains.Length]; this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
-                //}
-
-                if (truncate != null)
-                {
-                    tsCopy.Truncate(truncate.t1, truncate.t2);  //somewhat slack, since truncation is AFTER a deep clone...
-                }
+                tsCopy.data.dataArray = null;
             }
+            else
+            {
+                tsCopy.data.dataArray = new double[this.data.dataArray.Length];
+                System.Array.Copy(this.data.dataArray, tsCopy.data.dataArray, this.data.dataArray.Length);
+            }
+            tsCopy.data.anchorPeriod = this.data.anchorPeriod;
+            tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
             
-
             if (this.type == ESeriesType.ArraySuper)
             {
                 //Clone the array-subseries
@@ -2178,8 +2164,7 @@ namespace Gekko
             }
 
             if (this.type != ESeriesType.Light)
-            {
-                tsCopy.meta = new SeriesMetaInformation();
+            {                
                 tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
                 tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
                 if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
@@ -2193,6 +2178,12 @@ namespace Gekko
                 }
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
+
+            if (truncate != null)
+            {
+                tsCopy.Truncate(truncate.t1, truncate.t2);  //somewhat slack, since truncation is AFTER a deep clone...
+            }
+
             return tsCopy;
         }
 
