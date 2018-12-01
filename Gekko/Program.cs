@@ -8597,906 +8597,7 @@ namespace Gekko
                 return item[0].GetHashCode();
             }
         }
-
-        //private static void GetGamsVariable(string gvar, GAMSDatabase db, string filterScn)
-        //{
-        //    GAMSVariable n = db.GetVariable(gvar);
-
-        //    int[] dims = new int[n.Domains.Count];
-
-        //    //N has --> a=86, t=116, s=4, scns=5.
-
-        //    int timeIndex = -12345;
-        //    int scnsIndex = -12345;
-        //    for (int i = 0; i < n.Domains.Count; i++)
-        //    {
-        //        GAMSSet gs = (GAMSSet)n.Domains.ElementAt(i);
-        //        dims[i] = gs.NumberRecords;
-        //        if (gs.Name == "t")
-        //        {
-        //            timeIndex = i;
-        //        }
-        //        else if (gs.Name == "scns")
-        //        {
-        //            scnsIndex = i;
-        //        }
-        //    }
-
-        //    Series ts2 = null;
-        //    int counter = 0;
-        //    string oldHash = "";
-
-        //    DateTime t0 = DateTime.Now;
-
-        //    foreach (GAMSVariableRecord record in n)
-        //    {
-        //        if (scnsIndex != -12345)
-        //        {
-        //            string scns = record.Keys[scnsIndex];
-        //            if (filterScn != null && !G.Equal(scns, filterScn)) continue;
-        //        }
-        //        counter++;
-
-        //        int tt = -12345;
-        //        string t = null;
-        //        if (timeIndex != -12345)
-        //        {
-        //            t = record.Keys[timeIndex];
-        //            tt = int.Parse(t.Substring(1)) + 2010;  //remove the "t" and add 2010                
-        //        }
-
-        //        double d = record.Level;
-
-        //        string hash = null;
-        //        for (int i = 0; i < record.Keys.Length; i++)
-        //        {
-        //            if (i == timeIndex) continue;
-        //            hash += record.Keys[i];
-        //            if (i < record.Keys.Length - 1) hash += Globals.symbolTurtle; //ok as delimiter;                    
-        //        }
-
-        //        if (hash != oldHash) ts2 = (Program.databanks.GetFirst().GetVariable(EFreq.A, gvar + Globals.symbolTurtle + hash);
-
-        //        if (ts2 == null)
-        //        {
-        //            ts2 = new Series(EFreq.A, gvar + Globals.symbolTurtle + hash);
-        //            Program.databanks.GetFirst().AddVariable(ts2);
-        //            if (timeIndex == -12345)
-        //            {
-        //                ts2.type = ESeriesType.Timeless;
-        //            }
-        //        }
-
-        //        if (timeIndex == -12345)
-        //        {
-        //            ts2.SetTimelessData(d);
-        //        }
-        //        else
-        //        {
-        //            ts2.SetData(new GekkoTime(EFreq.A, tt, 1), d);
-        //        }
-        //        oldHash = hash;
-        //    }
-
-        //    Series ts = Program.databanks.GetFirst().GetVariable(EFreq.A, gvar);
-        //    if (ts == null)
-        //    {
-        //        ts = new Series(EFreq.A, gvar);
-        //        //ts.SetGhost(true);  //only a placeholder, should not be counted etc.
-        //        Program.databanks.GetFirst().AddVariable(ts);
-        //    }
-
-        //    double time = (DateTime.Now - t0).TotalMilliseconds;
-        //    G.Writeln2("TIME: " + time / 1000d);
-        //}
-
-        /*
-        /// <summary>
-        /// Returns a filename based on the sourcefile and the targetMask, as used in the second argument in rename/copy operations.
-        /// targetMask may contain wildcards (* and ?).
-        /// 
-        /// This follows the rules of: http://superuser.com/questions/475874/how-does-the-windows-rename-command-interpret-wildcards
-        /// </summary>
-        /// <param name="sourcefile">filename to change to target without wildcards</param>
-        /// <param name="targetMask">mask with wildcards</param>
-        /// <returns>a valid target filename given sourcefile and targetMask</returns>
-        public static string CopyTargetHelper(string sourcefile, string targetMask)
-        {
-            if (string.IsNullOrEmpty(sourcefile))
-                throw new ArgumentNullException("sourcefile");
-
-            if (string.IsNullOrEmpty(targetMask))
-                throw new ArgumentNullException("targetMask");
-
-            if (sourcefile.Contains('*') || sourcefile.Contains('?'))
-                throw new ArgumentException("sourcefile cannot contain wildcards");
-
-            // no wildcards: return complete mask as file
-            if (!targetMask.Contains('*') && !targetMask.Contains('?'))
-                return targetMask;
-
-            var maskReader = new StringReader(targetMask);
-            var sourceReader = new StringReader(sourcefile);
-            var targetBuilder = new StringBuilder();
-
-            while (maskReader.Peek() != -1)
-            {
-
-                int current = maskReader.Read();
-                int sourcePeek = sourceReader.Peek();
-                switch (current)
-                {
-                    case '*':
-                        int next = maskReader.Read();
-                        switch (next)
-                        {
-                            case -1:
-                            case '?':
-                                // Append all remaining characters from sourcefile
-                                targetBuilder.Append(sourceReader.ReadToEnd());
-                                break;
-                            default:
-                                // Read source until the last occurrance of 'next'.
-                                // We cannot seek in the StringReader, so we will create a new StringReader if needed
-                                string sourceTail = sourceReader.ReadToEnd();
-                                int lastIndexOf = sourceTail.LastIndexOf((char)next);
-                                // If not found, append everything and the 'next' char
-                                if (lastIndexOf == -1)
-                                {
-                                    targetBuilder.Append(sourceTail);
-                                    targetBuilder.Append((char)next);
-
-                                }
-                                else
-                                {
-                                    string toAppend = sourceTail.Substring(0, lastIndexOf + 1);
-                                    string rest = sourceTail.Substring(lastIndexOf + 1);
-                                    sourceReader.Dispose();
-                                    // go on with the rest...
-                                    sourceReader = new StringReader(rest);
-                                    targetBuilder.Append(toAppend);
-                                }
-                                break;
-                        }
-
-                        break;
-                    case '?':
-                        if (sourcePeek != -1 && sourcePeek != '.')
-                        {
-                            targetBuilder.Append((char)sourceReader.Read());
-                        }
-                        break;
-                    case '.':
-                        // eat all characters until the dot is found
-                        while (sourcePeek != -1 && sourcePeek != '.')
-                        {
-                            sourceReader.Read();
-                            sourcePeek = sourceReader.Peek();
-                        }
-
-                        targetBuilder.Append('.');
-                        // need to eat the . when we peeked it
-                        if (sourcePeek == '.')
-                            sourceReader.Read();
-
-                        break;
-                    default:
-                        if (sourcePeek != '.') sourceReader.Read(); // also consume the source's char if not .
-                        targetBuilder.Append((char)current);
-                        break;
-                }
-
-            }
-
-            sourceReader.Dispose();
-            maskReader.Dispose();
-            return targetBuilder.ToString().TrimEnd('.', ' ');
-        }
-        */
-
-
-        public static Table Dream(string options)
-        {
-            //Experimantal stuff to decompose DREAM equations
-
-            int t0 = 2013;
-
-            Table table = new Table();
-            //Program.databanks.Getfirst().Clear();
-
-            //Variable LMax
-            //dim 0 --> DA IX IW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable J_LMax
-            //dim 0 --> DA IX IW DX DW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable eta
-            //dim 0 --> DA IX IW DX DW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable tmargWork
-            //dim 0 --> DA IX IW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable adjrho
-            //dim 0 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable rho
-            //dim 0 --> DA IX IW DX DW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable W
-            //dim 0 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable PCH
-            //dim 0 --> d c g R p eo ep eg H N
-            //dim 1 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable gamma
-            //dim 0 --> m f
-
-            //Variable adjLmax
-            //dim 0 --> DA IX IW DX DW
-            //dim 1 --> m f
-            //dim 2 --> 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
-            //35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68
-            //69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            //Variable NInd
-            //dim 0 --> DA IX IW
-            //dim 1 --> m f
-            //dim 2 --> 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33
-            //34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
-            //68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85
-            //dim 3 --> t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 t19 t20 t21 t22 t23 t24 t25
-            //t26 t27 t28 t29 t30 t31 t32 t33 t34 t35 t36 t37 t38 t39 t40 t41 t42 t43 t44 t45 t46 t47 t48 t49 t50 t51
-            //t52 t53 t54 t55 t56 t57 t58 t59 t60 t61 t62 t63 t64 t65 t66 t67 t68 t69 t70 t71 t72 t73 t74 t75 t76 t77
-            //t78 t79 t80 t81 t82 t83 t84 t85 t86 t87 t88 t89 t90 t91 t92 t93 t94 t95 t96 t97 t98 t99 t100 t101 t102
-            //t103 t104 t105 t106 t107 t108 t109 t110 t111 t112 t113 t114 t115
-
-            G.Writeln2("Loading DREAM data start");
-
-            //DateTime t0 = DateTime.Now;
-
-            GAMSWorkspace ws = new GAMSWorkspace(workingDirectory: "c:\\tools\\decomp");
-            GAMSDatabase db = ws.AddDatabaseFromGDX("c:\\tools\\decomp\\calib_d.gdx");
-
-            if (false)
-            {
-                GAMSVariable xx = db.GetVariable("LMax");
-
-            }
-
-            double[,,,] LMax = new double[3, 2, 85, 116];
-            db.GetVariable("LMax").CopyToArray(LMax, 0);
-
-            double[,,,] J_LMax = new double[5, 2, 85, 116];
-            db.GetVariable("J_LMax").CopyToArray(J_LMax, 0);
-
-            double[,,,] eta = new double[5, 2, 85, 116];
-            db.GetVariable("eta").CopyToArray(eta, 0);
-
-            double[,,,] tmargWork = new double[3, 2, 85, 116];
-            db.GetVariable("tmargWork").CopyToArray(tmargWork, 0);
-
-            double[] adjrho = new double[116];
-            db.GetVariable("adjrho").CopyToArray(adjrho, 0);
-
-            double[,,,] rho = new double[5, 2, 85, 116];
-            db.GetVariable("rho").CopyToArray(rho, 0);
-
-            double[] W = new double[116];
-            db.GetVariable("W").CopyToArray(W, 0);
-
-            double[,] PCH = new double[10, 116];
-            db.GetVariable("PCH").CopyToArray(PCH, 0);
-
-            double[] gamma = new double[2];
-            db.GetVariable("gamma").CopyToArray(gamma, 0);
-
-            double[,,,] adjLmax = new double[5, 2, 85, 116];
-            db.GetVariable("adjLmax").CopyToArray(adjLmax, 0);
-            
-            GAMSParameter p2 = db.GetParameter("NInd");
-            p2.AddRecord(new string[] { "IX", "m", "84", "t0" });
-            p2.AddRecord(new string[] { "IX", "m", "84", "t1" });
-            p2.AddRecord(new string[] { "IX", "m", "84", "t2" });
-            p2.AddRecord(new string[] { "IX", "m", "85", "t0" });
-            p2.AddRecord(new string[] { "IX", "m", "85", "t1" });
-            p2.AddRecord(new string[] { "IX", "m", "85", "t2" });
-            p2.AddRecord(new string[] { "IX", "m", "85", "t3" });
-            p2.AddRecord(new string[] { "IW", "m", "83", "t3" });
-            p2.AddRecord(new string[] { "IW", "m", "83", "t4" });
-            p2.AddRecord(new string[] { "IW", "m", "84", "t0" });
-            p2.AddRecord(new string[] { "IW", "m", "84", "t1" });
-            p2.AddRecord(new string[] { "IW", "m", "84", "t4" });
-            p2.AddRecord(new string[] { "IW", "m", "84", "t5" });
-            p2.AddRecord(new string[] { "IW", "m", "85", "t0" });
-            p2.AddRecord(new string[] { "IW", "m", "85", "t1" });
-            p2.AddRecord(new string[] { "IW", "m", "85", "t2" });
-            p2.AddRecord(new string[] { "IW", "m", "85", "t5" });
-            p2.AddRecord(new string[] { "IW", "m", "85", "t6" });
-            double[,,,] NInd = new double[3, 2, 86, 116];  //a is 0-based here, 1-based in the others!
-            p2.CopyToArray(NInd, 0);
-
-            G.Writeln("Loading DREAM data end");
-
-            double max = 0d;
-
-            G.Writeln("DREAM decomposition start");
-
-            //DateTime t1 = DateTime.Now;
-
-            string type = "vars__tid";
-
-            int S = 2;
-            int A = 86;
-            int O = 3;
-            int V = 9;
-            int T = 116;
-
-            double[,,,,] result = new double[V, S, A, O, T];  //9 variabler
-            double[,,,] resultSum = new double[S, A, O, T];
-            double[,,,] resultLevelLag = new double[S, A, O, T];
-
-            for (int t = 0; t < T; t++)
-            {
-                double errorMax = double.MinValue;
-                double errorMin = double.MaxValue;
-
-                double d_J_LMax = 0d;
-                double d_eta = 0d;
-                double d_tmargWork = 0d;
-                double d_adjrho = 0d;
-                double d_rho = 0d;
-                double d_W = 0d;
-                double d_PCH = 0d;
-                double d_adjLmax = 0d;
-                double d_NInd = 0d;
-                double d_SUM = 0d;
-
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if (t == 0) continue;
-
-                double sum1 = 0d;
-                double sum2 = 0d;
-                double count1 = 0d;
-                double count2 = 0d;
-
-                double x1 = 0d;
-                double x2 = 0d;
-
-                for (int o = 0; o < O; o++)
-                {
-                    for (int s = 0; s < S; s++)
-                    {
-                        for (int a = 1; a < A; a++)
-                        {
-                            double lhsClean = NInd[o, s, a, t];
-                            double lhs = LMax[o, s, a - 1, t] * NInd[o, s, a, t];
-
-                            x1 += lhsClean;
-                            x2 += lhs;
-
-                            double lhsLag = LMax[o, s, a - 1, t - 1] * NInd[o, s, a, t - 1];
-                            double rhs = (J_LMax[o, s, a - 1, t] + (eta[o, s, a - 1, t] * Math.Pow((1 - tmargWork[o, s, a - 1, t]) * adjrho[t] * rho[o, s, a - 1, t] * W[t] / PCH[1, t], gamma[s])) + adjLmax[o, s, a - 1, t]) * NInd[o, s, a, t];
-                            double rhsLag = (J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1];
-
-                            double delta = 0.000001;
-                            double alpha_J_LMax = (((J_LMax[o, s, a - 1, t - 1] + delta) + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_eta = ((J_LMax[o, s, a - 1, t - 1] + ((eta[o, s, a - 1, t - 1] + delta) * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_tmargWork = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - (tmargWork[o, s, a - 1, t - 1] + delta)) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_adjrho = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * (adjrho[t - 1] + delta) * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_rho = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * (rho[o, s, a - 1, t - 1] + delta) * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_W = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * (W[t - 1] + delta) / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_PCH = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / (PCH[1, t - 1] + delta), gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_adjLmax = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + (adjLmax[o, s, a - 1, t - 1] + delta)) * NInd[o, s, a, t - 1] - rhsLag) / delta;
-                            double alpha_NInd = ((J_LMax[o, s, a - 1, t - 1] + (eta[o, s, a - 1, t - 1] * Math.Pow((1 - tmargWork[o, s, a - 1, t - 1]) * adjrho[t - 1] * rho[o, s, a - 1, t - 1] * W[t - 1] / PCH[1, t - 1], gamma[s])) + adjLmax[o, s, a - 1, t - 1]) * (NInd[o, s, a, t - 1] + delta) - rhsLag) / delta;
-
-                            double beta_J_LMax = alpha_J_LMax * (J_LMax[o, s, a - 1, t] - J_LMax[o, s, a - 1, t - 1]);
-                            double beta_eta = alpha_eta * (eta[o, s, a - 1, t] - eta[o, s, a - 1, t - 1]);
-                            double beta_tmargWork = alpha_tmargWork * (tmargWork[o, s, a - 1, t] - tmargWork[o, s, a - 1, t - 1]);
-                            double beta_adjrho = alpha_adjrho * (adjrho[t] - adjrho[t - 1]);
-                            double beta_rho = alpha_rho * (rho[o, s, a - 1, t] - rho[o, s, a - 1, t - 1]);
-                            double beta_W = alpha_W * (W[t] - W[t - 1]);
-                            double beta_PCH = alpha_PCH * (PCH[1, t] - PCH[1, t - 1]);
-                            double beta_adjLmax = alpha_adjLmax * (adjLmax[o, s, a - 1, t] - adjLmax[o, s, a - 1, t - 1]);
-                            double beta_NInd = alpha_NInd * (NInd[o, s, a, t] - NInd[o, s, a, t - 1]);
-
-                            double sum = beta_J_LMax + beta_eta + beta_tmargWork + beta_adjrho + beta_rho + beta_W + beta_PCH + beta_adjLmax + beta_NInd;
-                            double target = rhs - rhsLag;
-                            double error = sum / target;
-
-                            //error = 1d;
-
-                            //if (t >= 2 && o == 0 && s == 0 && a == 40)
-                            //{
-                            //    Console.WriteLine();
-                            //}
-
-                            double gamma_J_LMax = beta_J_LMax / error;
-                            double gamma_eta = beta_eta / error;
-                            double gamma_tmargWork = beta_tmargWork / error;
-                            double gamma_adjrho = beta_adjrho / error;
-                            double gamma_rho = beta_rho / error;
-                            double gamma_W = beta_W / error;
-                            double gamma_PCH = beta_PCH / error;
-                            double gamma_adjLmax = beta_adjLmax / error;
-                            double gamma_NInd = beta_NInd / error;
-
-                            if (sum == 0d && target == 0d)
-                            {
-                                error = 1;
-                                if (beta_J_LMax == 0d) gamma_J_LMax = 0d;
-                                if (beta_eta == 0d) gamma_eta = 0d;
-                                if (beta_tmargWork == 0d) gamma_tmargWork = 0d;
-                                if (beta_adjrho == 0d) gamma_adjrho = 0d;
-                                if (beta_rho == 0d) gamma_rho = 0d;
-                                if (beta_W == 0d) gamma_W = 0d;
-                                if (beta_PCH == 0d) gamma_PCH = 0d;
-                                if (beta_adjLmax == 0d) gamma_adjLmax = 0d;
-                                if (beta_NInd == 0d) gamma_NInd = 0d;
-                            }
-
-                            //Hvorfor stiger rho fra DA, m, 49, t15-->t16 fra 1 til 3.04??
-
-                            errorMax = Math.Max(errorMax, error);
-                            errorMin = Math.Min(errorMin, error);
-
-                            if (false && error > 0.95 && error < 1.05 && target > .5)
-                            {
-                                double share = beta_NInd / sum;
-                                if (share < 0.7)
-                                {
-                                    G.Writeln(";");
-                                    G.Writeln(target + " ... " + sum);
-                                }
-                            }
-
-                            //G.Writeln(target + " ... " + sum);
-
-                            if (false)
-                            {
-
-                                sum1 += rhs * NInd[o, s, a, t];
-                                count1 += NInd[o, s, a, t];
-                                sum2 += rhs;
-                                count2++;
-
-                                d_J_LMax += gamma_J_LMax;
-                                d_eta += gamma_eta;
-                                d_tmargWork += gamma_tmargWork;
-                                d_adjrho += gamma_adjrho;
-                                d_rho += gamma_rho;
-                                d_W += gamma_W;
-                                d_PCH += gamma_PCH;
-                                d_adjLmax += gamma_adjLmax;
-                                d_NInd += gamma_NInd;
-
-                                d_SUM += lhs - lhsLag;
-                            }
-
-                            result[0, s, a, o, t] = gamma_J_LMax;
-                            result[1, s, a, o, t] = gamma_eta;
-                            result[2, s, a, o, t] = gamma_tmargWork;
-                            result[3, s, a, o, t] = gamma_adjrho;
-                            result[4, s, a, o, t] = gamma_rho;
-                            result[5, s, a, o, t] = gamma_W;
-                            result[6, s, a, o, t] = gamma_PCH;
-                            result[7, s, a, o, t] = gamma_adjLmax;
-                            result[8, s, a, o, t] = gamma_NInd;
-                            resultSum[s, a, o, t] = d_SUM;
-
-                            resultLevelLag[s, a, o, t] = lhsLag;
-                        }
-                    }
-                }
-
-                if (false)
-                {
-                    G.Writeln2("------------------------------------------");
-                    G.Writeln("t = " + t + " = " + sum1 / count1);
-                    G.Writeln("t = " + t + " = " + sum2 / count2);
-                    G.Writeln("errormin " + errorMin + " errormax " + errorMax);
-                    G.Writeln("d_J_LMax " + d_J_LMax);
-                    G.Writeln("d_eta " + d_eta);
-                    G.Writeln("d_tmargWork " + d_tmargWork);
-                    G.Writeln("d_adjrho " + d_adjrho);
-                    G.Writeln("d_rho " + d_rho);
-                    G.Writeln("d_W " + d_W);
-                    G.Writeln("d_PCH " + d_PCH);
-                    G.Writeln("d_adjLmax " + d_adjLmax);
-                    G.Writeln("d_NInd " + d_NInd);
-                    G.Writeln("-------");
-                    G.Writeln("d_SUM " + d_SUM);
-                    double SUM2 = d_J_LMax + d_eta + d_tmargWork + d_adjrho + d_rho + d_W + d_PCH + d_adjLmax + d_NInd;
-                    G.Writeln("d_SUM2 " + SUM2);
-                }
-            }
-
-            //result = new double[T, S, A, O, T];  //9 variabler
-
-            if (true)
-            {
-
-                string row = null;
-                string col = null;
-                string t1 = null;
-                string t2 = null;
-                string a1 = null;
-                string a2 = null;
-                string s1 = null;
-                string s2 = null;
-                string o1 = null;
-                string o2 = null;
-                string v1 = null;
-                string v2 = null;
-
-                string[] ss = options.Substring(5).Split(',');
-                foreach (string ss2 in ss)
-                {
-                    string s3 = ss2.Replace(" ", "").ToLower();
-                    if (s3.StartsWith("row="))
-                    {
-                        row = s3.Substring(4);
-                    }
-                    if (s3.StartsWith("col="))
-                    {
-                        col = s3.Substring(4);
-                    }
-                    if (s3.StartsWith("t="))
-                    {
-                        string[] s4 = s3.Substring(2).Split('-');
-                        if (s4.Length > 2)
-                        {
-                            MessageBox.Show("Use for example t=" + t0 + "-2030");
-                            throw new GekkoException();
-                        }
-                        if (s4.Length == 1)
-                        {
-                            t1 = s4[0];
-                            t2 = s4[0];
-                        }
-                        else
-                        {
-                            t1 = s4[0];
-                            t2 = s4[1];
-                        }
-                    }
-                    if (s3.StartsWith("a="))
-                    {
-                        string[] s4 = s3.Substring(2).Split('-');
-                        if (s4.Length > 2)
-                        {
-                            MessageBox.Show("Use for example a=18-64");
-                            throw new GekkoException();
-                        }
-                        if (s4.Length == 1)
-                        {
-                            a1 = s4[0];
-                            a2 = s4[0];
-                        }
-                        else
-                        {
-                            a1 = s4[0];
-                            a2 = s4[1];
-                        }
-                    }
-                    if (s3.StartsWith("s="))
-                    {
-                        string[] s4 = s3.Substring(2).Split('-');
-                        if (s4.Length > 2)
-                        {
-                            MessageBox.Show("Use for example s=0-0 (s runs from 0 to 1 inclusive)");
-                            throw new GekkoException();
-                        }
-                        if (s4.Length == 1)
-                        {
-                            s1 = s4[0];
-                            s2 = s4[0];
-                        }
-                        else
-                        {
-                            s1 = s4[0];
-                            s2 = s4[1];
-                        }
-                    }
-                    if (s3.StartsWith("o="))
-                    {
-                        string[] s4 = s3.Substring(2).Split('-');
-                        if (s4.Length > 2)
-                        {
-                            MessageBox.Show("Use for example o=0-1 (o runs from 0 to 2 inclusive)");
-                            throw new GekkoException();
-                        }
-                        if (s4.Length == 1)
-                        {
-                            o1 = s4[0];
-                            o2 = s4[0];
-                        }
-                        else
-                        {
-                            o1 = s4[0];
-                            o2 = s4[1];
-                        }
-                    }
-                    if (s3.StartsWith("v="))
-                    {
-                        string[] s4 = s3.Substring(2).Split('-');
-                        if (s4.Length > 2)
-                        {
-                            MessageBox.Show("Use for example v=0-3 (v runs from 0 to 8 inclusive)");
-                            throw new GekkoException();
-                        }
-                        if (s4.Length == 1)
-                        {
-                            v1 = s4[0];
-                            v2 = s4[0];
-                        }
-                        else
-                        {
-                            v1 = s4[0];
-                            v2 = s4[1];
-                        }
-                    }
-                }
-
-                /*
-                string row = "a";
-                string col = "t";
-                double[,] tab = new double[A, T];
-                int tRest = -12345;
-
-                string row = "v";
-                string col = "t";
-                double[,] tab = new double[V, T];
-                int tRest = -12345;
-
-
-                string row = "v";
-                string col = "a";
-                double[,] tab = new double[V, A];
-                int tRest = 2;
-                */
-
-                int row1 = -12345;
-                int col1 = -12345;
-                if (row == "t") row1 = T + 1;
-                if (row == "s") row1 = S + 1;
-                if (row == "a") row1 = A + 1;
-                if (row == "o") row1 = O + 1;
-                if (row == "v") row1 = V + 1;
-                if (col == "t") col1 = T + 1;
-                if (col == "s") col1 = S + 1;
-                if (col == "a") col1 = A + 1;
-                if (col == "o") col1 = O + 1;
-                if (col == "v") col1 = V + 1;
-
-                double[,] tab = new double[row1, col1];
-                int tRest = -12345;
-
-
-
-                for (int t = 0; t < T; t++)
-                {
-                    if (Skip(t0, "t", t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, -12345, t)) continue;
-                    for (int o = 0; o < O; o++)
-                    {
-                        if (Skip(t0, "o", t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, -12345, o)) continue;
-                        for (int s = 0; s < S; s++)
-                        {
-                            if (Skip(t0, "s", t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, -12345, s)) continue;
-                            for (int a = 1; a < A; a++)
-                            {
-                                if (Skip(t0, "a", t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, -12345, a)) continue;
-                                for (int v = 0; v < V; v++)
-                                {
-                                    if (Skip(t0, "v", t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, -12345, v)) continue;
-                                    //if (tRest != -12345 && t != tRest) continue;
-
-                                    int row2 = -12345;
-                                    int col2 = -12345;
-                                    if (row == "t") row2 = t;
-                                    if (row == "s") row2 = s;
-                                    if (row == "a") row2 = a;
-                                    if (row == "o") row2 = o;
-                                    if (row == "v") row2 = v;
-                                    if (col == "t") col2 = t;
-                                    if (col == "s") col2 = s;
-                                    if (col == "a") col2 = a;
-                                    if (col == "o") col2 = o;
-                                    if (col == "v") col2 = v;
-
-                                    tab[row2, col2] += result[v, s, a, o, t];
-
-                                }
-                            }
-                        }
-                    }
-                }
-
-                for (int i = 0; i < tab.GetLength(0) - 1; i++)
-                {
-                    for (int j = 0; j < tab.GetLength(1) - 1; j++)
-                    {
-                        tab[tab.GetLength(0) - 1, j] += tab[i, j];
-                        tab[i, tab.GetLength(1) - 1] += tab[i, j];
-                        tab[tab.GetLength(0) - 1, tab.GetLength(1) - 1] += tab[i, j];
-                    }
-                }
-
-                string[] vars = new string[] { "J_LMax", "eta", "tmargWork", "adjrho", "rho", "W", "PCH", "adjLmax", "NInd" };
-                string[] origins = new string[] { "DA", "IX", "IW" };
-                string[] sexs = new string[] { "M", "K" };
-
-                double[] colSum = new double[tab.GetLength(1)];
-                double totalSum = 0d;
-
-                string format = "f10.2";
-                int ri = 0;
-                for (int i = 0; i < tab.GetLength(0); i++)
-                {
-                    double rowSum = 0d;
-                    bool skipRow = Skip(t0, row, t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, tab.GetLength(0), i);
-
-                    if (skipRow) continue;
-
-                    int ci = 0;
-                    for (int j = 0; j < tab.GetLength(1); j++)
-                    {
-                        bool skipCol = Skip(t0, col, t1, t2, a1, a2, s1, s2, o1, o2, v1, v2, tab.GetLength(1), j);
-                        if (skipCol) continue;
-
-                        if (ri == 0)
-                        {
-                            if (j == tab.GetLength(1) - 1)
-                            {
-                                table.Set(new Coord(1, ci + 2), "Grand Total", double.NaN, CellType.Text, null);
-                            }
-                            else
-                            {
-                                if (col == "a") table.Set(new Coord(1, ci + 2), "" + j, double.NaN, CellType.Text, null);
-                                else if (col == "t") table.Set(new Coord(1, ci + 2), "" + (j + t0), double.NaN, CellType.Text, null);
-                                else if (col == "o") table.Set(new Coord(1, ci + 2), "" + origins[j], double.NaN, CellType.Text, null);
-                                else if (col == "s") table.Set(new Coord(1, ci + 2), "" + sexs[j], double.NaN, CellType.Text, null);
-                                else if (col == "v") table.Set(new Coord(1, ci + 2), "" + vars[j], double.NaN, CellType.Text, null);
-                            }
-                        }
-
-                        if (ci == 0)
-                        {
-                            if (i == tab.GetLength(0) - 1)
-                            {
-                                table.Set(new Coord(ri + 2, 1), "Grand Total", double.NaN, CellType.Text, null);
-                            }
-                            else
-                            {
-                                if (row == "a") table.Set(new Coord(ri + 2, 1), "" + i, double.NaN, CellType.Text, null);
-                                else if (row == "t") table.Set(new Coord(ri + 2, 1), "" + (i + t0), double.NaN, CellType.Text, null);
-                                else if (row == "o") table.Set(new Coord(ri + 2, 1), origins[i], double.NaN, CellType.Text, null);
-                                else if (row == "s") table.Set(new Coord(ri + 2, 1), sexs[i], double.NaN, CellType.Text, null);
-                                else if (row == "v") table.Set(new Coord(ri + 2, 1), vars[i], double.NaN, CellType.Text, null);
-                            }
-                        }
-
-                        if (i == tab.GetLength(0) - 1 && j == tab.GetLength(1) - 1)
-                        {
-                            table.Set(new Coord(ri + 2, ci + 2), null, totalSum, CellType.Number, format);
-                        }
-                        else if (i == tab.GetLength(0) - 1)
-                        {
-                            table.Set(new Coord(ri + 2, ci + 2), null, colSum[j], CellType.Number, format);
-                        }
-                        else if (j == tab.GetLength(1) - 1)
-                        {
-                            table.Set(new Coord(ri + 2, ci + 2), null, rowSum, CellType.Number, format);
-                        }
-                        else
-                        {
-                            rowSum += tab[i, j];
-                            totalSum += tab[i, j];
-                            colSum[j] += tab[i, j];
-                            table.Set(new Coord(ri + 2, ci + 2), null, tab[i, j], CellType.Number, format);
-                        }
-
-                        ci++;
-                    }
-                    ri++;
-                }
-            }
-
-            G.Writeln("DREAM decomposition end");
-
-            //G.Writeln2("max = " + max);
-            //G.Writeln("t0 " + (DateTime.Now - t0).TotalMilliseconds);
-            //G.Writeln("t1 " + (DateTime.Now - t1).TotalMilliseconds);
-
-            //          E_LMax(oLab,s,ax0,t) $ tcx0(t)..
-            // LMax(oLab,s,ax0,t) =E= J_LMax(oLab,s,ax0,t) +
-            //(  eta(oLab,s,ax0,t)*
-            //  ( (1-tmargWork(oLab,s,ax0,t))*adjrho(t)*rho(oLab,s,ax0,t)*W(t)/PCH('C',t) )**gamma(s)  ) + adjLmax(oLab,s,ax0,t);
-
-            return table;
-        }
-
-        private static bool Skip(int t0, string col, string t1, string t2, string a1, string a2, string s1, string s2, string o1, string o2, string v1, string v2, int n, int j)
-        {
-            bool skipCol = false;
-            if (col == "t" && t1 != null)
-                if (j < int.Parse(t1) - t0 || j > int.Parse(t2) - t0) skipCol = true;
-            if (col == "s" && s1 != null)
-                if (j < int.Parse(s1) || j > int.Parse(s2)) skipCol = true;
-            if (col == "a" && a1 != null)
-                if (j < int.Parse(a1) || j > int.Parse(a2)) skipCol = true;
-            if (col == "o" && o1 != null)
-                if (j < int.Parse(o1) || j > int.Parse(o2)) skipCol = true;
-            if (col == "v" && v1 != null)
-                if (j < int.Parse(v1) || j > int.Parse(v2)) skipCol = true;
-            if (j == n - 1) skipCol = false;
-            return skipCol;
-        }
-
+        
         private static string GetRhomeWin32NT(StringBuilder logger)
         {
             RegistryKey rCoreKey = GetRCoreRegistryKeyWin32(logger);
@@ -9846,6 +8947,14 @@ namespace Gekko
             //WaitForFileDelete(
         }
 
+        public static void AddToPrecedents(Databank db, string varnameWithFreq)
+        {
+            string two = db.name + ":" + varnameWithFreq;
+            if (!Globals.precedents.ContainsKey(two))
+            {
+                Globals.precedents.Add(two, 0);
+            }
+        }
         public static void X12a(Gekko.O.X12a o)
         {
             List<string> listItems = O.Restrict(o.names, true, false, true, false);
@@ -12997,22 +12106,7 @@ namespace Gekko
                         makeBatFileForAremos();
                         return "";  //no need for the parser to chew on this afterwards!
                     }
-                }
-
-                if (s2.StartsWith("dream"))
-                {
-                    if (false) {
-
-                        DecompOptions decompOptions = new DecompOptions();
-                        decompOptions.dream = s2;
-                        Decomp(decompOptions);
-                    }
-                    else
-                    {
-                        Program.Dream("t=2010-2010");
-                    }
-                    return "";
-                }
+                }                
 
                 if (s2.Length == 5)
                 {
@@ -34426,7 +33520,150 @@ namespace Gekko
             return true;
         }
 
-        public static double[,] PutJacobiIntoArray()
+        public static List<DecompHelper> Decompose(O.Decomp o)
+        {
+            int timeDecompose = 1;
+            GekkoTime t1 = o.t1;
+            GekkoTime t2 = o.t2;
+
+            List<DecompHelper> decompContributions = new List<DecompHelper>();
+            //DecompHelper dh = new DecompHelper();
+            //dh.variableWithLag = variableWithLag;
+            //dh.y0 = y0;
+            //dh.y1 = y1;
+            //dh.x0 = before;
+            //dh.x1 = after;
+            //dh.slope = (dh.y1 - dh.y0) / (dh.x1 - dh.x0);
+            //dh.z = yDatabank;
+            //decompContributions.Add(dh);
+
+            GekkoSmpl smpl = new GekkoSmpl(t1, t2);
+            Func<IVariable> decomp = o.expression;
+            IVariable iv = null;
+            try
+            {
+                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                iv = decomp();
+
+                Series iv_series = iv as Series;
+                if (iv == null)
+                {
+                    G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
+                    throw new GekkoException();
+                }
+                
+                double eps = Globals.newtonSmallNumber;
+
+                if (Globals.precedents != null)
+                {
+                    List<string> ss = Globals.precedents.Keys.ToList<string>();
+                    ss.Sort(StringComparer.OrdinalIgnoreCase);
+                    List<DecompPrecedent> sss = new List<DecompPrecedent>();
+                    foreach (string s in ss)
+                    {
+                        IVariable ivTemp = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+
+                        if (ivTemp.Type() == EVariableType.Series)
+                        {
+                            Series ivTemp_series = ivTemp as Series;
+                            if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series                                
+                            sss.Add(new DecompPrecedent(s, ivTemp));
+                        }
+                        else if (ivTemp.Type() == EVariableType.Val)
+                        {
+                            sss.Add(new DecompPrecedent(s, ivTemp));
+                        }
+
+                    }
+
+                    Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    {
+
+                        double x = iv_series.GetData(smpl, t);
+
+                        foreach (DecompPrecedent dp in sss)
+                        {
+                            // --------------------------------------------
+                            // This is where the decomposition takes place
+                            // --------------------------------------------
+
+                            DecompHelper dh = new DecompHelper();
+                            dh.variableWithLag = dp.s;  // <-------------- LAG????
+                            
+                            //dh.y0 = y0;
+                                                        //dh.y1 = y1;
+                                                        //dh.x0 = before;
+                                                        //dh.x1 = after;
+                                                        //dh.slope = (dh.y1 - dh.y0) / (dh.x1 - dh.x0);
+                                                        //dh.z = yDatabank;
+                                                        
+
+                            if (dp.iv.Type() == EVariableType.Series)
+                            {
+                                Series ivTemp_series = dp.iv as Series;
+                                double before = ivTemp_series.GetData(smpl, t);
+                                try
+                                {                                    
+                                    double after = before + eps;
+                                    ivTemp_series.SetData(t, after);
+                                    IVariable ivTempA = decomp();
+                                    Series ivTempA_series = ivTempA as Series;
+                                    double xA = ivTempA_series.GetData(smpl, t);
+                                    double grad = (xA - x) / eps;
+                                    G.Writeln2("DECOMP " + t.ToString() + " " + dp.s + " --> grad = " + grad);
+
+                                }
+                                finally
+                                {
+                                    ivTemp_series.SetData(t, before);
+                                }
+                            }
+                            else if (dp.iv.Type() == EVariableType.Val)
+                            {
+                                //We allow a val to change between Work and Ref
+                                ScalarVal ivTemp_val = dp.iv as ScalarVal;
+                                double before = ivTemp_val.val;
+                                try
+                                {                                    
+                                    double after = before + eps;
+                                    ivTemp_val.val = after;
+                                    IVariable ivTempA = decomp();
+                                    Series ivTempA_series = ivTempA as Series;
+                                    double xA = ivTempA_series.GetData(smpl, t);
+                                    double grad = (xA - x) / eps;
+                                    G.Writeln2("DECOMP " + t.ToString() + " " + dp.s + " --> grad = " + grad);
+                                }
+                                finally
+                                {
+                                    ivTemp_val.val = before;
+                                }
+                            }
+                            else
+                            {
+                                //skip other types, this includes matrices
+                                //so an expression with a matrix that changes from Work to Ref is
+                                //not decomoposed as regards to this matrix
+                                //(we would have to shock each cell in the matrix...)
+                            }
+
+                            //decompContributions.Add(dh);
+                            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                Globals.precedents = null;
+            }
+
+            return decompContributions;
+
+        }
+
+    public static double[,] PutJacobiIntoArray()
         {
             double[,] a = new double[model.jacobiMatrix.RowCount, model.jacobiMatrix.ColumnCount];
             for (int i = 0; i < model.jacobiMatrix.RowCount; i++)

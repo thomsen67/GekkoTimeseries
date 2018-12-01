@@ -499,6 +499,23 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        //public static void WalkASTToFindVariables(ASTNode node, List<string>precedents)
+        //{
+        //    //before subnodes
+            
+        //    if (node.Text == "ASTBANKVARNAME")
+        //    {
+        //        string code = node.Code.ToString();
+        //        precedents.Add(code);                
+        //    }
+        //    foreach (ASTNode child in node.ChildrenIterator())
+        //    {
+        //        WalkASTToFindVariables(child, precedents);
+        //    }
+        //    //after subnodes            
+        //}
+
+
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
             
@@ -5184,23 +5201,8 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPITEMS":
                         {                            
-                            ASTNode child = node[0];
-                            if (child.Text == "ASTBANKVARNAME")
-                            {
-                                //Same logic as ASTLISTITEMS, where "LIST a" is parsed as an expression but translated into 'a' in the parser.
-                                //node.Code.A("o" + Num(node) + ".variable = O.ConvertToString(" + AstBankHelper(child, w, 1) + ");" + G.NL);
-
-                            //TODO: implement this
-
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: Sorry, decomposition of expressions not yet implemented in Gekko 3.0");
-                                throw new GekkoException();
-                                //node.Code.A("o" + Num(node) + ".expressionCs = " + Globals.QT + child.Code.ToString().Replace("\"", "\\\"") + Globals.QT + ";" + G.NL);
-                                string sss = child.Code.ToString();
-                                node.Code.A("o" + Num(node) + ".expressionCs = " + Globals.QT + sss.Replace("`", "\\\"") + Globals.QT + ";" + G.NL);
-                            }                            
+                            node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(O.MaxLag()), o" + Num(node) + ".t2.Add(O.MaxLead()))" + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".expression = () => " + node[0].Code + ";" + G.NL);                            
                         }
                         break;
                     case "ASTUNFIX":
@@ -5908,6 +5910,11 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static Func<IVariable> Expression(GekkoSmpl smpl)
+        {
+            return () => O.Multiply(smpl, O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "x2", null, null, new LookupSettings(), EVariableType.Var, null));
         }
 
         private static string OperatorHelper(ASTNode node, int i)

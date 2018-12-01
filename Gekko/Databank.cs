@@ -170,6 +170,7 @@ namespace Gekko
             {
                 this.storage.TryGetValue(variable, out iv);
             }
+            if (iv != null && Globals.precedents != null) Program.AddToPrecedents(this, variable);
             return iv;
         }
 

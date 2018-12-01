@@ -1144,7 +1144,7 @@ namespace Gekko
                 table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
                 string s = FindEquationText(this.decompOptions);
-                if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
 
                 this.decompOptions.guiDecompValues = table;

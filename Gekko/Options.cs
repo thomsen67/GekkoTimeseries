@@ -58,6 +58,10 @@ Additionally, there are model, solve, equation options.
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
         //public string databank_logic = "default";  //default | aremos
         public bool databank_search = true;
+
+        public int decomp_maxlag = 10;
+        public int decomp_maxlead = 10;
+
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";

@@ -6,69 +6,41 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static int labelCounter;
-public static void C0(GekkoSmpl smpl, P p) {
-//[[commandStart]]2
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static int labelCounter;
+        public static void C0(GekkoSmpl smpl, P p) {
+            //[[commandStart]]0
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-O.Assignment o2 = new O.Assignment();
-O.AdjustT0(smpl, -1);
-//IVariable ivTmpvar6 = O.FunctionLookup0("f")(smpl, p);
-O.AdjustT0(smpl, 1);
-//O.Lookup(smpl, null, null, "%v", null, ivTmpvar6, new  LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
-;
+            O.Decomp o0 = new O.Decomp();
+            o0.t1 = Globals.globalPeriodStart;
+            o0.t2 = Globals.globalPeriodEnd;
 
-//[[commandEnd]]2
-}
+            smpl = new GekkoSmpl(o0.t1.Add(O.MaxLag()), o0.t2.Add(O.MaxLead()));
+            o0.expression = () => O.Add(smpl, O.Multiply(smpl, i32, O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null)), O.Multiply(smpl, i33, O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag, O.Negate(smpl, i34)
+            ), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i34)
+            )));
 
-public static void CC0(GekkoSmpl smpl, P p) {
-//[[commandStart]]1
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+            o0.Exe();
 
-Program.Tell(O.ConvertToString(O.HandleString(new ScalarString(@"a1y"))), false);
-//[[commandEnd]]1
-}
-
-public static void FunctionDef5() {
-
-O.PrepareUfunction(0, "f");
-
-Globals.ufunctions0.Add("f", (GekkoSmpl smpl, P p) => 
-
-{ Databank local0 = Program.databanks.local;
-Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();
-try {
+            //[[commandEnd]]0
+        }
 
 
-CC0(smpl, p);
+        public static readonly ScalarVal i32 = new ScalarVal(2d);
+        public static readonly ScalarVal i33 = new ScalarVal(3d);
+        public static readonly ScalarVal i34 = new ScalarVal(1d);
 
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-return null; 
-} 
-finally {
-Program.databanks.local = local0; Program.databanks.localGlobal = lg0;
-}
-});
-
-}
-
-
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-FunctionDef5();
-
-
-//[[commandEnd]]0
-
-
-C0(smpl, p);
+            C0(smpl, p);
 
 
 
-}
-}
+        }
+    }
 }

@@ -44,10 +44,13 @@ namespace Gekko
         {
             //check local bank
             IVariable rv = this.GetLocal().GetIVariable(varName);
-            if (rv != null) return rv;
+            if (rv != null)
+            {                
+                return rv;
+            }
 
             if (this.optionBank != null)
-            {
+            {                
                 return this.optionBank.GetIVariable(varName);
             }
 
@@ -56,8 +59,11 @@ namespace Gekko
                 if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
                 Databank db2 = this.storage[i];
                 rv = db2.GetIVariable(varName);
-                if (rv != null) return rv;
-            }
+                if (rv != null)
+                {                    
+                    return rv;
+                }
+            }            
             return this.GetGlobal().GetIVariable(varName);
         }
 

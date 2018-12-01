@@ -15,8 +15,19 @@ namespace Gekko
     /// For instance, changing the name of "Prt()" here would entail searching for all "O.Prt" strings
     /// in the code.    
     /// </summary>
+    /// 
+    public class DecompPrecedent
+    {
+        public string s = null;
+        public IVariable iv = null;
+        public DecompPrecedent(string s, IVariable iv)
+        {
+            this.s = s;
+            this.iv = iv;
+        }
+    }
 
-    public class LookupSettings
+        public class LookupSettings
     {
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
@@ -250,6 +261,16 @@ namespace Gekko
                 double x_lag = x_series.GetData(smpl, t.Add(-1));
             }
             return x.Divide(smpl, y);
+        }
+
+        public static int MaxLag()
+        {
+            return Program.options.decomp_maxlag;
+        }
+
+        public static int MaxLead()
+        {
+            return Program.options.decomp_maxlead;
         }
 
         //private static void AssignmentError(Series x_series, string s)
@@ -1523,7 +1544,7 @@ namespace Gekko
                                     //Ref lookup
                                     Databank db = null;
                                     db = Program.databanks.GetRef();
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);                                    
                                 }
                                 else
                                 {
@@ -1551,7 +1572,6 @@ namespace Gekko
                                             //just return the null
                                         }
                                     }
-
                                 }
                             }
                             else
@@ -1562,7 +1582,7 @@ namespace Gekko
                                     //Ref lookup
                                     Databank db = null;
                                     db = Program.databanks.GetRef();
-                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
+                                    rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);                                    
                                 }
                                 else
                                 {
@@ -1612,6 +1632,8 @@ namespace Gekko
             }
             return rv;
         }
+
+        
 
         private static List ReadListFile(string varname)
         {
@@ -7631,12 +7653,18 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             public string variable = null;
             public string expressionCs = null;
+            public Func<IVariable> expression = null;
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs);
+                Program.Decompose(this);
+
+                //Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs);
             }
         }
+
+            
 
         public class Info
         {

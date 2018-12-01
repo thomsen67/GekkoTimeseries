@@ -40,7 +40,7 @@ using System.Security.Permissions;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-[assembly: AssemblyVersion("2.21.4.0")]
-[assembly: AssemblyFileVersion("2.21.4.0")]
+[assembly: AssemblyVersion("2.21.5.0")]
+[assembly: AssemblyFileVersion("2.21.5.0")]
 
 [assembly: AssemblyDelaySign(true)]

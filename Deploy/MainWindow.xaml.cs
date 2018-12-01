@@ -23,17 +23,16 @@ namespace Deploy
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string startupPath = null;
+        //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+        public static string zip = @"c:\Program Files\7-Zip\7z.dll";
 
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public void SetStartupPath(string s)
-        {
-            startupPath = s;
-        }
+        
+
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -166,7 +165,7 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = startupPath + "\\zip\\7z.dll";
+                string sevenzPath = zip;
                 SevenZipExtractor.SetLibraryPath(sevenzPath);
                 SevenZipCompressor tmp = new SevenZipCompressor();
                 tmp.ArchiveFormat = OutArchiveFormat.Zip;
@@ -174,7 +173,7 @@ namespace Deploy
                 tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tmp\Gekko_files\Gekko.zip", true);
                 MessageBox.Show("Zipping of Gekko program dir ok");
             }
-            catch
+            catch (Exception e2)
             {
                 MessageBox.Show("*** ERROR: Zipping of Gekko program dir failed");
             }
@@ -222,7 +221,7 @@ namespace Deploy
                 txt += "  <li>" + t3 + "</li>" + "\r\n";
                 txt += "</ul>" + "\r\n";
 
-                System.IO.File.WriteAllText(@"c:\tmp\Gekko_files\sha.txt", t1 + t2 + t3);
+                System.IO.File.WriteAllText(@"c:\tmp\Gekko_files\sha.txt", txt);
                 MessageBox.Show(@"SHA ok, copied to c:\tmp\Gekko_files");
             }
             catch (Exception exception)
@@ -235,7 +234,7 @@ namespace Deploy
         {
             try
             {
-                string sevenzPath = startupPath + "\\zip\\7z.dll";
+                string sevenzPath = zip;
                 SevenZipExtractor.SetLibraryPath(sevenzPath);
                 SevenZipCompressor tmp = new SevenZipCompressor();
                 tmp.ArchiveFormat = OutArchiveFormat.Zip;
