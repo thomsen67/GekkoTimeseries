@@ -33523,8 +33523,8 @@ namespace Gekko
         public static List<DecompHelper> Decompose(O.Decomp o)
         {
             int timeDecompose = 1;
-            GekkoTime t1 = o.t1;
-            GekkoTime t2 = o.t2;
+            GekkoTime per1 = o.t1;
+            GekkoTime per2 = o.t2;
 
             List<DecompHelper> decompContributions = new List<DecompHelper>();
             //DecompHelper dh = new DecompHelper();
@@ -33537,7 +33537,7 @@ namespace Gekko
             //dh.z = yDatabank;
             //decompContributions.Add(dh);
 
-            GekkoSmpl smpl = new GekkoSmpl(t1, t2);
+            GekkoSmpl smpl = new GekkoSmpl(per1, per2);
             Func<IVariable> decomp = o.expression;
             IVariable iv = null;
             try
@@ -33551,7 +33551,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
                     throw new GekkoException();
                 }
-                
+
                 double eps = Globals.newtonSmallNumber;
 
                 if (Globals.precedents != null)
@@ -33578,78 +33578,72 @@ namespace Gekko
 
                     Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+                    foreach (DecompPrecedent dp in sss)
                     {
 
-                        double x = iv_series.GetData(smpl, t);
-
-                        foreach (DecompPrecedent dp in sss)
+                        foreach (GekkoTime t1 in new GekkoTimeIterator(per1, per2))
                         {
-                            // --------------------------------------------
-                            // This is where the decomposition takes place
-                            // --------------------------------------------
 
-                            DecompHelper dh = new DecompHelper();
-                            dh.variableWithLag = dp.s;  // <-------------- LAG????
-                            
-                            //dh.y0 = y0;
-                                                        //dh.y1 = y1;
-                                                        //dh.x0 = before;
-                                                        //dh.x1 = after;
-                                                        //dh.slope = (dh.y1 - dh.y0) / (dh.x1 - dh.x0);
-                                                        //dh.z = yDatabank;
-                                                        
-
-                            if (dp.iv.Type() == EVariableType.Series)
+                            if (true)
                             {
-                                Series ivTemp_series = dp.iv as Series;
-                                double before = ivTemp_series.GetData(smpl, t);
-                                try
-                                {                                    
-                                    double after = before + eps;
-                                    ivTemp_series.SetData(t, after);
-                                    IVariable ivTempA = decomp();
-                                    Series ivTempA_series = ivTempA as Series;
-                                    double xA = ivTempA_series.GetData(smpl, t);
-                                    double grad = (xA - x) / eps;
-                                    G.Writeln2("DECOMP " + t.ToString() + " " + dp.s + " --> grad = " + grad);
 
-                                }
-                                finally
+                                
+
+
+                                // --------------------------------------------
+                                // This is where the decomposition takes place
+                                // --------------------------------------------
+
+                                DecompHelper dh = new DecompHelper();
+                                dh.variableWithLag = dp.s;  // <-------------- LAG????
+
+                                //dh.y0 = y0;
+                                //dh.y1 = y1;
+                                //dh.x0 = before;
+                                //dh.x1 = after;
+                                //dh.slope = (dh.y1 - dh.y0) / (dh.x1 - dh.x0);
+                                //dh.z = yDatabank;
+
+
+                                if (dp.iv.Type() == EVariableType.Series)
                                 {
-                                    ivTemp_series.SetData(t, before);
+                                    Series ivTemp_series = dp.iv as Series;
+                                    double before = ivTemp_series.GetData(smpl, t1);
+                                    try
+                                    {
+                                        double after = before + eps;
+                                        ivTemp_series.SetData(t1, after);
+                                        IVariable ivTempA = decomp();
+                                        Series ivTempA_series = ivTempA as Series;
+                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                                        {
+                                            double x = iv_series.GetData(smpl, t2);
+                                            double xA = ivTempA_series.GetData(smpl, t2);
+                                            double grad = (xA - x) / eps;
+                                            G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad);
+                                        }
+                                    }
+                                    finally
+                                    {
+                                        ivTemp_series.SetData(t1, before);
+                                    }
                                 }
-                            }
-                            else if (dp.iv.Type() == EVariableType.Val)
-                            {
-                                //We allow a val to change between Work and Ref
-                                ScalarVal ivTemp_val = dp.iv as ScalarVal;
-                                double before = ivTemp_val.val;
-                                try
-                                {                                    
-                                    double after = before + eps;
-                                    ivTemp_val.val = after;
-                                    IVariable ivTempA = decomp();
-                                    Series ivTempA_series = ivTempA as Series;
-                                    double xA = ivTempA_series.GetData(smpl, t);
-                                    double grad = (xA - x) / eps;
-                                    G.Writeln2("DECOMP " + t.ToString() + " " + dp.s + " --> grad = " + grad);
-                                }
-                                finally
+                                else if (dp.iv.Type() == EVariableType.Val)
                                 {
-                                    ivTemp_val.val = before;
+                                    //We allow a val to change between Work and Ref
+                                    //TODO
                                 }
-                            }
-                            else
-                            {
-                                //skip other types, this includes matrices
-                                //so an expression with a matrix that changes from Work to Ref is
-                                //not decomoposed as regards to this matrix
-                                //(we would have to shock each cell in the matrix...)
-                            }
+                                else
+                                {
+                                    //skip other types, this includes matrices
+                                    //so an expression with a matrix that changes from Work to Ref is
+                                    //not decomoposed as regards to this matrix
+                                    //(we would have to shock each cell in the matrix...)
+                                }
 
-                            //decompContributions.Add(dh);
-                            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                                //decompContributions.Add(dh);
+                                //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                            }
                         }
                     }
                 }
