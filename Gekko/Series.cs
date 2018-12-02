@@ -1899,7 +1899,13 @@ namespace Gekko
                     }
                 }
             }
-            
+
+            if (Globals.precedents != null && rv != null)
+            {
+                Series rv_series = rv as Series;
+                string name = rv_series.GetName();
+                if (!Globals.precedents.ContainsKey(name)) Globals.precedents.Add(name, 0);
+            }
 
             return rv;
         }
@@ -2164,17 +2170,20 @@ namespace Gekko
             }
 
             if (this.type != ESeriesType.Light)
-            {                
-                tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
-                tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
-                if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
-                if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
-                if (this.meta.units != null) tsCopy.meta.source = this.meta.units;
-                if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;                                      
-                if (this.meta.domains != null)
+            {
+                if (this.meta != null)
                 {
-                    tsCopy.meta.domains = new string[this.meta.domains.Length];
-                    this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
+                    tsCopy.meta.firstPeriodPositionInArray = this.meta.firstPeriodPositionInArray;
+                    tsCopy.meta.lastPeriodPositionInArray = this.meta.lastPeriodPositionInArray;
+                    if (this.meta.label != null) tsCopy.meta.label = this.meta.label;
+                    if (this.meta.source != null) tsCopy.meta.source = this.meta.source;
+                    if (this.meta.units != null) tsCopy.meta.source = this.meta.units;
+                    if (this.meta.stamp != null) tsCopy.meta.stamp = this.meta.stamp;
+                    if (this.meta.domains != null)
+                    {
+                        tsCopy.meta.domains = new string[this.meta.domains.Length];
+                        this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
+                    }
                 }
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }

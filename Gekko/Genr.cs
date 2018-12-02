@@ -18,10 +18,10 @@ O.Decomp o0 = new O.Decomp();
 o0.t1 = Globals.globalPeriodStart;
 o0.t2 = Globals.globalPeriodEnd;
 
-smpl = new GekkoSmpl(o0.t1.Add(O.MaxLag()), o0.t2.Add(O.MaxLead()));
-o0.expression = () => O.Add(smpl, O.Multiply(smpl, i32, O.Lookup(smpl, null, null, "x1", null, null, new  LookupSettings(), EVariableType.Var, null)), O.Multiply(smpl, i33, O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag,O.Negate(smpl, i34)
-), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "x1", null, null, new  LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i34)
-)));
+smpl = new GekkoSmpl(o0.t1.Add(-O.MaxLag()), o0.t2.Add(O.MaxLead()));
+o0.expression = () => O.Add(smpl, O.Add(smpl, O.Multiply(smpl, i94, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None,new ScalarString("a")), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x", null, null, new  LookupSettings(), EVariableType.Var, null), new ScalarString("a"))), O.Multiply(smpl, i95, O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag,O.Negate(smpl, i96)
+), smpl, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None,new ScalarString("a")), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x", null, null, new  LookupSettings(), EVariableType.Var, null), new ScalarString("a")), O.Negate(smpl, i96)
+))), O.Lookup(smpl, null, null, "%v", null, null, new  LookupSettings(), EVariableType.Var, null));
 
 o0.Exe();
 
@@ -29,9 +29,9 @@ o0.Exe();
 }
 
 
-public static readonly ScalarVal i32 = new ScalarVal(2d);
-public static readonly ScalarVal i33 = new ScalarVal(3d);
-public static readonly ScalarVal i34 = new ScalarVal(1d);
+public static readonly ScalarVal i94 = new ScalarVal(2d);
+public static readonly ScalarVal i95 = new ScalarVal(3d);
+public static readonly ScalarVal i96 = new ScalarVal(1d);
 
 public static void CodeLines(P p)
 {

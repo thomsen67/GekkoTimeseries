@@ -19,11 +19,11 @@ namespace Gekko
     public class DecompPrecedent
     {
         public string s = null;
-        public IVariable iv = null;
+        public IVariable x = null;
         public DecompPrecedent(string s, IVariable iv)
         {
             this.s = s;
-            this.iv = iv;
+            this.x = iv;
         }
     }
 
@@ -7658,9 +7658,8 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Decompose(this);
-
-                //Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs);
+                //Gekko.Table tab = Program.Decompose(this);
+                Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs, this.expression);
             }
         }
 

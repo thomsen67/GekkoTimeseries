@@ -10580,7 +10580,7 @@ namespace Gekko
             return inputFileLines;
         }
 
-        public static void Decomp(string type, GekkoTime t1, GekkoTime t2, string prtOption, string var, List<Dictionary<string, string>> precedents, string variable, string expressionCs)
+        public static void Decomp(string type, GekkoTime t1, GekkoTime t2, string prtOption, string var, List<Dictionary<string, string>> precedents, string variable, string expressionCs, Func<IVariable> expression)
         {
             //This is the starting point of a decomposition call
             //Calls: Decomp(decompOptions);
@@ -10598,7 +10598,8 @@ namespace Gekko
             decompOptions.t1 = t1;
             decompOptions.t2 = t2;
             decompOptions.prtOption = prtOption;
-            decompOptions.expression = expressionCs;
+            decompOptions.expressionOld = expressionCs;
+            decompOptions.expression = expression;
             if (variable != null)
             {
                 if (Program.model == null)
@@ -10613,23 +10614,26 @@ namespace Gekko
             else
             {
                 //uses expressionCs
-                foreach (string s in precedents[0].Keys)
+                if (false)
                 {
-                    if (s.Contains(":"))
+                    foreach (string s in precedents[0].Keys)
                     {
-                        G.Writeln2("*** ERROR: You cannot decompose with a named databank (using ':')");
-                        throw new GekkoException();
+                        if (s.Contains(":"))
+                        {
+                            G.Writeln2("*** ERROR: You cannot decompose with a named databank (using ':')");
+                            throw new GekkoException();
+                        }
+                        else if (s.Contains("@"))
+                        {
+                            G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
+                            throw new GekkoException();
+                        }
                     }
-                    else if (s.Contains("@"))
-                    {
-                        G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
-                        throw new GekkoException();
-                    }
-                }
 
-                //decompOptions.vars = new List<string> { var };
-                //decompOptions.isExpression = true;
-                decompOptions.precedents = precedents;
+                    //decompOptions.vars = new List<string> { var };
+                    //decompOptions.isExpression = true;
+                    decompOptions.precedents = precedents;
+                }
                 Decomp(decompOptions);
             }
         }
@@ -10785,7 +10789,7 @@ namespace Gekko
             //decompOptions.isCalledFromDecompWindow = false;
             Window1 w = new Window1(decompOptions);
             Globals.windowsDecomp.Add(w);
-            if (decompOptions.expression != null)
+            if (decompOptions.expressionOld != null)
             {
                 w.Title = "Decompose expression";
             }
@@ -10881,7 +10885,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
 
-                if (decompOptions.expression == null && !Program.model.fromVariableToEquationNumber.ContainsKey(leftSideVariable + Globals.lagIndicator + "0"))
+                if (decompOptions.expressionOld == null && !Program.model.fromVariableToEquationNumber.ContainsKey(leftSideVariable + Globals.lagIndicator + "0"))
                 {
                     G.Writeln2("*** ERROR: DECOMP: variable '" + leftSideVariable + "' does not exist as left-hand side variable in model");
                     throw new GekkoException();
@@ -10889,7 +10893,7 @@ namespace Gekko
 
                 Dictionary<string, string> precedents = null;
                 EquationHelper eh = null;
-                if (decompOptions.expression != null)
+                if (decompOptions.expressionOld != null)
                 {
                     precedents = decompOptions.precedents[0];
                 }
@@ -10901,7 +10905,7 @@ namespace Gekko
                 }
 
                 CompilerResults cr;
-                CreateDecompDll(leftSideVariable, decompOptions.expression != null, eh, out cr);
+                CreateDecompDll(leftSideVariable, decompOptions.expressionOld != null, eh, out cr);
 
                 List<Dictionary<string, string>> precedents2 = new List<Dictionary<string, string>>();
                 precedents2.Add(precedents);
@@ -10937,7 +10941,7 @@ namespace Gekko
                         y0 = RunDecompEquation(cr, t, databank);
 
                         double yDatabank = double.NaN;
-                        if (decompOptions.expression != null)
+                        if (decompOptions.expressionOld != null)
                         {
                             yDatabank = y0;
                         }
@@ -11024,7 +11028,7 @@ namespace Gekko
                             i++;
                             table.Set(i + 3 + o, 1, G.FormatVariableAndLag(dh.variableWithLag)); //What should format be?
                         }
-                        if (decompOptions.expression != null)
+                        if (decompOptions.expressionOld != null)
                         {
                             table.Set(2, 1, Globals.decompText0);
                         }
@@ -15045,9 +15049,129 @@ namespace Gekko
 
         public static void Tell(string text, bool nocr)
         {
+            if (1 == 0 && Globals.runningOnTTComputer)
+            {
+                int[,,] b = new int[6, 2, 3];
+
+                b[0, 0, 0] = -1;
+                b[0, 0, 1] = -1;
+                b[0, 0, 2] = 0;
+                b[0, 1, 0] = -1;
+                b[0, 1, 1] = -1;
+                b[0, 1, 2] = 1;
+
+                b[1, 0, 0] = 1;
+                b[1, 0, 1] = -1;
+                b[1, 0, 2] = 0;
+                b[1, 1, 0] = 0;
+                b[1, 1, 1] = -1;
+                b[1, 1, 2] = 1;
+
+                b[2, 0, 0] = -1;
+                b[2, 0, 1] = 0;
+                b[2, 0, 2] = 1;
+                b[2, 1, 0] = -1;
+                b[2, 1, 1] = 1;
+                b[2, 1, 2] = 0;
+
+                b[3, 0, 0] = 1;
+                b[3, 0, 1] = 0;
+                b[3, 0, 2] = 1;
+                b[3, 1, 0] = 0;
+                b[3, 1, 1] = 1;
+                b[3, 1, 2] = 0;
+
+                b[4, 0, 0] = -1;
+                b[4, 0, 1] = 1;
+                b[4, 0, 2] = 0;
+                b[4, 1, 0] = -1;
+                b[4, 1, 1] = 0;
+                b[4, 1, 2] = 1;
+
+                b[5, 0, 0] = 0;
+                b[5, 0, 1] = 1;
+                b[5, 0, 2] = 1;
+                b[5, 1, 0] = 1;
+                b[5, 1, 1] = 0;
+                b[5, 1, 2] = 0;
+
+                List<int> nums = new List<int> { 11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54, 61, 62, 63, 64, };
+                var permute = Permute(nums);
+
+                
+                //for (int i = 0; i < permute.Count; i++)
+                //{
+                //    List<int> combi = permute[i];
+                //    for (int j = 0; j < 6; j++)
+                //    {
+
+                //    }
+                //}
+            }            
+            
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
+        }
+
+        public static IEnumerable<IEnumerable<T>> Permute<T>(this IEnumerable<T> sequence)
+        {
+            if (sequence == null)
+            {
+                yield break;
+            }
+
+            var list = sequence.ToList();
+
+            if (!list.Any())
+            {
+                yield return Enumerable.Empty<T>();
+            }
+            else
+            {
+                var startingElementIndex = 0;
+
+                foreach (var startingElement in list)
+                {
+                    var remainingItems = list.AllExcept(startingElementIndex);
+
+                    foreach (var permutationOfRemainder in remainingItems.Permute())
+                    {
+                        yield return startingElement.Concat(permutationOfRemainder);
+                    }
+
+                    startingElementIndex++;
+                }
+            }
+        }
+
+        private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
+        {
+            yield return firstElement;
+            if (secondSequence == null)
+            {
+                yield break;
+            }
+
+            foreach (var item in secondSequence)
+            {
+                yield return item;
+            }
+        }
+
+        private static IEnumerable<T> AllExcept<T>(this IEnumerable<T> sequence, int indexToSkip)
+        {
+            if (sequence == null)
+            {
+                yield break;
+            }
+
+            var index = 0;
+
+            foreach (var item in sequence.Where(item => index++ != indexToSkip))
+            {
+                yield return item;
+            }
         }
 
         public static void Display(string text)
@@ -33520,9 +33644,11 @@ namespace Gekko
             return true;
         }
 
-        public static List<DecompHelper> Decompose(O.Decomp o)
+        public static Table Decompose(DecompOptions o)
         {
-            int timeDecompose = 1;
+            Table tab = new Table();
+
+            string type = "n";  //n or m
             GekkoTime per1 = o.t1;
             GekkoTime per2 = o.t2;
 
@@ -33539,17 +33665,24 @@ namespace Gekko
 
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
             Func<IVariable> decomp = o.expression;
-            IVariable iv = null;
+            IVariable y0a = null;
             try
             {
                 Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                iv = decomp();
+                y0a = decomp();               
 
-                Series iv_series = iv as Series;
-                if (iv == null)
+                Series y0a_series = y0a as Series;
+                
+                if (y0a == null)
                 {
                     G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
                     throw new GekkoException();
+                }
+
+                Series y0_series = y0a_series;
+                if (y0a_series.type != ESeriesType.Light)
+                {
+                    y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
                 double eps = Globals.newtonSmallNumber;
@@ -33561,99 +33694,161 @@ namespace Gekko
                     List<DecompPrecedent> sss = new List<DecompPrecedent>();
                     foreach (string s in ss)
                     {
-                        IVariable ivTemp = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+                        IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
-                        if (ivTemp.Type() == EVariableType.Series)
+                        if (x.Type() == EVariableType.Series)
                         {
-                            Series ivTemp_series = ivTemp as Series;
+                            Series ivTemp_series = x as Series;
                             if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series                                
-                            sss.Add(new DecompPrecedent(s, ivTemp));
+                            sss.Add(new DecompPrecedent(s, x));
                         }
-                        else if (ivTemp.Type() == EVariableType.Val)
+                        else if (x.Type() == EVariableType.Val)
                         {
-                            sss.Add(new DecompPrecedent(s, ivTemp));
+                            sss.Add(new DecompPrecedent(s, x));
                         }
 
                     }
 
                     Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
 
+                    GekkoDictionary<string, double> values = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                    int iVar = -1;
+
                     foreach (DecompPrecedent dp in sss)
                     {
-
+                        iVar++;
                         foreach (GekkoTime t1 in new GekkoTimeIterator(per1, per2))
                         {
+                            
 
-                            if (true)
+                            // --------------------------------------------
+                            // This is where the decomposition takes place
+                            // --------------------------------------------
+
+                            DecompHelper dh = new DecompHelper();
+                            dh.variableWithLag = dp.s;  // <-------------- LAG????
+                                                        
+                            if (dp.x.Type() == EVariableType.Series)
                             {
-
-                                
-
-
-                                // --------------------------------------------
-                                // This is where the decomposition takes place
-                                // --------------------------------------------
-
-                                DecompHelper dh = new DecompHelper();
-                                dh.variableWithLag = dp.s;  // <-------------- LAG????
-
-                                //dh.y0 = y0;
-                                //dh.y1 = y1;
-                                //dh.x0 = before;
-                                //dh.x1 = after;
-                                //dh.slope = (dh.y1 - dh.y0) / (dh.x1 - dh.x0);
-                                //dh.z = yDatabank;
-
-
-                                if (dp.iv.Type() == EVariableType.Series)
+                                Series x_series = dp.x as Series;
+                                double x_before = x_series.GetData(smpl, t1);
+                                try
                                 {
-                                    Series ivTemp_series = dp.iv as Series;
-                                    double before = ivTemp_series.GetData(smpl, t1);
-                                    try
-                                    {
-                                        double after = before + eps;
-                                        ivTemp_series.SetData(t1, after);
-                                        IVariable ivTempA = decomp();
-                                        Series ivTempA_series = ivTempA as Series;
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                                    double x_after = x_before + eps;
+                                    x_series.SetData(t1, x_after);
+                                    IVariable y1 = decomp();
+                                    Series y1_series = y1 as Series;
+                                    
+                                    foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                                    {   
+                                        double y0_double = y0_series.GetData(smpl, t2);
+                                        double y1_double = y1_series.GetData(smpl, t2);
+                                        double grad = (y1_double - y0_double) / eps;
+                                        int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
+                                        //G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad + " lag = " + lag);
+                                        string name = G.Chop_FreqRemove(dp.s, per1.freq);
+                                        if (!G.isNumericalError(grad) && grad != 0d)
                                         {
-                                            double x = iv_series.GetData(smpl, t2);
-                                            double xA = ivTempA_series.GetData(smpl, t2);
-                                            double grad = (xA - x) / eps;
-                                            G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad);
+                                            if (lag != 0)
+                                            {
+                                                if (lag < 0) name += "[" + lag + "]";
+                                                else name += "[+" + lag + "]";
+                                            }
+                                            string name2 = name + "¤" + t2.ToString();
+                                            if (type == "n")
+                                            {
+                                                values.Add(name2, x_before);
+                                                if (iVar == 0 && t2.IsSamePeriod(per1))
+                                                {
+                                                    values.Add("_lhs" + "¤" + t1.ToString(), y0_double);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                values.Add(name2, grad);
+                                                if (iVar == 0 && t2.IsSamePeriod(per1))
+                                                {
+                                                    values.Add("_lhs" + "¤" + t1.ToString(), double.NaN);
+                                                }
+                                            }
+                                            if (!vars.ContainsKey(name))
+                                            {
+                                                vars.Add(name, 0);                                                
+                                            }
+                                            if (!vars.ContainsKey("_lhs"))
+                                            {                                                
+                                                if (iVar == 0 && t2.IsSamePeriod(per1))
+                                                {
+                                                    vars.Add("_lhs", 0);
+                                                }
+                                            }
                                         }
                                     }
-                                    finally
-                                    {
-                                        ivTemp_series.SetData(t1, before);
-                                    }
                                 }
-                                else if (dp.iv.Type() == EVariableType.Val)
+                                finally
                                 {
-                                    //We allow a val to change between Work and Ref
-                                    //TODO
+                                    x_series.SetData(t1, x_before);
                                 }
-                                else
-                                {
-                                    //skip other types, this includes matrices
-                                    //so an expression with a matrix that changes from Work to Ref is
-                                    //not decomoposed as regards to this matrix
-                                    //(we would have to shock each cell in the matrix...)
-                                }
+                            }
+                            else if (dp.x.Type() == EVariableType.Val)
+                            {
+                                //TODO
+                            }
+                            else
+                            {
+                                //skip other types, this includes matrices
+                                //so an expression with a matrix that changes from Work to Ref is
+                                //not decomoposed as regards to this matrix
+                                //(we would have to shock each cell in the matrix...)
+                            }
 
-                                //decompContributions.Add(dh);
-                                //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                            //decompContributions.Add(dh);
+                            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                        }
+                    }
+
+                    List<string> vars2 = new List<string>(vars.Keys.ToArray());
+                    vars2.Sort(StringComparer.OrdinalIgnoreCase);
+                    
+                    tab.writeOnce = true;
+                    int i = 0;
+                    foreach (string s in vars2)
+                    {
+                        i++;
+                        tab.Set(i + 1, 1, s);
+                        int j = 0;
+                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                        {
+                            j++;
+                            if (i == 1)
+                            {
+                                Cell c = new Cell();
+                                c.date = t2.ToString();
+                                c.cellType = CellType.Date;
+                                tab.Set(new Coord(1, j + 1), c);
+                            }
+                            double d = double.NaN;
+                            values.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                            //if (!G.isNumericalError(d))
+                            {
+                                Cell c = new Cell();
+                                c.number = d;
+                                c.cellType = CellType.Number;
+                                tab.Set(new Coord(i + 1, j + 1), c);
                             }
                         }
                     }
                 }
+
             }
             finally
             {
                 Globals.precedents = null;
             }
 
-            return decompContributions;
+            return tab;
 
         }
 

@@ -917,7 +917,7 @@ namespace Gekko
 
                             if (G.Equal(var2, Globals.decompText0))
                             {
-                                if (decompOptions.expression != null)
+                                if (decompOptions.expressionOld != null)
                                 {
                                     this.equation.Text = "This value corresponds to evaluating the expression.";
                                 }
@@ -928,7 +928,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText1))
                             {
-                                if (decompOptions.expression != null)
+                                if (decompOptions.expressionOld != null)
                                 {
                                     this.equation.Text = "This difference is always 0 for expressions.";
                                 }
@@ -940,7 +940,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
-                                if (decompOptions.expression != null)
+                                if (decompOptions.expressionOld != null)
                                 {
                                     this.equation.Text = "This difference between the two rows above is always 0 for expressions.";
                                 }
@@ -952,7 +952,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText2))
                             {
-                                if (decompOptions.expression != null)
+                                if (decompOptions.expressionOld != null)
                                 {
                                     this.equation.Text = "This value is the result of evaluating the expression minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero).";
                                 }
@@ -963,7 +963,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText2a))  //raw
                             {
-                                if (decompOptions.expression != null)
+                                if (decompOptions.expressionOld != null)
                                 {
                                     this.equation.Text = "These values correspond to evaluating the expression (always equal to the row above for expressions).";
                                 }
@@ -1020,14 +1020,17 @@ namespace Gekko
         public void RecalcCellsWithNewType()
         {
             try
-            {                
-                if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
-
-                if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                if (this.decompOptions.modelHash != Program.model.modelHashTrue)
+            {
+                if (this.decompOptions.expression == null)
                 {
-                    MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
-                    return;
+                    if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
+
+                    if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
+                    if (this.decompOptions.modelHash != Program.model.modelHashTrue)
+                    {
+                        MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
+                        return;
+                    }
                 }
 
                 //Setting defaults
@@ -1136,12 +1139,17 @@ namespace Gekko
 
                 _statusText.Text = "";
 
-                bool useLocalData = false;                
+                bool useLocalData = false;
 
-                this.decompOptions.modelHash = Program.model.modelHashTrue;  //To make sure that decomp is not clicked and results shown, after a new model has been loaded
+                if (this.decompOptions.expression == null)
+                {
+                    this.decompOptions.modelHash = Program.model.modelHashTrue;  //To make sure that decomp is not clicked and results shown, after a new model has been loaded
+                }
 
-                Table table = null;                
-                table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
+                Table table = null;
+                //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
+                
+                table = Program.Decompose(this.decompOptions);
 
                 string s = FindEquationText(this.decompOptions);
                 //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
@@ -1195,9 +1203,9 @@ namespace Gekko
 
         private string FindEquationText(DecompOptions decompOptions)
         {
-            if (decompOptions.expression != null)
+            if (decompOptions.expressionOld != null)
             {
-                return decompOptions.expression;
+                return decompOptions.expressionOld;
             }
             else
             {
@@ -1470,7 +1478,8 @@ namespace Gekko
         public string variable = null;
         public bool isPercentageType = false;
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
-        public string expression = null;  //only != null for expressions
+        public string expressionOld = null;  //only != null for expressions
+        public Func<IVariable> expression = null;
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
         //public GekkoParserTimePeriod tp;
