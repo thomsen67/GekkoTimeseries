@@ -33676,8 +33676,9 @@ namespace Gekko
             IVariable y0aRef = null;
 
             GekkoDictionary<string, double> cellsGrad = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, double> cellsGradRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsQuo = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            //GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsAltRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsContribD = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsContribM = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
@@ -33787,76 +33788,99 @@ namespace Gekko
                             // This is where the decomposition takes place
                             // --------------------------------------------
 
-                            DecompHelper dh = new DecompHelper();
-                            dh.variableWithLag = dp.s;  // <-------------- LAG????
-
-                            //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
-                            if (dpx.Type() == EVariableType.Series)
+                            for (int j = 0; j < 2; j++)
                             {
-                                Series x_series = dpx as Series;
-                                double x_before = x_series.GetData(smpl, t1);
-                                try
+
+
+                                //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+                                if (dpx.Type() == EVariableType.Series)
                                 {
-                                    double x_after = x_before + eps;
-                                    x_series.SetData(t1, x_after);
-
-                                    //Function call start --------------
-                                    O.AdjustSmpl(o.smplForFunc, 0);
-                                    IVariable y1 = decomp();
-                                    O.AdjustSmpl(o.smplForFunc, 1);
-                                    //Function call end   --------------
-
-                                    Series y1_series = y1 as Series;
-
-                                    foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                                    Series x_series = null;
+                                    Series y_series = null;
+                                    if (j == 0)
                                     {
-                                        double y0_double = y0_series.GetData(smpl, t2);
-                                        double y1_double = y1_series.GetData(smpl, t2);
-                                        double grad = (y1_double - y0_double) / eps;
-                                        int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
-                                        //G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad + " lag = " + lag);
-                                        string name = G.Chop_FreqRemove(dp.s, per1.freq);
-                                        if (!G.isNumericalError(grad) && grad != 0d)
+                                        x_series = dpx as Series;
+                                        y_series = y0_series;
+                                    }
+                                    else
+                                    {
+                                        x_series = xRef_series;
+                                        y_series = y0Ref_series;
+                                    }
+                                    double x_before = x_series.GetData(smpl, t1);
+                                    try
+                                    {
+                                        double x_after = x_before + eps;
+                                        x_series.SetData(t1, x_after);
+
+                                        //Function call start --------------
+                                        O.AdjustSmpl(o.smplForFunc, 0);
+                                        if (j == 1) o.smplForFunc.bankNumber = 1;
+                                        IVariable y1 = decomp();
+                                        if (j == 1) o.smplForFunc.bankNumber = 0;
+                                        O.AdjustSmpl(o.smplForFunc, 1);
+                                        //Function call end   --------------
+
+                                        Series y1_series = y1 as Series;
+
+                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
                                         {
-                                            if (lag != 0)
+                                            double y0_double = y_series.GetData(smpl, t2);
+                                            double y1_double = y1_series.GetData(smpl, t2);
+                                            double grad = (y1_double - y0_double) / eps;
+                                            int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
+                                                                                              //G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad + " lag = " + lag);
+                                            string name = G.Chop_FreqRemove(dp.s, per1.freq);
+                                            if (!G.isNumericalError(grad) && grad != 0d)
                                             {
-                                                if (lag < 0) name += "[" + lag + "]";
-                                                else name += "[+" + lag + "]";
+                                                if (lag != 0)
+                                                {
+                                                    if (lag < 0) name += "[" + lag + "]";
+                                                    else name += "[+" + lag + "]";
+                                                }
+                                                string name2 = name + "¤" + t2.ToString();
+
+                                                if (j == 0)
+                                                {
+                                                    cellsGrad.Add(name2, grad);
+                                                    cellsQuo.Add(name2, x_before);
+                                                }
+                                                else
+                                                {
+                                                    cellsGradRef.Add(name2, grad);
+                                                    cellsAltRef.Add(name2, x_before);
+                                                }                                                
+                                                
+                                                //cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
+
+                                                if (!vars.ContainsKey(name))
+                                                {
+                                                    vars.Add(name, 0);
+                                                }
+
                                             }
-                                            string name2 = name + "¤" + t2.ToString();
-
-                                            cellsGrad.Add(name2, grad);
-                                            cellsQuo.Add(name2, x_before);
-                                            if (xRef_series != null) cellsAltRef.Add(name2, xRef_series.GetData(smpl, t2));
-                                            cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
-
-                                            if (!vars.ContainsKey(name))
-                                            {
-                                                vars.Add(name, 0);
-                                            }
-
                                         }
                                     }
+                                    finally
+                                    {
+                                        x_series.SetData(t1, x_before);
+                                    }
                                 }
-                                finally
+                                else if (dpx.Type() == EVariableType.Val)
                                 {
-                                    x_series.SetData(t1, x_before);
+                                    //TODO
                                 }
-                            }
-                            else if (dpx.Type() == EVariableType.Val)
-                            {
-                                //TODO
-                            }
-                            else
-                            {
-                                //skip other types, this includes matrices
-                                //so an expression with a matrix that changes from Work to Ref is
-                                //not decomoposed as regards to this matrix
-                                //(we would have to shock each cell in the matrix...)
-                            }
+                                else
+                                {
+                                    //skip other types, this includes matrices
+                                    //so an expression with a matrix that changes from Work to Ref is
+                                    //not decomoposed as regards to this matrix
+                                    //(we would have to shock each cell in the matrix...)
+                                }
 
-                            //decompContributions.Add(dh);
-                            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                                //decompContributions.Add(dh);
+                                //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                            }
                         }
                     }
 
@@ -33886,7 +33910,8 @@ namespace Gekko
                             double dGrad = double.NaN;
                             cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dQuo);
                             cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out dAltRef);
-                            cellsAltLag.TryGetValue(s + "¤" + t2.ToString(), out dAltLag);
+                            //cellsAltLag.TryGetValue(s + "¤" + t2.ToString(), out dAltLag);
+                            cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dAltLag);
                             cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out dGrad);
                             double dContribM = -dGrad * (dAltRef - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
                             double dContribD = -dGrad * (dAltLag - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
