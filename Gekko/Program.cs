@@ -33648,7 +33648,7 @@ namespace Gekko
         {
             Table tab = new Table();
 
-            string type = "n";  //n or m
+            string type = "d";  //d or m
             GekkoTime per1 = o.t1;
             GekkoTime per2 = o.t2;
 
@@ -33685,6 +33685,8 @@ namespace Gekko
                     y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
+                
+
                 double eps = Globals.newtonSmallNumber;
 
                 if (Globals.precedents != null)
@@ -33711,13 +33713,23 @@ namespace Gekko
 
                     Dictionary<string, List<DecompHelper>> decompHelpers = new Dictionary<string, List<DecompHelper>>();
 
-                    GekkoDictionary<string, double> values = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, double> gradients = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, double> cellsQuo = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                    GekkoDictionary<string, double> cellsAlt = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+
                     GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     int iVar = -1;
 
                     foreach (DecompPrecedent dp in sss)
                     {
+                        Series xAlt_series = null;
+                        if (type == "m" && dp.x.Type() == EVariableType.Series)
+                        {
+                            Series x_series = dp.x as Series;
+                            xAlt_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+                        }
+
                         iVar++;
                         foreach (GekkoTime t1 in new GekkoTimeIterator(per1, per2))
                         {
@@ -33757,33 +33769,23 @@ namespace Gekko
                                                 else name += "[+" + lag + "]";
                                             }
                                             string name2 = name + "¤" + t2.ToString();
-                                            if (type == "n")
+                                            
+                                            gradients.Add(name2, grad);
+                                            cellsQuo.Add(name2, x_before);
+                                            if (type == "m")
                                             {
-                                                values.Add(name2, x_before);
-                                                if (iVar == 0 && t2.IsSamePeriod(per1))
-                                                {
-                                                    values.Add("_lhs" + "¤" + t1.ToString(), y0_double);
-                                                }
+                                                cellsAlt.Add(name2, xAlt_series.GetData(smpl, t2));
                                             }
                                             else
                                             {
-                                                values.Add(name2, grad);
-                                                if (iVar == 0 && t2.IsSamePeriod(per1))
-                                                {
-                                                    values.Add("_lhs" + "¤" + t1.ToString(), double.NaN);
-                                                }
+                                                cellsAlt.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
                                             }
+
                                             if (!vars.ContainsKey(name))
                                             {
                                                 vars.Add(name, 0);                                                
                                             }
-                                            if (!vars.ContainsKey("_lhs"))
-                                            {                                                
-                                                if (iVar == 0 && t2.IsSamePeriod(per1))
-                                                {
-                                                    vars.Add("_lhs", 0);
-                                                }
-                                            }
+                                            
                                         }
                                     }
                                 }
@@ -33809,10 +33811,17 @@ namespace Gekko
                         }
                     }
 
-                    List<string> vars2 = new List<string>(vars.Keys.ToArray());
+                    List<string> vars2 = new List<string>(vars.Keys.ToArray());                    
                     vars2.Sort(StringComparer.OrdinalIgnoreCase);
+                    vars2.Insert(0, "lhs");
                     
                     tab.writeOnce = true;
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        gradients.Add("lhs" + "¤" + t.ToString(), -12345d);
+                    }
+
                     int i = 0;
                     foreach (string s in vars2)
                     {
@@ -33830,7 +33839,7 @@ namespace Gekko
                                 tab.Set(new Coord(1, j + 1), c);
                             }
                             double d = double.NaN;
-                            values.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                            gradients.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                             //if (!G.isNumericalError(d))
                             {
                                 Cell c = new Cell();
