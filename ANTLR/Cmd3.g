@@ -566,6 +566,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_PARAM;
     ASTOPT_STRING_PCIM;
     ASTOPT_STRING_PLOTCODE;
+	ASTOPT_STRING_PRTCODE;
     ASTOPT_STRING_PRESERVE;
 	ASTOPT_STRING_MISSING;
     ASTOPT_STRING_PRIM;
@@ -2522,9 +2523,15 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-decomp:						DECOMP (leftAngle dates? RIGHTANGLE)? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTDATES dates?) ^(ASTDECOMPITEMS decompElement));
+decomp:						DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement));
 
 decompElement:              expression -> expression;
+
+decompOpt1:					ISNOTQUAL
+						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
+						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
+                            ;
+decompOpt1h:				    name -> ^(ASTOPT_STRING_PRTCODE name);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DELETE

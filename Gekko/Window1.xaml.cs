@@ -1083,7 +1083,7 @@ namespace Gekko
 
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used
 
-                if (this.decompOptions.guiDecompIsBaseline) transformationCodeAugmented = "b" + transformationCodeAugmented;
+                if (this.decompOptions.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
 
@@ -1149,11 +1149,17 @@ namespace Gekko
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
+                this.decompOptions.prtOption = transformationCodeAugmented;
                 table = Program.Decompose(this.decompOptions);
 
                 string s = FindEquationText(this.decompOptions);
                 //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
+
+                //
+                // NOTE:
+                //
+                flowText.Visibility = Visibility.Collapsed;
 
                 this.decompOptions.guiDecompValues = table;
                 ClearGrid();

@@ -10580,8 +10580,9 @@ namespace Gekko
             return inputFileLines;
         }
 
-        public static void Decomp(string type, GekkoTime t1, GekkoTime t2, string prtOption, string var, List<Dictionary<string, string>> precedents, string variable, string expressionCs, Func<IVariable> expression, GekkoSmpl smplForFunc)
+        public static void Decomp(O.Decomp o)
         {
+
             //This is the starting point of a decomposition call
             //Calls: Decomp(decompOptions);
             //       DecompThreadFunction
@@ -10593,51 +10594,53 @@ namespace Gekko
             DecompOptions decompOptions = new DecompOptions();
 
             //type is "udvalg" or "decomp", but not used at the moment
-            decompOptions.variable = variable;
-            decompOptions.type = type;
-            decompOptions.t1 = t1;
-            decompOptions.t2 = t2;
-            decompOptions.prtOption = prtOption;
-            decompOptions.expressionOld = expressionCs;
-            decompOptions.expression = expression;
-            decompOptions.smplForFunc = smplForFunc;
-            if (variable != null)
-            {
-                if (Program.model == null)
-                {
-                    G.Writeln();
-                    G.Writeln("*** ERROR: No model is defined, needed for decomposition");
-                    throw new GekkoException();
-                }
-                //decompOptions.vars = new List<string> { var.Replace("SIMPLE_DECOMP_VARIABLE:", "").Trim() };
-                Decomp(decompOptions);
-            }
-            else
-            {
-                //uses expressionCs
-                if (false)
-                {
-                    foreach (string s in precedents[0].Keys)
-                    {
-                        if (s.Contains(":"))
-                        {
-                            G.Writeln2("*** ERROR: You cannot decompose with a named databank (using ':')");
-                            throw new GekkoException();
-                        }
-                        else if (s.Contains("@"))
-                        {
-                            G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
-                            throw new GekkoException();
-                        }
-                    }
+            //decompOptions.variable = variable;
+            //decompOptions.type = type;
+            decompOptions.t1 = o.t1;
+            decompOptions.t2 = o.t2;
+            //decompOptions.prtOption = prtOption;
+            //decompOptions.expressionOld = expressionCs;
+            decompOptions.expression = o.expression;
+            decompOptions.smplForFunc = o.smplForFunc;
+            decompOptions.prtOption = o.opt_prtcode.ToLower();
+            //if (variable != null)
+            //{
+            //    if (Program.model == null)
+            //    {
+            //        G.Writeln();
+            //        G.Writeln("*** ERROR: No model is defined, needed for decomposition");
+            //        throw new GekkoException();
+            //    }
+            //    //decompOptions.vars = new List<string> { var.Replace("SIMPLE_DECOMP_VARIABLE:", "").Trim() };
+            //    Decomp(decompOptions);
+            //}
+            //else
+            //{
+            //    //uses expressionCs
+            //    if (false)
+            //    {
+            //        foreach (string s in precedents[0].Keys)
+            //        {
+            //            if (s.Contains(":"))
+            //            {
+            //                G.Writeln2("*** ERROR: You cannot decompose with a named databank (using ':')");
+            //                throw new GekkoException();
+            //            }
+            //            else if (s.Contains("@"))
+            //            {
+            //                G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
+            //                throw new GekkoException();
+            //            }
+            //        }
 
-                    //decompOptions.vars = new List<string> { var };
-                    //decompOptions.isExpression = true;
-                    decompOptions.precedents = precedents;
-                }
-                Decomp(decompOptions);
-            }
+            //        //decompOptions.vars = new List<string> { var };
+            //        //decompOptions.isExpression = true;
+            //        decompOptions.precedents = precedents;
+            //    }
+            Decomp(decompOptions);
+
         }
+
         public static string[] GetListOfStringsFromListOfIvariables(IVariable[] indexes)
         {
             string[] keys = new string[indexes.Length];
@@ -33649,7 +33652,7 @@ namespace Gekko
         {
             Table tab = new Table();
 
-            string type = "d";  //d or m
+            //string type = "d";  //d or m
             GekkoTime per1 = o.t1;
             GekkoTime per2 = o.t2;
 
@@ -33660,8 +33663,8 @@ namespace Gekko
 
             GekkoDictionary<string, double> cellsGrad = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsQuo = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsAltD = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsAltM = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, double> cellsAltRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsContribD = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
             GekkoDictionary<string, double> cellsContribM = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
 
@@ -33713,8 +33716,13 @@ namespace Gekko
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
+                    cellsQuo.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t));
                     cellsContribD.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
-                    if (y0Ref_series != null) cellsContribM.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
+                    if (y0Ref_series != null)
+                    {
+                        cellsContribM.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
+                        cellsAltRef.Add(lhs + "¤" + t.ToString(), y0Ref_series.GetData(smpl, t));
+                    }
                 }
 
                 double eps = Globals.newtonSmallNumber;
@@ -33749,11 +33757,11 @@ namespace Gekko
 
                     foreach (DecompPrecedent dp in sss)
                     {
-                        Series xAlt_series = null;
+                        Series xRef_series = null;
                         if (dp.x.Type() == EVariableType.Series)
                         {
                             //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
-                            xAlt_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+                            xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
                         }
 
                         iVar++;
@@ -33803,8 +33811,8 @@ namespace Gekko
 
                                             cellsGrad.Add(name2, grad);
                                             cellsQuo.Add(name2, x_before);
-                                            if (xAlt_series != null) cellsAltM.Add(name2, xAlt_series.GetData(smpl, t2));
-                                            cellsAltD.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
+                                            if (xRef_series != null) cellsAltRef.Add(name2, xRef_series.GetData(smpl, t2));
+                                            cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
 
                                             if (!vars.ContainsKey(name))
                                             {
@@ -33857,15 +33865,15 @@ namespace Gekko
                             if (s == lhs) continue;
                             j++;
                             double dQuo = double.NaN;
-                            double dAltM = double.NaN;
-                            double dAltD = double.NaN;
+                            double dAltRef = double.NaN;
+                            double dAltLag = double.NaN;
                             double dGrad = double.NaN;
                             cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dQuo);
-                            cellsAltM.TryGetValue(s + "¤" + t2.ToString(), out dAltM);
-                            cellsAltD.TryGetValue(s + "¤" + t2.ToString(), out dAltD);
+                            cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out dAltRef);
+                            cellsAltLag.TryGetValue(s + "¤" + t2.ToString(), out dAltLag);
                             cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out dGrad);
-                            double dContribM = -dGrad * (dAltM - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
-                            double dContribD = -dGrad * (dAltD - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
+                            double dContribM = -dGrad * (dAltRef - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
+                            double dContribD = -dGrad * (dAltLag - dQuo);  //dAlt is Ref, dQuo is Work, therefore minus
                             cellsContribM.Add(s + "¤" + t2.ToString(), dContribM);
                             cellsContribD.Add(s + "¤" + t2.ToString(), dContribD);
                         }
@@ -33890,15 +33898,120 @@ namespace Gekko
                                 tab.Set(new Coord(1, j + 1), c);
                             }
                             double d = double.NaN;
-                            if (type == "d")
+                            if (o.prtOption == "n" || o.prtOption == "xn" || o.prtOption == "x")
                             {
-                                cellsContribD.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                                cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                             }
+                            else if (o.prtOption == "r" || o.prtOption == "xr" || o.prtOption == "xrn")
+                            {
+                                cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d);
+                            }
+                            else if (o.prtOption == "d")
+                            {
+                                cellsContribD.TryGetValue(s + "¤" + t2.ToString(), out d);
+                            }
+                            else if (o.prtOption == "rd")
+                            {
+                                // ?????????????????????????
+                            }
+                            else if (o.prtOption == "xd")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                d = d1 - d0;
+                            }
+                            else if (o.prtOption == "xrd")
+                            {
+                                double d1 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                d = d1 - d0;
+                            }
+                            else if (o.prtOption == "m")
+                            {
+                                cellsContribM.TryGetValue(s + "¤" + t2.ToString(), out d);
+                            }
+                            else if (o.prtOption == "xm")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d0);
+                                d = d1 - d0;
+                            }
+                            else if (o.prtOption == "p")
+                            {
+                                double dd = double.NaN; cellsContribD.TryGetValue(s + "¤" + t2.ToString(), out dd);
+                                double dLhsLag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
+                                d = (dd / dLhsLag) * 100d;
+                            }
+                            else if (o.prtOption == "rp")
+                            {
+                                // ?????????????????????????
+                            }
+                            else if (o.prtOption == "xp")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                d = (d1 / d0 - 1d) * 100d;
+                            }
+                            else if (o.prtOption == "xrp")
+                            {
+                                double d1 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                d = (d1 / d0 - 1d) * 100d;
+                            }
+                            else if (o.prtOption == "q")
+                            {
+                                double dd = double.NaN; cellsContribM.TryGetValue(s + "¤" + t2.ToString(), out dd);
+                                double dLhsLag = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.ToString(), out dLhsLag);
+                                d = (dd / dLhsLag) * 100d;
+                            }
+                            else if (o.prtOption == "xq")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d0);
+                                d = (d1 / d0 - 1d) * 100d;
+                            }
+                            else if (o.prtOption == "dp")
+                            {
+                                double dd = double.NaN; cellsContribD.TryGetValue(s + "¤" + t2.ToString(), out dd);
+                                double dd_lag = double.NaN; cellsContribD.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dd_lag);
+                                double dLhsLag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
+                                double dLhsLag_lag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).Add(-1).ToString(), out dLhsLag_lag);
+                                d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+                            }
+                            else if (o.prtOption == "xdp")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d1_lag = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d1_lag);
+                                double d0 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d0_lag = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).Add(-1).ToString(), out d0_lag);
+                                d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                            }
+                            else if (o.prtOption == "xrdp")
+                            {
+                                double d1 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d1_lag = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d1_lag);
+                                double d0 = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d0_lag = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).Add(-1).ToString(), out d0_lag);
+                                d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                            }
+                            else if (o.prtOption == "mp")  // <p> - <rp>
+                            {
+                                // ?????????????????????????
+                            }
+                            else if (o.prtOption == "xmp")
+                            {
+                                double d1 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out d1);
+                                double d0 = double.NaN; cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d1_ref = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out d1_ref);
+                                double d0_ref = double.NaN; cellsAltRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out d0_ref);
+                                d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
+                            }                            
                             else
                             {
-                                cellsContribM.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                                MessageBox.Show("*** ERROR: Wrong printcode: " + o.prtOption);
+                                throw new GekkoException();
                             }
-                            //cellsAlt.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                            
                             //if (!G.isNumericalError(d))
                             {
                                 Cell c = new Cell();

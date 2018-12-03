@@ -7673,12 +7673,14 @@ namespace Gekko
             public string variable = null;
             public string expressionCs = null;
             public Func<IVariable> expression = null;
+            public string opt_prtcode = null;
 
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
+                if (G.NullOrEmpty(this.opt_prtcode)) this.opt_prtcode = "n";
                 //Gekko.Table tab = Program.Decompose(this);
-                Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs, this.expression, this.smplForFunc);
+                Program.Decomp(this);
             }
         }
 
