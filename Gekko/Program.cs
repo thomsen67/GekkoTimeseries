@@ -33650,6 +33650,20 @@ namespace Gekko
 
         public static Table Decompose(DecompOptions o)
         {
+            //
+            //
+            //
+            //                 Ref   -- m -->      Work
+            //
+            //                   ^                    ^
+            //                   |                    |
+            //                  rd                    d
+            //                   |                    |
+            //            
+            //                 Ref[-1]             Work[-1]
+            //
+            //
+
             Table tab = new Table();
 
             //string type = "d";  //d or m
@@ -33758,7 +33772,8 @@ namespace Gekko
                     foreach (DecompPrecedent dp in sss)
                     {
                         Series xRef_series = null;
-                        if (dp.x.Type() == EVariableType.Series)
+                        IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+                        if (dpx.Type() == EVariableType.Series)
                         {
                             //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
                             xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
@@ -33775,9 +33790,10 @@ namespace Gekko
                             DecompHelper dh = new DecompHelper();
                             dh.variableWithLag = dp.s;  // <-------------- LAG????
 
-                            if (dp.x.Type() == EVariableType.Series)
+                            //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+                            if (dpx.Type() == EVariableType.Series)
                             {
-                                Series x_series = dp.x as Series;
+                                Series x_series = dpx as Series;
                                 double x_before = x_series.GetData(smpl, t1);
                                 try
                                 {
@@ -33827,7 +33843,7 @@ namespace Gekko
                                     x_series.SetData(t1, x_before);
                                 }
                             }
-                            else if (dp.x.Type() == EVariableType.Val)
+                            else if (dpx.Type() == EVariableType.Val)
                             {
                                 //TODO
                             }

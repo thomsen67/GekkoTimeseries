@@ -19,11 +19,11 @@ namespace Gekko
     public class DecompPrecedent
     {
         public string s = null;
-        public IVariable x = null;
+        //public IVariable x = null;
         public DecompPrecedent(string s, IVariable iv)
         {
             this.s = s;
-            this.x = iv;
+            //this.x = iv;
         }
     }
 
