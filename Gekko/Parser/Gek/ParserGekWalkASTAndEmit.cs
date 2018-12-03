@@ -5200,9 +5200,9 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDECOMPITEMS":
-                        {                            
-                            node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-O.MaxLag()), o" + Num(node) + ".t2.Add(O.MaxLead()))" + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".expression = () => " + node[0].Code + ";" + G.NL);                            
+                        {
+                            node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".expression = () => " + node[0].Code + ";" + G.NL);                                                        
                         }
                         break;
                     case "ASTUNFIX":

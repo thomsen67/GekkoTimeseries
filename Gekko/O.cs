@@ -3667,6 +3667,24 @@ namespace Gekko
             return s;
         }
 
+        public static void AdjustSmpl(GekkoSmpl smpl, int i)
+        {
+            if (i == 0)
+            {
+                smpl.t0 = smpl.t0.Add(-O.MaxLag());
+                smpl.t1 = smpl.t1.Add(-O.MaxLag());
+                smpl.t2 = smpl.t2.Add(O.MaxLead());
+                smpl.t3 = smpl.t3.Add(O.MaxLead());
+            }
+            else
+            {
+                smpl.t0 = smpl.t0.Add(O.MaxLag());
+                smpl.t1 = smpl.t1.Add(O.MaxLag());
+                smpl.t2 = smpl.t2.Add(-O.MaxLead());
+                smpl.t3 = smpl.t3.Add(-O.MaxLead());
+            }
+        }
+
 
         //See also UnChop()
         public static void Chop(string input2, out string dbName, out string varName, out string freq, out string[] indexes)
@@ -7651,6 +7669,7 @@ namespace Gekko
         {
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
+            public GekkoSmpl smplForFunc = null;
             public string variable = null;
             public string expressionCs = null;
             public Func<IVariable> expression = null;
@@ -7659,7 +7678,7 @@ namespace Gekko
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
                 //Gekko.Table tab = Program.Decompose(this);
-                Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs, this.expression);
+                Program.Decomp(null, this.t1, this.t2, null, null, null, variable, expressionCs, this.expression, this.smplForFunc);
             }
         }
 

@@ -1100,7 +1100,7 @@ namespace Gekko
                     radioButton28.IsEnabled = false;
                     radioButton28.Opacity = 0.5;
                     radioButton30.IsEnabled = false;
-                    radioButton30.Opacity = 0.5;                    
+                    radioButton30.Opacity = 0.5;
                 }
 
                 if (this.decompOptions.guiDecompIsShares)
@@ -1127,7 +1127,7 @@ namespace Gekko
                 if (this.decompOptions.guiDecompIsRaw)
                 {
                     checkBox1.IsEnabled = false;  //shares
-                    checkBox1.Opacity = 0.5;                
+                    checkBox1.Opacity = 0.5;
                     flowText.Visibility = Visibility.Collapsed;
                 }
 
@@ -1135,7 +1135,7 @@ namespace Gekko
                 {
                     checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
                     checkBox2.Opacity = 0.5;
-                }                
+                }
 
                 _statusText.Text = "";
 
@@ -1148,7 +1148,7 @@ namespace Gekko
 
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
-                
+
                 table = Program.Decompose(this.decompOptions);
 
                 string s = FindEquationText(this.decompOptions);
@@ -1156,15 +1156,18 @@ namespace Gekko
                 equation.Text = s;
 
                 this.decompOptions.guiDecompValues = table;
-                ClearGrid();                                
+                ClearGrid();
                 MakeTable(table, this.decompOptions);
 
-                
+
             }
             catch (Exception e)
             {
-                MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
                 this.isClosing = true;
+
+                MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+
+
             }
         }
 
@@ -1489,6 +1492,7 @@ namespace Gekko
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
         public bool showErrors = false;
+        public GekkoSmpl smplForFunc = null;
         //-------- tranformation start --------------
         public string guiDecompTransformationCode = "n";
         public bool guiDecompIsShares = false;
