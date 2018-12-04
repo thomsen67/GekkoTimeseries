@@ -1903,7 +1903,7 @@ namespace Gekko
             if (Globals.precedents != null && rv != null)
             {
                 Series rv_series = rv as Series;
-                string name = rv_series.GetName();
+                string name = this.GetParentDatabank().name + ":" + rv_series.GetName();
                 if (!Globals.precedents.ContainsKey(name)) Globals.precedents.Add(name, 0);
             }
 
