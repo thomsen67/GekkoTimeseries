@@ -88,6 +88,30 @@ namespace Gekko
         public Series series2;
     }
 
+    class DecompDict
+    {
+        public GekkoDictionary<string, Series> storage = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+        public Series this[string s]
+        {
+            get
+            {
+                Series ts = null; storage.TryGetValue(s, out ts);
+                if (ts == null)
+                {
+                    string s2 = G.Chop_AddFreq(s, "");
+                    ts = new Series(Program.options.freq, s2);
+                    storage.Add(s, ts);
+                }
+                return ts;
+            }
+        }
+
+        public Series Get(string s)
+        {
+            return storage[s];
+        }        
+    }
+
     public class MyCustomAttribute : Attribute
     {
         public string Lag { get; set; }
@@ -33675,14 +33699,14 @@ namespace Gekko
             IVariable y0a = null;
             IVariable y0aRef = null;
 
-            GekkoDictionary<string, Series> cellsGrad = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsGradRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsQuo = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            DecompDict cellsGrad = new DecompDict();
+            DecompDict cellsGradRef = new DecompDict();
+            DecompDict cellsQuo = new DecompDict();
             //GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsAltRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsContribD = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsContribDRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, Series> cellsContribM = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            DecompDict cellsAltRef = new DecompDict();
+            DecompDict cellsContribD = new DecompDict();
+            DecompDict cellsContribDRef = new DecompDict();
+            DecompDict cellsContribM = new DecompDict();
 
             string lhs = "lhs";
 
