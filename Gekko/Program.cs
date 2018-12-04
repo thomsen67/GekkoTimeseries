@@ -33851,7 +33851,7 @@ namespace Gekko
 
                                         Series y1_series = y1 as Series;
 
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(-3), per2.Add(0)))  //-3 because of option <dp> etc.
                                         {
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
