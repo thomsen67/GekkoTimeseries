@@ -33675,14 +33675,14 @@ namespace Gekko
             IVariable y0a = null;
             IVariable y0aRef = null;
 
-            GekkoDictionary<string, double> cellsGrad = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsGradRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsQuo = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsGrad = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsGradRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsQuo = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
             //GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsAltRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsContribD = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsContribDRef = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            GekkoDictionary<string, double> cellsContribM = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsAltRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsContribD = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsContribDRef = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, Series> cellsContribM = new GekkoDictionary<string, Series>(StringComparer.OrdinalIgnoreCase);
 
             string lhs = "lhs";
 
@@ -33755,13 +33755,13 @@ namespace Gekko
 
                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                 {
-                    cellsQuo.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t));
-                    cellsContribD.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
+                    cellsQuo[lhs].SetData(t, y0_series.GetData(smpl, t));
+                    cellsContribD[lhs].SetData(t, y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
                     if (y0Ref_series != null)
                     {                        
-                        cellsAltRef.Add(lhs + "¤" + t.ToString(), y0Ref_series.GetData(smpl, t));
-                        cellsContribM.Add(lhs + "¤" + t.ToString(), y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
-                        cellsContribDRef.Add(lhs + "¤" + t.ToString(), y0Ref_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t.Add(-1)));
+                        cellsAltRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t));
+                        cellsContribM[lhs].SetData(t, y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
+                        cellsContribDRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t.Add(-1)));
                     }
                 }
 
@@ -33846,13 +33846,13 @@ namespace Gekko
 
                                                 if (j == 0)
                                                 {
-                                                    cellsGrad.Add(name2, grad);
-                                                    cellsQuo.Add(name2, x_before);
+                                                    cellsGrad[name].SetData(t2, grad);
+                                                    cellsQuo[name].SetData(t2, x_before);
                                                 }
                                                 else
                                                 {
-                                                    cellsGradRef.Add(name2, grad);
-                                                    cellsAltRef.Add(name2, x_before);
+                                                    cellsGradRef[name].SetData(t2, grad);
+                                                    cellsAltRef[name].SetData(t2, x_before);
                                                 }                                                
                                                 
                                                 //cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
@@ -33908,27 +33908,40 @@ namespace Gekko
                         {
                             if (s == lhs) continue;
                             j++;
-                            double dQuo = double.NaN;
-                            double dAltRef = double.NaN;
-                            double dAltLag = double.NaN;
-                            double dAlt = double.NaN;
-                            double dGradLag = double.NaN;
-                            double dGradRef = double.NaN;
-                            double dGradRefLag = double.NaN;
-                            cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dQuo);
-                            cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out dAltRef);
-                            //cellsAltLag.TryGetValue(s + "¤" + t2.ToString(), out dAltLag);
-                            cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dAltLag);
-                            cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dAlt);
-                            cellsGrad.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradLag);
-                            cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out dGradRef);
-                            cellsGradRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradRefLag);
+                            //double dQuo = double.NaN;
+                            //double dAltRef = double.NaN;
+                            //double dAltLag = double.NaN;
+                            //double dAlt = double.NaN;
+                            //double dGradLag = double.NaN;
+                            //double dGradRef = double.NaN;
+                            //double dGradRefLag = double.NaN;
+                            //cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dQuo);
+                            double dQuo = cellsQuo[s].GetData(smpl, t2);
+
+                            //cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out dAltRef);
+                            double dAltRef = cellsAltRef[s].GetData(smpl, t2);
+
+                            //cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dAltLag);
+                            double dAltLag = cellsQuo[s].GetData(smpl, t2.Add(-1));
+
+                            //cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dAlt);
+                            double dAlt = cellsQuo[s].GetData(smpl, t2);
+
+                            //cellsGrad.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradLag);
+                            double dGradLag = cellsGrad[s].GetData(smpl, t2.Add(-1));
+
+                            //cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out dGradRef);
+                            double dGradRef = cellsGradRef[s].GetData(smpl, t2);
+
+                            //cellsGradRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradRefLag);
+                            double dGradRefLag = cellsGradRef[s].GetData(smpl, t2.Add(-1));
+
                             double dContribM = dGradRef * (dQuo - dAltRef);
                             double dContribD = dGradLag * (dQuo - dAltLag);
                             double dContribDRef = dGradRefLag * (dAlt - dAltLag);
-                            cellsContribM.Add(s + "¤" + t2.ToString(), dContribM);
-                            cellsContribD.Add(s + "¤" + t2.ToString(), dContribD);
-                            cellsContribDRef.Add(s + "¤" + t2.ToString(), dContribDRef);
+                            cellsContribM[s].SetData(t2, dContribM);
+                            cellsContribD[s].SetData(t2, dContribD);
+                            cellsContribDRef[s].SetData(t2, dContribDRef);
                         }
 
 
@@ -33954,130 +33967,130 @@ namespace Gekko
                             double d = double.NaN;
                             if (o.prtOption == "n" || o.prtOption == "xn" || o.prtOption == "x")
                             {
-                                cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                                d = cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                                 //cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                             }
                             else if (o.prtOption == "r" || o.prtOption == "xr" || o.prtOption == "xrn")
                             {
-                                cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d);
+                                d = cellsAltRef[varname].GetData(smpl, t2);
                                 //cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                             }
                             else if (o.prtOption == "d")
                             {
-                                cellsContribD.TryGetValue(varname + "¤" + t2.ToString(), out d);
+                                d = cellsContribD[varname].GetData(smpl, t2);
                             }
                             else if (o.prtOption == "rd")
                             {
-                                cellsContribDRef.TryGetValue(varname + "¤" + t2.ToString(), out d);
+                                d = cellsContribDRef[varname].GetData(smpl, t2);
                             }
                             else if (o.prtOption == "xd")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
                                 d = d1 - d0;
                             }
                             else if (o.prtOption == "xrd")
                             {
-                                double d1 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
+                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
                                 d = d1 - d0;
                             }
                             else if (o.prtOption == "m")
                             {
-                                cellsContribM.TryGetValue(varname + "¤" + t2.ToString(), out d);
+                                d = cellsContribM[varname].GetData(smpl, t2);
                             }
                             else if (o.prtOption == "xm")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d0);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d0 = cellsAltRef[varname].GetData(smpl, t2);
                                 d = d1 - d0;
                             }
                             else if (o.prtOption == "p")
                             {
-                                double dd = double.NaN; cellsContribD.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dLhsLag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
+                                double dd = cellsContribD[varname].GetData(smpl, t2);
+                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
                                 d = (dd / dLhsLag) * 100d;
                             }
                             else if (o.prtOption == "rp")
                             {
-                                double dd = double.NaN; cellsContribDRef.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dLhsLag = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
+                                double dd = cellsContribDRef[varname].GetData(smpl, t2);
+                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
                                 d = (dd / dLhsLag) * 100d;
                             }
                             else if (o.prtOption == "xp")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
                                 d = (d1 / d0 - 1d) * 100d;
                             }
                             else if (o.prtOption == "xrp")
                             {
-                                double d1 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
+                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
+                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
                                 d = (d1 / d0 - 1d) * 100d;
                             }
                             else if (o.prtOption == "q")
                             {
-                                double dd = double.NaN; cellsContribM.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dLhsLag = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.ToString(), out dLhsLag);
+                                double dd = cellsContribM[varname].GetData(smpl, t2);
+                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2);
                                 d = (dd / dLhsLag) * 100d;
                             }
                             else if (o.prtOption == "xq")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d0);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d0 = cellsAltRef[varname].GetData(smpl, t2);
                                 d = (d1 / d0 - 1d) * 100d;
                             }
                             else if (o.prtOption == "dp")
                             {
-                                double dd = double.NaN; cellsContribD.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dd_lag = double.NaN; cellsContribD.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out dd_lag);
-                                double dLhsLag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
-                                double dLhsLag_lag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).Add(-1).ToString(), out dLhsLag_lag);
+                                double dd = cellsContribD[varname].GetData(smpl, t2);
+                                double dd_lag = cellsContribD[varname].GetData(smpl, t2.Add(-1));
+                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                                double dLhsLag_lag = cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                                 d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                             }
                             else if (o.prtOption == "rdp")
                             {
-                                double dd = double.NaN; cellsContribDRef.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dd_lag = double.NaN; cellsContribDRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out dd_lag);
-                                double dLhsLag = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
-                                double dLhsLag_lag = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.Add(-1).Add(-1).ToString(), out dLhsLag_lag);
+                                double dd = cellsContribDRef[varname].GetData(smpl, t2);
+                                double dd_lag = cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
+                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
+                                double dLhsLag_lag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                                 d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                             }
                             else if (o.prtOption == "xdp")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d1_lag = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d1_lag);
-                                double d0 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
-                                double d0_lag = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).Add(-1).ToString(), out d0_lag);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d1_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                                double d0_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
                                 d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                             }
                             else if (o.prtOption == "xrdp")
                             {
-                                double d1 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d1_lag = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d1_lag);
-                                double d0 = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
-                                double d0_lag = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).Add(-1).ToString(), out d0_lag);
+                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
+                                double d1_lag = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
+                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
+                                double d0_lag = cellsAltRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
                                 d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                             }
                             else if (o.prtOption == "mp")  // <p> - <rp>
                             {
-                                double dd = double.NaN; cellsContribD.TryGetValue(varname + "¤" + t2.ToString(), out dd);
-                                double dLhsLag = double.NaN; cellsQuo.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag);
+                                double dd = cellsContribD[varname].GetData(smpl, t2);
+                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
                                 d = (dd / dLhsLag) * 100d;
 
-                                double dd2 = double.NaN; cellsContribDRef.TryGetValue(varname + "¤" + t2.ToString(), out dd2);
-                                double dLhsLag2 = double.NaN; cellsAltRef.TryGetValue(lhs + "¤" + t2.Add(-1).ToString(), out dLhsLag2);
+                                double dd2 = cellsContribDRef[varname].GetData(smpl, t2);
+                                double dLhsLag2 = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
                                 d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
 
 
                             }
                             else if (o.prtOption == "xmp")
                             {
-                                double d1 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.ToString(), out d1);
-                                double d0 = double.NaN; cellsQuo.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0);
-                                double d1_ref = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.ToString(), out d1_ref);
-                                double d0_ref = double.NaN; cellsAltRef.TryGetValue(varname + "¤" + t2.Add(-1).ToString(), out d0_ref);
+                                double d1 = cellsQuo[varname].GetData(smpl, t2);
+                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                                double d1_ref = cellsAltRef[varname].GetData(smpl, t2);
+                                double d0_ref = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
                                 d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
                             }                            
                             else
