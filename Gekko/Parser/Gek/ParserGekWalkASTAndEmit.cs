@@ -3227,7 +3227,7 @@ namespace Gekko.Parser.Gek
 
                                 //node.Code.A("o" + Num(node) + ".printCs = print" + Num(node) + "; " + G.NL);  //so Action can be used later on
 
-                                node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
+                               node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
                                                                 
                                 node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 

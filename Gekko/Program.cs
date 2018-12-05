@@ -10626,7 +10626,7 @@ namespace Gekko
             //decompOptions.expressionOld = expressionCs;
             decompOptions.expression = o.expression;
             decompOptions.smplForFunc = o.smplForFunc;
-            decompOptions.prtOption = o.opt_prtcode.ToLower();
+            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
             //if (variable != null)
             //{
             //    if (Program.model == null)
@@ -33699,15 +33699,16 @@ namespace Gekko
             IVariable y0a = null;
             IVariable y0aRef = null;
 
-            DecompDict cellsGrad = new DecompDict();
+            DecompDict cellsGradQuo = new DecompDict();
             DecompDict cellsGradRef = new DecompDict();
             DecompDict cellsQuo = new DecompDict();
             //GekkoDictionary<string, double> cellsAltLag = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-            DecompDict cellsAltRef = new DecompDict();
+            DecompDict cellsRef = new DecompDict();
             DecompDict cellsContribD = new DecompDict();
             DecompDict cellsContribDRef = new DecompDict();
             DecompDict cellsContribM = new DecompDict();
 
+            int perLag = -2;
             string lhs = "lhs";
 
             try
@@ -33776,14 +33777,13 @@ namespace Gekko
                     y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
-
-                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(perLag), per2))
                 {
                     cellsQuo[lhs].SetData(t, y0_series.GetData(smpl, t));
                     cellsContribD[lhs].SetData(t, y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
                     if (y0Ref_series != null)
                     {                        
-                        cellsAltRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t));
+                        cellsRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t));
                         cellsContribM[lhs].SetData(t, y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
                         cellsContribDRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t.Add(-1)));
                     }
@@ -33809,7 +33809,7 @@ namespace Gekko
                         }
 
                         iVar++;
-                        foreach (GekkoTime t1 in new GekkoTimeIterator(per1, per2))
+                        foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
                         {
 
                             // --------------------------------------------
@@ -33851,7 +33851,7 @@ namespace Gekko
 
                                         Series y1_series = y1 as Series;
 
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(-3), per2.Add(0)))  //-3 because of option <dp> etc.
+                                            foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
                                         {
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
@@ -33870,13 +33870,13 @@ namespace Gekko
 
                                                 if (j == 0)
                                                 {
-                                                    cellsGrad[name].SetData(t2, grad);
+                                                    cellsGradQuo[name].SetData(t2, grad);
                                                     cellsQuo[name].SetData(t2, x_before);
                                                 }
                                                 else
                                                 {
                                                     cellsGradRef[name].SetData(t2, grad);
-                                                    cellsAltRef[name].SetData(t2, x_before);
+                                                    cellsRef[name].SetData(t2, x_before);
                                                 }                                                
                                                 
                                                 //cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
@@ -33932,206 +33932,28 @@ namespace Gekko
                         {
                             if (s == lhs) continue;
                             j++;
-                            //double dQuo = double.NaN;
-                            //double dAltRef = double.NaN;
-                            //double dAltLag = double.NaN;
-                            //double dAlt = double.NaN;
-                            //double dGradLag = double.NaN;
-                            //double dGradRef = double.NaN;
-                            //double dGradRefLag = double.NaN;
-                            //cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dQuo);
-                            double dQuo = cellsQuo[s].GetData(smpl, t2);
+                            
+                            double vQuo = cellsQuo[s].GetData(smpl, t2);                                                        
+                            double vRef = cellsRef[s].GetData(smpl, t2);                                                        
+                            double vQuoLag = cellsQuo[s].GetData(smpl, t2.Add(-1));
+                            double vRefLag = cellsRef[s].GetData(smpl, t2.Add(-1));                                                                                    
+                            double vGradQuoLag = cellsGradQuo[s].GetData(smpl, t2.Add(-1));
+                            double vGradQuo = cellsGradQuo[s].GetData(smpl, t2);                                                        
+                            double vGradRef = cellsGradRef[s].GetData(smpl, t2);                                                        
+                            double vGradRefLag = cellsGradRef[s].GetData(smpl, t2.Add(-1));
+                            
+                            double dContribM = vGradRef * (vQuo - vRef);
+                            double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+                            double dContribDRef = vGradRefLag * (vRef - vRefLag);                            
 
-                            //cellsAltRef.TryGetValue(s + "¤" + t2.ToString(), out dAltRef);
-                            double dAltRef = cellsAltRef[s].GetData(smpl, t2);
-
-                            //cellsQuo.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dAltLag);
-                            double dAltLag = cellsQuo[s].GetData(smpl, t2.Add(-1));
-
-                            //cellsQuo.TryGetValue(s + "¤" + t2.ToString(), out dAlt);
-                            double dAlt = cellsQuo[s].GetData(smpl, t2);
-
-                            //cellsGrad.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradLag);
-                            double dGradLag = cellsGrad[s].GetData(smpl, t2.Add(-1));
-
-                            //cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out dGradRef);
-                            double dGradRef = cellsGradRef[s].GetData(smpl, t2);
-
-                            //cellsGradRef.TryGetValue(s + "¤" + t2.Add(-1).ToString(), out dGradRefLag);
-                            double dGradRefLag = cellsGradRef[s].GetData(smpl, t2.Add(-1));
-
-                            double dContribM = dGradRef * (dQuo - dAltRef);
-                            double dContribD = dGradLag * (dQuo - dAltLag);
-                            double dContribDRef = dGradRefLag * (dAlt - dAltLag);
                             cellsContribM[s].SetData(t2, dContribM);
                             cellsContribD[s].SetData(t2, dContribD);
                             cellsContribDRef[s].SetData(t2, dContribDRef);
                         }
-
-
                     }
-
-                    i = 0;
-                    foreach (string varname in vars2)
-                    {
-                        i++;
-                        string varname2 = G.Chop_RemoveBank(varname, Program.databanks.GetFirst().name);
-                        tab.Set(i + 1, 1, varname2);
-                        int j = 0;
-                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
-                        {
-                            j++;
-                            if (i == 1)
-                            {
-                                Cell c = new Cell();
-                                c.date = t2.ToString();
-                                c.cellType = CellType.Date;
-                                tab.Set(new Coord(1, j + 1), c);
-                            }
-                            double d = double.NaN;
-                            if (o.prtOption == "n" || o.prtOption == "xn" || o.prtOption == "x")
-                            {
-                                d = cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
-                                //cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
-                            }
-                            else if (o.prtOption == "r" || o.prtOption == "xr" || o.prtOption == "xrn")
-                            {
-                                d = cellsAltRef[varname].GetData(smpl, t2);
-                                //cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
-                            }
-                            else if (o.prtOption == "d")
-                            {
-                                d = cellsContribD[varname].GetData(smpl, t2);
-                            }
-                            else if (o.prtOption == "rd")
-                            {
-                                d = cellsContribDRef[varname].GetData(smpl, t2);
-                            }
-                            else if (o.prtOption == "xd")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                                d = d1 - d0;
-                            }
-                            else if (o.prtOption == "xrd")
-                            {
-                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
-                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
-                                d = d1 - d0;
-                            }
-                            else if (o.prtOption == "m")
-                            {
-                                d = cellsContribM[varname].GetData(smpl, t2);
-                            }
-                            else if (o.prtOption == "xm")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d0 = cellsAltRef[varname].GetData(smpl, t2);
-                                d = d1 - d0;
-                            }
-                            else if (o.prtOption == "p")
-                            {
-                                double dd = cellsContribD[varname].GetData(smpl, t2);
-                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-                                d = (dd / dLhsLag) * 100d;
-                            }
-                            else if (o.prtOption == "rp")
-                            {
-                                double dd = cellsContribDRef[varname].GetData(smpl, t2);
-                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
-                                d = (dd / dLhsLag) * 100d;
-                            }
-                            else if (o.prtOption == "xp")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                                d = (d1 / d0 - 1d) * 100d;
-                            }
-                            else if (o.prtOption == "xrp")
-                            {
-                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
-                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
-                                d = (d1 / d0 - 1d) * 100d;
-                            }
-                            else if (o.prtOption == "q")
-                            {
-                                double dd = cellsContribM[varname].GetData(smpl, t2);
-                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2);
-                                d = (dd / dLhsLag) * 100d;
-                            }
-                            else if (o.prtOption == "xq")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d0 = cellsAltRef[varname].GetData(smpl, t2);
-                                d = (d1 / d0 - 1d) * 100d;
-                            }
-                            else if (o.prtOption == "dp")
-                            {
-                                double dd = cellsContribD[varname].GetData(smpl, t2);
-                                double dd_lag = cellsContribD[varname].GetData(smpl, t2.Add(-1));
-                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-                                double dLhsLag_lag = cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
-                                d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
-                            }
-                            else if (o.prtOption == "rdp")
-                            {
-                                double dd = cellsContribDRef[varname].GetData(smpl, t2);
-                                double dd_lag = cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
-                                double dLhsLag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
-                                double dLhsLag_lag = cellsAltRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
-                                d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
-                            }
-                            else if (o.prtOption == "xdp")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d1_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                                double d0_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
-                                d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
-                            }
-                            else if (o.prtOption == "xrdp")
-                            {
-                                double d1 = cellsAltRef[varname].GetData(smpl, t2);
-                                double d1_lag = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
-                                double d0 = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
-                                double d0_lag = cellsAltRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
-                                d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
-                            }
-                            else if (o.prtOption == "mp")  // <p> - <rp>
-                            {
-                                double dd = cellsContribD[varname].GetData(smpl, t2);
-                                double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-                                d = (dd / dLhsLag) * 100d;
-
-                                double dd2 = cellsContribDRef[varname].GetData(smpl, t2);
-                                double dLhsLag2 = cellsAltRef[lhs].GetData(smpl, t2.Add(-1));
-                                d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
-
-
-                            }
-                            else if (o.prtOption == "xmp")
-                            {
-                                double d1 = cellsQuo[varname].GetData(smpl, t2);
-                                double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                                double d1_ref = cellsAltRef[varname].GetData(smpl, t2);
-                                double d0_ref = cellsAltRef[varname].GetData(smpl, t2.Add(-1));
-                                d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
-                            }                            
-                            else
-                            {
-                                MessageBox.Show("*** ERROR: Wrong printcode: " + o.prtOption);
-                                throw new GekkoException();
-                            }
-                            
-                            //if (!G.isNumericalError(d))
-                            {
-                                Cell c = new Cell();
-                                c.number = d;
-                                c.cellType = CellType.Number;
-                                tab.Set(new Coord(i + 1, j + 1), c);
-                            }
-                        }
-                    }
+                    
+                    DecomposePutIntoTable(o, tab, per1, per2, smpl, cellsQuo, cellsRef, cellsContribD, cellsContribDRef, cellsContribM, lhs, vars2);
+                    
                 }
 
             }
@@ -34144,7 +33966,220 @@ namespace Gekko
 
         }
 
-    public static double[,] PutJacobiIntoArray()
+        private static void DecomposePutIntoTable(DecompOptions o, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDict cellsQuo, DecompDict cellsRef, DecompDict cellsContribD, DecompDict cellsContribDRef, DecompDict cellsContribM, string lhs, List<string> vars2)
+        {
+            string code1 = o.prtOptionLower;
+            string code2 = null;
+            if (code1.StartsWith("s"))
+            {
+                code1 = code1.Substring(1);
+                code2 = "s";
+            }
+
+            if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+            {
+                tab.Set(1, 1, "%");                
+            }
+
+            int j = 0;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+            {
+                j++;
+                int i = 0;
+                double lhsSum = 0d;
+                double rhsSum = 0d;
+                foreach (string varname in vars2)
+                {
+                    i++;
+                    if (j == 1)
+                    {
+                        string varname2 = G.Chop_RemoveBank(varname, Program.databanks.GetFirst().name);
+                        tab.Set(i + 1, 1, varname2);
+                    }
+
+                    if (i == 1)
+                    {
+                        Cell c = new Cell();
+                        c.date = t2.ToString();
+                        c.cellType = CellType.Date;
+                        tab.Set(new Coord(1, j + 1), c);
+                    }
+                    double d = double.NaN;
+                    if (code1 == "n" || code1 == "xn" || code1 == "x")
+                    {
+                        d = cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                                                                  //cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                    }
+                    else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
+                    {
+                        d = cellsRef[varname].GetData(smpl, t2);
+                        //cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                    }
+                    else if (code1 == "d")
+                    {
+                        d = cellsContribD[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "rd")
+                    {
+                        d = cellsContribDRef[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "xd")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "xrd")
+                    {
+                        double d1 = cellsRef[varname].GetData(smpl, t2);
+                        double d0 = cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "m")
+                    {
+                        d = cellsContribM[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "xm")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = cellsRef[varname].GetData(smpl, t2);
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "p")
+                    {
+                        double dd = cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "rp")
+                    {
+                        double dd = cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag = cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "xp")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "xrp")
+                    {
+                        double d1 = cellsRef[varname].GetData(smpl, t2);
+                        double d0 = cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "q")
+                    {
+                        double dd = cellsContribM[varname].GetData(smpl, t2);
+                        double dLhsLag = cellsRef[lhs].GetData(smpl, t2);
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "xq")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = cellsRef[varname].GetData(smpl, t2);
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "dp")
+                    {
+                        double dd = cellsContribD[varname].GetData(smpl, t2);
+                        double dd_lag = cellsContribD[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+                    }
+                    else if (code1 == "rdp")
+                    {
+                        double dd = cellsContribDRef[varname].GetData(smpl, t2);
+                        double dd_lag = cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+                    }
+                    else if (code1 == "xdp")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d1_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                    }
+                    else if (code1 == "xrdp")
+                    {
+                        double d1 = cellsRef[varname].GetData(smpl, t2);
+                        double d1_lag = cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = cellsRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                    }
+                    else if (code1 == "mp")  // <p> - <rp>
+                    {
+                        double dd = cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+
+                        double dd2 = cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag2 = cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
+
+
+                    }
+                    else if (code1 == "xmp")
+                    {
+                        double d1 = cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1_ref = cellsRef[varname].GetData(smpl, t2);
+                        double d0_ref = cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
+                    }
+                    else
+                    {
+                        MessageBox.Show("*** ERROR: Wrong printcode: " + o.prtOptionLower);
+                        throw new GekkoException();
+                    }
+
+                    if (i == 1)
+                    {
+                        lhsSum = d;
+                    }
+                    else
+                    {
+                        rhsSum += d;
+                    }
+
+                    //if (!G.isNumericalError(d))
+                    {
+                        Cell c = new Cell();
+                        c.number = d;
+                        c.cellType = CellType.Number;                        
+                        if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+                        {                            
+                            c.numberFormat = "F15.2";
+                        }
+                        tab.Set(new Coord(i + 1, j + 1), c);
+                    }
+                }
+                if (code2 == "s")
+                {
+                    double factor = 100d / rhsSum;
+                    for (i = 2; i <= vars2.Count; i++)
+                    {
+                        tab.Get(i + 1, j + 1).number *= factor;
+                    }
+                    tab.Get(1 + 1, j + 1).number = 100d;                                      
+                }
+                else if (code1 == "d" || code1 == "rd" || code1 == "m" || code1 == "p" || code1 == "rp" || code1 == "q" || code1 == "dp" || code1 == "rdp" || code1 == "mp")
+                {
+                    double factor = lhsSum / rhsSum;
+                    for (i = 2; i <= vars2.Count; i++)
+                    {
+                        tab.Get(i + 1, j + 1).number *= factor;
+                    }
+                }                
+            }
+        }
+
+        public static double[,] PutJacobiIntoArray()
         {
             double[,] a = new double[model.jacobiMatrix.RowCount, model.jacobiMatrix.ColumnCount];
             for (int i = 0; i < model.jacobiMatrix.RowCount; i++)

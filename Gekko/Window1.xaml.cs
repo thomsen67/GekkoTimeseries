@@ -159,19 +159,19 @@ namespace Gekko
             else
             {
                 //All these buttons are in the "Decomp" columns, codes are from e.g. UDVALG<p> or UDVALG<q> calls from command lines/files.
-                if (G.Equal(decompOptions.prtOption, "d"))
+                if (G.Equal(decompOptions.prtOptionLower, "d"))
                 {
                     radioButton6.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOption, "p"))
+                if (G.Equal(decompOptions.prtOptionLower, "p"))
                 {
                     radioButton8.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOption, "m"))
+                if (G.Equal(decompOptions.prtOptionLower, "m"))
                 {
                     radioButton26.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOption, "q"))
+                if (G.Equal(decompOptions.prtOptionLower, "q"))
                 {
                     radioButton28.IsChecked = true;
                 }
@@ -1149,7 +1149,7 @@ namespace Gekko
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
-                this.decompOptions.prtOption = transformationCodeAugmented;
+                this.decompOptions.prtOptionLower = transformationCodeAugmented;
                 table = Program.Decompose(this.decompOptions);
 
                 string s = FindEquationText(this.decompOptions);
@@ -1494,7 +1494,7 @@ namespace Gekko
         //public GekkoParserTimePeriod tp;
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
-        public string prtOption;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
+        public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
         public bool showErrors = false;
@@ -1530,7 +1530,7 @@ namespace Gekko
             d.variable = this.variable;
             d.t1 = this.t1;
             d.t2 = this.t2;
-            d.prtOption = this.prtOption;            
+            d.prtOptionLower = this.prtOptionLower;            
             d.guiDecompIsShares = this.guiDecompIsShares;
             d.guiDecompIsRaw = this.guiDecompIsRaw;
             d.guiDecompIsBaseline = this.guiDecompIsBaseline;
