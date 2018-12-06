@@ -263,7 +263,7 @@
                     </Border>
                 </DockPanel>
                 <CheckBox Grid.Column="11" Grid.Row="2" Name="checkBox1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Show as shares</CheckBox>
-                <CheckBox Grid.Column="11" Grid.Row="3" Name="checkBoxErrors" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Show decomposition and data errors" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked">Show errors</CheckBox>
+                <CheckBox Grid.Column="10" Grid.Row="3" Name="checkBoxErrors" HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Show decomposition and data errors" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Grid.ColumnSpan="2" Margin="0,3,46.333,3">Show errors</CheckBox>
                 <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options
                 </TextBlock>
@@ -279,26 +279,26 @@
 
             <ScrollViewer VerticalScrollBarVisibility= "Auto" HorizontalScrollBarVisibility="Auto"  Height="350" Margin="10,0,0,0" Focusable="False" Name="scrollView1" BorderThickness="10">
                 <Border BorderThickness="0" BorderBrush="Black" Name="canvasBorder">
-                <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=grid1, Path=ActualHeight}" Width="{Binding ElementName=grid1, Path=ActualWidth}" Name="canvas">
-                    <DockPanel Canvas.Left="{Binding ElementName=frezenBorder, Path=ActualWidth}" Canvas.Top="{Binding ElementName=frezenBorder2, Path=ActualHeight}" Name="dockPanel1">
-                        <Grid Name="grid1">
-                        </Grid>
-                    </DockPanel>
-                    <Border x:Name="frezenBorder" Background="White" Canvas.Left="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
-                        <!--Canvas.Top="20"-->
-                        <Grid Name="grid1Left">
-                        </Grid>
-                    </Border>
-                    <Border x:Name="frezenBorder2" Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
-                        <Grid Background="Yellow" Name="grid1Top">
-                        </Grid>
-                    </Border>
-                    <Border Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" 
+                    <Canvas HorizontalAlignment="Left" VerticalAlignment="Top" Height="{Binding ElementName=grid1, Path=ActualHeight}" Width="{Binding ElementName=grid1, Path=ActualWidth}" Name="canvas">
+                        <DockPanel Canvas.Left="{Binding ElementName=frezenBorder, Path=ActualWidth}" Canvas.Top="{Binding ElementName=frezenBorder2, Path=ActualHeight}" Name="dockPanel1">
+                            <Grid Name="grid1">
+                            </Grid>
+                        </DockPanel>
+                        <Border x:Name="frezenBorder" Background="White" Canvas.Left="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
+                            <!--Canvas.Top="20"-->
+                            <Grid Name="grid1Left">
+                            </Grid>
+                        </Border>
+                        <Border x:Name="frezenBorder2" Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" >
+                            <Grid Background="Yellow" Name="grid1Top">
+                            </Grid>
+                        </Border>
+                        <Border Background="White" Canvas.Top="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" 
                         Canvas.Left="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ScrollViewer}}}" Name="frezenBorderUpperLeft">
-                        <Grid Name="gridUpperLeft"></Grid>
-                    </Border>
-                </Canvas>
-                    </Border>
+                            <Grid Name="gridUpperLeft"></Grid>
+                        </Border>
+                    </Canvas>
+                </Border>
             </ScrollViewer>
 
             <Border BorderThickness="5">
@@ -319,7 +319,7 @@
                 </Grid>
             </Border>
 
-        
+
 
         </StackPanel>
     </DockPanel>

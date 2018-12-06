@@ -1909,9 +1909,8 @@ namespace Gekko
                 Series rv_series = rv as Series;
                 if (rv_series.type != ESeriesType.ArraySuper)
                 {                    
-                    string name = this.GetParentDatabank().name + ":" + rv_series.GetName();
                     //TODO: name may probably be null, for instance in x[#i] where the #i is not present, and a timeless series with NaN or 0 is returned
-                    if (!Globals.precedents.ContainsKey(name)) Globals.precedents.Add(name, 0);
+                    Program.AddToPrecedents(this.GetParentDatabank(), rv_series.GetName());                    
                 }
             }
 

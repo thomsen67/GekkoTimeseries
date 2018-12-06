@@ -33688,6 +33688,22 @@ namespace Gekko
             //
             //
 
+            G.Writeln("Decompstart");
+
+            string code1 = o.prtOptionLower;
+            string code2 = null;
+            if (code1.StartsWith("s"))
+            {
+                code1 = code1.Substring(1);
+                code2 = "s";
+            }
+
+            o.isPercentageType = false;
+            if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+            {
+                o.isPercentageType = true;
+            }
+
             Table tab = new Table();
 
             //string type = "d";  //d or m
@@ -33709,7 +33725,7 @@ namespace Gekko
             DecompDict cellsContribM = new DecompDict();
 
             int perLag = -2;
-            string lhs = "lhs";
+            string lhs = "Expression value";
 
             try
             {
@@ -33763,7 +33779,6 @@ namespace Gekko
                 O.AdjustSmpl(o.smplForFunc, 1);
                 //Function call end   --------------
 
-
                 Series y0aRef_series = y0aRef as Series;
                 if (y0aRef == null)
                 {
@@ -33799,6 +33814,7 @@ namespace Gekko
 
                     foreach (DecompPrecedent dp in decompPrecedents)
                     {
+                        G.Writeln("lkasfjad --> " + dp.s);
                         Series xRef_series = null;
                         IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
                         if (dpx.Type() == EVariableType.Series)
@@ -33810,6 +33826,8 @@ namespace Gekko
                         iVar++;
                         foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
                         {
+
+                            G.Writeln("  lkfjad --> " + t1.ToString());
 
                             // --------------------------------------------
                             // This is where the decomposition takes place
@@ -33854,8 +33872,7 @@ namespace Gekko
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
                                             double grad = (y1_double - y0_double) / eps;
-                                            int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
-                                                                                              //G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad + " lag = " + lag);
+                                            int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                            
                                             string name = G.Chop_FreqRemove(dp.s, per1.freq);
 
                                             if (lag != 0)
@@ -33878,22 +33895,15 @@ namespace Gekko
                                             }
 
                                             if (!G.isNumericalError(grad) && grad != 0d)
-                                            {
-                                                
-                                                //string name2 = name + "¤" + t2.ToString();
-
+                                            {                                                
                                                 if (j == 0)
                                                 {
-                                                    cellsGradQuo[name].SetData(t2, grad);
-                                                    //cellsQuo[name].SetData(t2, x_before);
+                                                    cellsGradQuo[name].SetData(t2, grad);                                                    
                                                 }
                                                 else
                                                 {
-                                                    cellsGradRef[name].SetData(t2, grad);
-                                                    //cellsRef[name].SetData(t2, x_before);
-                                                }
-
-                                                //cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
+                                                    cellsGradRef[name].SetData(t2, grad);                                                 
+                                                }                                                
 
                                                 if (!vars.ContainsKey(name))
                                                 {
@@ -33924,97 +33934,14 @@ namespace Gekko
                                 //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
                             }
                         }
-                    }
-
-                    
+                    }                    
 
                     List<string> vars2 = new List<string>(vars.Keys.ToArray());
                     vars2.Sort(StringComparer.OrdinalIgnoreCase);
                     vars2.Insert(0, lhs);
-
-                    //iVar = -1;
-                    //foreach (string s2 in vars2)
-                    //{
-                    //    iVar++;
-                    //    if (iVar == 0) continue; //skip lhs
-                    //    string s = G.Chop_AddFreq(s2, G.GetFreq(Program.options.freq));
-                    //    Series xRef_series = null;
-                    //    IVariable dpx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
-                    //    if (dpx.Type() == EVariableType.Series)
-                    //    {
-                    //        //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
-                    //        xRef_series = O.GetIVariableFromString(G.Chop_SetBank(s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
-                    //    }
-
-                        
-                    //    //foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
-                    //    {
-
-                    //        // --------------------------------------------
-                    //        // This is where the decomposition takes place
-                    //        // --------------------------------------------
-
-                    //        for (int j = 0; j < 2; j++)
-                    //        {
-
-                    //            //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
-                    //            if (true)
-                    //            {
-                    //                Series x_series = null;
-                    //                //Series y_series = null;
-                    //                if (j == 0)
-                    //                {
-                    //                    x_series = dpx as Series;
-                    //                    //y_series = y0_series;
-                    //                }
-                    //                else
-                    //                {
-                    //                    x_series = xRef_series;
-                    //                    //y_series = y0Ref_series;
-                    //                }
-                                    
-                    //                //try
-                    //                {
                                         
-
-                    //                    foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
-                    //                    {                                            
-                    //                        string name = G.Chop_FreqRemove(s, per1.freq);
-                    //                        if (true)
-                    //                        {
-                                                
-                    //                            if (j == 0)
-                    //                            {
-                                                    
-                    //                                cellsQuo[name].SetData(t2, x_series.GetData(smpl, t2));
-                    //                            }
-                    //                            else
-                    //                            {
-                                                    
-                    //                                cellsRef[name].SetData(t2, x_series.GetData(smpl, t2));
-                    //                            }
-                                                
-
-                    //                        }
-                    //                    }
-                    //                }
-                                    
-                    //            }
-                                
-
-                    //            //decompContributions.Add(dh);
-                    //            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
-                    //        }
-                    //    }
-                    //}
-
                     tab.writeOnce = true;
-
-                    //foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                    //{
-                    //    cellsGrad.Add("lhs" + "¤" + t.ToString(), -12345d);
-                    //}
-
+                    
                     int i = 0;
                     foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
                     {
@@ -34043,9 +33970,9 @@ namespace Gekko
                             cellsContribDRef[s].SetData(t2, dContribDRef);
                         }
                     }
-                    
-                    DecomposePutIntoTable(o, tab, per1, per2, smpl, cellsQuo, cellsRef, cellsContribD, cellsContribDRef, cellsContribM, lhs, vars2);
-                    
+                    G.Writeln("Putintotable1");
+                    DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, cellsQuo, cellsRef, cellsContribD, cellsContribDRef, cellsContribM, lhs, vars2);
+                    G.Writeln("Putintotable2");
                 }
 
             }
@@ -34059,17 +33986,12 @@ namespace Gekko
 
         }
 
-        private static void DecomposePutIntoTable(DecompOptions o, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDict cellsQuo, DecompDict cellsRef, DecompDict cellsContribD, DecompDict cellsContribDRef, DecompDict cellsContribM, string lhs, List<string> vars2)
+        private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, DecompDict cellsQuo, DecompDict cellsRef, DecompDict cellsContribD, DecompDict cellsContribDRef, DecompDict cellsContribM, string lhs, List<string> vars2)
         {
-            string code1 = o.prtOptionLower;
-            string code2 = null;
-            if (code1.StartsWith("s"))
-            {
-                code1 = code1.Substring(1);
-                code2 = "s";
-            }
+            int iOffset = 0;
+            if (o.showErrors) iOffset = 1;
 
-            if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+            if (o.isPercentageType)
             {
                 tab.Set(1, 1, "%");                
             }
@@ -34085,9 +34007,8 @@ namespace Gekko
                 {
                     i++;
                     if (j == 1)
-                    {
-                        string varname2 = G.Chop_RemoveBank(varname, Program.databanks.GetFirst().name);
-                        tab.Set(i + 1, 1, varname2);
+                    {                        
+                        tab.Set(i + 1, 1, G.Chop_RemoveBank(varname, Program.databanks.GetFirst().name));                        
                     }
 
                     if (i == 1)
@@ -34240,36 +34161,76 @@ namespace Gekko
                         rhsSum += d;
                     }
 
-                    //if (!G.isNumericalError(d))
+                    DecomposeInsertValue(tab, code1, code2, j, i, d, o);
+
+                    if (i == 1 && o.showErrors)
                     {
-                        Cell c = new Cell();
-                        c.number = d;
-                        c.cellType = CellType.Number;                        
-                        if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
-                        {                            
-                            c.numberFormat = "F15.2";
+                        i = i + iOffset;
+                        //skip a line, to make room for error showing (at i = 2, or row 3 in the table)
+                        if (j == 1 && DecomposePutIntoTableIsError(o, i))
+                        {
+                            tab.Set(i + 1, 1, Globals.decompText2);
+                            tab.Get(i + 1, 1).backgroundColor = "LightRed";
                         }
-                        tab.Set(new Coord(i + 1, j + 1), c);
                     }
+
                 }
-                if (code2 == "s")
+                if (code1 == "d" || code1 == "rd" || code1 == "m" || code1 == "p" || code1 == "rp" || code1 == "q" || code1 == "dp" || code1 == "rdp" || code1 == "mp")
                 {
-                    double factor = 100d / rhsSum;
-                    for (i = 2; i <= vars2.Count; i++)
-                    {
-                        tab.Get(i + 1, j + 1).number *= factor;
-                    }
-                    tab.Get(1 + 1, j + 1).number = 100d;                                      
-                }
-                else if (code1 == "d" || code1 == "rd" || code1 == "m" || code1 == "p" || code1 == "rp" || code1 == "q" || code1 == "dp" || code1 == "rdp" || code1 == "mp")
-                {
+                    double error = lhsSum - rhsSum;
                     double factor = lhsSum / rhsSum;
-                    for (i = 2; i <= vars2.Count; i++)
+                    int end = vars2.Count;
+                    if (o.showErrors)
                     {
-                        tab.Get(i + 1, j + 1).number *= factor;
+                        factor = 1d;  //resetting
+                        end = end + iOffset;
                     }
-                }                
+                    for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                    {
+                        if (DecomposePutIntoTableIsError(o, i)) //real table row 3
+                        {
+                            DecomposeInsertValue(tab, code1, code2, j, i, error, o);
+                            tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
+                        }
+                        else
+                        {
+                            tab.Get(i + 1, j + 1).number *= factor;
+                        }
+                    }
+                    if (code2 == "s")
+                    {
+                        //just take raw cell numbers and make them sum to 100
+                        tab.Get(1 + 1, j + 1).number *= 100d / tab.Get(1 + 1, j + 1).number;  //variable 1, table row 2
+                        double sum = 0d;
+                        for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                        {
+                            sum += tab.Get(i + 1, j + 1).number;
+                        }
+                        for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                        {
+                            tab.Get(i + 1, j + 1).number *= 100d / sum;
+                        }                        
+                    }
+                }
             }
+        }
+
+        private static bool DecomposePutIntoTableIsError(DecompOptions o, int i)
+        {
+            return o.showErrors && i == 2;
+        }
+
+        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions decompOptions)
+        {
+            Cell c = new Cell();
+            c.number = d;
+            c.cellType = CellType.Number;
+            int decimals = 0;
+            if (decompOptions.isPercentageType) decimals = decompOptions.decimalsPch;
+            else decimals = decompOptions.decimalsLevel;
+            string format = "f16." + decimals.ToString();
+            c.numberFormat = format;
+            tab.Set(new Coord(i + 1, j + 1), c);
         }
 
         public static double[,] PutJacobiIntoArray()

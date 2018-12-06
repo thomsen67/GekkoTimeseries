@@ -363,7 +363,7 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Series tsRotated = new Series(EFreq.U, ts.name);
+            Series tsRotated = new Series(EFreq.U, G.Chop_SetFreq(ts.name, G.GetFreq(EFreq.U)));
             tsRotated.meta.label = ts.meta.label;
             tsRotated.SetArrayTimeseries(ts.dimensions + 1, true);
 
@@ -397,6 +397,7 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(tsSub.GetRealDataPeriodFirst(), tsSub.GetRealDataPeriodLast()))
                 {
                     MapMultidimItem mapRotated = map.Clone();
+                    map.parent = tsRotated;
                     mapRotated.storage[iDim - 1] = t.ToString();
 
                     Series tsRotatedSub = null;

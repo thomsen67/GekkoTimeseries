@@ -3007,6 +3007,12 @@ namespace Gekko
 
                                             lhs_series = rhs.DeepClone(null) as Series;
                                             lhs_series.name = varnameWithFreq;
+                                            //!we need to make all the subseries point to the superseries, this pointer is used in DECOMP and other places
+                                            foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in lhs_series.dimensionsStorage.storage)
+                                            {
+                                                kvp.Key.parent = lhs_series;
+                                                (kvp.Value as Series).mmi.parent = lhs_series;
+                                            }
                                             removeFirst = lhs != null;
                                             //lhs_series = clone;
                                             //AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, clone);
