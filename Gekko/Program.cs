@@ -33819,7 +33819,6 @@ namespace Gekko
                             for (int j = 0; j < 2; j++)
                             {
 
-
                                 //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
                                 if (dpx.Type() == EVariableType.Series)
                                 {
@@ -33851,7 +33850,7 @@ namespace Gekko
 
                                         Series y1_series = y1 as Series;
 
-                                            foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
+                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
                                         {
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
@@ -33859,26 +33858,42 @@ namespace Gekko
                                             int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
                                                                                               //G.Writeln2("DECOMP " + dp.s + " " + t1.ToString() + " " + t2.ToString() + " --> grad = " + grad + " lag = " + lag);
                                             string name = G.Chop_FreqRemove(dp.s, per1.freq);
-                                            if (!G.isNumericalError(grad) && grad != 0d)
-                                            {
-                                                if (lag != 0)
-                                                {
-                                                    if (lag < 0) name += "[" + lag + "]";
-                                                    else name += "[+" + lag + "]";
-                                                }
-                                                string name2 = name + "¤" + t2.ToString();
 
+                                            if (lag != 0)
+                                            {
+                                                if (lag < 0) name += "[" + lag + "]";
+                                                else name += "[+" + lag + "]";
+                                            }
+
+                                            if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
+                                            {
+                                                //slack: we get too many variants of name[-x] and name[+x] here
                                                 if (j == 0)
-                                                {
-                                                    cellsGradQuo[name].SetData(t2, grad);
+                                                {                                                    
                                                     cellsQuo[name].SetData(t2, x_before);
                                                 }
                                                 else
                                                 {
-                                                    cellsGradRef[name].SetData(t2, grad);
                                                     cellsRef[name].SetData(t2, x_before);
-                                                }                                                
+                                                }
+                                            }
+
+                                            if (!G.isNumericalError(grad) && grad != 0d)
+                                            {
                                                 
+                                                //string name2 = name + "¤" + t2.ToString();
+
+                                                if (j == 0)
+                                                {
+                                                    cellsGradQuo[name].SetData(t2, grad);
+                                                    //cellsQuo[name].SetData(t2, x_before);
+                                                }
+                                                else
+                                                {
+                                                    cellsGradRef[name].SetData(t2, grad);
+                                                    //cellsRef[name].SetData(t2, x_before);
+                                                }
+
                                                 //cellsAltLag.Add(name2, x_series.GetData(smpl, t2.Add(-1)));
 
                                                 if (!vars.ContainsKey(name))
@@ -33912,9 +33927,87 @@ namespace Gekko
                         }
                     }
 
+                    
+
                     List<string> vars2 = new List<string>(vars.Keys.ToArray());
                     vars2.Sort(StringComparer.OrdinalIgnoreCase);
                     vars2.Insert(0, lhs);
+
+                    //iVar = -1;
+                    //foreach (string s2 in vars2)
+                    //{
+                    //    iVar++;
+                    //    if (iVar == 0) continue; //skip lhs
+                    //    string s = G.Chop_AddFreq(s2, G.GetFreq(Program.options.freq));
+                    //    Series xRef_series = null;
+                    //    IVariable dpx = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+                    //    if (dpx.Type() == EVariableType.Series)
+                    //    {
+                    //        //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
+                    //        xRef_series = O.GetIVariableFromString(G.Chop_SetBank(s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+                    //    }
+
+                        
+                    //    //foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
+                    //    {
+
+                    //        // --------------------------------------------
+                    //        // This is where the decomposition takes place
+                    //        // --------------------------------------------
+
+                    //        for (int j = 0; j < 2; j++)
+                    //        {
+
+                    //            //IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+                    //            if (true)
+                    //            {
+                    //                Series x_series = null;
+                    //                //Series y_series = null;
+                    //                if (j == 0)
+                    //                {
+                    //                    x_series = dpx as Series;
+                    //                    //y_series = y0_series;
+                    //                }
+                    //                else
+                    //                {
+                    //                    x_series = xRef_series;
+                    //                    //y_series = y0Ref_series;
+                    //                }
+                                    
+                    //                //try
+                    //                {
+                                        
+
+                    //                    foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
+                    //                    {                                            
+                    //                        string name = G.Chop_FreqRemove(s, per1.freq);
+                    //                        if (true)
+                    //                        {
+                                                
+                    //                            if (j == 0)
+                    //                            {
+                                                    
+                    //                                cellsQuo[name].SetData(t2, x_series.GetData(smpl, t2));
+                    //                            }
+                    //                            else
+                    //                            {
+                                                    
+                    //                                cellsRef[name].SetData(t2, x_series.GetData(smpl, t2));
+                    //                            }
+                                                
+
+                    //                        }
+                    //                    }
+                    //                }
+                                    
+                    //            }
+                                
+
+                    //            //decompContributions.Add(dh);
+                    //            //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+                    //        }
+                    //    }
+                    //}
 
                     tab.writeOnce = true;
 

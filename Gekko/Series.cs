@@ -165,13 +165,17 @@ namespace Gekko
         // ----------------------------------------------------
         public string GetName()
         {
-            if (this.name == null && Globals.runningOnTTComputer)
-            {
-                G.Writeln2("*** ERROR: Name error");
-                throw new GekkoException();
-            }
+            //if (this.name == null && Globals.runningOnTTComputer)
+            //{
+            //    G.Writeln2("*** ERROR: Name error");
+            //    throw new GekkoException();
+            //}
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
+                if (this.mmi == null)
+                {
+                    return null;
+                }
                 return this.mmi.GetName();
             }
             else return this.name;
@@ -1903,8 +1907,16 @@ namespace Gekko
             if (Globals.precedents != null && rv != null)
             {
                 Series rv_series = rv as Series;
-                string name = this.GetParentDatabank().name + ":" + rv_series.GetName();
-                if (!Globals.precedents.ContainsKey(name)) Globals.precedents.Add(name, 0);
+                if (rv_series.type != ESeriesType.ArraySuper)
+                {
+                    //if(this.isNotFoundArraySubSeries==ESeriesMissing.)
+                    if (this.type == ESeriesType.Timeless)
+                    {
+
+                    }
+                    string name = this.GetParentDatabank().name + ":" + rv_series.GetName();
+                    if (!Globals.precedents.ContainsKey(name)) Globals.precedents.Add(name, 0);
+                }
             }
 
             return rv;

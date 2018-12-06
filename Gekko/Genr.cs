@@ -6,58 +6,43 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static int labelCounter;
-public static void C0(GekkoSmpl smpl, P p) {
-//[[commandStart]]0
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-Func<IVariable> func56 = () => {
-var smplCommandRemember57 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-Series temp55 = new Series(ESeriesType.Normal, Program.options.freq, null); temp55.SetZero(smpl);
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static int labelCounter;
+        public static void C0(GekkoSmpl smpl, P p)
+        {
+            //[[commandStart]]0
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-foreach (IVariable listloop_i53 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new  LookupSettings(), EVariableType.Var, null))) {
-temp55.InjectAdd(smpl, temp55, O.Add(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None,listloop_i53), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x", null, null, new  LookupSettings(), EVariableType.Var, null), listloop_i53), O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag,O.Negate(smpl, i54)
-), smpl, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None,listloop_i53), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x", null, null, new  LookupSettings(), EVariableType.Var, null), listloop_i53), O.Negate(smpl, i54)
-)));
+            O.Assignment o0 = new O.Assignment();
+            foreach (IVariable listloop_i24 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, o0)))
+            {
+                foreach (IVariable listloop_j25 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("j")))), null, new LookupSettings(), EVariableType.Var, o0)))
+                {
+                    O.AdjustT0(smpl, -1);
+                    IVariable ivTmpvar26 = O.Add(smpl, O.Add(smpl, i27, O.Dollar(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_i24, listloop_j25), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_i24, listloop_j25), O.In(smpl, listloop_i24, O.Lookup(smpl, null, null, "#i0", null, null, new LookupSettings(), EVariableType.Var, null))
+                    )), O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_j25), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_j25));
+                    O.AdjustT0(smpl, 1);
+                    O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null), ivTmpvar26, o0, listloop_i24, listloop_j25)
+                    ;
+                }
+            }
 
-labelCounter++;
-}
-labelCounter = 0;
-smpl.command = smplCommandRemember57;
-return temp55;
-
-};
-
-
-O.Decomp o0 = new O.Decomp();
-o0.t1 = Globals.globalPeriodStart;
-o0.t2 = Globals.globalPeriodEnd;
-
-o0.opt_prtcode = O.ConvertToString((new ScalarString("n")));
+            //[[commandEnd]]0
+        }
 
 
+        public static readonly ScalarVal i27 = new ScalarVal(1d);
 
-o0.smplForFunc = smpl;
-o0.expression = () => func56();
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-o0.Exe();
-
-//[[commandEnd]]0
-}
-
-
-public static readonly ScalarVal i54 = new ScalarVal(1d);
-
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-
-C0(smpl, p);
+            C0(smpl, p);
 
 
 
-}
-}
+        }
+    }
 }
