@@ -60,7 +60,7 @@ namespace Gekko
         public const int smplInitStart = 0;  //could be -2
         public const int smplInitEnd = 0;
 
-        public static GekkoDictionary<string, int> precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        public static GekkoDictionary<string, int> precedents = null;  //important that it starts out as null
 
         public static bool autoSigils = false; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."
 

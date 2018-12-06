@@ -33722,7 +33722,7 @@ namespace Gekko
                 //Function call end   --------------
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
-                if (Globals.precedents != null)
+                if (true)
                 {
                     List<string> ss = Globals.precedents.Keys.ToList<string>();
                     ss.Sort(StringComparer.OrdinalIgnoreCase);
@@ -33741,8 +33741,7 @@ namespace Gekko
                             decompPrecedents.Add(new DecompPrecedent(s, x));
                         }
                     }
-                }
-                Globals.precedents = null;
+                }                
 
                     Series y0a_series = y0a as Series;
                 if (y0a == null)
@@ -34052,6 +34051,7 @@ namespace Gekko
             }
             finally
             {
+                //Important: makes sure is is *always* nulled after a DECOMP
                 Globals.precedents = null;
             }
 
