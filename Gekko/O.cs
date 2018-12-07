@@ -7680,6 +7680,7 @@ namespace Gekko
             public string expressionCs = null;
             public Func<IVariable> expression = null;
             public string opt_prtcode = null;
+            public string label = null;
 
             public void Exe()
             {

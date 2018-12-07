@@ -1150,7 +1150,16 @@ namespace Gekko
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
                 this.decompOptions.prtOptionLower = transformationCodeAugmented;
-                table = Program.Decompose(this.decompOptions);
+
+                if (true)
+                {
+                    table = Program.Decompose(this.decompOptions);
+                }
+                else
+                {
+                    //Not faster...
+                    table = Program.DecomposeNEWEXPERIMENTAL(this.decompOptions);
+                }
 
                 string s = FindEquationText(this.decompOptions);
                 //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
