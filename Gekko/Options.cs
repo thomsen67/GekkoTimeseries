@@ -121,6 +121,7 @@ Additionally, there are model, solve, equation options.
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
+        public string plot_using = ""; //a global template
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_elements_max = 400;
         public int print_fields_ndec = 4;

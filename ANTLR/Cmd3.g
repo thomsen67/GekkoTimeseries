@@ -3438,6 +3438,7 @@ optionType:
 			 | PLOT XLABELS DIGITS '='? Integer ->  PLOT XLABELS DIGITS  ^(ASTINTEGER Integer)
 			 | PLOT XLABELS NONANNUAL '='? optionPlotXlabels ->  PLOT XLABELS NONANNUAL ^(ASTSTRINGSIMPLE optionPlotXlabels)
 			 | PLOT DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator ->  PLOT DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | PLOT USING '='? fileName -> PLOT USING ^(ASTSTRINGSIMPLE fileName)
 
 			 | PLOT NEW '='? yesNoSimple -> PLOT NEW ^(ASTBOOL yesNoSimple )		
 			

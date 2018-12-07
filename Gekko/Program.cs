@@ -9378,7 +9378,7 @@ namespace Gekko
         {
             string ss = G.PrettifyTimeseriesHash(variableNameWithLag, true, false) + "\n";
             List<string> varExpl = Program.GetVariableExplanation(variableNameWithoutLag);
-            if (Program.unfoldedVariableList == null) varExpl.Add("[Label not found: no model varlist loaded]");
+            //if (Program.unfoldedVariableList == null) varExpl.Add("[Label not found: no model varlist loaded]");
             foreach (string line in varExpl)
             {
                 if (line != "")
@@ -14832,7 +14832,11 @@ namespace Gekko
                 }                
             }
 
-            if (seriesCounter == 0 && nonSeries > 0)
+            if (seriesCounter + nonSeries == 0)
+            {
+                G.Writeln2("Did not find any variable(s) to display");
+            }
+            else if (seriesCounter == 0 && nonSeries > 0)
             {
                 //nomessage
             }
@@ -23482,6 +23486,7 @@ namespace Gekko
 
         public static void Pause(string arg)
         {
+            arg = HandleNewlines(arg);
             if (arg.Length > 0)
             {
                 G.Writeln();
@@ -23490,6 +23495,11 @@ namespace Gekko
             if (arg.Length > 0) arg += "\n" + "\n";
             arg += "Press [Enter] to continue";
             MessageBox.Show(arg);
+        }
+
+        public static string HandleNewlines(string arg)
+        {
+            return arg.Replace("\\n", "\n");
         }
 
         public static void Clear(O.Clear o, P p)
@@ -30551,31 +30561,89 @@ namespace Gekko
             XmlDocument doc = new XmlDocument();
 
             //Gpt gpt = null;
-            if (o.opt_using != null)
+            if (o.opt_using != null || Program.options.plot_using != "")
             {
-                string fileName = o.opt_using;
-                bool cancel = false;
-                if (fileName == "*")
+                XmlDocument doc1 = null;
+                XmlDocument doc2 = null;
+                
+                if (Program.options.plot_using != "")
                 {
-                    SelectFile("gpt", ref fileName, ref cancel);
-                }
-                if (cancel) return;
+                    string fileName = Program.options.plot_using;
+                    fileName = AddExtension(fileName, ".gpt");
+                    fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+                    doc1 = new XmlDocument();
+                    string xmlText = GetTextFromFileWithWait(fileName);
 
-                fileName = AddExtension(fileName, ".gpt");
-                fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-                doc = new XmlDocument();
-                string xmlText = GetTextFromFileWithWait(fileName);
-
-                try
-                {
-                    doc.LoadXml(xmlText);
+                    try
+                    {
+                        doc1.LoadXml(xmlText);
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln();
+                        G.Writeln("*** ERROR: Plot template file: '" + fileName + "'");
+                        WriteXmlError(e, fileName);
+                        throw new GekkoException();
+                    }
                 }
-                catch (Exception e)
+
+                if (o.opt_using != null)
                 {
-                    G.Writeln();
-                    G.Writeln("*** ERROR: Plot schema file: '" + fileName + "'");
-                    WriteXmlError(e, fileName);
-                    throw new GekkoException();
+
+                    string fileName = o.opt_using;
+                    bool cancel = false;
+                    if (fileName == "*")
+                    {
+                        SelectFile("gpt", ref fileName, ref cancel);
+                    }
+                    if (cancel) return;
+
+                    fileName = AddExtension(fileName, ".gpt");
+                    fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
+                    doc2 = new XmlDocument();
+                    string xmlText = GetTextFromFileWithWait(fileName);
+
+                    try
+                    {
+                        doc2.LoadXml(xmlText);
+                    }
+                    catch (Exception e)
+                    {
+                        G.Writeln();
+                        G.Writeln("*** ERROR: Plot template file: '" + fileName + "'");
+                        WriteXmlError(e, fileName);
+                        throw new GekkoException();
+                    }
+                }
+
+                if (doc1 != null)
+                {
+                    //global template
+                    
+                    if (doc2 != null)
+                    {
+                        //doc1 = x1, doc2 = x2
+                        //XmlNode temp = doc1.ImportNode(doc2, true) as XmlDocument;  --> hmmm does not work, maybe just do it in code, not as a xml merge
+                        doc = doc2;
+                    }
+                    else
+                    {
+                        //doc1 = x1, doc2 = null
+                        doc = doc1;
+                    }
+                }
+                else
+                {
+                    if (doc2 != null)
+                    {
+                        //doc1 = null, doc2 = x2
+                        doc = doc2;
+                    }
+                    else
+                    {
+                        //doc1 = null, doc2 = null
+                        //do nothing, doc will be unchanged (empty)
+                    }                    
                 }
             }
 

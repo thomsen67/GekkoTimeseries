@@ -7403,6 +7403,7 @@ namespace Gekko
             {
                 string value = "";
                 string msg = O.ConvertToString(message);
+                msg = Program.HandleNewlines(msg);
                 if (Program.InputBox("Accept", msg, ref value) == DialogResult.OK)
                 {
                     string varname = name.ConvertToString();
