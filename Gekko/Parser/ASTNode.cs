@@ -58,6 +58,7 @@ namespace Gekko.Parser
         public string leftBlanks = null;
         public string timeLoopNestCode = null; //code delivered from sub-tree
         public GekkoDictionary<string, TwoStrings> listLoopAnchor = null;
+        public GekkoDictionary<string, TwoStrings> listLoopAnchor2 = null;  //lookups that need to be moved outside listloop, like sum(#i, x[#i]) where the lookup of x can be moved out
         public GekkoDictionary<string, string> functionDefAnchor = null;
         public List<Tuple<string, string>> functionDef = null;
         public string functionType = null;

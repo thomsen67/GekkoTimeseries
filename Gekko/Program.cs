@@ -12206,6 +12206,33 @@ namespace Gekko
                     }
                 }
 
+                if (s2.Length == 6)
+                {
+                    string sub = s2;
+                    if (G.Equal(sub, "cheat0"))
+                    {
+                        Globals.cheat = 0;
+                        G.Writeln2("Default func");
+                    }
+                    else if (G.Equal(sub, "cheat1"))
+                    {
+                        Globals.cheat = 1;
+                        G.Writeln2("Func in code");
+                    }
+                    else if (G.Equal(sub, "cheat2"))
+                    {
+                        Globals.cheat = 2;
+                        G.Writeln2("Method iv outside");
+                    }
+                    else if (G.Equal(sub, "cheat3"))
+                    {
+                        Globals.cheat = 3;
+                        G.Writeln2("Method");
+                    }
+                    else throw new GekkoException();
+                    return "";
+                }
+
                 if (s2.Length == 7)
                 {
 
@@ -15359,7 +15386,7 @@ namespace Gekko
             }
 
             string si = null;
-            if (nIgnores > 0) si = " (ignored  " + nIgnores + ")";
+            if (nIgnores > 0) si = " (ignored " + nIgnores + ")";
 
             G.Writeln2("Copied data for " + nOk + " variables" + si);
 
@@ -33746,6 +33773,48 @@ namespace Gekko
             return true;
         }
 
+        public static IVariable Test(GekkoSmpl smpl) 
+        {
+            var smplCommandRemember20 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+            Series temp18 = new Series(ESeriesType.Normal, Program.options.freq, null); temp18.SetZero(smpl);
+
+            foreach
+             (IVariable listloop_a17 in new O.GekkoListIterator(O.Lookup(smpl, null,
+             ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(),
+             EVariableType.Var, null)))
+            {
+                temp18.InjectAdd(smpl, temp18, O.Indexer(O.Indexer2(smpl,
+                 O.EIndexerType.None, listloop_a17), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "npop",
+                 null, null, new LookupSettings(), EVariableType.Var, null),
+                 listloop_a17));
+            }
+
+            return temp18;
+
+        }
+
+        public static IVariable Test2(GekkoSmpl smpl)
+        {
+            var smplCommandRemember20 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+            Series temp18 = new Series(ESeriesType.Normal, Program.options.freq, null); temp18.SetZero(smpl);
+
+            IVariable x = O.Lookup(smpl, null, null, "npop",
+                 null, null, new LookupSettings(), EVariableType.Var, null);
+
+            foreach
+             (IVariable listloop_a17 in new O.GekkoListIterator(O.Lookup(smpl, null,
+             ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(),
+             EVariableType.Var, null)))
+            {
+                temp18.InjectAdd(smpl, temp18, O.Indexer(O.Indexer2(smpl,
+                 O.EIndexerType.None, listloop_a17), smpl, O.EIndexerType.None, x,
+                 listloop_a17));
+            }
+
+            return temp18;
+
+        }
+
         public static Table Decompose(DecompOptions o)
         {
             //
@@ -33761,6 +33830,8 @@ namespace Gekko
             //                 Ref[-1]             Work[-1]
             //
             //
+
+            //int cheat = 2;
 
             int funcCounter = 0;
 
@@ -33789,9 +33860,34 @@ namespace Gekko
             GekkoTime per2 = o.t2;
 
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-            Func<IVariable> decomp = o.expression;
+            //Func<IVariable> decomp = o.expression;
             IVariable y0a = null;
             IVariable y0aRef = null;
+
+
+
+            Func<IVariable> test = () =>
+            {
+                var smplCommandRemember20 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+                Series temp18 = new Series(ESeriesType.Normal, Program.options.freq, null); temp18.SetZero(smpl);
+
+                foreach
+                 (IVariable listloop_a17 in new O.GekkoListIterator(O.Lookup(smpl, null,
+                 ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(),
+                 EVariableType.Var, null)))
+                {
+                    temp18.InjectAdd(smpl, temp18, O.Indexer(O.Indexer2(smpl,
+                     O.EIndexerType.None, listloop_a17), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "npop",
+                     null, null, new LookupSettings(), EVariableType.Var, null),
+                     listloop_a17));
+
+
+                }
+
+                return temp18;
+
+            };
+
 
             DecompDict cellsGradQuo = new DecompDict();
             DecompDict cellsGradRef = new DecompDict();
@@ -33811,10 +33907,25 @@ namespace Gekko
 
                 //Function call start --------------
                 O.AdjustSmpl(o.smplForFunc, 0);
-                y0a = decomp(); funcCounter++;
+                if (Globals.cheat == 0)
+                {
+                    y0a = o.expression(); funcCounter++;
+                }
+                else if (Globals.cheat == 1)
+                {
+                    y0a = test(); funcCounter++;
+                }
+                else if (Globals.cheat == 2)
+                {
+                    y0a = Test2(smpl); funcCounter++;
+                }
+                else
+                {
+                    y0a = Test(smpl); funcCounter++;
+                }
                 O.AdjustSmpl(o.smplForFunc, 1);
                 //Function call end   --------------
-
+                
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
                 if (true)
                 {
@@ -33835,9 +33946,11 @@ namespace Gekko
                             decompPrecedents.Add(new DecompPrecedent(s, x));
                         }
                     }
-                }                
+                }
 
-                    Series y0a_series = y0a as Series;
+                Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary                
+
+                Series y0a_series = y0a as Series;
                 if (y0a == null)
                 {
                     G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
@@ -33851,8 +33964,23 @@ namespace Gekko
 
                 //Function call start --------------
                 O.AdjustSmpl(o.smplForFunc, 0);
-                o.smplForFunc.bankNumber = 1;
-                y0aRef = decomp(); funcCounter++;
+                o.smplForFunc.bankNumber = 1;                                
+                if (Globals.cheat == 0)
+                {
+                    y0aRef = o.expression(); funcCounter++;
+                }
+                else if (Globals.cheat == 1)
+                {
+                    y0aRef = test(); funcCounter++;
+                }
+                else if (Globals.cheat == 2)
+                {
+                    y0aRef = Test2(smpl); funcCounter++;
+                }
+                else
+                {
+                    y0aRef = Test(smpl); funcCounter++;
+                }
                 o.smplForFunc.bankNumber = 0;
                 O.AdjustSmpl(o.smplForFunc, 1);
                 //Function call end   --------------
@@ -33940,8 +34068,27 @@ namespace Gekko
 
                                         //Function call start --------------
                                         O.AdjustSmpl(o.smplForFunc, 0);
-                                        if (j == 1) o.smplForFunc.bankNumber = 1;
-                                        IVariable y1 = decomp(); funcCounter++;                                        
+                                        if (j == 1) o.smplForFunc.bankNumber = 1;                                                                                
+                                        IVariable y1 = null;
+
+                                        if (Globals.cheat == 0)
+                                        {
+                                            //y1 = decomp(); funcCounter++;
+                                            y1 = o.expression(); funcCounter++;
+                                        }
+                                        else if (Globals.cheat == 1)
+                                        {
+                                            y1 = test(); funcCounter++;
+                                        }
+                                        else if (Globals.cheat == 2)
+                                        {
+                                            y1 = Test2(smpl); funcCounter++;
+                                        }
+                                        else
+                                        {
+                                            y1 = Test(smpl); funcCounter++;
+                                        }
+
                                         if (j == 1) o.smplForFunc.bankNumber = 0;
                                         O.AdjustSmpl(o.smplForFunc, 1);
                                         //Function call end   --------------

@@ -6424,7 +6424,7 @@ namespace Gekko.Parser.Gek
                 
         private static bool SearchUpwardsInTree7(ASTNode node)
         {
-            //finds out if node is sum() function of type sum(#x, ...)
+            //finds out if node is inside sum() function of type sum(#x, ...)
             ASTNode tmp = node;
             string rv = null;
             while (tmp != null)

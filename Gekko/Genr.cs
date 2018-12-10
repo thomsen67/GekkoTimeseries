@@ -14,26 +14,53 @@ namespace Gekko
         {
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+            Func<IVariable, IVariable> func6 = (IVariable listloop_i3) =>
+            {
+                var smplCommandRemember7 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+                Series temp5 = new Series(ESeriesType.Normal, Program.options.freq, null); temp5.SetZero(smpl);
+
+                foreach (IVariable listloop_j4 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("j")))), null, new LookupSettings(), EVariableType.Var, null)))
+                {
+                    temp5.InjectAdd(smpl, temp5, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_i3, listloop_j4), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_i3, listloop_j4));
+
+                    labelCounter++;
+                }
+                smpl.command = smplCommandRemember7;
+                return temp5;
+
+            };
+
+            Func<IVariable> func9 = () =>
+            {
+                var smplCommandRemember10 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
+                Series temp8 = new Series(ESeriesType.Normal, Program.options.freq, null); temp8.SetZero(smpl);
+
+                foreach (IVariable listloop_i3 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, null)))
+                {
+                    temp8.InjectAdd(smpl, temp8, func6(listloop_i3));
+
+                    labelCounter++;
+                }
+                labelCounter = 0;
+                smpl.command = smplCommandRemember10;
+                return temp8;
+
+            };
+
+            //x = 1 + sum(#i, sum(#j, x[#i, #j]));
 
             O.Assignment o0 = new O.Assignment();
-            foreach (IVariable listloop_i24 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, o0)))
-            {
-                foreach (IVariable listloop_j25 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("j")))), null, new LookupSettings(), EVariableType.Var, o0)))
-                {
-                    O.AdjustT0(smpl, -1);
-                    IVariable ivTmpvar26 = O.Add(smpl, O.Add(smpl, i27, O.Dollar(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_i24, listloop_j25), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_i24, listloop_j25), O.In(smpl, listloop_i24, O.Lookup(smpl, null, null, "#i0", null, null, new LookupSettings(), EVariableType.Var, null))
-                    )), O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_j25), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_j25));
-                    O.AdjustT0(smpl, 1);
-                    O.IndexerSetData(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null), ivTmpvar26, o0, listloop_i24, listloop_j25)
-                    ;
-                }
-            }
+            O.AdjustT0(smpl, -1);
+            IVariable ivTmpvar1 = O.Add(smpl, i2, func9());
+            O.AdjustT0(smpl, 1);
+            O.Lookup(smpl, null, null, "x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+            ;
 
             //[[commandEnd]]0
         }
 
 
-        public static readonly ScalarVal i27 = new ScalarVal(1d);
+        public static readonly ScalarVal i2 = new ScalarVal(1d);
 
         public static void CodeLines(P p)
         {
