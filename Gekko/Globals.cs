@@ -42,7 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "";
 
-        public static int cheat = 2;
+        public static int cheat = 0;
+        public static bool cheat2 = true;
 
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTFUNCTIONNAKED", "" }, { "ASTPROCEDURE", "" }, { "ASTDOTORINDEXER", "" }, { "ASTFUNCTION", "" } };
         
@@ -369,6 +370,7 @@ namespace Gekko
         public static int remoteExists = -12345;  //unknown
 
         public static string listLoopInternalName = "listloop_";
+        public static string listLoopMovedStuff = "listloopMovedStuff_";
 
         public static string printNaNIndicator = "M";  //= AREMOS, could be "NaN" instead
 

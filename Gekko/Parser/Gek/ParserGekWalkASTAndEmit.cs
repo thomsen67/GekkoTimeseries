@@ -502,7 +502,7 @@ namespace Gekko.Parser.Gek
         //public static void WalkASTToFindVariables(ASTNode node, List<string>precedents)
         //{
         //    //before subnodes
-            
+
         //    if (node.Text == "ASTBANKVARNAME")
         //    {
         //        string code = node.Code.ToString();
@@ -518,7 +518,7 @@ namespace Gekko.Parser.Gek
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
-            
+
             //if (node != null) G.Writeln(G.Blanks(absoluteDepth) + node.Text);
 
             if (node.Parent != null)
@@ -536,7 +536,7 @@ namespace Gekko.Parser.Gek
             {
                 relativeDepth = 0;  //new indentation level, used to know what is a command and what is stuff deeper down the tree
             }
-            
+
             if (relativeDepth == 1)
             {
                 //NEW COMMAND encountered
@@ -546,7 +546,7 @@ namespace Gekko.Parser.Gek
                 w.commandLinesCounter++;  //becomes 0 first time here (starts at -1)
                 node.commandLinesCounter = w.commandLinesCounter.ToString(); //used for the O(node)-method, so that o0, o1, o2 numbers do not suddenly change after for instance a FOR.
                 w.expressionCounter = -1;  //for labels in PRT elements
-                
+
             }
 
             //#9874352093573
@@ -615,7 +615,7 @@ namespace Gekko.Parser.Gek
                 case "ASTFUNCTIONDEF2":
                 case "ASTPROCEDUREDEF":
 
-                    {                        
+                    {
                         if (SearchUpwardsInTree8(node) != null)
                         {
                             G.Writeln2("***ERROR: Function definition inside function definition is not allowed");
@@ -632,7 +632,7 @@ namespace Gekko.Parser.Gek
                             string s = null;
                             if (sigil == "ASTPERCENT") s += Globals.symbolScalar;
                             else if (sigil == "ASTHASH") s += Globals.symbolCollection;
-                            
+
                             s += name;
 
                             s = G.AddSigil(s, type);  //see also #980753275
@@ -645,7 +645,7 @@ namespace Gekko.Parser.Gek
                             }
                             node.functionDefAnchor.Add(s, Globals.functionArgName + ++Globals.counter);
                             if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
-                            node.functionDef.Add(new Tuple<string, string>(type.ToLower(), Globals.functionArgName + Globals.counter));                            
+                            node.functionDef.Add(new Tuple<string, string>(type.ToLower(), Globals.functionArgName + Globals.counter));
                         }
                         string ftype = null;
                         if (node.Text == "ASTPROCEDUREDEF") ftype = "void";
@@ -656,7 +656,7 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
-                       
+
 
                         string functionName = GetFunctionName(node);
                         string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
@@ -677,7 +677,7 @@ namespace Gekko.Parser.Gek
                     }
                     break;
                 case "ASTLEFTSIDE":
-                    {                        
+                    {
                         node.ivTempVarName = "ivTmpvar" + ++Globals.counter;  //we use the counter value to hook up the rhs with the lhs                        
                     }
                     break;
@@ -686,7 +686,7 @@ namespace Gekko.Parser.Gek
                         node.mapTempVarName = "mapTmpvar" + ++Globals.counter;  //we use the counter value to hook up in a map def
                     }
                     break;
-            }                       
+            }                           
             
             foreach (ASTNode child in node.ChildrenIterator())
             {                   
@@ -2548,7 +2548,7 @@ namespace Gekko.Parser.Gek
 
                                 string tempName = "temp" + ++Globals.counter;
                                 string funcName = "func" + ++Globals.counter;
-                                StringBuilder sb1 = new StringBuilder();
+                                
                                 string listName = null;
                                 if (node.listLoopAnchor == null)
                                 {
@@ -2564,6 +2564,13 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 int smplCommandNumber = ++Globals.counter;
+
+                                StringBuilder sb1 = new StringBuilder();
+
+                                if (node.CodeSentFromSubTree != null)
+                                {
+                                    sb1.Append(node.CodeSentFromSubTree);
+                                }
 
                                 sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
                                 //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
@@ -4186,6 +4193,8 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
+                                string lookupCode = null;
+
                                 if (simpleBank != null && simpleName != null && simpleFreq != null)
                                 {
                                     //Ok is simple stuff like b:ts!f, or b:%v
@@ -4208,10 +4217,8 @@ namespace Gekko.Parser.Gek
                                     //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
                                     //optionsString = "null";  //the above does not work
 
-
-                                    string lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
-                                    node.Code.CA(lookupCode);
-
+                                    lookupCode = "O.Lookup(smpl, " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
+                                    
                                     node.AlternativeCode = new GekkoSB();
                                     string ss = sigil + simpleName;
                                     if (simpleBankText777 != "null") ss = simpleBank + Globals.symbolBankColon + ss;
@@ -4237,11 +4244,33 @@ namespace Gekko.Parser.Gek
                                         bankNameCs = node[0][0].Code.ToString();
                                         nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
                                     }
-                                    node.Code.A("O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")");
-                                    
+                                    lookupCode = "O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
+                                                                        
                                     node.AlternativeCode = new GekkoSB();
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
+
+                                if (Globals.cheat2)
+                                {
+                                    ASTNode highest = SearchUpwardsInTree7a(node);
+                                    if (highest != null)
+                                    {
+                                        if (lookupCode.Contains(Globals.listLoopInternalName))
+                                        {
+                                            //that would not be good, for instance #i in a x{#i}y variable inside the name
+                                        }
+                                        else
+                                        {
+                                            
+                                            string name = Globals.listLoopMovedStuff + ++Globals.counter;
+                                            w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
+                                            lookupCode = name;                                            
+                                            //highest.CodeSentFromSubTree+=
+                                        }
+                                    }
+                                }
+
+                                node.Code.A(lookupCode);
                             }
                             break;
                         }
@@ -5866,7 +5895,8 @@ namespace Gekko.Parser.Gek
 
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
-            
+                       
+
             if (relativeDepth == 1)
             {
                 //#982375: if it is 0, walk the sub-tree to see...                  
@@ -5881,7 +5911,7 @@ namespace Gekko.Parser.Gek
                     else
                     {
                         //#2384328423                        
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL +  "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL +  "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }                    
                 }
@@ -6442,6 +6472,28 @@ namespace Gekko.Parser.Gek
                 tmp = tmp.Parent;
             }
             return false;
+        }
+
+        private static ASTNode SearchUpwardsInTree7a(ASTNode node)
+        {
+            //finds highest sum() function of type sum(#x, ...)
+            ASTNode tmp = node;
+            ASTNode highest = null;            
+            while (tmp != null)
+            {
+                //if(IsGamsSumFunction(node, ))
+                if (tmp.Text == "ASTFUNCTION")
+                {
+                    string functionName = GetFunctionName(tmp);
+                    if (IsGamsSumFunction(tmp, functionName) != null)
+                    {
+                        //this is a gams-like sum
+                        highest = tmp;
+                    }
+                }
+                tmp = tmp.Parent;
+            }
+            return highest;
         }
 
         private static string SearchUpwardsInTree8(ASTNode node)
@@ -7661,6 +7713,7 @@ namespace Gekko.Parser.Gek
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
 
         public GekkoStringBuilder localFuncs = null;
+        public string localInsideLoopVariables = null;
 
         public GekkoDictionary<string, string> localStatementCache = null;        
         public seriesType seriesHelper = seriesType.None;

@@ -12209,7 +12209,17 @@ namespace Gekko
                 if (s2.Length == 6)
                 {
                     string sub = s2;
-                    if (G.Equal(sub, "cheat0"))
+                    if (G.Equal(sub, "cheat8"))
+                    {
+                        Globals.cheat2 = true;
+                        G.Writeln2("Move outside = true");
+                    }
+                    else if (G.Equal(sub, "cheat9"))
+                    {
+                        Globals.cheat2 = false;
+                        G.Writeln2("Move outside = false");
+                    }
+                    else if (G.Equal(sub, "cheat0"))
                     {
                         Globals.cheat = 0;
                         G.Writeln2("Default func");
