@@ -5787,7 +5787,7 @@ namespace UnitTests
             I("RESET;");
             I("create ts, ts1, ts2, ts3, ts4;");
             I("SERIES <2002 2004> ts = (2, 3, 4);");
-            I("SERIES <2008 2010> ts = (9, 8, 7);");
+            I("SERIES <2008 2010> ts = (9, 8, 7);"); 
             I("SERIES <2004 2008> tsb = (-1, -2, -3, -4, -5);");
             I("smooth ts1 = ts spline;                                  //fill holes with cubic spline");
             I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
