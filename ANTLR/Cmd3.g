@@ -1295,6 +1295,7 @@ Y2                    = 'Y2'                       ;
     ULEV             = '_LEV';
     UNDO             = 'UNDO'            ;
     UNFIX             = 'UNFIX'            ;
+	SPEEDUP          = 'SPEEDUP';
     UNSWAP           = 'UNSWAP';
     UPCH             = '_PCH';
     UPDATEFREQ       = 'UPDATEFREQ'      ;
@@ -1867,6 +1868,7 @@ d.Add("Y" ,Y);
                                         d.Add("udvalg"  , UDVALG    );
                                         d.Add("undo"    , UNDO      );
                                         d.Add("unfix"    , UNFIX      );
+										d.Add("speedup"    , SPEEDUP      );
                                         d.Add("unswap"  , UNSWAP      );
                                         d.Add("updatefreq"              , UPDATEFREQ);
                                         d.Add("updx"    , UPDX       );
@@ -3358,6 +3360,7 @@ optionType:
 
 			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
+			 | BUGFIX SPEEDUP '='? yesNoSimple -> BUGFIX SPEEDUP ^(ASTBOOL yesNoSimple)
 
              //| CALC question -> CALC question
              //| CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR
@@ -3854,6 +3857,7 @@ ident2: 					Ident |
   TRANSLATE|
   TRUNCATE|
   UNFIX|
+  SPEEDUP|
   UNLOCK_|
   UNSWAP|
   VAL|

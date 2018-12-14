@@ -3360,7 +3360,7 @@ namespace Gekko
                     if (lag == 0 && !Globals.showZero)
                     {
                         //This is probably so that equations can be GENR'ed
-                        wh2.rightHandSideCsCode.longVersion.Append("databank.GetVariable(" + Globals.QT + variable + Globals.QT + ").GetData(null, t)");
+                        wh2.rightHandSideCsCode.longVersion.Append("databank.GetVariable(" + Globals.QT + variable + Globals.QT + ").GetDataNonLight(t)");
                         wh2.rightHandSideCsCode.humanVersion.Append(variable);
                     }
                     else

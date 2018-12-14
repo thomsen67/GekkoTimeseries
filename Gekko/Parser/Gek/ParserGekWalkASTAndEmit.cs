@@ -4250,7 +4250,7 @@ namespace Gekko.Parser.Gek
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
 
-                                if (Globals.cheat2)
+                                if (Program.options.bugfix_speedup)
                                 {
                                     ASTNode highest = SearchUpwardsInTree7a(node);
                                     if (highest != null)

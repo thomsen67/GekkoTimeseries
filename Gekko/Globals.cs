@@ -41,13 +41,11 @@ namespace Gekko
     public class Globals        
     {
         public static string versionInternal = "";
-
-        public static int cheat = 0;
-        public static bool cheat2 = true;
-
+        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTFUNCTIONNAKED", "" }, { "ASTPROCEDURE", "" }, { "ASTDOTORINDEXER", "" }, { "ASTFUNCTION", "" } };
         
         public static bool fixLookup = true;
+        //public static bool seriesSpeedup = false; 
 
         public static bool useIndexerAlone = false;
 
@@ -651,6 +649,7 @@ namespace Gekko
 "TRANSLATE",
 "TRUNCATE",
 "UNFIX",
+"SPEEDUP",
 "UNSWAP",
 "VAL",
 "WRITE",

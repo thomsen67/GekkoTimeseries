@@ -6752,14 +6752,14 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
                         counter++;
-                        double data = oldSeries.GetData(null, gt);
+                        double data = oldSeries.GetDataSimple(gt);
                         if (G.isNumericalError(data))
                         {
                             missings.Add(counter);
                             missingsDates.Add(gt);
                             continue;  //ignore this observation
                         }
-                        yy.Add(oldSeries.GetData(null, gt));
+                        yy.Add(oldSeries.GetDataSimple(gt));
                         xx.Add(counter);
                     }
 
@@ -6790,7 +6790,7 @@ namespace Gekko
                     bool recording = false;
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
-                        double z = oldSeries.GetData(null, gt);
+                        double z = oldSeries.GetDataSimple(gt);
                         if (G.isNumericalError(z))
                         {
                             if (!recording)
@@ -6805,8 +6805,8 @@ namespace Gekko
                         {
                             GekkoTime t1 = missingStart.Add(-1);
                             GekkoTime t2 = gt;
-                            double z1 = oldSeries.GetData(null, t1);
-                            double z2 = oldSeries.GetData(null, t2);
+                            double z1 = oldSeries.GetDataSimple(t1);
+                            double z2 = oldSeries.GetDataSimple(t2);
                             double n = GekkoTime.Observations(t1, t2) - 1;
                             if (type == ESmoothTypes.Geometric)
                             {
@@ -6850,7 +6850,7 @@ namespace Gekko
                     //This is not terribly efficient, and we could use array copy etc.
                     //And we do create and clone a whole new timeseries (newSeriesTemp).
                     //But it works, and speed is probably not an issue with SMOOTH.
-                    lhs.SetData(gt, newSeriesTemp.GetData(null, gt));
+                    lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
                 }
                 lhs.Stamp();
                 G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
@@ -6946,8 +6946,8 @@ namespace Gekko
                 foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t1b))
                 {
                     count++;
-                    sum1 += ts1.GetData(null, gt);
-                    sum2 += ts2.GetData(null, gt);
+                    sum1 += ts1.GetDataSimple(gt);
+                    sum2 += ts2.GetDataSimple(gt);
                 }
                 double avg1 = sum1 / count;
                 double avg2 = sum2 / count;
@@ -6968,11 +6968,11 @@ namespace Gekko
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t2a.Add(-1)))
                     {
-                        ts3.SetData(gt, ts1.GetData(null, gt) / relative);
+                        ts3.SetData(gt, ts1.GetDataSimple(gt) / relative);
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t2a, t2b))
                     {
-                        ts3.SetData(gt, ts2.GetData(null, gt));
+                        ts3.SetData(gt, ts2.GetDataSimple(gt));
                     }
                 }
                 else
@@ -6991,11 +6991,11 @@ namespace Gekko
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1a, t1b))
                     {
-                        ts3.SetData(gt, ts1.GetData(null, gt));
+                        ts3.SetData(gt, ts1.GetDataSimple(gt));
                     }
                     foreach (GekkoTime gt in new GekkoTimeIterator(t1b.Add(1), t2b))
                     {
-                        ts3.SetData(gt, ts2.GetData(null, gt) * relative);
+                        ts3.SetData(gt, ts2.GetDataSimple(gt) * relative);
                     }
                 }
                 ts3.Stamp();
@@ -8145,7 +8145,7 @@ namespace Gekko
                     double n = 0d;
                     foreach (GekkoTime t in new GekkoTimeIterator(ddate1, ddate2))
                     {
-                        sum += ts.GetData(null, t);
+                        sum += ts.GetDataSimple(t);
                         n++;
                     }
 

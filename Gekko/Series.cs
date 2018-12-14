@@ -498,16 +498,25 @@ namespace Gekko
             }
         }
 
+        public double GetDataSimple(GekkoTime t)
+        {
+            //for Normal or Timeless series, not Light
+            //if out of bounds, a NaN is returned, no error is issued
+            //this is fine if it is not an expression, for instance if it is taken directly from a databank
+            return GetData(null, t);
+        }
+
         /// <summary>
         /// Gets the timeseries value corresponding to the given period.
         /// </summary>
         /// <param name="t">The period.</param>
         /// <returns>The value (double.NaN if missing)</returns>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
-        //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
-        //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
+            //smpl so that tooSmall/tooLarge error can be raised (set to null if irrelevant)
+            //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
+            //Instead of GetData(null, t), please use GetDataNonLight(t)
             double rv = double.NaN;
             if (this.freq != t.freq)
             {
@@ -542,7 +551,17 @@ namespace Gekko
                 {
                     if (this.type == ESeriesType.Light)
                     {
-                        if (smpl != null)
+                        if (smpl == null)
+                        {
+                            //ignore error
+                            if (Globals.runningOnTTComputer)
+                            {
+                                //for instance, printing montly data ending in m10, where m11 and m12 are also shown
+                                System.Windows.Forms.MessageBox.Show("*** ERROR: tooSmallTooLarge with no smpl");
+                                throw new GekkoException();
+                            }
+                        }
+                        else
                         {
                             if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
                         }
@@ -1213,9 +1232,29 @@ namespace Gekko
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                foreach (GekkoTime t in smpl.Iterate03())
+
+                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
                 {
-                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t)));
+                    GekkoTime window1 = smpl.t0;
+                    GekkoTime window2 = smpl.t3;
+
+                    int ia1 = rv_series.ResizeDataArray(window1); //t0
+                    int ia2 = rv_series.ResizeDataArray(window2);  //t3
+                    int ib1 = x1_series.ResizeDataArray(window1);  //t0
+                    int ib2 = x1_series.ResizeDataArray(window2);  //t3
+                    double[] arraya = rv_series.data.dataArray;
+                    double[] arrayb = x1_series.data.dataArray;
+                    for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                    {                        
+                        arraya[i + ia1] = a(arrayb[i + ib1]);
+                    }
+                }
+                else
+                {
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {
+                        rv_series.SetData(t, a(x1_series.GetData(smpl, t)));
+                    }
                 }
             }
             else if (x1_series.type == ESeriesType.Light)
@@ -1223,7 +1262,7 @@ namespace Gekko
                 //safe to alter the object itself, since it is temporary
                 for (int i = 0; i < x1_series.data.dataArray.Length; i++)
                 {
-                    x1_series.data.dataArray[i] = a.Invoke(x1_series.data.dataArray[i]);
+                    x1_series.data.dataArray[i] = a(x1_series.data.dataArray[i]);
                 }
                 rv_series = x1_series;
             }
@@ -1238,24 +1277,46 @@ namespace Gekko
 
         //pch(), dlog(), dif()
         public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a)
-        {            
+        {
+            //Functions like d() and pch() where lag is used
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
-                rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-                foreach (GekkoTime t in smpl.Iterate03())
+                rv_series = new Series(ESeriesType.Light, smpl.t0.Add(-1), smpl.t3);
+
+                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
                 {
-                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-1))));
+                    GekkoTime window1 = smpl.t0.Add(-1);
+                    GekkoTime window2 = smpl.t3;
+
+                    int ia1 = rv_series.ResizeDataArray(window1); //t0-1
+                    int ia2 = rv_series.ResizeDataArray(window2);  //t3
+                    int ib1 = x1_series.ResizeDataArray(window1);  //t0-1
+                    int ib2 = x1_series.ResizeDataArray(window2);  //t3
+                    double[] arraya = rv_series.data.dataArray;
+                    double[] arrayb = x1_series.data.dataArray;
+                    for (int i = 1; i < GekkoTime.Observations(window1, window2); i++)
+                    {
+                        //i starts in 1, that is, t0
+                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - 1]);
+                    }
+                }
+                else
+                {                    
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {
+                        rv_series.SetData(t, a(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-1))));
+                    }
                 }
             }
             else if (x1_series.type == ESeriesType.Light)
             {
-                //safe to alter the object itself, since it is temporary
+                //safe to alter the object itself, since it is temporary                
                 double[] temp = new double[x1_series.data.dataArray.Length];
                 temp[0] = double.NaN;
                 for (int i = 0 + 1; i < x1_series.data.dataArray.Length; i++)
                 {
-                    temp[i] = a.Invoke(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
+                    temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
                 }
                 x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
@@ -1277,13 +1338,33 @@ namespace Gekko
             GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
 
             rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
-            
+
             // ---------------------------
             // x2 is a VAL or MATRIX 1x1
             // ---------------------------
-            foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+
+            if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
             {
-                rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_val));
+                int ia1 = rv_series.ResizeDataArray(window1);
+                int ia2 = rv_series.ResizeDataArray(window2);
+
+                int ib1 = x1_series.ResizeDataArray(window1);
+                int ib2 = x1_series.ResizeDataArray(window2);
+                
+                double[] arraya = rv_series.data.dataArray;
+                double[] arrayb = x1_series.data.dataArray;                
+
+                for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                {
+                    arraya[i + ia1] = a(arrayb[i + ib1], x2_val);
+                }
+            }
+            else
+            {
+                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                {
+                    rv_series.SetData(t, a(x1_series.GetData(smpl, t), x2_val));
+                }
             }
 
             return rv_series;
@@ -1292,78 +1373,8 @@ namespace Gekko
         private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
             if (x1_series.type == ESeriesType.ArraySuper && x2_series.type == ESeriesType.ArraySuper)
-            {                                
-                //SOMETHING FISHY HERE, when domains do not match
-                //Make better check of matching domains, and how to use #default list.
-                //#894543543543
-                
-                //This is typically used for printing differences
-                if (x1_series.dimensions != x2_series.dimensions)
-                {
-                    G.Writeln2("*** ERROR: The two array-series have different number of dimensions (" + x1_series.dimensions + " vs " + x2_series.dimensions + ")");
-                    throw new GekkoException();
-                }
-
-                Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, "temp", x1_series.dimensions);
-                temp.meta = new SeriesMetaInformation();
-
-                List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
-                List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
-
-                keys1.Sort(Program.CompareMapMultidimItems);
-                keys2.Sort(Program.CompareMapMultidimItems);
-
-                List m0 = new List(); //subseries first
-                List m1 = new List(); //subseries ref
-
-                //#98075grane
-
-                if (keys1.Count != keys2.Count)
-                {
-                    G.Writeln2("*** ERROR: The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");
-                    throw new GekkoException();
-                }
-
-                for (int i = 0; i < keys1.Count; i++)
-                {
-                    MapMultidimItem mm1 = keys1[i];
-                    MapMultidimItem mm2 = keys2[i];
-                    if (!mm1.Equals(mm2))
-                    {
-                        G.Writeln2("*** ERROR: Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
-                        throw new GekkoException();
-                    }
-                    Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
-                    Series sub2 = x2_series.dimensionsStorage.storage[mm2] as Series;                    
-                    Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));                                        
-                    foreach (GekkoTime t in smpl.Iterate03())
-                    {
-                        sub.SetData(t, a.Invoke(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
-                    }
-                    temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
-
-                    //For safety, we clone the domain array of strings.
-                    //We first try to steal domains from x1, then from x2
-                    //If these do not have domains, the resulting series is domain-less too
-                    if (x1_series.meta != null && x1_series.meta.domains != null)
-                    {
-                        temp.meta.domains = new string[x1_series.meta.domains.Length];
-                        for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
-                        {
-                            temp.meta.domains[ii] = x1_series.meta.domains[ii];
-                        }
-                    }
-                    else if (x2_series.meta != null && x2_series.meta.domains != null)
-                    {
-                        temp.meta.domains = new string[x2_series.meta.domains.Length];
-                        for (int ii = 0; ii < x2_series.meta.domains.Length; ii++)
-                        {
-                            temp.meta.domains[ii] = x2_series.meta.domains[ii];
-                        }
-                    }
-                }                
-                
-                return temp;
+            {
+                return ArithmeticsArraySeriesArraySeries(smpl, x1_series, x2_series, a);                
             }
             else
             {
@@ -1392,13 +1403,112 @@ namespace Gekko
                 //But when dealing with GetData(), SetData() etc. the difference can not be seen.
                 //So for practical purposes, Func<> here does not cost performance.
                 //If raw arrays were being used over large samples, perhaps the difference would manifest.
-                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+
+                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal && x2_series.type == ESeriesType.Normal)
                 {
-                    rv_series.SetData(t, a.Invoke(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
+                    int ia1 = rv_series.ResizeDataArray(window1);
+                    int ia2 = rv_series.ResizeDataArray(window2);
+
+                    int ib1 = x1_series.ResizeDataArray(window1);
+                    int ib2 = x1_series.ResizeDataArray(window2);
+
+                    int ic1 = x2_series.ResizeDataArray(window1);
+                    int ic2 = x2_series.ResizeDataArray(window2);
+
+                    double[] arraya = rv_series.data.dataArray;
+                    double[] arrayb = x1_series.data.dataArray;
+                    double[] arrayc = x2_series.data.dataArray;
+
+                    for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                    {
+                        arraya[i + ia1] = a(arrayb[i + ib1], arrayc[i + ic1]);
+                    }
+                }
+                else
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                    {
+                        rv_series.SetData(t, a(x1_series.GetData(smpl, t), x2_series.GetData(smpl, t)));
+                    }
                 }
 
                 return rv_series;
             }
+        }
+
+        private static Series ArithmeticsArraySeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
+        {
+            //SOMETHING FISHY HERE, when domains do not match
+            //Make better check of matching domains, and how to use #default list.
+            //#894543543543
+
+            //This is typically used for printing differences
+            if (x1_series.dimensions != x2_series.dimensions)
+            {
+                G.Writeln2("*** ERROR: The two array-series have different number of dimensions (" + x1_series.dimensions + " vs " + x2_series.dimensions + ")");
+                throw new GekkoException();
+            }
+
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, "temp", x1_series.dimensions);
+            temp.meta = new SeriesMetaInformation();
+
+            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
+            List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
+
+            keys1.Sort(Program.CompareMapMultidimItems);
+            keys2.Sort(Program.CompareMapMultidimItems);
+
+            List m0 = new List(); //subseries first
+            List m1 = new List(); //subseries ref
+
+            //#98075grane
+
+            if (keys1.Count != keys2.Count)
+            {
+                G.Writeln2("*** ERROR: The two array-series have different number of elements (" + keys1.Count + " vs " + keys2.Count + ")");
+                throw new GekkoException();
+            }
+
+            for (int i = 0; i < keys1.Count; i++)
+            {
+                MapMultidimItem mm1 = keys1[i];
+                MapMultidimItem mm2 = keys2[i];
+                if (!mm1.Equals(mm2))
+                {
+                    G.Writeln2("*** ERROR: Non-corresponding elements [" + mm1.ToString() + "] and [" + mm2.ToString() + "]");
+                    throw new GekkoException();
+                }
+                Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
+                Series sub2 = x2_series.dimensionsStorage.storage[mm2] as Series;
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    sub.SetData(t, a(sub1.GetData(smpl, t), sub2.GetData(smpl, t)));
+                }
+                temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+
+                //For safety, we clone the domain array of strings.
+                //We first try to steal domains from x1, then from x2
+                //If these do not have domains, the resulting series is domain-less too
+                if (x1_series.meta != null && x1_series.meta.domains != null)
+                {
+                    temp.meta.domains = new string[x1_series.meta.domains.Length];
+                    for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                    }
+                }
+                else if (x2_series.meta != null && x2_series.meta.domains != null)
+                {
+                    temp.meta.domains = new string[x2_series.meta.domains.Length];
+                    for (int ii = 0; ii < x2_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x2_series.meta.domains[ii];
+                    }
+                }
+            }
+
+            return temp;
         }
 
         private static void InitWindows(out GekkoTime window1, out GekkoTime window2, out GekkoTime windowNew1, out GekkoTime windowNew2)
@@ -1972,14 +2082,7 @@ namespace Gekko
         //}
 
         public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
-        {
-
-
-            
-
-
-
-
+        {            
             if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -2017,7 +2120,7 @@ namespace Gekko
 
         public double GetVal(GekkoTime t)
         {
-            return this.GetData(null, t);
+            return this.GetDataSimple(t);
         }
 
         public double ConvertToVal()

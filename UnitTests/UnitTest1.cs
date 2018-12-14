@@ -3334,12 +3334,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 11d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 14d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 11d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 14d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3359,12 +3359,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 11d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 11d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3525,12 +3525,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d * 1.03d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d * 1.03d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3550,12 +3550,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.01d * 1.02d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.01d * 1.02d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.01d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.01d * 1.02d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
 
@@ -3709,12 +3709,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3734,12 +3734,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 7d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 6d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 7d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 8d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3893,12 +3893,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -3918,12 +3918,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.01d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -4080,12 +4080,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.04d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.04d * 1.04d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.04d * 1.04d * 1.04d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.04d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.04d * 1.04d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -4105,12 +4105,12 @@ namespace UnitTests
                             {
                                 Map m = O.GetIVariableFromString("#m", O.ECreatePossibilities.NoneReturnNull) as Map;
                                 Series y = m.GetIVariable("y!a") as Series;
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.02d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d * 1.03d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.02d * 1.03d * 1.04d, sharedDelta);
-                                _AssertHelperTwoDoubles(y.GetData(null, new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), double.NaN, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 5d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2002, 1)), 5d * 1.02d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2003, 1)), 5d * 1.02d * 1.03d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2004, 1)), 5d * 1.02d * 1.03d * 1.04d, sharedDelta);
+                                _AssertHelperTwoDoubles(y.GetDataSimple(new GekkoTime(EFreq.A, 2005, 1)), double.NaN, sharedDelta);
                                 count++;
                             }
                         }
@@ -7706,7 +7706,7 @@ namespace UnitTests
             Series ts2 = First().GetIVariable("y_saa!q") as Series;
             foreach (GekkoTime gt in new GekkoTimeIterator(new GekkoTime(EFreq.Q, 2000, 1), new GekkoTime(EFreq.Q, 2009, 2)))
             {
-                Assert.AreEqual(ts1.GetData(null, gt), ts2.GetData(null, gt), 0.005d);
+                Assert.AreEqual(ts1.GetDataSimple(gt), ts2.GetDataSimple(gt), 0.005d);
             }
 
             //mode er mult eller add
@@ -9263,7 +9263,7 @@ namespace UnitTests
 
             foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                double y = ts.GetData(null, t);
+                double y = ts.GetDataSimple(t);
                 _AssertHelperTwoDoubles(x, y, delta);
             }
         }
@@ -9323,7 +9323,7 @@ namespace UnitTests
 
         //    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
         //    {
-        //        double y = ts.GetData(null, t);
+        //        double y = ts.GetDataNonLight(t);
         //        _AssertHelperTwoDoubles(x, y, delta);
         //    }
         //}
@@ -12078,12 +12078,12 @@ namespace UnitTests
             I("SERIES tsQ ^= 1;");
             GekkoTime ggt1 = new GekkoTime(EFreq.Q, 2000, 2);
             GekkoTime ggt2 = new GekkoTime(EFreq.Q, 2002, 3);
-            Assert.IsTrue(double.IsNaN((First().GetIVariable("tsQ!q") as Series).GetData(null, ggt1.Add(-1))));
-            Assert.IsTrue(double.IsNaN((First().GetIVariable("tsQ!q") as Series).GetData(null, ggt2.Add(1))));
+            Assert.IsTrue(double.IsNaN((First().GetIVariable("tsQ!q") as Series).GetDataSimple(ggt1.Add(-1))));
+            Assert.IsTrue(double.IsNaN((First().GetIVariable("tsQ!q") as Series).GetDataSimple(ggt2.Add(1))));
             counter = 0;
             foreach (GekkoTime gt in new GekkoTimeIterator(ggt1, ggt2))
             {
-                Assert.AreEqual((First().GetIVariable("tsQ!q") as Series).GetData(null, gt), 0.12345d + (double)counter);
+                Assert.AreEqual((First().GetIVariable("tsQ!q") as Series).GetDataSimple(gt), 0.12345d + (double)counter);
                 counter++;
             }
 
@@ -12244,39 +12244,39 @@ namespace UnitTests
 
             for (int i = start; i <= end; i++)
             {
-                Assert.AreEqual(tsA1.GetData(null, new GekkoTime(EFreq.A, i, 1)), (double)i);
-                Assert.AreEqual(tsA2.GetData(null, new GekkoTime(EFreq.A, i, 1)), (double)i);
+                Assert.AreEqual(tsA1.GetDataSimple(new GekkoTime(EFreq.A, i, 1)), (double)i);
+                Assert.AreEqual(tsA2.GetDataSimple(new GekkoTime(EFreq.A, i, 1)), (double)i);
                 for (int j = 1; j <= 4; j++)
                 {
-                    Assert.AreEqual(tsQ1.GetData(null, new GekkoTime(EFreq.Q, i, j)), (double)i + (double)j / 100d);
-                    Assert.AreEqual(tsQ2.GetData(null, new GekkoTime(EFreq.Q, i, j)), (double)i + (double)j / 100d);
+                    Assert.AreEqual(tsQ1.GetDataSimple(new GekkoTime(EFreq.Q, i, j)), (double)i + (double)j / 100d);
+                    Assert.AreEqual(tsQ2.GetDataSimple(new GekkoTime(EFreq.Q, i, j)), (double)i + (double)j / 100d);
                 }
                 for (int j = 1; j <= 12; j++)
                 {
-                    Assert.AreEqual(tsM1.GetData(null, new GekkoTime(EFreq.M, i, j)), (double)i + (double)j / 100d);
-                    Assert.AreEqual(tsM2.GetData(null, new GekkoTime(EFreq.M, i, j)), (double)i + (double)j / 100d);
+                    Assert.AreEqual(tsM1.GetDataSimple(new GekkoTime(EFreq.M, i, j)), (double)i + (double)j / 100d);
+                    Assert.AreEqual(tsM2.GetDataSimple(new GekkoTime(EFreq.M, i, j)), (double)i + (double)j / 100d);
                 }
             }
 
-            Assert.IsTrue(double.IsNaN(tsA1.GetData(null, new GekkoTime(EFreq.A, start - 1, 1))));
-            Assert.IsTrue(double.IsNaN(tsA1.GetData(null, new GekkoTime(EFreq.A, end + 1, 1))));
-            Assert.IsTrue(double.IsNaN(tsA2.GetData(null, new GekkoTime(EFreq.A, start - 1, 1))));
-            Assert.IsTrue(double.IsNaN(tsA2.GetData(null, new GekkoTime(EFreq.A, end + 1, 1))));
+            Assert.IsTrue(double.IsNaN(tsA1.GetDataSimple(new GekkoTime(EFreq.A, start - 1, 1))));
+            Assert.IsTrue(double.IsNaN(tsA1.GetDataSimple(new GekkoTime(EFreq.A, end + 1, 1))));
+            Assert.IsTrue(double.IsNaN(tsA2.GetDataSimple(new GekkoTime(EFreq.A, start - 1, 1))));
+            Assert.IsTrue(double.IsNaN(tsA2.GetDataSimple(new GekkoTime(EFreq.A, end + 1, 1))));
 
-            Assert.IsTrue(double.IsNaN(tsA1.GetData(null, (new GekkoTime(EFreq.A, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsA1.GetData(null, (new GekkoTime(EFreq.A, end, 1)).Add(1))));
-            Assert.IsTrue(double.IsNaN(tsA2.GetData(null, (new GekkoTime(EFreq.A, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsA2.GetData(null, (new GekkoTime(EFreq.A, end, 1)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsA1.GetDataSimple((new GekkoTime(EFreq.A, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsA1.GetDataSimple((new GekkoTime(EFreq.A, end, 1)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsA2.GetDataSimple((new GekkoTime(EFreq.A, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsA2.GetDataSimple((new GekkoTime(EFreq.A, end, 1)).Add(1))));
 
-            Assert.IsTrue(double.IsNaN(tsQ1.GetData(null, (new GekkoTime(EFreq.Q, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsQ1.GetData(null, (new GekkoTime(EFreq.Q, end, 4)).Add(1))));
-            Assert.IsTrue(double.IsNaN(tsQ2.GetData(null, (new GekkoTime(EFreq.Q, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsQ2.GetData(null, (new GekkoTime(EFreq.Q, end, 4)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsQ1.GetDataSimple((new GekkoTime(EFreq.Q, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsQ1.GetDataSimple((new GekkoTime(EFreq.Q, end, 4)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsQ2.GetDataSimple((new GekkoTime(EFreq.Q, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsQ2.GetDataSimple((new GekkoTime(EFreq.Q, end, 4)).Add(1))));
 
-            Assert.IsTrue(double.IsNaN(tsM1.GetData(null, (new GekkoTime(EFreq.M, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsM1.GetData(null, (new GekkoTime(EFreq.M, end, 12)).Add(1))));
-            Assert.IsTrue(double.IsNaN(tsM2.GetData(null, (new GekkoTime(EFreq.M, start, 1)).Add(-1))));
-            Assert.IsTrue(double.IsNaN(tsM2.GetData(null, (new GekkoTime(EFreq.M, end, 12)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsM1.GetDataSimple((new GekkoTime(EFreq.M, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsM1.GetDataSimple((new GekkoTime(EFreq.M, end, 12)).Add(1))));
+            Assert.IsTrue(double.IsNaN(tsM2.GetDataSimple((new GekkoTime(EFreq.M, start, 1)).Add(-1))));
+            Assert.IsTrue(double.IsNaN(tsM2.GetDataSimple((new GekkoTime(EFreq.M, end, 12)).Add(1))));
 
             //testing getting data with GetDataSequence()
             List<Series> listA = new List<Series>();
@@ -15785,14 +15785,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille1.cmd;");
             double delta = 0.0002d;
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 42960.0455d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 42960.0455d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 85920.0909d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 85920.0909d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 284964.7035d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 284964.7035d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 945121.0002d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 42960.0455d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 85920.0909d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 284964.7035d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 945121.0002d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 945121.0002d, delta);
         }
 
         [TestMethod]
@@ -15806,14 +15806,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille2.cmd;");
             double delta = 0.01d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 67695.0934d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 67695.0934d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 77545.9412d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 77545.9412d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 222821.3945d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 222821.3945d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 989331.9881d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 67695.0934d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 77545.9412d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 222821.3945d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 989331.9881d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 989331.9881d, delta);
         }
 
         [TestMethod]
@@ -15827,14 +15827,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille3.cmd;");
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 146098.8121d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 146098.8121d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 48482.9387d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 48482.9387d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 533625.2015d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 533625.2015d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 935807.1374d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 146098.8121d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 48482.9387d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 533625.2015d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 935807.1374d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 935807.1374d, delta);
         }
 
         [TestMethod]
@@ -15848,14 +15848,14 @@ namespace UnitTests
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\';");
             I("RUN lille4.cmd;"); //option solve newton backtrack = no;
             double delta = 0.0001d;  //the numbers are quite large, so 0.01 is strict.
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 161071.7813d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 161071.7813d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 44425.9141d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 44425.9141d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 540864.2500d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 540864.2500d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2000, 1)), 921567.5625d, delta);
-            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetData(null, new GekkoTime(EFreq.A, 2001, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x1" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 161071.7813d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x2" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 44425.9141d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x3" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 540864.2500d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2000, 1)), 921567.5625d, delta);
+            _AssertHelperTwoDoubles((First().GetIVariable("x4" + "!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, 2001, 1)), 921567.5625d, delta);
         }
 
         [TestMethod]
@@ -17650,7 +17650,7 @@ namespace UnitTests
                         else I("RUN m" + ii + ".cmd;");
                         for (int t = 2002; t <= 2100; t++)
                         {
-                            _AssertHelperTwoDoubles((First().GetIVariable("sum!a") as Series).GetData(null, new GekkoTime(EFreq.A, t, 1)), 0d, delta);
+                            _AssertHelperTwoDoubles((First().GetIVariable("sum!a") as Series).GetDataSimple(new GekkoTime(EFreq.A, t, 1)), 0d, delta);
                         }
                     }
                 }
@@ -17902,12 +17902,12 @@ namespace UnitTests
             string f = G.Chop_GetFreq(s);
 
             //hack: false used 4 places in GetVariable() and Contains()
-            double valWork = (First().GetIVariable(s) as Series).GetData(null, new GekkoTime(G.GetFreq(f), year, sub));
+            double valWork = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub));
             double valBase = double.NaN;
-            if (Ref().ContainsIVariable(s)) valBase = (Ref().GetIVariable(s) as Series).GetData(null, new GekkoTime(G.GetFreq(f), year, sub));
-            double valWorkLag = (First().GetIVariable(s) as Series).GetData(null, new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
+            if (Ref().ContainsIVariable(s)) valBase = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub));
+            double valWorkLag = (First().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
             double valBaseLag = double.NaN;
-            if (Ref().ContainsIVariable(s)) valBaseLag = (Ref().GetIVariable(s) as Series).GetData(null, new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
+            if (Ref().ContainsIVariable(s)) valBaseLag = (Ref().GetIVariable(s) as Series).GetDataSimple(new GekkoTime(G.GetFreq(f), year, sub).Add(-1));
             //end hack
 
             UData u = new UData();
@@ -17942,9 +17942,9 @@ namespace UnitTests
             }
             for (int t = t1; t <= t2; t++)
             {
-                double p1 = (fy.GetData(null, new GekkoTime(EFreq.A, t, 1)) / xx_fy.GetData(null, new GekkoTime(EFreq.A, t, 1)) - 1) * 100d;
-                double p2 = (cp.GetData(null, new GekkoTime(EFreq.A, t, 1)) / xx_cp.GetData(null, new GekkoTime(EFreq.A, t, 1)) - 1) * 100d;
-                double a3 = enl.GetData(null, new GekkoTime(EFreq.A, t, 1)) - xx_enl.GetData(null, new GekkoTime(EFreq.A, t, 1));
+                double p1 = (fy.GetDataSimple(new GekkoTime(EFreq.A, t, 1)) / xx_fy.GetDataSimple(new GekkoTime(EFreq.A, t, 1)) - 1) * 100d;
+                double p2 = (cp.GetDataSimple(new GekkoTime(EFreq.A, t, 1)) / xx_cp.GetDataSimple(new GekkoTime(EFreq.A, t, 1)) - 1) * 100d;
+                double a3 = enl.GetDataSimple(new GekkoTime(EFreq.A, t, 1)) - xx_enl.GetDataSimple(new GekkoTime(EFreq.A, t, 1));
                 Assert.IsTrue(Math.Abs(p1) < limits[0]); //%
                 Assert.IsTrue(Math.Abs(p2) < limits[1]); //%
                 Assert.IsTrue(Math.Abs(a3) < limits[2]); //abs
@@ -18003,8 +18003,8 @@ namespace UnitTests
 
                 for (int t = t1; t <= t2; t++)
                 {
-                    double dW = tsW.GetData(null, new GekkoTime(EFreq.A, t, 1));
-                    double dB = tsB.GetData(null, new GekkoTime(EFreq.A, t, 1));
+                    double dW = tsW.GetDataSimple(new GekkoTime(EFreq.A, t, 1));
+                    double dB = tsB.GetDataSimple(new GekkoTime(EFreq.A, t, 1));
                     if (double.IsNaN(dW) && double.IsNaN(dB))
                     {
                         //do nothing
