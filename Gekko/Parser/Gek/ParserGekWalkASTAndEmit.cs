@@ -2601,7 +2601,7 @@ namespace Gekko.Parser.Gek
 
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
-                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + tempName + ", " + node[2].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + node[2].Code.ToString() + ");" + G.NL);
                                     sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
                                 else

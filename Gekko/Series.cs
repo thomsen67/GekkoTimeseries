@@ -557,8 +557,7 @@ namespace Gekko
                             if (Globals.runningOnTTComputer)
                             {
                                 //for instance, printing montly data ending in m10, where m11 and m12 are also shown
-                                System.Windows.Forms.MessageBox.Show("*** ERROR: tooSmallTooLarge with no smpl");
-                                throw new GekkoException();
+                                G.Writeln("+++ WARNING: TT error: tooSmallTooLarge with no smpl");                                
                             }
                         }
                         else
@@ -1233,7 +1232,7 @@ namespace Gekko
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
 
-                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
+                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;
@@ -1284,7 +1283,7 @@ namespace Gekko
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0.Add(-1), smpl.t3);
 
-                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
+                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0.Add(-1);
                     GekkoTime window2 = smpl.t3;
@@ -1343,7 +1342,7 @@ namespace Gekko
             // x2 is a VAL or MATRIX 1x1
             // ---------------------------
 
-            if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal)
+            if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
             {
                 int ia1 = rv_series.ResizeDataArray(window1);
                 int ia2 = rv_series.ResizeDataArray(window2);
@@ -1404,7 +1403,7 @@ namespace Gekko
                 //So for practical purposes, Func<> here does not cost performance.
                 //If raw arrays were being used over large samples, perhaps the difference would manifest.
 
-                if (Program.options.bugfix_speedup && x1_series.type == ESeriesType.Normal && x2_series.type == ESeriesType.Normal)
+                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless && x2_series.type != ESeriesType.Timeless)
                 {
                     int ia1 = rv_series.ResizeDataArray(window1);
                     int ia2 = rv_series.ResizeDataArray(window2);
@@ -2081,27 +2080,43 @@ namespace Gekko
         //    return null;
         //}
 
-        public void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y)
+        public void InjectAdd(GekkoSmpl smpl, IVariable y)
         {            
-            if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
+            if (this.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
-                foreach (GekkoTime t in smpl.Iterate03())
+                Series y_series = y as Series;
+                if (Program.options.bugfix_speedup && this.type != ESeriesType.Timeless && y_series.type != ESeriesType.Timeless)
                 {
-                    this.SetData(t, ((Series)x).GetData(smpl, t) + ((Series)y).GetData(smpl, t));
+                    GekkoTime window1 = smpl.t0;
+                    GekkoTime window2 = smpl.t3;
+
+                    int ib1 = this.ResizeDataArray(window1);
+                    int ib2 = this.ResizeDataArray(window2);
+
+                    int ic1 = y_series.ResizeDataArray(window1);
+                    int ic2 = y_series.ResizeDataArray(window2);
+                                        
+                    double[] arrayb = this.data.dataArray;
+                    double[] arrayc = y_series.data.dataArray;
+
+                    for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                    {
+                        arrayb[i + ib1] += arrayc[i + ic1];
+                    }
                 }
-            }
-            else if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Series)
-            {
-                foreach (GekkoTime t in smpl.Iterate03())
+                else
                 {
-                    this.SetData(t, ((ScalarVal)x).val + ((Series)y).GetData(smpl, t));
+                    foreach (GekkoTime t in smpl.Iterate03())
+                    {
+                        this.SetData(t, ((Series)this).GetData(smpl, t) + ((Series)y).GetData(smpl, t));
+                    }
                 }
-            }
-            else if (x.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
+            }            
+            else if (this.Type() == EVariableType.Series && y.Type() == EVariableType.Val)
             {
                 foreach (GekkoTime t in smpl.Iterate03())
                 {
-                    this.SetData(t, ((Series)x).GetData(smpl, t) + ((ScalarVal)y).val);
+                    this.SetData(t, ((Series)this).GetData(smpl, t) + ((ScalarVal)y).val);
                 }
             }
             else
