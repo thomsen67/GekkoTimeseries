@@ -5788,14 +5788,26 @@ namespace UnitTests
             I("create ts, ts1, ts2, ts3, ts4;");
             I("SERIES <2002 2004> ts = (2, 3, 4);");
             I("SERIES <2008 2010> ts = (9, 8, 7);");
+            I("SERIES <2004 2008> tsb = (-1, -2, -3, -4, -5);");
             I("smooth ts1 = ts spline;                                  //fill holes with cubic spline");
             I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
             I("smooth ts3 = work:ts geometric;                               //fill holes with geometric interpolation");
             I("smooth work:ts4 = work:ts repeat;                                  //fill holes with last known value.");
+            I("smooth work:ts5 = work:ts overlay work:tsb;                              //fill holes with other series.");
+
+            _AssertSeries(First(), "ts4", 2004, 4d, sharedDelta);
             _AssertSeries(First(), "ts4", 2005, 4d, sharedDelta);
             _AssertSeries(First(), "ts4", 2006, 4d, sharedDelta);
             _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
-            I("prt <2002 2010> ts, ts1, ts2, ts3, ts4;");
+            _AssertSeries(First(), "ts4", 2008, 9d, sharedDelta);
+
+            _AssertSeries(First(), "ts5", 2004, 4d, sharedDelta);
+            _AssertSeries(First(), "ts5", 2005, -2d, sharedDelta);
+            _AssertSeries(First(), "ts5", 2006, -3d, sharedDelta);
+            _AssertSeries(First(), "ts5", 2007, -4d, sharedDelta);
+            _AssertSeries(First(), "ts5", 2008, 9d, sharedDelta);
+
+            I("prt <2002 2010> ts, ts1, ts2, ts3, ts4, ts5;");
         }
 
         [TestMethod]

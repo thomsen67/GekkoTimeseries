@@ -544,6 +544,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_GBK;
     ASTOPT_STRING_GEKKO18;
     ASTOPT_STRING_GEOMETRIC;
+	ASTOPT_STRING_OVERLAY;
     ASTOPT_STRING_GNUPLOT;
     ASTOPT_STRING_TITLE;
     ASTOPT_STRING_HTML;
@@ -1037,6 +1038,7 @@ Y2                    = 'Y2'                       ;
     GEKKO18 = 'GEKKO18';
     GENR             = 'GENR'            ;
     GEOMETRIC = 'GEOMETRIC';
+	OVERLAY = 'OVERLAY';
     GMULPRT          = 'GMULPRT'         ;
     GNUPLOT = 'GNUPLOT';
     GOAL             = 'GOAL';
@@ -1615,6 +1617,7 @@ d.Add("Y" ,Y);
                                         d.Add("GEKKO18", GEKKO18);
                                         d.Add("genr"    , GENR      );
                                         d.Add("GEOMETRIC", GEOMETRIC);
+										d.Add("OVERLAY", OVERLAY);
                                         d.Add("gmulprt" , GMULPRT   );
                                         d.Add("GNUPLOT" ,GNUPLOT);
                                         d.Add("goal"    , GOAL   );
@@ -3146,12 +3149,13 @@ simOpt1h:                   FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
 // SMOOTH
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames smoothOpt2?);
+smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? seqOfBankvarnames? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} ^(ASTPLACEHOLDER smoothOpt2?) seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames?);
 smoothOpt2:                 smoothOpt2h;  //can only choose 1
 smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesNo?)
                           | REPEAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_REPEAT yesNo?)
                           | GEOMETRIC (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEOMETRIC yesNo?)
 						  | LINEAR (EQUAL yesNo)? -> ^(ASTOPT_STRING_LINEAR yesNo?)
+						  | OVERLAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_OVERLAY yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3866,6 +3870,8 @@ ident2: 					Ident |
   XEDIT|
   // ---------------------------------------
   ABS|
+  GEOMETRIC|
+  OVERLAY|
   ADDBANK|
   SHOWBANK|
   SHOWFREQ|
@@ -4290,6 +4296,8 @@ ident3: 					Ident |
   TOBANK|
   FROMBANK|
   ABS|
+  GEOMETRIC|
+  OVERLAY|
   ADDBANK|
   SHOWBANK|
   SHOWFREQ|

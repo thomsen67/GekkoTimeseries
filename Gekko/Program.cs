@@ -387,7 +387,8 @@ namespace Gekko
         Spline,
         Linear,
         Geometric,
-        Repeat
+        Repeat,
+        Overlay
     }
 
     public enum EPrintCodeTypes
@@ -34093,9 +34094,9 @@ namespace Gekko
                 Globals.precedents = null;
             }
 
-            DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);
-
             if (funcCounter > 0) G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds) + " --> " + funcCounter + " evals");
+
+            DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);
             
             return tab;
 

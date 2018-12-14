@@ -6703,11 +6703,13 @@ namespace Gekko
 
             public List names0;
             public List names1;
+            public List names2;
 
             public string opt_spline = null;
             public string opt_geometric = null;
             public string opt_linear = null;
             public string opt_repeat = null;
+            public string opt_overlay = null;
             public P p = null;
             public void Exe()
             {
@@ -6717,8 +6719,10 @@ namespace Gekko
                 //so some room for improvement if it becomes a bottleneck.
                 //only done for missings enclosed by real numbers (no end-missings will be filled)  
 
-                List<string> listItems0 = Restrict(names0, true, false, true, true);
-                List<string> listItems1 = Restrict(names1, true, false, true, true);
+                List<string> listItems0 = Restrict(this.names0, true, false, true, true);
+                List<string> listItems1 = Restrict(this.names1, true, false, true, true);
+                List<string> listItems2 = null;
+                if (this.names2 != null) listItems2 = Restrict(this.names2, true, false, true, true);
 
                 if (listItems0.Count != 1 || listItems1.Count != 1)
                 {
@@ -6739,6 +6743,7 @@ namespace Gekko
                 if (G.Equal(opt_linear, "yes")) type = ESmoothTypes.Linear;
                 if (G.Equal(opt_spline, "yes")) type = ESmoothTypes.Spline;
                 if (G.Equal(opt_repeat, "yes")) type = ESmoothTypes.Repeat;
+                if (G.Equal(opt_overlay, "yes")) type = ESmoothTypes.Overlay;
 
                 GekkoTime realStart = oldSeries.GetRealDataPeriodFirst();
                 GekkoTime realEnd = oldSeries.GetRealDataPeriodLast();
@@ -6784,7 +6789,7 @@ namespace Gekko
                     //2007                      NC     0.562500000000000
                     //2008       1.000000000000000     1.000000000000000                 
                 }
-                else if (type == ESmoothTypes.Linear || type == ESmoothTypes.Repeat || type == ESmoothTypes.Geometric)
+                else if (type == ESmoothTypes.Linear || type == ESmoothTypes.Repeat || type == ESmoothTypes.Geometric || type == ESmoothTypes.Overlay)
                 {
                     GekkoTime missingStart = GekkoTime.tNull;
                     bool recording = false;
@@ -6821,6 +6826,12 @@ namespace Gekko
                             double counterGeometric = z1;
                             double counterGeometricA = Math.Pow((z2 / z1), 1d / n);
 
+                            Series overlay = null;
+                            if (type == ESmoothTypes.Overlay)
+                            {
+                                overlay = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true) as Series;
+                            }
+
                             foreach (GekkoTime gt2 in new GekkoTimeIterator(t1.Add(1), t2.Add(-1)))
                             {
                                 if (type == ESmoothTypes.Repeat)
@@ -6836,6 +6847,10 @@ namespace Gekko
                                 {
                                     counterLinear *= counterGeometricA;
                                     newSeriesTemp.SetData(gt2, counterLinear);
+                                }
+                                else if (type == ESmoothTypes.Overlay)
+                                {
+                                    newSeriesTemp.SetData(gt2, overlay.GetDataSimple(gt2));
                                 }
                                 else throw new GekkoException();
                             }

@@ -5134,17 +5134,11 @@ namespace Gekko.Parser.Gek
                     case "ASTSMOOTH":
                         {
                             node.Code.A("O.Smooth o" + Num(node) + " = new O.Smooth();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                            //node.Code.A("o" + Num(node) + ".lhs = (" + node[0].Code + ");" + G.NL;
-                            //node.Code.A("o" + Num(node) + ".rhs = (" + node[1].Code + ");" + G.NL;
-                            //for (int i = 2; i < node.ChildrenCount(); i++)  //get the rest
-                            //{
-                            //    node.Code.A(node[i].Code;
-                            //}
-                            node.Code.A("o" + Num(node) + ".names0 = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".names1 = " + node[1].Code + ";" + G.NL);
-                            //node.Code.A("o" + Num(node) + ".names2 = " + node[2].Code + ";" + G.NL);
-                            node.Code.A(node[2].Code);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
+                            if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
+                            node.Code.A(node[0][0].Code);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

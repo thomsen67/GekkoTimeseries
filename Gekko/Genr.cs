@@ -16,51 +16,40 @@ namespace Gekko
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
 
-            Func<GraphHelper, string> print0 = (gh) =>
-            {
-                O.Prt o0 = new O.Prt();
-                labelCounter = 0; o0.guiGraphIsRefreshing = gh.isRefreshing;
-                o0.guiGraphPrintCode = gh.printCode;
-                o0.guiGraphIsLogTransform = gh.isLogTransform;
-                o0.prtType = "p";
-                ESeriesMissing r1_0 = Program.options.series_array_print_missing; ESeriesMissing r2_0 = Program.options.series_normal_print_missing; try
-                {
-                    O.HandleOptionBankRef1(o0.opt_bank, o0.opt_ref); O.HandleMissing1(o0.opt_missing);
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope0 = new O.Prt.Element();
-                        ope0.labelGiven = new List<string>() { "bl/1000|[@2,2:3='bl',<1252>,1:2]|[@4,5:8='1000',<1201>,1:5]" };
-                        smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
-                        ope0.printCodesFinal = Program.GetElementPrintCodes(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.printCodesFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = O.Divide(smpl, O.Lookup(smpl, null, null, "bl", null, null, new LookupSettings(), EVariableType.Var, null), i1);
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
-                        }
-                        smpl.bankNumber = 0;
-                        o0.prtElements.Add(ope0);
-                    }
+            O.Assignment o0 = new O.Assignment();
+            smpl.t0 = O.ConvertToDate(i7, O.GetDateChoices.FlexibleStart);
+            ;
+            smpl.t1 = O.ConvertToDate(i7, O.GetDateChoices.FlexibleStart);
+            ;
+            smpl.t2 = O.ConvertToDate(i8, O.GetDateChoices.FlexibleEnd);
+            ;
+            smpl.t3 = O.ConvertToDate(i8, O.GetDateChoices.FlexibleEnd);
+            ;
 
-                }
-                finally
-                {
-                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_0, r2_0);
-                }
-                o0.counter = 1;
-                o0.printCsCounter = Globals.printCs.Count - 1;
-                o0.Exe();
-                return o0.emfName;
-            };
-            Globals.printCs.Add(Globals.printCs.Count, print0);
-            print0(new GraphHelper());
+
+            O.AdjustT0(smpl, -1);
+            IVariable ivTmpvar1 = O.Add(smpl, O.Add(smpl, O.Add(smpl, O.Add(smpl, O.Add(smpl, O.Add(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "y1", null, null, new LookupSettings(), EVariableType.Var, null), O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag, O.Negate(smpl, i2)
+            ), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "y1", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i2)
+            )), O.Lookup(smpl, null, null, "y2", null, null, new LookupSettings(), EVariableType.Var, null)), O.Indexer(O.Indexer2(smpl, O.EIndexerType.IndexerLag, O.Negate(smpl, i3)
+            ), smpl, O.EIndexerType.IndexerLag, O.Lookup(smpl, null, null, "y2", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl, i3)
+            )), O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, i4
+            ), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "y3", null, null, new LookupSettings(), EVariableType.Var, null), i4
+            )), O.Lookup(smpl, null, null, "%x", null, null, new LookupSettings(), EVariableType.Var, null)), i5), i6);
+            O.AdjustT0(smpl, 1);
+            O.Lookup(smpl, null, null, "x1", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+            ;
 
             //[[commandEnd]]0
         }
 
 
-        public static readonly ScalarVal i1 = new ScalarVal(1000d);
+        public static readonly ScalarVal i2 = new ScalarVal(1d);
+        public static readonly ScalarVal i3 = new ScalarVal(1d);
+        public static readonly ScalarVal i4 = new ScalarVal(2000d);
+        public static readonly ScalarVal i5 = new ScalarVal(1d);
+        public static readonly ScalarVal i6 = new ScalarVal(2d);
+        public static readonly ScalarVal i7 = new ScalarVal(2000d);
+        public static readonly ScalarVal i8 = new ScalarVal(2020d);
 
         public static void CodeLines(P p)
         {
