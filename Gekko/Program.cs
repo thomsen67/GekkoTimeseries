@@ -15040,102 +15040,12 @@ namespace Gekko
         }
 
         public static void Tell(string text, bool nocr)
-        {
-            if (1 == 0 && Globals.runningOnTTComputer)
-            {
-                int[,,] b = new int[6, 2, 3];
-
-                b[0, 0, 0] = -1;
-                b[0, 0, 1] = -1;
-                b[0, 0, 2] = 0;
-                b[0, 1, 0] = -1;
-                b[0, 1, 1] = -1;
-                b[0, 1, 2] = 1;
-
-                b[1, 0, 0] = 1;
-                b[1, 0, 1] = -1;
-                b[1, 0, 2] = 0;
-                b[1, 1, 0] = 0;
-                b[1, 1, 1] = -1;
-                b[1, 1, 2] = 1;
-
-                b[2, 0, 0] = -1;
-                b[2, 0, 1] = 0;
-                b[2, 0, 2] = 1;
-                b[2, 1, 0] = -1;
-                b[2, 1, 1] = 1;
-                b[2, 1, 2] = 0;
-
-                b[3, 0, 0] = 1;
-                b[3, 0, 1] = 0;
-                b[3, 0, 2] = 1;
-                b[3, 1, 0] = 0;
-                b[3, 1, 1] = 1;
-                b[3, 1, 2] = 0;
-
-                b[4, 0, 0] = -1;
-                b[4, 0, 1] = 1;
-                b[4, 0, 2] = 0;
-                b[4, 1, 0] = -1;
-                b[4, 1, 1] = 0;
-                b[4, 1, 2] = 1;
-
-                b[5, 0, 0] = 0;
-                b[5, 0, 1] = 1;
-                b[5, 0, 2] = 1;
-                b[5, 1, 0] = 1;
-                b[5, 1, 1] = 0;
-                b[5, 1, 2] = 0;
-
-                List<int> nums = new List<int> { 11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34, 41, 42, 43, 44, 51, 52, 53, 54, 61, 62, 63, 64, };
-                var permute = Permute(nums);
-
-                
-                //for (int i = 0; i < permute.Count; i++)
-                //{
-                //    List<int> combi = permute[i];
-                //    for (int j = 0; j < 6; j++)
-                //    {
-
-                //    }
-                //}
-            }            
-            
+        {   
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
         }
-
-        public static IEnumerable<IEnumerable<T>> Permute<T>(this IEnumerable<T> sequence)
-        {
-            if (sequence == null)
-            {
-                yield break;
-            }
-
-            var list = sequence.ToList();
-
-            if (!list.Any())
-            {
-                yield return Enumerable.Empty<T>();
-            }
-            else
-            {
-                var startingElementIndex = 0;
-
-                foreach (var startingElement in list)
-                {
-                    var remainingItems = list.AllExcept(startingElementIndex);
-
-                    foreach (var permutationOfRemainder in remainingItems.Permute())
-                    {
-                        yield return startingElement.Concat(permutationOfRemainder);
-                    }
-
-                    startingElementIndex++;
-                }
-            }
-        }
+               
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
@@ -20428,12 +20338,12 @@ namespace Gekko
         {
             if (t1.freq != Program.options.freq)
             {
-                G.Writeln2("*** ERROR: Using DATE with freq " + t1.freq.ToString() + " in a " + Program.options.freq.ToString() + " setting");
+                G.Writeln2("*** ERROR: Using DATE with freq " + t1.freq.ToString() + " in a freq " + Program.options.freq.ToString() + " setting");
                 throw new GekkoException();
             }
             if (t2.freq != Program.options.freq)
             {
-                G.Writeln2("*** ERROR: Using DATE with freq " + t2.freq.ToString() + " in a " + Program.options.freq.ToString() + " setting");
+                G.Writeln2("*** ERROR: Using DATE with freq " + t2.freq.ToString() + " in a freq " + Program.options.freq.ToString() + " setting");
                 throw new GekkoException();
             }            
 
@@ -24041,7 +23951,12 @@ namespace Gekko
             {
                 SplitCommandBeingExecuted(out lineText, out lineNumber2, command);
             }
-            commandLines = CreateListOfStringsFromString(fileText);
+            commandLines = new List<string>();
+            commandLines.Add("Unknown file");
+            if (fileText != null)
+            {
+                commandLines = CreateListOfStringsFromString(fileText);
+            }
             //commandText = commandLines2[lineNumber2 - 1];
         }
 

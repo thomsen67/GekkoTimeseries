@@ -2475,7 +2475,8 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames collapseMethod?);
-collapseMethod:			    FIRST|LAST|AVG|TOTAL;
+collapseMethod:			    name;
+//collapseMethod:			    FIRST|LAST|AVG|TOTAL;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // COMPARE
@@ -2691,7 +2692,8 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
-interpolateMethod:			REPEAT | PRORATE;
+interpolateMethod:			name;
+//interpolateMethod:			REPEAT | PRORATE;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ITERSHOW

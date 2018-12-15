@@ -195,6 +195,7 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("using System.Text;");
             s2.AppendLine("using System.Windows.Forms;");
             s2.AppendLine("using System.Drawing;");  //to use Color.Red in G.Writeln()
+            //s2.AppendLine("using System.Core;");  //seems necessary in order to use functions/procedures with > 6 parameters... ?
             s2.AppendLine("using Gekko.Parser;"); //all the AST_Xxx() methods are found in Gekko.Parser.AST.cs
             s2.AppendLine("namespace Gekko");
             s2.AppendLine("{");

@@ -4865,6 +4865,22 @@ namespace Gekko
             {
                 if (Globals.ufunctions10.ContainsKey(name)) Globals.ufunctions10.Remove(name);
             }
+            else if (number == 11)
+            {
+                if (Globals.ufunctions11.ContainsKey(name)) Globals.ufunctions11.Remove(name);
+            }
+            else if (number == 12)
+            {
+                if (Globals.ufunctions12.ContainsKey(name)) Globals.ufunctions12.Remove(name);
+            }
+            else if (number == 13)
+            {
+                if (Globals.ufunctions13.ContainsKey(name)) Globals.ufunctions13.Remove(name);
+            }
+            else if (number == 14)
+            {
+                if (Globals.ufunctions14.ContainsKey(name)) Globals.ufunctions14.Remove(name);
+            }
         }
 
         // USER FUNCTION STUFF START
@@ -5025,6 +5041,58 @@ namespace Gekko
             if (rv == null)
             {
                 FunctionErrorMessage(name, 10);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup11(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions11.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 11);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup12(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions12.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 12);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup13(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions13.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 13);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> FunctionLookup14(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable> rv = null;
+            Globals.ufunctions14.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 14);
                 throw new GekkoException();
             }
             return rv;

@@ -116,6 +116,7 @@ namespace Gekko.Parser.Gek
             compilerParams.ReferencedAssemblies.Add("system.dll");
             compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");
             compilerParams.ReferencedAssemblies.Add("system.drawing.dll");
+            compilerParams.ReferencedAssemblies.Add("system.core.dll");
             if (addedAssembly != null) compilerParams.ReferencedAssemblies.Add(addedAssembly.Location);
 
             if (G.IsUnitTesting())
@@ -131,7 +132,9 @@ namespace Gekko.Parser.Gek
             }
 
             compilerParams.GenerateExecutable = false;
-            CSharpCodeProvider csCompiler = new CSharpCodeProvider();
+
+            Dictionary<string, string> providerOptions = new Dictionary<string, string> { { "CompilerVersion", "v4.0" } };
+            CSharpCodeProvider csCompiler = new CSharpCodeProvider(providerOptions);
 
             //code = ch.code + " ";
             Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        

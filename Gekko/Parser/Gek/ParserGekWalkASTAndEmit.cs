@@ -1022,7 +1022,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);                            
                             string type = "null";
-                            if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
+                            if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
@@ -1033,7 +1033,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
                             string type = "null";
-                            if (node.ChildrenCount() >= 3) type = "`" + node[2].Text + "`";
+                            if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -2337,7 +2337,7 @@ namespace Gekko.Parser.Gek
                             //w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
                             w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => " + G.NL);
-                            w.headerCs.AppendLine("{ " + LocalCode1(Num(node)) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node)) + "});" + G.NL);
+                            w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
                             //w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
 
@@ -2733,6 +2733,9 @@ namespace Gekko.Parser.Gek
                                 {
                                     //User defined function or procedure
 
+                                    //node.Code.A("try {" + G.NL);
+                                    //node.Code.A("p.Deeper();" + G.NL);
+
                                     string args = null;
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
@@ -2761,8 +2764,11 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
-                                    
 
+                                    //node.Code.A("}" + G.NL);  //end of try
+                                    //node.Code.A("finally {" + G.NL);
+                                    //node.Code.A("p.RemoveLast();" + G.NL);  //end of try
+                                    //node.Code.A("}" + G.NL);  //end of finally
 
                                 }
                             }
@@ -5409,13 +5415,13 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTRUN":
                         {                            
-                            node.Code.A(LocalCode1(Num(node))); //see LocalCode2
+                            node.Code.A(LocalCode1(Num(node), null)); //see LocalCode2
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
                             node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
-                            node.Code.A(LocalCode2(Num(node))); //see LocalCode1
+                            node.Code.A(LocalCode2(Num(node), null)); //see LocalCode1
                         }
                         break;
                     //case "ASTRUN":
@@ -5954,14 +5960,24 @@ namespace Gekko.Parser.Gek
             throw new GekkoException();
         }
 
-        private static string LocalCode1(string num)
-        {            
-            return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal();" + G.NL + "try {" + G.NL;
+        private static string LocalCode1(string num, string functionName)
+        {
+            string s = null;
+            if (functionName != null)
+            {
+                s = "p.lastFileSentToANTLR = `procedure/function: " + functionName + "`; p.SetLastFileSentToANTLR(`procedure/function: " + functionName + "`); p.Deeper();";
+            }
+            return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); " + s + G.NL + "try {" + G.NL;
         }
 
-        private static string LocalCode2(string num)
-        {            
-            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + G.NL + "}" + G.NL;
+        private static string LocalCode2(string num, string functionName)
+        {
+            string s = null;
+            if (functionName != null)
+            {
+                s = "p.RemoveLast();";
+            }
+            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + G.NL + "} " + s + " " + G.NL;
         }
 
         private static string LocalCode3(string num)
