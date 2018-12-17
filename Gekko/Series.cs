@@ -1319,6 +1319,7 @@ namespace Gekko
                 }
                 x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
+                rv_series.SetDirty(true);
             }
             else
             {
@@ -1506,7 +1507,7 @@ namespace Gekko
                     }
                 }
             }
-
+            temp.SetDirty(true);
             return temp;
         }
 
@@ -2371,10 +2372,10 @@ namespace Gekko
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
         public int anchorPeriodPositionInArray = -123454321;
 
-        public double[] GetDataArray_BEWARE_REMEMBER_DIRTY_AND_PROTECT()
-        {
-            return this.dataArray;
-        }
+        //public double[] GetDataArray_BEWARE_REMEMBER_DIRTY_AND_PROTECT()
+        //{
+        //    return this.dataArray;
+        //}
     }    
 
     [ProtoContract]

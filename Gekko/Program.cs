@@ -25490,7 +25490,7 @@ namespace Gekko
                     if (eFreq1 == EFreq.Q && eFreq0 == EFreq.A)
                     {
                         //Conversion from A to Q                                        
-                        if (G.Equal(method, "repeat"))
+                        if (G.Equal(method, "rep") || G.Equal(method, "repeat"))
                         {
                             for (int i = 1; i < Globals.freqQSubperiods + 1; i++)
                             {
@@ -25508,7 +25508,7 @@ namespace Gekko
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: wrong method in INTERPOLATE: " + method + "'");
+                            G.Writeln2("*** ERROR: wrong method in INTERPOLATE: '" + method + "'");
                             throw new GekkoException();
                         }
                     }
