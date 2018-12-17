@@ -2634,7 +2634,7 @@ namespace Gekko
                                                 int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
                                                 Matrix m = new Matrix(1, n);
                                                 double[,] destination = m.data;
-                                                double[] source = rhs_series.data.dataArray;
+                                                double[] source = rhs_series.data.GetDataArray_BEWARE_REMEMBER_DIRTY_AND_PROTECT();                                                                                                
 
                                                 int destinationStart = 0;
                                                 int ii1 = Math.Max(0, i1);

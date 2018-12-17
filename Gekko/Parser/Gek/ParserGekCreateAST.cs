@@ -168,6 +168,8 @@ namespace Gekko.Parser.Gek
             Gekko.Parser.Gek.ParserGekWalkASTAndEmit.WalkASTAndEmit(root, 0, 0, textInput, wh2, p);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("WALK END");
 
+            //PrintAST2(root, 0);
+
             s.AppendLine(root.Code.ToString());
 
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("EMIT cs end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
@@ -1252,7 +1254,29 @@ namespace Gekko.Parser.Gek
                     PrintAST(child, depth + 1);
                 }
             }
-        }        
+        }
+
+        public static void PrintAST2(ASTNode node, int depth)
+        {
+            string txt = node.Text;
+            if (node.Text != null)
+            {
+                if (node.Text == "\r\n") txt = "<nl>";
+                if (node.Text == "\n") txt = "<nl>";
+                txt = txt.Replace("\r\n", "<NL>");
+                txt = txt.Replace("\n", "<NL>");
+            }
+            if (depth > 0) G.Writeln(G.Blanks(depth * 2) + txt + " [" + node.Line + "]");
+            //G.Writeln(G.Blanks(depth * 2) + node.Text + "    line:" + node.Line);
+            if (node.ChildrenCount() > 0)
+            {
+                for (int i = 0; i < node.ChildrenCount(); ++i)
+                {
+                    ASTNode child = node[i];
+                    PrintAST2(child, depth + 1);
+                }
+            }
+        }
 
         private static void WriteLinkToHelpFile2(string line)
         {

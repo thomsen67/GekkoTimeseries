@@ -2362,15 +2362,20 @@ namespace Gekko
 
     [ProtoContract]
     public class SeriesDataInformation
-    {        
+    {
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
         public double[] dataArray = null;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
         [ProtoMember(2)]
         public GekkoTime anchorPeriod = GekkoTime.tNull;
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
-        public int anchorPeriodPositionInArray = -123454321;        
-    }
+        public int anchorPeriodPositionInArray = -123454321;
+
+        public double[] GetDataArray_BEWARE_REMEMBER_DIRTY_AND_PROTECT()
+        {
+            return this.dataArray;
+        }
+    }    
 
     [ProtoContract]
     public class SeriesMetaInformation
