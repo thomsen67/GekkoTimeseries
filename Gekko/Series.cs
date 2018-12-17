@@ -2369,8 +2369,7 @@ namespace Gekko
         public GekkoTime anchorPeriod = GekkoTime.tNull;
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
-        public int anchorPeriodPositionInArray = -123454321;
-        
+        public int anchorPeriodPositionInArray = -123454321;        
     }
 
     [ProtoContract]

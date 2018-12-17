@@ -540,6 +540,18 @@ namespace Gekko
             return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
         }
 
+        public static IVariable isopen(GekkoSmpl smpl, IVariable x1)
+        {
+            string s1 = O.ConvertToString(x1);
+            if (G.Equal(s1, Globals.Ref) || G.Equal(s1, Globals.Work) || G.Equal(s1, Globals.Global) || G.Equal(s1, Globals.Local)) return Globals.scalarVal1;
+            for (int i = 2; i < Program.databanks.storage.Count; i++)
+            {
+                Databank db = Program.databanks.storage[i];
+                if (G.Equal(db.name, s1)) return Globals.scalarVal1;
+            }
+            return Globals.scalarVal0;
+        }
+
         public static IVariable concat(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             //same as %s1 + %s2 anyway.
