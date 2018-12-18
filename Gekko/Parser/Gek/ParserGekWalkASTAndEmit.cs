@@ -5994,9 +5994,9 @@ namespace Gekko.Parser.Gek
             string s = null;
             if (functionName != null)
             {
-                s = "p.RemoveLast();";
+                s = "p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
             }
-            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + G.NL + "} " + s + " " + G.NL;
+            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + s + ";" + G.NL + "} " + s + G.NL;
         }
 
         private static string LocalCode3(string num)

@@ -4809,17 +4809,30 @@ namespace Gekko
 
         public static void PrepareUfunction(int number, string name)
         {
-            if (number > 10)
+            //If the user has defined a procedure MYPROC, and Gekko later implements a MYPROC command,
+            //we will get an error here, since Gekko will refuse to load a procedure with that name.
+            //This guards agains compatibility issues with new Gekko versions.
+
+            if (number > 14)
             {
-                G.Writeln2("*** ERROR: More than 10 user function arguments is not allowed at the moment.");
+                G.Writeln2("*** ERROR: More than 14 user function/procedure arguments is not allowed at the moment.");
                 G.Writeln("           You may consider using a MAP argument to work around this restriction.", Color.Red);
                 throw new GekkoException();
             }
             if (Globals.gekkoInbuiltFunctions.ContainsKey(name))
             {
-                G.Writeln2("*** ERROR: Loading of user function '" + name + "' failed, since this is also the name of an");
-                G.Writeln("           in-built Gekko function. Please rename your user function.", Color.Red);
+                G.Writeln2("*** ERROR: Loading of user function/procedure '" + name + "' failed, since this is also the name of an");
+                G.Writeln("           in-built Gekko function. Please use another name.", Color.Red);
                 throw new GekkoException();
+            }
+            foreach (string s in Globals.helpTopics)
+            {
+                if (G.Equal(s, name))
+                {
+                    G.Writeln2("*** ERROR: Loading of user function/procedure '" + name + "' failed, since this is also the name of an");
+                    G.Writeln("           in-built Gekko command. Please use another name.", Color.Red);
+                    throw new GekkoException();
+                }
             }
             if (number == 0)
             {
