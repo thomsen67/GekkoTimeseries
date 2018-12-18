@@ -40181,12 +40181,14 @@ namespace Gekko
 
         public void Deeper()
         {
-             this.counter++;            
+            if (Globals.runningOnTTComputer) G.Writeln2("DEEPER " + this.counter, Color.Green);
+            this.counter++;            
         }
 
         public void RemoveLast()
         {
-            if (counter > 0)
+            if (Globals.runningOnTTComputer) G.Writeln2("REMOVELAST " + this.counter, Color.Green);
+            if (this.counter > 0)
             {
                 string temp = this.stack[counter];
                 if (temp != null)

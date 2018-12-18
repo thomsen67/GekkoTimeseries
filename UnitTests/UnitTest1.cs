@@ -8441,6 +8441,59 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_StackTrace()
+        {
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\StackTrace';");
+            I("RUN p1;");
+
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "1a";
+            FAIL("RUN p1;");
+            string s = Globals.unitTestScreenOutput.ToString();
+            string ss = G.NL +
+                @"*** ERROR: ErrorHelper #1a" + G.NL
+              + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 10" + G.NL
+              + @"    [  10]:   %v = errorhelper('1a'); //line 10" + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 10)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "1b";
+            FAIL("RUN p1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #1b" + G.NL
+              + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 20" + G.NL
+              + @"    [  20]:   %v = errorhelper('1b'); //line 20" + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 20)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "1c";
+            FAIL("RUN p1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #1c" + G.NL
+              + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 30" + G.NL
+              + @"    [  30]:   %v = errorhelper('1c'); //line 30" + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 30)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+
+        }
+
+        [TestMethod]
         public void _Test_DefaultDomains()
         {
             Databank work = First();

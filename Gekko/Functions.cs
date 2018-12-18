@@ -540,6 +540,17 @@ namespace Gekko
             return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
         }
 
+        public static IVariable errorhelper(GekkoSmpl t, IVariable x)
+        {
+            string s = O.ConvertToString(x);
+            if (s == Globals.errorHelper)
+            {
+                G.Writeln2("*** ERROR: ErrorHelper #" + s);
+                throw new GekkoException();
+            }
+            return Globals.scalarVal0;
+        }
+
         public static IVariable isopen(GekkoSmpl smpl, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);

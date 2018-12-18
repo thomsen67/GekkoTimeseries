@@ -5984,7 +5984,7 @@ namespace Gekko.Parser.Gek
             string s = null;
             if (functionName != null)
             {
-                s = "p.lastFileSentToANTLR = `procedure/function: " + functionName + "`; p.SetLastFileSentToANTLR(`procedure/function: " + functionName + "`); p.Deeper();";
+                s = "p.lastFileSentToANTLR = O.LastText(`" + functionName + "`); p.SetLastFileSentToANTLR(O.LastText(`" + functionName + "`)); p.Deeper();";
             }
             return "Databank local" + num + " = Program.databanks.local;" + G.NL + "Program.databanks.local = new Databank(`" + Globals.Local + "`); LocalGlobal lg" + num + " = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); " + s + G.NL + "try {" + G.NL;
         }

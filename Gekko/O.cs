@@ -4916,6 +4916,13 @@ namespace Gekko
             return rv;
         }
 
+        public static string LastText(string s)
+        {            
+            if (s.Contains(Globals.procedure)) s = "PROCEDURE " + s.Replace(Globals.procedure, "");
+            else s = "FUNCTION " + s;
+            return s;
+        }
+
         public static Func<GekkoSmpl, P, IVariable, IVariable> FunctionLookup1(string name)
         {
             //NOTE: the number of args is hardcoded two places below
