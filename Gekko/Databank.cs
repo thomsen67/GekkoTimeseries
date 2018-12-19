@@ -189,7 +189,7 @@ namespace Gekko
         {
             if (name != null && name.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
-                O.WriteExternalListFile(name, x);
+                O.WriteListFile(name, x);
             }
             else
             {

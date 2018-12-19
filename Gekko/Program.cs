@@ -1394,11 +1394,20 @@ namespace Gekko
                 int col = 0;
                 foreach (string s2 in chunks)
                 {
+                    bool hasQuotes = false;
                     string s = s2.Trim();
-                    if (s.StartsWith("'") && s.EndsWith("'")) s = s.Substring(1, s.Length - 2);
-                    if (s.StartsWith("\"") && s.EndsWith("\"")) s = s.Substring(1, s.Length - 2);
+                    if (s.StartsWith("'") && s.EndsWith("'"))
+                    {
+                        s = s.Substring(1, s.Length - 2);
+                        hasQuotes = true;
+                    }
+                    if (s.StartsWith("\"") && s.EndsWith("\""))
+                    {
+                        s = s.Substring(1, s.Length - 2);
+                        hasQuotes = true;
+                    }
                     col++;
-                    CellLight cell = new CellLight(s);
+                    CellLight cell = new CellLight(s, hasQuotes);
                     if (s != "") matrix.Add(row, col, cell);  //no need to keep empty cells in matrix (there can be many such)
                 }
             }
@@ -21445,20 +21454,11 @@ namespace Gekko
             if (o.list1 != null)
             {
                 list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write, null);
-            }
+            }            
             
-            //foreach (TwoStrings output in outputs)
-            //{
-            //    IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);
-            //    O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
-            //    O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
-            //}
-            
-            //if (o.list != null) o.listItems = Program.UnfoldFlexibleListIntoListOfStrings(o.list);
-
             if (writeType == EWriteType.Tsdx)
             {
-                G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to to ." + Globals.extensionDatabank + ".");
+                G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to ." + Globals.extensionDatabank + ".");
                 G.Writeln("           If you really need a .tsdx file, you can WRITE/EXPORT a ." + Globals.extensionDatabank + " file,", Color.Red);
                 G.Writeln("           and rename that file to .tsdx afterwards.", Color.Red);
                 G.Writeln();
@@ -40187,13 +40187,13 @@ namespace Gekko
 
         public void Deeper()
         {
-            if (Globals.runningOnTTComputer) G.Writeln2("DEEPER " + this.counter, Color.Green);
+            //if (Globals.runningOnTTComputer) G.Writeln2("DEEPER " + this.counter, Color.Green);
             this.counter++;            
         }
 
         public void RemoveLast()
         {
-            if (Globals.runningOnTTComputer) G.Writeln2("REMOVELAST " + this.counter, Color.Green);
+            //if (Globals.runningOnTTComputer) G.Writeln2("REMOVELAST " + this.counter, Color.Green);
             if (this.counter > 0)
             {
                 string temp = this.stack[counter];
@@ -40796,6 +40796,7 @@ namespace Gekko
         public string text;
         public DateTime dateTime;
         public ECellLightType type;
+        public bool hasQuotes;
 
         public CellLight(double input)
         {
@@ -40803,6 +40804,7 @@ namespace Gekko
             data = input;
             dateTime = DateTime.MinValue;
             type = ECellLightType.Double;
+            hasQuotes = false;
         }
 
         public CellLight(DateTime input)
@@ -40811,6 +40813,7 @@ namespace Gekko
             data = double.NaN;
             dateTime = input;
             type = ECellLightType.DateTime;
+            hasQuotes = false;
         }
 
         public CellLight(string input)
@@ -40819,6 +40822,16 @@ namespace Gekko
             data = double.NaN;
             dateTime = DateTime.MinValue;
             type = ECellLightType.String;
+            hasQuotes = false;
+        }
+
+        public CellLight(string input, bool hasQuotes2)
+        {
+            text = input;
+            data = double.NaN;
+            dateTime = DateTime.MinValue;
+            type = ECellLightType.String;
+            hasQuotes = hasQuotes2;
         }
 
     }

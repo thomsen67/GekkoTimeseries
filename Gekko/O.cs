@@ -2402,7 +2402,7 @@ namespace Gekko
 
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
-                WriteExternalListFile(varnameWithFreq, rhs);
+                WriteListFile(varnameWithFreq, rhs);
             }
             else
             {
@@ -3252,7 +3252,7 @@ namespace Gekko
 
         }
 
-        public static void WriteExternalListFile(string varnameWithFreq, IVariable rhs)
+        public static void WriteListFile(string varnameWithFreq, IVariable rhs)
         {
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             //List<string> temp = Program.GetListOfStringsFromList(rhs);
@@ -3271,6 +3271,36 @@ namespace Gekko
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
+                bool allSimpleStringTokens = true;
+                foreach (IVariable iv in rhs_list.list)
+                {
+                    if (iv.Type() == EVariableType.List)
+                    {
+                        foreach (IVariable sub in (iv as List).list)
+                        {
+                            if (sub.Type() == EVariableType.String && G.IsSimpleToken(O.ConvertToString(sub)))
+                            {
+                                //ok
+                            }
+                            else
+                            {
+                                allSimpleStringTokens = false;
+                                break;
+                            }
+                        }
+                    }
+                    else if (iv.Type() == EVariableType.String && G.IsSimpleToken(O.ConvertToString(iv)))
+                    {
+                        //ok
+                    }
+                    else
+                    {
+                        allSimpleStringTokens = false;
+                        break;
+                    }
+                    if (allSimpleStringTokens == false) break;
+                }
+
                 foreach (IVariable iv in rhs_list.list)
                 {
                     if (iv.Type() == EVariableType.List)
@@ -3279,11 +3309,12 @@ namespace Gekko
                         {
                             if (sub.Type() == EVariableType.String)
                             {
-                                res.Write(sub.ConvertToString() + "; ");
+                                if (allSimpleStringTokens) res.Write(sub.ConvertToString() + "; ");
+                                else res.Write("'" + sub.ConvertToString() + "'; ");
                             }
                             else if (sub.Type() == EVariableType.Date)
                             {
-                                res.Write(sub.ConvertToDate(GetDateChoices.Strict) + "; ");
+                                res.Write("'" + sub.ConvertToDate(GetDateChoices.Strict) + "'; ");
                             }
                             else if (sub.Type() == EVariableType.Val)
                             {
@@ -3298,11 +3329,12 @@ namespace Gekko
                     }
                     else if (iv.Type() == EVariableType.String)
                     {
-                        res.Write(iv.ConvertToString());
+                        if (allSimpleStringTokens) res.Write(iv.ConvertToString());
+                        else res.Write("'" + iv.ConvertToString() + "'");
                     }
                     else if (iv.Type() == EVariableType.Date)
                     {
-                        res.Write(iv.ConvertToDate(GetDateChoices.Strict));
+                        res.Write("'" + iv.ConvertToDate(GetDateChoices.Strict) + "'");
                     }
                     else if (iv.Type() == EVariableType.Val)
                     {
@@ -4115,14 +4147,21 @@ namespace Gekko
                     {
                         if (emptyFound) problem = true;
 
-                        double d;
-                        if (double.TryParse(cell.text, out d))
+                        if (cell.hasQuotes)
                         {
-                            m2.Add(new ScalarVal(d));
+                            m2.Add(new ScalarString(cell.text));  //always a string, even if it looks like a value
                         }
                         else
                         {
-                            m2.Add(new ScalarString(cell.text));
+                            double d;
+                            if (double.TryParse(cell.text, out d))
+                            {
+                                m2.Add(new ScalarVal(d));
+                            }
+                            else
+                            {
+                                m2.Add(new ScalarString(cell.text));
+                            }
                         }
                     }
                     else if (cell.type == ECellLightType.Double)
