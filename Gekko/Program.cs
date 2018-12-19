@@ -15040,10 +15040,16 @@ namespace Gekko
         }
 
         public static void Tell(string text, bool nocr)
-        {   
+        {
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
+            if (Globals.runningOnTTComputer)
+            {
+                Globals.errorHelper = "1a";
+                //O.FunctionLookup0("procedure___x1")(new GekkoSmpl(), new Gekko.P());
+                Program.obeyCommandCalledFromGUI("run x1; x1;", new P());
+            }
         }
                
 

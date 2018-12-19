@@ -198,11 +198,11 @@ namespace Gekko
 
                     return null;
                 }
+                catch { p.Deeper(); throw; }
                 finally
                 {
-                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0;
+                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
                 }
-                p.RemoveLast();
             });
 
         }
@@ -226,11 +226,11 @@ namespace Gekko
 
                     return null;
                 }
+                catch { p.Deeper(); throw; }
                 finally
                 {
-                    Program.databanks.local = local6; Program.databanks.localGlobal = lg6;
+                    Program.databanks.local = local6; Program.databanks.localGlobal = lg6; p.RemoveLast(); ;
                 }
-                p.RemoveLast();
             });
 
         }
@@ -254,11 +254,11 @@ namespace Gekko
 
                     return null;
                 }
+                catch { p.Deeper(); throw; }
                 finally
                 {
-                    Program.databanks.local = local12; Program.databanks.localGlobal = lg12;
+                    Program.databanks.local = local12; Program.databanks.localGlobal = lg12; p.RemoveLast(); ;
                 }
-                p.RemoveLast();
             });
 
         }
@@ -282,11 +282,11 @@ namespace Gekko
 
                     return null;
                 }
+                catch { p.Deeper(); throw; }
                 finally
                 {
-                    Program.databanks.local = local14; Program.databanks.localGlobal = lg14;
+                    Program.databanks.local = local14; Program.databanks.localGlobal = lg14; p.RemoveLast(); ;
                 }
-                p.RemoveLast();
             });
 
         }
@@ -310,11 +310,11 @@ namespace Gekko
 
                     return null;
                 }
+                catch { p.Deeper(); throw; }
                 finally
                 {
-                    Program.databanks.local = local16; Program.databanks.localGlobal = lg16;
+                    Program.databanks.local = local16; Program.databanks.localGlobal = lg16; p.RemoveLast(); ;
                 }
-                p.RemoveLast();
             });
 
         }
@@ -347,6 +347,9 @@ namespace Gekko
 
 
             //[[commandEnd]]16
+
+            Globals.errorHelper = "1a";
+            O.FunctionLookup0("procedure___x1")(smpl, p);
 
 
 

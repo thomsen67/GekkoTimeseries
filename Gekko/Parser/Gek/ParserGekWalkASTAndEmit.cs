@@ -5992,11 +5992,13 @@ namespace Gekko.Parser.Gek
         private static string LocalCode2(string num, string functionName)
         {
             string s = null;
+            string s2 = null;
             if (functionName != null)
             {
                 s = "p.RemoveLast();";  //must be inside finally {}, because there may be a return from the method (and also an exception should adjust the counter)
+                s2 = "catch { p.Deeper(); throw; }" + G.NL;  //otherwise the following RemoveLast will remove too much for functions/procedures
             }
-            return "} " + G.NL + "finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + s + ";" + G.NL + "} " + s + G.NL;
+            return "} " + G.NL + s2 + " finally {" + G.NL + "Program.databanks.local = local" + num + "; Program.databanks.localGlobal = lg" + num + ";" + s + ";" + G.NL + "} " + G.NL;
         }
 
         private static string LocalCode3(string num)

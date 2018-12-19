@@ -8474,24 +8474,148 @@ namespace UnitTests
 
             // -----
 
-            if (true)
-            {
-                I("RESET;");
-                Globals.unitTestScreenOutput = new StringBuilder();
-                Globals.errorHelper = "1b";
-                FAIL("RUN x1;");
-                s = Globals.unitTestScreenOutput.ToString();
-                ss = G.NL +
-                    @"*** ERROR: ErrorHelper #1b" + G.NL
-                  + @"*** ERROR: Running file 'PROCEDURE x1', line 20" + G.NL
-                  + @"    [  20]:   " + G.NL
-                  + @"" + G.NL
-                  + @"    Call stack: Command line calling -->" + G.NL
-                  + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
-                  + @"    PROCEDURE x1 (run-time error in line 20)" + G.NL + G.NL;
-                Assert.IsTrue(s == ss);
-            }
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "1b";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #1b" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x1', line 20" + G.NL
+              + @"    [  20]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 (run-time error in line 20)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "1c";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #1c" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x1', line 28" + G.NL
+              + @"    [  28]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 (run-time error in line 28)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "2a";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #2a" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x2', line 40" + G.NL
+              + @"    [  40]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 11 calling -->" + G.NL
+              + @"    PROCEDURE x2 (run-time error in line 40)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
             
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "2b";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #2b" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x2', line 50" + G.NL
+              + @"    [  50]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 11 calling -->" + G.NL
+              + @"    PROCEDURE x2 (run-time error in line 50)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "2c";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #2c" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x2', line 60" + G.NL
+              + @"    [  60]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 11 calling -->" + G.NL
+              + @"    PROCEDURE x2 (run-time error in line 60)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "3";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #3" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x3', line 70" + G.NL
+              + @"    [  70]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 11 calling -->" + G.NL
+              + @"    PROCEDURE x2 line 41 calling -->" + G.NL
+              + @"    PROCEDURE x3 (run-time error in line 70)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "4";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #4" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x4', line 80" + G.NL
+              + @"    [  80]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 11 calling -->" + G.NL
+              + @"    PROCEDURE x2 line 51 calling -->" + G.NL
+              + @"    PROCEDURE x4 (run-time error in line 80)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
+            // -----
+
+            I("RESET;");
+            Globals.unitTestScreenOutput = new StringBuilder();
+            Globals.errorHelper = "5";
+            FAIL("RUN x1;");
+            s = Globals.unitTestScreenOutput.ToString();
+            ss = G.NL +
+                @"*** ERROR: ErrorHelper #5" + G.NL
+              + @"*** ERROR: Running file 'PROCEDURE x5', line 90" + G.NL
+              + @"    [  90]:   " + G.NL
+              + @"" + G.NL
+              + @"    Call stack: Command line calling -->" + G.NL
+              + @"    c:\Thomas\Gekko\regres\StackTrace\x1.gcm line 100 calling -->" + G.NL
+              + @"    PROCEDURE x1 line 21 calling -->" + G.NL              
+              + @"    PROCEDURE x5 (run-time error in line 90)" + G.NL + G.NL;
+            Assert.IsTrue(s == ss);
+
 
             // -----------------------------------------------------
             // ----- COMMAND FILES (gcm)
@@ -8560,7 +8684,7 @@ namespace UnitTests
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p2.gcm', line 40" + G.NL
               + @"    [  40]:   %v = errorhelper('2a'); //line 40" + G.NL
               + @"" + G.NL
-              + @"    Call stack: Command line calling -->" + G.NL              
+              + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p2.gcm (run-time error in line 40)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
@@ -8648,10 +8772,9 @@ namespace UnitTests
               + @"    [  90]:   %v = errorhelper('5'); //line 90" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
-              + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 21 calling -->" + G.NL              
+              + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 21 calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p5.gcm (run-time error in line 90)" + G.NL + G.NL;
             Assert.IsTrue(s == ss);
-
 
         }
 
