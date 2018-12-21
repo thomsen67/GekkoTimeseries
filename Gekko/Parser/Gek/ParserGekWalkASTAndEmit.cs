@@ -3247,20 +3247,15 @@ namespace Gekko.Parser.Gek
                                     Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
                                 }
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
-
-                                //node.Code.A("o" + Num(node) + ".labelHelper2 = O.AddLabelHelper2(smpl);" + G.NL);
-                                //node.Code.A("o" + Num(node) + ".labelHelper22 = O.AddLabelHelper22(smpl);" + G.NL);
-
+                                                                
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                                 node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
 
                                 node.Code.A("};" + G.NL);  //end Action
+                                
+                                node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
 
-                                //node.Code.A("o" + Num(node) + ".printCs = print" + Num(node) + "; " + G.NL);  //so Action can be used later on
-
-                              node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
-                                                                
                                 node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 
                             }

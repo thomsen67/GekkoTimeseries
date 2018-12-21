@@ -14982,7 +14982,8 @@ namespace UnitTests
 
             List<string> other = new List<string>();
             other.Add(null);
-            if (Globals.UNITTESTFOLLOWUP_important) other.Add("other:");
+            //if (Globals.UNITTESTFOLLOWUP_important) other.Add("other:");
+            other.Add("other:");
 
             foreach (string bank in other)
             {
@@ -15135,11 +15136,14 @@ namespace UnitTests
                         //
                         // test matrix import
                         //
-                        I("SHEET <2001 2002 IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
-                        _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
-                        _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
-                        _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);                        
-                        _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);                        
+                        if (bank == null)
+                        {
+                            I("SHEET <2001 2002 IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
+                            _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
+                            _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
+                            _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);
+                            _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
+                        }
                     }
                 }
                 // ------ gnuplot (not actually testing the file)     
@@ -15414,14 +15418,14 @@ namespace UnitTests
                 }
                 else if (freq == "q")
                 {
-                    _AssertSeries(First(), "xx1", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 1, 1001, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 2, 1002, sharedDelta);
-                    _AssertSeries(First(), "xx1", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 4001, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 4002, sharedDelta);
-                    _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 1, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 2, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 1999, 4, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 1, 4001, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 4002, sharedDelta);
+                    _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
                 else throw new GekkoException();
             }

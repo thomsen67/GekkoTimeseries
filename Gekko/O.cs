@@ -6299,7 +6299,7 @@ namespace Gekko
 
                 hlp.array = this.opt_array;
 
-                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos);
+                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
                 Program.ReadInfo readInfo = readInfos[0];
                 readInfo.shouldMerge = hlp.Merge;
 
@@ -7331,6 +7331,8 @@ namespace Gekko
             public string opt_edit = null;
             public string opt_save = null;
             public double opt_pos = double.NaN;
+            public string opt_create = null;  //may use OPEN b1, where b1.gbk does not exist (like OPEN<edit>b1).
+
             public void Exe()
             {
                 if (G.Equal(opt_prot, "yes"))
@@ -7352,6 +7354,11 @@ namespace Gekko
 
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
 
+                bool create = false;
+                if (G.Equal(opt_create, "yes"))
+                {
+                    create = true;
+                }
 
                 //hlp.openFileNames = this.openFileNames;
                 hlp.openFileNames = new List<List<string>>();
@@ -7442,7 +7449,7 @@ namespace Gekko
                 }
 
                 List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(false, hlp, true, readInfos);
+                Program.OpenOrRead(false, hlp, true, readInfos, create);
 
 
                 foreach (Program.ReadInfo readInfo in readInfos)

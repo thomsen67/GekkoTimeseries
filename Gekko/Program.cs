@@ -2135,7 +2135,7 @@ namespace Gekko
             return found;
         }
 
-        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos)
+        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
         {
             //open = true if called with OPEN command                      
 
@@ -2281,7 +2281,7 @@ namespace Gekko
                 //                   |                                                             |
                 // ----------------------------------------------+---------------------------------+
                 //                   |                           |                                 |
-                //  not already open |  read into position       |    fail unless OPEN<edit>       |
+                //  not already open |  read into position       |  fail unless OPEN<edit/create>  |
                 //                   |   maybe editable          |      createBrandNew             |
                 // ------------------+---------------------------+---------------------------------+
                 //
@@ -2335,8 +2335,15 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found");
-                        throw new GekkoException();
+                        if (create)
+                        {
+                            category3_createBrandNew = true;
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: OPEN: The databank '" + originalFileNameWithExtension + "' could not be found (see OPEN<create> if this is intentional).");
+                            throw new GekkoException();
+                        }
                     }
                 }                
 
@@ -2417,7 +2424,7 @@ namespace Gekko
                     //OPEN or READ...TO...
                     // -----------------------
 
-                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
+                    databank = Program.databanks.OpenDatabankNew(readInfo.dbName, databankTemp, oRead.openType, oRead.openTypePosition, existI, workI, refI, create); //puts it in storage[2], returns bool that says if it is just moved around in databank list, or freshly read from file                        
 
                     //if (createBrandNew)
                     //{
@@ -13110,38 +13117,7 @@ namespace Gekko
                         if (i < lineNewVersion.Length - 1) c3 = lineNewVersion[i + 1];
                         char c4 = '\n';
                         if (i < lineNewVersion.Length - 2) c4 = lineNewVersion[i + 2];
-
-                        //// -------------------------------------------------------------
-                        //// Handle .1, .2, etc. For instance y.1 --> y[-1]
-                        //// -------------------------------------------------------------
-                        //if (c2 == '.' && char.IsDigit(c3) && !G.IsLetterOrDigitOrUnderscore(c4) && c4 != '.')
-                        //{
-                        //    //now we have stuff like .1, and we need to check the chars before the '.'
-                        //    bool good = false;
-                        //    for (int ii = i - 1; ii >= 0; ii--)
-                        //    {
-                        //        //it may be for instance y.1 or y12345.1, so we run it backwards looking for
-                        //        //digits only. When there are no more digits, it MUST be a letter or underscore
-                        //        if (char.IsDigit(lineNewVersion[ii])) continue;
-                        //        if (G.IsLetterOrUnderscore(lineNewVersion[ii])) good = true;
-                        //        break;
-                        //    }
-                        //    //not ok: fy.11  fy.1a  fy.1_  fy.1.    All else is ok for fy[-1] translation, also if fy were fy12345 instead
-                        //    //this will also get translated: %n.1  {s}.1   #m.1
-                        //    if (good)
-                        //    {
-                        //        if (!lineNewVersion.Contains("'"))
-                        //        {
-                        //            //You can have stuff like TABLE xx.currow.setvalues(1,2000,2010,1,'n',0.001,'f10.3'), where 'f10.3' should not become 'f10[-3]' !!!
-                        //            //This seems hard to solve properly, so the stuff here is only temporary
-                        //            //CONCLUSION: should be solved in the PARSER in the long run
-                        //            sb.Append(Globals.symbolGlueChar6 + "-" + c3 + "]");
-                        //            i++;
-                        //            continue;
-                        //        }
-                        //    }
-                        //}
-
+                        
                         // -------------------------------------------------------------
                         // Handle PRT<m d> etc.
                         // -------------------------------------------------------------
@@ -13337,168 +13313,7 @@ namespace Gekko
                                 sb.Append(Globals.symbolGlueChar4);
                             }
                             continue;
-                        }
-
-                        // -------------------------------------------------------------
-                        // Handle SERIES #m = ...
-                        // Problem is that it needs to be interpreted as UPD-type, not GENR-type
-                        // -------------------------------------------------------------
-                        if (true)
-                        {
-                            if (!G.IsEnglishLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
-                            {
-                                bool success = false;
-                                string ident1 = null;
-                                int j1 = GetNextIdent(lineNewVersion, i, out ident1);
-                                if (j1 != -12345)
-                                {
-                                    if (ident1.ToLower() == "ser" || ident1.ToLower() == "series")
-                                    {
-
-
-                                        //==========================================
-                                        bool hasStarted = false;
-                                        for (int ii = j1; ii < lineNewVersion.Length; ii++)
-                                        {
-                                            if (lineNewVersion[ii] == ' ') continue;
-                                            if (lineNewVersion[ii] == '<')
-                                            {
-                                                hasStarted = true;
-                                                continue;
-                                            }
-                                            if (hasStarted && lineNewVersion[ii] == '>')
-                                            {
-                                                j1 = ii + 1;
-                                                break;
-                                            }
-                                        }
-                                        //==========================================
-
-
-                                        int j2 = GetNextHash(lineNewVersion, j1);
-                                        if (j2 != -12345)
-                                        {
-                                            string ident3 = null;
-                                            int j3 = GetNextIdent(lineNewVersion, j2, out ident3);
-                                            if (j3 != -12345)
-                                            {
-                                                int j4 = GetNextEquals(lineNewVersion, j3);
-                                                if (j4 != -12345)
-                                                {
-                                                    success = true;
-                                                    sb.Append(c2);
-                                                    sb.Append("_");
-                                                    sb.Append("_");
-                                                    sb.Append("_");  //SER -> S___ER, SERIES -> S___ERIES, see also //#098275432874
-                                                    continue;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // -------------------------------------------------------------
-                        // Handle SERIES y = 1 -2 -2 -1 and SERIES y = 1 -2 -2 -1*2
-                        // Problem is that the second is genr type, but the parser starts treating it like upd type.
-                        // -------------------------------------------------------------
-                        if (false)
-                        {
-                            if (!G.IsEnglishLetter(c1) && (c2 == 's' || c2 == 'S') && (c3 == 'e' || c3 == 'E'))
-                            {
-                                bool success = false;
-                                string ident1 = null;
-                                int j1 = GetNextIdent(lineNewVersion, i, out ident1);
-                                if (j1 != -12345)
-                                {
-                                    if (ident1.ToLower() == "ser" || ident1.ToLower() == "series")
-                                    {
-
-
-                                        //==========================================
-                                        bool hasStarted = false;
-                                        for (int ii = j1; ii < lineNewVersion.Length; ii++)
-                                        {
-                                            if (lineNewVersion[ii] == ' ') continue;
-                                            if (lineNewVersion[ii] == '<')
-                                            {
-                                                hasStarted = true;
-                                                continue;
-                                            }
-                                            if (hasStarted && lineNewVersion[ii] == '>')
-                                            {
-                                                j1 = ii + 1;
-                                                break;
-                                            }
-                                        }
-                                        //==========================================
-
-
-                                        int j3 = GetNextEquals2(lineNewVersion, j1);
-                                        if (j3 != -12345)
-                                        {
-                                            int j4 = GetNextComment(lineNewVersion, j3);
-                                            string rest = null;
-                                            if (j4 == -12345) rest = lineNewVersion.Substring(j3, lineNewVersion.Length - j3);
-                                            else rest = lineNewVersion.Substring(j3, j4 - j3);
-
-                                            int semi = rest.IndexOf(";");
-                                            if (semi != -1)
-                                            {
-                                                rest = rest.Substring(0, semi);
-                                            }
-
-                                            StringTokenizer2 tok = new StringTokenizer2(rest, false, false);
-                                            tok.IgnoreWhiteSpace = false;
-                                            tok.SymbolChars = new char[] { '%', '&', '/', '(', ')', '=', '?', '@', '$', '{', '[', ']', '}', '+', '|', '^', '*', '<', '>', ';', ',', ':', '-' };
-                                            Token token;
-                                            int numberCounter = 0;
-                                            bool simpleBlankSeparatedUpd = true;
-                                            do
-                                            {
-                                                token = tok.Next();
-                                                string value = token.Value;
-                                                string kind = token.Kind.ToString();
-                                                if (kind == "EOF" || kind == "WhiteSpace" || kind == "Number" || (kind == "Word" && value.ToLower() == "m") || (kind == "Symbol" && value == "-"))
-                                                {
-                                                    //continue
-                                                }
-                                                else
-                                                {
-                                                    simpleBlankSeparatedUpd = false;
-                                                    break;
-                                                }
-                                                if (kind == "Number") numberCounter++;
-                                            } while (token.Kind != ETokenType.EOF);
-
-                                            //Must have at least two numbers to be activated
-                                            if (simpleBlankSeparatedUpd && numberCounter == 1)
-                                            {
-                                                //number = 0: if the numbers are on the next line. That is typically upd type then.
-                                                //it must be rather seldom that we have 1 number on the SERIES line, and the rest
-                                                //on the next line, and that such a line is upd type.
-                                                simpleBlankSeparatedUpd = false;
-                                            }
-
-                                            if (simpleBlankSeparatedUpd)
-                                            {
-                                                //will be of the form "1 -1 -2 3 4 -5 1e6 5" (with at least 2 numbers)
-                                                //if (Globals.runningOnTTComputer) G.Writeln("DETECTED simpleBlankSeparatedUpd!");
-                                                //really ugly hack
-                                                success = true;
-                                                sb.Append(c2);
-                                                sb.Append("_");
-                                                sb.Append("_");
-                                                sb.Append("_");
-                                                sb.Append("_");  //SER -> S____ER, SERIES -> S____ERIES, see also //#098275432874
-                                                continue;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        }                        
 
                         // -------------------------------------------------------------
                         // Handle dots (.)
@@ -15052,13 +14867,7 @@ namespace Gekko
         {
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
-            else G.Writeln(text);
-            if (Globals.runningOnTTComputer)
-            {
-                Globals.errorHelper = "1a";
-                //O.FunctionLookup0("procedure___x1")(new GekkoSmpl(), new Gekko.P());
-                Program.obeyCommandCalledFromGUI("run x1; x1;", new P());
-            }
+            else G.Writeln(text);            
         }
                
 
@@ -15376,7 +15185,7 @@ namespace Gekko
             if (type == EWildcardSearchType.Write)
             {
                 allowBankRhs = true;
-                if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
+                //if (!Globals.UNITTESTFOLLOWUP_important) allowBankRhs = false;  //would be nice if it could be true  
             }
             
             List<string> rhs = O.Restrict(names1, allowBankRhs, true, true, true);
@@ -15758,8 +15567,8 @@ namespace Gekko
                         {
                             if (!G.Equal(G.Chop_GetBank(two.s2), currentFirstBankName))
                             {
-                                G.Writeln2("*** ERROR: Internal error #08745765398475");
-                                throw new GekkoException();
+                                //G.Writeln2("*** ERROR: Internal error #08745765398475");
+                                //throw new GekkoException();
                             }
                         }
 
@@ -15818,6 +15627,12 @@ namespace Gekko
 
         private static List<string> MatchInBank(string bankname, string wildcardName, string wildcardFreq)
         {
+            if (wildcardName.Contains("."))
+            {
+                G.Writeln2("*** ERROR: Wildcards contains a '.' --> please use '!' to indicate frequency");
+                throw new GekkoException();
+            }
+            
             //For each matching databank
             List<string> varsMatched = new List<string>();
             List<string> allVariablesInBank = new List<string>();
@@ -21724,7 +21539,7 @@ namespace Gekko
 
         private static void CheckSomethingToWrite(List<ToFrom> listFilteredForCurrentFreq)
         {
-            if (listFilteredForCurrentFreq.Count == 0)
+            if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
             {
                 G.Writeln2("*** ERROR: No variables to write");
                 throw new GekkoException();
@@ -22759,82 +22574,7 @@ namespace Gekko
                     }
                 }
                 //file.WriteLine();
-                i++;
-
-                               
-
-
-                //foreach (ToFrom var in vars)
-                //{
-                //    j = 1;
-                //    IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
-                //    Series ts = iv as Series;
-                //    if (ts == null)
-                //    {
-                //        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                //        G.Writeln2("*** ERROR: Variable " + var.s1 + " of wrong type");
-                //        throw new GekkoException();
-                //    }
-
-                //    GekkoTime tsStart = ts.GetPeriodFirst();
-                //    GekkoTime tsEnd = ts.GetPeriodLast();
-
-                //    counter++;
-                //    string temp = G.Chop_GetName(var.s2);
-                //    if (format == EdataFormat.Csv) file.Write(temp);
-                //    else file.Write(G.varFormat(temp, prnWidth));  //prn and gnuplot
-                //    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                //    {
-                //        if (format == EdataFormat.Csv) file.Write(";");
-                //        double data = ts.GetData(null, t);
-                //        if (G.isNumericalError(data))
-                //        {
-                //            if (t.StrictlySmallerThan(tsStart) || t.StrictlyLargerThan(tsEnd))
-                //            {
-                //                if (format == EdataFormat.Csv) file.Write(""); //write nothing, indicates out-of-sample
-                //                else file.Write(G.varFormat(" \"\"", prnWidth)); //write "", indicates out-of-sample
-                //            }
-                //            else
-                //            {
-                //                string s = HandleFunnyNumbers(format == EdataFormat.Csv);
-                //                if (format == EdataFormat.Csv) file.Write(s);
-                //                else file.Write(G.varFormat(s, prnWidth));
-                //            }
-                //        }
-                //        else
-                //        {
-                //            string s = null;
-                //            if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
-                //            {
-                //                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
-                //            }
-                //            else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-                //            {
-                //                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
-                //            }
-                //            else
-                //            {
-                //                G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
-                //                throw new GekkoException();
-                //            }
-                //            if (format == EdataFormat.Csv)
-                //            {
-                //                if (data < 0) file.Write(s);
-                //                else file.Write(" " + s);
-                //            }
-                //            else
-                //            {
-                //                //prn and gnuplot
-                //                if (data < 0) file.Write(G.varFormat(s, prnWidth));
-                //                else file.Write(G.varFormat(" " + s, prnWidth));
-                //            }
-                //        }
-                //    }
-                //    file.WriteLine();
-                //}
-
-                
-
+                i++;                
 
                 foreach (ToFrom var in vars)
                 {

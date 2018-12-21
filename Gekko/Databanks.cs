@@ -151,7 +151,7 @@ namespace Gekko
 
 
 
-        public Databank OpenDatabankNew(string name, Databank databankTemp, EOpenType openType, int openPosition, int existI, int workI, int refI)
+        public Databank OpenDatabankNew(string name, Databank databankTemp, EOpenType openType, int openPosition, int existI, int workI, int refI, bool create)
         {
             Databank rv = null;
             if (openType == EOpenType.Pos)
@@ -257,7 +257,7 @@ namespace Gekko
             else  //the databank name does not exist already
             {
                 //readFromFile = true;                
-                rv = DatabankLogicDefaultNew(name, databankTemp, openType, openPosition, m);                
+                rv = DatabankLogicDefaultNew(name, databankTemp, openType, openPosition, m, create);                
             }
             this.storage = m;
             return rv;
@@ -553,12 +553,12 @@ namespace Gekko
             return rv;
         }
 
-        private Databank DatabankLogicDefaultNew(string name, Databank databank, EOpenType openType, int openPosition, List<Databank> m)
+        private Databank DatabankLogicDefaultNew(string name, Databank databank, EOpenType openType, int openPosition, List<Databank> m, bool create)
         {
             Databank rv = databank;
-            if (openType == EOpenType.Edit && rv == null)
+            if ((openType == EOpenType.Edit || create) && rv == null)
             {
-                //OPEN <edit> b, where b does not exist as a file, and where b is not opened already
+                //OPEN <edit/create> b, where b does not exist as a file, and where b is not opened already
                 rv = new Databank(name);
             }
 

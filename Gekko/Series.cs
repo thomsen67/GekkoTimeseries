@@ -1319,7 +1319,7 @@ namespace Gekko
                 }
                 x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
-                rv_series.SetDirty(true);
+                //rv_series.SetDirty(true);
             }
             else
             {

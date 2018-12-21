@@ -537,6 +537,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_DIRECT;
 	ASTOPT_STRING_EDIT;
 	ASTOPT_STRING_FIRST;
+	ASTOPT_STRING_CREATE;
 	ASTOPT_STRING_LAST;
 	ASTOPT_STRING_FILENAME;
     ASTOPT_STRING_FIX;
@@ -2789,6 +2790,7 @@ openOpt1h:                  TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
 						  | EDIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_EDIT yesNo?)	
 						  | SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 						  | POS EQUAL expression -> ^(ASTOPT_VAL_POS expression)
+						  | CREATE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CREATE yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3069,9 +3071,10 @@ read:                       readHelper   readOpt1? fileNameStar (TO nameOrStar)?
 readHelper:                 READ | IMPORT;
 
 readOpt1:                   ISNOTQUAL
-						  | leftAngle        readOpt1h* RIGHTANGLE -> readOpt1h*						
-						  | leftAngle dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
+						  | leftAngle2          readOpt1h* RIGHTANGLE -> readOpt1h*						
+						  | leftAngleNo2 dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
                             ;
+
 readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
 						  | PRIM (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRIM yesNo?)  //obsolete
 						  | FIRST (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIRST yesNo?)
@@ -3115,9 +3118,10 @@ run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, input
 						  // We also have a SHEET without import, see the prt rule
 sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^({token("ASTSHEETIMPORT", ASTSHEETIMPORT, input.LT(1).Line)} ^(ASTPLACEHOLDER sheetImportOpt1) ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
 sheetImportOpt1           : ISNOTQUAL
-						  | leftAngle        IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
-						  | leftAngle dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
+						  | leftAngle2          IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
+						  | leftAngleNo2 dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
 						  ;
+
 sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)						
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)						
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
@@ -3286,9 +3290,10 @@ write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarname
 
 writeHelper:                WRITE | EXPORT;
 writeOpt1:                  ISNOTQUAL
-						  | leftAngle        writeOpt1h* RIGHTANGLE -> writeOpt1h*
-						  | leftAngle dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
+						  | leftAngle2          writeOpt1h* RIGHTANGLE -> writeOpt1h*
+						  | leftAngleNo2 dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
 						    ;
+
 writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
 						  | TSDX (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSDX yesNo?)
 						  | FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)	
@@ -3718,8 +3723,8 @@ pow:                        stars -> ASTPOW
                             ;
 
 leftAngle:                  leftAngle2 | leftAngleNo2;
-leftAngle2:				    LEFTANGLESPECIAL;
-leftAngleNo2:	            LEFTANGLESIMPLE;
+leftAngle2:				    LEFTANGLESPECIAL; // <=<
+leftAngleNo2:	            LEFTANGLESIMPLE;  // <
 
 rightParen:                 RIGHTPAREN (GLUE!)?;
 
@@ -4143,6 +4148,7 @@ ident2: 					Ident |
   ALIAS|
   REORDER|
   REPLACE|
+  REPEAT|
   REP|
   RESPECT|
   RES|
@@ -4565,6 +4571,7 @@ ident3: 					Ident |
   ALIAS|
   REORDER|
   REPLACE|
+  REPEAT|
   REP|
   RESPECT|
   RES|
