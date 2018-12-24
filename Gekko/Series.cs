@@ -2147,20 +2147,20 @@ namespace Gekko
 
         public string ConvertToString()
         {
-            G.Writeln2("Ts error 14");
-            return null;
+            G.Writeln2("*** ERROR: Cannot convert series to string (series name: '" + this.GetName() + "')");
+            throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("Ts error 15");
-            return GekkoTime.tNull;
+            G.Writeln2("*** ERROR: Cannot convert series to date (series name: '" + this.GetName() + "')");
+            throw new GekkoException();
         }
 
         public List<IVariable> ConvertToList()
         {
-            G.Writeln2("Ts error 16");
-            return null;
+            G.Writeln2("*** ERROR: Cannot convert series to list (series name: '" + this.GetName() + "')");
+            throw new GekkoException();
         }
 
         public EVariableType Type()

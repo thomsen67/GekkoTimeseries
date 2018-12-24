@@ -10,346 +10,167 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static int labelCounter;
-
-        public static void CC0(GekkoSmpl smpl, P p)
+        public static void C0(GekkoSmpl smpl, P p)
         {
+            //[[commandStart]]0
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+
+
+            O.Reset o0 = new O.Reset();
+            o0.p = p; o0.Exe(smpl);
+
+            //[[commandEnd]]0
+
+
             //[[commandStart]]1
-            p.SetText(@"¤10"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
 
-            O.Assignment o1 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar1 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"1a")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+            O.Time o1 = new O.Time();
+            o1.t1 = O.ConvertToDate(i24, O.GetDateChoices.FlexibleStart);
             ;
+            o1.t2 = O.ConvertToDate(i25, O.GetDateChoices.FlexibleEnd);
+            ;
+
+            o1.Exe();
 
             //[[commandEnd]]1
 
 
             //[[commandStart]]2
-            p.SetText(@"¤11"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤2"); O.InitSmpl(smpl, p);
 
 
-            O.FunctionLookup0("procedure___x2")(smpl, p);
+            O.Assignment o2 = new O.Assignment();
+            O.AdjustT0(smpl, -1);
+            IVariable ivTmpvar26 = i27;
+            O.AdjustT0(smpl, 1);
+            O.Lookup(smpl, null, null, "x1", null, ivTmpvar26, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
+            ;
 
             //[[commandEnd]]2
 
 
             //[[commandStart]]3
-            p.SetText(@"¤20"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤3"); O.InitSmpl(smpl, p);
 
 
             O.Assignment o3 = new O.Assignment();
             O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar2 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"1b")));
+            IVariable ivTmpvar28 = i29;
             O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar2, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+            O.Lookup(smpl, null, null, "x2", null, ivTmpvar28, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
             ;
 
             //[[commandEnd]]3
 
 
             //[[commandStart]]4
-            p.SetText(@"¤21"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤4"); O.InitSmpl(smpl, p);
 
 
-            O.FunctionLookup0("procedure___x5")(smpl, p);
+            O.Assignment o4 = new O.Assignment();
+            O.AdjustT0(smpl, -1);
+            IVariable ivTmpvar30 = O.Multiply(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, Functions.date(smpl, O.HandleString(new ScalarString(@"2030")))), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null), Functions.date(smpl, O.HandleString(new ScalarString(@"2030")))), O.Lookup(smpl, null, null, "x2", null, null, new LookupSettings(), EVariableType.Var, null));
+            O.AdjustT0(smpl, 1);
+            O.Lookup(smpl, null, null, "y", null, ivTmpvar30, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
+            ;
 
             //[[commandEnd]]4
 
 
             //[[commandStart]]5
-            p.SetText(@"¤28"); O.InitSmpl(smpl, p);
+            p.SetText(@"¤5"); O.InitSmpl(smpl, p);
 
 
-            O.Assignment o5 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar3 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"1c")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
+            Func<GraphHelper, string> print5 = (gh) =>
+            {
+                O.Prt o5 = new O.Prt();
+                labelCounter = 0; o5.guiGraphIsRefreshing = gh.isRefreshing;
+                o5.guiGraphPrintCode = gh.printCode;
+                o5.guiGraphIsLogTransform = gh.isLogTransform;
+                o5.prtType = "p";
+                ESeriesMissing r1_5 = Program.options.series_array_print_missing; ESeriesMissing r2_5 = Program.options.series_normal_print_missing; try
+                {
+                    O.HandleOptionBankRef1(o5.opt_bank, o5.opt_ref); O.HandleMissing1(o5.opt_missing);
+                    {
+                        List<int> bankNumbers = null;
+                        O.Prt.Element ope5 = new O.Prt.Element();
+                        ope5.labelGiven = new List<string>() { "x1|[@43,78:79='x1',<1256>,5:2]|[@43,78:79='x1',<1256>,5:2]" };
+                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
+                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
+                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
+                        {
+                            int bankNumber = bankNumbers[bankNumberI];
+                            smpl.bankNumber = bankNumber;
+                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null);
+                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
+                        }
+                        smpl.bankNumber = 0;
+                        o5.prtElements.Add(ope5);
+                    }
+
+                    {
+                        List<int> bankNumbers = null;
+                        O.Prt.Element ope5 = new O.Prt.Element();
+                        ope5.labelGiven = new List<string>() { "x2|[@46,82:83='x2',<1256>,5:6]|[@46,82:83='x2',<1256>,5:6]" };
+                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
+                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
+                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
+                        {
+                            int bankNumber = bankNumbers[bankNumberI];
+                            smpl.bankNumber = bankNumber;
+                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "x2", null, null, new LookupSettings(), EVariableType.Var, null);
+                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
+                        }
+                        smpl.bankNumber = 0;
+                        o5.prtElements.Add(ope5);
+                    }
+
+                    {
+                        List<int> bankNumbers = null;
+                        O.Prt.Element ope5 = new O.Prt.Element();
+                        ope5.labelGiven = new List<string>() { "y|[@49,86:86='y',<761>,5:10]|[@49,86:86='y',<761>,5:10]" };
+                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
+                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
+                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
+                        {
+                            int bankNumber = bankNumbers[bankNumberI];
+                            smpl.bankNumber = bankNumber;
+                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null);
+                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
+                        }
+                        smpl.bankNumber = 0;
+                        o5.prtElements.Add(ope5);
+                    }
+
+                }
+                finally
+                {
+                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_5, r2_5);
+                }
+                o5.counter = 4;
+                o5.printCsCounter = Globals.printCs.Count - 1;
+                o5.Exe();
+                return o5.emfName;
+            };
+            Globals.printCs.Add(Globals.printCs.Count, print5);
+            print5(new GraphHelper());
 
             //[[commandEnd]]5
         }
-        public static void CC1(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]7
-            p.SetText(@"¤40"); O.InitSmpl(smpl, p);
 
 
-            O.Assignment o7 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar5 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"2a")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar5, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]7
-
-
-            //[[commandStart]]8
-            p.SetText(@"¤41"); O.InitSmpl(smpl, p);
-
-
-            O.FunctionLookup0("procedure___x3")(smpl, p);
-
-            //[[commandEnd]]8
-
-
-            //[[commandStart]]9
-            p.SetText(@"¤50"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o9 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar6 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"2b")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar6, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]9
-
-
-            //[[commandStart]]10
-            p.SetText(@"¤51"); O.InitSmpl(smpl, p);
-
-
-            O.FunctionLookup0("procedure___x4")(smpl, p);
-
-            //[[commandEnd]]10
-
-
-            //[[commandStart]]11
-            p.SetText(@"¤60"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o11 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar7 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"2c")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar7, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]11
-        }
-        public static void CC2(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]13
-            p.SetText(@"¤70"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o13 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar9 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"3")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar9, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]13
-        }
-        public static void CC3(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]15
-            p.SetText(@"¤80"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o15 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar11 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"4")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar11, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]15
-        }
-        public static void CC4(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]17
-            p.SetText(@"¤90"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o17 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar13 = Functions.errorhelper(smpl, O.HandleString(new ScalarString(@"5")));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "%v", null, ivTmpvar13, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
-            ;
-
-            //[[commandEnd]]17
-        }
-
-        public static void FunctionDef4()
-        {
-
-            O.PrepareUfunction(0, "procedure___x1");
-
-            Globals.ufunctions0.Add("procedure___x1", (GekkoSmpl smpl, P p) =>
-
-            {
-                Databank local0 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("procedure___x1"); p.SetLastFileSentToANTLR(O.LastText("procedure___x1")); p.Deeper();
-                try
-                {
-
-
-                    CC0(smpl, p);
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
-        public static void FunctionDef8()
-        {
-
-            O.PrepareUfunction(0, "procedure___x2");
-
-            Globals.ufunctions0.Add("procedure___x2", (GekkoSmpl smpl, P p) =>
-
-            {
-                Databank local6 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg6 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("procedure___x2"); p.SetLastFileSentToANTLR(O.LastText("procedure___x2")); p.Deeper();
-                try
-                {
-
-
-                    CC1(smpl, p);
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local = local6; Program.databanks.localGlobal = lg6; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
-        public static void FunctionDef10()
-        {
-
-            O.PrepareUfunction(0, "procedure___x3");
-
-            Globals.ufunctions0.Add("procedure___x3", (GekkoSmpl smpl, P p) =>
-
-            {
-                Databank local12 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg12 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("procedure___x3"); p.SetLastFileSentToANTLR(O.LastText("procedure___x3")); p.Deeper();
-                try
-                {
-
-
-                    CC2(smpl, p);
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local = local12; Program.databanks.localGlobal = lg12; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
-        public static void FunctionDef12()
-        {
-
-            O.PrepareUfunction(0, "procedure___x4");
-
-            Globals.ufunctions0.Add("procedure___x4", (GekkoSmpl smpl, P p) =>
-
-            {
-                Databank local14 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg14 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("procedure___x4"); p.SetLastFileSentToANTLR(O.LastText("procedure___x4")); p.Deeper();
-                try
-                {
-
-
-                    CC3(smpl, p);
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local = local14; Program.databanks.localGlobal = lg14; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
-        public static void FunctionDef14()
-        {
-
-            O.PrepareUfunction(0, "procedure___x5");
-
-            Globals.ufunctions0.Add("procedure___x5", (GekkoSmpl smpl, P p) =>
-
-            {
-                Databank local16 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg16 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("procedure___x5"); p.SetLastFileSentToANTLR(O.LastText("procedure___x5")); p.Deeper();
-                try
-                {
-
-
-                    CC4(smpl, p);
-
-
-                    return null;
-                }
-                catch { p.Deeper(); throw; }
-                finally
-                {
-                    Program.databanks.local = local16; Program.databanks.localGlobal = lg16; p.RemoveLast(); ;
-                }
-            });
-
-        }
-
+        public static readonly ScalarVal i24 = new ScalarVal(2010d);
+        public static readonly ScalarVal i25 = new ScalarVal(2020d);
+        public static readonly ScalarVal i27 = new ScalarVal(100d);
+        public static readonly ScalarVal i29 = new ScalarVal(200d);
 
         public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-            FunctionDef4();
 
-
-            //[[commandEnd]]0
-
-            FunctionDef8();
-
-
-            //[[commandEnd]]6
-
-            FunctionDef10();
-
-
-            //[[commandEnd]]12
-
-            FunctionDef12();
-
-
-            //[[commandEnd]]14
-
-            FunctionDef14();
-
-
-            //[[commandEnd]]16
-
-            Globals.errorHelper = "1a";
-            O.FunctionLookup0("procedure___x1")(smpl, p);
+            C0(smpl, p);
 
 
 

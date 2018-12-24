@@ -3886,6 +3886,10 @@ namespace Gekko
             }
             else if (!t.IsNull())
             {
+                smplRemember = new GekkoSmpl2();
+                smplRemember.t0 = smpl.t0;
+                smplRemember.t3 = smpl.t3;
+
                 smpl.t0 = t;
                 smpl.t3 = t;
             }
@@ -6826,8 +6830,6 @@ namespace Gekko
             //public IVariable rhs = null;
             //public IVariable lhs = null;
 
-
-
             public List names0;
             public List names1;
             public List names2;
@@ -6874,130 +6876,154 @@ namespace Gekko
 
                 GekkoTime realStart = oldSeries.GetRealDataPeriodFirst();
                 GekkoTime realEnd = oldSeries.GetRealDataPeriodLast();
-                if (type == ESmoothTypes.Spline)
+
+                if (realStart.IsNull())
                 {
-                    int counter = -1;  //this can actually be an arbitrary number, but we start with 0.
-                    List<double> xx = new List<double>();
-                    List<double> yy = new List<double>();
-                    List<int> missings = new List<int>();
-                    List<GekkoTime> missingsDates = new List<GekkoTime>();
+                    //do nothing, the lhs series is not touched (but may be created here)
+                    G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + " (" + oldSeries.name + " has no data)");                    
+                }
+                else
+                {
+                    //this works okay if the rhs series has only 1 observation
+                    if (type == ESmoothTypes.Spline)
+                    {
+                        int counter = -1;  //this can actually be an arbitrary number, but we start with 0.
+                        List<double> xx = new List<double>();
+                        List<double> yy = new List<double>();
+                        List<int> missings = new List<int>();
+                        List<GekkoTime> missingsDates = new List<GekkoTime>();
+                        foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
+                        {
+                            counter++;
+                            double data = oldSeries.GetDataSimple(gt);
+                            if (G.isNumericalError(data))
+                            {
+                                missings.Add(counter);
+                                missingsDates.Add(gt);
+                                continue;  //ignore this observation
+                            }
+                            yy.Add(oldSeries.GetDataSimple(gt));
+                            xx.Add(counter);
+                        }
+
+                        double[] x = xx.ToArray();
+                        double[] y = yy.ToArray();
+
+                        alglib.spline1dinterpolant s;
+                        alglib.spline1dbuildcubic(x, y, out s);
+                        for (int i = 0; i < missings.Count; i++)
+                        {
+                            newSeriesTemp.SetData(missingsDates[i], alglib.spline1dcalc(s, missings[i]));
+                        }
+
+                        //AREMOS spline, fits parabola nicely. Gekko gives the same on this input data (left column)
+                        //2000       1.000000000000000     1.000000000000000
+                        //2001                      NC     0.562500000000000
+                        //2002       0.250000000000000     0.250000000000000
+                        //2003                      NC     0.062500000000000
+                        //2004       0.000000000000000     0.000000000000000
+                        //2005                      NC     0.062500000000000
+                        //2006       0.250000000000000     0.250000000000000
+                        //2007                      NC     0.562500000000000
+                        //2008       1.000000000000000     1.000000000000000                 
+                    }
+                    else if (type == ESmoothTypes.Linear || type == ESmoothTypes.Repeat || type == ESmoothTypes.Geometric)
+                    {
+                        GekkoTime missingStart = GekkoTime.tNull;
+                        bool recording = false;
+                        foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
+                        {
+                            //realStart and realEnd can not be tNull here
+                            double z = oldSeries.GetDataSimple(gt);
+                            if (G.isNumericalError(z))
+                            {
+                                if (!recording)
+                                {
+                                    missingStart = gt;
+                                    recording = true;
+                                }
+                                continue;
+                            }
+
+                            if (recording)
+                            {
+                                GekkoTime t1 = missingStart.Add(-1);
+                                GekkoTime t2 = gt;
+                                double z1 = oldSeries.GetDataSimple(t1);
+                                double z2 = oldSeries.GetDataSimple(t2);
+                                double n = GekkoTime.Observations(t1, t2) - 1;
+                                if (type == ESmoothTypes.Geometric)
+                                {
+                                    if (z1 <= 0d || z2 <= 0d)
+                                    {
+                                        G.Writeln2("*** ERROR: Geometric smoothing not intended for numbers <= 0");
+                                        throw new GekkoException();
+                                    }
+                                }
+                                double counterLinear = z1;
+                                double counterLinearA = (z2 - z1) / n;
+                                double counterGeometric = z1;
+                                double counterGeometricA = Math.Pow((z2 / z1), 1d / n);
+
+                                foreach (GekkoTime gt2 in new GekkoTimeIterator(t1.Add(1), t2.Add(-1)))
+                                {
+                                    if (type == ESmoothTypes.Repeat)
+                                    {
+                                        newSeriesTemp.SetData(gt2, z1);
+                                    }
+                                    else if (type == ESmoothTypes.Linear)
+                                    {
+                                        counterLinear += counterLinearA;
+                                        newSeriesTemp.SetData(gt2, counterLinear);
+                                    }
+                                    else if (type == ESmoothTypes.Geometric)
+                                    {
+                                        counterLinear *= counterGeometricA;
+                                        newSeriesTemp.SetData(gt2, counterLinear);
+                                    }
+                                    else throw new GekkoException();
+                                }
+                                recording = false;
+                                missingStart = GekkoTime.tNull;
+                            }
+                        }
+                    }
+                    else if (type == ESmoothTypes.Overlay)
+                    {
+                        Series overlay = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true) as Series;
+                        GekkoTime realStartOverlay = overlay.GetRealDataPeriodFirst();
+                        GekkoTime realEndOverlay = overlay.GetRealDataPeriodLast();
+
+                        if (realStartOverlay.IsNull())
+                        {
+                            G.Writeln2("+++ WARNING: The overlay series '" + overlay.GetName() + "' has no observations");
+                        }
+                        else
+                        {
+                            foreach (GekkoTime gt in new GekkoTimeIterator(realStartOverlay, realEndOverlay))
+                            {
+                                //realStart and realEnd can not be tNull here
+                                double z = oldSeries.GetDataSimple(gt);
+                                if (G.isNumericalError(z))
+                                {
+                                    newSeriesTemp.SetData(gt, overlay.GetDataSimple(gt));
+                                }
+                            }
+                        }
+                    }
+                    else throw new GekkoException();
+
                     foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
                     {
-                        counter++;
-                        double data = oldSeries.GetDataSimple(gt);
-                        if (G.isNumericalError(data))
-                        {
-                            missings.Add(counter);
-                            missingsDates.Add(gt);
-                            continue;  //ignore this observation
-                        }
-                        yy.Add(oldSeries.GetDataSimple(gt));
-                        xx.Add(counter);
+                        //This is not terribly efficient, and we could use array copy etc.
+                        //And we do create and clone a whole new timeseries (newSeriesTemp).
+                        //But it works, and speed is probably not an issue with SMOOTH.
+                        lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
                     }
-
-                    double[] x = xx.ToArray();
-                    double[] y = yy.ToArray();
-
-                    alglib.spline1dinterpolant s;
-                    alglib.spline1dbuildcubic(x, y, out s);
-                    for (int i = 0; i < missings.Count; i++)
-                    {
-                        newSeriesTemp.SetData(missingsDates[i], alglib.spline1dcalc(s, missings[i]));
-                    }
-
-                    //AREMOS spline, fits parabola nicely. Gekko gives the same on this input data (left column)
-                    //2000       1.000000000000000     1.000000000000000
-                    //2001                      NC     0.562500000000000
-                    //2002       0.250000000000000     0.250000000000000
-                    //2003                      NC     0.062500000000000
-                    //2004       0.000000000000000     0.000000000000000
-                    //2005                      NC     0.062500000000000
-                    //2006       0.250000000000000     0.250000000000000
-                    //2007                      NC     0.562500000000000
-                    //2008       1.000000000000000     1.000000000000000                 
+                    lhs.Stamp();
+                    G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
                 }
-                else if (type == ESmoothTypes.Linear || type == ESmoothTypes.Repeat || type == ESmoothTypes.Geometric || type == ESmoothTypes.Overlay)
-                {
-                    GekkoTime missingStart = GekkoTime.tNull;
-                    bool recording = false;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
-                    {
-                        double z = oldSeries.GetDataSimple(gt);
-                        if (G.isNumericalError(z))
-                        {
-                            if (!recording)
-                            {
-                                missingStart = gt;
-                                recording = true;
-                            }
-                            continue;
-                        }
-
-                        if (recording)
-                        {
-                            GekkoTime t1 = missingStart.Add(-1);
-                            GekkoTime t2 = gt;
-                            double z1 = oldSeries.GetDataSimple(t1);
-                            double z2 = oldSeries.GetDataSimple(t2);
-                            double n = GekkoTime.Observations(t1, t2) - 1;
-                            if (type == ESmoothTypes.Geometric)
-                            {
-                                if (z1 <= 0d || z2 <= 0d)
-                                {
-                                    G.Writeln2("*** ERROR: Geometric smoothing not intended for numbers <= 0");
-                                    throw new GekkoException();
-                                }
-                            }
-                            double counterLinear = z1;
-                            double counterLinearA = (z2 - z1) / n;
-                            double counterGeometric = z1;
-                            double counterGeometricA = Math.Pow((z2 / z1), 1d / n);
-
-                            Series overlay = null;
-                            if (type == ESmoothTypes.Overlay)
-                            {
-                                overlay = O.GetIVariableFromString(listItems2[0], ECreatePossibilities.NoneReportError, true) as Series;
-                            }
-
-                            foreach (GekkoTime gt2 in new GekkoTimeIterator(t1.Add(1), t2.Add(-1)))
-                            {
-                                if (type == ESmoothTypes.Repeat)
-                                {
-                                    newSeriesTemp.SetData(gt2, z1);
-                                }
-                                else if (type == ESmoothTypes.Linear)
-                                {
-                                    counterLinear += counterLinearA;
-                                    newSeriesTemp.SetData(gt2, counterLinear);
-                                }
-                                else if (type == ESmoothTypes.Geometric)
-                                {
-                                    counterLinear *= counterGeometricA;
-                                    newSeriesTemp.SetData(gt2, counterLinear);
-                                }
-                                else if (type == ESmoothTypes.Overlay)
-                                {
-                                    newSeriesTemp.SetData(gt2, overlay.GetDataSimple(gt2));
-                                }
-                                else throw new GekkoException();
-                            }
-                            recording = false;
-                            missingStart = GekkoTime.tNull;
-                        }
-                    }
-                }
-                else throw new GekkoException();
-                foreach (GekkoTime gt in new GekkoTimeIterator(realStart, realEnd))
-                {
-                    //This is not terribly efficient, and we could use array copy etc.
-                    //And we do create and clone a whole new timeseries (newSeriesTemp).
-                    //But it works, and speed is probably not an issue with SMOOTH.
-                    lhs.SetData(gt, newSeriesTemp.GetDataSimple(gt));
-                }
-                lhs.Stamp();
-                G.Writeln2("Smooth of '" + oldSeries.name + "', method = " + type.ToString().ToLower() + ", " + realStart.ToString() + "-" + realEnd.ToString());
             }
-
         }
 
         public class Splice
