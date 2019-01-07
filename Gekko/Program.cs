@@ -2240,6 +2240,11 @@ namespace Gekko
                     extension = "flat";
                     isGbk = false;
                 }
+                if (oRead.Type == EDataFormat.Aremos)
+                {
+                    extension = "aremos";
+                    isGbk = false;
+                }
                 if (oRead.Type == EDataFormat.Xls)
                 {
                     extension = "xls";
@@ -2763,6 +2768,10 @@ namespace Gekko
             else if (oRead.Type == EDataFormat.Flat)
             {
                 Program.ReadFlat(databankTemp, readInfo, file);
+            }
+            else if (oRead.Type == EDataFormat.Aremos)
+            {
+                Program.ReadAremos(databankTemp, readInfo, file);
             }
             else
             {
@@ -4092,7 +4101,7 @@ namespace Gekko
                             }
                             catch
                             {
-                                G.Writeln2("*** ERROR: READ<ser>: Could not understand '" + s + "' as a number for series '" + varname + "' (line " + n + ")");
+                                G.Writeln2("*** ERROR: Could not understand '" + s + "' as a number for series '" + varname + "' (line " + n + ")");
                                 throw new GekkoException();
                             }
                         }
@@ -4122,27 +4131,348 @@ namespace Gekko
 
             readInfo.variables = n;  //does not count emptyWarnings
             readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+            
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;
+            
 
-            ////See almost identical code in readTsd and readCsv
-            //if (merge)
-            //{
-            //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-            //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-            //}
-            //else
-            //{
-                readInfo.startPerResultingBank = readInfo.startPerInFile;
-                readInfo.endPerResultingBank = readInfo.endPerInFile;
-            //}
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
+        }
 
-            //if (firstYearWarnings > 0) G.Writeln("+++ WARNING: " + firstYearWarnings + " variables had data before databank time period (data skipped)");
+        public static void ReadAremos(Databank databank, ReadInfo readInfo, string fileLocal)
+        {
 
-            //readInfo.databank.info1 = readInfo.info1;
-            //readInfo.databank.date = readInfo.date;
-            //readInfo.databank.FileNameWithPath = readInfo.fileName;
+            // AREMOS dump format
+
+
+            /*
+            
+            The following is an AREMOS procedure to dump all banks listed (here: abase, arsbased, ...)
+            
+            -------------------------------------------------------------------
+            procedure dump1 list m;                    !navne uden .bnk extension
+              set report columns 35 decimals 20;
+              set databank limit 25000;                !hold øje med at der ikke er nogen 'Search truncated by limit'
+              for i = #m;
+                close *; clear;
+                open #i;
+                dump * #i|.dmp;
+                close *; clear;
+              end;
+            end;
+
+            list banker = abase, arsbased, dbase, dbasemd, justbyt, KADAM, kadamaar, kadamk, kadamkaar, knrsup, matis, matisk, t5, testdump;
+            dump1 #banker; 
+            -------------------------------------------------------------------
+
+            In Gekko:
+
+            -------------------------------------------------------------------
+            reset;
+
+            global:#i = abase, arsbased, dbase, dbasemd, justbyt, KADAM, kadamaar, kadamk, kadamkaar, matis, matisk, t5;
+
+            time 1900 2500;
+            for string %i = #i;
+              clear work;
+              import<aremos>{%i}.dmp;
+              write {%i};
+            end;
+            -------------------------------------------------------------------
+
+            The format looks like this from AREMOS:
+             
+             SERIES<ANNUAL
+             90 120 > X.A
+              =              1.00000000000000000000, ...
+                             1.00000000000000000000;
+
+             SERIES<QUARTERLY
+             90Q1 120Q4 > X.Q
+              =              4.00000000000000000000, ...
+                             4.00000000000000000000;
+
+             SERIES<MONTHLY
+             90M1 120M12 > X.M
+              =             12.00000000000000000000, ...
+                            12.00000000000000000000;
+
+             MATRIX M1.NULL  =
+                [              1.00000000000000000000,
+                               2.00000000000000000000 ] ||
+                [              3.00000000000000000000,
+                               4.00000000000000000000 ];
+             
+             LIST M2.NULL
+              = A,B,C
+             ;
+
+             * 
+             * 
+             * */
+
+            int emptyWarnings = 0;
+            int firstYearWarnings = 0;
+
+            int matrixError = 0;
+
+            DateTime dt1 = DateTime.Now;
+
+            int variableCounter = 0;
+
+
+            char[] c = new char[] { ' ' };
+            double[] tempArray = new double[10000];
+
+            int n = 0;
+
+            int year1 = int.MaxValue;
+            int year2 = int.MinValue;
+
+            string txt = Program.GetTextFromFileWithWait(fileLocal);
+            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanksSkipNewlines(txt, 10, null, null, null, null);
+                         
+            int nSeries = 0;
+            int nList = 0;
+
+            for (int i = 0; i < tokens.storage.Count; i++)
+            {
+
+                if (G.Equal(tokens[i].s, "matrix"))
+                {
+                    matrixError++;
+                }
+                else if (G.Equal(tokens[i].s, "series"))
+                {
+                    nSeries++;
+
+                    if (tokens[i + 1].s != "<")
+                    {
+                        G.Writeln2("*** ERROR: Expected '<', " + tokens[i + 1].LineAndPosText());
+                        throw new GekkoException();
+                    }
+
+                    string freq2 = tokens[i + 2].s;
+                    EFreq freq = EFreq.A;
+                    if (G.Equal(freq2, "annual")) freq = EFreq.A;
+                    else if (G.Equal(freq2, "quarterly")) freq = EFreq.Q;
+                    else if (G.Equal(freq2, "monthly")) freq = EFreq.M;
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected 'ANNUAL', 'QUARTERLY' or 'MONTHLY', " + tokens[i + 2].LineAndPosText());
+                        throw new GekkoException();
+                    }
+
+                    GekkoTime gt1 = GekkoTime.tNull;
+                    GekkoTime gt2 = GekkoTime.tNull;
+                    int offset = 0;
+                    if (tokens[i + 4].leftblanks == 0 && tokens[i + 6].leftblanks == 0)
+                    {
+                        offset = 2;
+                        string t1 = tokens[i + 3].s + tokens[i + 4].s;
+                        gt1 = G.FromStringToDate(t1);
+                        string t2 = tokens[i + 5].s + tokens[i + 6].s;
+                        gt2 = G.FromStringToDate(t2);
+                    }
+                    else
+                    {
+                        string t1 = tokens[i + 3].s;
+                        gt1 = G.FromStringToDate(t1);
+                        string t2 = tokens[i + 4].s;
+                        gt2 = G.FromStringToDate(t2);
+                    }
+
+                    year1 = Math.Min(year1, gt1.super);
+                    year2 = Math.Max(year2, gt2.super);
+
+                    if (tokens[i + 5 + offset].s != ">")
+                    {
+                        G.Writeln2("*** ERROR: Expected '>', " + tokens[i + 5 + offset].LineAndPosText());
+                        throw new GekkoException();
+                    }
+
+                    string name1 = tokens[i + 6 + offset].s;
+                    
+                    if (tokens[i + 7 + offset].s != ".")
+                    {
+                        G.Writeln2("*** ERROR: Expected '.', " + tokens[i + 7 + offset].LineAndPosText());
+                        throw new GekkoException();
+                    }
+                    string name2 = tokens[i + 8 + offset].s;
+
+                    string name = name1;
+                    if (!G.Equal(name2, "null"))
+                    {
+                        if (!G.Equal(name2, G.GetFreq(freq)))
+                        {
+                            //for instance quarterly x.sol (not x.q)
+                            G.Writeln2("+++ WARNING: Changed " + name1 + "." + name2 + " into " + name1 + "_" + name2 + "!" + G.GetFreq(freq));
+                            name += "_" + name2;
+                        }
+                    }
+                    name = name + Globals.freqIndicator + G.GetFreq(freq);
+                    Series ts = new Series(freq, name);
+                    if (databank.ContainsIVariable(name))
+                    {
+                        G.Writeln2("*** ERROR: Dublet series name ('" + name + "')");
+                        throw new GekkoException();
+                    }
+                    databank.AddIVariable(name, ts);
+
+                    if (tokens[i + 9 + offset].type == ETokenType.QuotedString)
+                    {
+                        ts.meta.label = G.StripQuotes(tokens[i + 9 + offset].s);
+                        offset++;                        
+                    }
+
+                    if (tokens[i + 9 + offset].type == ETokenType.QuotedString)
+                    {
+                        ts.meta.source = G.StripQuotes(tokens[i + 9 + offset].s);
+                        offset++;
+                    }
+
+                    if (tokens[i + 9 + offset].s != "=")
+                    {
+                        G.Writeln2("*** ERROR: Expected '=', " + tokens[i + 9 + offset].LineAndPosText());
+                        throw new GekkoException();
+                    }
+
+                    int counter = -1;
+
+                    int state = 0;
+                    for (int j = i + 10 + offset; j < tokens.storage.Count; j++)
+                    {
+                        if (state == 0)
+                        {
+                            bool minus = false;
+                            if (G.Equal(tokens[j].s, "-"))
+                            {
+                                minus = true;
+                                j++;
+                            }
+
+                            double d = double.NaN;
+                            if (G.Equal(tokens[j].s, "m"))
+                            {
+                                //do nothing, it is a missing value.
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    d = double.Parse(tokens[j].s, System.Globalization.CultureInfo.InvariantCulture);
+                                    counter++;
+                                    if (minus) d = -d;
+                                    ts.SetData(gt1.Add(counter), d);
+                                }
+                                catch
+                                {
+                                    G.Writeln2("*** ERROR: Could not understand '" + tokens[j].s + "' as a number, " + tokens[j].LineAndPosText());
+                                    throw new GekkoException();
+                                }
+                            }
+                            state = 1;
+                        }
+                        else
+                        {
+                            if (tokens[j].s == ";")
+                            {
+                                i = j;
+                                break;
+                            }
+                            else if (tokens[j].s != ",")
+                            {
+                                G.Writeln2("*** ERROR: Expected ',', " + tokens[j].LineAndPosText());
+                                throw new GekkoException();
+                            }
+                            state = 0;
+                        }
+                    }
+                }
+                else if (G.Equal(tokens[i].s, "list"))
+                {                    
+                    nList++;
+
+                    int offset = 0;
+
+                    string name1 = tokens[i + 1 + offset].s;
+                    if (tokens[i + 2 + offset].s != ".")
+                    {
+                        G.Writeln2("*** ERROR: Expected '.', " + tokens[i + 2 + offset].LineAndPosText());
+                        throw new GekkoException();
+                    }
+                    string name2 = tokens[i + 3 + offset].s;
+
+                    string name = name1;
+                    if (!G.Equal(name2, "null"))
+                    {
+                        G.Writeln2("*** ERROR: Expected '.', " + tokens[i + 7 + offset].LineAndPosText());
+                    }
+                    name = Globals.symbolCollection + name;
+
+                    List lst = new List();
+                    
+                    if (databank.ContainsIVariable(name))
+                    {
+                        G.Writeln2("*** ERROR: Dublet list name ('" + name + "')");
+                        throw new GekkoException();
+                    }
+                    databank.AddIVariable(name, lst);
+
+                    if (tokens[i + 4 + offset].s != "=")
+                    {
+                        G.Writeln2("*** ERROR: Expected '=', " + tokens[i + 4 + offset].LineAndPosText());
+                        throw new GekkoException();
+                    }
+
+                    int counter = -1;
+
+                    int state = 0;
+                    for (int j = i + 5 + offset; j < tokens.storage.Count; j++)
+                    {
+                        if (state == 0)
+                        {
+                            counter++;
+                            lst.list.Add(new ScalarString(tokens[j].s));
+                            state = 1;
+                        }
+                        else
+                        {
+                            if (tokens[j].s == ";")
+                            {
+                                i = j;
+                                break;
+                            }
+                            else if (tokens[j].s != ",")
+                            {
+                                G.Writeln2("*** ERROR: Expected ',', " + tokens[j].LineAndPosText());
+                                throw new GekkoException();
+                            }
+                            state = 0;
+                        }
+                    }
+                }
+            }
+
+            G.Writeln();
+            if (nSeries > 0) G.Writeln(nSeries + " series imported");
+            if (nList > 0) G.Writeln(nList + " lists imported");
+
+            if (matrixError > 0)
+            {
+                G.Writeln("+++ NOTE: Matrix not yet implemented (" + matrixError + " statements ignored)");
+            }
+
+            n = nSeries + nList;
+            
+            readInfo.startPerInFile = year1;
+            readInfo.endPerInFile = year2;
+            readInfo.nanCounter = 0;
+
+            readInfo.variables = n;  //does not count emptyWarnings
+            readInfo.time = (DateTime.Now - dt1).TotalMilliseconds;
+
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;
 
         }
 
@@ -38361,6 +38691,12 @@ namespace Gekko
                 //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
                 foreach (SamHelper sh in items)
                 {
+
+                    if (sh.series1.name.ToLower().Contains("d07002120"))
+                    {
+
+                    }
+
                     count++;
                     Series ts = sh.series1;
                     Series tsGrund = sh.series2;
@@ -38368,24 +38704,22 @@ namespace Gekko
                     double max = 0d;
                     double maxAbs = 0d;
                     double maxRel = 0d;
-
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                    
+                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts)))
                     {
                         double varDelta = 0;
                         double varPch = 0;
 
                         double var1 = ts.GetDataSimple(t);
                         double var2 = tsGrund.GetDataSimple(t);
+
+                        //we check first both 0, both M, one non-M && one M.
+
                         if (var1 == 0 && var2 == 0d)
                         {
                             varPch = 0d;
                             varDelta = var1 - var2;
-                        }
-                        else if (var2 == 0)
-                        {
-                            varPch = 1e+100d;
-                            varDelta = var1 - var2;
-                        }
+                        }                        
                         else if (double.IsNaN(var1) && double.IsNaN(var2))
                         {
                             //this is considered okay
@@ -38397,6 +38731,11 @@ namespace Gekko
                             //this is considered a problem
                             varPch = 1e+100d;
                             varDelta = 1e+100;
+                        }
+                        else if (var2 == 0)
+                        {
+                            varPch = 1e+100d;
+                            varDelta = var1 - var2;
                         }
                         else
                         {
@@ -38463,7 +38802,7 @@ namespace Gekko
                             else break;
                         }
                     }
-                    
+
                     if (order)
                     {
                         ordered.Add(-max1, sh);
@@ -38548,7 +38887,7 @@ namespace Gekko
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts)))
                     {
                         double varLevel = 0;
                         double varLevel2 = 0;
@@ -38601,7 +38940,29 @@ namespace Gekko
             }
         }
 
-        
+        private static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, Series ts)
+        {
+            AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(tStart, tEnd);
+            GekkoTime tStart2 = GekkoTime.tNull;
+            GekkoTime tEnd2 = GekkoTime.tNull;
+            if (ts.freq == EFreq.A)
+            {
+                tStart2 = dates.t1Annual;
+                tEnd2 = dates.t2Annual;
+            }
+            else if (ts.freq == EFreq.Q)
+            {
+                tStart2 = dates.t1Quarterly;
+                tEnd2 = dates.t2Quarterly;
+            }
+            else if (ts.freq == EFreq.M)
+            {
+                tStart2 = dates.t1Monthly;
+                tEnd2 = dates.t2Monthly;
+            }
+            return new Tuple<GekkoTime, GekkoTime>(tStart2, tEnd2);
+        }
+
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            
@@ -39732,7 +40093,8 @@ namespace Gekko
         Flat,
         Xls,
         Xlsx,
-        Gdx
+        Gdx,
+        Aremos
     }
 
     public enum EOpenType

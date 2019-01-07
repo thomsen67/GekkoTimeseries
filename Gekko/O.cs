@@ -2155,7 +2155,8 @@ namespace Gekko
             }
             if (!allowSigil && s.Contains(Globals.symbolCollection))
             {
-                G.Writeln2("*** ERROR: Collection symbol (" + Globals.symbolCollection + ") not accepted, use {#x} instead of #x");
+                G.Writeln2("*** ERROR: Collection symbol (" + Globals.symbolCollection + ") not accepted, you may use {#x} instead of #x");
+                G.Writeln("    If you are concatenating lists, use '+' to add the elements of one list to another", Color.Red);
                 throw new GekkoException();
             }
             if (!allowFreq && s.Contains(Globals.freqIndicator))
@@ -6129,6 +6130,7 @@ namespace Gekko
             public string opt_ref = null;
             public string opt_array = null;
             public string opt_flat = null;
+            public string opt_aremos = null;
             public string type = null;  //read or import
 
             public P p = null;
@@ -6185,6 +6187,7 @@ namespace Gekko
                 if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
                 if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
                 if (G.Equal(this.opt_flat, "yes")) hlp.Type = EDataFormat.Flat;
+                if (G.Equal(this.opt_aremos, "yes")) hlp.Type = EDataFormat.Aremos;
                 if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
 
                 hlp.gdxopt = this.opt_gdxopt;

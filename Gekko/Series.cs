@@ -407,42 +407,56 @@ namespace Gekko
             int newFirst = Math.Max(this.meta.firstPeriodPositionInArray, indexStart);
             int newLast = Math.Min(this.meta.lastPeriodPositionInArray, indexEnd);
 
-            if (newFirst > newLast)
+            if (this.data.dataArray == null)
             {
-                //the truncate window is completely before or after the data window
-                //wipe all the data, and set the sample to 1 length
-                for (int i = 0; i < this.data.dataArray.Length; i++)
-                {
-                    this.data.dataArray[i] = double.NaN;
-                }
-
-                SetNullPeriod();
+                //do nothing, could be a series defined like x = m(); 
+                //in that case, this.meta.firstPeriodPositionInArray and this.meta.lastPeriodPositionInArray will be strange too
             }
             else
             {
-                //the following two must be inside existing timeseries array
-                this.meta.firstPeriodPositionInArray = newFirst;
-                this.meta.lastPeriodPositionInArray = newLast;
-
-                //NOTE: after this, the anchor position may be outside first/lastPeriodPositionInArray. 
-                //But this should not be a problem: it is only a hook
-                //that translates a date into an index and vice versa.
-
-                //When Truncate() is used for writing databanks, the timeseries
-                //will be Trim()'ed anyway, so these missings will disappear. But since the method
-                //could be used for other purposes later on, we set the values to missings explicitly
-                //The time loss is very small, and usually WRITE is not time-truncated anyway.
-
-                for (int i = 0; i < this.meta.firstPeriodPositionInArray; i++)
+                if (newFirst > newLast)
                 {
-                    this.data.dataArray[i] = double.NaN;
+                    //the truncate window is completely before or after the data window
+                    //wipe all the data, and set the sample to 1 length
+
+                    if (this.data == null || this.data.dataArray == null)
+                    {
+
+                    }
+
+                    for (int i = 0; i < this.data.dataArray.Length; i++)
+                    {
+                        this.data.dataArray[i] = double.NaN;
+                    }
+
+                    SetNullPeriod();
                 }
-                for (int i = this.meta.lastPeriodPositionInArray + 1; i < this.data.dataArray.Length; i++)
+                else
                 {
-                    this.data.dataArray[i] = double.NaN;
+                    //the following two must be inside existing timeseries array
+                    this.meta.firstPeriodPositionInArray = newFirst;
+                    this.meta.lastPeriodPositionInArray = newLast;
+
+                    //NOTE: after this, the anchor position may be outside first/lastPeriodPositionInArray. 
+                    //But this should not be a problem: it is only a hook
+                    //that translates a date into an index and vice versa.
+
+                    //When Truncate() is used for writing databanks, the timeseries
+                    //will be Trim()'ed anyway, so these missings will disappear. But since the method
+                    //could be used for other purposes later on, we set the values to missings explicitly
+                    //The time loss is very small, and usually WRITE is not time-truncated anyway.
+
+                    for (int i = 0; i < this.meta.firstPeriodPositionInArray; i++)
+                    {
+                        this.data.dataArray[i] = double.NaN;
+                    }
+                    for (int i = this.meta.lastPeriodPositionInArray + 1; i < this.data.dataArray.Length; i++)
+                    {
+                        this.data.dataArray[i] = double.NaN;
+                    }
                 }
+                this.SetDirty(true);
             }
-            this.SetDirty(true);
         }
 
         private void SetNullPeriod()

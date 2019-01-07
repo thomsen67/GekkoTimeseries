@@ -361,6 +361,8 @@ namespace Gekko
         private GekkoTime _EndDate;
         private EFreq _freq;
 
+        public GekkoTimeIterator(Tuple<GekkoTime, GekkoTime> tuple) : this(tuple.Item1, tuple.Item2) { }       
+
         public GekkoTimeIterator(GekkoTime startDate, GekkoTime endDate)
         {
             _StartDate = startDate;

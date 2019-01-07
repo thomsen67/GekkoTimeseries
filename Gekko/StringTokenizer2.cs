@@ -1026,6 +1026,24 @@ namespace Gekko
             return GetTokensWithLeftBlanks(s, emptyTokensAtEnd, null, null, null, null);
         }
 
+
+
+
+        public static TokenList GetTokensWithLeftBlanksSkipNewlines(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
+        {
+            TokenList tokens2 = GetTokensWithLeftBlanks(s, emptyTokensAtEnd, commentsClosed, commentsNonClosed, commentsClosedOnlyStartOfLine, commentsNonClosedOnlyStartOfLine);
+            TokenList tokens = new TokenList();
+            foreach (TokenHelper th in tokens2.storage)
+            {
+                if (th.type == ETokenType.EOL || th.s == G.NL)
+                {
+                    continue;  //will also delete blanks before NL, these could be added to the next token if important
+                }
+                tokens.storage.Add(th);
+            }
+            return tokens;
+        }
+
         public static TokenList GetTokensWithLeftBlanks(string s, int emptyTokensAtEnd, List<Tuple<string, string>> commentsClosed, List<string> commentsNonClosed, List<Tuple<string, string>> commentsClosedOnlyStartOfLine, List<string> commentsNonClosedOnlyStartOfLine)
         {
             StringTokenizer2 tok = new StringTokenizer2(s, false, false);

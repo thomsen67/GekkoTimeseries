@@ -599,6 +599,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_XLS;
     ASTOPT_STRING_XLSX;
 	ASTOPT_STRING_FLAT;
+	ASTOPT_STRING_AREMOS;
 	ASTOPT_VAL_WIDTH;
 	ASTOPT_VAL_DEC;
 	ASTOPT_VAL_NWIDTH;
@@ -3095,6 +3096,7 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
+						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						    ;
 
 							
