@@ -38690,13 +38690,7 @@ namespace Gekko
                 int count = 0;
                 //There is a little bit unnecessary overhead here, if compareType is "alphabetical". But never mind.
                 foreach (SamHelper sh in items)
-                {
-
-                    if (sh.series1.name.ToLower().Contains("d07002120"))
-                    {
-
-                    }
-
+                {                    
                     count++;
                     Series ts = sh.series1;
                     Series tsGrund = sh.series2;

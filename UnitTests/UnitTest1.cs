@@ -16596,6 +16596,35 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ReplaceTimeseries()
+        {            
+            I("RESET;");
+            I("TIME 2001 2003;");            
+            I("SERIES x = (1, m(), 3);");
+            I("SERIES y1 = replace(x, m(), 100);");
+            _AssertSeries(First(), "y1", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y1", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y1", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "y1", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "y1", 2004, double.NaN, sharedDelta);
+            I("SERIES y2 = replace(x, 3, 100);");
+            _AssertSeries(First(), "y2", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y2", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y2", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y2", 2003, 100d, sharedDelta);
+            _AssertSeries(First(), "y2", 2004, double.NaN, sharedDelta);
+            I("SERIES<2000 2004> y3 = replace(x, m(), 100);");
+            _AssertSeries(First(), "y3", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y3", 2000, 100d, sharedDelta);
+            _AssertSeries(First(), "y3", 2001, 1d, sharedDelta);
+            _AssertSeries(First(), "y3", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "y3", 2003, 3d, sharedDelta);
+            _AssertSeries(First(), "y3", 2004, 100d, sharedDelta);
+            _AssertSeries(First(), "y3", 2005, double.NaN, sharedDelta);
+        }
+
+
+        [TestMethod]
         public void _Test_HPFilter()
         {
             UData u = null;

@@ -6868,6 +6868,11 @@ namespace Gekko
                 Series oldSeries = O.ConvertToSeries(ivOld) as Series;
                 Series lhs = O.ConvertToSeries(ivLhs) as Series;
 
+                //if (oldSeries.name.ToLower().Contains("d74200000001"))
+                //{
+
+                //}
+
                 Series newSeriesTemp = oldSeries.DeepClone(null) as Series;  //brand new object, not present in Work (yet)                
 
                 ESmoothTypes type = ESmoothTypes.Spline;  //what is the default in AREMOS??

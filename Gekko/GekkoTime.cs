@@ -165,6 +165,8 @@ namespace Gekko
 
                 if (freq == EFreq.A)
                 {
+                    //From Q or M to A freq is just the annual part of the date
+
                     if (t1.freq == EFreq.Q)
                     {
                         tt1 = new GekkoTime(EFreq.A, t1.super, 1);  
@@ -181,12 +183,14 @@ namespace Gekko
                 {
                     if (t1.freq == EFreq.A)
                     {
+                        //from A to Q sets q1 for start year and q4 for end year
                         tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
 
                     else if (t1.freq == EFreq.M)
                     {
+                        //from M to Q finds corresponding Q
                         tt1 = new GekkoTime(EFreq.Q, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
                     }
@@ -195,11 +199,13 @@ namespace Gekko
                 {
                     if (t1.freq == EFreq.A)
                     {
+                        //from A to M sets m1 for start year, and m12 for end year
                         tt1 = new GekkoTime(EFreq.M, t1.super, 1);
                         tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
                     }                
                     else if (t1.freq == EFreq.Q)
                     {
+                        //from Q to M sets mx for start q, and my for end q
                         tt1 = new GekkoTime(EFreq.M, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
                         tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
                     }

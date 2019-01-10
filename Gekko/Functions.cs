@@ -2806,7 +2806,7 @@ namespace Gekko
         public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, IVariable max)
         {
             return replace(smpl, ths, x2, x3, false, max);
-        }
+        }                
 
         public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3)
         {
@@ -2816,7 +2816,7 @@ namespace Gekko
         public static IVariable replace(GekkoSmpl smpl, IVariable ths, IVariable x2, IVariable x3, bool isInside, IVariable max)
         {
             int imax = O.ConvertToInt(max);
-            
+
             if (ths.Type() == EVariableType.String)
             {
                 if (isInside)
@@ -2870,9 +2870,61 @@ namespace Gekko
                             }
                         }
                     }
-                    if (!hit) tmp.Add(iv);                    
+                    if (!hit) tmp.Add(iv);
                 }
                 return tmp;
+            }
+            else if (ths.Type() == EVariableType.Series)
+            {
+                if (isInside == false && max.ConvertToVal() == 0d)
+                {
+                    Series ths_series = ths as Series;
+                    
+                    //good
+                    double d2 = O.ConvertToVal(x2);
+                    double d3 = O.ConvertToVal(x3);
+
+                    Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+
+                    if (ths_series.type == ESeriesType.ArraySuper)
+                    {
+                        G.Writeln2("*** ERROR: Replace(): you cannot use array-series as argument");
+                        throw new GekkoException();
+                    }
+
+                    if (ths_series.type == ESeriesType.Timeless)
+                    {
+                        G.Writeln2("*** ERROR: Replace(): you cannot use timeless series as argument");
+                        throw new GekkoException();
+                    }
+
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        //will only replace for current sample, not outside of it! So PRT dif(replace(x, m(), 1)) may spring a surprise since relpace does not replace before sample start. But not intended for that though.
+                        double d = ths_series.GetDataSimple(t);
+                        if (double.IsNaN(d2) && double.IsNaN(d))
+                        {
+                            lhs.SetData(t, d3);
+                        }
+                        else if (d == d2)
+                        {
+                            lhs.SetData(t, d3);
+                        }
+                        else
+                        {
+                            //replicate
+                            lhs.SetData(t, d);
+                        }
+                    }
+
+                    return lhs;
+
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Replace(): you cannot use series type with 'inside' or 'max'");
+                    throw new GekkoException();
+                }
             }
             else
             {
