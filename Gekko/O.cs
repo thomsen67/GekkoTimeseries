@@ -1761,11 +1761,11 @@ namespace Gekko
             return db;
         }
 
-        public static IVariable RemoveIVariableFromString(string fullname)
+        public static IVariable RemoveIVariableFromString(string fullname, bool reportError)
         {
             string dbName, varName, freq; string[] indexes;
             O.Chop(fullname, out dbName, out varName, out freq, out indexes);
-            IVariable iv = O.RemoveIVariableFromString(dbName, varName, freq, indexes);
+            IVariable iv = O.RemoveIVariableFromString(dbName, varName, freq, indexes, reportError);
             return iv;
         }
 
@@ -2014,21 +2014,10 @@ namespace Gekko
         //    return iv;
         //}
 
-        public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes)
+        public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes, bool reportError)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
-
-            //Databank bank = null;
-            //if (dbName == null)
-            //{
-            //    LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varName);  //varname is always without freq 
-            //    bank = HandleLocalGlobalBank(lg);
-            //}
-            //else
-            //{
-            //    bank = Program.databanks.GetDatabank(dbName, true);
-            //}
-
+                        
             Databank bank = null;
             if (dbName == null)
             {
@@ -2045,8 +2034,16 @@ namespace Gekko
 
             if (iv == null)
             {
-                G.Writeln2("*** ERROR: Variable with the name " + nameWithFreq + " does not exist in '" + dbName + "' databank");
-                throw new GekkoException();
+                if (reportError)
+                {
+                    G.Writeln2("*** ERROR: Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    G.Writeln("+++ WARNING: Variable " + dbName + Globals.symbolBankColon + nameWithFreq + " does not exist for deletion");
+                    return iv;
+                }
             }
 
             if (G.Chop_HasSigil(nameWithFreq))
@@ -6128,6 +6125,7 @@ namespace Gekko
             public string opt_prim = null;  //obsolete
             public string opt_first = null;
             public string opt_ref = null;
+            public string opt_respect = null;
             public string opt_array = null;
             public string opt_flat = null;
             public string opt_aremos = null;
@@ -6137,6 +6135,9 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
+
+                GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
+
                 ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
                 hlp.t1 = this.t1;
                 hlp.t2 = this.t2;
@@ -7657,8 +7658,8 @@ namespace Gekko
 
         public class Copy
         {
-            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
+            public GekkoTime t1 = GekkoTime.tNull;
+            public GekkoTime t2 = GekkoTime.tNull;
             public string opt_respect = null;
             public List names1 = null;
             public List names2 = null;
@@ -9579,10 +9580,14 @@ namespace Gekko
             public string opt_gcm = null;
             public string opt_flat = null;
             public string opt_cols = null;
+            public string opt_respect = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
+
+                GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
+
                 Program.Write(this);
             }
         }

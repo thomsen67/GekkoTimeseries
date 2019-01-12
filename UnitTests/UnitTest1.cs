@@ -4286,7 +4286,8 @@ namespace UnitTests
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
 
             I("SERIES<2000 2005> x4 = 12;");
-            I("COPY <2002 2003 respect> x4 to b10:x2;");
+            //I("COPY <2002 2003 respect> x4 to b10:x2;");
+            I("COPY <2002 2003> x4 to b10:x2;");
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, 11d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 12d, sharedDelta);
@@ -4303,8 +4304,9 @@ namespace UnitTests
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
 
             I("LIST #m = ('x1',);");
-            I("COPY <2002 2003 respect> #m to #m2;");
-            
+            //I("COPY <2002 2003 respect> #m to #m2;");
+            I("COPY <2002 2003> #m to #m2;");
+
             //TODO: test that the copied series is truncated
             //TODO: also test array-series.
 
@@ -7299,7 +7301,8 @@ namespace UnitTests
             I("TIME 2010 2011;");
             I("create a1;");
             I("SERIES a1 = (111, 112);");
-            I("COPY<2011 2011 respect> a1 TO b1;");
+            //I("COPY<2011 2011 respect> a1 TO b1;");
+            I("COPY<2011 2011> a1 TO b1;");
             _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
             _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
             _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
@@ -7311,7 +7314,8 @@ namespace UnitTests
             //I("create a1, a2;");
             I("SERIES a1 = (111, 112);");
             I("SERIES a2 = (222, 223);");
-            I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
+            //I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
+            I("COPY<2011 2011>  a1, a2 TO b1, b2;");
             _AssertSeries(First(), "b1", 2009, double.NaN, sharedDelta);
             _AssertSeries(First(), "b1", 2010, double.NaN, sharedDelta);
             _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
@@ -7330,7 +7334,8 @@ namespace UnitTests
             I("SERIES a1 = (111, 112);");
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
-            I("COPY<2011 2011 respect>  a1 TO b1;");
+            //I("COPY<2011 2011 respect>  a1 TO b1;");
+            I("COPY<2011 2011>  a1 TO b1;");
             _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
             _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
             _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
@@ -7345,7 +7350,8 @@ namespace UnitTests
             I("TIME 2009 2012;");
             I("SERIES b1 = 777;");
             I("SERIES b2 = 888;");
-            I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
+            //I("COPY<2011 2011 respect>  a1, a2 TO b1, b2;");
+            I("COPY<2011 2011>  a1, a2 TO b1, b2;");
             _AssertSeries(First(), "b1", 2009, 777d, sharedDelta);
             _AssertSeries(First(), "b1", 2010, 777d, sharedDelta);
             _AssertSeries(First(), "b1", 2011, 112d, sharedDelta);
@@ -8300,11 +8306,16 @@ namespace UnitTests
             _AssertSeries(First(), "xx8", 2010, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx8", 2011, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx8", 2012, 8d + 1d, sharedDelta);
-            I("SERIES<2009 2012> xx9 = 123, 124, 125, 126;");
-            I("SERIES<2012 2012> dif(xx9) = dif(a) + dif(dif(a[-1]));");  //see above
-            _AssertSeries(First(), "xx9", 2010, 124d, sharedDelta);
-            _AssertSeries(First(), "xx9", 2011, 125d, sharedDelta);
-            _AssertSeries(First(), "xx9", 2012, 125d + 8d + 1d, sharedDelta);
+            I("SERIES<2009 2012> xx9 = (123, 124, 125, 126);");
+
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("SERIES<2012 2012> dif(xx9) = dif(a) + dif(dif(a[-1]));");  //see above
+                _AssertSeries(First(), "xx9", 2010, 124d, sharedDelta);
+                _AssertSeries(First(), "xx9", 2011, 125d, sharedDelta);
+                _AssertSeries(First(), "xx9", 2012, 125d + 8d + 1d, sharedDelta);
+            }
+
 
             //I("SERIES ");
         }

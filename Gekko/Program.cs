@@ -15272,7 +15272,7 @@ namespace Gekko
             {
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //no search
                 if (type != EVariableType.Var && type !=  iv.Type()) continue; //skip it                
-                O.RemoveIVariableFromString(output.s1);  //get it out of dictionary
+                O.RemoveIVariableFromString(output.s1, true);  //get it out of dictionary
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
             }
 
@@ -15296,7 +15296,7 @@ namespace Gekko
             SearchOptions options = new SearchOptions();
             if (ignoreErrors) options.ignoreErrors = true;
             List<ToFrom> outputs = SearchFromTo(o.names1, o.names2, o.opt_frombank, o.opt_tobank, EWildcardSearchType.Copy, options);
-                        
+
             int nIgnores = 0;
             int nOk = 0;
 
@@ -15316,15 +15316,7 @@ namespace Gekko
                 }
             }
 
-            GekkoSmplSimple truncate = null;
-            if (G.Equal(o.opt_respect, "yes"))
-            {
-                truncate = new GekkoSmplSimple(o.t1, o.t2);
-            }
-            else
-            {
-                //COPY<2010 2020> is just ignored regarding time period, <respect> must be used.
-            }
+            GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, o.opt_respect);
 
             foreach (ToFrom output in outputs)
             {
@@ -15344,7 +15336,7 @@ namespace Gekko
                     }
                 }
                 else
-                {                    
+                {
                     if (type != EVariableType.Var && type != iv.Type()) continue; //skip it
                 }
 
@@ -15381,6 +15373,32 @@ namespace Gekko
 
             G.Writeln2("Copied data for " + nOk + " variables" + si);
 
+        }
+
+        public static GekkoSmplSimple HandleRespectPeriod(GekkoTime t1, GekkoTime t2, string respect)
+        {
+            GekkoSmplSimple truncate = null;
+            if (t1.IsNull())
+            {
+                if (G.Equal(respect, "yes"))
+                {
+                    truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+                }
+            }
+            else
+            {
+                if (G.Equal(respect, "yes"))
+                {
+                    G.Writeln2("*** ERROR: You cannot mix dates and 'respect' in the option field");
+                    throw new GekkoException();
+                    //truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+                }
+                else
+                {
+                    truncate = new GekkoSmplSimple(t1, t2);
+                }
+            }
+            return truncate;
         }
 
         public static void AddIfInRange(string bankname, string freqname, string s, string s1, string s2, List<string> m)
@@ -17274,7 +17292,7 @@ namespace Gekko
                         string lhs = lhsTokensGekko.ToStringTrim();
                         string rhs = rhsTokensGekko.ToStringTrim();
                                                 
-                        if (eqCounter > 10 || lhs.Contains("*"))
+                        if (false && (eqCounter > 10 || lhs.Contains("*")))
                         {
                             //skip
                         }
@@ -17318,22 +17336,48 @@ namespace Gekko
                         }
 
                         string varname = null;
-                        varname = lhsTokensGams.subnodes[0].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
 
-                        if (lhsTokensGams.subnodes[1] != null && lhsTokensGams.subnodes[1].SubnodesType() == "(")
+                        string lineText = null;
+                        for (int ii = 0; ii < lhsTokensGams.subnodes.Count(); ii++)
                         {
-                            if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                            if (lhsTokensGams.subnodes[ii].type == ETokenType.Word)
                             {
-                                varname = lhsTokensGams.subnodes[1].subnodes[0].ToStringTrim();
-                            }
-                            else if (G.Equal(varname, "sum"))
-                            {
-                                varname = null; //ignore it
+                                varname = lhsTokensGams.subnodes[ii].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
+                                lineText = lhsTokensGams.subnodes[ii].LineAndPosText();
+                                if (G.Equal(varname, "sum"))
+                                {
+                                    varname = null; //ignore it
+                                }
+                                else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                                {
+                                    varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
+                                    lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
+                                }
                             }
                         }
 
+                        //varname = lhsTokensGams.subnodes[0].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
+
+                        //if (lhsTokensGams.subnodes[1] != null && lhsTokensGams.subnodes[1].SubnodesType() == "(")
+                        //{
+                        //    if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                        //    {
+                        //        varname = lhsTokensGams.subnodes[1].subnodes[0].ToStringTrim();
+                        //    }
+                        //    else if (G.Equal(varname, "sum"))
+                        //    {
+                        //        varname = null; //ignore it
+                        //    }
+                        //}
+
                         if (varname != null)
                         {
+                            if (!G.IsSimpleToken(varname))
+                            {
+                                G.Writeln2("+++ WARNING: Reading model: could not identify variable from this (" + lineText + "):");
+                                G.Writeln("             " + lhsTokensGams.ToString(), Color.Orange);
+                            }
+
                             if (xx.ContainsKey(varname))
                             {
                                 xx[varname].Add(e);  //can have more than one eq with same lhs variable
@@ -25690,9 +25734,9 @@ namespace Gekko
 
             for (int i = 0; i < list.Count; i++)
             {
-                string var = list[i].s1;         
-                O.RemoveIVariableFromString(var);
-                counter++;
+                string var = list[i].s1;
+                IVariable iv = O.RemoveIVariableFromString(var, false); //just warning
+                if (iv != null) counter++;
             }
             
             if (counter == 0) G.Writeln("Did not delete any variables");

@@ -1563,18 +1563,29 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDATES":
+                    case "ASTDATES_TYPE2":
                         {
                             //what about G.GetStart/EndDate()??
                             //We use  O.GetDateChoices.FlexibleStart and  O.GetDateChoices.FlexibleEnd
                             //These can transform an integer into a quarterly or monthly frequency.
                             //This is only legal/possible for two such dates (from/to).
+
                             string ss1 = node.GetChildCode(0).ToString();
                             string s1 = null;
-                            if (ss1 == null) s1 = "Globals.globalPeriodStart";
+                            if (ss1 == null)
+                            {
+                                if (node.Text == "ASTDATES_TYPE2") s1 = "GekkoTime.tNull";
+                                else s1 = "Globals.globalPeriodStart";
+                            }
                             else s1 = "O.ConvertToDate(" + ss1 + ", O.GetDateChoices.FlexibleStart);" + G.NL;
+
                             string ss2 = node.GetChildCode(1).ToString();
                             string s2 = null;
-                            if (ss2 == null) s2 = "Globals.globalPeriodEnd";
+                            if (ss2 == null)
+                            {
+                                if (node.Text == "ASTDATES_TYPE2") s2 = "GekkoTime.tNull";
+                                else s2 = "Globals.globalPeriodEnd";
+                            }
                             else s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd);" + G.NL;
 
                             if (node?.Parent?.Parent?.Parent?.Text == "ASTASSIGNMENT")

@@ -246,6 +246,7 @@ ASTCOMPARE2;
     ASTDATE;
     ASTDATE;
     ASTDATES;
+	ASTDATES_TYPE2;  //for copy, read/write
     ASTDATES;
     ASTDATESSTATEMENT;
     ASTDATESTATEMENT;
@@ -2505,7 +2506,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
-						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) copyOpt1h*)
+						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES_TYPE2 dates?) copyOpt1h*)
 						  ;
 copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)
 						  | ERROR (EQUAL yesNo)? -> ^(ASTOPT_STRING_ERROR yesNo?)
@@ -3074,7 +3075,7 @@ readHelper:                 READ | IMPORT;
 
 readOpt1:                   ISNOTQUAL
 						  | leftAngle2          readOpt1h* RIGHTANGLE -> readOpt1h*						
-						  | leftAngleNo2 dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES dates?) readOpt1h*
+						  | leftAngleNo2 dates? readOpt1h* RIGHTANGLE -> ^(ASTDATES_TYPE2 dates?) readOpt1h*
                             ;
 
 readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?)
@@ -3294,7 +3295,7 @@ write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarname
 writeHelper:                WRITE | EXPORT;
 writeOpt1:                  ISNOTQUAL
 						  | leftAngle2          writeOpt1h* RIGHTANGLE -> writeOpt1h*
-						  | leftAngleNo2 dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES dates?) writeOpt1h*
+						  | leftAngleNo2 dates? writeOpt1h* RIGHTANGLE ->  ^(ASTDATES_TYPE2 dates?) writeOpt1h*
 						    ;
 
 writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  //all these will fail, just to provide better error messages for WRITE<csv> etc.
