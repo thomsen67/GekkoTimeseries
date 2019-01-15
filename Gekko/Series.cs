@@ -2373,9 +2373,9 @@ namespace Gekko
             mmi.parent = arraySeries;  //The mmi item points to the array-series
             subSeries.mmi = mmi; //the sub-series points to the mmi, this way we can get from the sub-series all the way up to the array-series.                        
         }
-    }
+    }    
 
-    [ProtoContract]
+        [ProtoContract]
     public class SeriesDataInformation
     {
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
@@ -2420,6 +2420,10 @@ namespace Gekko
         public string stamp;                
         [ProtoMember(6)]        
         public string units;
+
+        //the following two are not protobuffed at the moment
+        public bool fixedTimeless = false; //only if the series is timeless type
+        public GekkoTimeSpans fixedNormal = null;  //only for non-timeless types
 
         [ProtoMember(7)]
         public string[] domains = null;

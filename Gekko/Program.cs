@@ -5310,16 +5310,16 @@ namespace Gekko
             // 0                normal timeless    NA
             //
             //
-            // 1                gedim = 1          normal series
+            // 1                gdim = 1           normal series
             //                  timeless
             //
-            // 2                gedim = 2          gdim = 1
+            // 2                gdim = 2           gdim = 1
             //                  timeless
             //
-            //3                 gedim = 3          gdim = 2
+            //3                 gdim = 3           gdim = 2
             //                  timeless
 
-            // gdxdim = gekkodim + (1-istimeless)
+            // gdxdim = gdim + (1-istimeless)
 
             // only complication is that Gekko may mix timeless and non-timeless
             // subseries, maybe that should not be allowed?
@@ -5336,6 +5336,8 @@ namespace Gekko
             int counterParameters = 0;
             int yearMax = int.MinValue;
             int yearMin = int.MaxValue;
+
+            int counterFixed = 0;
 
             EFreq freq = EFreq.A;
             if (G.Equal(Program.options.gams_time_freq, "u")) freq = EFreq.U;
@@ -5647,7 +5649,7 @@ namespace Gekko
                                         }
                                     }
 
-                                    double value = values[gamsglobals.val_level];
+                                    double value = values[gamsglobals.val_level];                                    
 
                                     if (value == Globals.gamsEps)
                                     {
@@ -5673,6 +5675,10 @@ namespace Gekko
                                     if (tt == -12345)
                                     {
                                         ts2.SetTimelessData(value);
+                                        if (GamsIsFixed(values, value))
+                                        {
+                                            ts2.meta.fixedTimeless = true;
+                                        }
                                     }
                                     else
                                     {
@@ -5682,11 +5688,39 @@ namespace Gekko
                                         //TODO
                                         //TODO
 
-
-                                        ts2.SetData(new GekkoTime(freq, tt, 1), value);
+                                        GekkoTime gt = new GekkoTime(freq, tt, 1);
+                                        ts2.SetData(gt, value);
                                         yearMax = Math.Max(tt, yearMax);
                                         yearMin = Math.Min(tt, yearMin);
+
+                                        if (GamsIsFixed(values, value))
+                                        {                                            
+                                            if (ts2.meta.fixedNormal == null) ts2.meta.fixedNormal = new GekkoTimeSpans();
+                                            if (ts2.meta.fixedNormal.data.Count == 0)
+                                            {
+                                                //the very first
+                                                ts2.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
+                                            }
+                                            else
+                                            {
+                                                GekkoTimeSpan gts = ts2.meta.fixedNormal.data[ts2.meta.fixedNormal.data.Count - 1];
+                                                if (gts.tEnd.IsSamePeriod(gt.Add(-1)))
+                                                {
+                                                    gts.tEnd = gt;
+                                                }
+                                                else
+                                                {
+                                                    ts2.meta.fixedNormal.data.Add(new GekkoTimeSpan(gt, gt));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                        }
                                     }
+
+                                    
 
                                     oldDims = dims; //ok to point, dims will be created from scratch at beginning of loop                                 
                                 }  //end of records/dimensions for the variable or parameter
@@ -5754,6 +5788,13 @@ namespace Gekko
             //Anyway, the speed penalty is small anyway.
             databank.Trim();
 
+            if (Globals.runningOnTTComputer) G.Writeln2("FIXED::: " + counterFixed);
+
+        }
+
+        private static bool GamsIsFixed(double[] values, double value)
+        {
+            return value == values[gamsglobals.val_lower] || value == values[gamsglobals.val_upper];
         }
 
         private static void GetGAMSWorkspace(ref string gamsDir, ref GAMSWorkspace ws)
@@ -15548,7 +15589,8 @@ namespace Gekko
             bool lhsHasStarOrQuestionGlobal = false;  //true for LHS, for 'a*', '*:x', 'b?:x?', etc.
 
             foreach (string wildCardLhs in lhs)
-            {
+            {               
+
                 string bankLhs = null;
                 string nameLhs = null; 
                 string freqLhs  = null;
@@ -15627,25 +15669,42 @@ namespace Gekko
 
                 if (indexLhs != null)
                 {
-                    G.Writeln2("*** ERROR: " + command + " with indexes before TO/AS not yet implemented");
-                    throw new GekkoException();
+                    if (lhsHasStarOrQuestion)
+                    {
+                        G.Writeln2("*** ERROR: " + command + " with wildcard indexes not yet implemented");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        //could be just DISP x[a] for instance
+                    }
                 }
 
                 bool hasExplicitBank = bankLhs != null;
 
-                if (lhsHasStarOrQuestion || type == EWildcardSearchType.Search)
+                if (!lhsHasStarOrQuestion && type == EWildcardSearchType.Search)
                 {
-                    //There is a star or question in bank, name or freq, or a range in name
+                    //a hack to make DISP x[a] work                    
                     //OR: it is an INDEX command without stars, here we must find out if the single non-wildcard item exists
+                    IVariable iv = O.GetIVariableFromString(wildCardLhs, O.ECreatePossibilities.NoneReturnNull);
+                    if (iv != null)
+                    {
+                        lhsUnfolded.Add(wildCardLhs);
+                        lhsUnfoldedExplicit.Add(hasExplicitBank);
+                    }
+                }
+                else if (lhsHasStarOrQuestion)
+                {
+                    //There is a star or question in bank, name or freq, or a range in name                    
 
                     List<string> listOfAllOpenBanks = GetListOfAllBanks();
                     List<string> db_banks = new List<string>();
                     if (bankLhs == null)
                     {
-                        db_banks.Add(currentFirstBankName);                        
+                        db_banks.Add(currentFirstBankName);
                     }
                     else
-                    {                        
+                    {
                         db_banks = Search(bankLhs, listOfAllOpenBanks);
                     }
 
