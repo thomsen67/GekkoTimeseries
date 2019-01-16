@@ -21800,165 +21800,176 @@ namespace Gekko
             bool isCaps = true; if (G.Equal(o.opt_caps, "no")) isCaps = false;
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
-
-            //List<BankNameVersion> list = null; //#0938432095 GetInfoFromListOfWildcards(o.listItems);
-
+            
             bool writeAllVariables = false;
             if (list == null) writeAllVariables = true;
 
-            if (writeType == EWriteType.R)
-            {
-                //special treatment for the time being
-                ExportR(o);
-                return o.list1.Count();
-            }
-            else if (writeAllVariables)  //writing the whole first databank
-            {
-                //list = GetAllVariablesFromBank(Program.databanks.GetFirst());
+            bool aliasRemember = Program.options.interface_alias;
 
-                //List<BankNameVersion> list = new List<BankNameVersion>();
-                list = new List<ToFrom>();
-                foreach (string s in Program.databanks.GetFirst().storage.Keys)
+            try
+            {
+                
+                if (writeAllVariables) Program.options.interface_alias = false;
+
+                if (writeType == EWriteType.R)
                 {
-                    if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
-                    {
-                        continue;  //probably some artefact creeping in from PCIM?
-                    }
-                    list.Add(new ToFrom("First:" + s, "First:" + s, true));
-                    //BankNameVersion bnv = new Gekko.BankNameVersion();
-                    //bnv.name = s;
-                    //list.Add(bnv);
+                    //special treatment for the time being
+                    ExportR(o);
+                    return o.list1.Count();
                 }
-                //list.Sort(StringComparer.InvariantCulture);
-                //list = list.OrderBy(o => o.s1).ToList();                
-            }
-            
-
-            bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes");
-
-            //TODO TODO TODO
-            //TODO TODO TODO
-            //TODO TODO TODO Not sure is this filter stuff works ok for quarters and months...?
-            //TODO TODO TODO
-            //TODO TODO TODO
-
-            List<ToFrom> listFilteredForCurrentFreq = null;
-            if (isRecordsFormat)
-            {
-                //can handle multiple frequencies
-                listFilteredForCurrentFreq = list;
-            }
-            else
-            {
-                //2D format, only 1 frequency
-                //listFilteredForCurrentFreq = FilterListForFrequency(list);
-
-                foreach (ToFrom two in list)
+                else if (writeAllVariables)  //writing the whole first databank
                 {
-                    if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))
+                    //list = GetAllVariablesFromBank(Program.databanks.GetFirst());
+
+                    //List<BankNameVersion> list = new List<BankNameVersion>();
+                    list = new List<ToFrom>();
+                    foreach (string s in Program.databanks.GetFirst().storage.Keys)
                     {
-                        //good
-                        if (listFilteredForCurrentFreq == null) listFilteredForCurrentFreq = new List<ToFrom>();
-                        listFilteredForCurrentFreq.Add(two);
+                        if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
+                        {
+                            continue;  //probably some artefact creeping in from PCIM?
+                        }
+                        list.Add(new ToFrom("First:" + s, "First:" + s, true));
+                        //BankNameVersion bnv = new Gekko.BankNameVersion();
+                        //bnv.name = s;
+                        //list.Add(bnv);
                     }
+                    //list.Sort(StringComparer.InvariantCulture);
+                    //list = list.OrderBy(o => o.s1).ToList();                
                 }
-            }
 
-            if (tStart.IsNull() && tEnd.IsNull())
-            {
-                if (isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes"))
+
+                bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes");
+
+                //TODO TODO TODO
+                //TODO TODO TODO
+                //TODO TODO TODO Not sure is this filter stuff works ok for quarters and months...?
+                //TODO TODO TODO
+                //TODO TODO TODO
+
+                List<ToFrom> listFilteredForCurrentFreq = null;
+                if (isRecordsFormat)
                 {
-                    //Do nothing, skip this, we do not need to know the timespan of the bank
-                    //Not done for GBK or TSD, would just waste time. For these formats, a null period
-                    //is handled ok    
+                    //can handle multiple frequencies
+                    listFilteredForCurrentFreq = list;
                 }
                 else
                 {
-                    GetDatabankPeriodFilteredForFreq(listFilteredForCurrentFreq, ref tStart, ref tEnd);
-                }
-            }
+                    //2D format, only 1 frequency
+                    //listFilteredForCurrentFreq = FilterListForFrequency(list);
 
-            string writeOption = "" + Globals.extensionDatabank + "";  //default
-            if (G.Equal(o.opt_tsd, "yes")) writeOption = "tsd";
+                    foreach (ToFrom two in list)
+                    {
+                        if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))
+                        {
+                            //good
+                            if (listFilteredForCurrentFreq == null) listFilteredForCurrentFreq = new List<ToFrom>();
+                            listFilteredForCurrentFreq.Add(two);
+                        }
+                    }
+                }
 
-            if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
-            {
-                //2D format
-                EdataFormat format = EdataFormat.Csv;
-                if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
-                else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"));
-            }
-            else if (G.Equal(o.opt_gnuplot, "yes"))
-            {
-                //2D format
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
-            }
-            else if (G.Equal(o.opt_tsp, "yes"))
-            {
-                //RECORDS
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
-            }
-            else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
-            {
-                //2D format
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"));
-                return 0;
-            }
-            else if (o.opt_gcm != null)
-            {
-                //RECORDS
-                if (fileName == null || fileName.Trim() == "")
+                if (tStart.IsNull() && tEnd.IsNull())
                 {
-                    G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<series>");
-                    throw new GekkoException();
+                    if (isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes"))
+                    {
+                        //Do nothing, skip this, we do not need to know the timespan of the bank
+                        //Not done for GBK or TSD, would just waste time. For these formats, a null period
+                        //is handled ok    
+                    }
+                    else
+                    {
+                        GetDatabankPeriodFilteredForFreq(listFilteredForCurrentFreq, ref tStart, ref tEnd);
+                    }
                 }
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_gcm, fileName);
-                return 0;
-            }
-            else if (o.opt_gdx != null)
-            {
-                //RECORDS
-                if (fileName == null || fileName.Trim() == "")
+
+                string writeOption = "" + Globals.extensionDatabank + "";  //default
+                if (G.Equal(o.opt_tsd, "yes")) writeOption = "tsd";
+
+                if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
                 {
-                    G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<gdx>");
-                    throw new GekkoException();
+                    //2D format
+                    EdataFormat format = EdataFormat.Csv;
+                    if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
+                    else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    return CsvPrnWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, format, G.Equal(o.opt_cols, "yes"));
                 }
-                CheckSomethingToWrite(listFilteredForCurrentFreq);
-                string file = AddExtension(fileName, "." + "gdx");
-                string pathAndFilename = CreateFullPathAndFileName(file);
-                if (Program.options.gams_fast)
-                {                    
-                    WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
-                }
-                else
+                else if (G.Equal(o.opt_gnuplot, "yes"))
                 {
-                    WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
+                    //2D format
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
                 }
-                return 0;
-            }
-            else if (isRecordsFormat)
-            {
-                //RECORDS
-                //tsd or gbk or unspecified format                
-                CheckSomethingToWrite(list);
-                //first argument (the databank) is only used if list = null
-                if (isDefault)
+                else if (G.Equal(o.opt_tsp, "yes"))
                 {
-                    return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    //RECORDS
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
                 }
-                if (writeType == EWriteType.Tsd)
+                else if (G.Equal(o.opt_xls, "yes") || G.Equal(o.opt_xlsx, "yes"))
                 {
-                    return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    //2D format
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"));
+                    return 0;
                 }
-                else if (writeType == EWriteType.Flat)
+                else if (o.opt_gcm != null)
                 {
-                    return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    //RECORDS
+                    if (fileName == null || fileName.Trim() == "")
+                    {
+                        G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<series>");
+                        throw new GekkoException();
+                    }
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_gcm, fileName);
+                    return 0;
+                }
+                else if (o.opt_gdx != null)
+                {
+                    //RECORDS
+                    if (fileName == null || fileName.Trim() == "")
+                    {
+                        G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<gdx>");
+                        throw new GekkoException();
+                    }
+                    CheckSomethingToWrite(listFilteredForCurrentFreq);
+                    string file = AddExtension(fileName, "." + "gdx");
+                    string pathAndFilename = CreateFullPathAndFileName(file);
+                    if (Program.options.gams_fast)
+                    {
+                        WriteGdx(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
+                    }
+                    else
+                    {
+                        WriteGdxSlow(Program.databanks.GetFirst(), tStart, tEnd, pathAndFilename, list, writeOption, false);
+                    }
+                    return 0;
+                }
+                else if (isRecordsFormat)
+                {
+                    //RECORDS
+                    //tsd or gbk or unspecified format                
+                    CheckSomethingToWrite(list);
+                    //first argument (the databank) is only used if list = null
+                    if (isDefault)
+                    {
+                        return WriteGbk(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    }
+                    if (writeType == EWriteType.Tsd)
+                    {
+                        return WriteTsd(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    }
+                    else if (writeType == EWriteType.Flat)
+                    {
+                        return WriteFlat(Program.databanks.GetFirst(), tStart, tEnd, fileName, isCaps, list, writeOption, writeAllVariables, false);
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Unknown databank format");
+                        throw new GekkoException();
+                    }
                 }
                 else
                 {
@@ -21966,10 +21977,9 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            else
+            finally
             {
-                G.Writeln2("*** ERROR: Unknown databank format");
-                throw new GekkoException();
+                Program.options.interface_alias = aliasRemember;
             }
         }
 

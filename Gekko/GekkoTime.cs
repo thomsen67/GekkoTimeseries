@@ -447,12 +447,22 @@ namespace Gekko
         }
     }
 
-    //For use with VPRT
+    [ProtoContract]
+    //For use with VPRT, and fixing in timeseriesries
     public class GekkoTimeSpan
     {
+        [ProtoMember(1)]
         public GekkoTime tStart;
+        [ProtoMember(2)]
         public GekkoTime tEnd;
+        [ProtoMember(3)]
         public int by = 1;
+
+        public GekkoTimeSpan()
+        {
+            //only because of protobuf
+        }
+
         public GekkoTimeSpan(GekkoTime t1, GekkoTime t2)
         {
             this.tStart = t1;
@@ -466,9 +476,16 @@ namespace Gekko
         }
     }
 
-    //For use with VPRT
+    [ProtoContract]    
+    //For use with VPRT, and fixing in timeseries
     public class GekkoTimeSpans
     {
+        public GekkoTimeSpans()
+        {
+            //only because of protobuf
+        }
+
+        [ProtoMember(1)]
         public List<GekkoTimeSpan> data = new List<GekkoTimeSpan>();
 
         public string ToString()
