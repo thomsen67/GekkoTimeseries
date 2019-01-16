@@ -14804,13 +14804,17 @@ namespace Gekko
             }
             else
             {
-                Series parent = ts.mmi.parent;
-                if (parent != null)
+                if (ts.mmi != null)
                 {
-                    if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
-                    if (parent.meta.fix == EFixedType.Parameter)
+                    //then it is a sub-series
+                    Series parent = ts.mmi.parent;
+                    if (parent != null)
                     {
-                        G.Writeln("Fixed (parameter)");
+                        if (!G.NullOrBlanks(parent.meta.label)) G.Writeln(parent.meta.label);
+                        if (parent.meta.fix == EFixedType.Parameter)
+                        {
+                            G.Writeln("Fixed (parameter)");
+                        }
                     }
                 }
 

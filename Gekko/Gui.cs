@@ -1499,14 +1499,12 @@ namespace Gekko
                         }
                     }
                     lines.Sort();
-                    StringBuilder sb = new StringBuilder();
-                    string first = "";
+
                     foreach (string line in lines)
                     {
-                        sb.AppendLine(first + line);
-                        first = " ";
+                        G.Writeln(line, ETabs.Output);
                     }
-                    G.Writeln(sb.ToString(), ETabs.Output);
+                    
                 }
                 else
                 {

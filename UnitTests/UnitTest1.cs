@@ -12971,6 +12971,40 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Alias2()
+        {
+            //this would fail with stack overflow if it were not for #6324987324234, avoiding recursion
+            I("reset; OPTION interface alias = yes;");
+            I("x = series(1); x[a] = 1;");
+            I("global:#alias = (('x', 'x[a]'),);");  // a --> b            
+            I("PRT x;");
+        }
+
+        [TestMethod]
+        public void _Test_Fix()
+        {
+            //No real test here, TODO...!
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
+            I("read <gdx> testfix;"); //See c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\testfix.gms
+            I("time 2001 2003;");
+            I("disp d4;");
+            I("disp d4[a2, f];");
+            I("disp d5;");
+            I("disp d5[a2];");
+            I("disp d6;");
+            I("disp d6[a2, f];");
+            I("disp d7;");
+            I("disp d7[a2];");
+            I("disp d8;");
+            I("disp d8[a3, f];");
+            I("disp d9;");
+            I("disp d9[a2];");
+            I("disp d10;");
+            I("disp d10[a2];");
+        }
+
+        [TestMethod]
         public void _Test_ObjectOrientation()
         {
             // ---------------------------------------------------------------------------

@@ -32,6 +32,7 @@ namespace Gekko
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
         public bool canSearch = true;
+        public short depth = 0; //used to avoid recursions with #alias list. #6324987324234
        // public string label = null;
 
         public LookupSettings()
@@ -1220,7 +1221,11 @@ namespace Gekko
                 }
 
                 LookupSettings settingsTemp = settings;
-                if (indexes != null) settingsTemp = new LookupSettings();  //normal abort if array-super-series is not found, cannot just be created
+                if (indexes != null)
+                {
+                    settingsTemp = new LookupSettings(); //normal abort if array-super-series is not found, cannot just be created
+                    settingsTemp.depth = settings.depth;  //no recursion for #alias
+                }
 
                 IVariable iv = Lookup(smpl, map, dbName, varName, freq, rhsExpression, settingsTemp, type, errorIfNotFound, options);
 
@@ -1313,6 +1318,7 @@ namespace Gekko
             if (Program.options.interface_alias)
             {
                 bool foundAlias = true;
+
                 if (Program.alias == null)
                 {
                     IVariable alias2 = Program.databanks.GetGlobal().GetIVariable("#alias");
@@ -1359,17 +1365,22 @@ namespace Gekko
                         Program.alias = alias3;  //we wait until global:#alias has finished looping, so that only if global:#alias is ok, will Program.alias be != null
                     }
                 }
+
                 if (foundAlias)
                 {
-                    //use the dict
-                    string var2 = null; Program.alias.TryGetValue(varnameWithFreq, out var2);
-                    if (var2 != null)
+                    if (settings.depth == 0)
                     {
-                        varnameWithFreq = var2;
-                        //varname = G.Chop_RemoveFreq(varnameWithFreq);
+                        //use the dict
+                        string var2 = null; Program.alias.TryGetValue(varnameWithFreq, out var2);
+                        if (var2 != null)
+                        {
+                            varnameWithFreq = var2;
+                            //varname = G.Chop_RemoveFreq(varnameWithFreq);
 
-                        return O.Lookup(smpl, map, new ScalarString(varnameWithFreq), rhsExpression, settings, type, options);
+                            settings.depth++;  //will be 1
+                            return O.Lookup(smpl, map, new ScalarString(varnameWithFreq), rhsExpression, settings, type, options);
 
+                        }
                     }
                 }
                 
