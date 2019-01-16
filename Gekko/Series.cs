@@ -35,6 +35,14 @@ namespace Gekko
         ArraySuper        
     }
 
+    public enum EFixedType
+    {
+        None, //no fixing or parameter (that is: endogenous)
+        Parameter, //for series type normal or arraysuper, corresponds to GAMS parameter
+        Normal, //for series type normal
+        Timeless, //for series type timeless
+    }
+
     //                 name        meta        dataArray     dimensions      dimensionsArray
     // ---------------------------------------------------------------------------------------------
     // Normal             x           x                x             0               null
@@ -2324,6 +2332,16 @@ namespace Gekko
                         tsCopy.meta.domains = new string[this.meta.domains.Length];
                         this.meta.domains.CopyTo(tsCopy.meta.domains, 0);
                     }
+                    tsCopy.meta.fix = this.meta.fix; //will also get copied for array-series
+                    if (this.meta.fixedNormal != null)
+                    {
+                        //will also get copied for array-series
+                        tsCopy.meta.fixedNormal = new GekkoTimeSpans();
+                        foreach (GekkoTimeSpan gts in this.meta.fixedNormal.data)
+                        {
+                            tsCopy.meta.fixedNormal.data.Add(new GekkoTimeSpan(gts.tStart, gts.tEnd));
+                        }
+                    }
                 }
                 if (this.mmi != null) tsCopy.mmi = this.mmi;  //only for array sub-series  
             }
@@ -2420,13 +2438,14 @@ namespace Gekko
         public string stamp;                
         [ProtoMember(6)]        
         public string units;
-
-        //the following two are not protobuffed at the moment
-        public bool fixedTimeless = false; //only if the series is timeless type
-        public GekkoTimeSpans fixedNormal = null;  //only for non-timeless types
-
+            
         [ProtoMember(7)]
         public string[] domains = null;
+
+        [ProtoMember(8)]
+        public EFixedType fix = EFixedType.None;
+        [ProtoMember(9)]
+        public GekkoTimeSpans fixedNormal = null;  //only for EFixedType.Normal, setting the periods
 
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        

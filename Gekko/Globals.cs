@@ -220,7 +220,8 @@ namespace Gekko
         public const string printCode_q = "q";
         public const string printCode_mp = "mp";
 
-        
+        public const string fixedTimelessText = "all periods (timeless)";
+        public const string fixedParameterText = "everything fixed (parameter)";
 
         public List<Databank> bankOpen = new List<Databank>();
         

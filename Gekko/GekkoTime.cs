@@ -470,5 +470,23 @@ namespace Gekko
     public class GekkoTimeSpans
     {
         public List<GekkoTimeSpan> data = new List<GekkoTimeSpan>();
+
+        public string ToString()
+        {
+            string s = null;
+            foreach (GekkoTimeSpan gts in this.data)
+            {
+                if (gts.tStart.IsSamePeriod(gts.tEnd))
+                {
+                    s += gts.tStart.ToString() + ", ";
+                }
+                else
+                {
+                    s += gts.tStart.ToString() + "-" + gts.tEnd.ToString() + ", ";
+                }
+            }
+            s = s.Substring(0, s.Length - ", ".Length);
+            return s;
+        }
     }
 }

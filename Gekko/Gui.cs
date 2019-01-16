@@ -1461,6 +1461,53 @@ namespace Gekko
                 {
                     Program.List(input, null, null);
                 }
+                else if (type == "dispfix")
+                {
+                    Gui.gui.tabControl1.SelectedTab = Gui.gui.tabPage2;
+                    Program.Cls("output");
+                    Series ts = O.GetIVariableFromString(input, O.ECreatePossibilities.NoneReportError, false) as Series;
+                    if (!(ts.type == ESeriesType.ArraySuper))
+                    {
+                        G.Writeln2("*** ERROR: strange error rgd. links");
+                        throw new GekkoException();
+                    }
+
+                    //StringBuilder sb = new StringBuilder();
+
+                    List<string> lines = new List<string>();
+                    
+
+                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
+                    {
+                        Series sub = kvp.Value as Series;
+                        string name = G.Chop_RemoveFreq(sub.GetName(), G.GetFreq(Program.options.freq));
+
+                        if (sub.meta.fix == EFixedType.Timeless)
+                        {
+                            lines.Add(name + ": " + Globals.fixedTimelessText);
+                            //G.Writeln(name + ": " + Globals.fixedTimelessText, ETabs.Output);
+                        }
+                        else if (sub.meta.fix == EFixedType.Normal)
+                        {
+                            lines.Add(name + ": " + sub.meta.fixedNormal.ToString());
+                            //G.Writeln(name + ": " + sub.meta.fixedNormal.ToString(), ETabs.Output);
+                        }
+                        else if (ts.meta.fix == EFixedType.Parameter)
+                        {
+                            lines.Add(name + ": " + Globals.fixedParameterText);
+                            //G.Writeln(name + ": " + Globals.fixedParameterText, ETabs.Output);
+                        }
+                    }
+                    lines.Sort();
+                    StringBuilder sb = new StringBuilder();
+                    string first = "";
+                    foreach (string line in lines)
+                    {
+                        sb.AppendLine(first + line);
+                        first = " ";
+                    }
+                    G.Writeln(sb.ToString(), ETabs.Output);
+                }
                 else
                 {
                     G.Writeln2("*** ERROR: strange error rgd. links");
