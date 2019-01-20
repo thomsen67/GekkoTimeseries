@@ -46,6 +46,7 @@ tokens {
 	ASTBANKVARNAME2;
 	ASTHASH;
 	ASTPERCENT;
+	ASTSEQ7;
 	ASTPLUS2;
 	ASTMINUS2;
 	ASTSTAR2;
@@ -1997,7 +1998,7 @@ leftSideDollarExpression:   listFile
                           | (bankvarnameIndexer -> bankvarnameIndexer) (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*								
 						    ; 						
 
-bankvarnameIndexer:         (bankvarname -> bankvarname)
+bankvarnameIndexer:         bankvarname
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $bankvarnameIndexer $lbla))*
 						    ;
 
@@ -2076,6 +2077,21 @@ seqItem:                      MINUS listItemWildRange -> ^(ASTSEQITEMMINUS listI
 							| bankvarnameIndexer	//probably only indexer part of this is used...?					   
 						      ;
 
+//remember AT and minus and ranges
+seqItem7:                  bank7? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));				
+bank7: wildcard7 COLON?;
+freq7: GLUE EXCLAMATION GLUE wildcard7 -> wildcard7;  
+indexer7: leftBracket (wildcard7 (',' wildcard7)*) RIGHTBRACKET -> wildcard7+;
+
+name7:                      name7Helper+;
+name7Helper:                name | identDigit;
+
+wildcard7:         		   
+						    name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | name7 wildSymbolEnd  //a?						  	
+						  | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						    ;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
@@ -2120,9 +2136,14 @@ rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)
 
 range                     : wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
 
-wildcard:                   wildcard2 -> ^(ASTWILDCARD wildcard2);
+wildcard:                   wildcard3 -> ^(ASTWILDCARD wildcard3);
 
-wildcard2:         		    identDigit (wildSymbolMiddle identDigit)+ wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+wildcardFreq:			    GLUE EXCLAMATION GLUE wildcard2 -> ASTEXCLAMATION wildcard2;
+
+wildcard3:                  sigil? wildcard2 wildcardFreq?; 
+
+wildcard2:         		   
+						    identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
 						  | identDigit wildSymbolEnd  //a?						  	
 						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
 						  | wildSymbolFree //?
@@ -3247,7 +3268,8 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // TELL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
+//tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
+tell:					    TELL seqItem7 -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} seqItem7);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TIME
@@ -3721,6 +3743,7 @@ leftParenGlue:              GLUE! LEFTPAREN;
 leftParenNoGlue:            LEFTPAREN;
 
 leftBracketGlue:            LEFTBRACKETGLUE;
+leftBracket:                LEFTBRACKETGLUE | LEFTBRACKET;
 
 pow:                        stars -> ASTPOW
                           | HAT -> ASTPOW

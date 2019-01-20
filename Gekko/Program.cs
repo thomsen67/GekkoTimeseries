@@ -15314,7 +15314,27 @@ namespace Gekko
         {
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
-            else G.Writeln(text);            
+            else G.Writeln(text);
+            if (Globals.runningOnTTComputer)
+            {
+                //
+                // Here we demonstrate polynomial interpolation and differentiation
+                // of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
+                //
+                
+                double[] x = new double[] { 0, 1, 2 };
+                double[] y = new double[] { 0, 0, 2 };
+                double t = -1;
+                double v;                
+                alglib.barycentricinterpolant p;
+
+                // barycentric model is created
+                alglib.polynomialbuild(x, y, out p);
+
+                // barycentric interpolation is demonstrated
+                v = alglib.barycentriccalc(p, t);
+                G.Writeln2("v = " + v); // EXPECTED: 2.0
+            }     
         }
                
 
