@@ -1341,20 +1341,12 @@ Y2                    = 'Y2'                       ;
 
                               @lexer::namespace { Gekko }
 
-                              @members {
-							                      
-								/*				               
-								 public boolean HasLeftBlanks(TokenStream input) { return !DirectlyFollows(input.LT(-1), input.LT(1));   }
-
-								  private bool DirectlyFollows(Token first, Token second) {
-									CommonToken firstT = (CommonToken)first;
-									CommonToken secondT = (CommonToken)second;
-								    if (firstT.GetStopIndex() + 1 != secondT.GetStartIndex())
-									return false;      
-									return true;
-								 }
-
-								 */
+                              @members {							                      
+								
+								 private bool HasLeftBlanks()
+								 {            
+						            return input.LT(-1).TokenIndex + 1 != input.LT(1).TokenIndex;
+								 }								
 
 								 private CommonToken token(string text, int type, int line) {
                                                                CommonToken t = new CommonToken(type, text);
@@ -2709,7 +2701,7 @@ hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, input.LT(1).Line)} expres
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-help:					    HELP  {input.LT(1).TokenIndex + 1 == input.LT(2).TokenIndex}?=> name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
+help:					    HELP  {HasLeftBlanks()}?=> name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF
