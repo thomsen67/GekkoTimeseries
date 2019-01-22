@@ -15315,7 +15315,7 @@ namespace Gekko
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 //
                 // Here we demonstrate polynomial interpolation and differentiation

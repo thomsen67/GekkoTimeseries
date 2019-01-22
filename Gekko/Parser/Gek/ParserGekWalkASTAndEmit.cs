@@ -912,7 +912,77 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("new ScalarString(`@`)");
                         }
-                        break;                    
+                        break;
+                    case "ASTCOLON":
+                        {
+                            node.Code.CA("new ScalarString(`:`)");
+                            //node.Code.CA("XXXXX");
+                            
+ 
+                        }
+                        break;
+                    case "ASTL0":
+                        {                            
+
+                            node.Code.CA("new ScalarString(`[`)");
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                for (int j = 0; j < node[i].ChildrenCount(); j++)
+                                {
+                                    node.Code.A(".Add(null, ").A(node[i][j].Code).A(")");
+                                }                                    
+                                if (i < node.ChildrenCount() - 1) node.Code.A(".Add(null, new ScalarString(`,`))");
+                            }
+                            node.Code.A(".Add(null, new ScalarString(`]`))");
+                        }
+                        break;
+                    //case "ASTL1":
+                    //    {
+                    //        node.Code.CA("new ScalarString(`[`)");
+                    //    }
+                    //    break;
+                    //case "ASTL2":
+                    //    {
+                    //        node.Code.CA("new ScalarString(`]`)");
+                    //    }
+                    //    break;
+                    case "ASTSEQ7":
+                        {                                                       
+
+                            string s = null;
+                            bool isFirst = true;
+                            for (int i = 0; i < 4; i++)
+                            {
+                                if (node[i] != null)
+                                {                                    
+                                    for (int j = 0; j < node[i].ChildrenCount(); j++)
+                                    {
+                                        //if (i == 0 && j == 0) s += node[i][j].Code.ToString();
+                                        //else s += ".Add(null, " + node[i][j].Code.ToString() + ")";
+                                        string ss1 = null;
+                                        string ss2 = null;
+                                        if (!isFirst)
+                                        {
+                                            ss1 = ".Add(null, ";
+                                            ss2 = ")";
+                                        }
+                                        s += ss1 + node[i][j].Code.ToString() + ss2;
+                                        
+                                        isFirst = false;                                     
+                                    }
+                                }
+                            }
+
+                            node.Code.A(s);
+
+
+
+                            //if (node[0][0].Code != null) node.Code.A(node[0][0].Code).A(" ++ ");
+                            //if (node[1][0].Code != null) node.Code.A(node[1][0].Code).A(" ++ ");
+                            //if (node[2][0].Code != null) node.Code.A(node[2][0].Code).A(" ++ ");
+                            //if (node[3][0].Code != null) node.Code.A(node[3][0].Code).A(" ++ ");
+                        }
+                        break;
                     case "ASTUPDDATACOMPLICATED":
                         {
                             
@@ -3976,12 +4046,12 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" ||  child.Text == "ASTSEQITEMMINUS")
+                                if (child.Text == "ASTSEQ7" || child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" || child.Text == "ASTSEQITEMMINUS")
                                 {
                                     name = child.Code.ToString();
                                 }
                                 else
-                                {                                    
+                                {
                                     if (child.AlternativeCode == null)
                                     {
                                         G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
@@ -3992,7 +4062,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         G.Writeln2("*** ERROR: Name is expected. Use {...} to turn a string into a name.");
                                         throw new GekkoException();
-                                    }                                    
+                                    }
                                 }
                                 code += name + ", ";
                             }

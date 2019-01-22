@@ -32,6 +32,9 @@ options {
 tokens {
 	ASTDOLLAR;
 	ASTLOCAL;
+	ASTCOLON;
+	ASTL0;
+	ASTL1;
 	ASTGLOBAL;
 	ASTIN;
 	ASTCURLYALONE;
@@ -1339,8 +1342,20 @@ Y2                    = 'Y2'                       ;
                               @lexer::namespace { Gekko }
 
                               @members {
-							                                   
-								 
+							                      
+								/*				               
+								 public boolean HasLeftBlanks(TokenStream input) { return !DirectlyFollows(input.LT(-1), input.LT(1));   }
+
+								  private bool DirectlyFollows(Token first, Token second) {
+									CommonToken firstT = (CommonToken)first;
+									CommonToken secondT = (CommonToken)second;
+								    if (firstT.GetStopIndex() + 1 != secondT.GetStartIndex())
+									return false;      
+									return true;
+								 }
+
+								 */
+
 								 private CommonToken token(string text, int type, int line) {
                                                                CommonToken t = new CommonToken(type, text);
                                                            t.Line = line;
@@ -1998,7 +2013,7 @@ leftSideDollarExpression:   listFile
                           | (bankvarnameIndexer -> bankvarnameIndexer) (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*								
 						    ; 						
 
-bankvarnameIndexer:         bankvarname
+bankvarnameIndexer:         (bankvarname -> bankvarname)
 						    (lbla=dotOrIndexer -> ^(ASTDOTORINDEXER $bankvarnameIndexer $lbla))*
 						    ;
 
@@ -2072,19 +2087,27 @@ expressionOrNothing:        expression -> expression
 //accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
 //seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
 
-seqItem:                      MINUS listItemWildRange -> ^(ASTSEQITEMMINUS listItemWildRange)
-							| listItemWildRange
-							| bankvarnameIndexer	//probably only indexer part of this is used...?					   
+//seqItem:                      MINUS listItemWildRange -> ^(ASTSEQITEMMINUS listItemWildRange)
+//							| listItemWildRange
+//							| bankvarnameIndexer	//probably only indexer part of this is used...?					   
+//						      ;
+
+seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
+							| seqItem7
 						      ;
 
 //remember AT and minus and ranges
-seqItem7:                  bank7? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));				
-bank7: wildcard7 COLON?;
-freq7: GLUE EXCLAMATION GLUE wildcard7 -> wildcard7;  
-indexer7: leftBracket (wildcard7 (',' wildcard7)*) RIGHTBRACKET -> wildcard7+;
+//seqItem7: name {!HasLeftBlanks(input)}?=>name {!HasLeftBlanks(input)}?=>name;
+seqItem7:                  bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
+bank7: wildcard7 COLON -> wildcard7 ASTCOLON;
+freq7: GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
+indexer7: leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
 
-name7:                      name7Helper+;
-name7Helper:                name | identDigit;
+w7: wildcard7 -> ^(ASTL1 wildcard7);
+
+name7:name;
+//name7:                      name7Helper+;
+//name7Helper:                name | identDigit;
 
 wildcard7:         		   
 						    name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
@@ -2686,7 +2709,7 @@ hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, input.LT(1).Line)} expres
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
+help:					    HELP  {input.LT(1).TokenIndex + 1 == input.LT(2).TokenIndex}?=> name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF
@@ -3268,8 +3291,8 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // TELL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
-tell:					    TELL seqItem7 -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} seqItem7);
+tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
+//tell:					    TELL seqItem7 -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} seqItem7);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TIME
