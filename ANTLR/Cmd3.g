@@ -1343,28 +1343,10 @@ Y2                    = 'Y2'                       ;
 
                               @members {							                      
 								
-								 private bool LB()
+								 private bool HasLeftBlanks()
 								 {            
 						            return input.LT(-1).TokenIndex + 1 != input.LT(1).TokenIndex;
-								 }
-								 
-								 private bool RB()
-								 {            
-						            return input.LT(1).TokenIndex + 1 != input.LT(2).TokenIndex;
-								 }									
-
-								 private bool LS()
-								 {
-                                    IToken i1 = input.LT(-1);
-                                    IToken i2 = input.LT(1);
-                                    if (i1.TokenIndex + 1 != i2.TokenIndex) return true;
-                                    string s = i1.Text;
-                                    if (s == "/" || s == "[" || s == "(" || s == "+" || s == "*" || s == ";" || s == "," || s == "-" || s == "<" || s == ">" || s == "{")
-                                    {
-                                       return true;
-                                    }
-                                    return false;                                   
-                                 }
+								 }								
 
 								 private CommonToken token(string text, int type, int line) {
                                                                CommonToken t = new CommonToken(type, text);
@@ -1967,7 +1949,7 @@ additiveExpression:         (multiplicativeExpression -> multiplicativeExpressio
 							)*;
 
 multiplicativeExpression:   (powerExpression -> powerExpression)
-						    ( (STAR lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
+						    ( (star lbla=powerExpression -> ^(ASTSTAR $multiplicativeExpression $lbla))
 						    | (DIV lblb=powerExpression -> ^(ASTDIV $multiplicativeExpression  $lblb)) )*
 						    ;
 
@@ -2001,8 +1983,8 @@ value:                      function //must be before varname
 						  | StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
 					 	  | stringInQuotesWithCurlies
 						  | listFile						
-						  | {LS()}?=> LEFTBRACKET wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
-						  | {LS()}?=> LEFTCURLY wildRange RIGHTCURLY ->   ^(ASTBANKVARNAME ASTPLACEHOLDER ^(ASTVARNAME ASTPLACEHOLDER ^(ASTPLACEHOLDER ^(ASTNAME ^(ASTCURLY ^(ASTINDEXERALONE wildRange  )  ) ) )ASTPLACEHOLDER))
+						  | leftBracketNoGlue wildRange RIGHTBRACKET -> ^(ASTINDEXERALONE wildRange) //also see rule indexerExpression
+						  | leftCurlyNoGlue wildRange RIGHTCURLY ->   ^(ASTBANKVARNAME ASTPLACEHOLDER ^(ASTVARNAME ASTPLACEHOLDER ^(ASTPLACEHOLDER ^(ASTNAME ^(ASTCURLY ^(ASTINDEXERALONE wildRange  )  ) ) )ASTPLACEHOLDER))
 						  | matrix
 						  | list
 						  | map						  
@@ -2030,9 +2012,11 @@ bankvarnameIndexer:         (bankvarname -> bankvarname)
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- expression END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
-					
-dotOrIndexer:               {!LB()}?=> DOT dotHelper -> ^(ASTDOT dotHelper)			
-						  | {!LB()}?=> LEFTBRACKET indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
+	
+//indexerAlone:			    (leftBracketNoGlue|leftBracketNoGlueWild) indexerExpressionHelper RIGHTBRACKET -> ^(ASTINDEXERALONE indexerExpressionHelper); //also see rule indexerExpression
+						
+dotOrIndexer:               GLUEDOT DOT dotHelper -> ^(ASTDOT dotHelper)			
+						  | leftBracketGlue indexerExpressionHelper2 RIGHTBRACKET -> ^(ASTINDEXER indexerExpressionHelper2)
 						    ;
 
 						    //just like b1:fy!q, we can use #m.fy!q, where fy!q is the varname.
@@ -2040,37 +2024,40 @@ dotHelper:				    objectFunction | varname | integer;
 indexerExpressionHelper2:   (indexerExpressionHelper (',' indexerExpressionHelper)*) -> indexerExpressionHelper+;
 
 matrix:                     matrixCol;
-matrixCol:                  {LS()}?=> LEFTBRACKET matrixRow (SEMICOLON matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
+matrixCol:                  leftBracketNoGlue matrixRow (SEMICOLON matrixRow)* RIGHTBRACKET -> ^(ASTMATRIXCOL matrixRow+);
 matrixRow:                  expression (',' expression)*  -> ^(ASTMATRIXROW expression+);
 
 						    //trailing ',' is allowed, for instance ('a', 'b', ). This is Python style: ('a',) will then be a lists, not just a.
-list:                       {LS()}?=> LEFTPAREN repExpression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF repExpression listHelper)
-                          | {LS()}?=> LEFTPAREN repExpression ',' RIGHTPAREN -> ^(ASTLISTDEF repExpression)
+list:                       leftParenNoGlue repExpression ',' listHelper RIGHTPAREN -> ^(ASTLISTDEF repExpression listHelper)
+                          | leftParenNoGlue repExpression ',' RIGHTPAREN -> ^(ASTLISTDEF repExpression)
 						    ;
 listHelper:                 listHelper1 | listHelper2;
 listHelper1:                (repExpression ',')* repExpression -> repExpression+;
 listHelper2:                (repExpression ',')+ -> repExpression+;
 repExpression:              expression (REP repN)? -> ^(ASTLISTDEFITEM expression repN?);
 repN:						expression 
-						  | STAR -> ASTREPSTAR
+						  | star -> ASTREPSTAR
 						    ;
 
-map:                        {LS()}?=> LEFTPAREN mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
-                          | {LS()}?=> LEFTPAREN mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
+map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
+                          | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
 						    ;
 mapHelper:                  mapHelper1 | mapHelper2;
 mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
 mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 
-listFile:                   HASH {!LB()}?=> LEFTPAREN LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
+//listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
+listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
-function:                   ident {!LB()}?=> LEFTPAREN (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
-objectFunction:             ident {!LB()}?=> LEFTPAREN (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);
+function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
+objectFunction:             ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);
 					
 dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //must use parentheses now, else stuff like y $ x = 100 is too confusing.
 					//	  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis								
 						    ;
+
+//bankvarnameindex:           bankvarname ( leftBracketGlue expression RIGHTBRACKET ) -> ^({token("ASTCOMPARE2¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCOMPARE2, 0)} bankvarname expression);    //should catch #i0[#i] or #i0['a'], does not need a parenthesis!
 					
 indexerExpressionHelper:    function //else the stupid parser stumbles on f() etc.
 						  | ident -> ^({token("ASTINDEXERELEMENTIDENT¤"+($ident.text)+"¤"+($ident.start)+"¤"+($ident.stop), ASTINDEXERELEMENTIDENT, 0)} ident)
@@ -2102,28 +2089,24 @@ seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 						      ;
 
 //remember AT and minus and ranges
-
-seqItem7:                  bank7? {!RB()}?=> sigil7? wildcard7 {!LB()}?=> freq7? {!LB()}?=> indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
-
-sigil7:                     HASH -> ASTHASH
-						  | PERCENT -> ASTPERCENT
-						    ;
+//seqItem7: name {!HasLeftBlanks(input)}?=>name {!HasLeftBlanks(input)}?=>name;
+seqItem7:                  bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
 bank7: wildcard7 COLON -> wildcard7 ASTCOLON;
-freq7: EXCLAMATION {!LB()}?=> wildcard7 -> ASTEXCLAMATION wildcard7;  
+freq7: GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
 indexer7: leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
 
 w7: wildcard7 -> ^(ASTL1 wildcard7);
 
 name7:name;
+//name7:                      name7Helper+;
+//name7Helper:                name | identDigit;
 
-//wildcard7:         		   
-//						    name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-//						  | name7 wildSymbolEnd  //a?						  	
-//						  | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
-//						  | wildSymbolFree //?
-//						    ;
-
-wildcard7:  (identDigit | name7 | wildSymbolFree) ({!LB()}?=> identDigit | {!LB()}?=> name7 | {!LB()}?=> wildSymbolFree)*;
+wildcard7:         		   
+						    name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | name7 wildSymbolEnd  //a?						  	
+						  | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						    ;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
@@ -2134,7 +2117,7 @@ seqOfBankvarnamesAtLeast2:  seqItem (COMMA2 seqItem)+ ->  ^(ASTBANKVARNAMELIST s
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
 //accepts a, c:\a.b, '...', %s, #m.
 seqOfFileNames:             fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+);
-seqOfFileNamesStar:         STAR -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
+seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
 						    ;
 
@@ -2158,7 +2141,7 @@ listItemWildRange:          rangeWithBank ->                           rangeWith
 
 varnameOrWildcard:           wildcard | varname;
 
-wildcardWithBank:           AT {!LB()}?=> varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTNAME ^(ASTIDENT REF)) varnameOrWildcard)						  
+wildcardWithBank:           AT GLUE varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTNAME ^(ASTIDENT REF)) varnameOrWildcard)						  
                           | varnameOrWildcard COLON varnameOrWildcard -> ^(ASTWILDCARDWITHBANK varnameOrWildcard varnameOrWildcard)						  
 						  | varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) varnameOrWildcard)
 						  ;
@@ -2168,6 +2151,37 @@ rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)
 
 range                     : wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
 
+wildcard:                   wildcard3 -> ^(ASTWILDCARD wildcard3);
+
+wildcardFreq:			    GLUE EXCLAMATION GLUE wildcard2 -> ASTEXCLAMATION wildcard2;
+
+wildcard3:                  sigil? wildcard2 wildcardFreq?; 
+
+wildcard2:         		   
+						    identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						  | identDigit wildSymbolEnd  //a?						  	
+						  | wildSymbolStart identDigit (wildSymbolMiddle identDigit)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						  | wildSymbolFree //?
+						    ;
+
+wildSymbolFree            : star -> ASTWILDSTAR
+						  | question -> ASTWILDQUESTION
+						  ;
+
+wildSymbolStart           : starGlueRight -> ASTWILDSTAR
+						  | questionGlueRight -> ASTWILDQUESTION
+						  ;
+
+wildSymbolEnd             : starGlueLeft -> ASTWILDSTAR
+                          | questionGlueLeft -> ASTWILDQUESTION
+						  ;
+
+wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
+                          | questionGlueBoth -> ASTWILDQUESTION
+						  ;
+
+
+
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2176,20 +2190,38 @@ range                     : wildcardWithBank doubleDot2 wildcardWithBank -> wild
 name:                       name2 -> ^(ASTNAME name2);
 
 						    //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
-name2:                      (ident | nameCurlyStart) ({!LB()}?=> identDigit | nameCurly)* ;
+name2:                      (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
+
+//nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+//					      | leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+//						    ;
+//
+//nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
+//					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+//						    ;
+
 
 nameCurlyStart:             
-					        {LS()}?=> LEFTCURLY expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+					        leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
 nameCurly:                  
-					        {!LB()}?=> LEFTCURLY expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
+					        leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
-cname:                      name {!LB()}?=> cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
-cnameHelper:                sigil {!LB()}?=> name -> ^(ASTCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )                       
-						  | VERTICALBAR {!LB()}?=> name -> name //does not have glue after
+
+
+//cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
+//cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
+
+cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
+cnameHelper:                GLUE sigil name -> ^(ASTCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )                       
+						  | GLUE VERTICALBAR name -> name //does not have glue after
 						    ;
+
+//hashOrPercent:              PERCENT -> ASTPERCENT
+//						  | HASH -> ASTHASH
+//						    ; 
 
 nameOrCname:                cname | name;  //cname must be before name
 
@@ -2200,7 +2232,7 @@ varname:                    nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 
 bankvarname:                bankColon? varname -> ^(ASTBANKVARNAME ^(ASTPLACEHOLDER bankColon?) varname);
 
-bankColon:                  {!RB()}?=> AT -> ^(ASTNAME ^(ASTIDENT REF))            
+bankColon:                  AT GLUE -> ^(ASTNAME ^(ASTIDENT REF))            
 				          | nameOrCname COLON -> nameOrCname
 						    ;
 
@@ -2214,15 +2246,15 @@ seriesname:                 nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 // ------------------- name END -------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-sigil:                      HASH -> ASTHASH
-						  | PERCENT -> ASTPERCENT
+sigil:                      HASH GLUE -> ASTHASH
+						  | PERCENT GLUE -> ASTPERCENT
 						    ;
 
 sigilOrVertical:            sigil
 						  | VERTICALBAR -> ASTVERTICALBAR  //does not have glue after
 						    ;
 
-freq:			   		   EXCLAMATION {!LB()}?=> name -> name;
+freq:			   		   GLUE EXCLAMATION GLUE name -> name;
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- logical START -------------------------------------------------------------------------------
@@ -2356,8 +2388,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 
-percentEqual : PERCENTEQUAL;
-hashEqual: HASHEQUAL;
+percentEqual : GLUE? PERCENTEQUAL;
+hashEqual: GLUE? HASHEQUAL;
 
 assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
@@ -2472,7 +2504,7 @@ cls:					    CLS -> ^({token("ASTCLS", ASTCLS, input.LT(1).Line)});
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 							
 close:					    CLOSE closeOpt1? seqOfBankvarnames -> ^({token("ASTCLOSE", ASTCLOSE, input.LT(1).Line)} seqOfBankvarnames closeOpt1?)
-						  | CLOSE closeOpt1? STAR -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, input.LT(1).Line)} closeOpt1?)
+						  | CLOSE closeOpt1? star -> ^({token("ASTCLOSESTAR", ASTCLOSESTAR, input.LT(1).Line)} closeOpt1?)
 						    ;
 closeOpt1:				    ISNOTQUAL | leftAngle closeOpt1h* RIGHTANGLE -> ^(ASTOPT1 closeOpt1h*);
 closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)							
@@ -2645,13 +2677,13 @@ xx:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTP
 // FUNCTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-functionDef:				FUNCTION type ident {!LB()}?=> LEFTPAREN functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} type ident functionArg functionStatements);
+functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} type ident functionArg functionStatements);
 functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
 functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
 functionStatements2:        functionStatements;  //alias
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
-objectFunctionNaked:        bankvarname {!LB()}?=> DOT ident {!LB()}?=> LEFTPAREN (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
+objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO
@@ -2669,7 +2701,7 @@ hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, input.LT(1).Line)} expres
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-help:					    HELP name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
+help:					    HELP  {HasLeftBlanks()}?=> name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF
@@ -2829,7 +2861,7 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 procedure:					identWithoutCommand expression* -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand expression*);  
-functionNaked:              ident {!LB()}?=> LEFTPAREN (expression (',' expression)*)? RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident expression*);      
+functionNaked:              ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident expression*);      
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE DEFINITION
@@ -3205,27 +3237,27 @@ sysOpt1h:                   MUTE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MUTE yesNo?);
 // TABLE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 						  //TODO: use {token()} for line numbers...
-table:					    TABLE name EQUAL NEW TABLE {!LB()}?=> LEFTPAREN ')'  -> ^(ASTNEWTABLE name)
-						  | TABLE name {!LB()}?=> DOT PRINT {!LB()}?=> LEFTPAREN expression? ')'  -> ^(ASTTABLEPRINT name expression?)
-						  | tableCurrow SETTOPBORDER {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLESETTOPBORDER tableCurrow CURROW expression expression)
-						  | tableCurrow SETBOTTOMBORDER {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLESETBOTTOMBORDER tableCurrow CURROW expression expression)
-						  | tableCurrow SETLEFTBORDER {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression)
-						  | tableCurrow SETLEFTBORDER {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression expression)
-						  | tableCurrow SETRIGHTBORDER {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression)
-						  | tableCurrow SETRIGHTBORDER {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression expression)						
-						  | tableCurrow HIDELEFTBORDER {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLEHIDELEFTBORDER tableCurrow CURROW expression)
-						  | tableCurrow HIDERIGHTBORDER {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLEHIDERIGHTBORDER tableCurrow CURROW expression)						
-						  | tableCurrow SHOWBORDERS {!LB()}?=> LEFTPAREN ')'  -> ^(ASTTABLESHOWBORDERS tableCurrow CURROW)						
-						  | tableCurrow NEXT {!LB()}?=> LEFTPAREN ')'  -> ^(ASTTABLENEXT tableCurrow)
-						  | tableCurrow SETTEXT {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLESETTEXT tableCurrow CURROW expression expression)
-			              | tableCurrow ALIGNLEFT {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLEALIGNLEFT tableCurrow CURROW expression)
-						  | tableCurrow ALIGNCENTER {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLEALIGNCENTER tableCurrow CURROW expression)
-						  | tableCurrow ALIGNRIGHT {!LB()}?=> LEFTPAREN expression ')'  -> ^(ASTTABLEALIGNRIGHT tableCurrow CURROW expression)
-			              | tableCurrow MERGECOLS {!LB()}?=> LEFTPAREN expression ',' expression ')'  -> ^(ASTTABLEMERGECOLS tableCurrow CURROW expression expression)						
-						  | tableCurrow SETDATES {!LB()}?=> LEFTPAREN expression ',' expression ',' expression ')'  -> ^(ASTTABLESETDATES tableCurrow CURROW  expression expression expression)						
+table:					    TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE name)
+						  | TABLE name GLUEDOT DOT PRINT leftParenGlue expression? ')'  -> ^(ASTTABLEPRINT name expression?)
+						  | tableCurrow SETTOPBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETTOPBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETBOTTOMBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETBOTTOMBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETLEFTBORDER leftParenGlue expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression)
+						  | tableCurrow SETLEFTBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETLEFTBORDER tableCurrow CURROW expression expression)
+						  | tableCurrow SETRIGHTBORDER leftParenGlue expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression)
+						  | tableCurrow SETRIGHTBORDER leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETRIGHTBORDER tableCurrow CURROW expression expression)						
+						  | tableCurrow HIDELEFTBORDER leftParenGlue expression ')'  -> ^(ASTTABLEHIDELEFTBORDER tableCurrow CURROW expression)
+						  | tableCurrow HIDERIGHTBORDER leftParenGlue expression ')'  -> ^(ASTTABLEHIDERIGHTBORDER tableCurrow CURROW expression)						
+						  | tableCurrow SHOWBORDERS leftParenGlue ')'  -> ^(ASTTABLESHOWBORDERS tableCurrow CURROW)						
+						  | tableCurrow NEXT leftParenGlue ')'  -> ^(ASTTABLENEXT tableCurrow)
+						  | tableCurrow SETTEXT leftParenGlue expression ',' expression ')'  -> ^(ASTTABLESETTEXT tableCurrow CURROW expression expression)
+			              | tableCurrow ALIGNLEFT leftParenGlue expression ')'  -> ^(ASTTABLEALIGNLEFT tableCurrow CURROW expression)
+						  | tableCurrow ALIGNCENTER leftParenGlue expression ')'  -> ^(ASTTABLEALIGNCENTER tableCurrow CURROW expression)
+						  | tableCurrow ALIGNRIGHT leftParenGlue expression ')'  -> ^(ASTTABLEALIGNRIGHT tableCurrow CURROW expression)
+			              | tableCurrow MERGECOLS leftParenGlue expression ',' expression ')'  -> ^(ASTTABLEMERGECOLS tableCurrow CURROW expression expression)						
+						  | tableCurrow SETDATES leftParenGlue expression ',' expression ',' expression ')'  -> ^(ASTTABLESETDATES tableCurrow CURROW  expression expression expression)						
 						    //col, t1, t2, expression, printcode, scale, format
 						  						  
-						  | tableCurrow SETVALUES {!LB()}?=> LEFTPAREN expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression ASTPLACEHOLDER ASTPLACEHOLDER) expression expression expression)
+						  | tableCurrow SETVALUES leftParenGlue expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression ASTPLACEHOLDER ASTPLACEHOLDER) expression expression expression)
 						  
 						  | TABLE     tableOpt1? fileName -> ^(ASTTABLE     tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line below
 						  | MENUTABLE tableOpt1? fileName -> ^(ASTMENUTABLE tableOpt1? ^(ASTHANDLEFILENAME fileName)) //!beware line above
@@ -3239,7 +3271,7 @@ tableOpt1h:                 HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
   						  | optOld  //printcodes						
 						    ;
 
-tableCurrow:			    TABLE name {!LB()}?=> DOT CURROW {!LB()}?=> DOT -> name;
+tableCurrow:			    TABLE name GLUEDOT DOT CURROW GLUEDOT DOT  -> name;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TARGET
@@ -3665,7 +3697,7 @@ m:                          M;
 u:                          U;
 
 						    //If æøåÆØÅ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
-fileName:                   fileNameFirstPart ({!LB()}?=> BACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
+fileName:                   fileNameFirstPart (GLUEBACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
 						  | expression
 						    ;
 fileNameFirstPart:          fileNameFirstPart1  //   c:\xx
@@ -3680,17 +3712,17 @@ fileNameFirstPart2:         slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fil
                             //For instance READ a.b
 fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
 							//stuff like 'a.7z' or 'a b.doc' or 'æøå.doc' must be in quotes.
-fileNamePart:               fileNamePartHelper ({!LB()}?=> DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
+fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
 
 fileNamePartHelper:         name
 						  | identDigit  //cathes stuff like \05banker\bank etc.
 						    ;
 
-slashHelper1:               {!LB()}?=> BACKSLASH | DIV;
+slashHelper1:               GLUEBACKSLASH | DIV;
 slashHelper2:               BACKSLASH | DIV;
 
 fileNameStar:               fileName
-						  | STAR -> ASTFILENAMESTAR
+						  | star -> ASTFILENAMESTAR
 						    ;
 
 
@@ -3704,7 +3736,7 @@ exportType:                 D -> ASTOPD
 						    ;
 
 nameOrStar:                 name -> name
-						  | STAR -> ASTBANKISSTARCHEATCODE
+						  | star -> ASTBANKISSTARCHEATCODE
 						    ;
 
 
@@ -3720,6 +3752,14 @@ yesNoSimple:			    yes
 yes:                        YES -> ASTYES;
 no:                         NO -> ASTNO;
 
+
+leftParen:                  (GLUE!)? LEFTPAREN;
+leftParenGlue:              GLUE! LEFTPAREN;
+leftParenNoGlue:            LEFTPAREN;
+
+leftBracketGlue:            LEFTBRACKETGLUE;
+leftBracket:                LEFTBRACKETGLUE | LEFTBRACKET;
+
 pow:                        stars -> ASTPOW
                           | HAT -> ASTPOW
                             ;
@@ -3727,6 +3767,11 @@ pow:                        stars -> ASTPOW
 leftAngle:                  leftAngle2 | leftAngleNo2;
 leftAngle2:				    LEFTANGLESPECIAL; // <=<
 leftAngleNo2:	            LEFTANGLESIMPLE;  // <
+
+rightParen:                 RIGHTPAREN (GLUE!)?;
+
+leftBracketNoGlue:          LEFTBRACKET;
+leftBracketNoGlueWild:      LEFTBRACKETWILD;
 
 identDigit:                 identDigitHelper -> ^(ASTIDENTDIGIT identDigitHelper);
 identDigitHelper:		    ident                 //for instance ab27
@@ -3739,13 +3784,33 @@ identDigitHelper:		    ident                 //for instance ab27
 					//	  | EXCLAMATION
 					//	  | name                  //for instance {%s}
 						    ;
+						
+leftCurly:                  (GLUE!)? LEFTCURLY;
+leftCurlyGlue:              GLUE! LEFTCURLY;
+leftCurlyNoGlue:            LEFTCURLY;
 
-doubleDot:                  DOT {!LB()}?=> DOT;
+doubleVerticalBar:          GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
+
+doubleDot:                  GLUEDOT? DOT GLUEDOT DOT;
+doubleDot2:                 GLUEDOT? DOT GLUEDOT? DOT; //can accept two dots with space between
 
 double2:                    double2Helper -> ^(ASTDOUBLE double2Helper);
 double2Helper:              Double            //0.123 or 25e+12
 						  | DigitsEDigits     //for instance 25e12 which can also be a name chunk.
 						    ;
+
+star:                       (GLUESTAR!)? STAR (GLUESTAR!)?;
+starGlueBoth:               GLUESTAR! STAR GLUESTAR!;
+starGlueLeft:               GLUESTAR! STAR;
+starGlueRight:              STAR GLUESTAR!;
+starNoGlue:                 STAR;
+stars:                      (GLUESTAR!)? STARS (GLUESTAR!)?;
+
+question:                   (GLUESTAR!)? QUESTION (GLUESTAR!)?;
+questionGlueBoth:           GLUESTAR! QUESTION GLUESTAR!;
+questionGlueLeft:           GLUESTAR! QUESTION;
+questionGlueRight:          QUESTION GLUESTAR!;
+questionNoGlue:             QUESTION;
 
 date2:                      Integer | DateDef;
 
@@ -4708,6 +4773,9 @@ expression2:                expression;  //just an alias
 expression3:                expression;  //just an alias
 expression4:                expression | ;  //alias
 
+ //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
+ //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the
+ //      GLUE token is defined from.
 
 fragment NEWLINE2:          '\n' ;
 fragment NEWLINE3:          '\r\n' ;
@@ -4738,12 +4806,30 @@ IdentStartingWithInt:       (DIGIT|LETTER|'_')+;
 //It would not be practical to construct Double in the parser. We would like 2012q3 and 7e12 to be recognized as dates and number,
 //and this seems hard to do without having the parser work on really small tokens. Would probably be confusing and slow, and we would need glue around + and - (think 1.2e+34...).
 //Drawback is that we cannot handle a filenames like xx.7z, 01.txt, 12.13, but they can be put inside ''.
-Double:                     DIGIT+ DOT DIGIT* Exponent?   //1.2e+12  Can be without the +
+Double:                     DIGIT+ GLUEDOTNUMBER DOT DIGIT* Exponent?   //1.2e+12  Can be without the +
                           | DIGIT+ Exponent                             //25e12    DigitsEDigits captures the 25e12 (that is, not 25e+12) case before it could end here
-						  | DOT DIGIT+ Exponent?          //.2e-13   Can be "x=.23" or "x= .23", so glue is not known. Will not read the .23 in a.23 because it will be 'a' GLUEDOT DOT '23'.						  
+						  | GLUEDOTNUMBER DOT DIGIT+ Exponent?          //.2e-13   Can be "x=.23" or "x= .23", so glue is not known. Will not read the .23 in a.23 because it will be 'a' GLUEDOT DOT '23'.						  
                             ;
 
 fragment Exponent:          E_ ( '+' | '-' )? DIGIT+;
+
+//String interpolation: 'this is a red old car' 
+//                      00000000000000000000000
+//String interpolation: 'this is a {'r' + 'ed'} old car' 
+//                      111111111111          3333333333
+//String interpolation: 'this is a {'r' + 'ed'} old {'car'} from 1980' 
+//                      111111111111          2222222     333333333333
+//starts in state 0. aaa turns on state 1. Because of state 1, bbb can be matched. Because bbb ends with
+//{ state 2 is set, else it would be state 1. State 2 allows match of naked expression. After that
+//state is set to 1.
+
+//Uses lexer gates to solve the problem. 
+//Problem is that we are going to match "} car'", but it should not match that pattern in for instance "PRT {%i} 'label';". 
+//Therefore, when "'this is a {" is matched, a counter is set. Then the "} car'" token is only allowed to match if the couter is set.
+//See: https://theantlrguy.atlassian.net/wiki/spaces/ANTLR3/pages/2687108/1.+Lexer
+//The rules below do not allow nested interpolations, for instance %s = 'a{'b{'c'}d'}e'; That is crazy anyway.
+//StringInQuotes2: only allowed if after a StringInQuotes1, else normal '}' matches.
+//                 allows ~' but stops at ' or {.
 
 StringInQuotes:             ('\'' ('~\'' | '~{' | ~('\'' | '{'))* '\'');
 StringInQuotes1:            { stringCounter == 0 }?=> ('\'' (~('{' | '\''))* '{') { stringCounter++; };
@@ -4753,11 +4839,23 @@ StringInQuotes3:            { stringCounter == 1 }?=> ('}' (~('{' | '\''))* '\''
 //moved up here, because some of them start with glue, so better before GLUE token
 PLUSEQUAL:                  '+='; //<m>
 STAREQUAL:                  '*='; //<q>
-
+//GLUEPERCENTEQUAL:           'x%='; //<p>
 PERCENTEQUAL:               '%='; //<p>
-
+//GLUEHASHEQUAL:              'x#='; //<mp>
 HASHEQUAL:                  '#='; //<mp>
 HATEQUAL:                   '^='; //<d> 
+
+// --- These are done in Program.HandleObeyFilesNew() -------------------------------------------
+GLUE:                       '¨';
+GLUEDOT:                    '£';  //only relevant for '.', for instance a.b becomes a£.b, and x.1 becomes x£.1
+GLUEDOTNUMBER:              '§';  //only relevant for '.', for instance 12.34 becomes 12§.34
+GLUESTAR:                   '½';  //only relevant for '*' and '?', for instance a*b --> a½*½b
+LEFTANGLESPECIAL:           '<=<';  //indicates that there are two idents following the '<' in the text input.
+                                    // using <_< is not good, since it stumbles on mulprt<_lev>xx
+//MOD                       '¤';  //does not work with '%¨%' ================> NOT DONE YET!!
+GLUEBACKSLASH:              '¨\\';
+// -----------------------------------------------------------------------------------------------
+
 
 
 ISEQUAL:                    '==';
@@ -4770,7 +4868,7 @@ TILDE:					    '~';
 AT:                         '@';
 HAT:                        '^';
 SEMICOLON:                  ';';
-
+COLONGLUE:                  ':|';
 COLON:                      ':';
 COMMA2:                     ',';
 DOT:                        '.';
@@ -4781,7 +4879,7 @@ LEFTCURLY:                  '{';
 RIGHTCURLY:                 '}';
 LEFTPAREN:                  '(';
 RIGHTPAREN:                 ')';
-
+LEFTBRACKETGLUE:            '[_[';
 LEFTBRACKETWILD:            '[¨[';  //indicates that this is probably a wildcard, not a 1x1 matrix
 LEFTBRACKET:                '[';
 RIGHTBRACKET:               ']';
@@ -4793,7 +4891,7 @@ STAR:                       '*';
 DOUBLEVERTICALBAR1:         '||';
 DOUBLEAND:                  '&&';
 DOUBLEVERTICALBAR2:         '|¨|';
-
+//GLUEDOUBLEVERTICALBAR:    '¨|¨|';
 VERTICALBAR:                '|';
 PLUS:                       '+';
 MINUS:                      '-';
