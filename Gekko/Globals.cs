@@ -748,7 +748,7 @@ namespace Gekko
 
         public static bool debugTokens = false;  //tokens are printed 1 by 1, for debug purposes, show tokens, showtokens
         public static bool printGlue = false;  //for debugging purpose
-        public static bool addGlue = true;
+        public static bool addGlue = false;
         public static string dotGlue = "¨";     //3.14 --> 3¨14. But 3. 14 --> 3. 14
         public static string lparGlue = "§";    //f(x) --> f§(x). But f (x) --> f (x) and f((3+1)-2) --> f§(3+1)-2)
                                                 //so glue is only when preceeding chars is ident
