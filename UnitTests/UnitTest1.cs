@@ -6339,13 +6339,14 @@ namespace UnitTests
             I("COPY f* TO ref:*;");
             I("COPY fa..fc TO ref:*;");
             I("COPY {'f*'} TO ref:*;");
-            I("COPY {'fa'..'fc'} TO ref:*;");
+            I("COPY {'fa..fc'} TO ref:*;");
+            I("COPY fa..fc TO ref:*;");
             //---
             I("COPY {#m[1]} TO ref:*;");
             //I("COPY f*[1];");                =====> NO GOOD, do not allow
             //I("COPY fa..fc[1];");            =====> NO GOOD, do not allow
             I("COPY {['f*'][1]} TO ref:*;");
-            I("COPY {['fa'..'fc'][1]} TO ref:*;");
+            I("COPY {['fa..fc'][1]} TO ref:*;");
             //----------------------------
             I("COPY @fa TO work:*;");
             I("COPY @{%s} TO work:*;");
@@ -6353,9 +6354,9 @@ namespace UnitTests
             I("COPY @f* TO work:*;");
             I("COPY @fa..@fc TO work:*;");
             I("COPY {'ref:f*'};");
-            I("COPY {'ref:fa'..'ref:fc'};");
+            I("COPY {'ref:fa..ref:fc'};");
             I("COPY {'@f*'};");
-            I("COPY {'@fa'..'@fc'};");
+            I("COPY {'@fa..@fc'};");
             //---
             I("COPY @{#m[1]} TO work:*;");
             I("COPY {['@f*'][1]};");     //           =====> NO GOOD, do not allow
@@ -6368,7 +6369,8 @@ namespace UnitTests
             I("COPY ref:f* TO work:*;");
             I("COPY ref:fa..ref:fc TO work:*;");
             I("COPY {'ref:f*'};");
-            I("COPY {'ref:fa'..'ref:fc'};");
+            I("COPY {'ref:fa..ref:fc'};");
+            I("COPY ref:fa..ref:fc;");
             //---
             I("COPY ref:{#m[1]} TO work:*;");
             //I("COPY ref:f*[1];");                =====> NO GOOD, do not allow
@@ -6382,7 +6384,7 @@ namespace UnitTests
             I("COPY {%b}:f* TO work:*;");
             I("COPY {%b}:fa..{%b}:fc TO work:*;");
             I("COPY {'{%b}:f*'};");
-            I("COPY {'{%b}:fa'..'{%b}:fc'};");
+            I("COPY {'{%b}:fa..{%b}:fc'};");
             //---
             I("COPY {%b}:{#m[1]} TO work:*;");
             //I("COPY {%b}:f*[1];");                =====> NO GOOD, do not allow
@@ -12101,7 +12103,9 @@ namespace UnitTests
             FAIL("LIST #x5 = %s1, %s1;");
             I("LIST #x5 = (%s1, %s1);");
             Assert.AreEqual(_GetListOfStrings("x5").Count, 2);
-            I("LIST #x6 = x%s1, x{%s1};");
+            Assert.IsTrue(Globals.eliminateConcatenator);
+            //I("LIST #x6 = x%s1, x{%s1};");
+            I("LIST #x6 = x{%s1}, x{%s1};");            
             Assert.AreEqual(_GetListOfStrings("x6").Count, 2);
             Assert.AreEqual(_GetListOfStrings("x6")[0], "xtt");
             Assert.AreEqual(_GetListOfStrings("x6")[1], "xtt");

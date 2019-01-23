@@ -1342,11 +1342,29 @@ Y2                    = 'Y2'                       ;
                               @lexer::namespace { Gekko }
 
                               @members {							                      
-								
-								 private bool HasLeftBlanks()
+								 
+								  private bool LB()
 								 {            
 						            return input.LT(-1).TokenIndex + 1 != input.LT(1).TokenIndex;
-								 }								
+								 }
+								 
+								 private bool RB()
+								 {            
+						            return input.LT(1).TokenIndex + 1 != input.LT(2).TokenIndex;
+								 }									
+
+								 private bool LS()
+								 {
+                                    IToken i1 = input.LT(-1);
+                                    IToken i2 = input.LT(1);
+                                    if (i1.TokenIndex + 1 != i2.TokenIndex) return true;
+                                    string s = i1.Text;
+                                    if (s == "/" || s == "[" || s == "(" || s == "+" || s == "*" || s == ";" || s == "," || s == "-" || s == "<" || s == ">" || s == "{")
+                                    {
+                                       return true;
+                                    }
+                                    return false;                                   
+                                 }							
 
 								 private CommonToken token(string text, int type, int line) {
                                                                CommonToken t = new CommonToken(type, text);
@@ -2085,13 +2103,17 @@ expressionOrNothing:        expression -> expression
 //						      ;
 
 seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
-							| seqItem7
+							| seqItem7 doubleDot2 seqItem7 -> ^(ASTRANGEWITHBANK seqItem7 seqItem7)
+							| seqItem7							
 						      ;
 
 //remember AT and minus and ranges
 //seqItem7: name {!HasLeftBlanks(input)}?=>name {!HasLeftBlanks(input)}?=>name;
 seqItem7:                  bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
-bank7: wildcard7 COLON -> wildcard7 ASTCOLON;
+bank7: 
+	AT GLUE -> ASTAT
+	| wildcard7 COLON -> wildcard7 ASTCOLON
+	;
 freq7: GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
 indexer7: leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
 
@@ -2149,7 +2171,7 @@ wildcardWithBank:           AT GLUE varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^
 rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)
 						  ;
 
-range                     : wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
+range:                      wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
 
 wildcard:                   wildcard3 -> ^(ASTWILDCARD wildcard3);
 
@@ -2701,7 +2723,7 @@ hdg:						HDG expression -> ^({token("ASTHDG", ASTHDG, input.LT(1).Line)} expres
 // HELP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-help:					    HELP  {HasLeftBlanks()}?=> name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
+help:					    HELP  name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} name?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // IF

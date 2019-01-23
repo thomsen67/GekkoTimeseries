@@ -910,7 +910,7 @@ namespace Gekko.Parser.Gek
                         break;                    
                     case "ASTAT":
                         {
-                            node.Code.CA("new ScalarString(`@`)");
+                            node.Code.CA("new ScalarString(`Ref:`)");
                         }
                         break;
                     case "ASTCOLON":
