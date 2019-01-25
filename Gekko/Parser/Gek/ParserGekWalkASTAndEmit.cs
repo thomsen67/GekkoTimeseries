@@ -913,12 +913,19 @@ namespace Gekko.Parser.Gek
                             node.Code.CA("new ScalarString(`Ref:`)");
                         }
                         break;
+                    case "ASTSTARS":
+                        {
+                            node.Code.CA("new ScalarString(`**`)");
+                        }
+                        break;
+                    case "ASTTRIPLESTARS":
+                        {
+                            node.Code.CA("new ScalarString(`***`)");
+                        }
+                        break;
                     case "ASTCOLON":
                         {
                             node.Code.CA("new ScalarString(`:`)");
-                            //node.Code.CA("XXXXX");
-                            
- 
                         }
                         break;
                     case "ASTL0":

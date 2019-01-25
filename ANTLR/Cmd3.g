@@ -57,6 +57,8 @@ tokens {
 	ASTVERTICALBAR;
     ASTINDEXERELEMENT;
     ASTINDEXERELEMENTBANK;
+	ASTSTARS;
+	ASTTRIPLESTARS;
     ASTPOW;
 	ASTREPSTAR;
     ASTEMPTYRANGEELEMENT;
@@ -2094,41 +2096,30 @@ expressionOrNothing:        expression -> expression
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-//accepts b:x!q but also {%s}-stuff including {#m}, and indexers like x['a'] or x[a]
-//seqOfBankvarnames:          bankvarname (COMMA2 bankvarname)* ->  ^(ASTBANKVARNAMELIST bankvarname+);
-
-//seqItem:                      MINUS listItemWildRange -> ^(ASTSEQITEMMINUS listItemWildRange)
-//							| listItemWildRange
-//							| bankvarnameIndexer	//probably only indexer part of this is used...?					   
-//						      ;
-
 seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 							| seqItem7 doubleDot2 seqItem7 -> ^(ASTRANGEWITHBANK seqItem7 seqItem7)
 							| seqItem7							
 						      ;
 
-//remember AT and minus and ranges
-//seqItem7: name {!HasLeftBlanks(input)}?=>name {!HasLeftBlanks(input)}?=>name;
-seqItem7:                  bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
-bank7: 
-	AT GLUE -> ASTAT
-	| wildcard7 COLON -> wildcard7 ASTCOLON
-	;
-freq7: GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
-indexer7: leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
+seqItem7:                     bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
+bank7:						  AT GLUE -> ASTAT
+							| wildcard7 COLON -> wildcard7 ASTCOLON
+							  ;
 
-w7: wildcard7 -> ^(ASTL1 wildcard7);
+freq7:						  GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
+indexer7:					  leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
 
-name7:name;
-//name7:                      name7Helper+;
-//name7Helper:                name | identDigit;
+w7:							  wildcard7 -> ^(ASTL1 wildcard7);
 
-wildcard7:         		   
-						    name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-						  | name7 wildSymbolEnd  //a?						  	
-						  | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
-						  | wildSymbolFree //?
-						    ;
+name7:						  name;
+
+wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
+							| stars -> ASTSTARS		         //everything in a bank
+							| name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
+						    | name7 wildSymbolEnd  //a?						  	
+						    | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
+						    | wildSymbolFree //?
+						      ;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
@@ -3827,6 +3818,7 @@ starGlueLeft:               GLUESTAR! STAR;
 starGlueRight:              STAR GLUESTAR!;
 starNoGlue:                 STAR;
 stars:                      (GLUESTAR!)? STARS (GLUESTAR!)?;
+triplestars:                (GLUESTAR!)? TRIPLESTARS (GLUESTAR!)?;
 
 question:                   (GLUESTAR!)? QUESTION (GLUESTAR!)?;
 questionGlueBoth:           GLUESTAR! QUESTION GLUESTAR!;
@@ -4918,7 +4910,9 @@ VERTICALBAR:                '|';
 PLUS:                       '+';
 MINUS:                      '-';
 DIV:                        '/';
+TRIPLESTARS:                '***';
 STARS:                      '**';
+
 EQUAL:                      '=';
 MINUSEQUAL:                 '-='; 
 DIVEQUAL:                   '/=';
