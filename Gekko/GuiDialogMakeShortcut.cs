@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using VBIDE = Microsoft.Vbe.Interop;
+//using VBIDE = Microsoft.Vbe.Interop;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using System.Reflection;

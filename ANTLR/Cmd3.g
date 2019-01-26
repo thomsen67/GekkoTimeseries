@@ -2101,7 +2101,7 @@ seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 							| seqItem7							
 						      ;
 
-seqItem7:                     bank7? sigil? wildcard7 freq7? indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER sigil?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER freq7?) ^(ASTPLACEHOLDER indexer7?));
+seqItem7:                     bank7? wildcard7 indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7?));
 bank7:						  AT GLUE -> ASTAT
 							| wildcard7 COLON -> wildcard7 ASTCOLON
 							  ;
@@ -2115,10 +2115,10 @@ name7:						  name;
 
 wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 							| stars -> ASTSTARS		         //everything in a bank
-							| name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //a?b a?b?, a?b?c a?b?c?, etc.
-						    | name7 wildSymbolEnd  //a?						  	
-						    | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd?  //?a ?a? ?a?b ?a?b?, etc.
-						    | wildSymbolFree //?
+							| sigil? name7 (wildSymbolMiddle name7)* wildSymbolEnd? freq7? //a?b a?b?, a?b?c a?b?c?, etc.
+						    | sigil? name7 wildSymbolEnd freq7? //a?						  	
+						    | sigilNoGlue? wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd? freq7? //?a ?a? ?a?b ?a?b?, etc.
+						    | sigilNoGlue? wildSymbolFree freq7? //?
 						      ;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
@@ -2261,6 +2261,10 @@ seriesname:                 nameOrCname freq? -> ^(ASTVARNAME ^(ASTPLACEHOLDER) 
 
 sigil:                      HASH GLUE -> ASTHASH
 						  | PERCENT GLUE -> ASTPERCENT
+						    ;
+
+sigilNoGlue:                HASH -> ASTHASH
+						  | PERCENT -> ASTPERCENT
 						    ;
 
 sigilOrVertical:            sigil

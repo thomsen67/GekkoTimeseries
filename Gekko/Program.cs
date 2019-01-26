@@ -43,7 +43,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Serialization;
 using Office = Microsoft.Office.Core;
-using VBIDE = Microsoft.Vbe.Interop;
+//using VBIDE = Microsoft.Vbe.Interop;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using SevenZip;

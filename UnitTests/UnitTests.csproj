@@ -63,10 +63,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Diverse\ExternalDllFiles\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Diverse\ExternalDllFiles\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="Interop.IWshRuntimeLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Gekko\obj\Debug\Interop.IWshRuntimeLibrary.dll</HintPath>
@@ -126,7 +122,7 @@
       <Name>ANTLR</Name>
     </ProjectReference>
     <ProjectReference Include="..\Gekko\Gekko.csproj">
-      <Project>{977BF459-F717-4C88-992E-D68159D95F45}</Project>
+      <Project>{977bf459-f717-4c88-992e-d68159d95f45}</Project>
       <Name>Gekko</Name>
     </ProjectReference>
     <ProjectReference Include="..\MathNet.Numerics\Numerics.csproj">

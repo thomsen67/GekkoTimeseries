@@ -114,9 +114,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Diverse\ExternalDllFiles\GAMS.net4.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.0.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Diverse\ExternalDllFiles\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="PresentationCore">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -413,14 +416,6 @@
       <Project>{348405FA-5AAC-4F8B-BB47-211CAD2294AC}</Project>
       <Name>GekkoFlowChart</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\popup\SimplePopup\src\PopupControl\PopupControl.csproj">
-      <Project>{E305A89A-00AD-47F8-AC0E-95431A94BD37}</Project>
-      <Name>PopupControl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\com.calitha.goldparser\LexerParser.csproj">
-      <Project>{72FE7760-F96F-4ECC-9CE4-946BD831E405}</Project>
-      <Name>LexerParser</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MathNet.Numerics\Numerics.csproj">
       <Project>{8D2A69DC-7A76-44B3-B976-C078AF604763}</Project>
       <Name>Numerics</Name>
@@ -464,30 +459,6 @@
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="Microsoft.Office.Core">
-      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>4</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="Microsoft.Office.Interop.Excel">
-      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>6</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-    <COMReference Include="VBIDE">
-      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>3</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>
