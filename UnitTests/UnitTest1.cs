@@ -8912,6 +8912,47 @@ namespace UnitTests
 
             }
 
+            //date functions:
+
+            I("date %d = 2001a1;");
+            I("%x = %d.getyear();");
+            _AssertScalarVal(First(), "%x", 2001d);
+            I("%x = %d.getsubper();");
+            _AssertScalarVal(First(), "%x", 1d);
+            FAIL("%x = %d.getquarter();");
+            FAIL("%x = %d.getmonth();");
+            I("%x = %d.getfreq();");
+            _AssertScalarString(First(), "%x", "a");
+            // --------
+            I("date %d = 2001q2;");
+            I("%x = %d.getyear();");
+            _AssertScalarVal(First(), "%x", 2001d);
+            I("%x = %d.getsubper();");
+            _AssertScalarVal(First(), "%x", 2d);
+            I("%x = %d.getquarter();");
+            _AssertScalarVal(First(), "%x", 2d);
+            FAIL("%x = %d.getmonth();");
+            I("%x = %d.getfreq();");
+            _AssertScalarString(First(), "%x", "q");
+            // --------
+            I("date %d = 2001m3;");
+            I("%x = %d.getyear();");
+            _AssertScalarVal(First(), "%x", 2001d);
+            I("%x = %d.getsubper();");
+            _AssertScalarVal(First(), "%x", 3d);
+            FAIL("%x = %d.getquarter();");
+            I("%x = %d.getmonth();");
+            _AssertScalarVal(First(), "%x", 3d);
+            I("%x = %d.getfreq();");
+            _AssertScalarString(First(), "%x", "m");
+
+            I("%d = date(2001, 'a', 1);");
+            _AssertScalarDate(First(), "%d", EFreq.A, 2001, 1);
+            I("%d = date(2001, 'q', 2);");
+            _AssertScalarDate(First(), "%d", EFreq.Q, 2001, 2);
+            I("%d = date(2001, 'm', 3);");
+            _AssertScalarDate(First(), "%d", EFreq.M, 2001, 3);
+
             //time()
             I("SER xxtrend = time();");
             _AssertSeries(First(), "xxtrend", 2010, 2010d, sharedDelta);

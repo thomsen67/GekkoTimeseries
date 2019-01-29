@@ -2101,7 +2101,8 @@ seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 							| seqItem7							
 						      ;
 
-seqItem7:                     bank7? wildcard7 indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7?));
+seqItem7:                     listFile
+							| bank7? wildcard7 indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7?));
 bank7:						  AT GLUE -> ASTAT
 							| wildcard7 COLON -> wildcard7 ASTCOLON
 							  ;

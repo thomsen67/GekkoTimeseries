@@ -34,6 +34,85 @@ namespace Gekko
         }
 
         // ===========================================================================================================================
+        // ========================= functions to manipulate dates start =============================================================
+        // ===========================================================================================================================
+
+        public static IVariable date(GekkoSmpl smpl, IVariable y, IVariable f, IVariable s)
+        {
+            int yy = O.ConvertToInt(y);
+            string ff = O.ConvertToString(f);
+            int ss = O.ConvertToInt(s);
+            GekkoTime gt = new GekkoTime(G.GetFreq(ff), yy, ss);
+            return new ScalarDate(gt);
+        }
+
+        public static IVariable getyear(GekkoSmpl smpl, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                G.Writeln2("*** ERROR: getyear() expects date input");
+                throw new GekkoException();
+            }
+            
+            GekkoTime gt = (ths as ScalarDate).date;
+            return new ScalarVal(gt.super);
+        }
+
+        public static IVariable getsubper(GekkoSmpl smpl, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                G.Writeln2("*** ERROR: getsubper() expects date input");
+                throw new GekkoException();
+            }
+
+            GekkoTime gt = (ths as ScalarDate).date;
+            return new ScalarVal(gt.sub);
+        }
+
+        public static IVariable getquarter(GekkoSmpl smpl, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                G.Writeln2("*** ERROR: getyear() expects date input");
+                throw new GekkoException();
+            }
+
+            GekkoTime gt = (ths as ScalarDate).date;
+            if (gt.freq != EFreq.Q)
+            {
+                G.Writeln2("*** ERROR: getquarter() expects quarterly date");
+                throw new GekkoException();
+            }
+            return new ScalarVal(gt.sub);
+        }
+
+        public static IVariable getmonth(GekkoSmpl smpl, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                G.Writeln2("*** ERROR: getmonth() expects date input");
+                throw new GekkoException();
+            }
+
+            GekkoTime gt = (ths as ScalarDate).date;
+            if (gt.freq != EFreq.M)
+            {
+                G.Writeln2("*** ERROR: getmonth() expects monthly date");
+                throw new GekkoException();
+            }
+            return new ScalarVal(gt.sub);
+        }                
+
+        // ===========================================================================================================================
+        // ========================= functions to manipulate dates end ===============================================================
+        // ===========================================================================================================================
+
+
+
+
+
+        // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes start =========================================
         // ===========================================================================================================================
 
@@ -79,6 +158,11 @@ namespace Gekko
                 List rv = new List();
                 foreach (IVariable item in (ths as List).list) rv.Add(getfreq(smpl, item));
                 return rv;
+            }
+            else if (ths.Type() == EVariableType.Date)
+            {
+                GekkoTime gt = (ths as ScalarDate).date;
+                return new ScalarString(G.GetFreq(gt.freq));
             }
             else
             {

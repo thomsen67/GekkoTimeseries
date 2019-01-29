@@ -2607,9 +2607,9 @@ namespace Gekko
             WriteAbstract(s, null, true, Color.Gray, false, ETabs.Main);
         }
 
-        public static bool IsUnitTesting()
+        public static bool IsUnitTesting()  
         {
-            if ((Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
+            if ((Application.ExecutablePath.Contains("testhost.x86.exe") || Application.ExecutablePath.Contains("vstesthost.exe") || Application.ExecutablePath.Contains("QTAgent32.exe") || Application.ExecutablePath.Contains("vstest.executionengine.x86.exe"))) return true;
             else return false;
         }
 
