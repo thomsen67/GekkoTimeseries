@@ -1657,7 +1657,7 @@ namespace Gekko
                                         }
                                         try
                                         {
-                                            ss = double.Parse(s3, System.Globalization.CultureInfo.InvariantCulture);
+                                            ss = G.ParseIntoDouble(s3);
                                         }
                                         catch
                                         {
@@ -1794,323 +1794,6 @@ namespace Gekko
             }
             return coord;
         }
-
-        //public static void readCsvOLDDELETE(Databank databank, string file, bool merge, ReadInfo readInfo)
-        //{
-        //    if (!merge)
-        //    {
-        //        databank.Clear();
-        //    }
-
-        //    string freqHere = G.GetFreq(Program.options.freq);
-
-        //    string fullFileNameAndPath = CreateFullPathAndFileName(file);
-
-        //    bool trailingY = false;
-
-        //    if (!File.Exists(fullFileNameAndPath))
-        //    {
-        //        G.Writeln2("*** ERROR: csv file does not exist");
-        //        throw new GekkoException();
-        //    }
-
-        //    //should not contain זרו, so no need to use GetTextFromFile()
-        //    using (FileStream fs = WaitForFileStream(fullFileNameAndPath, GekkoFileReadOrWrite.Read))
-        //    using (StreamReader sr = new StreamReader(fs))
-        //    {
-        //        char delimiter = ';';
-        //        char periodIndicator = 'Y';
-        //        //This is an arbitrary size for this example.
-        //        int max = 100000000; //100 MB
-        //        char[] c = null;
-        //        int counter = 0;
-        //        int varCounter = -12345;
-        //        while (sr.Peek() >= 0)
-        //        {
-        //            counter++;
-        //            if (counter >= 2)
-        //            {
-        //                G.Writeln2("*** ERROR: File is > " + max / 1000000 + " MB");
-        //                throw new GekkoException();
-        //            }
-        //            c = new char[max];
-        //            int size = sr.Read(c, 0, c.Length);
-        //            int ii = 0;
-        //            int iiNewLine = 0;
-        //            for (int i = 0; i < 1; i++)
-        //            {
-        //                ii = skipSpaces(c, ii);
-        //                iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
-        //                //read periods
-        //                int pcounter = 0;
-        //                bool endOfLineEncountered = false;
-        //                bool firstPeriod = true;
-        //                GekkoTime per1 = GekkoTime.tNull;
-        //                GekkoTime per2 = GekkoTime.tNull;
-        //                for (pcounter = 0; pcounter < int.MaxValue; pcounter++)
-        //                {
-        //                    if (c[ii] != delimiter)
-        //                    {
-        //                        G.Writeln2("*** ERROR regarding CSV read, first character is not a '" + delimiter + "'");
-        //                    }
-        //                    int iiOld = ii;
-        //                    ii = findChar(c, iiOld + 1, ';');
-        //                    if (ii == -12345 || ii > iiNewLine)
-        //                    {
-        //                        ii = iiNewLine;
-        //                        endOfLineEncountered = true;
-        //                    }
-
-        //                    String date = new String(c, iiOld + 1, ii - iiOld - 1);
-        //                    date = date.Trim();  //removes blanks at start and end
-        //                    date = date.ToLower();  //if q or m
-
-        //                    if (date.EndsWith(periodIndicator.ToString(), true, null))
-        //                    {
-        //                        //remove 'Y' if it is there
-        //                        date = date.Remove(date.Length - 1);
-        //                        trailingY = true;
-        //                    }
-
-        //                    int per = -12345;
-        //                    int subPer = -12345;
-
-        //                    try
-        //                    {
-
-        //                        string perTemp = "";
-        //                        string subPerTemp = "";
-        //                        if (G.Equal(freqHere, "a"))
-        //                        {
-        //                            perTemp = date;
-        //                            subPerTemp = "1";
-        //                        }
-        //                        else
-        //                        {
-        //                            string[] temp = date.Split(new string[] { freqHere }, StringSplitOptions.None);
-        //                            if (temp.Length != 2)
-        //                            {
-        //                                G.Writeln2("*** ERROR: Could not find freq '" + freqHere + "' in this date: '" + date + "'");
-        //                                G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-        //                                throw new GekkoException();
-        //                            }
-        //                            perTemp = temp[0];
-        //                            subPerTemp = temp[1];
-        //                        }
-
-        //                        try
-        //                        {
-        //                            per = int.Parse(perTemp);
-        //                            subPer = int.Parse(subPerTemp);
-        //                        }
-        //                        catch
-        //                        {
-        //                            G.Writeln2("*** ERROR: Could not parse this date: '" + date + "'");
-        //                            G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-        //                            throw new GekkoException();
-        //                        }
-
-        //                        GekkoTime gt = new GekkoTime((Program.options.freq), per, subPer);
-
-        //                        if (firstPeriod)
-        //                        {
-        //                            per1 = gt;
-        //                            firstPeriod = false;
-        //                        }
-        //                        if (endOfLineEncountered)
-        //                        {
-        //                            per2 = gt;
-        //                        }
-        //                    }
-        //                    catch (Exception e)
-        //                    {
-        //                        G.Writeln2("*** ERROR: unexpected error while reading csv file");
-        //                        throw new GekkoException();
-        //                    }
-        //                    if (endOfLineEncountered == true) break;
-        //                }
-
-        //                G.Writeln("Csv data period = " + G.FromDateToString(per1) + " to " + G.FromDateToString(per2));
-        //                readInfo.startPerInFile = per1.super;
-        //                readInfo.endPerInFile = per2.super;
-
-        //                int expectedPeriodsPerLine = GekkoTime.Observations(per1, per2);
-
-        //                //reading the data part, first the variable name, and then the numbers
-
-        //                for (varCounter = 0; varCounter < int.MaxValue; varCounter++)
-        //                {
-        //                    if (c[ii] == '\r' && c[ii + 1] == '\n')
-        //                    {
-        //                        if (size <= ii + 2) break;
-        //                    }
-        //                    //G.Writeln("---");
-        //                    //double[] ts = null;
-        //                    Series dataArray = null;
-        //                    String varName = "";
-        //                    endOfLineEncountered = false;
-        //                    bool firstItem = true;
-        //                    ii = skipSpaces(c, ii + 2) - 1;
-        //                    iiNewLine = skipPastNewLine(c, ii) - 2;  //new line is two characters \r\n
-        //                    for (int i5 = 0; i5 < int.MaxValue; i5++)
-        //                    {
-
-        //                        int iiOld = ii;
-        //                        ii = findChar(c, iiOld + 1, size, ';');
-        //                        if (ii == -12345 || ii > iiNewLine)
-        //                        {
-        //                            ii = iiNewLine;
-        //                            endOfLineEncountered = true;
-        //                        }
-
-        //                        String s = new String(c, iiOld + 1, ii - iiOld - 1);
-        //                        s = s.Trim();
-        //                        if (firstItem)
-        //                        {
-        //                            //var name
-        //                            varName = s;
-        //                            firstItem = false;
-
-        //                            //Series ts=findOrCreateTimeSeriesInDataBank(
-
-        //                            if (!databank.ContainsVariable(varName))
-        //                            {
-        //                                Series data2 = new Series(G.GetFreq(freqHere), varName);  //TODO, FIX
-        //                                databank.AddVariable(data2);
-        //                                dataArray = data2;
-        //                            }
-        //                            else
-        //                            {
-        //                                dataArray = databank.GetVariable(varName);
-        //                            }
-        //                        }
-        //                        else
-        //                        {
-        //                            bool shouldSkip = false;
-        //                            //number
-        //                            double ss = double.NaN;
-        //                            if (s == "")
-        //                            {
-        //                                shouldSkip = true;
-        //                            }
-        //                            else if (s == "#N/A" || s == "#NAME?" || s == "#I/T" || s == "#NAVN?")  //the last ones are the Danish codes
-        //                            {
-        //                                ss = double.NaN;
-        //                            }
-        //                            else
-        //                            {
-        //                                string s3 = s;
-        //                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
-        //                                {
-        //                                    //do nothing
-        //                                }
-        //                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-        //                                {
-        //                                    s3 = s.Replace(",", ".");  //bit of a hack, will not handle 1.500,75   (--> 1500.75)
-        //                                }
-        //                                try
-        //                                {
-        //                                    ss = double.Parse(s3, System.Globalization.CultureInfo.InvariantCulture);
-        //                                }
-        //                                catch
-        //                                {
-        //                                    G.Writeln2("*** ERROR: Could not parse " + s + " as a number");
-        //                                    G.Writeln("+++ NOTE:  You may change separator: OPTION interface csv decimalseparator");
-        //                                    throw new GekkoException();
-        //                                }
-        //                            }
-
-        //                            if (!shouldSkip)
-        //                            {
-        //                                if (ss == 1e+15d)  //we use this as code for missing, as in AREMOS.
-        //                                {
-        //                                    ss = double.NaN;
-        //                                }
-        //                                GekkoTime gt2 = per1.Add(i5 - 1);
-        //                                dataArray.SetData(gt2, ss);
-        //                            }
-        //                        }
-        //                        if (endOfLineEncountered)
-        //                        {
-        //                            //G.Writeln(i5);
-        //                            if (i5 != expectedPeriodsPerLine)
-        //                            {
-        //                                G.Writeln2("*** ERROR: expected " + expectedPeriodsPerLine + " numbers for '" + varName + "'");
-        //                            }
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        if (trailingY) G.Writeln("+++ NOTE: Trailing 'Y's were removed from dates (for instance '2010Y' becomes '2010')");
-        //        c = null;
-        //        sr.Close();
-        //        readInfo.variables = varCounter;
-
-
-        //        //See almost identical code in readTsd() several places
-        //        if (merge)
-        //        {
-        //            readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-        //            readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-        //        }
-        //        else
-        //        {
-        //            readInfo.startPerResultingBank = readInfo.startPerInFile;
-        //            readInfo.endPerResultingBank = readInfo.endPerInFile;
-        //        }
-        //        Databank currentBank = Program.databanks.GetDatabank(databank.name);
-        //        currentBank.yearStart = readInfo.startPerResultingBank;
-        //        currentBank.yearEnd = readInfo.endPerResultingBank;
-
-        //        return;
-        //    }
-        //}
-
-        //public static void Index(string listName, string wildCard)
-        //{
-        //    string bank = Program.databanks.GetFirst().name;
-        //    if (wildCard.StartsWith(Globals.Work.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        bank = Globals.Work;
-        //        wildCard = wildCard.Substring(Globals.Work.Length + 1);
-        //        wildCard = wildCard.Trim();
-        //    }
-        //    if (wildCard.StartsWith(Globals.Ref.ToLower() + ":", StringComparison.OrdinalIgnoreCase))
-        //    {
-        //        bank = Globals.Ref;
-        //        wildCard = wildCard.Substring(Globals.Ref.Length + 1);
-        //        wildCard = wildCard.Trim();
-        //    }
-
-        //    Databank databank = Program.databanks.GetDatabank(bank);
-
-        //    G.Writeln();
-
-        //    if (databank.storage.Keys.Count == 0)
-        //    {
-        //        G.Writeln("+++ WARNING: the " + bank + " databank is empty -- did you forget to READ a databank?");
-        //    }
-
-        //    List<string> found = GetListFromWildcards(wildCard, databank);
-        //    {
-        //        if (found.Count == 0) G.Writeln("No series were found in " + bank + " databank matching '" + wildCard + "'");
-        //        else
-        //        {
-        //            G.Writeln(found.Count + " variables were found in " + bank + " databank matching '" + wildCard + "'");
-        //            found.Sort(StringComparer.InvariantCulture);
-        //            G.PrintListWithCommas(found, false);
-        //        }
-        //        if (listName != "")
-        //        {
-        //            if (Program.scalars.ContainsKey(Globals.symbolCollection + listName)) Program.scalars.Remove(Globals.symbolCollection + listName);
-        //            Program.scalars.Add(Globals.symbolCollection + listName, new List(found));
-        //            if (found.Count == 0) G.Writeln("+++ NOTE: The list #" + listName + " contains zero elements");
-        //            else G.Writeln("The list #" + listName + " contains the above list of variables");
-        //        }
-        //    }
-        //}
 
         private static List<string> GetListFromWildcards(string w, Databank databank)
         {
@@ -3930,7 +3613,7 @@ namespace Gekko
                             {
                                 width = 15;
                             }
-                            success = double.TryParse(line.Substring(ii + i5 * width, width), NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out ss);
+                            success = G.TryParseIntoDouble(line.Substring(ii + i5 * width, width), out ss);
                             if (!success)
                             {
                                 string toParse = line.Substring(ii + i5 * width, width).Trim();
@@ -4097,7 +3780,7 @@ namespace Gekko
                         {
                             try
                             {
-                                ss = double.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
+                                ss = G.ParseIntoDouble(s);
                             }
                             catch
                             {
@@ -4359,7 +4042,7 @@ namespace Gekko
                             {
                                 try
                                 {
-                                    d = double.Parse(tokens[j].s, System.Globalization.CultureInfo.InvariantCulture);
+                                    d = G.ParseIntoDouble(tokens[j].s);
                                     counter++;
                                     if (minus) d = -d;
                                     ts.SetData(gt1.Add(counter), d);
@@ -4908,7 +4591,7 @@ namespace Gekko
 
                                 try
                                 {
-                                    value = double.Parse(temp2);
+                                    value = G.ParseIntoDouble(temp2);
                                 }
                                 catch
                                 {
@@ -9328,7 +9011,7 @@ namespace Gekko
                         {
                             cnt++;
                             double d = double.NaN;
-                            if (s2 != "NA") d = double.Parse(s2);
+                            if (s2 != "NA") d = G.ParseIntoDouble(s2);
                             m.data[cnt / cols, cnt % cols] = d;
                         }
 
@@ -9525,7 +9208,7 @@ namespace Gekko
                                     int i1 = int.Parse(ss[0].Substring(0, 4));
                                     int i2 = int.Parse(ss[0].Substring(4, 2));
                                     GekkoTime gt = new GekkoTime(o.t1.freq, i1, i2);
-                                    ts.SetData(gt, double.Parse(ss[1]));
+                                    ts.SetData(gt, G.ParseIntoDouble(ss[1]));
                                 }
                                 catch
                                 {
@@ -11136,7 +10819,8 @@ namespace Gekko
         {
             Thread thread = new Thread(new ParameterizedThreadStart(DecompThreadFunction));
             thread.SetApartmentState(ApartmentState.STA);
-            thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+            thread.CurrentCulture = CultureInfo.InvariantCulture;
+            //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
             thread.Start(decompOptions);
             if (true)
             {
@@ -12578,9 +12262,9 @@ namespace Gekko
                                 string type = s3[0];
                                 int year = int.Parse(s3[1]);
                                 string var = s3[2];
-                                double val = double.Parse(s3[3]);
-                                double vs = double.Parse(s3[4]);
-                                double hs = double.Parse(s3[5]);
+                                double val = G.ParseIntoDouble(s3[3]);
+                                double vs = G.ParseIntoDouble(s3[4]);
+                                double hs = G.ParseIntoDouble(s3[5]);
                                 if (year < min) min = year;
                                 if (year > max) max = year;
                                 if (type == "abs")
@@ -12785,7 +12469,7 @@ namespace Gekko
                 if (s2.StartsWith("prune "))
                 {
                     string[] ss2 = s2.Split(' ');
-                    double prune = double.Parse(ss2[1].Trim());
+                    double prune = G.ParseIntoDouble(ss2[1].Trim());
                     Globals.pruneDecomp = prune;
                     G.Writeln("Flowchart prune set to: " + Globals.pruneDecomp);
                     G.Writeln();
@@ -31571,7 +31255,8 @@ namespace Gekko
 
                 Thread thread = new Thread(new ParameterizedThreadStart(GraphThreadFunction));
                 thread.SetApartmentState(ApartmentState.STA);
-                thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+                thread.CurrentCulture = CultureInfo.InvariantCulture;
+                //thread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
                 thread.Start(graphOptions);
 
                 //Also see #9237532567
@@ -31706,12 +31391,12 @@ namespace Gekko
                 {
                     if(linewidthCorrection!=1d)
                     {
-                        double temp = double.Parse(linewidth);
+                        double temp = G.ParseIntoDouble(linewidth);
                         linewidth = (temp * linewidthCorrection).ToString();
                     }
                     if (pointsizeCorrection != 1d)
                     {
-                        double temp = double.Parse(pointsize);
+                        double temp = G.ParseIntoDouble(pointsize);
                         pointsize = (temp * pointsizeCorrection).ToString();
                     }
                 }
@@ -32265,7 +31950,7 @@ namespace Gekko
             double y = double.NaN;
             if (x != null)
             {
-                if (!double.TryParse(x, out y))
+                if (!G.TryParseIntoDouble(x, out y))
                 {
                     G.Writeln2("*** ERROR: Could not parse '" + x + "' as a number");
                     throw new GekkoException();
@@ -36510,6 +36195,8 @@ namespace Gekko
                 //if you need to handle stuff
                 G.Writeln2("*** ERROR: Get data from Excel failed with the following message:");
                 G.Writeln(ex.Message, Color.Red);
+
+                ErrorMessageExcelInterop();
             }
             finally
             {
@@ -37407,6 +37094,7 @@ namespace Gekko
                     }
                     else
                     {
+                        //This may just file without error, and without producing a file -- BAD!
                         objBook.SaveCopyAs(fileNameTempLocalFile);
                         //objBook.SaveAs(fileName4, Missing.Value, Missing.Value,
                         //    Missing.Value, false, false, Excel.XlSaveAsAccessMode.xlNoChange,
@@ -37444,12 +37132,23 @@ namespace Gekko
                 errorMessage = String.Concat(errorMessage, theException.Source);
                 G.Writeln(errorMessage);
                 //see MS bug 320369
+
+                ErrorMessageExcelInterop();
+
                 System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
                 throw new GekkoException();
             }
 
             //see MS bug 320369
             System.Threading.Thread.CurrentThread.CurrentCulture = oldCI;
+        }
+
+        private static void ErrorMessageExcelInterop()
+        {
+            G.Writeln2("+++ NOTE: The Excel engine for import/export of Excel sheets is slow and unstable.");
+            G.Writeln("          Consider setting OPTION sheet engine = internal, using a better in-built engine for this.");
+            G.Writeln("          However, this only works for the newer .xlsx file format, not for .xls files.");
+            G.Writeln();
         }
 
         private static void ExcelCleanup(ref Excel.Workbook objBook, ref Excel.Workbooks objBooks, ref Excel.Sheets objSheets, ref Excel.Worksheet objSheet, ref Excel.Range range, ref Excel.Worksheet newSheet, ref Excel.Range range0)

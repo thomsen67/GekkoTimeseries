@@ -17,6 +17,7 @@ using ZoomAndPan;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
+
 namespace GekkoFlowChart
 {
     /// <summary>
@@ -516,12 +517,7 @@ namespace GekkoFlowChart
 
         private void textBox1_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //string s = ((TextBox)sender).Text;
-            //double d = double.NaN;
-            //if (double.TryParse(s, out d))
-            //{
-            //    DataModel.instance = new DataModel(-12345, d);
-            //}
+            
         }
 
         private void comboBox1_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -529,18 +525,18 @@ namespace GekkoFlowChart
             counter = 0;
             //Seems it is very hard to get the actual value from an editable combobox (aargh). See http://social.msdn.microsoft.com/Forums/en/wpf/thread/13c6dfad-4062-41b9-85d8-0d5f23dd349b
             string s = null;
-            ComboBoxItem cbi = (sender as ComboBox).SelectedValue as ComboBoxItem;            
+            ComboBoxItem cbi = (sender as ComboBox).SelectedValue as ComboBoxItem;
             if (cbi != null) s = cbi.Content.ToString();
             //The below will give old value before update
             //ComboBox c = (ComboBox)sender;
             //Console.WriteLine("XXX " + c.Text);            
             double d = double.NaN;
-            if (double.TryParse(s.Replace("%", ""), out d))
+            if (double.TryParse(s.Replace("%", ""), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d))
             {
                 prune = d / 100d;
-                DataModel.instance = new DataModel(-12345, prune, false);                
+                DataModel.instance = new DataModel(-12345, prune, false);
             }
-        }
+        }        
 
         private void comboBox1_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {

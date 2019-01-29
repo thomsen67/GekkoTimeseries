@@ -2874,7 +2874,7 @@ namespace Gekko
             }
             else
             {
-                if (double.TryParse(s, out v))
+                if (G.TryParseIntoDouble(s, out v))
                 {
                     //ok
                 }

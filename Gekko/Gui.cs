@@ -305,6 +305,10 @@ namespace Gekko
 
         private void GuiAutoExecStuff()
         {
+            //#7980345743573
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
             if (Directory.Exists(Globals.ttPath2 + @"\GekkoCS"))
             {
                 Globals.runningOnTTComputer = true;  //for some debugging                
@@ -1708,7 +1712,7 @@ namespace Gekko
             gui.threadInput = s;
             gui.threadWorkerThread = new Thread(new ThreadStart(this.WorkerThreadFunction), 10000000);  //with 1.7 MB (1700000) we can a sum of about 120 variables. Augmenting to 10 MB (10000000) --> around 700 variables in the sum (if it is a simple sum). That ought to be enough and 10x the default of 1 MB. The problem is all due to recursion when walking the AST.
             gui.threadWorkerThread.SetApartmentState(ApartmentState.STA);
-            gui.threadWorkerThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
+            gui.threadWorkerThread.CurrentCulture = CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
             gui.threadWorkerThread.Start();
         }
 

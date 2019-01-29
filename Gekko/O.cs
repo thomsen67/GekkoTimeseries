@@ -3087,7 +3087,7 @@ namespace Gekko
                                         foreach (string s2 in ss)
                                         {
                                             double v = double.NaN;
-                                            if (double.TryParse(s2, out v))
+                                            if (G.TryParseIntoDouble(s2, out v))
                                             {
                                                 ScalarVal sv = new ScalarVal(v);
                                                 if (converted == null) converted = new List();
@@ -4171,7 +4171,7 @@ namespace Gekko
                         else
                         {
                             double d;
-                            if (double.TryParse(cell.text, out d))
+                            if (G.TryParseIntoDouble(cell.text, out d))
                             {
                                 m2.Add(new ScalarVal(d));
                             }
@@ -7613,7 +7613,7 @@ namespace Gekko
                     {
                         try
                         {
-                            double v = double.Parse(value.Trim());
+                            double v = G.ParseIntoDouble(value.Trim());
                             Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarVal(v));
                             G.Writeln2("VAL " + varname + " = " + v);
                         }

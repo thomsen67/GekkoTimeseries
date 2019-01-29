@@ -94,7 +94,7 @@ namespace Gekko
                                 string n1 = (string)al[i];
                                 n1 = n1.Replace("d", "E");
                                 n1 = n1.Replace("D", "E");
-                                data[end] = double.Parse(n1, System.Globalization.CultureInfo.InvariantCulture);
+                                data[end] = G.ParseIntoDouble(n1);
                                 if (minus) data[end] = -data[end];
                             }
                         }
@@ -211,7 +211,7 @@ namespace Gekko
 
                                 try
                                 {
-                                    double v = double.Parse(n1, System.Globalization.CultureInfo.InvariantCulture);
+                                    double v = G.ParseIntoDouble(n1);
                                     if (minus) v = -v;
                                     ts.SetData(new GekkoTime(EFreq.A, year, 1), v);
                                 }

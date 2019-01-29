@@ -126,8 +126,35 @@ namespace Gekko
             return y;
         }
 
-        
-        public static string TrueFalse(bool x) {
+        public static bool TryParseIntoDouble(string s, out double d)
+        {
+            //NumberStyles.AllowDecimalPoint|NumberStyles.AllowExponent|NumberStyles.AllowLeadingSign
+            return double.TryParse(s, NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d);
+        }        
+
+        public static double ParseIntoDouble(string s, bool reportError)
+        {            
+            double d = double.NaN;
+            bool ok = G.TryParseIntoDouble(s, out d);
+            if (ok) return d;
+            if (reportError)
+            {
+                G.Writeln2("*** ERROR: Cannot convert '" + s + "' into a value");
+                throw new GekkoException();
+            }
+            else
+            {
+                return double.NaN;
+            }
+        }
+        public static double ParseIntoDouble(string s)
+        {
+            return G.ParseIntoDouble(s, false);
+        }
+
+
+        public static string TrueFalse(bool x)
+        {
             string s = "false";
             if (x) s = "true";
             return s;

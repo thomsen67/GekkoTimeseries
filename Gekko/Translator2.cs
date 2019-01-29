@@ -543,7 +543,7 @@ namespace Gekko
                         else
                         {
                             double slet = double.NaN;
-                            if (double.TryParse(xx.Text, out slet))  //2005.01
+                            if (G.TryParseIntoDouble(xx.Text, out slet))  //2005.01
                             {
                                 badValCount++;
                             }

@@ -2418,9 +2418,9 @@ namespace Gekko
 
                             string variable2 = equationNode.GetChild(0).Text;
 
-                            //double lagDouble = double.Parse(equationNode.GetChild(2).Text);
+                            
                             double lagDouble = double.NaN;
-                            if (!double.TryParse(equationNode.GetChild(2).Text, out lagDouble)) lagDouble = double.NaN;
+                            if (!G.TryParseIntoDouble(equationNode.GetChild(2).Text, out lagDouble)) lagDouble = double.NaN;
 
                             if (equationNode.GetChild(1).Text == "+")
                             {

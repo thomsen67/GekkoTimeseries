@@ -965,7 +965,7 @@ namespace MathNet.Numerics
 						sb.Append(Consume());
 					ScanInteger(sb);
 				}
-				return double.Parse(sb.ToString(),NumberStyles.AllowDecimalPoint|NumberStyles.AllowExponent|NumberStyles.AllowLeadingSign,CultureInfo.InvariantCulture);
+                return double.Parse(sb.ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture);
 			}
 			private void ScanInteger(StringBuilder sb)
 			{

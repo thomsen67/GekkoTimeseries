@@ -81,7 +81,7 @@ namespace Gekko
                 //For Annual and Undated, this has been handled above
                 //typically for TIME 2000 2010 or SERIES<2000 2010> which are turned into
                 //for instance 2000m1 to 2000m12.
-                int year = G.findYear(intValue);  //error is the year is crazy
+                int year = G.findYear(intValue);  //error if the year is crazy
                 if (Program.options.freq == EFreq.Q)
                 {                    
                     int sub = 1;
