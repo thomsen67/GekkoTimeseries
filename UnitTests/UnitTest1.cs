@@ -8945,13 +8945,39 @@ namespace UnitTests
             _AssertScalarVal(First(), "%x", 3d);
             I("%x = %d.getfreq();");
             _AssertScalarString(First(), "%x", "m");
-
+            // ----
             I("%d = date(2001, 'a', 1);");
             _AssertScalarDate(First(), "%d", EFreq.A, 2001, 1);
             I("%d = date(2001, 'q', 2);");
             _AssertScalarDate(First(), "%d", EFreq.Q, 2001, 2);
             I("%d = date(2001, 'm', 3);");
             _AssertScalarDate(First(), "%d", EFreq.M, 2001, 3);
+            // --- conversion between freqs
+            I("%d = 2001q2;");
+            I("%d1 = date(%d, 'a', 'start');");
+            I("%d2 = date(%d, 'a', 'end');");
+            _AssertScalarDate(First(), "%d1", EFreq.A, 2001, 1);
+            _AssertScalarDate(First(), "%d2", EFreq.A, 2001, 1);
+            I("%d = 2001a1;");
+            I("%d1 = date(%d, 'q', 'start');");
+            I("%d2 = date(%d, 'q', 'end');");
+            _AssertScalarDate(First(), "%d1", EFreq.Q, 2001, 1);
+            _AssertScalarDate(First(), "%d2", EFreq.Q, 2001, 4);
+            I("%d = 2001q2;");
+            I("%d1 = date(%d, 'm', 'start');");
+            I("%d2 = date(%d, 'm', 'end');");
+            _AssertScalarDate(First(), "%d1", EFreq.M, 2001, 4);
+            _AssertScalarDate(First(), "%d2", EFreq.M, 2001, 6);
+            I("%d = 2001m3;");
+            I("%d1 = date(%d, 'q', 'start');");
+            I("%d2 = date(%d, 'q', 'end');");
+            _AssertScalarDate(First(), "%d1", EFreq.Q, 2001, 1);
+            _AssertScalarDate(First(), "%d2", EFreq.Q, 2001, 1);
+            I("%d = 2001m4;");
+            I("%d1 = date(%d, 'q', 'start');");
+            I("%d2 = date(%d, 'q', 'end');");
+            _AssertScalarDate(First(), "%d1", EFreq.Q, 2001, 2);
+            _AssertScalarDate(First(), "%d2", EFreq.Q, 2001, 2);
 
             //time()
             I("SER xxtrend = time();");

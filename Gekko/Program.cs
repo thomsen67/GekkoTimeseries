@@ -38908,7 +38908,7 @@ namespace Gekko
                     double maxAbs = 0d;
                     double maxRel = 0d;
                     
-                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts)))
+                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
                         double varDelta = 0;
                         double varPch = 0;
@@ -39090,7 +39090,7 @@ namespace Gekko
                     if (dlog) samFile.WriteLine("------------");
                     samFile.WriteLine();
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts)))
+                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
                     {
                         double varLevel = 0;
                         double varLevel2 = 0;
@@ -39143,28 +39143,66 @@ namespace Gekko
             }
         }
 
-        private static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, Series ts)
+        public static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, EFreq tsFreq)
         {
             AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(tStart, tEnd);
             GekkoTime tStart2 = GekkoTime.tNull;
             GekkoTime tEnd2 = GekkoTime.tNull;
-            if (ts.freq == EFreq.A)
+            if (tsFreq == EFreq.A)
             {
                 tStart2 = dates.t1Annual;
                 tEnd2 = dates.t2Annual;
             }
-            else if (ts.freq == EFreq.Q)
+            else if (tsFreq == EFreq.Q)
             {
                 tStart2 = dates.t1Quarterly;
                 tEnd2 = dates.t2Quarterly;
             }
-            else if (ts.freq == EFreq.M)
+            else if (tsFreq == EFreq.M)
             {
                 tStart2 = dates.t1Monthly;
                 tEnd2 = dates.t2Monthly;
             }
             return new Tuple<GekkoTime, GekkoTime>(tStart2, tEnd2);
         }
+
+        public static GekkoTime ConvertFreq(GekkoTime t, EFreq tsFreq, string startEnd)
+        {
+            AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(t, t);
+            GekkoTime tStart2 = GekkoTime.tNull;
+            GekkoTime tEnd2 = GekkoTime.tNull;
+            if (tsFreq == EFreq.A)
+            {
+                tStart2 = dates.t1Annual;
+                tEnd2 = dates.t2Annual;
+            }
+            else if (tsFreq == EFreq.Q)
+            {
+                tStart2 = dates.t1Quarterly;
+                tEnd2 = dates.t2Quarterly;
+            }
+            else if (tsFreq == EFreq.M)
+            {
+                tStart2 = dates.t1Monthly;
+                tEnd2 = dates.t2Monthly;
+            }
+            if (G.Equal(startEnd, "start"))
+            {
+                return tStart2;
+            }
+            else if (G.Equal(startEnd, "end"))
+            {
+                return tEnd2;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected 'start' or 'end' argument, not '" + startEnd + "'");
+                throw new GekkoException();
+            }
+            
+        }
+
+
 
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)

@@ -37,13 +37,24 @@ namespace Gekko
         // ========================= functions to manipulate dates start =============================================================
         // ===========================================================================================================================
 
-        public static IVariable date(GekkoSmpl smpl, IVariable y, IVariable f, IVariable s)
+        public static IVariable date(GekkoSmpl smpl, IVariable iv1, IVariable iv2, IVariable iv3)
         {
-            int yy = O.ConvertToInt(y);
-            string ff = O.ConvertToString(f);
-            int ss = O.ConvertToInt(s);
-            GekkoTime gt = new GekkoTime(G.GetFreq(ff), yy, ss);
-            return new ScalarDate(gt);
+            if (iv1.Type() == EVariableType.Val)
+            {
+                int yy = O.ConvertToInt(iv1);
+                string ff = O.ConvertToString(iv2);
+                int ss = O.ConvertToInt(iv3);
+                GekkoTime gt = new GekkoTime(G.GetFreq(ff), yy, ss);
+                return new ScalarDate(gt);
+            }
+            else
+            {
+                GekkoTime dd = O.ConvertToDate(iv1);
+                string ff = O.ConvertToString(iv2);
+                string startEnd2 = O.ConvertToString(iv3);
+                GekkoTime gt = Program.ConvertFreq(dd, G.GetFreq(ff), startEnd2);
+                return new ScalarDate(gt);
+            }
         }
 
         public static IVariable getyear(GekkoSmpl smpl, IVariable ths)
