@@ -268,13 +268,7 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: The two date frequencies do not match");
                 throw new GekkoException();
-            }
-
-            if (t1.freq == EFreq.U)
-            {
-                G.Writeln2("*** ERROR: Undated frequency does not work for frequency conversion");
-                throw new GekkoException();
-            }
+            }            
 
             if (GekkoTime.Observations(t1, t2) < 1)
             {
@@ -285,6 +279,7 @@ namespace Gekko
             GekkoTime.ConvertFreqs(EFreq.A, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
             GekkoTime.ConvertFreqs(EFreq.Q, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
             GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
+            GekkoTime.ConvertFreqs(EFreq.U, t1, t2, ref allFreqsHelper.t1Undated, ref allFreqsHelper.t2Undated);
 
             return allFreqsHelper;
         }

@@ -13758,30 +13758,35 @@ namespace Gekko
         public static void AdjustFreq()
         {
             //hash #980432
+
+            Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
+
             if (Program.options.freq == EFreq.A)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.A, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.A, Globals.globalPeriodEnd.super, 1);
-                G.Writeln("Frequency changed to annual (A)");
+                G.Writeln("Freq changed to annual (A)");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;                
             }
             else if (Program.options.freq == EFreq.Q)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.Q, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.Q, Globals.globalPeriodEnd.super, 4);
-                G.Writeln("Frequency changed to quarterly (Q) -- note that 'q1' is set for start year and 'q4' for end year");
+                G.Writeln("Freq changed to quarterly (Q) -- note that start/end quarters have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;                
             }
             else if (Program.options.freq == EFreq.M)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.M, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.M, Globals.globalPeriodEnd.super, 12);
-                G.Writeln("Frequency changed to monthly (M) -- note that 'm1' is set for start year and 'm12' for end year");
+                G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;                
             }
             else if (Program.options.freq == EFreq.U)
             {
-                Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
-                Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);
+
                 G.Writeln("Frequency changed to undated (U)");
-            }
+                Globals.globalPeriodStart = new GekkoTime(EFreq.U, Globals.globalPeriodStart.super, 1);
+                Globals.globalPeriodEnd = new GekkoTime(EFreq.U, Globals.globalPeriodEnd.super, 1);                
+            }                      
+
         }
 
         public static string GetSHA256Hash(string modelText)
@@ -20379,20 +20384,15 @@ namespace Gekko
 
         public static void Time(GekkoTime t1, GekkoTime t2)
         {
-            if (t1.freq != Program.options.freq)
+            Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(t1, t2, Program.options.freq);
+            
+            Globals.globalPeriodStart = freqs.Item1;
+            Globals.globalPeriodEnd = freqs.Item2;
+            G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
+            if (t1.freq != Program.options.freq || t2.freq != Program.options.freq)
             {
-                G.Writeln2("*** ERROR: Using DATE with freq " + t1.freq.ToString() + " in a freq " + Program.options.freq.ToString() + " setting");
-                throw new GekkoException();
+                G.Writeln("+++ NOTE: The dates have been converted to " + G.GetFreqString(Program.options.freq) + " frequency");
             }
-            if (t2.freq != Program.options.freq)
-            {
-                G.Writeln2("*** ERROR: Using DATE with freq " + t2.freq.ToString() + " in a freq " + Program.options.freq.ToString() + " setting");
-                throw new GekkoException();
-            }            
-
-            Globals.globalPeriodStart = t1;
-            Globals.globalPeriodEnd = t2;
-            G.Writeln2("Global time set: " + G.FromDateToString(t1) + " to " + G.FromDateToString(t2) + " (" + GekkoTime.Observations(t1, t2) + " periods)");
 
             //if (Globals.runningOnTTComputer)
             //{

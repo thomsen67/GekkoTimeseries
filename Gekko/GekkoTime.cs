@@ -177,6 +177,11 @@ namespace Gekko
                         tt1 = new GekkoTime(EFreq.A, t1.super, 1);  
                         tt2 = new GekkoTime(EFreq.A, t2.super, 1);  
                     }
+                    else if (t1.freq == EFreq.U)
+                    {
+                        tt1 = new GekkoTime(EFreq.A, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                    }
 
                 }
                 else if (freq == EFreq.Q)
@@ -187,12 +192,16 @@ namespace Gekko
                         tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
-
                     else if (t1.freq == EFreq.M)
                     {
                         //from M to Q finds corresponding Q
                         tt1 = new GekkoTime(EFreq.Q, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
+                    }
+                    else if (t1.freq == EFreq.U)
+                    {
+                        tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
                 }
                 else if (freq == EFreq.M)
@@ -208,6 +217,31 @@ namespace Gekko
                         //from Q to M sets mx for start q, and my for end q
                         tt1 = new GekkoTime(EFreq.M, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
                         tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
+                    }
+                    else if (t1.freq == EFreq.U)
+                    {                        
+                        tt1 = new GekkoTime(EFreq.M, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
+                    }
+                }
+                else if (freq == EFreq.U)
+                {
+                    //From Q or M to U freq is just the annual part of the date
+
+                    if (t1.freq == EFreq.A)
+                    {
+                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                    }
+                    else if (t1.freq == EFreq.Q)
+                    {
+                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                    }
+                    else if (t1.freq == EFreq.M)
+                    {
+                        tt1 = new GekkoTime(EFreq.U, t1.super, 1);
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
                     }
                 }
             }
@@ -409,6 +443,8 @@ namespace Gekko
         public GekkoTime t2Quarterly;
         public GekkoTime t1Monthly;
         public GekkoTime t2Monthly;
+        public GekkoTime t1Undated;
+        public GekkoTime t2Undated;
     }
 
     public class GekkoTimeIteratorBackwards : IEnumerable<GekkoTime>
