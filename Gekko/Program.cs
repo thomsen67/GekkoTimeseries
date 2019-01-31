@@ -16475,7 +16475,7 @@ namespace Gekko
                         Program.model.modelInfo.loadedFromMdlFile = true;
                         Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                     }
-                    catch
+                    catch (Exception e)
                     {
                         if (G.IsUnitTesting())
                         {
@@ -17325,25 +17325,31 @@ namespace Gekko
             {
                 if (Program.databanks.GetGlobal().ContainsIVariable(Globals.symbolCollection + s)) Program.databanks.GetGlobal().RemoveIVariable(Globals.symbolCollection + s);
             }
-            
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.all.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.endo.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exo.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exod.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exodjz.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoj.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exotrue.ToArray())));
-            Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoz.ToArray())));
-                        
-            //if (Program.model.modelInfo.modelListHelper.all != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all")).AddRange(Program.model.modelInfo.modelListHelper.all);
-            //if (Program.model.modelInfo.modelListHelper.endo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "endo")).AddRange(Program.model.modelInfo.modelListHelper.endo);
-            //if (Program.model.modelInfo.modelListHelper.exo != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exo")).AddRange(Program.model.modelInfo.modelListHelper.exo);
-            //if (Program.model.modelInfo.modelListHelper.exod != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exod")).AddRange(Program.model.modelInfo.modelListHelper.exod);
-            //if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exodjz")).AddRange(Program.model.modelInfo.modelListHelper.exodjz);
-            //if (Program.model.modelInfo.modelListHelper.exoj != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoj")).AddRange(Program.model.modelInfo.modelListHelper.exoj);
-            //if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exotrue")).AddRange(Program.model.modelInfo.modelListHelper.exotrue);
-            //if (Program.model.modelInfo.modelListHelper.exoz != null) Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "exoz")).AddRange(Program.model.modelInfo.modelListHelper.exoz);
 
+            if (Program.model.modelInfo.modelListHelper.all != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.all.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "all", new List());
+
+            if (Program.model.modelInfo.modelListHelper.endo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.endo.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "endo", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exo != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exo.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exo", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exod != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exod.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exod", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exodjz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exodjz.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exodjz", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exoj != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoj.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoj", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exotrue != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exotrue.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exotrue", new List());
+
+            if (Program.model.modelInfo.modelListHelper.exoz != null) Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List(Program.GetListOfIVariablesFromListOfStrings(Program.model.modelInfo.modelListHelper.exoz.ToArray())));
+            else Program.databanks.GetGlobal().AddIVariable(Globals.symbolCollection + "exoz", new List());
+                        
             Program.model.modelInfo.modelListHelper = null;  //only used for temporary transfer of these lists
         }
 

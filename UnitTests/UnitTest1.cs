@@ -8105,11 +8105,13 @@ namespace UnitTests
             // Important
             I("SERIES a2 = {#a}[1] + 2;");
             _AssertSeries(First(), "a2", 2010, 102, sharedDelta);
-            FAIL("#a = 1a, 1b;");
+            I("#a = 1a, 1b;");
             FAIL("#a = 1;");
             FAIL("#a = 007;");
+            I("#a = 007, 008;");
             FAIL("#a = '007';");
             FAIL("#a = 2015q3;");
+            I("#a = 1, 007, 2015q3, 1e5, a38;");
             I("#a = ('1', '007', '2015q3');");
 
             if (Globals.UNITTESTFOLLOWUP)
@@ -12127,6 +12129,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_List()
         {
+            I("reset;");
+
             I("#m = ('a', 'b');");
 
             I("p #m['a'];");

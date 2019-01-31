@@ -2112,7 +2112,7 @@ indexer7:					  leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
 
 w7:							  wildcard7 -> ^(ASTL1 wildcard7);
 
-name7:						  name;
+name7:						  (identDigit | nameCurlyStart) (GLUE! identDigit | nameCurly)*;  //was: name, but name7 can be 117, 007, 1e10, 1a, etc.
 
 wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 							| stars -> ASTSTARS		         //everything in a bank
