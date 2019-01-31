@@ -31239,7 +31239,7 @@ namespace Gekko
                     po.isLevel = true;                    
                     po.isDiff = false;
                     po.isPch = false;                    
-                    po.isMultiplier = true;
+                    po.isMultiplier = false;
                 }
                 po.isLog = false;
                 po.isDlog = false;

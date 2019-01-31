@@ -666,8 +666,13 @@ namespace Gekko
             return new ScalarString(s1 + s2);
         }
 
-        //rename to substring()??
         public static IVariable piece(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
+        {
+            G.Writeln2("*** ERROR: Rename: please use substring() instead of piece()");
+            throw new GekkoException();
+        }
+                
+        public static IVariable substring(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             string s = null;
             string s1 = O.ConvertToString(x1);

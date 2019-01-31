@@ -5802,6 +5802,10 @@ namespace UnitTests
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
 
+            //Testing Central Bank tables (Nationalbanken)
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("RUN dnmud;");
 
         }
 

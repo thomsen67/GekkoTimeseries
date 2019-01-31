@@ -314,91 +314,67 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
-            if (Globals.useIndexerAlone)
+            if (indexes.Length == 1)
             {
-                if (indexes.Length == 1)
+                IVariable index = indexes[0];
+                //Indices run from 1, 2, 3, ... n. Element 0 is length of list.
+                if (index.Type() == EVariableType.Val)
                 {
-                    //All this is probably not relevant anymore
-
-                    IVariable index = indexes[0];
-                    IVariable rv = null;
-                    if (this.string2 == Globals.indexerAloneCheatString)
+                    int ival = O.ConvertToInt(index);
+                    if (ival < 0)
                     {
-                        //corresponds to empty indexer like ['fy*'], different from #a['fy*']
-                        if (index.Type() == EVariableType.String)
-                        {
-                            //string vars = null;                    
-                            //ExtractBankAndRestHelper h = Program.ExtractBankAndRest(((ScalarString)index).string2, EExtrackBankAndRest.GetDatabank);
-                            //List<string> output = Program.MatchWildcardInDatabank(h.name, h.databank);
-                            //rv = new List(output);
-                            string s = ((ScalarString)index).string2;
-                            if (s.StartsWith(Globals.firstCheatString + Globals.symbolBankColon2))
-                            {
-                                s = s.Substring((Globals.firstCheatString + Globals.symbolBankColon2).Length);
-                            }
-                            rv = O.NOTUSED_HandleWildcards(s, null);
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: The inside of a free-standing [...] list should not be a");
-                            G.Writeln("    VAL, DATE or the like, for instance PRT [2.3] or PRT [2010q5].");
-                            G.Writeln("    The right use is PRT [gd*] and similar.");
-                            throw new GekkoException();
-                        }
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: You cannot use indexer on a string, for instance %s[2],");
-                        G.Writeln("    but you may use the string as a name instead: {%s}[2015].");
+                        G.Writeln2("*** ERROR: Illegal string indexer [" + ival + "]: negative number not allowed");
                         throw new GekkoException();
                     }
-                    return rv;
+                    else if (ival == 0)
+                    {
+                        G.Writeln2("*** ERROR: Illegal [0] string indexing. Use the length() function for string length.");
+                        throw new GekkoException();
+                    }
+                    else if (ival > this.string2.Length)
+                    {
+                        G.Writeln2("*** ERROR: Illegal string indexer [" + ival + "]: larger than length of string (" + this.string2.Length + ")");
+                        throw new GekkoException();
+                    }
+
+                    return new ScalarString(this.string2[ival - 1].ToString());
+                }
+                else if (index.Type() == EVariableType.Range)
+                {
+                    Range index_range = index as Range;
+
+                    //slice like %s[2..5], substring
+
+                    int ival1 = O.ConvertToInt(index_range.first);
+                    int ival2 = O.ConvertToInt(index_range.last);
+                    if (ival1 > this.string2.Length || ival2 > this.string2.Length || ival2 < ival1 || ival1 < 1 || ival2 < 1)
+                    {
+                        G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
+                        throw new GekkoException();
+                    }
+
+                    string s = this.string2.Substring(ival1 - 1, ival2 - ival1 + 1);
+                    return new ScalarString(s);
+
+                }
+                else if (index.Type() == EVariableType.String)
+                {
+                    G.Writeln2("*** ERROR: You cannot use %s1[%s2], where %s1 and %s2 are strings. Perhaps see the search() function.");
+                    throw new GekkoException();
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on STRING or NAME");
+                    G.Writeln2("*** ERROR: Type mismatch regarding []-index");
                     throw new GekkoException();
                 }
             }
-            G.Writeln2("*** ERROR: You cannot (yet) use indexes on string type variable");
-            throw new GekkoException();
-
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on string");
+                throw new GekkoException();
+            }
         }
 
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange1, IVariablesFilterRange indexRange2)
-        //{
-        //    throw new GekkoException();
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange)
-        //{
-        //    if (this._string2 == Globals.indexerAloneCheatString)
-        //    {
-        //        //corresponds to empty index range like ['fx'..'fy'], different from #a['fx'..'fy']
-        //        IVariable iv1 = indexRange.first;
-        //        IVariable iv2 = indexRange.last;
-        //        string s1 = O.ConvertToString(iv1);
-        //        string s2 = O.ConvertToString(iv2);                
-        //        ExtractBankAndRestHelper h = Program.ExtractBankAndRest(s1, EExtrackBankAndRest.GetDatabank);                
-        //        List<string> temp = Program.MatchRangeInDatabank(h.name, s2, h.databank);
-        //        return new List(temp);
-        //    }
-        //    else
-        //    {
-        //        G.Writeln2("*** ERROR: You cannot use []-index on string");
-        //        throw new GekkoException();
-        //    }            
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariable index, IVariablesFilterRange indexRange)
-        //{
-        //    throw new GekkoException();
-        //}
-
-        //public IVariable Indexer(GekkoSmpl t, IVariablesFilterRange indexRange, IVariable index)
-        //{
-        //    throw new GekkoException();
-        //}
 
         public IVariable Negate(GekkoSmpl t)
         {

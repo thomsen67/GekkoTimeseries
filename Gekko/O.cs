@@ -3913,28 +3913,7 @@ namespace Gekko
         public static IVariable Indexer(GekkoSmpl2 smplRemember, GekkoSmpl smpl, O.EIndexerType indexerType, IVariable x, params IVariable[] indexes)
         {
             Program.RevertSmpl(smplRemember, smpl);
-
-            if (Globals.useIndexerAlone)
-            {
-                if (x == null)
-                {
-                    //this should not be possible, [a*x] is not wildcard anymore
-
-                    if (indexes.Length == 1)
-                    {
-                        //[y]
-                        //['q*']
-                        ScalarString ss = new ScalarString(Globals.indexerAloneCheatString);  //a bit cheating, but we save an interface method, and performance is not really an issue when indexing whole databanks
-                        return ss.Indexer(smpl, indexerType, indexes);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Stand-alone indexer with pattern [... , ... ] not possible");
-                        throw new GekkoException();
-                    }
-                }
-            }
-
+                        
             //x[y]
             //a[1] or #a['q*']
             //#x[1, 2]                 
