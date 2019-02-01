@@ -8423,7 +8423,7 @@ namespace Gekko
             public GekkoTime t2 = GekkoTime.tNull;
             public void Exe()
             {
-                G.CheckLegalPeriod(this.t1, this.t2);
+                //G.CheckLegalPeriod(this.t1, this.t2);
                 Program.Time(t1, t2);
             }
             public static void Q()

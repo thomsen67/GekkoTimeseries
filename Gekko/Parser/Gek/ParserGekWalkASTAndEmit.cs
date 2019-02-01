@@ -1262,20 +1262,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 string a = node[1][0].AlternativeCode.ToString();
-                                //if (Globals.runningOnTTComputer)
-                                //{
-                                //    //G.Writeln2("--> " + a);
-                                //    node.Code.A("G.Writeln2(` ---> ` + O.ConvertToString(" + a + "));" + G.NL);
-                                //}
                                 
-                                //node.Code.A("O.Endo o" + Num(node) + " = new O.Endo();" + G.NL);
-                                //node.Code.A("o" + Num(node) + ".gts = " + node[0][0].Code + G.NL);
-                                //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-
-                                //ASTNode nodeGeneralTime = node[0][0];
-                                //ASTNode nodeVar1 = node[1][0];
-                                //ASTNode nodeLocalTime1 = node[1][1];
-
                                 string gt = "gt" + ++Globals.counter;
                                 string la = "la" + ++Globals.counter;
                                 string l = "l" + ++Globals.counter;
@@ -2846,7 +2833,8 @@ namespace Gekko.Parser.Gek
                                     string args = null;
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
-                                        args += ", " + node[i].Code;
+                                        if(false && Globals.runningOnTTComputer) args += ", " + node[i].AlternativeCode;
+                                        else args += ", " + node[i].Code;
                                     }
                                     int numberOfArguments = node.ChildrenCount() - 1;                                    
 

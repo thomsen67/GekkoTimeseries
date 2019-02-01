@@ -20392,6 +20392,8 @@ namespace Gekko
         {
             Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(t1, t2, Program.options.freq);
             
+            G.CheckLegalPeriod(freqs.Item1, freqs.Item2);
+
             Globals.globalPeriodStart = freqs.Item1;
             Globals.globalPeriodEnd = freqs.Item2;
             G.Writeln2("Global time set: " + G.FromDateToString(Globals.globalPeriodStart) + " to " + G.FromDateToString(Globals.globalPeriodEnd) + " (" + GekkoTime.Observations(Globals.globalPeriodStart, Globals.globalPeriodEnd) + " periods)");
@@ -38868,47 +38870,30 @@ namespace Gekko
                 tStart2 = dates.t1Monthly;
                 tEnd2 = dates.t2Monthly;
             }
+            else if (tsFreq == EFreq.U)
+            {
+                tStart2 = dates.t1Undated;
+                tEnd2 = dates.t2Undated;
+            }
             return new Tuple<GekkoTime, GekkoTime>(tStart2, tEnd2);
         }
 
         public static GekkoTime ConvertFreq(GekkoTime t, EFreq tsFreq, string startEnd)
-        {
-            AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(t, t);
-            GekkoTime tStart2 = GekkoTime.tNull;
-            GekkoTime tEnd2 = GekkoTime.tNull;
-            if (tsFreq == EFreq.A)
-            {
-                tStart2 = dates.t1Annual;
-                tEnd2 = dates.t2Annual;
-            }
-            else if (tsFreq == EFreq.Q)
-            {
-                tStart2 = dates.t1Quarterly;
-                tEnd2 = dates.t2Quarterly;
-            }
-            else if (tsFreq == EFreq.M)
-            {
-                tStart2 = dates.t1Monthly;
-                tEnd2 = dates.t2Monthly;
-            }
+        {            
             if (G.Equal(startEnd, "start"))
             {
-                return tStart2;
+                return GekkoTime.ConvertFreqs1(tsFreq, t);
             }
             else if (G.Equal(startEnd, "end"))
             {
-                return tEnd2;
+                return GekkoTime.ConvertFreqs2(tsFreq, t);
             }
             else
             {
                 G.Writeln2("*** ERROR: Expected 'start' or 'end' argument, not '" + startEnd + "'");
                 throw new GekkoException();
-            }
-            
+            }            
         }
-
-
-
 
         private static string MaybeRemoveFreq(string s1, bool removeCurrentFreqFromNames)
         {            

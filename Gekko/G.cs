@@ -264,22 +264,36 @@ namespace Gekko
 
             AllFreqsHelper allFreqsHelper = new Gekko.AllFreqsHelper();
 
-            if (t1.freq != t2.freq)
-            {
-                G.Writeln2("*** ERROR: The two date frequencies do not match");
-                throw new GekkoException();
-            }            
+            //if (t1.freq != t2.freq)
+            //{
+            //    G.Writeln2("*** ERROR: The two date frequencies do not match");
+            //    throw new GekkoException();
+            //}                                    
 
-            if (GekkoTime.Observations(t1, t2) < 1)
+            GekkoTime.ConvertFreqs(EFreq.A, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
+            if (GekkoTime.Observations(allFreqsHelper.t1Annual, allFreqsHelper.t2Annual) < 1)
             {
                 G.Writeln2("*** ERROR: Start period must be <= end period");
                 throw new GekkoException();
             }
-
-            GekkoTime.ConvertFreqs(EFreq.A, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
             GekkoTime.ConvertFreqs(EFreq.Q, t1, t2, ref allFreqsHelper.t1Quarterly, ref allFreqsHelper.t2Quarterly);
+            if (GekkoTime.Observations(allFreqsHelper.t1Quarterly, allFreqsHelper.t2Quarterly) < 1)
+            {
+                G.Writeln2("*** ERROR: Start period must be <= end period");
+                throw new GekkoException();
+            }
             GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
+            if (GekkoTime.Observations(allFreqsHelper.t1Monthly, allFreqsHelper.t2Monthly) < 1)
+            {
+                G.Writeln2("*** ERROR: Start period must be <= end period");
+                throw new GekkoException();
+            }
             GekkoTime.ConvertFreqs(EFreq.U, t1, t2, ref allFreqsHelper.t1Undated, ref allFreqsHelper.t2Undated);
+            if (GekkoTime.Observations(allFreqsHelper.t1Undated, allFreqsHelper.t2Undated) < 1)
+            {
+                G.Writeln2("*** ERROR: Start period must be <= end period");
+                throw new GekkoException();
+            }
 
             return allFreqsHelper;
         }
