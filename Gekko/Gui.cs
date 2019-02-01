@@ -2693,58 +2693,77 @@ namespace Gekko
 
         public static void CloseAllDecompUdvalg(bool print)
         {
-            //close all PPLOT+UDVALG
-            List<Graph> windowsGraphTemp = new List<Graph>();
-            windowsGraphTemp.AddRange(Globals.windowsGraph);
-            Globals.ch = new CounterHelper();
-            for (int i = 0; i < windowsGraphTemp.Count; i++)
+            try
             {
-                CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-            }
-            List<Window1> windowsDecompTemp = new List<Window1>();
-            windowsDecompTemp.AddRange(Globals.windowsDecomp);
-            for (int i = 0; i < windowsDecompTemp.Count; i++)
-            {
-                CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-            }
+                //close all PPLOT+UDVALG
+                List<Graph> windowsGraphTemp = new List<Graph>();
+                windowsGraphTemp.AddRange(Globals.windowsGraph);
+                Globals.ch = new CounterHelper();
+                for (int i = 0; i < windowsGraphTemp.Count; i++)
+                {
+                    if (windowsGraphTemp[i] == null) continue;
+                    CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
+                }
+                List<Window1> windowsDecompTemp = new List<Window1>();
+                windowsDecompTemp.AddRange(Globals.windowsDecomp);
+                for (int i = 0; i < windowsDecompTemp.Count; i++)
+                {
+                    if (windowsDecompTemp[i] == null) continue;
+                    CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
+                }
 
-            if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
-            {
-                G.Writeln();
-                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+                if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
+                {
+                    G.Writeln();
+                    if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+                    if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+                }
+                Globals.windowsGraph = new List<Graph>();
+                Globals.windowsDecomp = new List<Window1>();
+                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
             }
-            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+            catch { }
         }
                 
 
         private void allPPLOTToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //close all PPLOT
-            List<Graph> windowsGraphTemp = new List<Graph>();
-            windowsGraphTemp.AddRange(Globals.windowsGraph);
-            Globals.ch = new CounterHelper();
-            for (int i = 0; i < windowsGraphTemp.Count; i++)
+            try
             {
-                CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
-            }            
-            if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
-            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+                //close all PPLOT
+                List<Graph> windowsGraphTemp = new List<Graph>();
+                windowsGraphTemp.AddRange(Globals.windowsGraph);
+                Globals.ch = new CounterHelper();
+                for (int i = 0; i < windowsGraphTemp.Count; i++)
+                {
+                    if (windowsGraphTemp[i] == null) continue;
+                    CrossThreadStuff.CloseGraph(windowsGraphTemp[i]);  //fails silently
+                }
+                if (Globals.ch.windowsGraphCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsGraphCloseCounter + " PLOT windows");
+                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+                Globals.windowsGraph = new List<Graph>();
+            }
+            catch { }
         }
 
         private void allUDVALGToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //close all UDVALG
-            List<Window1> windowsDecompTemp = new List<Window1>();
-            //windowsDecompTemp.AddRange(windowsDecompTemp); <------------- erroneous in 1.6.5
-            windowsDecompTemp.AddRange(Globals.windowsDecomp);
-            Globals.ch = new CounterHelper();
-            for (int i = 0; i < windowsDecompTemp.Count; i++)
+            try
             {
-                CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
-            }            
-            if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
-            //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+                //close all UDVALG
+                List<Window1> windowsDecompTemp = new List<Window1>();
+                windowsDecompTemp.AddRange(Globals.windowsDecomp);
+                Globals.ch = new CounterHelper();
+                for (int i = 0; i < windowsDecompTemp.Count; i++)
+                {
+                    if (windowsDecompTemp[i] == null) continue;
+                    CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
+                }
+                if (Globals.ch.windowsDecompCloseCounter > 0) G.Writeln2("Closed " + Globals.ch.windowsDecompCloseCounter + " DECOMP windows");
+                //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
+                Globals.windowsDecomp = new List<Window1>();
+            }
+            catch { }
         }
 
         private void allPPLOTAndUDVALGToolStripMenuItem_Click(object sender, EventArgs e)

@@ -1413,7 +1413,11 @@ namespace Gekko
         {
             Globals.guiDecompWindowTopDistance = Math.Max(1, (int)this.Top);
             Globals.guiDecompWindowLeftDistance = Math.Max(1, (int)this.Left);
-            Globals.windowsDecomp.Remove(this);
+            try
+            {
+                if (Globals.windowsDecomp != null && this != null) Globals.windowsDecomp.Remove(this);
+            }
+            catch { }
             //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
         }
 

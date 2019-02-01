@@ -578,7 +578,11 @@ namespace Gekko
         {
             Globals.guiGraphWindowTopDistance = Math.Max(1, this.Top);
             Globals.guiGraphWindowLeftDistance = Math.Max(1, this.Left);
-            Globals.windowsGraph.Remove(this);
+            try
+            {
+                if (Globals.windowsGraph != null && this != null) Globals.windowsGraph.Remove(this);
+            }
+            catch { }
             //if (!G.IsUnitTesting()) Program.ShowPeriodInStatusField("");
             //CrossThreadStuff.ShowPeriodInStatusField();
         }
