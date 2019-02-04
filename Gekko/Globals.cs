@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "";
 
+        //public static List<Func<GekkoSmpl, IVariable>> names = new List<Func<GekkoSmpl, IVariable>>();
+
         public static bool eliminateConcatenator = true;
 
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction

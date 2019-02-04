@@ -1914,7 +1914,7 @@ namespace Gekko
         }
 
         public static void ServiceMessage(string s, P p)
-        {
+        {            
             if (p == null)
             {
                 G.Write2(s);
