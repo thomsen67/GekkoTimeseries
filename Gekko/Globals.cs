@@ -42,7 +42,7 @@ namespace Gekko
     {
         public static string versionInternal = "";
 
-        //public static List<Func<GekkoSmpl, IVariable>> names = new List<Func<GekkoSmpl, IVariable>>();
+        public static bool functionFuncArguments = true;
 
         public static bool eliminateConcatenator = true;
 
@@ -142,6 +142,23 @@ namespace Gekko
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions12 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions13 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
         public static Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>> ufunctions14 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>();
+
+        public static Dictionary<string, Func<GekkoSmpl, P, IVariable>> ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, IVariable>> ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, IVariable>> ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+        public static Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew14 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();
+
         //maybe 14 is max??
         public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null } };
 

@@ -10,42 +10,16 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static int labelCounter;
-        public static void C0(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]0
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-
-            O.Reset o0 = new O.Reset();
-            o0.p = p; o0.Exe(smpl);
-
-            //[[commandEnd]]0
-
-
-            //[[commandStart]]1
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-
-            O.Time o1 = new O.Time();
-            o1.t1 = O.ConvertToDate(i24, O.GetDateChoices.FlexibleStart);
-            ;
-            o1.t2 = O.ConvertToDate(i25, O.GetDateChoices.FlexibleEnd);
-            ;
-
-            o1.Exe();
-
-            //[[commandEnd]]1
-
-
+        public static void C0(GekkoSmpl smpl, P p) {
             //[[commandStart]]2
             p.SetText(@"¤2"); O.InitSmpl(smpl, p);
 
 
             O.Assignment o2 = new O.Assignment();
             O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar26 = i27;
+            IVariable ivTmpvar4 = i5;
             O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "x1", null, ivTmpvar26, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
+            O.Lookup(smpl, null, null, "y", null, ivTmpvar4, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
             ;
 
             //[[commandEnd]]2
@@ -55,120 +29,87 @@ namespace Gekko
             p.SetText(@"¤3"); O.InitSmpl(smpl, p);
 
 
-            O.Assignment o3 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar28 = i29;
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "x2", null, ivTmpvar28, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
-            ;
+            Func<GraphHelper, string> print3 = (gh) =>
+            {
+                O.Prt o3 = new O.Prt();
+                labelCounter = 0; o3.guiGraphIsRefreshing = gh.isRefreshing;
+                o3.guiGraphPrintCode = gh.printCode;
+                o3.guiGraphIsLogTransform = gh.isLogTransform;
+                o3.prtType = "prt";
+                ESeriesMissing r1_3 = Program.options.series_array_print_missing; ESeriesMissing r2_3 = Program.options.series_normal_print_missing; try {
+                    O.HandleOptionBankRef1(o3.opt_bank, o3.opt_ref); O.HandleMissing1(o3.opt_missing);
+                    {
+                        List<int> bankNumbers = null;
+                        O.Prt.Element ope3 = new O.Prt.Element();
+                        ope3.labelGiven = new List<string>() { "f¨(y)|[@34,64:64='f',<1264>,3:4]|[@38,68:68=')',<1211>,3:8]" };
+                        smpl = new GekkoSmpl(o3.t1, o3.t2); smpl.t0 = smpl.t0.Add(-2);
+                        ope3.printCodesFinal = Program.GetElementPrintCodes(o3, ope3); bankNumbers = O.Prt.GetBankNumbers(null, ope3.printCodesFinal);
+                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {
+                            int bankNumber = bankNumbers[bankNumberI];
+                            smpl.bankNumber = bankNumber;
+                            ope3.variable[bankNumber] = O.FunctionLookupNew1("f")(smpl, p, new GekkoArg((smpl777) => O.Lookup(smpl777, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), (smpl777) => new ScalarString("y")));
+                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope3);
+                        }
+                        smpl.bankNumber = 0;
+                        o3.prtElements.Add(ope3);
+                    }
+
+                }
+                finally {
+                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_3, r2_3);
+                }
+                o3.counter = 1;
+                o3.printCsCounter = Globals.printCs.Count - 1;
+                o3.Exe();
+                return o3.emfName;
+            };
+            Globals.printCs.Add(Globals.printCs.Count, print3);
+            print3(new GraphHelper());
 
             //[[commandEnd]]3
-
-
-            //[[commandStart]]4
-            p.SetText(@"¤4"); O.InitSmpl(smpl, p);
-
-
-            O.Assignment o4 = new O.Assignment();
-            O.AdjustT0(smpl, -1);
-            IVariable ivTmpvar30 = O.Multiply(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, Functions.date(smpl, O.HandleString(new ScalarString(@"2030")))), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null), Functions.date(smpl, O.HandleString(new ScalarString(@"2030")))), O.Lookup(smpl, null, null, "x2", null, null, new LookupSettings(), EVariableType.Var, null));
-            O.AdjustT0(smpl, 1);
-            O.Lookup(smpl, null, null, "y", null, ivTmpvar30, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
-            ;
-
-            //[[commandEnd]]4
-
-
-            //[[commandStart]]5
-            p.SetText(@"¤5"); O.InitSmpl(smpl, p);
-
-
-            Func<GraphHelper, string> print5 = (gh) =>
-            {
-                O.Prt o5 = new O.Prt();
-                labelCounter = 0; o5.guiGraphIsRefreshing = gh.isRefreshing;
-                o5.guiGraphPrintCode = gh.printCode;
-                o5.guiGraphIsLogTransform = gh.isLogTransform;
-                o5.prtType = "p";
-                ESeriesMissing r1_5 = Program.options.series_array_print_missing; ESeriesMissing r2_5 = Program.options.series_normal_print_missing; try
-                {
-                    O.HandleOptionBankRef1(o5.opt_bank, o5.opt_ref); O.HandleMissing1(o5.opt_missing);
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope5 = new O.Prt.Element();
-                        ope5.labelGiven = new List<string>() { "x1|[@43,78:79='x1',<1256>,5:2]|[@43,78:79='x1',<1256>,5:2]" };
-                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
-                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "x1", null, null, new LookupSettings(), EVariableType.Var, null);
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
-                        }
-                        smpl.bankNumber = 0;
-                        o5.prtElements.Add(ope5);
-                    }
-
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope5 = new O.Prt.Element();
-                        ope5.labelGiven = new List<string>() { "x2|[@46,82:83='x2',<1256>,5:6]|[@46,82:83='x2',<1256>,5:6]" };
-                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
-                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "x2", null, null, new LookupSettings(), EVariableType.Var, null);
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
-                        }
-                        smpl.bankNumber = 0;
-                        o5.prtElements.Add(ope5);
-                    }
-
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope5 = new O.Prt.Element();
-                        ope5.labelGiven = new List<string>() { "y|[@49,86:86='y',<761>,5:10]|[@49,86:86='y',<761>,5:10]" };
-                        smpl = new GekkoSmpl(o5.t1, o5.t2); smpl.t0 = smpl.t0.Add(-2);
-                        ope5.printCodesFinal = Program.GetElementPrintCodes(o5, ope5); bankNumbers = O.Prt.GetBankNumbers(null, ope5.printCodesFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope5.variable[bankNumber] = O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null);
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope5);
-                        }
-                        smpl.bankNumber = 0;
-                        o5.prtElements.Add(ope5);
-                    }
-
-                }
-                finally
-                {
-                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_5, r2_5);
-                }
-                o5.counter = 4;
-                o5.printCsCounter = Globals.printCs.Count - 1;
-                o5.Exe();
-                return o5.emfName;
-            };
-            Globals.printCs.Add(Globals.printCs.Count, print5);
-            print5(new GraphHelper());
-
-            //[[commandEnd]]5
         }
 
 
-        public static readonly ScalarVal i24 = new ScalarVal(2010d);
-        public static readonly ScalarVal i25 = new ScalarVal(2020d);
-        public static readonly ScalarVal i27 = new ScalarVal(100d);
-        public static readonly ScalarVal i29 = new ScalarVal(200d);
+        public static readonly ScalarVal i2 = new ScalarVal(2d);
+        public static void FunctionDef3() {
+
+            O.PrepareUfunction(1, "f");
+
+            Globals.ufunctionsNew1.Add("f", (GekkoSmpl smpl, P p, GekkoArg functionarg_xf7dke8cj_1_func) => 
+
+{ Databank local0 = Program.databanks.local;
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                try {
+                    IVariable functionarg_xf7dke8cj_1 = O.TypeCheck_series(functionarg_xf7dke8cj_1_func.f1(smpl), 1);
+                    functionarg_xf7dke8cj_1 = O.TypeCheck_series(functionarg_xf7dke8cj_1, 1);
+
+
+                    //[[commandSpecial]]1
+                    return O.TypeCheck_series(O.Multiply(smpl, i2, functionarg_xf7dke8cj_1), 0);
+
+                    //[[commandEnd]]1
+
+
+                    return null;
+                }
+                catch { p.Deeper(); throw; }
+                finally {
+                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
+                }
+            });
+
+        }
+
+        public static readonly ScalarVal i5 = new ScalarVal(100d);
 
         public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+            FunctionDef3();
+
+
+            //[[commandEnd]]0
+
 
             C0(smpl, p);
 

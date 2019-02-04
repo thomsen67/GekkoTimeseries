@@ -76,11 +76,11 @@ namespace Gekko
     //    }
     //}
 
-    public class GekkoFuncs
+    public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1;
         public Func<GekkoSmpl, IVariable> f2;
-        public GekkoFuncs(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
+        public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
         {
             this.f1 = f1;
             this.f2 = f2;
@@ -15017,10 +15017,10 @@ namespace Gekko
             return iv;
         }        
 
-        public static IVariable ff3(GekkoSmpl smpl, GekkoFuncs func)
+        public static IVariable ff3(GekkoSmpl smpl, GekkoArg arg1)
         {
             //used to test Func<> in function arguments, #980745824309
-            IVariable iv = func.f2(smpl);
+            IVariable iv = arg1.f2(smpl);
             iv = O.Add(smpl, iv, Globals.scalarVal1);
             return iv;
         }
@@ -15053,7 +15053,7 @@ namespace Gekko
                     dt = DateTime.Now;
                     for (int i = 0; i < n; i++)
                     {
-                        IVariable ivTmpvar1 = ff3(smpl, new GekkoFuncs((smpl2) => O.Add(smpl2, O.Lookup(smpl2, null, null, "%x", null, null, new LookupSettings(), EVariableType.Var, null), Globals.scalarVal1), null));
+                        IVariable ivTmpvar1 = ff3(smpl, new GekkoArg((smpl2) => O.Add(smpl2, O.Lookup(smpl2, null, null, "%x", null, null, new LookupSettings(), EVariableType.Var, null), Globals.scalarVal1), null));
                         O.Lookup(smpl, null, null, "%x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, new O.Assignment());
                     }
                     G.Writeln((double)n / (DateTime.Now - dt).TotalMilliseconds * 1000d);  //110.000

@@ -4869,65 +4869,133 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            if (number == 0)
+
+            if (Globals.functionFuncArguments)
             {
-                if (Globals.ufunctions0.ContainsKey(name)) Globals.ufunctions0.Remove(name);
+
+                if (number == 0)
+                {
+                    if (Globals.ufunctionsNew0.ContainsKey(name)) Globals.ufunctionsNew0.Remove(name);
+                }
+                else if (number == 1)
+                {
+                    if (Globals.ufunctionsNew1.ContainsKey(name)) Globals.ufunctionsNew1.Remove(name);
+                }
+                else if (number == 2)
+                {
+                    if (Globals.ufunctionsNew2.ContainsKey(name)) Globals.ufunctionsNew2.Remove(name);
+                }
+                else if (number == 3)
+                {
+                    if (Globals.ufunctionsNew3.ContainsKey(name)) Globals.ufunctionsNew3.Remove(name);
+                }
+                else if (number == 4)
+                {
+                    if (Globals.ufunctionsNew4.ContainsKey(name)) Globals.ufunctionsNew4.Remove(name);
+                }
+                else if (number == 5)
+                {
+                    if (Globals.ufunctionsNew5.ContainsKey(name)) Globals.ufunctionsNew5.Remove(name);
+                }
+                else if (number == 6)
+                {
+                    if (Globals.ufunctionsNew6.ContainsKey(name)) Globals.ufunctionsNew6.Remove(name);
+                }
+                else if (number == 7)
+                {
+                    if (Globals.ufunctionsNew7.ContainsKey(name)) Globals.ufunctionsNew7.Remove(name);
+                }
+                else if (number == 8)
+                {
+                    if (Globals.ufunctionsNew8.ContainsKey(name)) Globals.ufunctionsNew8.Remove(name);
+                }
+                else if (number == 9)
+                {
+                    if (Globals.ufunctionsNew9.ContainsKey(name)) Globals.ufunctionsNew9.Remove(name);
+                }
+                else if (number == 10)
+                {
+                    if (Globals.ufunctionsNew10.ContainsKey(name)) Globals.ufunctionsNew10.Remove(name);
+                }
+                else if (number == 11)
+                {
+                    if (Globals.ufunctionsNew11.ContainsKey(name)) Globals.ufunctionsNew11.Remove(name);
+                }
+                else if (number == 12)
+                {
+                    if (Globals.ufunctionsNew12.ContainsKey(name)) Globals.ufunctionsNew12.Remove(name);
+                }
+                else if (number == 13)
+                {
+                    if (Globals.ufunctionsNew13.ContainsKey(name)) Globals.ufunctionsNew13.Remove(name);
+                }
+                else if (number == 14)
+                {
+                    if (Globals.ufunctionsNew14.ContainsKey(name)) Globals.ufunctionsNew14.Remove(name);
+                }
             }
-            else if (number == 1)
+            else
             {
-                if (Globals.ufunctions1.ContainsKey(name)) Globals.ufunctions1.Remove(name);
-            }
-            else if (number == 2)
-            {
-                if (Globals.ufunctions2.ContainsKey(name)) Globals.ufunctions2.Remove(name);
-            }
-            else if (number == 3)
-            {
-                if (Globals.ufunctions3.ContainsKey(name)) Globals.ufunctions3.Remove(name);
-            }
-            else if (number == 4)
-            {
-                if (Globals.ufunctions4.ContainsKey(name)) Globals.ufunctions4.Remove(name);
-            }
-            else if (number == 5)
-            {
-                if (Globals.ufunctions5.ContainsKey(name)) Globals.ufunctions5.Remove(name);
-            }
-            else if (number == 6)
-            {
-                if (Globals.ufunctions6.ContainsKey(name)) Globals.ufunctions6.Remove(name);
-            }
-            else if (number == 7)
-            {
-                if (Globals.ufunctions7.ContainsKey(name)) Globals.ufunctions7.Remove(name);
-            }
-            else if (number == 8)
-            {
-                if (Globals.ufunctions8.ContainsKey(name)) Globals.ufunctions8.Remove(name);
-            }
-            else if (number == 9)
-            {
-                if (Globals.ufunctions9.ContainsKey(name)) Globals.ufunctions9.Remove(name);
-            }
-            else if (number == 10)
-            {
-                if (Globals.ufunctions10.ContainsKey(name)) Globals.ufunctions10.Remove(name);
-            }
-            else if (number == 11)
-            {
-                if (Globals.ufunctions11.ContainsKey(name)) Globals.ufunctions11.Remove(name);
-            }
-            else if (number == 12)
-            {
-                if (Globals.ufunctions12.ContainsKey(name)) Globals.ufunctions12.Remove(name);
-            }
-            else if (number == 13)
-            {
-                if (Globals.ufunctions13.ContainsKey(name)) Globals.ufunctions13.Remove(name);
-            }
-            else if (number == 14)
-            {
-                if (Globals.ufunctions14.ContainsKey(name)) Globals.ufunctions14.Remove(name);
+                if (number == 0)
+                {
+                    if (Globals.ufunctions0.ContainsKey(name)) Globals.ufunctions0.Remove(name);
+                }
+                else if (number == 1)
+                {
+                    if (Globals.ufunctions1.ContainsKey(name)) Globals.ufunctions1.Remove(name);
+                }
+                else if (number == 2)
+                {
+                    if (Globals.ufunctions2.ContainsKey(name)) Globals.ufunctions2.Remove(name);
+                }
+                else if (number == 3)
+                {
+                    if (Globals.ufunctions3.ContainsKey(name)) Globals.ufunctions3.Remove(name);
+                }
+                else if (number == 4)
+                {
+                    if (Globals.ufunctions4.ContainsKey(name)) Globals.ufunctions4.Remove(name);
+                }
+                else if (number == 5)
+                {
+                    if (Globals.ufunctions5.ContainsKey(name)) Globals.ufunctions5.Remove(name);
+                }
+                else if (number == 6)
+                {
+                    if (Globals.ufunctions6.ContainsKey(name)) Globals.ufunctions6.Remove(name);
+                }
+                else if (number == 7)
+                {
+                    if (Globals.ufunctions7.ContainsKey(name)) Globals.ufunctions7.Remove(name);
+                }
+                else if (number == 8)
+                {
+                    if (Globals.ufunctions8.ContainsKey(name)) Globals.ufunctions8.Remove(name);
+                }
+                else if (number == 9)
+                {
+                    if (Globals.ufunctions9.ContainsKey(name)) Globals.ufunctions9.Remove(name);
+                }
+                else if (number == 10)
+                {
+                    if (Globals.ufunctions10.ContainsKey(name)) Globals.ufunctions10.Remove(name);
+                }
+                else if (number == 11)
+                {
+                    if (Globals.ufunctions11.ContainsKey(name)) Globals.ufunctions11.Remove(name);
+                }
+                else if (number == 12)
+                {
+                    if (Globals.ufunctions12.ContainsKey(name)) Globals.ufunctions12.Remove(name);
+                }
+                else if (number == 13)
+                {
+                    if (Globals.ufunctions13.ContainsKey(name)) Globals.ufunctions13.Remove(name);
+                }
+                else if (number == 14)
+                {
+                    if (Globals.ufunctions14.ContainsKey(name)) Globals.ufunctions14.Remove(name);
+                }
             }
         }
 
@@ -4951,6 +5019,15 @@ namespace Gekko
             }
         }
 
+
+        public static string LastText(string s)
+        {
+            if (s.Contains(Globals.procedure)) s = "PROCEDURE " + s.Replace(Globals.procedure, "");
+            else s = "FUNCTION " + s;
+            return s;
+        }
+
+
         public static Func<GekkoSmpl, P, IVariable> FunctionLookup0(string name)
         {
             //NOTE: the number of args is hardcoded two places below
@@ -4962,13 +5039,6 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }
-
-        public static string LastText(string s)
-        {            
-            if (s.Contains(Globals.procedure)) s = "PROCEDURE " + s.Replace(Globals.procedure, "");
-            else s = "FUNCTION " + s;
-            return s;
         }
 
         public static Func<GekkoSmpl, P, IVariable, IVariable> FunctionLookup1(string name)
@@ -5152,6 +5222,222 @@ namespace Gekko
             }
             return rv;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+        public static Func<GekkoSmpl, P, IVariable> FunctionLookupNew0(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, IVariable> rv = null;
+            Globals.ufunctionsNew0.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 0);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+
+        public static Func<GekkoSmpl, P, GekkoArg, IVariable> FunctionLookupNew1(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew1.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 1);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, IVariable> FunctionLookupNew2(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew2.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 2);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew3(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew3.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 3);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew4(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew4.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 4);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew5(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew5.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 5);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew6(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew6.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 6);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew7(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew7.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 7);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew8(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew8.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 8);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew9(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew9.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 9);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew10(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew10.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 10);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew11(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew11.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 11);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew12(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew12.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 12);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew13(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew13.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 13);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+        public static Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> FunctionLookupNew14(string name)
+        {
+            //NOTE: the number of args is hardcoded two places below
+            Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable> rv = null;
+            Globals.ufunctionsNew14.TryGetValue(name, out rv);
+            if (rv == null)
+            {
+                FunctionErrorMessage(name, 14);
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
+
+
+
+
+
+
+
+
 
         // USER FUNCTION STUFF END
         // USER FUNCTION STUFF END

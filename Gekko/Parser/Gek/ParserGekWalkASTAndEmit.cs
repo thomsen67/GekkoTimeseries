@@ -2418,19 +2418,39 @@ namespace Gekko.Parser.Gek
                             {
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
-                                    vars += ", IVariable " + node.functionDef[i].Item2;  //type is checked later on
+                                    if (Globals.functionFuncArguments)
+                                    {
+                                        vars += ",  GekkoArg " + node.functionDef[i].Item2 + "_func"; //type is checked later on
+                                    }
+                                    else
+                                    {
+                                        vars += ", IVariable " + node.functionDef[i].Item2; //type is checked later on
+                                    }
                                 }
 
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
-                                    typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
+                                    if (Globals.functionFuncArguments)
+                                    {
+                                        typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func.f1(smpl)" + ", " + (i + 1) + ");" + G.NL;
+                                        //arg1.f2(smpl)
+                                        typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
+                                    }
                                 }
                             }
 
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
                             //w.headerCs.AppendLine(Globals.splitSTOP);
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctions" + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => " + G.NL);
+
+                            string ss = null;
+                            if (Globals.functionFuncArguments) ss = "New";
+
+                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl smpl, P p" + vars + ") => " + G.NL);
                             w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
                             //w.headerCs.AppendLine(Globals.splitSTART);
                             w.headerCs.AppendLine("}" + G.NL);
@@ -2826,33 +2846,41 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //User defined function or procedure
-
-                                    //node.Code.A("try {" + G.NL);
-                                    //node.Code.A("p.Deeper();" + G.NL);
-
+                                    
                                     string args = null;
                                     for (int i = 1; i < node.ChildrenCount(); i++)
                                     {
-                                        if(false && Globals.runningOnTTComputer) args += ", " + node[i].AlternativeCode;
-                                        else args += ", " + node[i].Code;
+                                        if (Globals.functionFuncArguments)
+                                        {
+                                            args += ", " + "new GekkoArg((smpl777) => " + node[i].Code.ToString().Replace("smpl", "smpl777") + ", " + "(smpl777) => " + node[i].AlternativeCode.ToString().Replace("smpl", "smpl777") + ")";
+                                        }
+                                        else
+                                        {
+                                            if (false && Globals.runningOnTTComputer) args += ", " + node[i].AlternativeCode;
+                                            else args += ", " + node[i].Code;
+                                        }
                                     }
-                                    int numberOfArguments = node.ChildrenCount() - 1;                                    
+                                    int numberOfArguments = node.ChildrenCount() - 1;
 
                                     //TODO TODO TODO
                                     // the 'extra' parameter indicating lag to come
                                     //
+
+                                    string fl = "O.FunctionLookup";
+                                    if (Globals.functionFuncArguments) fl = "O.FunctionLookupNew";
+
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {                                        
                                         //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
                                     {
-                                        node.Code.A("O.FunctionLookup").A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
                                     }
                                     
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
@@ -2860,10 +2888,6 @@ namespace Gekko.Parser.Gek
                                         node.Code.A(";" + G.NL);
                                     }
 
-                                    //node.Code.A("}" + G.NL);  //end of try
-                                    //node.Code.A("finally {" + G.NL);
-                                    //node.Code.A("p.RemoveLast();" + G.NL);  //end of try
-                                    //node.Code.A("}" + G.NL);  //end of finally
 
                                 }
                             }
