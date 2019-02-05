@@ -4071,8 +4071,17 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTBANKVARNAMELIST":                    
-                        {   
+                        {
+                            bool isFor = false;
+                            ASTNode parent = node?.Parent?.Parent?.Parent?.Parent;
+                            if (parent != null && parent.Text == "ASTFOR")
+                            {
+                                isFor = true;
+                            }
+
                             string code = "O.ExplodeIvariablesSeq(new List(new List<IVariable> {";
+                            if (isFor) code = "O.ExplodeIvariablesSeqFor(new List(new List<IVariable> {";
+
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;

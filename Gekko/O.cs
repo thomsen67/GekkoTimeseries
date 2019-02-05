@@ -339,6 +339,13 @@ namespace Gekko
             return rv;
         }
 
+        public static List ExplodeIvariablesSeqFor(IVariable iv)
+        {
+            List m = ExplodeIvariablesSeq(iv);
+            m = Restrict2(m, true, false, true, true);  //no sigils
+            return m;
+        }
+
         public static List ExplodeIvariablesSeq(IVariable iv)
         {
             List m = new List(ExplodeIvariablesHelper(iv));
