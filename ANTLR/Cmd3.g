@@ -2695,12 +2695,14 @@ xx:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTP
 // FUNCTION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-functionDef:				FUNCTION type ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} type ident functionArg functionStatements);
+functionDef:				FUNCTION typeRv ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} typeRv ident functionArg functionStatements);
 functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
-functionArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
+functionArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
 functionStatements2:        functionStatements;  //alias
-type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
+typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
+typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
+type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
 objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -2887,10 +2889,8 @@ functionNaked:              ident leftParenGlue (expression (',' expression)*)? 
 
 procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, input.LT(1).Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
 procedureArg:                (procedureArgElement (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
-procedureArgElement:         type svarname -> ^(ASTPLACEHOLDER type svarname);
+procedureArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
-//procedureStatements2:        procedureStatements;  //alias
-//type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PRINT, PLOT, SHEET, CLIP

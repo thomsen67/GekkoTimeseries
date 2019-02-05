@@ -14994,7 +14994,7 @@ namespace UnitTests
             _AssertScalarVal(First(), "%n", 8);
             I("string %s = lower(%s3);                                    //lower case");
             _AssertScalarString(First(), "%s", "ab");
-            I("string %s = piece(%s1, 4, 2);                             //substring");
+            I("string %s = substring(%s1, 4, 2);                             //substring");
             _AssertScalarString(First(), "%s", "bb");
             I("string %s = replace(%s1, %s2, 'xx');                      //replace %s2 with 'xx' in %s1");
             _AssertScalarString(First(), "%s", "aa xx cc");

@@ -1496,6 +1496,7 @@ namespace Gekko
             else if (G.Equal(type, "matrix")) etype = EVariableType.Matrix;
             else if (G.Equal(type, "map")) etype = EVariableType.Map;
             else if (G.Equal(type, "var")) etype = EVariableType.Var;
+            else if (G.Equal(type, "name")) etype = EVariableType.Name;
             else if (type == null || type == "") etype = EVariableType.Var;
             else
             {

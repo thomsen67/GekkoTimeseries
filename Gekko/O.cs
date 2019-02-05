@@ -6259,6 +6259,29 @@ namespace Gekko
             return x;
         }
 
+        public static IVariable TypeCheck_name(IVariable x, int position)
+        {
+            if (x == null)
+            {
+                G.Writeln("*** ERROR: Argument #" + position + " should be a name");
+                throw new GekkoException();
+            }
+            if (x.Type() != EVariableType.String)
+            {
+                try
+                {
+                    x = new ScalarString(O.ConvertToString(x));
+                }
+                catch (Exception e)
+                {
+                    if (position <= 0) G.Writeln("*** ERROR: Name error, argument #" + position);
+                    else G.Writeln("*** ERROR: Argument #" + position + " should be a name");
+                    throw new GekkoException();
+                }
+            }
+            return x;
+        }
+
         public static IVariable TypeCheck_date(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Date)

@@ -18,7 +18,8 @@ namespace Gekko
         Matrix,
         Var,
         Range,              
-        GekkoNull        
+        GekkoNull,
+        Name
     }
 
     public enum EScalarRefType

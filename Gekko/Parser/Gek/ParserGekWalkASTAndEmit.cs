@@ -2432,9 +2432,9 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (Globals.functionFuncArguments)
                                     {
-                                        typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func.f1(smpl)" + ", " + (i + 1) + ");" + G.NL;
-                                        //arg1.f2(smpl)
-                                        typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
+                                        string f = "f1";
+                                        if (node.functionDef[i].Item1.ToLower() == "name") f = "f2";
+                                        typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(smpl)" + ", " + (i + 1) + ");" + G.NL;
                                     }
                                     else
                                     {
@@ -2852,7 +2852,8 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (Globals.functionFuncArguments)
                                         {
-                                            args += ", " + "new GekkoArg((smpl777) => " + node[i].Code.ToString().Replace("smpl", "smpl777") + ", " + "(smpl777) => " + node[i].AlternativeCode.ToString().Replace("smpl", "smpl777") + ")";
+                                            string result = GetFuncArgumentCode(node, i);
+                                            args += ", " + result;
                                         }
                                         else
                                         {
@@ -3567,21 +3568,15 @@ namespace Gekko.Parser.Gek
                             {
                                 if (indexesReport == null) indexesReport = indexes;
 
-                                if (node[1][0].Text == "ASTOBJECTFUNCTION")
-                                {                                    
-                                    string s = node[1][0].Code.ToString();
-                                    string[] ss = s.Split(new string[] { Globals.objFunctionPlaceholder }, StringSplitOptions.None);
-                                    if (ss.Length != 2)
-                                    {
-                                        G.Writeln2("*** ERROR: Unexpected function error");
-                                        throw new GekkoException();
-                                    }
-                                    string s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());
-                                    node.Code.A(s2);
-                                }
-                                else if (node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
+                                
+
+                                if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
                                 {
-                                    //node.Code.A(node[0].Code).A(node[1][0].Code).A(";" + G.NL);
+                                    string functionNameLower = node[1][0][0][0].Text.ToLower();
+
+                                    bool isInbuilt = false;
+                                    string meta = null;
+                                    if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta)) isInbuilt = true;
 
                                     string s = node[1][0].Code.ToString();
                                     string[] ss = s.Split(new string[] { Globals.objFunctionPlaceholder }, StringSplitOptions.None);
@@ -3590,13 +3585,23 @@ namespace Gekko.Parser.Gek
                                         G.Writeln2("*** ERROR: Unexpected function error");
                                         throw new GekkoException();
                                     }
-                                    string s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());
+
+                                    string s2 = null;
+                                    if (Globals.functionFuncArguments && !isInbuilt)
+                                    {                                        
+                                        s2 = s.Replace(Globals.objFunctionPlaceholder, GetFuncArgumentCode(node, 0));                                        
+                                    }
+                                    else
+                                    {                                        
+                                        s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());                                        
+                                    }
                                     node.Code.A(s2);
-                                }
+                                }                                
                                 else
                                 {
                                     node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
                                 }
+
                                 if (node[0].AlternativeCode != null)
                                 {
                                     node.AlternativeCode = new GekkoSB();
@@ -6059,6 +6064,15 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static string GetFuncArgumentCode(ASTNode node, int i)
+        {
+            string alternative = "null";
+            if (node[i].AlternativeCode != null) alternative = node[i].AlternativeCode.ToString().Replace("smpl", "smpl777");
+            string original = node[i].Code.ToString().Replace("smpl", "smpl777");
+            string result = "new GekkoArg((smpl777) => " + original + ", " + "(smpl777) => " + alternative + ")";
+            return result;
         }
 
         private static Func<IVariable> Expression(GekkoSmpl smpl)
