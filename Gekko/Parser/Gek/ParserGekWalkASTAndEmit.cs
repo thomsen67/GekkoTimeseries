@@ -3588,8 +3588,9 @@ namespace Gekko.Parser.Gek
 
                                     string s2 = null;
                                     if (Globals.functionFuncArguments && !isInbuilt)
-                                    {                                        
-                                        s2 = s.Replace(Globals.objFunctionPlaceholder, GetFuncArgumentCode(node, 0));                                        
+                                    {
+                                        string code = GetFuncArgumentCode(node, 0);
+                                        s2 = s.Replace(Globals.objFunctionPlaceholder, code);                                        
                                     }
                                     else
                                     {                                        
@@ -3600,20 +3601,25 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
+
+                                    //this alternative code is only done for x[a] type of variables, not x.f() etc.
+
+                                    if (node[0].AlternativeCode != null)
+                                    {
+                                        node.AlternativeCode = new GekkoSB();
+                                        node.AlternativeCode.A("(").A(node[0].AlternativeCode).A(")");
+                                        for (int i = 0; i < node[1].ChildrenCount(); i++)
+                                        {
+                                            if (i == 0) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"[\"))");
+                                            node.AlternativeCode = node.AlternativeCode.A(".Add(smpl, ").A(node[1][i].Code).A(")");
+                                            if (i < node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\", \"))");
+                                            if (i == node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"]\"))");
+                                        }
+                                    }
+
                                 }
 
-                                if (node[0].AlternativeCode != null)
-                                {
-                                    node.AlternativeCode = new GekkoSB();
-                                    node.AlternativeCode.A("(").A(node[0].AlternativeCode).A(")");
-                                    for (int i = 0; i < node[1].ChildrenCount(); i++)
-                                    {
-                                        if (i == 0) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"[\"))");
-                                        node.AlternativeCode = node.AlternativeCode.A(".Add(smpl, ").A(node[1][i].Code).A(")");
-                                        if (i < node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\", \"))");
-                                        if (i == node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(smpl, new ScalarString(\"]\"))");
-                                    }
-                                }
+                                
                             }
                             else
                             {                                
@@ -6068,10 +6074,14 @@ namespace Gekko.Parser.Gek
 
         private static string GetFuncArgumentCode(ASTNode node, int i)
         {
+            
             string alternative = "null";
-            if (node[i].AlternativeCode != null) alternative = node[i].AlternativeCode.ToString().Replace("smpl", "smpl777");
-            string original = node[i].Code.ToString().Replace("smpl", "smpl777");
-            string result = "new GekkoArg((smpl777) => " + original + ", " + "(smpl777) => " + alternative + ")";
+
+            string c = "spml" + ++Globals.counter;
+
+            if (node[i].AlternativeCode != null) alternative = node[i].AlternativeCode.ToString().Replace("smpl", c);
+            string original = node[i].Code.ToString().Replace("smpl", c);
+            string result = "new GekkoArg((" + c + ") => " + original + ", " + "(" + c + ") => " + alternative + ")";
             return result;
         }
 
