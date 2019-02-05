@@ -6453,6 +6453,10 @@ namespace UnitTests
             I("%u = 'y';");
             I("%v = 'f';");
 
+            //Test of string indexing (1-length substring)
+            I("%sSlice = %s[2];");
+            _AssertScalarString(First(), "%sSlice", "y");
+
             I("SERIES xx1 = {%s}[2000];");
             I("%v1 = {%s}[2000];");
             FAIL("SERIES xx1 = {s}[2000];");
@@ -9404,6 +9408,39 @@ namespace UnitTests
             I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
             I("SIM<2006 2006>;");
             I("ITERSHOW <2010 2010>fy;");
+        }
+
+        [TestMethod]
+        public void _Test_NameType()
+        {
+            I("RESET; time 2001 2001;");
+            I("%a = 'x';");
+            I("x = 100;");
+            I("FUNCTION val f(name %a, string %b, series c); %x1 = {%a}[2001];  %x2 = {%b}[2001]; %x3 = c[2001]; return 1; END;");
+            I("%temp = f(x, 'x', x);");
+            _AssertScalarVal(First(), "%x1", 100d);
+            _AssertScalarVal(First(), "%x2", 100d);
+            _AssertScalarVal(First(), "%x3", 100d);
+
+            FAIL("%temp = f('x', 'x', x);");
+            FAIL("%temp = f(x, x, x);");
+            FAIL("%temp = f(x, x, 'x');");
+
+            // --- procedure
+
+            I("RESET; time 2001 2001;");
+            I("%a = 'x';");
+            I("x = 100;");
+            I("PROCEDURE f name %a, string %b, series c; %x1 = {%a}[2001];  %x2 = {%b}[2001]; %x3 = c[2001]; END;");
+            I("f x 'x' x;");
+            _AssertScalarVal(First(), "%x1", 100d);
+            _AssertScalarVal(First(), "%x2", 100d);
+            _AssertScalarVal(First(), "%x3", 100d);
+                        
+            FAIL("f 'x' 'x' x;");
+            FAIL("f x x x;");
+            FAIL("f x 'x' 'x';");
+
         }
 
         [TestMethod]
