@@ -8235,8 +8235,8 @@ namespace Gekko
                 int rCount = Program.databanks.GetRef().storage.Count;
                 string originalDataFileWork = "[empty]";
                 string originalDataFileBaseline = "[empty]";
-                string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst().name);
-                string b = GetDatabankFileNameWithPath(Program.databanks.GetRef().name);
+                string w = GetDatabankFileNameWithPath(Program.databanks.GetFirst());
+                string b = GetDatabankFileNameWithPath(Program.databanks.GetRef());
                 if (w != null) originalDataFileWork = w;
                 if (b != null) originalDataFileBaseline = b;
                 string banks1 = "";
@@ -8293,7 +8293,7 @@ namespace Gekko
                 workingFolder = Program.options.folder_working;
 
             }
-            string ss = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
+            string ss = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst()) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef()) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
 
@@ -8317,12 +8317,12 @@ namespace Gekko
             CrossThreadStuff.CutButtonEnabled(i > 0);
         }
 
-        private static string GetDatabankFileNameWithPath(string bank)
+        private static string GetDatabankFileNameWithPath(Databank bank)
         {
             string fileName = "[no bank filename]";
-            if (Program.databanks.GetDatabank(bank) != null)
+            if (bank != null)
             {
-                fileName = Program.databanks.GetDatabank(bank).FileNameWithPath;
+                fileName = bank.FileNameWithPath;
             }
             return fileName;
         }
@@ -38639,7 +38639,7 @@ namespace Gekko
             using (StreamWriter samFile = G.GekkoStreamWriter(fs))
             {
 
-                samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst().name) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef().name) + ") databanks");
+                samFile.WriteLine("Comparing first-position (" + GetDatabankFileNameWithPath(Program.databanks.GetFirst()) + ") and reference (" + GetDatabankFileNameWithPath(Program.databanks.GetRef()) + ") databanks");
                 samFile.WriteLine();
                 samFile.WriteLine("There are the following " + both2.Count + " series in both databanks:");
                 G.PrintListWithCommasToFile(samFile, both2);

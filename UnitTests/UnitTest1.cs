@@ -8878,8 +8878,25 @@ namespace UnitTests
             I("global:#default = map();");
             I("global:#default.#s = ('e1',); ");
             I("p <q> a;");
-            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);            
+            table = Globals.lastPrtOrMulprtTable; Assert.AreEqual(table.GetColMaxNumber(), 2);
 
+            // --------------------------
+
+            //arrayseries algebra
+            I("reset;");
+            I("x1 = series(1); x1[a] = 100; x1[b] = 200;");
+            I("x2 = series(1); x2[a] = 3; x2[b] = 4;");
+            //TODO: y = x1 + x2
+            I("prt x1 + x2;");
+            I("prt x1 - x2;");
+            I("prt x1 * x2;");
+            I("prt x1 / x2;");
+
+            // pR*qR virker. 2*qR virker ikke. pY*qR virker heller ikke
+            // DISP qY[pub] giver label og tal. 
+            //   Det kunne være rart, hvis den også gav ligningen for qY[pub]. Bedst ved at indsætte [pub] i stedet for [#s] i ligningen for qY[#s], men det ville også være fint, hvis den bare viste qY[#s]
+            //pC * qY skal acceptere forskellige sets, hvis begge er betinget på ét element fx [tot] -> behøver ikke være det samme
+            //pC * qY[#s] skal være samme som pC[tot] * qY[#s]
         }
 
 
@@ -13122,15 +13139,6 @@ namespace UnitTests
             counter++;
         }
 
-        [TestMethod]
-        public void _Test_Alias2()
-        {
-            //this would fail with stack overflow if it were not for #6324987324234, avoiding recursion
-            I("reset; OPTION interface alias = yes;");
-            I("x = series(1); x[a] = 1;");
-            I("global:#alias = (('x', 'x[a]'),);");  // a --> b            
-            I("PRT x;");
-        }
 
         [TestMethod]
         public void _Test_Fix()
@@ -16556,12 +16564,22 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Alias()
         {
+            //basic alias
             I("reset;");
             I("option interface alias = yes;");
             I("#(listfile m) = (('fy', 'c[a]'), ('fe', 'c[b]'));");            
             I("global:#alias = #(listfile m);");
             I("c = series(1); c[a] = 100; c[b] = 200;");
-            I("prt fy, fe;");            
+            I("prt fy, fe;");
+
+            //avoid recursion in alias
+            //this would fail with stack overflow if it were not for #6324987324234, avoiding recursion
+            I("reset; OPTION interface alias = yes;");
+            I("x = series(1); x[a] = 1;");
+            I("global:#alias = (('x', 'x[a]'),);");  // a --> b            
+            I("PRT x;");
+
+            
         }
 
         [TestMethod]

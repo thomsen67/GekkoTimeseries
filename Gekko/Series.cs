@@ -1352,44 +1352,52 @@ namespace Gekko
         }
 
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
-        {            
-            Series rv_series;
-            GekkoTime window1, window2, windowNew1, windowNew2;
-            InitWindows(out window1, out window2, out windowNew1, out windowNew2);
-
-            GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
-
-            rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
-
-            // ---------------------------
-            // x2 is a VAL or MATRIX 1x1
-            // ---------------------------
-
-            if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+        {
+            if (x1_series.type == ESeriesType.ArraySuper)
             {
-                int ia1 = rv_series.ResizeDataArray(window1);
-                int ia2 = rv_series.ResizeDataArray(window2);
-
-                int ib1 = x1_series.ResizeDataArray(window1);
-                int ib2 = x1_series.ResizeDataArray(window2);
-                
-                double[] arraya = rv_series.data.dataArray;
-                double[] arrayb = x1_series.data.dataArray;                
-
-                for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
-                {
-                    arraya[i + ia1] = a(arrayb[i + ib1], x2_val);
-                }
+                return ArithmeticsArraySeriesVal(smpl, x1_series, x2_val, a);
             }
             else
             {
-                foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
-                {
-                    rv_series.SetData(t, a(x1_series.GetData(smpl, t), x2_val));
-                }
-            }
 
-            return rv_series;
+                Series rv_series;
+                GekkoTime window1, window2, windowNew1, windowNew2;
+                InitWindows(out window1, out window2, out windowNew1, out windowNew2);
+
+                GetStartEndPeriod(smpl, x1_series, ref window1, ref window2); //if light series, the returned period corresponds to array size, else smpl window is used
+
+                rv_series = new Series(ESeriesType.Light, window1, window2);  //also checks that nobs > 0            
+
+                // ---------------------------
+                // x2 is a VAL or MATRIX 1x1
+                // ---------------------------
+
+                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                {
+                    int ia1 = rv_series.ResizeDataArray(window1);
+                    int ia2 = rv_series.ResizeDataArray(window2);
+
+                    int ib1 = x1_series.ResizeDataArray(window1);
+                    int ib2 = x1_series.ResizeDataArray(window2);
+
+                    double[] arraya = rv_series.data.dataArray;
+                    double[] arrayb = x1_series.data.dataArray;
+
+                    for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                    {
+                        arraya[i + ia1] = a(arrayb[i + ib1], x2_val);
+                    }
+                }
+                else
+                {
+                    foreach (GekkoTime t in new GekkoTimeIterator(window1, window2))
+                    {
+                        rv_series.SetData(t, a(x1_series.GetData(smpl, t), x2_val));
+                    }
+                }
+
+                return rv_series;
+            }
         }
 
         private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
@@ -1458,6 +1466,45 @@ namespace Gekko
             }
         }
 
+        private static Series ArithmeticsArraySeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
+        {
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
+            temp.meta = new SeriesMetaInformation();
+            temp.data = new SeriesDataInformation();
+
+            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();            
+
+            keys1.Sort(Program.CompareMapMultidimItems);            
+
+            for (int i = 0; i < keys1.Count; i++)
+            {
+                MapMultidimItem mm1 = keys1[i];                
+                
+                Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
+                
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    sub.SetData(t, a(sub1.GetData(smpl, t), x2_val));
+                }
+                temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+
+                //For safety, we clone the domain array of strings.
+                //We first try to steal domains from x1, then from x2
+                //If these do not have domains, the resulting series is domain-less too
+                if (x1_series.meta != null && x1_series.meta.domains != null)
+                {
+                    temp.meta.domains = new string[x1_series.meta.domains.Length];
+                    for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                    }
+                }                
+            }
+            temp.SetDirty(true);
+            return temp;
+        }
+
         private static Series ArithmeticsArraySeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
             //SOMETHING FISHY HERE, when domains do not match
@@ -1471,8 +1518,9 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, "temp", x1_series.dimensions);
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
             temp.meta = new SeriesMetaInformation();
+            temp.data = new SeriesDataInformation();
 
             List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
             List<MapMultidimItem> keys2 = x2_series.dimensionsStorage.storage.Keys.ToList();
@@ -2288,7 +2336,7 @@ namespace Gekko
             //.isNotFoundArraySub... field is not cloned
             //the .isDirty and .parentDatabank fields are not cloned
 
-            Series tsCopy = new Series(this.freq, this.name);  //this will create the .meta object - the .data object is always there
+            Series tsCopy = new Series(this.freq, this.name);  //this will create t½he .meta object - the .data object is always there
 
             tsCopy.type = this.type;
             tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases

@@ -650,7 +650,9 @@ namespace Gekko
         {
             string s1 = O.ConvertToString(x1);
             if (G.Equal(s1, Globals.Ref) || G.Equal(s1, Globals.Work) || G.Equal(s1, Globals.Global) || G.Equal(s1, Globals.Local)) return Globals.scalarVal1;
-            for (int i = 2; i < Program.databanks.storage.Count; i++)
+
+            //Work is typically at pos = 0, but not always so. Ref is always at pos = 1, but we just probe storage[1] for simplicity
+            for (int i = 0; i < Program.databanks.storage.Count; i++)
             {
                 Databank db = Program.databanks.storage[i];
                 if (G.Equal(db.name, s1)) return Globals.scalarVal1;
