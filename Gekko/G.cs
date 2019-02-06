@@ -417,6 +417,12 @@ namespace Gekko
             return false;
         }
 
+        public static bool Chop_HasIndex(string s)
+        {
+            if (G.Chop_GetIndex(s).Count > 0) return true;
+            return false;
+        }
+
         public static bool IsGekkoNull(IVariable x1)
         {
             return x1.Type() == EVariableType.GekkoNull;

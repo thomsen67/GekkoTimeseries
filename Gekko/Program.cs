@@ -14569,7 +14569,7 @@ namespace Gekko
 
                 if (precedents2.Count > 0)
                 {
-                    G.Write("Influences: ");
+                    G.Write("Variable " + varnameWithoutFreqAndIndex + " influences: ");
                     int counter = -1;
                     foreach (string s in precedents2)
                     {
@@ -14587,6 +14587,11 @@ namespace Gekko
 
                 if (eqs != null && eqs.Count > 0)
                 {
+                    if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
+                    {
+                        G.Writeln("+++ NOTE: Some of the following equations may relate to other elements of " + varnameWithoutFreqAndIndex + " than " + varnameWithoutFreq);
+                    }
+
                     PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
                     eqsPrinted = true;
 
