@@ -360,6 +360,20 @@ namespace Gekko
             }
         }
 
+        public static IVariable removeindex(GekkoSmpl smpl, IVariable ths)
+        {
+            if (ths.Type() == EVariableType.List)
+            {
+                List rv = new List();
+                foreach (IVariable item in (ths as List).list) rv.Add(removeindex(smpl, item));
+                return rv;
+            }
+            else
+            {
+                return new ScalarString(G.Chop_RemoveIndex(O.ConvertToString(ths)));
+            }
+        }
+
 
         //See equivalent method in G.cs
         public static IVariable removefreq(GekkoSmpl smpl, IVariable ths, IVariable x2)

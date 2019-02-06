@@ -8883,15 +8883,40 @@ namespace UnitTests
             // --------------------------
 
             //arrayseries algebra
-            I("reset;");
+            I("reset; time 2010 2010;");
+            I("x = 10;");
             I("x1 = series(1); x1[a] = 100; x1[b] = 200;");
             I("x2 = series(1); x2[a] = 3; x2[b] = 4;");
-            //TODO: y = x1 + x2
-            I("prt x1 + x2;");
-            I("prt x1 - x2;");
-            I("prt x1 * x2;");
-            I("prt x1 / x2;");
+            I("x3 = series(1); x3[a] = 13; x3[c] = 14;");
 
+            // -- two aseries
+            I("y = x1 - x2;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, 97d, sharedDelta);
+            I("y = x2 - x1;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, -97d, sharedDelta);
+            // -- one aseries one series
+            I("y = x1 - x;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, 90d, sharedDelta);
+            I("y = x - x1;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, -90d, sharedDelta);
+            // -- one aseries one val
+            I("y = x1 - 10;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, 90d, sharedDelta);
+            I("y = 10 - x1;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, -90d, sharedDelta);
+
+            FAIL("y = x1 - x3;");
+            FAIL("y = x3 - x1");
+
+            I("y = x1 - x3[a];");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, 87d, sharedDelta);
+            I("y = x3[a] - x1;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, -87d, sharedDelta);
+            I("y = x1 - x3[c];");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, 86d, sharedDelta);
+            I("y = x3[c] - x1;");
+            _AssertSeries(First(), "y!a", new string[] { "a" }, 2010, -86d, sharedDelta);
+            
             // pR*qR virker. 2*qR virker ikke. pY*qR virker heller ikke
             // DISP qY[pub] giver label og tal. 
             //   Det kunne være rart, hvis den også gav ligningen for qY[pub]. Bedst ved at indsætte [pub] i stedet for [#s] i ligningen for qY[#s], men det ville også være fint, hvis den bare viste qY[#s]

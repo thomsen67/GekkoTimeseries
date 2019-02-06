@@ -1359,7 +1359,6 @@ namespace Gekko
             }
             else
             {
-
                 Series rv_series;
                 GekkoTime window1, window2, windowNew1, windowNew2;
                 InitWindows(out window1, out window2, out windowNew1, out windowNew2);
@@ -1406,9 +1405,19 @@ namespace Gekko
             {
                 return ArithmeticsArraySeriesArraySeries(smpl, x1_series, x2_series, a);                
             }
+            else if (x1_series.type == ESeriesType.ArraySuper)
+            {
+                //first array, last normal
+                return ArithmeticsArraySeriesSeries(smpl, x1_series, x2_series, a);
+            }
+            else if (x2_series.type == ESeriesType.ArraySuper)
+            {
+                //first normal, last arary
+                return ArithmeticsSeriesArraySeries(smpl, x1_series, x2_series, a);
+            }
             else
             {
-
+                //both normal series
                 Series rv_series;
                 GekkoTime window1, window2, windowNew1, windowNew2;
                 InitWindows(out window1, out window2, out windowNew1, out windowNew2);
@@ -1500,6 +1509,84 @@ namespace Gekko
                         temp.meta.domains[ii] = x1_series.meta.domains[ii];
                     }
                 }                
+            }
+            temp.SetDirty(true);
+            return temp;
+        }
+
+        private static Series ArithmeticsArraySeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
+        {
+            Series temp = new Series(ESeriesType.ArraySuper, x1_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x1_series.freq)), x1_series.dimensions);
+            temp.meta = new SeriesMetaInformation();
+            temp.data = new SeriesDataInformation();
+
+            List<MapMultidimItem> keys1 = x1_series.dimensionsStorage.storage.Keys.ToList();
+
+            keys1.Sort(Program.CompareMapMultidimItems);
+
+            for (int i = 0; i < keys1.Count; i++)
+            {
+                MapMultidimItem mm1 = keys1[i];
+
+                Series sub1 = x1_series.dimensionsStorage.storage[mm1] as Series;
+
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    sub.SetData(t, a(sub1.GetData(smpl, t), x2_series.GetData(smpl, t)));
+                }
+                temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+
+                //For safety, we clone the domain array of strings.
+                //We first try to steal domains from x1, then from x2
+                //If these do not have domains, the resulting series is domain-less too
+                if (x1_series.meta != null && x1_series.meta.domains != null)
+                {
+                    temp.meta.domains = new string[x1_series.meta.domains.Length];
+                    for (int ii = 0; ii < x1_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x1_series.meta.domains[ii];
+                    }
+                }
+            }
+            temp.SetDirty(true);
+            return temp;
+        }
+
+        private static Series ArithmeticsSeriesArraySeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
+        {
+            Series temp = new Series(ESeriesType.ArraySuper, x2_series.freq, G.Chop_AddFreq("temp", G.GetFreq(x2_series.freq)), x2_series.dimensions);
+            temp.meta = new SeriesMetaInformation();
+            temp.data = new SeriesDataInformation();
+
+            List<MapMultidimItem> keys1 = x2_series.dimensionsStorage.storage.Keys.ToList();
+
+            keys1.Sort(Program.CompareMapMultidimItems);
+
+            for (int i = 0; i < keys1.Count; i++)
+            {
+                MapMultidimItem mm1 = keys1[i];
+
+                Series sub1 = x2_series.dimensionsStorage.storage[mm1] as Series;
+
+                Series sub = new Series(ESeriesType.Normal, sub1.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(sub1.freq));
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    sub.SetData(t, a(x1_series.GetData(smpl, t), sub1.GetData(smpl, t)));
+                }
+                temp.dimensionsStorage.AddIVariableWithOverwrite(mm1, sub);
+
+                //For safety, we clone the domain array of strings.
+                //We first try to steal domains from x1, then from x2
+                //If these do not have domains, the resulting series is domain-less too
+                if (x2_series.meta != null && x2_series.meta.domains != null)
+                {
+                    temp.meta.domains = new string[x2_series.meta.domains.Length];
+                    for (int ii = 0; ii < x2_series.meta.domains.Length; ii++)
+                    {
+                        temp.meta.domains[ii] = x2_series.meta.domains[ii];
+                    }
+                }
             }
             temp.SetDirty(true);
             return temp;

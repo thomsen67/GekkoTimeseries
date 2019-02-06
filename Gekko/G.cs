@@ -478,7 +478,7 @@ namespace Gekko
         //See equivalent method in Functions.cs
         public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
-            string s = O.UnChop(bank, name, freq, index);
+            string s = O.UnChop(bank, name, freq, index);            
             return s;
         }
 
@@ -566,6 +566,15 @@ namespace Gekko
         public static string Chop_FreqSet(string s1, EFreq freq)
         {
             return Chop_SetFreq(s1, G.GetFreq(freq));
+        }
+
+        //See equivalent method in Functions.cs
+        public static string Chop_RemoveIndex(string s1)
+        {
+            string bank, name, freq; string[] index;
+            O.Chop(s1, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return s1;
+            return O.UnChop(bank, name, freq, null);
         }
 
         //See equivalent method in Functions.cs

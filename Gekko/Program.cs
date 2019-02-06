@@ -14549,13 +14549,18 @@ namespace Gekko
 
             if (Program.modelGams?.equations != null)
             {
+                string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
+
                 GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equations)
                 {
                     foreach (ModelGamsEquation e5 in e4.Value)
                     {
                         GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                        if (knownVars2.ContainsKey(varnameWithoutFreq) && !precedents.ContainsKey(e4.Key)) precedents.Add(e4.Key, null);
+                        if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !precedents.ContainsKey(e4.Key))
+                        {
+                            precedents.Add(e4.Key, null);
+                        }
                     }
                 }
                 List<string> precedents2 = new List<string>();
@@ -14578,11 +14583,11 @@ namespace Gekko
                     G.Writeln();
                 }
 
-                List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreq, out eqs);
+                List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
 
                 if (eqs != null && eqs.Count > 0)
                 {
-                    PrintEquationWithLinks(gamsToGekko, varnameWithoutFreq, eqs, showDetailed);
+                    PrintEquationWithLinks(gamsToGekko, varnameWithoutFreqAndIndex, eqs, showDetailed);
                     eqsPrinted = true;
 
                     if (!showDetailed)
@@ -14593,7 +14598,7 @@ namespace Gekko
                     }
                 }
 
-                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreq, clickedLink, 0);
+                if (!G.IsUnitTesting()) Gui.gui.GuiBrowseArrowsStuff(varnameWithoutFreqAndIndex, clickedLink, 0);
 
             }
 
