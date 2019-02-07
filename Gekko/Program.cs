@@ -15498,6 +15498,17 @@ namespace Gekko
                     string sss = wildCardLhs;
                     if (sss.StartsWith(Globals.symbolRefShortcut)) sss = "ref:" + sss.Substring(1);
                     O.Chop(sss, out bankLhs, out nameLhs, out freqLhs, out indexLhs);
+                    if (nameLhs == "***")
+                    {
+                        if (bankLhs != null)
+                        {
+                            G.Writeln2("*** ERROR: You cannot combine '***' wiht bank, frequency or index.");
+                            throw new GekkoException();
+                        }
+                        bankLhs = "*";
+                        nameLhs = "**";
+                        //so *** = *:**
+                    }
                 }
 
                 //Now we have bankLhs and freqLhs (indexLhs does not work...)
@@ -15905,13 +15916,11 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: You cannot combine '**' wildcard with frequency");
                     throw new GekkoException();
-                }
-                //bankname + Globals.symbolBankColon
+                }                
                 foreach (string s in allVariablesInBank)
                 {
                     varsMatched.Add(bankname + Globals.symbolBankColon + s);
-                }
-                //varsMatched.AddRange(allVariablesInBank);
+                }                
             }
             else
             {
@@ -23721,7 +23730,9 @@ namespace Gekko
                     gekkoBuiltInFunctions.Add(name, meta);  //meta contains info on lags etc.         
                 }
             }
-            
+
+            gekkoBuiltInFunctions.Add("string", null); //%s = string(1) is translated into tostring() since string() function is not allowed in C#.
+
             return gekkoBuiltInFunctions;
         }
 
