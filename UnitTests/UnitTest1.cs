@@ -3151,7 +3151,8 @@ namespace UnitTests
             // test of <keep=p>
             I("RESET; TIME 2001 2006;");
             I("x = (0.5, 1.5, 1, 1.01, 1.01*1.03, 1.01*1.03*1.05);"); //1%, 3%, 5%            
-            I("<2001 2003 m keep=p> x = 2;");  //adds 2 in 2001-2003, then follow old growth
+            I("v = 2;");
+            I("<2001 2003 m keep=p> x = v + 0;");  //adds 2 in 2001-2003, then follow old growth
             _AssertSeries(First(), "x", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x", 2001, 2.5d, sharedDelta);
             _AssertSeries(First(), "x", 2002, 3.5d, sharedDelta);
@@ -3166,8 +3167,9 @@ namespace UnitTests
             //After this, we can be pretty sure that operators work for array-series as for normal series.
             I("RESET; TIME 2001 2004;");
             I("x = series(1);");
+            I("v = 3;");
             I("x[a] = 5;");
-            I("<2002 2004 d> x[a] = 3;");
+            I("<2002 2004 d> x[a] = v + 0;");
             _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a" }, 2002, 8d, sharedDelta);
@@ -3175,11 +3177,12 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "a" }, 2004, 14d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
             I("RESET; TIME 2001 2004;");
+            I("v = 3;");
             I("x = series(1);");
             I("x[a] = 5;");
             I("x[b] = 10;");
             I("#i = a, b;");
-            I("<2002 2004 d> x[#i] = 3;");
+            I("<2002 2004 d> x[#i] = v + 0;");
             _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "a" }, 2002, 8d, sharedDelta);
@@ -3210,6 +3213,7 @@ namespace UnitTests
                     for (int i = 0; i < 2; i++)
                     {
                         I("RESET; TIME 2001 2004;");
+                        I("three = 3;");
                         if (k == 0)
                         {
                             I("y = 5;");
@@ -3236,11 +3240,11 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y ^= x1;");
+                                    I("<2002 2004> y ^= x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y ^= x1;");
+                                    I("<2002 2004> #m.y ^= x1 + 0;");
                                 }
                             }
                         }
@@ -3300,22 +3304,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 d> y = 3;");
+                                    I("<2002 2004 d> y = three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 d> #m.y = 3;");
+                                    I("<2002 2004 d> #m.y = three + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y ^= 3;");
+                                    I("<2002 2004> y ^= three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y ^= 3;");
+                                    I("<2002 2004> #m.y ^= three + 0;");
                                 }
                             }
                         }
@@ -3396,6 +3400,7 @@ namespace UnitTests
                     for (int i = 0; i < 2; i++)
                     {
                         I("RESET; TIME 2001 2004;");
+                        I("three = 3;");
                         if (k == 0)
                         {
                             I("y = 5;");
@@ -3411,22 +3416,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 p> y = x1;");
+                                    I("<2002 2004 p> y = x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 p> #m.y = x1;");
+                                    I("<2002 2004 p> #m.y = x1 + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y %= x1;");
+                                    I("<2002 2004> y %= x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y %= x1;");
+                                    I("<2002 2004> #m.y %= x1 + 0;");
                                 }
                             }
                         }
@@ -3486,22 +3491,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 p> y = 3;");
+                                    I("<2002 2004 p> y = three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 p> #m.y = 3;");
+                                    I("<2002 2004 p> #m.y = three + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y %= 3;");
+                                    I("<2002 2004> y %= three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y %= 3;");
+                                    I("<2002 2004> #m.y %= three + 0;");
                                 }
                             }
                         }
@@ -3585,6 +3590,7 @@ namespace UnitTests
                     for (int i = 0; i < 2; i++)
                     {
                         I("RESET; TIME 2001 2004;");
+                        I("three = 3;");
                         if (k == 0)
                         {
                             I("y = 5;");
@@ -3600,22 +3606,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 m> y = x1;");
+                                    I("<2002 2004 m> y = x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 m> #m.y = x1;");
+                                    I("<2002 2004 m> #m.y = x1 + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y += x1;");
+                                    I("<2002 2004> y += x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y += x1;");
+                                    I("<2002 2004> #m.y += x1 + 0;");
                                 }
                             }
                         }
@@ -3675,22 +3681,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 m> y = 3;");
+                                    I("<2002 2004 m> y = three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 m> #m.y = 3;");
+                                    I("<2002 2004 m> #m.y = three + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y += 3;");
+                                    I("<2002 2004> y += three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y += 3;");
+                                    I("<2002 2004> #m.y += three + 0;");
                                 }
                             }
                         }
@@ -3769,6 +3775,7 @@ namespace UnitTests
                     for (int i = 0; i < 2; i++)
                     {
                         I("RESET; TIME 2001 2004;");
+                        I("three = 3;");
                         if (k == 0)
                         {
                             I("y = 5;");
@@ -3784,11 +3791,11 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 q> y = x1;");
+                                    I("<2002 2004 q> y = x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 q> #m.y = x1;");
+                                    I("<2002 2004 q> #m.y = x1 + 0;");
                                 }
                             }
                             else
@@ -3859,22 +3866,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 q> y = 3;");
+                                    I("<2002 2004 q> y = three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 q> #m.y = 3;");
+                                    I("<2002 2004 q> #m.y = three + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y *= 1.03;");
+                                    I("<2002 2004> y *= 1 + three/100;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y *= 1.03;");
+                                    I("<2002 2004> #m.y *= 1 + three/100;");
                                 }
                             }
                         }
@@ -3954,6 +3961,7 @@ namespace UnitTests
                     for (int i = 0; i < 2; i++)
                     {
                         I("RESET; TIME 2001 2004;");
+                        I("three = 3;");
                         if (k == 0)
                         {
                             //growth: 1%
@@ -3971,22 +3979,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 mp> y = x1;");
+                                    I("<2002 2004 mp> y = x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 mp> #m.y = x1;");
+                                    I("<2002 2004 mp> #m.y = x1 + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y #= x1;");
+                                    I("<2002 2004> y #= x1 + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y #= x1;");
+                                    I("<2002 2004> #m.y #= x1 + 0;");
                                 }
                             }
                         }
@@ -4046,22 +4054,22 @@ namespace UnitTests
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004 mp> y = 3;");
+                                    I("<2002 2004 mp> y = three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004 mp> #m.y = 3;");
+                                    I("<2002 2004 mp> #m.y = three + 0;");
                                 }
                             }
                             else
                             {
                                 if (k == 0)
                                 {
-                                    I("<2002 2004> y #= 3;");
+                                    I("<2002 2004> y #= three + 0;");
                                 }
                                 else
                                 {
-                                    I("<2002 2004> #m.y #= 3;");
+                                    I("<2002 2004> #m.y #= three + 0;");
                                 }
                             }
                         }
@@ -4120,11 +4128,6 @@ namespace UnitTests
                 }
             }
             Assert.AreEqual(count, 16);  //safety
-
-
-            
-
-
 
         }
 

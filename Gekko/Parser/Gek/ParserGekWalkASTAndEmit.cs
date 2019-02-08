@@ -1120,6 +1120,7 @@ namespace Gekko.Parser.Gek
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;");
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
@@ -1131,6 +1132,7 @@ namespace Gekko.Parser.Gek
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;");
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

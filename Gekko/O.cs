@@ -3559,8 +3559,8 @@ namespace Gekko
         }
 
         public static void AdjustT0(GekkoSmpl smpl, int i)
-        {            
-            smpl.t0.Add(i);            
+        {
+            smpl.t0 = smpl.t0.Add(i);            
         }
 
         private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type)
@@ -9617,10 +9617,11 @@ namespace Gekko
             //public string v1 = null;
             public List lhs = null;
             public List rhs = null;
-            public string type = null;            
+            public string type = null;
+            public P p;
             public void Exe()
             {                
-                Program.Collapse(this.lhs, this.rhs, type);                
+                Program.Collapse(this.lhs, this.rhs, this.type, this.p);                
             }
         }
 
@@ -9629,9 +9630,10 @@ namespace Gekko
             public List lhs = null;
             public List rhs = null;
             public string type = null;
+            public P p;
             public void Exe()
             {
-                Program.Interpolate(this.lhs, this.rhs, type);
+                Program.Interpolate(this.lhs, this.rhs, this.type, this.p);
             }
         }
         

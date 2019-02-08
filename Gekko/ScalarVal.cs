@@ -202,7 +202,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Memory variable conversion error.");
+                        G.Writeln2("*** ERROR: Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -231,7 +231,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Memory variable conversion error.");
+                        G.Writeln2("*** ERROR: Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -272,7 +272,7 @@ namespace Gekko
                     }                
                 default:
                     {
-                        G.Writeln2("*** ERROR: Memory variable conversion error.");
+                        G.Writeln2("*** ERROR: Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -301,7 +301,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Memory variable conversion error.");
+                        G.Writeln2("*** ERROR: Variable conversion error.");
                         throw new GekkoException();
                     }
             }
@@ -330,7 +330,7 @@ namespace Gekko
                     }
                 default:
                     {
-                        G.Writeln2("*** ERROR: Memory variable conversion error.");
+                        G.Writeln2("*** ERROR: Variable conversion error.");
                         throw new GekkoException();
                     }
             }

@@ -25370,7 +25370,7 @@ namespace Gekko
         //    return counter;
         //}
 
-        public static void Collapse(List lhs, List rhs, string method)
+        public static void Collapse(List lhs, List rhs, string method, P p)
         {           
 
             if (lhs.list.Count != rhs.list.Count)
@@ -25510,12 +25510,14 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                G.Writeln2("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                //G.Writeln2("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                G.ServiceMessage("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
+
             }
             return;
         }
 
-        public static void Interpolate(List lhs, List rhs, string method)
+        public static void Interpolate(List lhs, List rhs, string method, P p)
         {
             if (lhs.list.Count != rhs.list.Count)
             {
@@ -25643,7 +25645,8 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-                G.Writeln("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                //G.Writeln("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                G.ServiceMessage("Interpolated '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
             }
             return;
         }
