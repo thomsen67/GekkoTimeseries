@@ -2652,6 +2652,24 @@ namespace Gekko
             }
         }
 
+        public static string RemoveComments(string input)
+        {
+            var blockComments = @"/\*(.*?)\*/";
+            var lineComments = @"//(.*?)\r?\n";
+            var strings = @"""((\\[^\n]|[^""\n])*)""";
+            var verbatimStrings = @"@(""[^""]*"")+";
+            string noComments = Regex.Replace(input,
+                blockComments + "|" + lineComments + "|" + strings + "|" + verbatimStrings,
+                me => {
+                    if (me.Value.StartsWith("/*") || me.Value.StartsWith("//"))
+                        return me.Value.StartsWith("//") ? Environment.NewLine : "";
+                    // Keep the literal strings
+                    return me.Value;
+                },
+                RegexOptions.Singleline);
+            return noComments;
+        }
+
         public static void WritelnGray(string s)
         {
             if (!Globals.runningOnTTComputer) return;
