@@ -8022,7 +8022,12 @@ namespace Gekko
                     if (listI != -12345)
                     {
 
-                        List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
+                        int fat = 5;
+                        var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+                        var tags2 = new List<string>() { "//" };
+                        List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), fat, tags1, tags2, null, null).storage;
+
+                        //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
                         string varLine = null;
                         for (int i2 = 0; i2 < a.Count; i2++)
                         {
@@ -8811,9 +8816,11 @@ namespace Gekko
 
             string genr = Program.GetTextFromFileWithWait(Program.options.folder_working + "\\" + "genr.gcm");
 
-            int fat = 3;
-
-            List<TokenHelper> a = Program.GetTokensWithLeftBlanks(genr, fat, true);
+            int fat = 3;            
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+            List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(genr, fat, tags1, tags2, null, null).storage;            
+            //List<TokenHelper> a = Program.GetTokensWithLeftBlanks(genr, fat, true);
 
             List<List<TokenHelper>> statements = new List<List<TokenHelper>>();
 
@@ -9069,7 +9076,9 @@ namespace Gekko
             }
             try
             {
-                List<TokenHelper> a = GetTokensWithLeftBlanks(equationText, 20, false);
+                int fat = 20;                
+                List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(equationText, fat, null, null, null, null).storage;
+                //List<TokenHelper> a = GetTokensWithLeftBlanks(equationText, 20, false);
 
                 int counter = -1;
                 for (int i = 0; i < a.Count; i++)

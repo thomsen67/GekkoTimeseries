@@ -7844,6 +7844,7 @@ namespace Gekko
 
         public class Doc
         {
+            public string opt_browser = null;
             public string opt_label = null;
             public string opt_source = null;
             public string opt_units = null;
@@ -7852,21 +7853,29 @@ namespace Gekko
 
             public void Exe()
             {
-                List<string> vars = Restrict(this.names, true, false, true, false);
-                foreach (string s in vars)
+                if (G.Equal(this.opt_browser, "yes"))
                 {
-                    IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);  //no searching!
-                    Series iv_series = iv as Series;
-                    if (iv_series == null)
+                    Program.Browser();
+                    return;
+                }
+                else
+                {
+                    List<string> vars = Restrict(this.names, true, false, true, false);
+                    foreach (string s in vars)
                     {
-                        G.Writeln2("*** ERROR: Only series are allowed");
-                        throw new GekkoException();
+                        IVariable iv = GetIVariableFromString(s, ECreatePossibilities.NoneReportError);  //no searching!
+                        Series iv_series = iv as Series;
+                        if (iv_series == null)
+                        {
+                            G.Writeln2("*** ERROR: Only series are allowed");
+                            throw new GekkoException();
+                        }
+                        if (opt_label != null) iv_series.meta.label = opt_label;
+                        if (opt_source != null) iv_series.meta.source = opt_source;
+                        if (opt_units != null) iv_series.meta.units = opt_units;
+                        if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
+                        iv_series.meta.SetDirty(true);
                     }
-                    if (opt_label != null) iv_series.meta.label = opt_label;
-                    if (opt_source != null) iv_series.meta.source = opt_source;
-                    if (opt_units != null) iv_series.meta.units = opt_units;
-                    if (opt_stamp != null) iv_series.meta.stamp = opt_stamp;
-                    iv_series.meta.SetDirty(true);
                 }
             }
         }

@@ -77,6 +77,7 @@ tokens {
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
+	ASTOPT_STRING_BROWSER;
     ASTOPT_STRING_PRINT;
 	ASTOPT_STRING_TOBANK;
 	ASTOPT_STRING_FROMBANK;
@@ -1026,6 +1027,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	BROWSER      = 'BROWSER'     ;
     FIRST            = 'FIRST';
     FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
     FIX = 'FIX';
@@ -1623,7 +1625,7 @@ d.Add("Y" ,Y);
                                         d.Add("file"    , FILE  );
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
-                                        d.Add("findmissingdata"         , FINDMISSINGDATA);
+                                        d.Add("browser"         , BROWSER);
                                         d.Add("first"    , FIRST  );
                                         d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
                                         d.Add("FIX", FIX);
@@ -2621,7 +2623,12 @@ dispOpt1h:				    INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 // DOC
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-doc:                        DOC seqOfBankvarnames docOpt2 -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames) ^(ASTOPT_ docOpt2?));
+doc:                        DOC docOpt1? seqOfBankvarnames? docOpt2 -> ^({token("ASTDOC", ASTDOC, input.LT(1).Line)} ^(ASTOPT_ docOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?) ^(ASTOPT_ docOpt2?))
+						    ;
+docOpt1:					ISNOTQUAL 
+						  | leftAngle docOpt1h* RIGHTANGLE -> ^(ASTOPT1 docOpt1h*)						  
+                            ;
+docOpt1h:				    BROWSER (EQUAL yesNo)? -> ^(ASTOPT_STRING_BROWSER yesNo?);
 docOpt2:                    docOpt2h*;
 docOpt2h:                   LABEL EQUAL expression -> ^(ASTOPT_STRING_LABEL expression)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
@@ -3867,6 +3874,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  BROWSER|
   FOR|
   FUNCTION|
   GOTO|
