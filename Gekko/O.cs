@@ -3021,7 +3021,7 @@ namespace Gekko
 
                                             if (operatorType != ESeriesUpdTypes.none)
                                             {
-                                                G.Writeln2("*** ERROR: Printcodes cannot be used for array-series (yet)");
+                                                G.Writeln2("*** ERROR: Operators cannot be used for array-series (yet)");
                                                 throw new GekkoException();
                                             }
 
@@ -6456,225 +6456,227 @@ namespace Gekko
                 if (opt_collapse != null)
                 {
                     Program.CollapsePoints(this);
-                    return;
-                }
-
-                GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
-
-                ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
-                hlp.t1 = this.t1;
-                hlp.t2 = this.t2;
-
-                bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
-
-                if (this.opt_prim != null)
-                {
-                    if (isRead == false)
-                    {   //import
-                        G.Writeln2("*** ERROR: IMPORT<prim> is obsolete, use IMPORT.");
-                        throw new GekkoException();
-                    }
-                    else
-                    {   //read
-                        G.Writeln2("*** ERROR: READ<prim> is obsolete, use READ<first>.");
-                        throw new GekkoException();
-                    }
-                }
-
-                if (isRead == false)  //import
-                {
-                    if (this.opt_first != null)
-                    {
-                        G.Writeln2("*** ERROR: IMPORT<first> is not legal syntax, just use IMPORT.");
-                        throw new GekkoException();
-                    }
-                    if (this.opt_merge != null)
-                    {
-                        G.Writeln2("*** ERROR: IMPORT<merge> is not legal syntax, IMPORT merges already.");
-                        throw new GekkoException();
-                    }
-                    hlp.Merge = true;               //this is so for IMPORT
-                    hlp.openType = EOpenType.First;  //this is so for IMPORT                    
-                }
-
-                bool isTo = false; if (this.readTo != null) isTo = true;
-                hlp.FileName = this.fileName;
-                if (G.Equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
-                if (G.Equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
-                if (G.Equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
-                if (G.Equal(this.opt_tsd, "yes")) hlp.Type = EDataFormat.Tsd;
-                if (G.Equal(this.opt_gbk, "yes")) hlp.Type = EDataFormat.Gbk;
-                if (G.Equal(this.opt_tsdx, "yes")) hlp.Type = EDataFormat.Tsdx;
-                if (G.Equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
-                if (G.Equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
-                if (G.Equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
-                if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
-                if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
-                if (G.Equal(this.opt_flat, "yes")) hlp.Type = EDataFormat.Flat;
-                if (G.Equal(this.opt_aremos, "yes")) hlp.Type = EDataFormat.Aremos;
-                if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
-
-                hlp.gdxopt = this.opt_gdxopt;
-
-                bool isSimple = false;
-
-                if (isTo)
-                {
-                    //READ...TO  ==> same as OPEN
-                    if (this.opt_merge != null)
-                    {
-                        G.Writeln2("*** ERROR: you cannot mix <merge> with TO keyword");
-                    }
-                    if (this.opt_first != null)
-                    {
-                        G.Writeln2("*** ERROR: you cannot mix <first> with TO keyword");
-                    }
-                    if (this.opt_ref != null)
-                    {
-                        G.Writeln2("*** ERROR: you cannot mix <ref> with TO keyword");
-                    }
                 }
                 else
                 {
-                    //READ or IMPORT
-                    if (G.Equal(this.opt_merge, "yes")) hlp.Merge = true;
-                    if (G.Equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
-                    if (G.Equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
-                    if (hlp.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
-                    if (isRead)
+
+                    GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
+
+                    ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
+                    hlp.t1 = this.t1;
+                    hlp.t2 = this.t2;
+
+                    bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
+
+                    if (this.opt_prim != null)
                     {
-                        if (hlp.openType == EOpenType.First)
-                        {
-                            if (!Program.databanks.GetFirst().editable)
-                            {
-                                G.Writeln2("*** ERROR: Cannot READ<first>, since first-position databank is non-editable");
-                                throw new GekkoException();
-                            }
+                        if (isRead == false)
+                        {   //import
+                            G.Writeln2("*** ERROR: IMPORT<prim> is obsolete, use IMPORT.");
+                            throw new GekkoException();
                         }
-                        else if (hlp.openType == EOpenType.Ref)
+                        else
+                        {   //read
+                            G.Writeln2("*** ERROR: READ<prim> is obsolete, use READ<first>.");
+                            throw new GekkoException();
+                        }
+                    }
+
+                    if (isRead == false)  //import
+                    {
+                        if (this.opt_first != null)
                         {
-                            if (!Program.databanks.GetRef().editable)
+                            G.Writeln2("*** ERROR: IMPORT<first> is not legal syntax, just use IMPORT.");
+                            throw new GekkoException();
+                        }
+                        if (this.opt_merge != null)
+                        {
+                            G.Writeln2("*** ERROR: IMPORT<merge> is not legal syntax, IMPORT merges already.");
+                            throw new GekkoException();
+                        }
+                        hlp.Merge = true;               //this is so for IMPORT
+                        hlp.openType = EOpenType.First;  //this is so for IMPORT                    
+                    }
+
+                    bool isTo = false; if (this.readTo != null) isTo = true;
+                    hlp.FileName = this.fileName;
+                    if (G.Equal(this.opt_csv, "yes")) hlp.Type = EDataFormat.Csv;
+                    if (G.Equal(this.opt_prn, "yes")) hlp.Type = EDataFormat.Prn;
+                    if (G.Equal(this.opt_pcim, "yes")) hlp.Type = EDataFormat.Pcim;
+                    if (G.Equal(this.opt_tsd, "yes")) hlp.Type = EDataFormat.Tsd;
+                    if (G.Equal(this.opt_gbk, "yes")) hlp.Type = EDataFormat.Gbk;
+                    if (G.Equal(this.opt_tsdx, "yes")) hlp.Type = EDataFormat.Tsdx;
+                    if (G.Equal(this.opt_tsp, "yes")) hlp.Type = EDataFormat.Tsp;
+                    if (G.Equal(this.opt_xls, "yes")) hlp.Type = EDataFormat.Xls;
+                    if (G.Equal(this.opt_xlsx, "yes")) hlp.Type = EDataFormat.Xlsx;
+                    if (G.Equal(this.opt_gdx, "yes")) hlp.Type = EDataFormat.Gdx;
+                    if (G.Equal(this.opt_px, "yes")) hlp.Type = EDataFormat.Px;
+                    if (G.Equal(this.opt_flat, "yes")) hlp.Type = EDataFormat.Flat;
+                    if (G.Equal(this.opt_aremos, "yes")) hlp.Type = EDataFormat.Aremos;
+                    if (G.Equal(this.opt_cols, "yes")) hlp.Orientation = "cols";
+
+                    hlp.gdxopt = this.opt_gdxopt;
+
+                    bool isSimple = false;
+
+                    if (isTo)
+                    {
+                        //READ...TO  ==> same as OPEN
+                        if (this.opt_merge != null)
+                        {
+                            G.Writeln2("*** ERROR: you cannot mix <merge> with TO keyword");
+                        }
+                        if (this.opt_first != null)
+                        {
+                            G.Writeln2("*** ERROR: you cannot mix <first> with TO keyword");
+                        }
+                        if (this.opt_ref != null)
+                        {
+                            G.Writeln2("*** ERROR: you cannot mix <ref> with TO keyword");
+                        }
+                    }
+                    else
+                    {
+                        //READ or IMPORT
+                        if (G.Equal(this.opt_merge, "yes")) hlp.Merge = true;
+                        if (G.Equal(this.opt_first, "yes")) hlp.openType = EOpenType.First;
+                        if (G.Equal(this.opt_ref, "yes")) hlp.openType = EOpenType.Ref;
+                        if (hlp.openType == EOpenType.Normal) isSimple = true;  //in that case, a CLONE is done afterwards
+                        if (isRead)
+                        {
+                            if (hlp.openType == EOpenType.First)
                             {
-                                G.Writeln2("*** ERROR: Cannot READ<ref>, since ref databank is non-editable");
-                                throw new GekkoException();
+                                if (!Program.databanks.GetFirst().editable)
+                                {
+                                    G.Writeln2("*** ERROR: Cannot READ<first>, since first-position databank is non-editable");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else if (hlp.openType == EOpenType.Ref)
+                            {
+                                if (!Program.databanks.GetRef().editable)
+                                {
+                                    G.Writeln2("*** ERROR: Cannot READ<ref>, since ref databank is non-editable");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else
+                            {
+                                if (!Program.databanks.GetFirst().editable)
+                                {
+                                    G.Writeln2("*** ERROR: Cannot READ, since first-position databank is non-editable");
+                                    throw new GekkoException();
+                                }
+                                if (!Program.databanks.GetRef().editable)
+                                {
+                                    G.Writeln2("*** ERROR: Cannot READ, since ref databank is non-editable");
+                                    throw new GekkoException();
+                                }
                             }
                         }
                         else
                         {
+                            //IMPORT
                             if (!Program.databanks.GetFirst().editable)
                             {
-                                G.Writeln2("*** ERROR: Cannot READ, since first-position databank is non-editable");
-                                throw new GekkoException();
-                            }
-                            if (!Program.databanks.GetRef().editable)
-                            {
-                                G.Writeln2("*** ERROR: Cannot READ, since ref databank is non-editable");
+                                G.Writeln2("*** ERROR: Cannot IMPORT, since first-position databank is non-editable");
                                 throw new GekkoException();
                             }
                         }
+                    }
+
+                    if (G.Equal(Program.options.interface_mode, "data"))
+                    {
+                        if (isRead && isSimple)
+                        {
+                            G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
+                            G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                        }
+                        if (isRead && !isTo && hlp.openType == EOpenType.Ref)
+                        {
+                            G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
+                            //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                            //throw new GekkoException();
+                        }
+                    }
+
+                    List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
+
+                    bool open = false;
+                    if (isTo)
+                    {
+                        //is in reality an OPEN                    
+                        open = true;
+                        hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
+                        hlp.editable = false;  //superfluous but for safety
+                        hlp.openType = EOpenType.Normal;
+                        if (readTo == "*")
+                        {
+                            readTo = Path.GetFileNameWithoutExtension(hlp.FileName);
+                        }
+                        hlp.openFileNames = new List<List<string>>();
+                        hlp.openFileNames.Add(new List<string>() { hlp.FileName, readTo });
+                    }
+
+                    bool wipeDatabankBeforeInsertingData = false;
+
+                    if (isRead && !hlp.Merge && !isTo)
+                    {
+                        //See #987432529835
+                        //READ, not IMPORT
+                        //No READ<merge>
+                        //No READ ... TO
+                        wipeDatabankBeforeInsertingData = true;
+                    }
+
+                    hlp.array = this.opt_array;
+
+                    Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
+                    Program.ReadInfo readInfo = readInfos[0];
+                    readInfo.shouldMerge = hlp.Merge;
+
+                    if (readInfo.abortedStar) return;  //an aborted READ *
+
+                    if (G.Equal(opt_ref, "yes"))
+                    {
+                        readInfo.dbName = Program.databanks.GetRef().name;
                     }
                     else
                     {
-                        //IMPORT
-                        if (!Program.databanks.GetFirst().editable)
-                        {
-                            G.Writeln2("*** ERROR: Cannot IMPORT, since first-position databank is non-editable");
-                            throw new GekkoException();
-                        }
+                        readInfo.dbName = Program.databanks.GetFirst().name;
                     }
-                }
 
-                if (G.Equal(Program.options.interface_mode, "data"))
-                {
+                    if (isTo)
+                    {
+                        readInfo.open = true;
+                        if (readTo != null && readTo == "*") readTo = Path.GetFileNameWithoutExtension(readInfo.fileName);
+                        readInfo.dbName = readTo;
+                    }
+
+                    G.Writeln();
+                    readInfo.Print();
+
                     if (isRead && isSimple)
                     {
-                        G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
-                        G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                        //See #987432529835
+                        //isSimple can never be true with READ ... TO ...
+                        //Do not do this with READ<first> or READ<ref>, only with READ.                    
+                        Program.MulbkClone();
+                        if (Program.model != null && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
+                        {
+                            //only in sim or mixed mode, if a model is existing
+                            CreateMissingModelVariables();
+                        }
                     }
-                    if (isRead && !isTo && hlp.openType == EOpenType.Ref)
+
+                    try
                     {
-                        G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                        //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
-                        //throw new GekkoException();
+                        //Program.ShowPeriodInStatusField("");
                     }
-                }
-
-                List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-
-                bool open = false;
-                if (isTo)
-                {
-                    //is in reality an OPEN                    
-                    open = true;
-                    hlp.Merge = false;  //but mixing <merge> and TO give error above anyway                
-                    hlp.editable = false;  //superfluous but for safety
-                    hlp.openType = EOpenType.Normal;
-                    if (readTo == "*")
+                    catch (Exception e)
                     {
-                        readTo = Path.GetFileNameWithoutExtension(hlp.FileName);
+                        //ignore
                     }
-                    hlp.openFileNames = new List<List<string>>();
-                    hlp.openFileNames.Add(new List<string>() { hlp.FileName, readTo });
-                }
-
-                bool wipeDatabankBeforeInsertingData = false;
-
-                if (isRead && !hlp.Merge && !isTo)
-                {
-                    //See #987432529835
-                    //READ, not IMPORT
-                    //No READ<merge>
-                    //No READ ... TO
-                    wipeDatabankBeforeInsertingData = true;
-                }
-
-                hlp.array = this.opt_array;
-
-                Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
-                Program.ReadInfo readInfo = readInfos[0];
-                readInfo.shouldMerge = hlp.Merge;
-
-                if (readInfo.abortedStar) return;  //an aborted READ *
-
-                if (G.Equal(opt_ref, "yes"))
-                {
-                    readInfo.dbName = Program.databanks.GetRef().name;
-                }
-                else
-                {
-                    readInfo.dbName = Program.databanks.GetFirst().name;
-                }
-
-                if (isTo)
-                {
-                    readInfo.open = true;
-                    if (readTo != null && readTo == "*") readTo = Path.GetFileNameWithoutExtension(readInfo.fileName);
-                    readInfo.dbName = readTo;
-                }
-
-                G.Writeln();
-                readInfo.Print();
-
-                if (isRead && isSimple)
-                {
-                    //See #987432529835
-                    //isSimple can never be true with READ ... TO ...
-                    //Do not do this with READ<first> or READ<ref>, only with READ.                    
-                    Program.MulbkClone();
-                    if (Program.model != null && (G.Equal(Program.options.interface_mode, "sim") || G.Equal(Program.options.interface_mode, "mixed")))
-                    {
-                        //only in sim or mixed mode, if a model is existing
-                        CreateMissingModelVariables();
-                    }
-                }
-
-                try
-                {
-                    //Program.ShowPeriodInStatusField("");
-                }
-                catch (Exception e)
-                {
-                    //ignore
                 }
 
             }
@@ -8155,13 +8157,21 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                if (this.searchName == null)
-                {                    
-                    Program.Disp(this.t1, this.t2, null, this);
+
+                if (G.Equal(this.opt_info, "yes"))
+                {
+                    Program.Info(this.t1, this.t2, iv);                    
                 }
                 else
                 {
-                    Program.DispSearch(this.searchName);
+                    if (this.searchName == null)
+                    {
+                        Program.Disp(this.t1, this.t2, null, this);
+                    }
+                    else
+                    {
+                        Program.DispSearch(this.searchName);
+                    }
                 }
             }
         }
@@ -8210,17 +8220,17 @@ namespace Gekko
 
             
 
-        public class Info
-        {
-            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
-            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
-            public List<string> listItems = null;
-            public void Exe()
-            {
-                G.CheckLegalPeriod(this.t1, this.t2);
-                Program.Info(this.t1, this.t2, this.listItems);
-            }
-        }
+        //public class Info
+        //{
+        //    public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+        //    public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
+        //    public List<string> listItems = null;
+        //    public void Exe()
+        //    {
+        //        G.CheckLegalPeriod(this.t1, this.t2);
+        //        Program.Info(this.t1, this.t2, this.listItems);
+        //    }
+        //}
 
         public class Itershow
         {
@@ -8796,7 +8806,7 @@ namespace Gekko
                 public string opt_html = null;
                 public string opt_window = null;                
                 
-                public List<OptString> printCodes = new List<OptString>();   
+                public List<OptString> operators = new List<OptString>();   
 
                 public string opt_mp = null;                
 
@@ -8813,7 +8823,7 @@ namespace Gekko
                     G.CheckLegalPeriod(this.t1, this.t2);
                     Globals.tableOption = "n";                    
                     
-                    foreach (OptString os in this.printCodes)
+                    foreach (OptString os in this.operators)
                     {
                         if (G.Equal(os.s2, "yes"))
                         {
@@ -8839,13 +8849,13 @@ namespace Gekko
                 public int col;
                 public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
                 public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set                
-                public string printcode = null;
+                public string op = null;
                 public double scale = 1d;
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
                     G.CheckLegalPeriod(this.t1, this.t2);
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.printcode, this.scale, this.format);
+                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.op, this.scale, this.format);
                 }
             }
         }
@@ -8860,12 +8870,12 @@ namespace Gekko
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set
             //public string rows = null;            
             public List<Element> prtElements = new List<Element>();                        
-            public List<OptString> printCodes = new List<OptString>();
+            public List<OptString> operators = new List<OptString>();
             public string emfName = null;  //name of produced emf file if PLOT
                         
             public int printCsCounter = -12345;
 
-            public string guiGraphPrintCode = null;  //clicking in the PLOT window
+            public string guiGraphOperator = null;  //clicking in the PLOT window
                   
             public string timefilter = null;
             //public string heading = null;
@@ -9285,7 +9295,7 @@ namespace Gekko
                 }
             }
 
-            public static List<int> GetBankNumbers(string tableOrGraphGlobalPrintCode, List<string> printCodes)
+            public static List<int> GetBankNumbers(string tableOrGraphGlobalOperator, List<string> operators)
             {               
                 
                 List<int> rv = new List<int>();
@@ -9295,47 +9305,47 @@ namespace Gekko
                 //{
                 //    rv = new List<int>(); rv.Add(0);
                 //}
-                if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_d))
+                if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_d))
                 {
                     rv = new List<int>(); rv.Add(0);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_p))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_p))
                 {
                     rv = new List<int>(); rv.Add(0);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_dp))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_dp))
                 {
                     rv = new List<int>(); rv.Add(0);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_r))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_r))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rn))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rn))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rd))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rd))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rp))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rp))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_rdp))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rdp))
                 {
                     rv = new List<int>(); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_m))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_m))
                 {
                     rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_q))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_q))
                 {
                     rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }
-                else if (G.Equal(tableOrGraphGlobalPrintCode, Globals.printCode_mp))
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_mp))
                 {
                     rv = new List<int>(); rv.Add(0); rv.Add(1);
                 }                
@@ -9343,15 +9353,15 @@ namespace Gekko
                 {
                     bool usesBase = false;
                     bool usesWork = false;
-                    foreach (string printCode in printCodes)  //could use break in loop, but this is not speed critical
+                    foreach (string operator2 in operators)  //could use break in loop, but this is not speed critical
                     {
-                        if (Program.IsPrintCodeShortMultiplier(printCode))
+                        if (Program.IsOperatorShortMultiplier(operator2))
                         {
                             usesWork = true;
                             usesBase = true;
                         }
-                        if (Program.IsPrintCodeShortBase(printCode)) usesBase = true;
-                        if (Program.IsPrintCodeShortWork(printCode)) usesWork = true;
+                        if (Program.IsOperatorShortBase(operator2)) usesBase = true;
+                        if (Program.IsOperatorShortWork(operator2)) usesWork = true;
                     }
                     
                     if (usesWork)
@@ -9441,10 +9451,10 @@ namespace Gekko
                 public IVariable[] variable = new IVariable[2];  //first and ref
                 public string endoExoIndicator = null;
                 //-- layout
-                public List<OptString> printCodes = new List<OptString>();
+                public List<OptString> operators = new List<OptString>();
 
-                public List<string> printCodesFinal = null;
-                public string printCodeFinal = null;
+                public List<string> operatorsFinal = null;
+                public string operatorFinal = null;
 
                 public int width = -12345;
                 public int dec = -12345;
@@ -9483,7 +9493,7 @@ namespace Gekko
             
             public IVariable[] variable = new IVariable[2];
 
-            public string printCode = null;
+            public string operator2 = null;
             public string label = null;
             public double min = double.MaxValue;
             public double max = double.MinValue;
@@ -9915,6 +9925,7 @@ namespace Gekko
             public string opt_flat = null;
             public string opt_cols = null;
             public string opt_respect = null;
+            public string opt_op = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()
             {

@@ -358,7 +358,7 @@ namespace Gekko
         Xls,
         Csv,
         R,
-        Series,
+        Gcm,
         Tsp   
     }
 
@@ -411,7 +411,7 @@ namespace Gekko
         Overlay
     }
 
-    public enum EPrintCodeTypes
+    public enum EOperatorTypes
     {
         ShortVersion,
         LongVersionHasYes,
@@ -3738,7 +3738,7 @@ namespace Gekko
                     string varname = linesplit[0];
                     if (linesplit.Length < 3)
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: Expected two dates for series '" + varname + "' (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: Expected two dates for series '" + varname + "' (line " + n + ")");
                         throw new GekkoException();
                     }
 
@@ -3752,7 +3752,7 @@ namespace Gekko
 
                     if (gt1.freq != gt2.freq)
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: Dates for series '" + varname + "' have different frequencies (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: Dates for series '" + varname + "' have different frequencies (line " + n + ")");
                         throw new GekkoException();
                     }
 
@@ -3761,25 +3761,25 @@ namespace Gekko
 
                     if (obs < 1)
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: Invalid time period for series '" + varname + "' (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: Invalid time period for series '" + varname + "' (line " + n + ")");
                         throw new GekkoException();
                     }
 
                     if (obs > 10000)
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: More then 10000 periods for series '" + varname + "' (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: More then 10000 periods for series '" + varname + "' (line " + n + ")");
                         throw new GekkoException();
                     }
 
                     if (obs2 == 0)
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: Expected > 0 observations for series '" + varname + "' (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: Expected > 0 observations for series '" + varname + "' (line " + n + ")");
                         throw new GekkoException();
                     }
 
                     if (obs != obs2 && obs2 > 1)  //for obs2 = 1, any timeperiod is ok.
                     {
-                        G.Writeln2("*** ERROR: READ<ser>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
+                        G.Writeln2("*** ERROR: IMPORT<flat>: Expected " + obs + " observations for for series '" + varname + "', got " + obs2 + " (line " + n + ")");
                         throw new GekkoException();
                     }
 
@@ -3792,7 +3792,7 @@ namespace Gekko
 
                         double ss = double.NaN;
 
-                        if (G.Equal(s, "m"))
+                        if (G.Equal(s, "m") || G.Equal(s, "m()"))
                         {
                             //do nothing, it is a missing value.
                         }
@@ -3800,7 +3800,7 @@ namespace Gekko
                         {
                             try
                             {
-                                ss = G.ParseIntoDouble(s);
+                                ss = G.ParseIntoDouble(s, true);
                             }
                             catch
                             {
@@ -3822,8 +3822,6 @@ namespace Gekko
 
                     ts.SetDataSequence(gt1, gt2, tempArray);
                     ts.Trim();  //to save RAM
-
-
                 }
             }
 
@@ -8354,7 +8352,7 @@ namespace Gekko
                             ope0.linetype = "lines";
                             ope0.dashtype = "3";
 
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
                             foreach (int bankNumber in bankNumbers)
                             {
                                 Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
@@ -8368,7 +8366,7 @@ namespace Gekko
                         {
                             O.Prt.Element ope0 = new O.Prt.Element();
                             ope0.labelGiven = new List<string>() { bank1.ToLower().Replace(".gbk", "") + ":" + var };
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
                             foreach (int bankNumber in bankNumbers)
                             {
                                 Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
@@ -8407,8 +8405,8 @@ namespace Gekko
                     {
                         List<int> bankNumbers = null;
 
-                        o0.printCodes = new List<OptString>();
-                        o0.printCodes.Add(new OptString("p", "yes"));
+                        o0.operators = new List<OptString>();
+                        o0.operators.Add(new OptString("p", "yes"));
 
                         if (ts2 != null)
                         {
@@ -8417,7 +8415,7 @@ namespace Gekko
                             ope0.linetype = "lines";
                             ope0.dashtype = "3";
 
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
                             foreach (int bankNumber in bankNumbers)
                             {
                                 Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
@@ -8431,7 +8429,7 @@ namespace Gekko
                         {
                             O.Prt.Element ope0 = new O.Prt.Element();
                             ope0.labelGiven = new List<string>() { bank1.ToLower().Replace(".gbk", "") + ":" + var };
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o0, ope0));
+                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
                             foreach (int bankNumber in bankNumbers)
                             {
                                 Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
@@ -15867,11 +15865,11 @@ namespace Gekko
             int nonSeries = 0;
 
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
-            if (o != null && G.Equal(o.opt_info, "yes"))
-            {
-                Info(tStart, tEnd, list);
-                return;
-            }
+            //if (o != null && G.Equal(o.opt_info, "yes"))
+            //{
+            //    Info(tStart, tEnd, list);
+            //    return;
+            //}
 
             Globals.dispLastDispStart = tStart; //kept if user chooses to click a link -- in that case we want to use same time settings
             Globals.dispLastDispEnd = tEnd; //kept if user chooses to click a link
@@ -17916,13 +17914,16 @@ namespace Gekko
             return true;
         }
 
-        public static void Info(GekkoTime tStart, GekkoTime tEnd, List<string> list)
+        public static void Info(GekkoTime tStart, GekkoTime tEnd, List list2)
         {
             if (Program.model == null)
             {
                 G.Writeln2("*** ERROR: DIP<info> command requires a model -- seems no model is defined");
                 throw new GekkoException();
             }
+
+            List<string> list = Program.GetListOfStringsFromList(list2);
+
             //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
             //List<string> unfoldedList = UnfoldLists(list);
             if (!(tStart.super == tEnd.super && tStart.sub == tEnd.sub))
@@ -23428,7 +23429,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_gcm, fileName);
+                    Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_op, fileName);
                     return 0;
                 }
                 else if (o.opt_gdx != null)
@@ -23496,7 +23497,7 @@ namespace Gekko
             else if (G.Equal(o.opt_gnuplot, "yes")) writeType = EWriteType.Gnuplot;
             else if (G.Equal(o.opt_prn, "yes")) writeType = EWriteType.Prn;
             else if (G.Equal(o.opt_r, "yes")) writeType = EWriteType.R;
-            else if (G.Equal(o.opt_gcm, "yes")) writeType = EWriteType.Series;
+            else if (G.Equal(o.opt_gcm, "yes")) writeType = EWriteType.Gcm;
             else if (G.Equal(o.opt_tsd, "yes")) writeType = EWriteType.Tsd;
             else if (G.Equal(o.opt_tsdx, "yes")) writeType = EWriteType.Tsdx;
             else if (G.Equal(o.opt_tsp, "yes")) writeType = EWriteType.Tsp;
@@ -26382,7 +26383,7 @@ namespace Gekko
 
             StampTypes type = StampTypes.Normal;
             if (G.Equal(Globals.tableOption, "m")) type = StampTypes.Multiplier;
-            else if (G.Equal(Globals.tableOption, Globals.printCode_r)) type = StampTypes.Base;
+            else if (G.Equal(Globals.tableOption, Globals.operator_r)) type = StampTypes.Base;
             List<string> lines = GetDatabankInfo(type);
             if (Program.options.table_stamp)
             {
@@ -26475,7 +26476,7 @@ namespace Gekko
 
                         s5 += "</div>" + G.NL;
 
-                        if (Program.options.interface_table_printcodes) sw.Write(s5);
+                        if (Program.options.interface_table_operators) sw.Write(s5);
                         sw.Write(pTag);
                         for (int i = 0; i < lines.Count; i++)
                         {
@@ -28344,12 +28345,12 @@ namespace Gekko
             if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
             else if (G.Equal(o.prtType, "sheet")) type = EPrintTypes.Sheet;
 
-            if (type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.printCodes.Count == 1 && G.Equal(o.printCodes[0].s1, "v") && G.Equal(o.printCodes[0].s2, "yes"))))
+            if (type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.operators.Count == 1 && G.Equal(o.operators[0].s1, "v") && G.Equal(o.operators[0].s2, "yes"))))
             {
 
                 for (int i = 0; i < o.prtElements.Count; i++)
                 {
-                    o.prtElements[i].printCodesFinal = new List<string> { "n", "p", "rn", "rp", "m", "q" };
+                    o.prtElements[i].operatorsFinal = new List<string> { "n", "p", "rn", "rp", "m", "q" };
                 }
             }
 
@@ -28392,11 +28393,11 @@ namespace Gekko
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
-                    int iPrintCode = -1;
-                    foreach (string printCode in element.printCodesFinal)  //this may be two printcodes <n p>
+                    int iOperator = -1;
+                    foreach (string operator2 in element.operatorsFinal)  //this may be two printcodes <n p>
                     {
 
-                        iPrintCode++;
+                        iOperator++;
                         //after this, it should be x1<n>  x1<p>  x2<n>  x2<p>
 
                         O.Prt.Element explodeElement = new O.Prt.Element();
@@ -28404,7 +28405,7 @@ namespace Gekko
                         int width = -12345;
                         int dec = -12345;
                         bool isPchType = false;
-                        if (IsLevelPrintCode(printCode))
+                        if (IsLevelOperator(operator2))
                         {
                             isPchType = false;
                             width = options.print_fields_nwidth;
@@ -28499,7 +28500,7 @@ namespace Gekko
                         if (xx1 != null) explodeElement.variable[1] = xx1.list[i];
                         else explodeElement.variable[1] = element.variable[1];
 
-                        int bankCombi = GetBankCombi(printCode);
+                        int bankCombi = GetBankCombi(operator2);
 
                         bool tjek1 = bankCombi == 0 && SkipSubSeries(explodeElement.variable[0]);
                         bool tjek2 = bankCombi == 1 && SkipSubSeries(explodeElement.variable[1]);
@@ -28537,7 +28538,7 @@ namespace Gekko
                             return;
                         }
 
-                        explodeElement.printCodeFinal = printCode;
+                        explodeElement.operatorFinal = operator2;
 
                         // ----------------------------------------------------
                         // Labels start
@@ -28586,18 +28587,18 @@ namespace Gekko
 
                         //FIXME
                         //FIXME
-                        if (G.Equal(element.printCodesFinal[0], "n") && iPrintCode > 0 && G.Equal(printCode, "p"))
+                        if (G.Equal(element.operatorsFinal[0], "n") && iOperator > 0 && G.Equal(operator2, "p"))
                         {
                             explodeElement.labelOLD = new List<string> { "%" };
                         }
-                        else if (G.Equal(element.printCodesFinal[0], "m") && iPrintCode > 0 && G.Equal(printCode, "q"))
+                        else if (G.Equal(element.operatorsFinal[0], "m") && iOperator > 0 && G.Equal(operator2, "q"))
                         {
                             explodeElement.labelOLD = new List<string> { "%" };
                         }
                         else
                         {
-                            if (iPrintCode == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iPrintCode > 0) explodeElement.labelOLD = new List<string> { "(" + printCode.ToLower() + ")" };
+                            if (iOperator == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
+                            else if (iOperator > 0) explodeElement.labelOLD = new List<string> { "(" + operator2.ToLower() + ")" };
                         }
 
                         containerExplode.Add(explodeElement);
@@ -28693,7 +28694,7 @@ namespace Gekko
                 O.Prt.Element cc = null;
                 IVariable ivWork = null;
                 IVariable ivRef = null;
-                string printCode = null;
+                string operator2 = null;
                 List<string> label = new List<string> { "" };
 
                 if (j - 2 >= 0)
@@ -28701,11 +28702,11 @@ namespace Gekko
                     cc = containerExplode[j - 2];
                     ivWork = cc.variable[0];
                     ivRef = cc.variable[1];
-                    printCode = cc.printCodeFinal;
+                    operator2 = cc.operatorFinal;
                     label = cc.labelOLD;
                 }
 
-                int bankCombi = GetBankCombi(printCode);
+                int bankCombi = GetBankCombi(operator2);
 
                 EFreq freqColumn = EFreq.None;
                 if (j > 1)
@@ -28877,7 +28878,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -28898,7 +28899,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -28919,7 +28920,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -28954,7 +28955,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -28975,7 +28976,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29005,7 +29006,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29026,7 +29027,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29047,7 +29048,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29082,7 +29083,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -29103,7 +29104,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29147,7 +29148,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29168,7 +29169,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29189,7 +29190,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29224,7 +29225,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -29246,7 +29247,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29279,7 +29280,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29300,7 +29301,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29321,7 +29322,7 @@ namespace Gekko
                             else
                             {
 
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29356,7 +29357,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -29393,7 +29394,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -29413,7 +29414,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29449,7 +29450,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                    PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                                 }
                             }
                         }
@@ -29495,7 +29496,7 @@ namespace Gekko
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, printCode, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                             if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                         }
@@ -29913,10 +29914,10 @@ namespace Gekko
         //    return isArraySeriesWithoutIndex;
         //}
 
-        private static int GetBankCombi(string printCode)
+        private static int GetBankCombi(string operator2)
         {
             int bankCombi = -12345;
-            List<int> bankNumbers = O.Prt.GetBankNumbers(null, new List<string> { printCode });
+            List<int> bankNumbers = O.Prt.GetBankNumbers(null, new List<string> { operator2 });
             if (bankNumbers.Contains(0) && !bankNumbers.Contains(1)) bankCombi = 0;
             else if (bankNumbers.Contains(1) && !bankNumbers.Contains(0)) bankCombi = 1;
             else bankCombi = 2;
@@ -30373,7 +30374,7 @@ namespace Gekko
         //}
 
         
-        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string printCode, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
+        private static void PrintHelper3(GekkoSmpl smpl, EPrintTypes type, EFreq sameFreq, Table table, int count, int i, int j, int iPlot, string operator2, bool isLogTransform, double scalarValueWork, Series tsWork, double scalarValueRef, Series tsRef, int year, EFreq freqColumn, int subHere, int sumOver, int[] skipCounter, O.Prt.Element cc)
         {
             //få den til at returnere "n", måske skal 
             string format = "f" + cc.widthFinal + "." + cc.decFinal;
@@ -30395,11 +30396,11 @@ namespace Gekko
             double? d = null;
             if (tsWork == null && tsRef == null)  //not series
             {
-                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, printCode, isLogTransform, sumOver, skipCounter);
+                if (sameFreq == freqColumn) d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, isLogTransform, sumOver, skipCounter);
             }
             else
             {
-                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, printCode, isLogTransform, sumOver, skipCounter);
+                if ((tsWork != null && tsWork.freq == freqColumn) || (tsRef != null && tsRef.freq == freqColumn)) d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, isLogTransform, sumOver, skipCounter);
             }
             if (d != null)
             {                
@@ -30443,14 +30444,14 @@ namespace Gekko
 
         }
 
-        private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string printcode, bool logTransform, int sumOver, int[] skipCounter)
+        private static double PrintHelperTransform(GekkoSmpl smpl, Series tsWork, Series tsRef, GekkoTime t, string operator2, bool logTransform, int sumOver, int[] skipCounter)
         {
             if (true)
             {
                 //TODO filter and skip, see below
                 double var1 = double.NaN;
                 double varPch = double.NaN;
-                Program.ComputeValueForPrintPlotNew(out var1, out varPch, printcode, t, tsWork, tsRef, logTransform, false, sumOver);
+                Program.ComputeValueForPrintPlotNew(out var1, out varPch, operator2, t, tsWork, tsRef, logTransform, false, sumOver);
                 return var1;
             }
             else
@@ -30505,7 +30506,7 @@ namespace Gekko
             }
         }
 
-        private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string printcode, bool logTransform, int sumOver, int[] skipCounter)
+        private static double PrintHelperTransformScalar(double scalarWork, double scalarRef, string operator2, bool logTransform, int sumOver, int[] skipCounter)
         {
             if (logTransform)
             {
@@ -30513,12 +30514,12 @@ namespace Gekko
                 scalarRef = Math.Log(scalarRef);
             }
 
-            if (G.Equal(printcode, "n")) return (sumOver * scalarWork);
-            else if (G.Equal(printcode, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
-            else if (G.Equal(printcode, "m")) return (sumOver * scalarWork) - (sumOver * scalarRef);
-            else if (G.Equal(printcode, "d")) return 0d;
-            else if (G.Equal(printcode, "p")) return 0d;
-            else if (G.Equal(printcode, "dp")) return 0d;
+            if (G.Equal(operator2, "n")) return (sumOver * scalarWork);
+            else if (G.Equal(operator2, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
+            else if (G.Equal(operator2, "m")) return (sumOver * scalarWork) - (sumOver * scalarRef);
+            else if (G.Equal(operator2, "d")) return 0d;
+            else if (G.Equal(operator2, "p")) return 0d;
+            else if (G.Equal(operator2, "dp")) return 0d;
             else
             {
                 G.Writeln2("*** ERROR: Transformation error");
@@ -30554,7 +30555,7 @@ namespace Gekko
                         if (container.variable[0] != null) c2.variable[0] = ((List)container.variable[0]).list[i];
                         if (container.variable[0] != null) c2.variable[0] = ((List)container.variable[0]).list[i];
                         c2.label = container.label;
-                        c2.printCode = container.printCode;
+                        c2.operator2 = container.operator2;
                         PrintHelper2(containerExplode, freqs, c2, false, isRef, errorList);  //the counter is fixed
                     }
                 }
@@ -30580,8 +30581,8 @@ namespace Gekko
             GekkoDictionary<string, string> temp = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
             {
-                List<string> printCodes = GetElementPrintCodes(o, pe);
-                foreach (string s in printCodes)
+                List<string> operators = GetElementOperators(o, pe);
+                foreach (string s in operators)
                 {
                     if (!temp.ContainsKey(s)) temp.Add(s, "");
                 }
@@ -30606,10 +30607,10 @@ namespace Gekko
         //    return label;
         //}
 
-        private static double CalculateAveragesForPrint(string printCode, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
+        private static double CalculateAveragesForPrint(string operator2, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
         {
             double rv = double.NaN;
-            if (IsLevelPrintCode(printCode))
+            if (IsLevelOperator(operator2))
             {
                 if (n == -12345)
                 {
@@ -30632,7 +30633,7 @@ namespace Gekko
             else
             {
                 //percent print codes
-                if (G.Equal(printCode, "p") || G.Equal(printCode, Globals.printCode_rp))
+                if (G.Equal(operator2, "p") || G.Equal(operator2, Globals.operator_rp))
                 {
                     if (n == -12345)
                     {
@@ -30684,12 +30685,12 @@ namespace Gekko
             return isMulprt;
         }
 
-        public static List<string> GetElementPrintCodes(O.Prt o, O.Prt.Element ope)
+        public static List<string> GetElementOperators(O.Prt o, O.Prt.Element ope)
         {
-            List<string> printCodes = new List<string>();
-            if (o.guiGraphPrintCode != null)
+            List<string> operators = new List<string>();
+            if (o.guiGraphOperator != null)
             {
-                printCodes.Add(o.guiGraphPrintCode);
+                operators.Add(o.guiGraphOperator);
             }
             else
             { 
@@ -30701,94 +30702,94 @@ namespace Gekko
 
                 bool isMulprt = IsMulprt(o);
                 
-                printCodes.AddRange(GetSuperPrintCodes(o)); //start with a fresh copy of super-printcodes
+                operators.AddRange(GetSuperOperators(o)); //start with a fresh copy of super-printcodes
 
-                if (!isMulprt && printCodes.Count == 1 && G.Equal(printCodes[0], "lev"))
+                if (!isMulprt && operators.Count == 1 && G.Equal(operators[0], "lev"))
                 {
                     G.Writeln2("*** ERROR: PRT<lev> is not legal: use PRT<abs> to print absolute levels");
                     throw new GekkoException();
                 }
 
-                if (isMulprt && printCodes.Count == 1 && (G.Equal(printCodes[0], "dif") || G.Equal(printCodes[0], "diff")))
+                if (isMulprt && operators.Count == 1 && (G.Equal(operators[0], "dif") || G.Equal(operators[0], "diff")))
                 {
                     G.Writeln2("*** ERROR: MULPRT<dif> is not legal: use MULPRT<abs> to print multiplier differences");
                     throw new GekkoException();
                 }
 
-                if (ope != null && ope.printCodes != null && ope.printCodes.Count > 0)
+                if (ope != null && ope.operators != null && ope.operators.Count > 0)
                 {
                     //element-specific printcode overrides!
-                    printCodes = new List<string>();
-                    foreach (OptString ts in ope.printCodes)
+                    operators = new List<string>();
+                    foreach (OptString ts in ope.operators)
                     {
                         //hmmm, what if there is a no after a yes for the same code????
-                        if (G.Equal(ts.s2, "yes")) printCodes.Add(ts.s1);
+                        if (G.Equal(ts.s2, "yes")) operators.Add(ts.s1);
                         else if (G.Equal(ts.s2, "no"))
                         {
                             //do not add
                         }
                         else
                         {
-                            G.Writeln2("*** ERROR: Printcode = '" + ts.s2 + "' should be 'yes' or 'no'");
+                            G.Writeln2("*** ERROR: Operator = '" + ts.s2 + "' should be 'yes' or 'no'");
                             throw new GekkoException();
                         }
                     }
                 }
-                printCodes = PrintGetPrintcodesOLD(isMulprt, printCodes, isGraph, isSheet);
+                operators = PrintGetOperatorsOLD(isMulprt, operators, isGraph, isSheet);
             }
-            return printCodes;
+            return operators;
         }
 
-        private static List<string> GetSuperPrintCodes(O.Prt o)
+        private static List<string> GetSuperOperators(O.Prt o)
         {
-            List<string> printCodesGlobal = new List<string>();
-            foreach (OptString ts in o.printCodes)
+            List<string> operatorsGlobal = new List<string>();
+            foreach (OptString ts in o.operators)
             {
                 //hmmm, what if there is a no after a yes for the same code????
                 if (G.Equal(ts.s2, "yes"))
                 {
-                    printCodesGlobal.Add(ts.s1);
+                    operatorsGlobal.Add(ts.s1);
                 }
                 else if (G.Equal(ts.s2, "no"))
                 {
-                    printCodesGlobal.Add("no" + ts.s1);  //for instance 'nopch'
+                    operatorsGlobal.Add("no" + ts.s1);  //for instance 'nopch'
                 }
                 else if (G.Equal(ts.s2, "append"))
                 {
-                    printCodesGlobal.Add("_" + ts.s1);  //for instance '_lev'
+                    operatorsGlobal.Add("_" + ts.s1);  //for instance '_lev'
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Printcode = '" + ts.s2 + "' should be 'yes' or 'no' or 'append'");
+                    G.Writeln2("*** ERROR: Operator = '" + ts.s2 + "' should be 'yes' or 'no' or 'append'");
                     throw new GekkoException();
                 }
             }
-            return printCodesGlobal;
+            return operatorsGlobal;
         }
 
-        private static void SetGmulprtPrintCodes(PrtHelper ph)
+        private static void SetGmulprtOperators(PrtHelper ph)
         {
-            ph.printCodes.Clear();
-            ph.printCodes.Add("n");
-            ph.printCodes.Add("p");
-            ph.printCodes.Add(Globals.printCode_r);
-            ph.printCodes.Add(Globals.printCode_rp);
-            ph.printCodes.Add("m");
-            ph.printCodes.Add("q");
+            ph.operators.Clear();
+            ph.operators.Add("n");
+            ph.operators.Add("p");
+            ph.operators.Add(Globals.operator_r);
+            ph.operators.Add(Globals.operator_rp);
+            ph.operators.Add("m");
+            ph.operators.Add("q");
         }
 
-        private static void ChangePrintCodesToLower(PrtHelper ph)
+        private static void ChangeOperatorsToLower(PrtHelper ph)
         {
-            if (ph.printCodes != null) ph.printCodes = ph.printCodes.ConvertAll(d => d.ToLower());
+            if (ph.operators != null) ph.operators = ph.operators.ConvertAll(d => d.ToLower());
             foreach (PrtHelperElement phe in ph.elementOptions)
             {
                 if (phe == null) continue;
-                if (phe.printCodes == null) continue;
-                phe.printCodes = phe.printCodes.ConvertAll(d => d.ToLower());
+                if (phe.operators == null) continue;
+                phe.operators = phe.operators.ConvertAll(d => d.ToLower());
             }
         }
 
-        private static void PrintInsertTimeseriesData(bool doAremosStuff, GekkoTime gt, int virtualCols, Table tab, int numberOfLabelsLinesMax, bool transpose, int width, int dec, ref int virtualRows, double var1, List<double> collapseFreqsValues, string printCode, O.Prt o)
+        private static void PrintInsertTimeseriesData(bool doAremosStuff, GekkoTime gt, int virtualCols, Table tab, int numberOfLabelsLinesMax, bool transpose, int width, int dec, ref int virtualRows, double var1, List<double> collapseFreqsValues, string operator2, O.Prt o)
         {
             int ii = virtualRows + numberOfLabelsLinesMax;
             int jj = virtualCols + 1;
@@ -30805,7 +30806,7 @@ namespace Gekko
                 {
                     int n = 4;
                     if (gt.freq == EFreq.M) n = 12;
-                    double x = CalculateAveragesForPrint(printCode, collapseFreqsValues, collapse, n);
+                    double x = CalculateAveragesForPrint(operator2, collapseFreqsValues, collapse, n);
                     if (!G.isNumericalError(x))
                     {
                         tab.Set(new Coord(ii + 1, jj), "", x, CellType.Number, "f" + width + "." + dec);
@@ -30829,12 +30830,12 @@ namespace Gekko
             return collapse;
         }
 
-        private static int PrintPrettify(O.Prt o, Table tab, int numberOfLabelsLinesMax, bool transpose, int maxLabelsLinesFound, bool identicalCodes, string onePrintCodeLabel, int virtualRowsStart, int virtualRowsMaxSeen)
+        private static int PrintPrettify(O.Prt o, Table tab, int numberOfLabelsLinesMax, bool transpose, int maxLabelsLinesFound, bool identicalCodes, string oneOperatorLabel, int virtualRowsStart, int virtualRowsMaxSeen)
         {
             if (identicalCodes)  //put in general marker for whole table just over the period column (or left of it if transposed)
             {
                 string s = "";
-                if (o.printCodes.Count == 1) s = onePrintCodeLabel;
+                if (o.operators.Count == 1) s = oneOperatorLabel;
                 if (s != "")
                 {
                     int ii = numberOfLabelsLinesMax + virtualRowsStart;
@@ -30925,7 +30926,7 @@ namespace Gekko
             return;
         }
 
-        private static List<string> PrintGetPrintcodesOLD(bool isMulprt, List<string> printCodes, bool isGraph, bool isSheet)
+        private static List<string> PrintGetOperatorsOLD(bool isMulprt, List<string> operators, bool isGraph, bool isSheet)
         {
             bool mul_lev = false;
             bool mul_abs = false;
@@ -30936,21 +30937,21 @@ namespace Gekko
             bool pch = false;
             bool gdif = false;
 
-            List<string> printCodesNew = null;
+            List<string> operatorsNew = null;
             //Range: ShortVersion, LongVersionHasYes, LongVersionHasAppend, LongVersionOnlyNo, None
-            EPrintCodeTypes printCodeType = GetPrintCodeType(printCodes);  //also performs validation that they are not mixed wrongly
+            EOperatorTypes operatorType = GetOperatorType(operators);  //also performs validation that they are not mixed wrongly
 
-            if (printCodeType == EPrintCodeTypes.None || printCodeType == EPrintCodeTypes.LongVersionHasYes || printCodeType == EPrintCodeTypes.LongVersionHasAppend || printCodeType == EPrintCodeTypes.LongVersionOnlyNo)
+            if (operatorType == EOperatorTypes.None || operatorType == EOperatorTypes.LongVersionHasYes || operatorType == EOperatorTypes.LongVersionHasAppend || operatorType == EOperatorTypes.LongVersionOnlyNo)
             {
-                printCodesNew = new List<string>();
-                PrintGetPrintCodesHelper2(isSheet, ref mul_lev, ref mul_abs, ref mul_pch, ref mul_gdif, ref abs, ref dif, ref pch, ref gdif);
+                operatorsNew = new List<string>();
+                PrintGetOperatorHelper2(isSheet, ref mul_lev, ref mul_abs, ref mul_pch, ref mul_gdif, ref abs, ref dif, ref pch, ref gdif);
                 if (isGraph)
                 {
                     mul_pch = false;  //probably never relavant, but for symmetry
                     pch = false;
                 }
 
-                if (printCodeType == EPrintCodeTypes.LongVersionHasYes)  //then it may contain yes and no elements (but no append). The yes element clears all defaults, so no elements are not really interesting here since they will have no effect
+                if (operatorType == EOperatorTypes.LongVersionHasYes)  //then it may contain yes and no elements (but no append). The yes element clears all defaults, so no elements are not really interesting here since they will have no effect
                 {
                     //clear them all
                     mul_lev = false;
@@ -30972,46 +30973,46 @@ namespace Gekko
                 bool pchTest = false;
                 bool gdifTest = false;
 
-                foreach (string printCode in printCodes)
+                foreach (string operator2 in operators)
                 {
                     if (isMulprt)  //MULPRT
                     {
-                        if (printCode == "lev" || printCode == "_lev")
+                        if (operator2 == "lev" || operator2 == "_lev")
                         {
                             levTest = TestNoDuplicateDisplayCode(levTest, "lev");
                             mul_lev = true;
                         }
-                        else if (printCode == "nolev")
+                        else if (operator2 == "nolev")
                         {
                             levTest = TestNoDuplicateDisplayCode(levTest, "lev");
                             mul_lev = false;
                         }
-                        else if (printCode == "abs" || printCode == "_abs")
+                        else if (operator2 == "abs" || operator2 == "_abs")
                         {
                             absTest = TestNoDuplicateDisplayCode(absTest, "abs");
                             mul_abs = true;
                         }
-                        else if (printCode == "noabs")
+                        else if (operator2 == "noabs")
                         {
                             absTest = TestNoDuplicateDisplayCode(absTest, "abs");
                             mul_abs = false;
                         }
-                        else if (printCode == "pch" || printCode == "_pch")
+                        else if (operator2 == "pch" || operator2 == "_pch")
                         {
                             pchTest = TestNoDuplicateDisplayCode(pchTest, "pch");
                             mul_pch = true;
                         }
-                        else if (printCode == "nopch")
+                        else if (operator2 == "nopch")
                         {
                             pchTest = TestNoDuplicateDisplayCode(pchTest, "pch");
                             mul_pch = false;
                         }
-                        else if (printCode == "gdif" || printCode == "_gdif")
+                        else if (operator2 == "gdif" || operator2 == "_gdif")
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             mul_gdif = true;
                         }
-                        else if (printCode == "nogdif")
+                        else if (operator2 == "nogdif")
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             mul_gdif = false;
@@ -31019,42 +31020,42 @@ namespace Gekko
                     }
                     else  //normal PRT
                     {
-                        if (printCode == "abs" || printCode == "_abs")
+                        if (operator2 == "abs" || operator2 == "_abs")
                         {
                             absTest = TestNoDuplicateDisplayCode(absTest, "abs");
                             abs = true;
                         }
-                        else if (printCode == "noabs")
+                        else if (operator2 == "noabs")
                         {
                             absTest = TestNoDuplicateDisplayCode(absTest, "abs");
                             abs = false;
                         }
-                        else if (printCode == "dif" || printCode == "_dif")
+                        else if (operator2 == "dif" || operator2 == "_dif")
                         {
                             difTest = TestNoDuplicateDisplayCode(difTest, "dif");
                             dif = true;
                         }
-                        else if (printCode == "nodif")
+                        else if (operator2 == "nodif")
                         {
                             difTest = TestNoDuplicateDisplayCode(difTest, "dif");
                             dif = false;
                         }
-                        else if (printCode == "pch" || printCode == "_pch")
+                        else if (operator2 == "pch" || operator2 == "_pch")
                         {
                             pchTest = TestNoDuplicateDisplayCode(pchTest, "pch");
                             pch = true;
                         }
-                        else if (printCode == "nopch")
+                        else if (operator2 == "nopch")
                         {
                             pchTest = TestNoDuplicateDisplayCode(pchTest, "pch");
                             pch = false;
                         }
-                        else if (printCode == "gdif" || printCode == "_gdif")
+                        else if (operator2 == "gdif" || operator2 == "_gdif")
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             gdif = true;
                         }
-                        else if (printCode == "nogdif")
+                        else if (operator2 == "nogdif")
                         {
                             gdifTest = TestNoDuplicateDisplayCode(gdifTest, "gdif");
                             gdif = false;
@@ -31064,41 +31065,41 @@ namespace Gekko
                 if (isMulprt)
                 {
                     //will always be in {n,m,q,mp} order
-                    if (mul_lev) printCodesNew.Add("n");
-                    if (mul_abs) printCodesNew.Add("m");
-                    if (mul_pch) printCodesNew.Add("q");
-                    if (mul_gdif) printCodesNew.Add("mp");
+                    if (mul_lev) operatorsNew.Add("n");
+                    if (mul_abs) operatorsNew.Add("m");
+                    if (mul_pch) operatorsNew.Add("q");
+                    if (mul_gdif) operatorsNew.Add("mp");
                 }
                 else
                 {
                     //will always be in {n,d,p,dp} order
-                    if (abs) printCodesNew.Add("n");
-                    if (dif) printCodesNew.Add("d");
-                    if (pch) printCodesNew.Add("p");
-                    if (gdif) printCodesNew.Add("dp");
+                    if (abs) operatorsNew.Add("n");
+                    if (dif) operatorsNew.Add("d");
+                    if (pch) operatorsNew.Add("p");
+                    if (gdif) operatorsNew.Add("dp");
                 }
             }
             else
             {
-                if (!isMulprt && !isGraph && printCodes.Count == 1 && G.Equal(printCodes[0], "r"))
+                if (!isMulprt && !isGraph && operators.Count == 1 && G.Equal(operators[0], "r"))
                 {
                     //PRT<r> or SHEET/CLIP<r>
-                    PrintGetPrintCodesHelper2(isSheet, ref mul_lev, ref mul_abs, ref mul_pch, ref mul_gdif, ref abs, ref dif, ref pch, ref gdif);
-                    printCodesNew = new List<string>();
-                    if (abs) printCodesNew.Add("rn");
-                    if (dif) printCodesNew.Add("rd");
-                    if (pch) printCodesNew.Add("rp");
-                    if (gdif) printCodesNew.Add("rdp");
+                    PrintGetOperatorHelper2(isSheet, ref mul_lev, ref mul_abs, ref mul_pch, ref mul_gdif, ref abs, ref dif, ref pch, ref gdif);
+                    operatorsNew = new List<string>();
+                    if (abs) operatorsNew.Add("rn");
+                    if (dif) operatorsNew.Add("rd");
+                    if (pch) operatorsNew.Add("rp");
+                    if (gdif) operatorsNew.Add("rdp");
                 }
                 else
                 {
-                    printCodesNew = printCodes;  //point to same object
+                    operatorsNew = operators;  //point to same object
                 }
             }
-            return printCodesNew;
+            return operatorsNew;
         }
 
-        private static void PrintGetPrintCodesHelper2(bool isSheet, ref bool mul_lev, ref bool mul_abs, ref bool mul_pch, ref bool mul_gdif, ref bool abs, ref bool dif, ref bool pch, ref bool gdif)
+        private static void PrintGetOperatorHelper2(bool isSheet, ref bool mul_lev, ref bool mul_abs, ref bool mul_pch, ref bool mul_gdif, ref bool abs, ref bool dif, ref bool pch, ref bool gdif)
         {
             if (isSheet)
             {
@@ -31125,14 +31126,14 @@ namespace Gekko
             }
         }
 
-        private static void PrintGetWithAndDecimals(O.Prt o, int varI, List<string> printCodesNew, List<int> widths, List<int> decs)
+        private static void PrintGetWithAndDecimals(O.Prt o, int varI, List<string> operatorsNew, List<int> widths, List<int> decs)
         {
-            foreach (string printCode in printCodesNew)
+            foreach (string operator2 in operatorsNew)
             {
                 int width = -12345;
                 int dec = -12345;
                 bool isPchType = false;
-                if (IsLevelPrintCode(printCode))
+                if (IsLevelOperator(operator2))
                 {
                     isPchType = false;
                     width = options.print_fields_nwidth;
@@ -31208,47 +31209,47 @@ namespace Gekko
             }
         }
 
-        private static bool IsLevelPrintCode(string printCode)
+        private static bool IsLevelOperator(string operator2)
         {
-            return printCode == "" || printCode == "n" || printCode == "d" || printCode == Globals.printCode_r || printCode == Globals.printCode_rn || printCode == Globals.printCode_rd || printCode == "m";
+            return operator2 == "" || operator2 == "n" || operator2 == "d" || operator2 == Globals.operator_r || operator2 == Globals.operator_rn || operator2 == Globals.operator_rd || operator2 == "m";
         }
 
-        private static string GetPrintCodeLabel(string printCode, bool isVerbose, bool useExoEndoIndicator, bool identicalCodes)
+        private static string GetOperatorLabel(string operator2, bool isVerbose, bool useExoEndoIndicator, bool identicalCodes)
         {
-            string printCodeLabel = "";
-            if (printCode == "n")
+            string operatorLabel = "";
+            if (operator2 == "n")
             {
-                printCodeLabel = "lev";  //MULPRT<lev>
+                operatorLabel = "lev";  //MULPRT<lev>
             }
-            else if (printCode == Globals.printCode_r || printCode == Globals.printCode_rn)
+            else if (operator2 == Globals.operator_r || operator2 == Globals.operator_rn)
             {
-                printCodeLabel = "@lev";
-                if (isVerbose) printCodeLabel = Globals.Ref + " bank";
+                operatorLabel = "@lev";
+                if (isVerbose) operatorLabel = Globals.Ref + " bank";
             }
-            else if (printCode == "d") printCodeLabel = "dif";  //PRT<dif>
-            else if (printCode == Globals.printCode_rd) printCodeLabel = "@dif";
-            else if (printCode == "p") printCodeLabel = "%";  //PRT<pch>
-            else if (printCode == Globals.printCode_rp)
+            else if (operator2 == "d") operatorLabel = "dif";  //PRT<dif>
+            else if (operator2 == Globals.operator_rd) operatorLabel = "@dif";
+            else if (operator2 == "p") operatorLabel = "%";  //PRT<pch>
+            else if (operator2 == Globals.operator_rp)
             {
-                printCodeLabel = "@%";
-                if (isVerbose) printCodeLabel = "%";
+                operatorLabel = "@%";
+                if (isVerbose) operatorLabel = "%";
             }
-            else if (printCode == "dp") printCodeLabel = "dif%";  //PRT<gdif>
-            else if (printCode == Globals.printCode_rdp) printCodeLabel = "@dif%";
-            else if (printCode == "m")
+            else if (operator2 == "dp") operatorLabel = "dif%";  //PRT<gdif>
+            else if (operator2 == Globals.operator_rdp) operatorLabel = "@dif%";
+            else if (operator2 == "m")
             {
-                printCodeLabel = "mdif";  //MULPRT<abs>
-                if (isVerbose) printCodeLabel = "Difference";
+                operatorLabel = "mdif";  //MULPRT<abs>
+                if (isVerbose) operatorLabel = "Difference";
             }
-            else if (printCode == "q")
+            else if (operator2 == "q")
             {
-                printCodeLabel = "m%";  //MULPRT<pch>
-                if (isVerbose) printCodeLabel = "%";
+                operatorLabel = "m%";  //MULPRT<pch>
+                if (isVerbose) operatorLabel = "%";
             }
-            else if (printCode == "mp") printCodeLabel = "mdif%";  //MULPRT<gdif>
-            if (!isVerbose) printCodeLabel = "[" + printCodeLabel + "]";
-            if (identicalCodes && printCodeLabel == "[lev]") printCodeLabel = "";  //no need for a [lev] on a PRT<nopch>.
-            return printCodeLabel;
+            else if (operator2 == "mp") operatorLabel = "mdif%";  //MULPRT<gdif>
+            if (!isVerbose) operatorLabel = "[" + operatorLabel + "]";
+            if (identicalCodes && operatorLabel == "[lev]") operatorLabel = "";  //no need for a [lev] on a PRT<nopch>.
+            return operatorLabel;
         }
 
         private static bool HasIdenticalCodes(List<string> graphVars, PrtHelper ph)
@@ -31262,12 +31263,12 @@ namespace Gekko
                     break;
                 }
             }
-            if (ph.printCodes.Count > 1) identicalCodes = false;
-            if (ph.printCodes.Count == 1)
+            if (ph.operators.Count > 1) identicalCodes = false;
+            if (ph.operators.Count == 1)
             {
-                string s = ph.printCodes[0];
-                if (IsPrintCodeLongAppend(s)) identicalCodes = false;
-                if (IsPrintCodeLongNo(s)) identicalCodes = false;
+                string s = ph.operators[0];
+                if (IsOperatorLongAppend(s)) identicalCodes = false;
+                if (IsOperatorLongNo(s)) identicalCodes = false;
             }
             return identicalCodes;
         }
@@ -31283,12 +31284,12 @@ namespace Gekko
                     break;
                 }
             }
-            if (ph.printCodes.Count > 1) identicalCodes = false;
-            if (ph.printCodes.Count == 1)
+            if (ph.operators.Count > 1) identicalCodes = false;
+            if (ph.operators.Count == 1)
             {
-                string s = ph.printCodes[0];
-                if (IsPrintCodeLongAppend(s)) identicalCodes = false;
-                if (IsPrintCodeLongNo(s)) identicalCodes = false;
+                string s = ph.operators[0];
+                if (IsOperatorLongAppend(s)) identicalCodes = false;
+                if (IsOperatorLongNo(s)) identicalCodes = false;
             }
             return identicalCodes;
         }
@@ -31305,39 +31306,39 @@ namespace Gekko
             return variable;
         }
 
-        private static EPrintCodeTypes GetPrintCodeType(List<string> printCodes)
+        private static EOperatorTypes GetOperatorType(List<string> operators)
         {
-            EPrintCodeTypes printCodeType = EPrintCodeTypes.Null;
+            EOperatorTypes operatorType = EOperatorTypes.Null;
             bool isVerbose = false;
-            foreach (string printCode in printCodes)
+            foreach (string operator2 in operators)
             {
-                if (IsPrintCodeLong(printCode))
+                if (IsOperatorLong(operator2))
                 {
-                    if (printCodeType == EPrintCodeTypes.LongVersionHasAppend)
+                    if (operatorType == EOperatorTypes.LongVersionHasAppend)
                     {
-                        WritePrintCodeMismatchError();
+                        WriteOperatorMismatchError();
                     }
-                    printCodeType = EPrintCodeTypes.LongVersionHasYes;
+                    operatorType = EOperatorTypes.LongVersionHasYes;
                 }
-                else if (IsPrintCodeLongAppend(printCode))
+                else if (IsOperatorLongAppend(operator2))
                 {
-                    if (printCodeType == EPrintCodeTypes.LongVersionHasYes)
+                    if (operatorType == EOperatorTypes.LongVersionHasYes)
                     {
-                        WritePrintCodeMismatchError();
+                        WriteOperatorMismatchError();
                     }
-                    printCodeType = EPrintCodeTypes.LongVersionHasAppend;
+                    operatorType = EOperatorTypes.LongVersionHasAppend;
                 }
-                else if (IsPrintCodeLongNo(printCode))
+                else if (IsOperatorLongNo(operator2))
                 {
-                    if (printCodeType == EPrintCodeTypes.Null)
+                    if (operatorType == EOperatorTypes.Null)
                     {
                         //do not override if others are found
-                        printCodeType = EPrintCodeTypes.LongVersionOnlyNo;
+                        operatorType = EOperatorTypes.LongVersionOnlyNo;
                     }
                 }
-                else if (IsPrintCodeShort(printCode))
+                else if (IsOperatorShort(operator2))
                 {
-                    if (printCodeType == EPrintCodeTypes.LongVersionHasAppend || printCodeType == EPrintCodeTypes.LongVersionHasYes || printCodeType == EPrintCodeTypes.LongVersionOnlyNo)
+                    if (operatorType == EOperatorTypes.LongVersionHasAppend || operatorType == EOperatorTypes.LongVersionHasYes || operatorType == EOperatorTypes.LongVersionOnlyNo)
                     {
                         G.Writeln();
                         G.Writeln("*** ERROR: You cannot mix display codes of short and long type, for example");
@@ -31346,9 +31347,9 @@ namespace Gekko
                         G.Writeln("           similar, whereas long types are lev, abs, dif, pch, gdif.", Color.Red);
                         throw new GekkoException();
                     }
-                    printCodeType = EPrintCodeTypes.ShortVersion;
+                    operatorType = EOperatorTypes.ShortVersion;
                 }
-                else if (G.Equal(printCode, "v"))
+                else if (G.Equal(operator2, "v"))
                 {
                     //in that case, all other print options are suppressed, so you can write MULPRT<v gdif> and only a MULPRT<v> will be issued (this makes it easier to quickly put a 'v' in the optionfield to get a GMULPRT)
                     isVerbose = true;
@@ -31360,56 +31361,56 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            if (printCodes.Count == 0)
+            if (operators.Count == 0)
             {
-                printCodeType = EPrintCodeTypes.None;
+                operatorType = EOperatorTypes.None;
             }
-            if (isVerbose) printCodeType = EPrintCodeTypes.Verbose;  //overrides everything else
-            if (printCodeType == EPrintCodeTypes.Null)
+            if (isVerbose) operatorType = EOperatorTypes.Verbose;  //overrides everything else
+            if (operatorType == EOperatorTypes.Null)
             {
                 G.Writeln();
                 G.Writeln("*** ERROR: Sorry, internal Gekko error related to display codes");
                 throw new GekkoException();
             }
-            return printCodeType;
+            return operatorType;
         }
 
-        public static bool IsPrintCodeShort(string printCode)
+        public static bool IsOperatorShort(string operator2)
         {
-            return G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp") || G.Equal(printCode, Globals.printCode_r) || G.Equal(printCode, Globals.printCode_rn) || G.Equal(printCode, Globals.printCode_rd) || G.Equal(printCode, Globals.printCode_rp) || G.Equal(printCode, Globals.printCode_rdp) || G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp");
+            return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp");
         }
 
-        public static bool IsPrintCodeShortMultiplier(string printCode)
+        public static bool IsOperatorShortMultiplier(string operator2)
         {
-            return G.Equal(printCode, "m") || G.Equal(printCode, "q") || G.Equal(printCode, "mp") || G.Equal(printCode, "v");
+            return G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, "v");
         }
 
-        public static bool IsPrintCodeShortBase(string printCode)
+        public static bool IsOperatorShortBase(string operator2)
         {
-            return G.Equal(printCode, Globals.printCode_r) || G.Equal(printCode, Globals.printCode_rn) || G.Equal(printCode, Globals.printCode_rd) || G.Equal(printCode, Globals.printCode_rp) || G.Equal(printCode, Globals.printCode_rdp);
+            return G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp);
         }
 
-        public static bool IsPrintCodeShortWork(string printCode)
+        public static bool IsOperatorShortWork(string operator2)
         {
-            return printCode == null || G.Equal(printCode, "") || G.Equal(printCode, "n") || G.Equal(printCode, "d") || G.Equal(printCode, "p") || G.Equal(printCode, "dp");
+            return operator2 == null || G.Equal(operator2, "") || G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp");
         }
 
-        private static bool IsPrintCodeLongNo(string printCode)
+        private static bool IsOperatorLongNo(string operator2)
         {
-            return G.Equal(printCode, "nolev") || G.Equal(printCode, "noabs") || G.Equal(printCode, "nodif") || G.Equal(printCode, "nopch") || G.Equal(printCode, "nogdif");
+            return G.Equal(operator2, "nolev") || G.Equal(operator2, "noabs") || G.Equal(operator2, "nodif") || G.Equal(operator2, "nopch") || G.Equal(operator2, "nogdif");
         }
 
-        private static bool IsPrintCodeLongAppend(string printCode)
+        private static bool IsOperatorLongAppend(string operator2)
         {
-            return G.Equal(printCode, "_lev") || G.Equal(printCode, "_abs") || G.Equal(printCode, "_dif") || G.Equal(printCode, "_pch") || G.Equal(printCode, "_gdif");
+            return G.Equal(operator2, "_lev") || G.Equal(operator2, "_abs") || G.Equal(operator2, "_dif") || G.Equal(operator2, "_pch") || G.Equal(operator2, "_gdif");
         }
 
-        private static bool IsPrintCodeLong(string printCode)
+        private static bool IsOperatorLong(string operator2)
         {
-            return G.Equal(printCode, "lev") || G.Equal(printCode, "abs") || G.Equal(printCode, "dif") || G.Equal(printCode, "pch") || G.Equal(printCode, "gdif");
+            return G.Equal(operator2, "lev") || G.Equal(operator2, "abs") || G.Equal(operator2, "dif") || G.Equal(operator2, "pch") || G.Equal(operator2, "gdif");
         }
 
-        private static void WritePrintCodeMismatchError()
+        private static void WriteOperatorMismatchError()
         {
             G.Writeln();
             G.Writeln("*** ERROR: You cannot mix display codes of type 'yes' and 'append', for instance");
@@ -31964,8 +31965,8 @@ namespace Gekko
                         po.isDiff = false;
                         po.isLevel = false;
                         break;
-                    case Globals.printCode_r:
-                    case Globals.printCode_rn:
+                    case Globals.operator_r:
+                    case Globals.operator_rn:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -31974,7 +31975,7 @@ namespace Gekko
                         po.isDiff = false;
                         po.isLevel = true;
                         break;
-                    case Globals.printCode_rd:
+                    case Globals.operator_rd:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -31983,7 +31984,7 @@ namespace Gekko
                         po.isDiff = true;
                         po.isLevel = false;
                         break;
-                    case Globals.printCode_rp:
+                    case Globals.operator_rp:
                         po.isMultiplier = false;
                         po.isBaseline = true;
                         po.isLog = false;
@@ -31998,7 +31999,7 @@ namespace Gekko
                     case "mp":  //"bmp" is not meaningful
                         po.isMp = true;
                         break;
-                    case Globals.printCode_rdp:
+                    case Globals.operator_rdp:
                         po.isDp = true;
                         po.isBaseline = true;
                         break;
@@ -33020,7 +33021,7 @@ namespace Gekko
                 PrtOptionsHelper po = new PrtOptionsHelper();
 
                 string code = null;
-                List<OptString> codes = o.printCodes;
+                List<OptString> codes = o.operators;
                 if (codes.Count == 1 && G.Equal(codes[0].s2, "yes")) code = codes[0].s1;
 
                 if (code != null)
@@ -33985,165 +33986,165 @@ namespace Gekko
             return;
         }
 
-        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string printCode2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable, int sumOver)
+        public static void ComputeValueForPrintPlotNew(out double var1, out double varPch, string operator2, GekkoTime gt, Series tsWork, Series tsBase, bool isLogTransform, bool isCalledFromTable, int sumOver)
         {
-            string printCode = printCode2.Trim();  //when it comes from for instance a table
+            string operator3 = operator2.Trim();  //when it comes from for instance a table
 
             if (isCalledFromTable && !G.Equal(Globals.tableOption, "n"))
             {
                 if (G.Equal(Globals.tableOption, "d"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "d";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "rd";
-                    else if (G.Equal(printCode, "rn")) printCode = "rd";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "d";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "rd";
+                    else if (G.Equal(operator3, "rn")) operator3 = "rd";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "p"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "p";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "rp";
-                    else if (G.Equal(printCode, "rn")) printCode = "rp";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "p";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "rp";
+                    else if (G.Equal(operator3, "rn")) operator3 = "rp";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "dp"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "dp";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "rdp";
-                    else if (G.Equal(printCode, "rn")) printCode = "rdp";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "dp";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "rdp";
+                    else if (G.Equal(operator3, "rn")) operator3 = "rdp";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "r") || G.Equal(Globals.tableOption, "rn"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "r";
-                    else if (G.Equal(printCode, "d")) printCode = "rd";
-                    else if (G.Equal(printCode, "p")) printCode = "rp";
-                    else if (G.Equal(printCode, "dp")) printCode = "rdp";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "r";
+                    else if (G.Equal(operator3, "d")) operator3 = "rd";
+                    else if (G.Equal(operator3, "p")) operator3 = "rp";
+                    else if (G.Equal(operator3, "dp")) operator3 = "rdp";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "rd"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "rd";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "rd";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "rp"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "rp";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "rp";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "rdp"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "rdp";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "rdp";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "m"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "m";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "mp";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "m";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "mp";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "q"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "q";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "q";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
                 else if (G.Equal(Globals.tableOption, "mp"))
                 {
-                    if (G.Equal(printCode, "n")) printCode = "mp";
-                    else if (G.Equal(printCode, "d")) printCode = "";
-                    else if (G.Equal(printCode, "p")) printCode = "";
-                    else if (G.Equal(printCode, "dp")) printCode = "";
-                    else if (G.Equal(printCode, "r")) printCode = "";
-                    else if (G.Equal(printCode, "rn")) printCode = "";
-                    else if (G.Equal(printCode, "rd")) printCode = "";
-                    else if (G.Equal(printCode, "rp")) printCode = "";
-                    else if (G.Equal(printCode, "rdp")) printCode = "";
-                    else if (G.Equal(printCode, "m")) printCode = "";
-                    else if (G.Equal(printCode, "q")) printCode = "";
-                    else if (G.Equal(printCode, "mp")) printCode = "";
+                    if (G.Equal(operator3, "n")) operator3 = "mp";
+                    else if (G.Equal(operator3, "d")) operator3 = "";
+                    else if (G.Equal(operator3, "p")) operator3 = "";
+                    else if (G.Equal(operator3, "dp")) operator3 = "";
+                    else if (G.Equal(operator3, "r")) operator3 = "";
+                    else if (G.Equal(operator3, "rn")) operator3 = "";
+                    else if (G.Equal(operator3, "rd")) operator3 = "";
+                    else if (G.Equal(operator3, "rp")) operator3 = "";
+                    else if (G.Equal(operator3, "rdp")) operator3 = "";
+                    else if (G.Equal(operator3, "m")) operator3 = "";
+                    else if (G.Equal(operator3, "q")) operator3 = "";
+                    else if (G.Equal(operator3, "mp")) operator3 = "";
                 }
-                if (printCode == "")
+                if (operator3 == "")
                 {
-                    G.Writeln2("*** ERROR: TABLE <" + Globals.tableOption + "> and table-file printcode '" + printCode2 + "' do not combine");
+                    G.Writeln2("*** ERROR: TABLE <" + Globals.tableOption + "> and table-file operator '" + operator2 + "' do not combine");
                     throw new GekkoException();
                 }
             }
@@ -34183,64 +34184,64 @@ namespace Gekko
                 }
             }
 
-            if (printCode == "" || printCode == "n")
+            if (operator3 == "" || operator3 == "n")
             {
                 var1 = x;
                 varPch = PchFunction(x, xLag);
             }
-            else if (printCode == "d")
+            else if (operator3 == "d")
             {
                 var1 = x - xLag;
                 varPch = PchFunction(x, xLag);
             }
-            else if (printCode == "p")
+            else if (operator3 == "p")
             {
                 var1 = PchFunction(x, xLag);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == "dp")
+            else if (operator3 == "dp")
             {
                 var1 = PchFunction(x, xLag) - PchFunction(xLag, xLag2);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == Globals.printCode_r || printCode == Globals.printCode_rn)  //r or rn
+            else if (operator3 == Globals.operator_r || operator3 == Globals.operator_rn)  //r or rn
             {
                 var1 = y;
                 varPch = PchFunction(y, yLag);
             }
-            else if (printCode == Globals.printCode_rd)  //rd
+            else if (operator3 == Globals.operator_rd)  //rd
             {
                 var1 = y - yLag;
                 varPch = PchFunction(y, yLag);
             }
-            else if (printCode == Globals.printCode_rp)  //rp
+            else if (operator3 == Globals.operator_rp)  //rp
             {
                 var1 = PchFunction(y, yLag);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == Globals.printCode_rdp)  //rdp
+            else if (operator3 == Globals.operator_rdp)  //rdp
             {
                 var1 = PchFunction(y, yLag) - PchFunction(yLag, yLag2);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == "m")
+            else if (operator3 == "m")
             {
                 var1 = x - y;
                 varPch = PchFunction(x, y);
             }
-            else if (printCode == "q")
+            else if (operator3 == "q")
             {
                 var1 = PchFunction(x, y);
                 varPch = double.PositiveInfinity;
             }
-            else if (printCode == "mp")
+            else if (operator3 == "mp")
             {
                 var1 = PchFunction(x, xLag) - PchFunction(y, yLag);
                 varPch = double.PositiveInfinity;
             }
             else
             {
-                G.Writeln2("*** ERROR: Internal error: unrecognized print code: '" + printCode + "'");
+                G.Writeln2("*** ERROR: Internal error: unrecognized print code: '" + operator3 + "'");
                 throw new GekkoException();
             }
             return;
@@ -36338,7 +36339,7 @@ namespace Gekko
                     }
                     else
                     {
-                        MessageBox.Show("*** ERROR: Wrong printcode: " + o.prtOptionLower);
+                        MessageBox.Show("*** ERROR: Wrong operator: " + o.prtOptionLower);
                         throw new GekkoException();
                     }
 
@@ -41670,7 +41671,7 @@ namespace Gekko
     public class PrtHelperElement
     {
         //public string printCode = null;  //will be OBSOLETE
-        public List<string> printCodes = new List<string>();
+        public List<string> operators = new List<string>();
         public int width = -12345;
         public int dec = -12345;
         public int nwidth = -12345;
@@ -41683,7 +41684,7 @@ namespace Gekko
     {
         public string prtType = null;  //prt, mulprt, pctprt etc.
         public List<PrtHelperElement> elementOptions = null;
-        public List<string> printCodes = new List<string>();
+        public List<string> operators = new List<string>();
         //public string printCode = null; // m, d, p, q, etc. --> will be OBSOLETE
         public string printType = null; //PRT, SHEET, CSHEET, PLOT, etc.
         public bool rows = false;

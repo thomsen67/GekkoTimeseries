@@ -108,7 +108,7 @@ Additionally, there are model, solve, equation options.
         public string interface_sound_type = "bowl";  //bowl, ding, notify, ring
         public int interface_sound_wait = 60; //seconds command files run to get a sound        
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
-        public bool interface_table_printcodes = true;
+        public bool interface_table_operators = true;
         public int interface_zoom = 100;
         public string menu_startfile = "menu.html";
         public bool model_cache = true;  //if using cache on file or not        

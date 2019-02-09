@@ -234,17 +234,17 @@ namespace Gekko
         public const string symbolRefShortcut = "@";
 
         public const string printCode_n = "n";        
-        public const string printCode_p = "p";
-        public const string printCode_d = "d";
-        public const string printCode_dp = "dp";
-        public const string printCode_r = "r";
-        public const string printCode_rn = "rn";
-        public const string printCode_rp = "rp";
-        public const string printCode_rd = "rd";
-        public const string printCode_rdp = "rdp";
-        public const string printCode_m = "m";
-        public const string printCode_q = "q";
-        public const string printCode_mp = "mp";
+        public const string operator_p = "p";
+        public const string operator_d = "d";
+        public const string operator_dp = "dp";
+        public const string operator_r = "r";
+        public const string operator_rn = "rn";
+        public const string operator_rp = "rp";
+        public const string operator_rd = "rd";
+        public const string operator_rdp = "rdp";
+        public const string operator_m = "m";
+        public const string operator_q = "q";
+        public const string operator_mp = "mp";
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";

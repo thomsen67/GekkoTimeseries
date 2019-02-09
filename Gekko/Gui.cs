@@ -2566,7 +2566,7 @@ namespace Gekko
             if (i != -1)
             {
                 string c2 = e.Url.AbsoluteUri.ToLower().Substring(i + "#".Length);
-                if (Program.IsPrintCodeShort(c2)) c = c2;
+                if (Program.IsOperatorShort(c2)) c = c2;
             }
 
 

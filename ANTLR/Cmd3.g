@@ -1190,7 +1190,7 @@ Y2                    = 'Y2'                       ;
     PRI              = 'PRI'             ;
     PRIM = 'PRIM';
     PRINT            = 'PRINT'           ;
-    PRINTCODES = 'PRINTCODES';
+    OPERATORS = 'OPERATORS';
     PRN = 'PRN';
     PROT = 'PROT';
     PRT              = 'PRT'             ;
@@ -1793,7 +1793,7 @@ d.Add("Y" ,Y);
                                         d.Add("pri"     , PRI     );
                                         d.Add("PRIM", PRIM);
                                         d.Add("print"   , PRINT     );
-                                        d.Add("PRINTCODES" ,PRINTCODES);
+                                        d.Add("OPERATORS" ,OPERATORS);
                                         d.Add("PRN", PRN);
                                         d.Add("PROT", PROT);
                                         d.Add("prt"     , PRT       );
@@ -3294,7 +3294,7 @@ table:					    TABLE name EQUAL NEW TABLE leftParenGlue ')'  -> ^(ASTNEWTABLE na
 						  | tableCurrow ALIGNRIGHT leftParenGlue expression ')'  -> ^(ASTTABLEALIGNRIGHT tableCurrow CURROW expression)
 			              | tableCurrow MERGECOLS leftParenGlue expression ',' expression ')'  -> ^(ASTTABLEMERGECOLS tableCurrow CURROW expression expression)						
 						  | tableCurrow SETDATES leftParenGlue expression ',' expression ',' expression ')'  -> ^(ASTTABLESETDATES tableCurrow CURROW  expression expression expression)						
-						    //col, t1, t2, expression, printcode, scale, format
+						    //col, t1, t2, expression, operator, scale, format
 						  						  
 						  | tableCurrow SETVALUES leftParenGlue expression ',' expression ',' expression ',' expression ',' expression ',' expression ',' expression ')'  -> ^(ASTTABLESETVALUES tableCurrow expression expression expression ^(ASTTABLESETVALUESELEMENT expression ASTPLACEHOLDER ASTPLACEHOLDER) expression expression expression)
 						  
@@ -3307,7 +3307,7 @@ tableOpt1:                  ISNOTQUAL
                             ;
 tableOpt1h:                 HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | WINDOW EQUAL MAIN -> ^(ASTOPT_STRING_WINDOW ASTTABLEMAIN)						
-  						  | optOld  //printcodes						
+  						  | optOld  //ops						
 						    ;
 
 tableCurrow:			    TABLE name GLUEDOT DOT CURROW GLUEDOT DOT  -> name;
@@ -3514,7 +3514,7 @@ optionType:
              | INTERFACE SOUND TYPE '='? optionInterfaceSound -> INTERFACE SOUND TYPE ^(ASTSTRINGSIMPLE optionInterfaceSound)
              | INTERFACE SOUND WAIT '='? Integer -> INTERFACE SOUND WAIT ^(ASTINTEGER Integer)
              | INTERFACE SUGGESTIONS '='? optionInterfaceSuggestions -> INTERFACE SUGGESTIONS ^(ASTSTRINGSIMPLE optionInterfaceSuggestions)             | MODEL question -> MODEL question
-			 | INTERFACE TABLE PRINTCODES '='? yesNoSimple ->  INTERFACE TABLE PRINTCODES  ^(ASTBOOL yesNoSimple)
+			 | INTERFACE TABLE OPERATORS '='? yesNoSimple ->  INTERFACE TABLE OPERATORS  ^(ASTBOOL yesNoSimple)
 			 | INTERFACE ZOOM '='? Integer -> INTERFACE ZOOM ^(ASTINTEGER Integer)
 
 			 | MENU question -> MENU question
@@ -4216,7 +4216,7 @@ ident2: 					Ident |
   PREFIX|
   PRETTY|
   PRIM|
-  PRINTCODES|
+  OPERATORS|
   PRN|
   PRORATE|
   PROT|
@@ -4641,7 +4641,7 @@ ident3: 					Ident |
   PREFIX|
   PRETTY|
   PRIM|
-  PRINTCODES|
+  OPERATORS|
   PRN|
   PRORATE|
   PROT|

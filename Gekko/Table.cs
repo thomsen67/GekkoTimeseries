@@ -1334,7 +1334,7 @@ namespace Gekko
 
         public void Set(int row, int col, string name, GekkoTime tStart, GekkoTime tEnd, string option, double scale, string format)
         {
-            if (Globals.tableOption == "" || Globals.tableOption == "n" || Globals.tableOption == "m" || Globals.tableOption == Globals.printCode_r)
+            if (Globals.tableOption == "" || Globals.tableOption == "n" || Globals.tableOption == "m" || Globals.tableOption == Globals.operator_r)
             {
                 //good
             }
@@ -1350,7 +1350,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             string db = Globals.Work;
-            if (G.Equal(Globals.tableOption, Globals.printCode_r)) db = Globals.Ref;
+            if (G.Equal(Globals.tableOption, Globals.operator_r)) db = Globals.Ref;
             int counter = 0;
             foreach (GekkoTime t in new GekkoTimeIterator( tStart, tEnd))
             {
@@ -1419,7 +1419,7 @@ namespace Gekko
                 }                             
 
                 this.SetNumber(row, col + counter, scale * var1, format);
-                if (Globals.tableOption == "p" || Globals.tableOption == "q" || Globals.tableOption == "mp" || Globals.tableOption == "dp" || Globals.tableOption == Globals.printCode_rp || Globals.tableOption == Globals.printCode_rdp)
+                if (Globals.tableOption == "p" || Globals.tableOption == "q" || Globals.tableOption == "mp" || Globals.tableOption == "dp" || Globals.tableOption == Globals.operator_rp || Globals.tableOption == Globals.operator_rdp)
                 {
                     Cell cell = this.Get(row, col + counter);
                     if (cell != null)
@@ -1440,12 +1440,12 @@ namespace Gekko
 
         private static void ReportSetError(string printcode, string s)
         {
-            if (Program.IsPrintCodeShortBase(printcode))
+            if (Program.IsOperatorShortBase(printcode))
             {
                 G.Writeln2("*** ERROR: You cannot use printcode '" + printcode + "' together with TABLE<" + s + ">");
                 throw new GekkoException();
             }
-            if (Program.IsPrintCodeShortMultiplier(printcode))
+            if (Program.IsOperatorShortMultiplier(printcode))
             {
                 G.Writeln2("*** ERROR: You cannot use printcode '" + printcode + "' together with TABLE<" + s + ">");
                 throw new GekkoException();

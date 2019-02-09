@@ -9452,7 +9452,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Info()
+        public void _Test_Info()
         {
             //Does not test the result, just that it parses
             I("RESET;");
@@ -10066,17 +10066,17 @@ namespace UnitTests
 
         }
 
-        [TestMethod]
-        public void _Test_ExportSeries()
-        {
-            //Only syntax check: do this seriously...!
-            I("RESET;");
-            I("TIME 2005 2010;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
-            I("SYS'del exportseries." + Globals.extensionCommand + "';");
-            I("EXPORT<2005 2010 gcm='='> fy, fe file=exportseries;");
-        }
+        //[TestMethod]
+        //public void _Test_ExportSeries()
+        //{
+        //    //Only syntax check: do this seriously...!
+        //    I("RESET;");
+        //    I("TIME 2005 2010;");
+        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+        //    I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+        //    I("SYS'del exportseries." + Globals.extensionCommand + "';");
+        //    I("EXPORT<2005 2010 gcm='='> fy, fe file=exportseries;");
+        //}
 
         [TestMethod]
         public void _Test_EndoExo2()
@@ -16034,7 +16034,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__ExportSeries()
+        public void _Test_ExportGcm()
         {
 
             // ------------------------ '=' --------------------------------
@@ -16045,7 +16045,7 @@ namespace UnitTests
             I("TIME 2001 2003;");
             I("SERIES y = 101, 102, 104;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = '='> deleteme;");
+            I("EXPORT<2001 2003 gcm printcode = '='> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
@@ -16063,7 +16063,7 @@ namespace UnitTests
             I("TIME 2001 2003;");
             I("SERIES y = 101, 102, 104;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series> deleteme;");
+            I("EXPORT<2001 2003 gcm> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
@@ -16081,7 +16081,7 @@ namespace UnitTests
             I("TIME 2001 2003;");
             I("SERIES y = 101, 102, 104;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = n> deleteme;");
+            I("EXPORT<2001 2003 gcm  printcode = n> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("RUN deleteme." + Globals.extensionCommand + ";");
@@ -16100,7 +16100,7 @@ namespace UnitTests
             I("SERIES y = 101 rep *;");
             I("SERIES <2002 2003> y ^ 1, 2;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2002 2003 series = '^'> deleteme;");
+            I("EXPORT<2002 2003 gcm printcode = '^'> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
@@ -16120,7 +16120,7 @@ namespace UnitTests
             I("SERIES y = 101 rep *;");
             I("SERIES <2002 2003 d> y = 1, 2;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2002 2003 series = d> deleteme;");
+            I("EXPORT<2002 2003 gcm printcode = d> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
@@ -16140,7 +16140,7 @@ namespace UnitTests
             I("SERIES y = 101 rep *;");
             I("SERIES <2002 2003> y % 2 4;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2002 2003 series = '%'> deleteme;");
+            I("EXPORT<2002 2003 gcm printcode = '%'> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
@@ -16160,7 +16160,7 @@ namespace UnitTests
             I("SERIES y = 101 rep *;");
             I("SERIES <2002 2003 p> y = 2, 4;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2002 2003 series = p> deleteme;");
+            I("EXPORT<2002 2003 gcm printcode = p> deleteme;");
             I("RESET;");
             I("CREATE y;");
             I("SERIES <2001 2001> y = 101;");
@@ -16181,7 +16181,7 @@ namespace UnitTests
             I("CLONE;");
             I("SERIES y + 1, 2, 4;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = '+'> deleteme;");
+            I("EXPORT<2001 2003 gcm printcode = '+'> deleteme;");
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
@@ -16202,7 +16202,7 @@ namespace UnitTests
             I("CLONE;");
             I("SERIES <m> y = 1, 2, 4;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = m> deleteme;");
+            I("EXPORT<2001 2003 gcm printcode = m> deleteme;");
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
@@ -16223,7 +16223,7 @@ namespace UnitTests
             I("CLONE;");
             I("SERIES <2001 2003> y * 1.01, 1.02, 1.04;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = '*'> deleteme;");
+            I("EXPORT<2001 2003 gcm printcode = '*'> deleteme;");
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
@@ -16244,7 +16244,7 @@ namespace UnitTests
             I("CLONE;");
             I("SERIES <2001 2003 q> y = 1, 2, 4;");
             I("SYS'del deleteme." + Globals.extensionCommand + "';");
-            I("EXPORT<2001 2003 series = q> deleteme;");
+            I("EXPORT<2001 2003 gcm printcode = q> deleteme;");
             I("RESET; TIME 2001 2003;");
             I("CREATE y;");
             I("SERIES y = 101, 102, 104;");
@@ -16921,17 +16921,17 @@ namespace UnitTests
             u = Data("xxxx", 2015, "a"); Assert.AreEqual(u.w, 624244.2243d, 0.0001d);
         }
 
-        [TestMethod]
-        public void Test__TranslateExjan15()
-        {
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\gekko18\exjan15';");
-            I("RUN REGRES;");
-            for (int i = 2013; i <= 2022; i++)
-            {
-                UData u = Data("fy", i, "a"); Assert.AreEqual(u.m, 0d, 11d);  //small differences for 2014-2022, not sure why, could be simulation options
-            }
-        }
+        //[TestMethod]
+        //public void Test__TranslateExjan15()
+        //{
+        //    I("RESET;");
+        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\gekko18\exjan15';");
+        //    I("RUN REGRES;");
+        //    for (int i = 2013; i <= 2022; i++)
+        //    {
+        //        UData u = Data("fy", i, "a"); Assert.AreEqual(u.m, 0d, 11d);  //small differences for 2014-2022, not sure why, could be simulation options
+        //    }
+        //}
 
         [TestMethod]
         public void _Test_Alias()
@@ -17001,10 +17001,10 @@ namespace UnitTests
 
         }
         [TestMethod]
-        public void Test__DatabankSerFormat()
+        public void _Test_DatabankFlatFormat()
         {
             I("RESET;");
-            I("READ <ser> " + Globals.ttPath2 + @"\regres\Databanks\test;");
+            I("READ <flat> " + Globals.ttPath2 + @"\regres\Databanks\test;");
             _AssertSeries(First(), "xx1", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx1", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx1", 2002, -2d, sharedDelta);
@@ -17019,12 +17019,12 @@ namespace UnitTests
             _AssertSeries(First(), "xx2", 2004, 3d, sharedDelta);
             _AssertSeries(First(), "xx2", 2005, double.NaN, sharedDelta);
 
-            _AssertSeries(First(), "xx3", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 1, 1d, sharedDelta);
-            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 2, 2, sharedDelta);
-            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 3, 3d, sharedDelta);
-            _AssertSeries(First(), "xx3", EFreq.Q, 2001, 4, 4, sharedDelta);
-            _AssertSeries(First(), "xx3", EFreq.Q, 2002, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2000, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 1, 1d, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 4, 4d, sharedDelta);
+            _AssertSeries(First(), "xx3!q", EFreq.Q, 2002, 1, double.NaN, sharedDelta);
         }
 
 
@@ -17152,48 +17152,48 @@ namespace UnitTests
             Assert.AreEqual((First().GetIVariable("extra2" + "!a") as Series).meta.stamp, stamp2);  //might fail around midnight!!
         }
 
-        [TestMethod]
-        public void Test__TranslateExaug15()
-        {
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\gekko18\exaug15';");
-            I("RUN REGRES;");
-            for (int i = 2014; i <= 2023; i++)
-            {
-                UData u = Data("fy", i, "a"); Assert.AreEqual(u.m, 0d, 1e-8d);  //almost exact reproduction!
-            }
-        }
+        //[TestMethod]
+        //public void Test__TranslateExaug15()
+        //{
+        //    I("RESET;");
+        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\gekko18\exaug15';");
+        //    I("RUN REGRES;");
+        //    for (int i = 2014; i <= 2023; i++)
+        //    {
+        //        UData u = Data("fy", i, "a"); Assert.AreEqual(u.m, 0d, 1e-8d);  //almost exact reproduction!
+        //    }
+        //}
 
-        [TestMethod]
-        public void Test__TranslateAREMOS1()
-        {
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\aremos\aremos1';");
-            I("sys'del t1." + Globals.extensionCommand + "';");
-            I("translate <aremos> t1;");
-            I("run t1;");
-            _AssertScalarString(First(), "%s", "abc");
-            _AssertScalarString(First(), "%n", "bce");
-            _AssertScalarDate(First(), "%d1", EFreq.A, 2002, 1);
-            _AssertScalarDate(First(), "%d2", EFreq.A, 1995, 1);
-            _AssertScalarDate(First(), "%d3", EFreq.Q, 1990, 3);
-            _AssertScalarVal(First(), "%v1", 1.2345);
-            _AssertScalarVal(First(), "%v2", -1.23e-5);
-            _AssertSeries(First(), "bce", 2000, double.NaN, 0d);
-            _AssertSeries(First(), "bce", 2001, 5d, 0d);
-            _AssertSeries(First(), "bce", 2002, 6d, 0d);
-            _AssertSeries(First(), "bce", 2003, 7d, 0d);
-            _AssertSeries(First(), "bce", 2004, double.NaN, 0d);
-            _AssertScalarVal(First(), "%v3", 1.2345 * 6d);
-            _AssertScalarString(First(), "%s2", "value:abc");
-            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 2, double.NaN, 0d);
-            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 3, 5d, 0d);
-            _AssertSeries(First(), "bce2", EFreq.Q, 1990, 4, 6d, 0d);
-            _AssertSeries(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
-            _AssertSeries(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
-            _AssertScalarVal(First(), "%v4", 1.2345 * 6d);
+        //[TestMethod]
+        //public void Test__TranslateAREMOS1()
+        //{
+        //    I("RESET;");
+        //    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\translate\aremos\aremos1';");
+        //    I("sys'del t1." + Globals.extensionCommand + "';");
+        //    I("translate <aremos> t1;");
+        //    I("run t1;");
+        //    _AssertScalarString(First(), "%s", "abc");
+        //    _AssertScalarString(First(), "%n", "bce");
+        //    _AssertScalarDate(First(), "%d1", EFreq.A, 2002, 1);
+        //    _AssertScalarDate(First(), "%d2", EFreq.A, 1995, 1);
+        //    _AssertScalarDate(First(), "%d3", EFreq.Q, 1990, 3);
+        //    _AssertScalarVal(First(), "%v1", 1.2345);
+        //    _AssertScalarVal(First(), "%v2", -1.23e-5);
+        //    _AssertSeries(First(), "bce", 2000, double.NaN, 0d);
+        //    _AssertSeries(First(), "bce", 2001, 5d, 0d);
+        //    _AssertSeries(First(), "bce", 2002, 6d, 0d);
+        //    _AssertSeries(First(), "bce", 2003, 7d, 0d);
+        //    _AssertSeries(First(), "bce", 2004, double.NaN, 0d);
+        //    _AssertScalarVal(First(), "%v3", 1.2345 * 6d);
+        //    _AssertScalarString(First(), "%s2", "value:abc");
+        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 2, double.NaN, 0d);
+        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 3, 5d, 0d);
+        //    _AssertSeries(First(), "bce2", EFreq.Q, 1990, 4, 6d, 0d);
+        //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 1, 7d, 0d);
+        //    _AssertSeries(First(), "bce2", EFreq.Q, 1991, 2, double.NaN, 0d);
+        //    _AssertScalarVal(First(), "%v4", 1.2345 * 6d);
             
-        }
+        //}
 
         [TestMethod]
         public void _Test_ReplaceTimeseries()
