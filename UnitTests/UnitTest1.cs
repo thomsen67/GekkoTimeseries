@@ -9400,15 +9400,15 @@ namespace UnitTests
             Assert.AreEqual(m.data[i - 1, j - 1], d, delta);
         }
 
-        private static void AssertHelperMatrix(string s, string dim, int i)
-        {
-            int dim2 = 0;
-            if (dim == "cols") dim2 = 1;
-            else if (dim == "rows") ;
-            else throw new GekkoException();
-            Matrix m = (Matrix)Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + s);
-            Assert.AreEqual(m.data.GetLength(dim2), i);
-        }
+        //private static void AssertHelperMatrix(string s, string dim, int i)
+        //{
+        //    int dim2 = 0;
+        //    if (dim == "cols") dim2 = 1;
+        //    else if (dim == "rows") ;
+        //    else throw new GekkoException();
+        //    Matrix m = (Matrix)Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + s);
+        //    Assert.AreEqual(m.data.GetLength(dim2), i);
+        //}
 
         private static void AssertHelperScalarVal(string s, double d, double delta)
         {
@@ -11568,7 +11568,330 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Collapse()
-        {            
+        {
+
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            // --------- import<collapse> from Excel data points ----------------
+            for (int e = 0; e < 2; e++)
+            { //engine
+
+                for (int j = 0; j < 2; j++)
+                {
+
+                    string filename = "datapoints";
+                    if (j == 1) filename = "datapoints2";
+                    string extra = null;
+                    if (j == 1) extra = " sheet='data2' cols cell='d5'  namecell='d2'  datecell='b5' ";
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    string freq = "m";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + ">" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        //Assert.AreEqual((First().GetIVariable("ts" + i) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 12)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 2)), i * 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 3)), i * 4d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 4)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 5)), i * 5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 6)), i * 6d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 7)), i * 7d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 8)), i * 8d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 9)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 10)), i * 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 11)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "q";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + ">" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 3)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 4)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 1)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 2)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 3)), i * 24d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 4)), i * 21d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "a";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + ">" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2016, 1)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2017, 1)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2018, 1)), i * 65d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2019, 1)), double.NaN);
+                    }
+
+                    //avg ------------------------------------------------------------
+
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "m";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=avg>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 12)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 2)), i * 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 3)), i * 4d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 4)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 5)), i * 5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 6)), i * 6d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 7)), i * 7d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 8)), i * 8d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 9)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 10)), i * 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 11)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "q";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=avg>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 3)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 4)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 1)), i * 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 2)), i * 5.5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 3)), i * 8d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 4)), i * 10.5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "a";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=avg>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2016, 1)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2017, 1)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2018, 1)), i * 6.5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2019, 1)), double.NaN);
+                    }
+
+                    //count ------------------------------------------------------------
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "m";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=count>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 12)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 1)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 2)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 3)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 4)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 5)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 6)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 7)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 8)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 9)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 10)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 11)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "q";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=count>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 3)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 4)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 1)), 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 2)), 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 3)), 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 4)), 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "a";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=count>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2016, 1)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2017, 1)), 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2018, 1)), 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2019, 1)), double.NaN);
+                    }
+
+                    //first ------------------------------------------------------------
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "m";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=first>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 12)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 2)), i * 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 3)), i * 4d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 4)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 5)), i * 5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 6)), i * 6d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 7)), i * 7d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 8)), i * 8d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 9)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 10)), i * 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 11)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "q";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=first>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 3)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 4)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 2)), i * 5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 3)), i * 7d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 4)), i * 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "a";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=first>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2016, 1)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2017, 1)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2019, 1)), double.NaN);
+                    }
+
+                    //last ------------------------------------------------------------
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "m";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=last>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 11)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2017, 12)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 1)), i * 2d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 2)), i * 3d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 3)), i * 4d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 4)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 5)), i * 5d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 6)), i * 6d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 7)), i * 7d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 8)), i * 8d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 9)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 10)), i * 10d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 11)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.M, 2018, 12)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "q";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=last>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 3)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 4)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 1)), i * 4d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 2)), i * 6d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 3)), i * 9d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2018, 4)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.Q, 2017, 1)), double.NaN);
+                    }
+
+                    I("RESET;");
+                    if (e == 0) I("OPTION sheet engine = excel;");
+                    else I("OPTION sheet engine = internal;");
+                    freq = "a";
+                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+                    I("OPTION freq " + freq + ";");
+                    I("IMPORT<xlsx " + extra + "collapse=" + freq + " method=last>" + filename + ";");
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2016, 1)), double.NaN);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2017, 1)), i * 1d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2018, 1)), i * 11d);
+                        Assert.AreEqual((First().GetIVariable("ts" + i + Globals.freqIndicator + freq) as Series).GetDataSimple(new GekkoTime(EFreq.A, 2019, 1)), double.NaN);
+                    }
+                }
+            }
+
+            // =================== COLLAPSE METHOD
+
+
             I("RESET; MODE data;");
             I("TIME 2000 2003;");
             I("OPTION freq q;");

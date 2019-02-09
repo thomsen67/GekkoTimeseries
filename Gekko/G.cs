@@ -539,19 +539,19 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_AddFreq(string s1, string s2)
+        public static string Chop_AddFreq(string varname, string freqname)
         {
             //only adds a freq if there is no freq already
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);
-            if (G.Chop_HasSigil(name)) return s1;
+            O.Chop(varname, out bank, out name, out freq, out index);
+            if (G.Chop_HasSigil(name)) return varname;
             if (freq == null)
             {
-                return O.UnChop(bank, name, s2, index);
+                return O.UnChop(bank, name, freqname, index);
             }
             else
             {
-                return s1;
+                return varname;
             }
         }
 

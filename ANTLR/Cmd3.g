@@ -84,6 +84,10 @@ tokens {
 	ASTOPT_STRING_UNITS;
 	ASTOPT_STRING_SORT;
 	ASTOPT_STRING_ALL;
+	ASTOPT_STRING_NAMECELL;
+	ASTOPT_STRING_DATECELL;
+	ASTOPT_STRING_METHOD;
+
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -1032,6 +1036,9 @@ Y2                    = 'Y2'                       ;
     FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
     FIX = 'FIX';
     FLAT             = 'FLAT'            ;
+	DATECELL             = 'DATECELL'            ;
+	NAMECELL             = 'NAMECELL'            ;
+
     FOLDER           = 'FOLDER'          ;
     FONT           = 'FONT'          ;
     FONTSIZE           = 'FONTSIZE'          ;
@@ -1630,6 +1637,8 @@ d.Add("Y" ,Y);
                                         d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
                                         d.Add("FIX", FIX);
                                         d.Add("flat"    , FLAT      );
+										d.Add("namecell"    , NAMECELL      );
+										d.Add("datecell"    , DATECELL      );
                                         d.Add("folder"  , FOLDER  );
                                         d.Add("font"  , FONT  );
                                         d.Add("fontsize"  , FONTSIZE  );
@@ -3158,9 +3167,14 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)
 						  | ARRAY (EQUAL yesNo)? -> ^(ASTOPT_STRING_ARRAY yesNo?)
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
-						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
+						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)						  
+						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
+						  | CELL '=' expression -> ^(ASTOPT_STRING_CELL expression)
+						  | NAMECELL '=' expression -> ^(ASTOPT_STRING_NAMECELL expression)
+						  | DATECELL '=' expression -> ^(ASTOPT_STRING_DATECELL expression)
+						  | METHOD '=' name -> ^(ASTOPT_STRING_METHOD name)
+						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)						  
 						    ;
-
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // RESTART
@@ -4065,6 +4079,8 @@ ident2: 					Ident |
   FIRST|
   FIX|
   FLAT|
+  NAMECELL|
+  DATECELL|
   FOLDER|
   FONTSIZE|
   FONT|
@@ -4492,6 +4508,8 @@ ident3: 					Ident |
   FIRST|
   FIX|
   FLAT|
+  DATECELL|
+  NAMECELL|
   FOLDER|
   FONTSIZE|
   FONT|

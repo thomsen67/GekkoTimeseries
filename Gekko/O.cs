@@ -6439,12 +6439,25 @@ namespace Gekko
             public string opt_array = null;
             public string opt_flat = null;
             public string opt_aremos = null;
+            public string opt_cell = null;
+            public string opt_datecell = null;
+            public string opt_namecell = null;
+            public string opt_method = null;
+            public string opt_collapse = null;
+            public string opt_sheet = null;
             public string type = null;  //read or import
+            
 
             public P p = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
+
+                if (opt_collapse != null)
+                {
+                    Program.CollapsePoints(this);
+                    return;
+                }
 
                 GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
 
