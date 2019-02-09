@@ -543,7 +543,7 @@ namespace Gekko
                         //var s10 = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming);
                         string s11 = e.InnerException.Message;
                         MessageBox.Show("Gekko: The user settings file seems corrupted. Working folder set to desktop folder: " + desktop + "\n\nYou may consider deleting the user settings file, cf. this message:\n" + s11);
-                        Program.options.folder_working = desktop;
+                        Program.options.folder_working = desktop; 
                     }
                 }
             }
