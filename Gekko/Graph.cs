@@ -40,7 +40,7 @@ namespace Gekko
 
     public class GraphHelper
     {
-        public string printCode = null;
+        public string operator2 = null;
         public bool isRefreshing = false;
         public bool isLogTransform = false;
     }
@@ -389,7 +389,7 @@ namespace Gekko
             //this.graphOptions.o.guiGraphIsRefreshing = true;
 
             GraphHelper gh = new Gekko.GraphHelper();
-            gh.printCode = s;
+            gh.operator2 = s;
             if (isDlog || isLog) gh.isLogTransform = true;
             gh.isRefreshing = true;
 

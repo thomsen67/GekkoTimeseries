@@ -2932,7 +2932,7 @@ namespace Gekko
                                             // x = Series Normal or Light
                                             //---------------------------------------------------------
 
-                                            if (operatorType == ESeriesUpdTypes.none)
+                                            if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                             {
                                                 //this runs fast
 
@@ -2993,7 +2993,7 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                if (operatorType == ESeriesUpdTypes.none)
+                                                if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                                 {
                                                     foreach (GekkoTime t in smpl.Iterate12())
                                                     {
@@ -3019,7 +3019,7 @@ namespace Gekko
                                                 throw new GekkoException();
                                             }
 
-                                            if (operatorType != ESeriesUpdTypes.none)
+                                            if (operatorType != ESeriesUpdTypes.none && operatorType != ESeriesUpdTypes.n)
                                             {
                                                 G.Writeln2("*** ERROR: Operators cannot be used for array-series (yet)");
                                                 throw new GekkoException();
@@ -3057,7 +3057,7 @@ namespace Gekko
                                 double d = ((ScalarVal)rhs).val;
                                 //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
 
-                                if (operatorType == ESeriesUpdTypes.none)
+                                if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                 {
                                     foreach (GekkoTime t in smpl.Iterate12())
                                     {
@@ -3178,7 +3178,7 @@ namespace Gekko
                                 {
                                     double d = rhs.ConvertToVal();  //will fail with error if not 1x1                            
 
-                                    if (operatorType == ESeriesUpdTypes.none)
+                                    if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                     {
                                         foreach (GekkoTime t in smpl.Iterate12())
                                         {
@@ -3199,7 +3199,7 @@ namespace Gekko
                                         G.Writeln2("*** ERROR: Expected " + n + " x 1 matrix, got " + rhs_matrix.data.GetLength(0) + " x " + rhs_matrix.data.GetLength(1));
                                         throw new GekkoException();
                                     }
-                                    if (operatorType == ESeriesUpdTypes.none)
+                                    if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                     {
                                         for (int i = 0; i < rhs_matrix.data.GetLength(0); i++)
                                         {
@@ -3425,7 +3425,7 @@ namespace Gekko
                 }
             }
 
-            if (operatorType == ESeriesUpdTypes.none)
+            if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
             {
                 for (int i = 0; i < n; i++)
                 {
@@ -3550,11 +3550,12 @@ namespace Gekko
         {
             if (options == null) return ESeriesUpdTypes.none;
             ESeriesUpdTypes operatorType = ESeriesUpdTypes.none;
-            if (G.Equal(options.opt_d, "yes")) operatorType = ESeriesUpdTypes.d;
+            if (G.Equal(options.opt_d, "yes")) operatorType = ESeriesUpdTypes.d;            
             else if (G.Equal(options.opt_p, "yes")) operatorType = ESeriesUpdTypes.p;
             else if (G.Equal(options.opt_m, "yes")) operatorType = ESeriesUpdTypes.m;
             else if (G.Equal(options.opt_q, "yes")) operatorType = ESeriesUpdTypes.q;
             else if (G.Equal(options.opt_mp, "yes")) operatorType = ESeriesUpdTypes.mp;
+            else if (G.Equal(options.opt_n, "yes")) operatorType = ESeriesUpdTypes.n;
             return operatorType;
         }
 
@@ -7897,6 +7898,7 @@ namespace Gekko
 
         public class Assignment
         {
+            public string opt_n = null;
             public string opt_d = null;
             public string opt_p = null;
             public string opt_m = null;
@@ -8849,13 +8851,13 @@ namespace Gekko
                 public int col;
                 public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
                 public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set                
-                public string op = null;
+                public string operator2 = null;
                 public double scale = 1d;
                 public string format = null;
                 public List<Prt.Element> prtElements = new List<Prt.Element>();
                 public void Exe() {
                     G.CheckLegalPeriod(this.t1, this.t2);
-                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.op, this.scale, this.format);
+                    Program.GetTable(this.name).CurRow.SetValues(this.col, this.prtElements[0].variable[0] as Series, this.prtElements[0].variable[1] as Series, null, this.t1, this.t2, Globals.tableOption, this.operator2, this.scale, this.format);
                 }
             }
         }

@@ -385,7 +385,7 @@ namespace Gekko
 
     public enum ESeriesUpdTypes
     {
-        none,
+        none,        
         d,
         p,
         m,
@@ -22695,8 +22695,9 @@ namespace Gekko
             }
         }
 
-        public static void Updprt(List<ToFrom> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
+        public static void WriteGcm(List<ToFrom> vars, GekkoTime tStart, GekkoTime tEnd, string op, string file)
         {
+            if (op == null) op = "n";
             if (op == "#")
             {
                 G.Writeln2("*** ERROR: The '#' operator is not supported in EXPORT<series>");
@@ -22709,7 +22710,7 @@ namespace Gekko
             }
 
             int type = 0;
-            if (op == "=" || op == "^" || op == "%" || op == "+" || op == "*") type = 1;
+            if (op == "=" || op == "^=" || op == "%=" || op == "+=" || op == "*=") type = 1;
             if (G.Equal(op, "n") || G.Equal(op, "d") || G.Equal(op, "p") || G.Equal(op, "m") || G.Equal(op, "q")) type = 2;
             if (type == 0)
             {
@@ -22726,7 +22727,7 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: The ." + Globals.extensionCommand + " file '" + pathAndFilename + "' already exists");
                 G.Writeln("           Please remove it, for instance with SYS 'del <filename>';", Color.Red);
-                G.Writeln("           This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " file.", Color.Red);
+                G.Writeln("           This is to avoid overwriting a 'real' ." + Globals.extensionCommand + " command file.", Color.Red);
                 throw new GekkoException();
             }
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
@@ -22736,52 +22737,29 @@ namespace Gekko
                 for (int j = 0; j < vars.Count; j++)
                 {
                     string var = G.Chop_GetName(vars[j].s1);
-
                     string baseVar = G.Chop_SetBank(vars[j].s1, Globals.Ref);
-
-                    //Databank db = GetBankFromBankNameVersion(vars[j].bank);
-
                     var = G.GetUpperLowerCase(var);
-
-                    //if (!db.ContainsVariable(var))
-                    //{
-                    //    G.Writeln2("*** ERROR: UPDPRT: Variable '" + var + "' not found in '" + db.name + "' databank");
-                    //    throw new GekkoException();
-                    //}
-
                     IVariable ivBase = null;
                     Series tsBase = null;
 
-                    if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
+                    if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
                     {
                         ivBase = O.GetIVariableFromString(baseVar, O.ECreatePossibilities.NoneReportError);  //no search here
+                        tsBase = ivBase as Series;
                     }
 
                     IVariable iv = O.GetIVariableFromString(var, O.ECreatePossibilities.NoneReportError, true);  //can search!
                     Series ts = iv as Series;
 
-                    //Series tsBase = null;
-                    //if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
-                    //{
-                    //    tsBase = base2.GetVariable(var);
-                    //}
-
                     string var2 = var;
-                    //for instance fy%q for fy in quarter freq
 
                     StringBuilder sb = new StringBuilder();
                     if (type == 1)
                     {
-                        if (op == "=")
-                        {
-                            sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + " (");
-                        }
-                        else
-                        {
-                            sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + "= (");
-                        }
+                        sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + " (");
                     }
                     else sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> " + var + " = (");
+
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
                         double val = double.NaN;
@@ -22791,7 +22769,7 @@ namespace Gekko
                         double b = double.NaN;
                         double bLag = double.NaN;  //well, not use at the moment
 
-                        if (op == "*" || op == "+" || G.Equal(op, "q") || G.Equal(op, "m"))
+                        if (op == "*=" || op == "+=" || G.Equal(op, "q") || G.Equal(op, "m"))
                         {
                             b = tsBase.GetDataSimple(t);
                             bLag = tsBase.GetDataSimple(t.Add(-1));
@@ -22801,19 +22779,19 @@ namespace Gekko
                         {
                             val = w;
                         }
-                        else if (op == "^" || op == "d")
+                        else if (op == "^=" || op == "d")
                         {
                             val = w - wLag;
                         }
-                        else if (op == "%" || op == "p")
+                        else if (op == "%=" || op == "p")
                         {
                             val = (w / wLag - 1) * 100d;
                         }
-                        else if (op == "+" || op == "m")
+                        else if (op == "+=" || op == "m")
                         {
                             val = w - b;
                         }
-                        else if (op == "*")
+                        else if (op == "*=")
                         {
                             val = w / b;
                         }
@@ -22823,7 +22801,7 @@ namespace Gekko
                         }
 
                         int decimals = 6;
-                        if (op == "*") decimals = 8;
+                        if (op == "*=") decimals = 8;
                         string valstring = G.UpdprtFormat(val, decimals, true); //6 decimals, must be enough also for interest rates etc.
 
                         valstring = valstring.Trim();  //necesssary?
@@ -23429,7 +23407,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    Program.Updprt(listFilteredForCurrentFreq, tStart, tEnd, o.opt_op, fileName);
+                    Program.WriteGcm(listFilteredForCurrentFreq, tStart, tEnd, o.opt_op, fileName);
                     return 0;
                 }
                 else if (o.opt_gdx != null)

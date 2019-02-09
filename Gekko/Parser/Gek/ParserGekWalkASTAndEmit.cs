@@ -998,12 +998,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTS":                    
                         {
-                            node.Code.A(AddPrintCode( Globals.operator_r, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator( Globals.operator_r, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;                    
                     case "ASTSN":  //rn
                         {
-                            node.Code.A(AddPrintCode(Globals.operator_rn, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator(Globals.operator_rn, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTBANK":
@@ -1017,17 +1017,17 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTSD":
                         {
-                            node.Code.A(AddPrintCode(Globals.operator_rd, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator(Globals.operator_rd, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTSDP":
                         {
-                            node.Code.A(AddPrintCode(Globals.operator_rdp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator(Globals.operator_rdp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTSP":
                         {
-                            node.Code.A(AddPrintCode(Globals.operator_rp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator(Globals.operator_rp, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTPRTROWS":
@@ -1590,12 +1590,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTD":
                         {
-                            node.Code.A(AddPrintCode("d", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("d", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTDP":
                         {
-                            node.Code.A(AddPrintCode("dp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("dp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTDATE":
@@ -3325,7 +3325,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("" + Globals.labelCounter + " = 0;");
 
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
-                                node.Code.A("o" + Num(node) + ".guiGraphPrintCode = gh.printCode;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
+                                node.Code.A("o" + Num(node) + ".guiGraphOperator = gh.operator2;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
                                                                 
                                 node.Code.A(node[0].Code);  //type (prt, plot, ...)                          
@@ -3906,12 +3906,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTM":
                         {
-                            node.Code.A(AddPrintCode("m", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("m", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTV":
                         {
-                            node.Code.A(AddPrintCode("v", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("v", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTMEM":
@@ -3962,7 +3962,7 @@ namespace Gekko.Parser.Gek
                         break;     
                     case "ASTMP":
                         {
-                            node.Code.A(AddPrintCode("mp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("mp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     //case "ASTMULBK":
@@ -3975,7 +3975,7 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTN":
                         {
-                            node.Code.A(AddPrintCode("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTASSIGNMENT":
@@ -4808,32 +4808,32 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTP":
                         {
-                            node.Code.A(AddPrintCode("p", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("p", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTPCH":
                         {
-                            node.Code.A(AddPrintCode("pch", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("pch", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTABS":
                         {
-                            node.Code.A(AddPrintCode("abs", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("abs", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTDIF":
                         {
-                            node.Code.A(AddPrintCode("dif", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("dif", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTGDIF":
                         {
-                            node.Code.A(AddPrintCode("gdif", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("gdif", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTLEV":
                         {
-                            node.Code.A(AddPrintCode("lev", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("lev", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTPERCENTNAMESIMPLE":
@@ -4913,7 +4913,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".col = O.ConvertToInt(" + node[1].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".t1 = O.ConvertToDate(" + node[2].Code + ", O.GetDateChoices.Strict);" + G.NL);
                             node.Code.A("o" + Num(node) + ".t2 = O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict);" + G.NL);
-                            node.Code.A("o" + Num(node) + ".printcode = O.ConvertToString(" + node[5].Code + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".operator2 = O.ConvertToString(" + node[5].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".scale = O.ConvertToVal(" + node[6].Code + ");" + G.NL);
                             node.Code.A("o" + Num(node) + ".format = O.ConvertToString(" + node[7].Code + ");" + G.NL);
 
@@ -5174,13 +5174,12 @@ namespace Gekko.Parser.Gek
 
                             if (node.Text == "ASTPRTELEMENT")
                             {
-                                node.Code.A("ope" + Num(node) + ".printCodesFinal = Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + ");");
-                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".printCodesFinal);");
-                                //node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementPrintCodes(o" + Num(node) + ", ope" + Num(node) + "));" + G.NL);
+                                node.Code.A("ope" + Num(node) + ".operatorsFinal = Program.GetElementOperators(o" + Num(node) + ", ope" + Num(node) + ");");
+                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".operatorsFinal);");                                
                             }
                             else if (node.Text == "ASTTABLESETVALUESELEMENT")
                             {
-                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o" + Num(node) + ".printcode}" + ");" + G.NL);
+                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o" + Num(node) + ".operator2}" + ");" + G.NL);
                             }
                             node.Code.A(G.NL);
                             //node.Code.A("foreach(int bankNumber in bankNumbers) {" + G.NL);
@@ -5344,7 +5343,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTQ":
                         {
-                            node.Code.A(AddPrintCode("q", node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                            node.Code.A(AddOperator("q", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     //case "ASTTRIMVARS":
@@ -7482,10 +7481,10 @@ namespace Gekko.Parser.Gek
         //    return;
         //}        
 
-        private static string AddPrintCode(string type, string s, string parentType, ASTNode node)
+        private static string AddOperator(string type, string s, string parentType, ASTNode node)
         {
-            string o = "o" + Num(node) + ".printCodes";
-            if (parentType == "ASTPRTELEMENTOPTIONFIELD") o = "ope" + Num(node) + ".printCodes";
+            string o = "o" + Num(node) + ".operators";
+            if (parentType == "ASTPRTELEMENTOPTIONFIELD") o = "ope" + Num(node) + ".operators";
             return o + ".Add(new OptString(`" + type + "`, O.ConvertToString(" + s + ")));" + G.NL;
         }        
 

@@ -171,6 +171,7 @@ ASTCOMPARE2;
 	ASTOPT_STRING_ITALIC;
 	ASTOPT_STRING_GRIDSTYLE;
 	ASTOPT_STRING_GCM;
+	ASTOPT_STRING_OP;
 	ASTOPT_STRING_PREFIX;
 	ASTOPT_STRING_GDX;
 	ASTOPT_STRING_GDXOPT;
@@ -925,6 +926,7 @@ Y2                    = 'Y2'                       ;
     AND              = 'AND';
     APPEND           = 'APPEND'          ;
     AREMOS = 'AREMOS';
+	OP = 'OP';
     AS               = 'AS';
     AUTO = 'AUTO';
     AVG          = 'AVG';
@@ -1529,6 +1531,7 @@ d.Add("Y" ,Y);
                                         d.Add("and"  , AND    );
                                         d.Add("append"  , APPEND     );
                                         d.Add("AREMOS", AREMOS);
+										d.Add("OP", OP);
                                         d.Add("as"  , AS    );
                                         d.Add("AUTO", AUTO);
                                         d.Add("avg"  , AVG    );
@@ -3387,9 +3390,9 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | XLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLS yesNo?)
   						  | XLSX (EQUAL yesNo)? -> ^(ASTOPT_STRING_XLSX yesNo?)						
 						  | CAPS (EQUAL yesNo)? -> ^(ASTOPT_STRING_CAPS yesNo?)		
-						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)
-						  | GCM EQUAL exportType -> ^(ASTOPT_STRING_GCM exportType)												
-						  | GCM -> ^(ASTOPT_STRING_GCM ASTOPN)												  				
+						  | GNUPLOT (EQUAL yesNo)? -> ^(ASTOPT_STRING_GNUPLOT yesNo?)						  
+						  | GCM (EQUAL yesNo)? -> ^(ASTOPT_STRING_GCM yesNo?)
+						  | OP EQUAL exportType -> ^(ASTOPT_STRING_OP exportType)							  				
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
 						  ;						  
@@ -3976,6 +3979,7 @@ ident2: 					Ident |
   ANNUAL|
   APPEND|
   AREMOS|
+  OP|
   ARRAY|
   ARROW|
   ASERIES|
@@ -4405,6 +4409,7 @@ ident3: 					Ident |
   ANNUAL|
   APPEND|
   AREMOS|
+  OP|
   ARRAY|
   ARROW|
   ASERIES|
