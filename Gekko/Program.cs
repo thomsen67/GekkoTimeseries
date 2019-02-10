@@ -39126,7 +39126,7 @@ namespace Gekko
             {
                 //Gekko.TranslatedCode.CodeLines(new P());
                 TranslatedCode xx = new TranslatedCode();
-                TranslatedCode.CodeLines(new P());
+                TranslatedCode. CodeLines(new P());
             }
         }
 

@@ -89,6 +89,7 @@ namespace Gekko.Parser.Gek
 
         public void Prepend(string s)
         {
+            if (s == null || s.Trim() == "") return;
             if (this.storage == null) this.storage = new StringBuilder();            
             this.storage.Insert(0, s);
         }
@@ -4058,12 +4059,24 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTMAPDEF":
                         {
+                            //string funcName = "MapDef_" + node.mapTempVarName;
+                            //string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
+                            //foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
+                            //string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
+                            //w.headerCs.Append(s);                            
+                            //node.Code.A(funcName + "(smpl)");
+
                             string funcName = "MapDef_" + node.mapTempVarName;
                             string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
                             foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
-                            string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
-                            w.headerCs.Append(s);                            
-                            node.Code.A(funcName + "(smpl)");
+                            //string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
+                            //w.headerCs.Append(s);
+                            //node.Code.A(funcName + "(smpl)");
+
+                            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+                            w.wh.localFuncs.AppendLine("Func<Map> " + funcName + " = () => {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "};" + G.NL);
+                            node.Code.A(funcName + "()");
+
                         }
                         break;
                     case "ASTMAPITEM":
@@ -6030,41 +6043,75 @@ namespace Gekko.Parser.Gek
 
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
-                       
 
-            if (relativeDepth == 1)
+
+            ////if (relativeDepth == 1)
+            //{
+            //    //#982375: if it is 0, walk the sub-tree to see...                  
+            //    bool gotoTarget = false;
+            //    if (w.wh != null && w.wh.isGotoOrTarget) gotoTarget = true;
+
+            //    if (!gotoTarget)
+            //    {
+            //        //HACK #438543
+            //        string putInBefore = null;
+
+            //        if (relativeDepth == 1)
+            //        {
+            //            if (Globals.special.ContainsKey(node.Text))
+            //            {
+            //                //do nothing                        
+            //            }
+            //            else
+            //            {
+            //                //#2384328423                        
+            //                putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL;
+            //            }
+            //        }
+            //        string addText = null;
+            //        if (w.wh != null && w.wh?.localInsideLoopVariables != null || w.wh?.localFuncs != null)
+            //        {
+            //            addText = w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+            //        }
+            //        node.Code.Prepend(putInBefore + addText);
+            //    }                
+            //}         
+
+            bool isGoto = false;
+            if (w.wh != null && w.wh.isGotoOrTarget) isGoto = true;
+            if(w.wh?.localFuncs!=null)
             {
-                //#982375: if it is 0, walk the sub-tree to see...                  
-                if (!w.wh.isGotoOrTarget)
+
+            }
+
+            if (!isGoto)
+            {                
+
+                if (relativeDepth == 1)
                 {
+                    //#982375: if it is 0, walk the sub-tree to see...                  
+
                     //HACK #438543
-                    if ( Globals.special.ContainsKey(node.Text))
-                        
+                    if (Globals.special.ContainsKey(node.Text))
                     {
                         //do nothing
+                        string putInBefore = w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        node.Code.Prepend(putInBefore);
+
+
                     }
                     else
                     {
                         //#2384328423                        
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL +  "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
-                    }                    
-                }
+                    }
 
-                //if (Program.options.system_code_split > 0)
-                //{
-                //    //See also #890752345
-                //    if (node.Text == "ASTRETURN" || node.Text == "ASTGOTO" || node.Text == "ASTTARGET" || node.Text == "ASTFUNCTIONDEF" || node.Text == "ASTFORNAME" || node.Text == "ASTFORSTRING" || node.Text == "ASTFORVAL" || node.Text == "ASTFORDATE" || node.Text == "ASTIF")
-                //    {
-                //        //skip split markers for these, but 
-                //    }
-                //    else
-                //    {
-                //        node.Code.Prepend(G.NL + Globals.splitCommandBlockStart + G.NL);
-                //        node.Code.A(G.NL + Globals.splitCommandBlockEnd + G.NL);
-                //    }
-                //}
-            }            
+                    //HACK #438543: a hack on this hack...! To avoid it is getting printed > 1 time for the same statement
+                    w.wh.localInsideLoopVariables = null;
+                    w.wh.localFuncs = null;
+                }
+            }
 
             if (node != null && absoluteDepth == 0)
             {

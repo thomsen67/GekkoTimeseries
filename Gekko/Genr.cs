@@ -6,65 +6,102 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static int labelCounter;
-public static void C0(GekkoSmpl smpl, P p) {
-//[[commandStart]]0
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static int labelCounter;
+        public static void C0(GekkoSmpl smpl, P p)
+        {
+            //[[commandStart]]2
+            p.SetText(@"¤4"); O.InitSmpl(smpl, p);
 
 
-O.Table.SetValues o0 = new O.Table.SetValues();
-o0.name = O.ConvertToString((new ScalarString("xx")));
-o0.col = O.ConvertToInt(i32);
-o0.t1 = O.ConvertToDate(i33, O.GetDateChoices.Strict);
-o0.t2 = O.ConvertToDate(i34, O.GetDateChoices.Strict);
-o0.operator2 = O.ConvertToString(O.HandleString(new ScalarString(@"n")));
-o0.scale = O.ConvertToVal(d36);
-o0.format = O.ConvertToString(O.HandleString(new ScalarString(@"f10.3")));
-try {
-O.isTableCall = true;
-{
-List<int> bankNumbers = O.Prt.CreateBankHelper(1);
-O.Prt.Element ope0 = new O.Prt.Element();
-ope0.labelGiven = new List<string>() {""};
-smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
-bankNumbers = O.Prt.GetBankNumbers(Globals.tableOption, new List<string>(){o0.operator2});
+            O.Assignment o2 = new O.Assignment();
+            O.AdjustT0(smpl, -2);
+            IVariable ivTmpvar8 = O.FunctionLookupNew1("f")(smpl, p, new GekkoArg((spml10) => i9, (spml10) => null));
+            O.AdjustT0(smpl, 2);
+            O.Lookup(smpl, null, null, "#m", null, ivTmpvar8, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o2)
+            ;
 
-for(int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {
-int bankNumber = bankNumbers[bankNumberI];
-smpl.bankNumber = bankNumber;
-ope0.variable[bankNumber] = i35;
-if(bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
-}
-smpl.bankNumber = 0;
-o0.prtElements.Add(ope0);
-}
-}
-finally {
-  O.isTableCall = false;
-}
-o0.Exe();
-
-//[[commandEnd]]0
-}
+            //[[commandEnd]]2
+        }
 
 
-public static readonly ScalarVal i32 = new ScalarVal(1d);
-public static readonly ScalarVal i33 = new ScalarVal(2000d);
-public static readonly ScalarVal i34 = new ScalarVal(2010d);
-public static readonly ScalarVal i35 = new ScalarVal(1d);
-public static readonly ScalarVal d36 = new ScalarVal(0.001d);
-
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-
-C0(smpl, p);
+        public static readonly ScalarVal i4 = new ScalarVal(2d);
+        public static readonly ScalarVal i6 = new ScalarVal(3d);
+        public static void FunctionDef7()
+        {
 
 
+            O.PrepareUfunction(1, "f");
 
-}
-}
+            Globals.ufunctionsNew1.Add("f", (GekkoSmpl smpl, P p, GekkoArg functionarg_xf7dke8cj_1_func) =>
+
+            {
+                Databank local0 = Program.databanks.local;
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                try
+                {
+                    IVariable functionarg_xf7dke8cj_1 = O.TypeCheck_val(functionarg_xf7dke8cj_1_func.f1(smpl), 1);
+
+
+                    Func<Map> MapDef_mapTmpvar2 = () =>
+                    {
+                        Map mapTmpvar2 = new Map();
+                        O.AdjustT0(smpl, -2);
+                        IVariable ivTmpvar3 = O.Multiply(smpl, i4, functionarg_xf7dke8cj_1);
+                        O.AdjustT0(smpl, 2);
+                        O.Lookup(smpl, mapTmpvar2, null, "x1", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+            ;
+
+                        O.AdjustT0(smpl, -2);
+                        IVariable ivTmpvar5 = O.Multiply(smpl, i6, functionarg_xf7dke8cj_1);
+                        O.AdjustT0(smpl, 2);
+                        O.Lookup(smpl, mapTmpvar2, null, "x2", null, ivTmpvar5, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+            ;
+
+
+                        return mapTmpvar2;
+                    };
+
+
+
+        //[[commandSpecial]]1
+        return O.TypeCheck_map(MapDef_mapTmpvar2(), 0);
+
+        //[[commandEnd]]1
+
+
+        return null;
+                }
+                catch { p.Deeper(); throw; }
+                finally
+                {
+                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
+                }
+            });
+
+        }
+
+        public static readonly ScalarVal i9 = new ScalarVal(7d);
+
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+
+            
+
+
+            FunctionDef7();
+
+
+            //[[commandEnd]]0
+
+
+            C0(smpl, p);
+
+
+
+        }
+    }
 }

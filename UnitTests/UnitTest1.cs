@@ -5321,7 +5321,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Pchy()
+        public void _Test_Pchy()
         {
             for (int i = 0; i < 3; i++)  //3 times to test with or without caching (third time just for extra safety)
             {
@@ -5371,7 +5371,7 @@ namespace UnitTests
 
             I("RESET; MODE data;");            
             I("OPTION freq q;");            
-            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");            
+            I("CREATE x; SER <2010q1 2011q1> x = (200, 1, 2, 3, 202);");            
             I("SERIES <2011q1 2011q1> y1 = pchy(x);");
             I("SERIES <2011q1 2011q1> y2 = dify(x);");
             I("SERIES <2011q1 2011q1> y3 = diffy(x);");
@@ -5388,7 +5388,7 @@ namespace UnitTests
             //same with expression inside
             I("RESET; MODE data;");
             I("OPTION freq q;");
-            I("CREATE x; SER <2010q1 2011q1> x = 200, 1, 2, 3, 202;");
+            I("CREATE x; SER <2010q1 2011q1> x = (200, 1, 2, 3, 202);");
             I("SERIES <2011q1 2011q1> y1 = pchy(0.5 * x + 0.5 * x);");
             I("SERIES <2011q1 2011q1> y2 = dify(0.5 * x + 0.5 * x);");
             I("SERIES <2011q1 2011q1> y3 = diffy(0.5 * x + 0.5 * x);");
@@ -5409,7 +5409,7 @@ namespace UnitTests
             //same with expression inside, with lag
             I("RESET; MODE data;");
             I("OPTION freq q;");
-            I("CREATE x; SER <2009q4 2011q1> x = 200, 1, 2, 3, 202, 12345;");
+            I("CREATE x; SER <2009q4 2011q1> x = (200, 1, 2, 3, 202, 12345);");
             I("SERIES <2011q1 2011q1> y1 = pchy(0.5 * x[-1] + 0.5 * x[-1]);");
             I("SERIES <2011q1 2011q1> y2 = dify(0.5 * x[-1] + 0.5 * x[-1]);");
             I("SERIES <2011q1 2011q1> y3 = diffy(0.5 * x[-1] + 0.5 * x[-1]);");
@@ -9171,114 +9171,58 @@ namespace UnitTests
         }
         
         [TestMethod]
-        public void Test__FunctionsUserDefined()
+        public void _Test_FunctionsUserDefined()
         {
             Databank work = First();
             //simplest possible
             I("RESET;");
-            I("function val f(val x); return %x*%x; end; val y = f(3+1);");
+            I("function val f(val %x); return %x*%x; end; val %y = f(3+1);");
             //val y = f(4);
             _AssertScalarVal(First(), "%y", 16);
 
             //simplest possible, with same-name x
             I("RESET;");
-            I("function val f(val x); return %x*%x; end; val x = 5; val y = f(3+1);");
+            I("function val f(val %x); return %x*%x; end; val %x = 5; val %y = f(3+1);");
             //val y = f(4);
             _AssertScalarVal(First(), "%x", 5);
             _AssertScalarVal(First(), "%y", 16);
 
             //normal and nested calls with two params
             I("RESET;");
-            I("function val f(val x, val y); return %x*%y; end; val q1 = 3; val q2 = 4; val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2)+0, f(%q1, %q2));");
+            I("function val f(val %x, val %y); return %x*%y; end; val %q1 = 3; val %q2 = 4; val %q3 = f(%q1, %q2); val %q4 = f(f(%q1, %q2)+0, f(%q1, %q2));");
             //val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2), f(%q1, %q2));
             _AssertScalarVal(First(), "%q3", 12);
             _AssertScalarVal(First(), "%q4", 144);
 
             I("RESET;");
             //2 return values, 1 param
-            I("function (val, val) f(val x); return (2*%x,3*%x); end; (val x1, val x2) = f(7);");
-            //(val x1, val x2) = f(7);
-            _AssertScalarVal(First(), "%x1", 14);
-            _AssertScalarVal(First(), "%x2", 21);
 
-            I("RESET;");
-            //5 return values of different type, 0 param
-            I("function (val, string, date, list, series) f(); list _temp = q1, q2; create _newvar; SERIES<2010 2011>_newvar = 777; return (123.45, 'abc', 2010a1, #_temp, _newvar); end; time 2009 2012; create x4; (val x0, string x1, date x2, list x3, series <2009 2012> x4) = f();");
-            //(val x1, val x2) = f(7);
-            _AssertScalarVal(First(), "%x0", 123.45);
-            _AssertScalarString(First(), "%x1", "abc");
-            _AssertScalarDate(First(), "%x2", EFreq.A, 2010, 1);
-            List<string> temp = _GetListOfStrings("x3");
-            Assert.AreEqual(temp.Count, 2);
-            Assert.AreEqual(temp[0], "q1");
-            Assert.AreEqual(temp[1], "q2");
-            _AssertSeries(First(), "x4", 2009, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x4", 2010, 777, sharedDelta);
-            _AssertSeries(First(), "x4", 2011, 777, sharedDelta);
-            _AssertSeries(First(), "x4", 2012, double.NaN, sharedDelta);
-            //FIXME: _newvar should not exist afterwards
+            // !!!!!!!!! Map_def problem: should be local function
 
-            I("RESET;");
-            //3 return values, 0 params
-            I("function (val, val, val) f(); val x = 5; return (2*%x, 3*%x, 4*%x); end; (val x1, val x2, val x3) = f();");
-            //(val x1, val x2, val x3) = f();
-            _AssertScalarVal(First(), "%x1", 10);
-            _AssertScalarVal(First(), "%x2", 15);
-            _AssertScalarVal(First(), "%x3", 20);
-            //-----------------------------------------
-            //---- FIXME: this is wrong, but right ----
-            //-----------------------------------------
-            _AssertScalarVal(First(), "%x", 5);
-
-            //3 return values, 1 2-tuple params + 2 return values, 0 params.
-            //Shows how tuples can feed into each other via f(g()), where g() returns a 2-tuple.
-            I("RESET;");
-            I("function (val, val, val) f((val x, val y)); return (200*%x, 300*%x, 400*%y); end; function (val, val) g(); return (2, 3); end; (val x1, val x2, val x3) = f(g());");
-            //(val x1, val x2, val x3) = f(g());
-            _AssertScalarVal(First(), "%x1", 400);
-            _AssertScalarVal(First(), "%x2", 600);
-            _AssertScalarVal(First(), "%x3", 1200);
-
-            //Using a list() function that functions as a container
-            //And calling f() recursively on itself (linear process) like this:
-            //f(f(list(0.5, 0.8)))
-            //Also tested that a free-floating tuple works:
-            //f(f((0.5, 0.8)))
-            //Same as before, just without the 'list'
-            //Note that (val x, val y) = (1, 2) is not allowed: tuples are not thought as vectors! only used as function arguments and return values.
-            I("RESET;");
-            I("function (val, val) list(val x1, val x2); return (%x1, %x2); end; function (val, val) f((val x1, val x2)); return (0.4*%x1+0.2*%x2+3, 0.7*%x2+0.1*%x1+1); end; (val x1, val x2) = f(list(0.5, 0.8)); (val y1, val y2) = f(f(list(0.5, 0.8))); (val xx1, val xx2) = f((0.5, 0.8)); (val yy1, val yy2) = f(f((0.5, 0.8)));");
-            //(val x1, val x2) = f(list(0.5, 0.8)); (val y1, val y2) = f(f(list(0.5, 0.8))); (val xx1, val xx2) = f((0.5, 0.8)); (val yy1, val yy2) = f(f((0.5, 0.8)));
-            _AssertScalarVal(First(), "%x1", 3.36d, 1e-8d);
-            _AssertScalarVal(First(), "%x2", 1.61d, 1e-8d);
-            _AssertScalarVal(First(), "%y1", 4.666d, 1e-8d);
-            _AssertScalarVal(First(), "%y2", 2.463d, 1e-8d);
-            _AssertScalarVal(First(), "%xx1", 3.36d, 1e-8d);
-            _AssertScalarVal(First(), "%xx2", 1.61d, 1e-8d);
-            _AssertScalarVal(First(), "%yy1", 4.666d, 1e-8d);
-            _AssertScalarVal(First(), "%yy2", 2.463d, 1e-8d);
-
+            I("function map f(val %x); return (x1=2*%x,x2=3*%x); end; #m = f(7);");
+            
+            
             // -----------------------------------------------------------
             // ----------- hiding/shadowing, and local/global variables
             // -----------------------------------------------------------
 
             //testing access of global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y); return %x*%y + %z; end; val z = 100; val q = f(3, 4+0);");
+            I("function val f(val %x, val %y); return %x*%y + %z; end; val %z = 100; val %q = f(3, 4+0);");
             //val q = f(3, 4);
             _AssertScalarVal(First(), "%q", 112);
             _AssertScalarVal(First(), "%z", 100);
 
             //local param shadows/hides global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y, val z); return %x*%y + %z; end; val z = 100; val q = f(3, 4, 1000+0);");
+            I("function val f(val %x, val %y, val %z); return %x*%y + %z; end; val %z = 100; val %q = f(3, 4, 1000+0);");
             //val q = f(3, 4, 1000);
             _AssertScalarVal(First(), "%q", 1012);
             _AssertScalarVal(First(), "%z", 100);  //is not changed, since %z is a parameter
 
             //local param shadows/hides global variable (%z)
             I("RESET;");
-            I("function val f(val x, val y); val z = 1000; return %x*%y + %z; end; val z = 100; val q = f(3, 4+0);");
+            I("function val f(val %x, val %y); val %z = 1000; return %x*%y + %z; end; val %z = 100; val %q = f(3, 4+0);");
             //val q = f(3, 4);
             _AssertScalarVal(First(), "%q", 1012);
             //-----------------------------------------
@@ -9291,7 +9235,7 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function date f(date x); return %x+3; end; date y = f(2000a1+0);");
+            I("function date f(date %x); return %x+3; end; date %y = f(2000a1+0);");
             //date y = f(2000a1);
             _AssertScalarDate(First(), "%y", EFreq.A, 2003, 1);
 
@@ -9300,7 +9244,7 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function string f(string x); return %x+'shine'; end; string y = f('sun');");
+            I("function string f(string %x); return %x+'shine'; end; string %y = f('sun');");
             //string y = f('sun');
             _AssertScalarString(First(), "%y", "sunshine");
 
@@ -9309,7 +9253,7 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function list f(list x, list y); return union(#x, #y); end; list xx=x1,x2; list yy=y1, y2;list z = f(#xx, #yy);");
+            I("function list f(list #x, list #y); return union(#x, #y); end; list #xx=x1,x2; list #yy=y1, y2;list #z = f(#xx, #yy);");
             //list z = f(#xx, #yy);
             List<string> z = _GetListOfStrings("z");
 
@@ -9325,13 +9269,13 @@ namespace UnitTests
             // -----------------------------------------------------------
 
             I("RESET;");
-            I("function matrix multiply(matrix x, matrix y); return #x * #y; end; matrix a = [1, 2 || 3, 4]; matrix b = [9, 8 || 7, 6]; matrix z = [0, 0 || 0, 0]; matrix c = multiply(#a, #b+#z);");
-            _AssertMatrix(First(), "c", "rows", 2);
-            _AssertMatrix(First(), "c", "cols", 2);
-            _AssertMatrix(First(), "c", 1, 1, 23d, 0d);
-            _AssertMatrix(First(), "c", 1, 2, 20d, 0d);
-            _AssertMatrix(First(), "c", 2, 1, 55d, 0d);
-            AssertHelperMatrix("c", 2, 2, 48d, 0d);
+            I("function matrix multiply2(matrix #x, matrix #y); return #x * #y; end; matrix #a = [1, 2 ; 3, 4]; matrix #b = [9, 8 ; 7, 6]; matrix #z = [0, 0 ; 0, 0]; matrix #c = multiply2(#a, #b+#z);");
+            _AssertMatrix(First(), "#c", "rows", 2);
+            _AssertMatrix(First(), "#c", "cols", 2);
+            _AssertMatrix(First(), "#c", 1, 1, 23d, 0d);
+            _AssertMatrix(First(), "#c", 1, 2, 20d, 0d);
+            _AssertMatrix(First(), "#c", 2, 1, 55d, 0d);
+            _AssertMatrix(First(), "#c", 2, 2, 48d, 0d);
             
             Assert.AreEqual(z[0], "x1");
             Assert.AreEqual(z[1], "x2");
@@ -9344,7 +9288,7 @@ namespace UnitTests
 
             I("RESET;");
             I("TIME 2000 2001;");
-            I("function series f(series x, series y); return x*y; end; VAL v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(xx, yy+%v);");
+            I("function series f(series x, series y); return x*y; end; VAL %v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(xx, yy+%v);");
             //SERIES zz = f(xx, yy);
             UData u;
             u = Data("xx", 2000, "a"); Assert.AreEqual(u.w, 2);
@@ -9356,7 +9300,7 @@ namespace UnitTests
 
             I("RESET;");
             I("TIME 2000 2001;");
-            I("function series f(series x, series y); return x*y; end; VAL v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(f(xx+%v, yy+%v), yy+%v);");
+            I("function series f(series x, series y); return x*y; end; VAL %v = 0; create xx, yy, zz; SERIES xx= 2; SERIES yy = 3; SERIES zz = f(f(xx+%v, yy+%v), yy+%v);");
             //nested use of series function
             //SERIES zz = f(f(xx, yy) yy);
             u = Data("xx", 2000, "a"); Assert.AreEqual(u.w, 2);
@@ -9366,13 +9310,6 @@ namespace UnitTests
             u = Data("zz", 2000, "a"); Assert.AreEqual(u.w, 18);
             u = Data("zz", 2001, "a"); Assert.AreEqual(u.w, 18);
 
-            I("RESET;");
-            I("TIME 2000 2001;");
-            I("function (series, series) f(series x, series y); return (x*y, x*x); end; create xx, yy, zz1, zz2; SERIES xx= 2; SERIES yy = 3; (series zz1, series zz2) = f(xx, yy);");
-            _AssertSeries(First(), "zz1", 2000, 6, sharedDelta);
-            _AssertSeries(First(), "zz1", 2001, 6, sharedDelta);
-            _AssertSeries(First(), "zz2", 2000, 4, sharedDelta);
-            _AssertSeries(First(), "zz2", 2001, 4, sharedDelta);
 
         }
 
@@ -16955,16 +16892,16 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Meta()
+        public void _Test__Meta()
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
             I("model meta;");
             I("time 2000 2001;");
-            I("create #all;");
+            I("create {#all};");
             I("create extra1, extra2;");
             I("series tg = 0.25;");
-            I("series extra1 = 2, 3;");
+            I("series extra1 = (2, 3);");
             I("series extra2 = 1/extra1 + 0.1*extra1[-1];");
             I("sim;");
             string stamp2 = Program.GetDateStamp();
