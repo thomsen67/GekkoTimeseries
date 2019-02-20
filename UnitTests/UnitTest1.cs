@@ -6223,86 +6223,6 @@ namespace UnitTests
             
         }
 
-    [TestMethod]
-        public void Test__ReadGdx()
-        {
-
-            // -----------------------------------------
-            // Reading from a gdx file and validating
-            // a series statement from Gams model.
-            // -----------------------------------------
-
-            I("reset; mode data;");
-            //!!!!!!!!!!! FIXME
-            //!!!!!!!!!!! FIXME
-            //!!!!!!!!!!! FIXME last \
-            //!!!!!!!!!!! FIXME
-            //!!!!!!!!!!! FIXME
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
-            I("OPTION gams time set = 't';");
-            I("OPTION gams time prefix = 't';");
-            I("OPTION gams time offset = 2006;");
-            I("OPTION gams time detect auto = yes;");  //probably not necessary here
-            I("read <gdx> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...            
-            //I("list scn = base;");
-            //I("list psl = chou, cpub, ccon, cgoo, cser;");
-            I("clone;");
-            I("delete m;");
-            I("aseries M[#psl,#scn] = myFM[#psl,#scn] * F[#psl,#scn] * ((PM[#psl,#scn]/PFF[#psl,#scn])*(PM[#psl,#scn]/PFF[#psl,#scn]))**(-EF[#psl]/2);");
-            _AssertSeries(First(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
-            _AssertSeries(Ref(), "m", new string[] { "chou", "base" }, 2006, 32.1879605531923d, sharedDelta);
-
-            //Cutting off a dimension
-            I("reset; mode data;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
-            I("OPTION gams time set = 't';");
-            I("OPTION gams time prefix = 't';");
-            I("OPTION gams time offset = 2006;");
-            I("OPTION gams time detect auto = yes;");  //probably not necessary here
-            I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
-            //I("list psl = chou, cpub, ccon, cgoo, cser;");
-            I("clone;");
-            I("delete m;");
-            I("aseries M[#psl] = myFM[#psl] * F[#psl] * ((PM[#psl]/PFF[#psl])*(PM[#psl]/PFF[#psl]))**(-EF[#psl]/2);");
-            _AssertSeries(First(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
-            _AssertSeries(Ref(), "m", new string[] { "chou" }, 2006, 32.1879605531923d, sharedDelta);
-
-            //comparing scenarios            
-            I("reset;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
-            I("OPTION gams time set = 't';");
-            I("OPTION gams time prefix = 't';");
-            I("OPTION gams time offset = 2006;");
-            I("OPTION gams time detect auto = yes;");  //probably not necessary here
-            I("read <gdx gdxopt='scns.base'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
-            I("write base;");
-            I("reset;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");
-            I("OPTION gams time set = 't';");
-            I("OPTION gams time prefix = 't';");
-            I("OPTION gams time offset = 2006;");
-            I("OPTION gams time detect auto = yes;");  //probably not necessary here
-            I("read <gdx gdxopt='scns.struc'> c:\\tools\\decomp\\report.gdx;"); //This reads from gdx file, note that 2006 is added to t{i}, for instance t0=2006, t1=2007...                        
-            I("write struc;");
-            I("reset;");
-            I("read <first> struc;");
-            I("read <ref> base;");
-            I("mulprt m['chou'];");
-            I("PRT m['chou'] - @m['chou'];");
-            I("PRT work:m['chou'] - ref:m['chou'];");
-            _AssertSeries(First(), "m", new string[] { "chou" }, 2006 + 27, 35.0258600515369d, sharedDelta);
-            _AssertSeries(Ref(), "m", new string[] { "chou" }, 2006 + 27, 35.0289043466536d, sharedDelta);
-
-            I("reset; mode data;");
-            I("OPTION gams exe folder = 'c:\\GAMS\\win32\\24.8\\';");            
-            I("read <gdx> c:\\tools\\decomp\\calib.gdx;");            
-            _AssertSeries(First(), "adam_ib", new string[] { "iba" }, 1990, 3147.56d, sharedDelta);
-            _AssertSeries(First(), "qc_a_y", new string[] { "52", "ccon" }, 2047, 0.000865742646856205d, sharedDelta);
-
-        }
-       
-
-
 
         [TestMethod]
         public void _Test_BankSyntaxLogic()
@@ -6679,52 +6599,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx3", 2003, 9d, 0d);
             _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
         }
-
-        [TestMethod]
-        public void Test__GenrLeftSideFunction()
-        {
-            I("RESET;");
-            I("CREATE gdp;");
-            I("TIME 2010 2012;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("TIME 2011 2012;");
-            I("SERIES log(gdp) = 10;");
-            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
-            _AssertSeries(First(), "gdp", 2011, Math.Exp(10d), 0d);
-            _AssertSeries(First(), "gdp", 2012, Math.Exp(10d), 0d);
-            I("TIME 2010 2012;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("TIME 2011 2012;");
-            I("SERIES dlog(gdp) = 0.1;");
-            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
-            _AssertSeries(First(), "gdp", 2011, 100d * Math.Exp(0.1d), 0d);
-            _AssertSeries(First(), "gdp", 2012, 100d * Math.Exp(0.1d) * Math.Exp(0.1d), 0d);
-            I("TIME 2010 2012;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("TIME 2011 2012;");
-            I("SERIES pch(gdp) = 10;");
-            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
-            _AssertSeries(First(), "gdp", 2011, 100d * 1.1d, 0d);
-            _AssertSeries(First(), "gdp", 2012, 100d * 1.1d * 1.1d, 0d);
-            I("TIME 2010 2012;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("TIME 2011 2012;");
-            I("SERIES dif(gdp) = 0.1;");
-            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
-            _AssertSeries(First(), "gdp", 2011, 100.1d, 0.000001d);
-            _AssertSeries(First(), "gdp", 2012, 100.2d, 0.000001d);
-            I("TIME 2010 2012;");
-            I("SERIES gdp = 100, 101, 102;");
-            I("TIME 2011 2012;");
-            I("SERIES diff(gdp) = 0.1;");
-            _AssertSeries(First(), "gdp", 2010, 100d, 0d);
-            _AssertSeries(First(), "gdp", 2011, 100.1d, 0.000001d);
-            _AssertSeries(First(), "gdp", 2012, 100.2d, 0.000001d);
-
-
-
-
-        }
+                
 
         [TestMethod]
         public void _Test_Series()
@@ -9194,14 +9069,18 @@ namespace UnitTests
             _AssertScalarVal(First(), "%q3", 12);
             _AssertScalarVal(First(), "%q4", 144);
 
-            I("RESET;");
-            //2 return values, 1 param
-
-            // !!!!!!!!! Map_def problem: should be local function
-
+            I("RESET;");            
             I("function map f(val %x); return (x1=2*%x,x2=3*%x); end; #m = f(7);");
-            
-            
+            //TODO: check result
+
+            I("RESET;");
+            I("function list f(val %x); return (2*%x, 3*%x); end; #m = f(7);");
+            //TODO: check result
+
+            I("RESET;");
+            I("function matrix f(val %x); return [2*%x, 3*%x]; end; #m = f(7);");
+            //TODO: check result
+
             // -----------------------------------------------------------
             // ----------- hiding/shadowing, and local/global variables
             // -----------------------------------------------------------
@@ -13184,7 +13063,7 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Test__Rebase()
+        public void _Test__Rebase()
         {            
             I("RESET;");
             I("TIME 2010 2012;");
@@ -13320,7 +13199,245 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void Test__Timefilter()
+        public void _Test_Exceptions_Variables()
+        {
+            //See Basic syntax rules in the Help system
+
+            // === COPY ===
+            Setup_Exceptions_Test();
+            I("z = x1;");  //can search
+            FAIL("COPY x1 to y;");
+            I("COPY temp:x1 to y;");
+
+            // === DELETE ===
+            Setup_Exceptions_Test();            
+            Globals.unitTestScreenOutput.Clear();            
+            I("DELETE x1;");  //does not crash, so tested below
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("does not exist for deletion"));
+            Globals.unitTestScreenOutput.Clear();
+            I("DELETE temp:x1;");
+            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("does not exist for deletion"));
+
+            // === RENAME ===
+            Setup_Exceptions_Test();            
+            FAIL("RENAME x1 to y;");
+            I("RENAME temp:x1 to y;");  //essentially moving
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                // === COUNT ===
+                //do it like INDEX
+            }
+
+            // === INDEX ===
+            Setup_Exceptions_Test();
+            Globals.unitTestScreenOutput.Clear();
+            I("INDEX temp:x*;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Found 1 matching items"));
+            Globals.unitTestScreenOutput.Clear();
+            I("INDEX x*;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Found 0 matching items"));
+
+            // === DISP ===
+            Setup_Exceptions_Test();
+            Globals.unitTestScreenOutput.Clear();
+            I("DISP temp:x*;");
+            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("Did not find any variable(s) to display"));
+            Globals.unitTestScreenOutput.Clear();
+            I("DISP x*;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Did not find any variable(s) to display"));
+
+            // === EXPORT ===
+            Setup_Exceptions_Test();
+            Globals.unitTestScreenOutput.Clear();
+            I("EXPORT temp:x* file=slet;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variables to"));
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("EXPORT x* file=slet;");  //fails with 'no variables to write'
+
+            // === WRITE ===
+            Setup_Exceptions_Test();
+            Globals.unitTestScreenOutput.Clear();
+            I("WRITE temp:x* file=slet;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("Wrote 1 variables to"));
+            Globals.unitTestScreenOutput.Clear();
+            FAIL("WRITE x* file=slet;");  //fails with 'no variables to write'
+
+            // === DOC ===
+            Setup_Exceptions_Test();
+            FAIL("DOC x1 label='abc';");
+            I("DOC temp:x1 label='abc';");
+
+            // === REBASE ===
+            Setup_Exceptions_Test();
+            FAIL("REBASE x1 2001 2002;");
+            I("REBASE temp:x1 2001 2002;");
+
+            // === TRUNCATE ===
+            Setup_Exceptions_Test();
+            FAIL("TRUNCATE <2001 2010> x1;");            
+            I("TRUNCATE <2001 2010> temp:x1;");
+
+        }
+
+        private static void Setup_Exceptions_Test()
+        {
+            I("RESET; TIME 2001 2010; OPTION databank search = yes;");
+            I("OPEN temp; UNLOCK temp; CLEAR temp;");
+            I("temp:x1 = 5;");
+        }
+
+        [TestMethod]
+        public void _Test_Exceptions_Periods()
+        {
+            //See Basic syntax rules in the Help system
+
+            // === COPY ===
+            Setup_Exceptions_Test();
+            I("COPY <2005 2006> temp:x1 to y;");
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2007, double.NaN, sharedDelta);
+
+            Setup_Exceptions_Test();
+            I("TIME 2005 2006;");
+            I("COPY <respect> temp:x1 to y;");
+            _AssertSeries(First(), "y!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2007, double.NaN, sharedDelta);
+
+            FAIL("COPY <2005 2006 respect> temp:x1 to y;");
+
+            // === WRITE ===
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+
+            Setup_Exceptions_Test();
+            I("WRITE <2005 2006> temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                Setup_Exceptions_Test();
+                I("TIME 2006 2006;");
+                I("WRITE <respect> temp:x1 file=temp2;");
+                I("RESET; READ temp2;");
+                _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+            }
+
+            // === READ ===
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; READ <2005 2006> temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                Setup_Exceptions_Test();
+                I("WRITE temp:x1 file=temp2;");
+                I("TIME 2005 2006;");
+                I("RESET; READ <respect> temp2;");
+                _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+            }
+
+            //IMPORT/EXPORT are tested here, for safety, since the internals are the same as READ/WRITE
+
+            // === EXPORT ===
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                Setup_Exceptions_Test();
+                I("TIME 2005 2006;");
+                I("EXPORT <all> temp:x1 file=temp2;");
+                I("RESET; READ temp2;");
+                _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+            }
+
+            Setup_Exceptions_Test();
+            I("TIME 2005 2006;");
+            I("EXPORT temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+
+            Setup_Exceptions_Test();
+            I("EXPORT <2005 2006> temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+
+            // === IMPORT ===
+            Setup_Exceptions_Test();
+            I("TIME 2005 2006;");
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; IMPORT temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2016, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; IMPORT <2005 2006> temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                Setup_Exceptions_Test();
+                I("WRITE temp:x1 file=temp2;");
+                I("TIME 2005 2006;");
+                I("RESET; IMPORT <all> temp2;");
+                _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+                _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+            }
+                       
+        }
+
+
+        [TestMethod]
+        public void _Test__Timefilter()
         {
             //
             // Testing TIMEFILTER, implicit a little bit of PRT testing too
@@ -13377,7 +13494,7 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2004;");
             I("SERIES<1999 1999> xx = 100;");
-            I("SERIES<2000 2004> xx % 10;");
+            I("SERIES<2000 2004> xx %= 10;");
             I("TIMEFILTER 2000,2004;");
             I("PRT xx;");
             Table tab = Globals.unitTestTablePointer;
@@ -13395,7 +13512,7 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2004;");
             I("SERIES<1999 1999> xx = 100;");
-            I("SERIES<2000 2004> xx % 10;");
+            I("SERIES<2000 2004> xx %= 10;");
             I("TIMEFILTER 2000,2004;");
             I("PRT<filter=avg> xx;");
             tab = Globals.unitTestTablePointer;
@@ -13413,8 +13530,8 @@ namespace UnitTests
             I("RESET;");
             I("TIME 2000 2004;");
             I("SERIES<1999 1999> xx = 100;");
-            I("SERIES<2000 2003> xx % 10;");
-            I("SERIES<2004 2004> xx % 20;");
+            I("SERIES<2000 2003> xx %= 10;");
+            I("SERIES<2004 2004> xx %= 20;");
             I("TIMEFILTER 2000,2004;");
             I("PRT<filter=avg> xx;");
             tab = Globals.unitTestTablePointer;
@@ -16194,434 +16311,7 @@ namespace UnitTests
 
 
         }
-
         
-
-        [TestMethod]
-        public void Test__Print()
-        {
-
-            //TODO: make more print tests (expressions, transformations...)
-
-            I("RESET;");
-            I("CREATE ts;");
-            I("TIME 2010 2012;");
-            I("SERIES ts = 1.23456;");
-            I("SERIES<2011 2012>ts % 5.6789;");
-            I("TIME 2009 2013;");
-            I("PRT ts;");
-            //string s = "";
-            //s += "                      ts  %" + G.NL;
-            //s += "2009              M  ******" + G.NL;
-            //s += "2010         1.2346  ******" + G.NL;
-            //s += "2011         1.3047    5.68" + G.NL;
-            //s += "2012         1.3788    5.68" + G.NL;
-            //s += "2013              M  ******" + G.NL;
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.2346"));  //stupid test, must be done better...
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3047"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3788"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("5.68"));
-
-            //quarterly
-            I("RESET;");
-            I("CLS;"); //to get unitTestScreenOutput flushed
-            I("OPTION freq q;");
-            I("CREATE ts;");
-            I("TIME 2010q3 2011q1;");
-            I("SERIES ts = 1.23456;");
-            I("SERIES<2010q4 2011q1>ts % 5.6789;");
-            I("TIME 2010q2 2011q2;");
-            I("PRT ts;");
-            //s = "                         ts  %" + G.NL;
-            //s += "2010q2               M  ******" + G.NL;
-            //s += "2010q3          1.2346  ******" + G.NL;
-            //s += "2010q4          1.3047    5.68" + G.NL;
-            //s += "2011q1          1.3788    5.68" + G.NL;
-            //s += "2011q2               M  ******" + G.NL;
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.2346"));  //stupid test, must be done better...
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3047"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3788"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("5.68"));
-
-
-            //quarterly
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("CLS;"); //to get unitTestScreenOutput flushed
-            I("OPTION freq q;");
-            I("CREATE ts;");
-            I("TIME 2010q3 2011q1;");
-            I("SERIES ts = 1.23456;");
-            I("SERIES<2010q4 2011q1>ts % 5.6789;");
-            I("TIME 2010q2 2011q2;");
-            I("WRITE temp;");
-            I("CLONE;");
-            I("PRT @ts;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.2346"));  //stupid test, must be done better...
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3047"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3788"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("5.68"));
-            I("RESET;");
-            I("OPTION freq q;");
-            I("CLS;"); //to get unitTestScreenOutput flushed
-            I("OPEN <" + Globals.extensionDatabank + "> temp;");
-            I("PRT temp:ts;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.2346"));  //stupid test, must be done better...
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3047"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3788"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("5.68"));
-
-            // ---------------------------------------------------------------------------------
-            // ------------------- more precise tests, using clipboard table -------------------
-            // ---------------------------------------------------------------------------------
-
-            //We test use of lists, of names, of colons, of @
-            //also <_lev> etc.
-
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
-            I("MODEL jul05;");            
-            I("TIME 2011 2015;");
-            I("CREATE px, fx, x;");
-            I("LIST xx = px;");
-            I("SERIES px = 1, 1.1, 1.2, 1.4, 1.3;");
-            I("SERIES fx = 100, 120, 90, 110, 150;");
-            I("SERIES x = px * fx;");
-            I("CLONE;");
-            I("SERIES px * 1.01, 1.05, 1.03, 1.02, 1.04;");
-            I("SERIES fx * 1.11, 1.15, 1.13, 1.12, 1.14;");
-            I("SERIES x = px * fx;");
-            I("OPEN<edit>mybank; CLEAR mybank;");
-            I("CREATE fx; SERIES fx = 200;");
-            I("CLOSE mybank; OPEN mybank;");            
-            
-            //=======================
-            //=======================
-            //=======================
-            // TODO: do this properly, the below results are from 1.8
-            //       has been visually checked for 2.0.2
-            //=======================
-            //=======================
-            
-            //Should show both level and pch
-            I("PRT<2014 2014 r> #xx;");
-
-            //Should show only level
-            I("PRT<2014 2014 rn> #xx;");
-            
-            //TODO also test %n where %n is name 'fx'
-            //Should show (E)
-            I("PRT<2014 2014> #xx;");
-
-            //[lev]             px           x/px 
-            //2014          1.4280       123.2000 
-            I("PRT<2014 2014 abs> #xx, x/px;");
-            
-            // [%]        px      x/px 
-            //2014     15.53     21.14
-            I("PRT<2014 2014 pch> #xx, x/px;");
-            
-            //        px [%]     x/px [dif] 
-            //2014     15.53        21.5000             
-            I("PRT<2014 2014 pch> #xx, x/px<dif>;");
-            
-            //                 px           x/px 
-            //2014         1.4280       123.2000 
-            I("PRT<2014 2014 nopch> #xx, x/px;");
-            
-            //[dif]             px           x/px 
-            //2014          0.1920        21.5000
-            I("PRT<2014 2014 dif> #xx, x/px;");
-            
-            //[dif%]        px      x/px 
-            //2014        8.52     47.44
-            I("PRT<2014 2014 gdif> #xx, x/px;");
-            
-            //                 px          [dif]       [%]           x/px          [dif]       [%] 
-            //2014         1.4280         0.1920     15.53       123.2000        21.5000     21.14 
-            I("PRT<2014 2014 _dif> #xx, x/px;");
-            
-            //                 px  x/px [%] 
-            //2014              1      21.1 
-            I("PRT<2014 2014> #xx <n dec=0>, x/px<p dec=1>;");
-            
-            //                 px       [%]         [@lev]      [@%]         [mdif]      [m%] 
-            //2014         1.4280     15.53         1.4000     16.67         0.0280      2.00 
-                                                                                  
-            //               x/px       [%]         [@lev]      [@%]         [mdif]      [m%] 
-            //2014       123.2000     21.14       110.0000     22.22        13.2000     12.00 
-            I("PRT<2014 2014 n p r rp m q> #xx, x/px;");            
-            
-            //                 px      (E)%           x/px      (E)% 
-            //2014         1.4280     15.53       123.2000     21.14 
-            I("PRT<2014 2014 nofilter> #xx, x/px;");
-            
-            //[mdif]      mybank:fx 
-            //2014          90.0000 
-            I("PRT<2014 2014 m> mybank:fx;");
-            
-            //[@lev]      mybank:fx 
-            //2014         110.0000             
-            I("PRT<2014 2014 r> mybank:fx;");
-            
-            //                 px          [dif]       [%]           x/px          [dif]       [%] 
-            //2014         1.4280         0.1920     15.53       123.2000        21.5000     21.14 
-            I("OPTION print prt dif = yes;");
-            I("PRT<2014 2014> #xx, x/px;");
-            I("OPTION print prt dif = no;");
-
-            //[lev]             px           x/px 
-            //2014          1.4280       123.2000 
-            I("MULPRT<2014 2014 lev> #xx, x/px;");
-            
-            //                 px         [mdif]      [m%]           x/px         [mdif]      [m%] 
-            //2014         1.4280         0.0280      2.00       123.2000        13.2000     12.00 
-            I("MULPRT<2014 2014 _lev> #xx, x/px;");
-            
-            //[mdif]             px           x/px 
-            //2014           0.0280        13.2000 
-            I("MULPRT<2014 2014 abs> #xx, x/px;");
-
-            //[m%]        px      x/px 
-            //2014      2.00     12.00            
-            I("MULPRT<2014 2014 pch> #xx, x/px;");
-            
-            //[mdif%]        px      x/px 
-            //2014        -1.13     -1.08 
-            I("MULPRT<2014 2014 gdif> #xx, x/px;");
-            
-            //                 px         %       Baseline         %     Difference         % 
-            //2014         1.4280     15.53         1.4000     16.67         0.0280      2.00 
-                                                                                  
-            //               x/px         %       Baseline         %     Difference         % 
-            //2014       123.2000     21.14       110.0000     22.22        13.2000     12.00 
-            I("MULPRT<2014 2014 v> #xx, x/px;");
-            
-            //                 px         [mdif]      [m%]           x/px         [mdif]      [m%] 
-            //2014         1.4280         0.0280      2.00       123.2000        13.2000     12.00 
-            I("OPTION print mulprt lev = yes;");
-            I("MULPRT<2014 2014> #xx, x/px;");
-            I("OPTION print mulprt lev = no;");
-            
-            FAIL("MULPRT<n>#xx, x/px;");
-            FAIL("MULPRT<d>#xx, x/px;");
-            FAIL("MULPRT<p>#xx, x/px;");
-            FAIL("MULPRT<dp>#xx, x/px;");
-            FAIL("MULPRT<r>#xx, x/px;");
-            FAIL("MULPRT<rn>#xx, x/px;");
-            FAIL("MULPRT<rd>#xx, x/px;");
-            FAIL("MULPRT<rp>#xx, x/px;");
-            FAIL("MULPRT<rdp>#xx, x/px;");
-            FAIL("MULPRT<m>#xx, x/px;");
-            FAIL("MULPRT<q>#xx, x/px;");
-            FAIL("MULPRT<mp>#xx, x/px;");
-
-            //=======================
-            //=======================
-            //=======================
-            //=======================
-            //=======================
-
-
-
-
-            Globals.lastPrtOrMulprtTable = null;
-            I("PRT<2014 2014> #xx, x/px;");
-            Table table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.GetRowMaxNumber(), 2);
-            Assert.AreEqual(table.GetColMaxNumber(), 5);            
-            Assert.IsNull(table.Get(1, 1));
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "(E)%");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x/px");
-            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "%");
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 3).number, 15.53398058, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 4).number, 123.2, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 5).number, 21.14060964, sharedTableDelta);
-
-            Globals.lastPrtOrMulprtTable = null;
-            I("PRT<2014 2014 n> #xx, x/px;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.GetRowMaxNumber(), 2);
-            Assert.AreEqual(table.GetColMaxNumber(), 3);
-            Assert.IsNull(table.Get(1, 1));
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");            
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");            
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?            
-            _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 3).number, 123.2, sharedTableDelta);
-
-            Globals.lastPrtOrMulprtTable = null;
-            I("PRT<2014 2014 d> #xx, x/px;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.GetRowMaxNumber(), 2);
-            Assert.AreEqual(table.GetColMaxNumber(), 3);            
-            Assert.AreEqual(table.Get(1, 1).CellText.TextData[0], "[dif]");
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.1920, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 3).number, 21.50, sharedTableDelta);
-
-            Globals.lastPrtOrMulprtTable = null;
-            I("PRT<2014 2014 p> #xx, x/px;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.GetRowMaxNumber(), 2);
-            Assert.AreEqual(table.GetColMaxNumber(), 3);            
-            Assert.AreEqual(table.Get(1, 1).CellText.TextData[0], "[%]");
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            _AssertHelperTwoDoubles(table.Get(2, 2).number, 15.5340, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 3).number, 21.1406, sharedTableDelta);
-
-            Globals.lastPrtOrMulprtTable = null;
-            I("PRT<2014 2014 m> #xx, x/px;");
-            table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.GetRowMaxNumber(), 2);
-            Assert.AreEqual(table.GetColMaxNumber(), 3);            
-            Assert.AreEqual(table.Get(1, 1).CellText.TextData[0], "[mdif]");
-            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");          
-            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-            _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.0280, sharedTableDelta);
-            _AssertHelperTwoDoubles(table.Get(2, 3).number, 13.2, sharedTableDelta);
-
-            //TODO TODO TODO TODO
-            //TODO TODO TODO TODO
-            //TODO TODO TODO TODO
-            //TODO TODO TODO TODO
-            //TODO TODO TODO TODO
-            //TODO TODO TODO TODO do these
-            if (false)
-            {
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 q> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 3);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.AreEqual(table.Get(1, 1).CellText.TextData[0], "[m%]");
-                //Assert.IsNull(table.Get(1, 2));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x");
-                Assert.IsNull(table.Get(2, 1));
-                Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "px [m%]");
-                Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "/px [m%]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(3, 2).number, 2d, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(3, 3).number, 12d, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 dp> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 3);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "p");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/p");
-                Assert.IsNull(table.Get(2, 1));
-                Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "x [dif%]");
-                Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "x [dif%]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(3, 2).number, 8.5210, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(3, 3).number, 47.4450, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 mp> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 3);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");
-                Assert.IsNull(table.Get(2, 1));
-                Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], " [mdif%]");
-                Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], " [mdif%]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(3, 2).number, -1.1327, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(3, 3).number, -1.0816, sharedTableDelta);
-
-                // ----------- BASE bank ------------
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 r> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 2);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.4, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 n> #xx, ref:x/@px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 2);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "ref:x/@px");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(2, 2).number, 1.428, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(2, 3).number, 110, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 rd> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 2);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px [@dif]");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px [@dif]");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(2, 2).number, 0.2, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(2, 3).number, 20d, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 rp> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 3);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x");
-                Assert.IsNull(table.Get(2, 1));
-                Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "px [@%]");
-                Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], "/px [@%]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(3, 2).number, 16.6667, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(3, 3).number, 22.2222, sharedTableDelta);
-
-                Globals.lastPrtOrMulprtTable = null;
-                I("PRT<2014 2014 rdp> #xx, x/px;");
-                table = Globals.lastPrtOrMulprtTable;
-                Assert.AreEqual(table.GetRowMaxNumber(), 3);
-                Assert.AreEqual(table.GetColMaxNumber(), 3);
-                Assert.IsNull(table.Get(1, 1));
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "px");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x/px");
-                Assert.IsNull(table.Get(2, 1));
-                Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], " [@dif%]");
-                Assert.AreEqual(table.Get(2, 3).CellText.TextData[0], " [@dif%]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2014"); //why is it not a date?
-                _AssertHelperTwoDoubles(table.Get(3, 2).number, 7.5758, sharedTableDelta);
-                _AssertHelperTwoDoubles(table.Get(3, 3).number, 47.2222, sharedTableDelta);
-
-            }
-
-            //TODO TODO
-            //These two should give the same (in levels):
-            //mulprt lang11:fy;
-            //prt lang11:fy-ref:fy;
-            //So MULPRT with bank:var tries to find var in ref bank.
-            //This is logical, because of the special case MULPRT work:var!
-            //Seems this is ok now, but do the test
-
-        }
 
         [TestMethod]
         public void _Test_Res()

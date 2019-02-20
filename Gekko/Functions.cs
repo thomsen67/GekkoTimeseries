@@ -2330,7 +2330,7 @@ namespace Gekko
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[10]);  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[10], 1);  //(x, x.1) => (x / x.1 - 1d) * 100d;                
             }
             else
             {
@@ -2381,7 +2381,7 @@ namespace Gekko
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[11]); // (x, x.1) => Math.Log(x / x.1);
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[11], 1); // (x, x.1) => Math.Log(x / x.1);
             }
             else
             {
@@ -2405,7 +2405,7 @@ namespace Gekko
             Program.RevertSmpl(smplOriginal, smpl);
             if (x1.Type() == EVariableType.Series)
             {
-                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[2]); // (x, x.1) => x - x.1;
+                return Series.ArithmeticsSeriesLag(smpl, x1 as Series, Globals.arithmentics[2], 1); // (x, x.1) => x - x.1;
             }
             else
             {
@@ -2472,21 +2472,75 @@ namespace Gekko
 
             return rv;
         }
-               
-        public static IVariable pchy(GekkoSmpl t, IVariable x1)
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable pchy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;                
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[10], SeriesLagYNumber(x1_series));  //(x, x.1) => (x / x.1 - 1d) * 100d;                
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: pchy() function only valid for time series arguments");
+                throw new GekkoException();
+            }
             return null;
         }
-               
-        public static IVariable dlogy(GekkoSmpl t, IVariable x1)
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable diffy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            return dify(smplOriginal, smpl, x1);
+        }
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable dify(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
+        {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[2], SeriesLagYNumber(x1_series));  // (x1, x2) => x1 - x2;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: dif() function only valid for time series arguments");
+                throw new GekkoException();
+            }
             return null;
         }
-                
-        public static IVariable dify(GekkoSmpl t, IVariable x1)
+
+        [MyCustom(Lag = "lag=13")]  //12+1, good enough for months, overkill for quarters but never mind
+        public static IVariable dlogy(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
         {
+            if (G.IsGekkoNull(x1)) return x1;
+            Program.RevertSmpl(smplOriginal, smpl);
+            if (x1.Type() == EVariableType.Series)
+            {
+                Series x1_series = x1 as Series;
+                return Series.ArithmeticsSeriesLag(smpl, x1_series, Globals.arithmentics[11], SeriesLagYNumber(x1_series));  // Math.Log(x1 / x2);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: dlogy() function only valid for time series arguments");
+                throw new GekkoException();
+            }
             return null;
         }
+
+        private static int SeriesLagYNumber(Series x1_series)
+        {
+            int i = 1;
+            if (x1_series.freq == EFreq.A || x1_series.freq == EFreq.U) i = Globals.freqASubperiods;
+            else if (x1_series.freq == EFreq.Q) i = Globals.freqQSubperiods;
+            else if (x1_series.freq == EFreq.M) i = Globals.freqMSubperiods;
+            return i;
+        }        
         
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {

@@ -25475,8 +25475,8 @@ namespace Gekko
                 else if (removed.fileHash == Globals.brandNewFile)
                 {
                     if (File.Exists(removed.FileNameWithPath))
-                    {
-                        MessageBox.Show("*** ERROR: The databank '" + removed.name + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                    {                        
+                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' did not exist when opening it,\nbut seems to exist as a file now. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
                         skipWrite = true;
                     }
                 }
@@ -25485,7 +25485,8 @@ namespace Gekko
                     string trueFileHash = Program.GetMD5Hash(GetTextFromFileWithWait(removed.FileNameWithPath));
                     if (!(trueFileHash == removed.fileHash))
                     {
-                        MessageBox.Show("*** ERROR: The databank '" + removed.name + "' seems to have been altered since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        MessageBox.Show("*** ERROR: The databank file '" + removed.FileNameWithPath + "' seems to have changed since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
+                        //MessageBox.Show("*** ERROR: The databank '" + removed.name + "' seems to have been altered since opening it. \nHence, Gekko cannot write the databank to file -- \nplease consider to run your code again.");
                         skipWrite = true;
                     }
                 }
@@ -27580,7 +27581,7 @@ namespace Gekko
                 n_i++;
             }
 
-            Matrix name_coeff = new Matrix(m, 1, double.NaN);
+            Matrix name_param = new Matrix(m, 1, double.NaN);
             Matrix name_t = new Matrix(m, 1, double.NaN);
             Matrix name_se = new Matrix(m, 1, double.NaN);
             Matrix name_stats = new Matrix(9, 1, double.NaN);
@@ -27767,7 +27768,7 @@ namespace Gekko
                 tab.SetNumber(i + 2, 3, se, "f16." + digits);
                 tab.SetNumber(i + 2, 4, t, "f12.2");
 
-                name_coeff.data[i, 0] = coeff;
+                name_param.data[i, 0] = coeff;
                 name_se.data[i, 0] = se;
                 name_t.data[i, 0] = t;
             }
@@ -27812,7 +27813,7 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_predict);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_residual);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_stats", name_stats);
-            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_coeff", name_coeff);
+            Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_param", name_param);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_t", name_t);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_se", name_se);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);

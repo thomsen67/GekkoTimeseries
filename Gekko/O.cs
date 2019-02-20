@@ -6590,14 +6590,20 @@ namespace Gekko
                     {
                         if (isRead && isSimple)
                         {
-                            G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
-                            G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                            if (Globals.modeIntendedWarning)
+                            {
+                                G.Writeln2("+++ WARNING: General READ is not intended for data-mode.");
+                                G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                            }
                         }
                         if (isRead && !isTo && hlp.openType == EOpenType.Ref)
                         {
-                            G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
-                            //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
-                            //throw new GekkoException();
+                            if (Globals.modeIntendedWarning)
+                            {
+                                G.Writeln2("+++ WARNING: READ<ref> is not intended for data-mode.");
+                                //G.Writeln("             Please use IMPORT, or consider READ<first>", Color.Red);
+                                //throw new GekkoException();
+                            }
                         }
                     }
 
@@ -6893,7 +6899,10 @@ namespace Gekko
                 G.Writeln("Cleared reference databank ('" + Program.databanks.GetRef().name + "') and copied " + number + " variables from first-position ('" + Program.databanks.GetFirst().name + "') to reference ('" + Program.databanks.GetRef().name + "') databank");
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
-                    G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
+                    if (Globals.modeIntendedWarning)
+                    {
+                        G.Writeln2("+++ WARNING: CLONE is not intended for data-mode (cf. MODE)");
+                    }
                 }
             }
         }
@@ -9142,7 +9151,10 @@ namespace Gekko
 
                 if (G.Equal(prtType, "mulprt") && G.Equal(Program.options.interface_mode, "data"))
                 {
-                    G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                    if (Globals.modeIntendedWarning)
+                    {
+                        G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
+                    }
                 }
             }
 
@@ -9544,7 +9556,10 @@ namespace Gekko
                 Program.Sim(this);
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
-                    G.Writeln2("+++ WARNING: SIM is not intended for data-mode (cf. MODE).");
+                    if (Globals.modeIntendedWarning)
+                    {
+                        G.Writeln2("+++ WARNING: SIM is not intended for data-mode (cf. MODE).");
+                    }
                 }
             }
         }
@@ -9571,7 +9586,10 @@ namespace Gekko
                 Program.Model(this);
                 if (G.Equal(Program.options.interface_mode, "data"))
                 {
-                    G.Writeln2("+++ WARNING: MODEL is not intended for data-mode (cf. MODE).");
+                    if (Globals.modeIntendedWarning)
+                    {
+                        G.Writeln2("+++ WARNING: MODEL is not intended for data-mode (cf. MODE).");
+                    }
                 }
             }
         }

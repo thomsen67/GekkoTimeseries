@@ -1297,36 +1297,41 @@ namespace Gekko
         }
 
         //pch(), dlog(), dif()
-        public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a)
+        public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a, int lag)
         {
             //Functions like d() and pch() where lag is used
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
-                rv_series = new Series(ESeriesType.Light, smpl.t0.Add(-1), smpl.t3);
+                rv_series = new Series(ESeriesType.Light, smpl.t0.Add(-lag), smpl.t3); //?? -1 or -lag??
 
                 if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
-                    GekkoTime window1 = smpl.t0.Add(-1);
+                    GekkoTime window1 = smpl.t0.Add(-lag);//?? -1 or -lag??
+                    //GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;
 
                     int ia1 = rv_series.ResizeDataArray(window1); //t0-1
-                    int ia2 = rv_series.ResizeDataArray(window2);  //t3
+                    int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
                     int ib1 = x1_series.ResizeDataArray(window1);  //t0-1
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3
                     double[] arraya = rv_series.data.dataArray;
                     double[] arrayb = x1_series.data.dataArray;
-                    for (int i = 1; i < GekkoTime.Observations(window1, window2); i++)
+                    for (int i = 0; i < lag; i++)
+                    {
+                        arraya[i] = double.NaN;
+                    }
+                    for (int i = lag; i < GekkoTime.Observations(window1, window2); i++)
                     {
                         //i starts in 1, that is, t0
-                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - 1]);
+                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
                     }
                 }
                 else
                 {                    
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
-                        rv_series.SetData(t, a(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-1))));
+                        rv_series.SetData(t, a(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-lag))));
                     }
                 }
             }
@@ -1334,10 +1339,13 @@ namespace Gekko
             {
                 //safe to alter the object itself, since it is temporary                
                 double[] temp = new double[x1_series.data.dataArray.Length];
-                temp[0] = double.NaN;
-                for (int i = 0 + 1; i < x1_series.data.dataArray.Length; i++)
+                for (int i = 0; i < lag; i++)
                 {
-                    temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - 1]);
+                    temp[i] = double.NaN;
+                }
+                for (int i = 0 + lag; i < x1_series.data.dataArray.Length; i++)
+                {
+                    temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - lag]);
                 }
                 x1_series.data.dataArray = temp;  //has same size and same anchors            
                 rv_series = x1_series;
