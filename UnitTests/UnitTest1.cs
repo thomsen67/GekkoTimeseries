@@ -13094,8 +13094,8 @@ namespace UnitTests
             FAIL("REBASE y1 2012 2011;");
             FAIL("REBASE y1 2010q1 2012;");
             FAIL("REBASE y1 2010m1 2012q4;");
-            I("LIST m = work:y1, y2;");
-            I("REBASE <bank=temp index = 1> #m 2010;");
+            I("LIST #m = work:y1, y2;");
+            I("REBASE <bank=temp index = 1> {#m} 2010;");
             _AssertSeries(First(), "y1", 2010, -7d / (-7d) * 1d, sharedDelta);
             _AssertSeries(First(), "y1", 2011, 3d / (-7d) * 1d, sharedDelta);
             _AssertSeries(First(), "y1", 2012, 4d / (-7d) * 1d, sharedDelta);
@@ -13106,7 +13106,7 @@ namespace UnitTests
             //quarterly
             I("OPTION freq q;");
             I("TIME 2010q1 2010q3;");
-            I("SER z1 = -7, 3, 4;");
+            I("SER z1 = (-7, 3, 4);");
             I("REBASE z1 2010q2 2010q3;");
             _AssertSeries(First(), "z1", EFreq.Q, 2009, 4, double.NaN, sharedDelta);
             _AssertSeries(First(), "z1", EFreq.Q, 2010, 1, -7d / ((3d + 4d) / 2d) * 100d, sharedDelta);
@@ -13116,7 +13116,7 @@ namespace UnitTests
 
             //using a whole year indicator for quarterly
             I("TIME 2010q4 2012q1;");
-            I("SER z2 = 1, 2, 3, 4, 5, 6;");
+            I("SER z2 = (1, 2, 3, 4, 5, 6);");
             I("REBASE z2 2011;");
             _AssertSeries(First(), "z2", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
             _AssertSeries(First(), "z2", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);
@@ -13129,7 +13129,7 @@ namespace UnitTests
 
             //Same as above
             I("TIME 2010q4 2012q1;");
-            I("SER z3 = 1, 2, 3, 4, 5, 6;");
+            I("SER z3 = (1, 2, 3, 4, 5, 6);");
             I("REBASE z3 2011q1 2011q4;");
             _AssertSeries(First(), "z3", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
             _AssertSeries(First(), "z3", EFreq.Q, 2010, 4, 1d / (14d / 4d) * 100d, sharedDelta);

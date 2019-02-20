@@ -8605,16 +8605,16 @@ namespace Gekko
             public double opt_index = 100d;
             public void Exe()
             {
+                if (t2.IsNull())
+                {
+                    t2 = t1;
+                }
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (t1.IsNull())
                 {
                     G.Writeln2("*** ERROR: The index date does not seem to exist");  //probably cannot happen
                     throw new GekkoException();
-                }
-                if (t2.IsNull())
-                {
-                    t2 = t1;
-                }
+                }                
                 if (t1.freq != t2.freq)
                 {
                     G.Writeln2("*** ERROR: The two index dates have different frequencies");
@@ -8632,8 +8632,10 @@ namespace Gekko
                 int count = 0;
                 
                 for (int i = 0; i < listItems.Count; i++)
-                {
-                    IVariable iv = O.GetIVariableFromString(listItems[i], ECreatePossibilities.NoneReportError);
+                {                           
+                    string varnameWithBank = G.Chop_AddBank(listItems[i], this.opt_bank); //this.opt_bank can be null, no problem                 
+
+                    IVariable iv = O.GetIVariableFromString(varnameWithBank, ECreatePossibilities.NoneReportError);
 
                     Series ts = iv as Series;
 
