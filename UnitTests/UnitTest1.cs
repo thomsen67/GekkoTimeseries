@@ -5543,6 +5543,19 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Count()
+        {
+            //==================== COUNT ===========================================
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("count f*;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 631 "));
+        }
+
+
+        [TestMethod]
         public void _Test_Index()
         {
             //==================== INDEX ===========================================
@@ -13394,7 +13407,7 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
 
-            Setup_Exceptions_Test();
+            Setup_Exceptions_Test(); //time is 2001-10
             I("EXPORT <2005 2006> temp:x1 file=temp2;");
             I("RESET; READ temp2;");
             _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
@@ -13404,16 +13417,16 @@ namespace UnitTests
 
 
             // === IMPORT ===
-            Setup_Exceptions_Test();
-            I("TIME 2005 2006;");
+            Setup_Exceptions_Test();            
             I("WRITE temp:x1 file=temp2;");
+            I("TIME 2005 2006;");
             I("RESET; IMPORT temp2;");
             _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
             _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2016, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
-            Setup_Exceptions_Test();
+            Setup_Exceptions_Test();  //time is 2001-10
             I("WRITE temp:x1 file=temp2;");
             I("RESET; IMPORT <2005 2006> temp2;");
             _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);

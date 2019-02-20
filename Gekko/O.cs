@@ -6446,8 +6446,10 @@ namespace Gekko
             public string opt_method = null;
             public string opt_collapse = null;
             public string opt_sheet = null;
+            public string opt_all = null;            
             public string type = null;  //read or import
             
+
 
             public P p = null;
             public void Exe()
@@ -6460,14 +6462,28 @@ namespace Gekko
                 }
                 else
                 {
-
-                    GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
-
+                    GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect, this.opt_all, this.type);
+                    
                     ReadOpenMulbkHelper hlp = new ReadOpenMulbkHelper();  //This is a bit confusing, using an old object to store the stuff.
-                    hlp.t1 = this.t1;
-                    hlp.t2 = this.t2;
+                    if (truncate != null)
+                    {
+                        hlp.t1 = truncate.t1;
+                        hlp.t2 = truncate.t2;
+                    }
 
                     bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
+
+                    if (isRead && this.opt_all != null)
+                    {
+                        G.Writeln2("*** ERROR: READ<all> is not allowed");
+                        throw new GekkoException();
+                    }
+
+                    if (!isRead && this.opt_respect != null)
+                    {
+                        G.Writeln2("*** ERROR: IMPORT<respect> is not allowed");
+                        throw new GekkoException();
+                    }
 
                     if (this.opt_prim != null)
                     {
@@ -8502,7 +8518,8 @@ namespace Gekko
             public string opt_showfreq = null;
             public string type = null;
             public List names1 = null; //the wildcard(s)
-            public List names2 = null; //destination list            
+            public List names2 = null; //destination list   
+            public bool isCountCommand = false;
 
             public void Exe()
             {
@@ -8512,88 +8529,97 @@ namespace Gekko
                 
                 List<string> names = Program.Search(this.names1, opt_bank, type);
 
-                if (G.Equal(opt_showbank, "all"))
-                {
-                    for (int i = 0; i < names.Count; i++)
-                    {
-                        //This will add first-name (e.g. 'Work') if it is not there
-                        names[i] = G.Chop_AddBank(names[i], Program.databanks.GetFirst().name);
-                    }
-                }
-                else if (G.Equal(opt_showbank, "no"))
-                {
-                    for (int i = 0; i < names.Count; i++)
-                    {
-                        //This will remove any bank
-                        names[i] = G.Chop_RemoveBank(names[i]);
-                    }
-                }
-                else if (G.Equal(opt_showbank, "yes") || opt_showbank == null)
-                {
-                    //this is default
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: showbank must be = yes, no or all");
-                    throw new GekkoException();
-                }
-
-                if (G.Equal(opt_showfreq, "all"))
-                {
-                    for (int i = 0; i < names.Count; i++)
-                    {
-                        //This will add current freq (e.g. '!a') if it is not there
-                        names[i] = G.Chop_AddFreq(names[i], G.GetFreq(Program.options.freq));
-                    }
-                }
-                else if (G.Equal(opt_showfreq, "no"))
-                {
-                    for (int i = 0; i < names.Count; i++)
-                    {
-                        //This will remove any freq
-                        names[i] = G.Chop_RemoveFreq(names[i]);
-                    }
-                }
-                else if (G.Equal(opt_showfreq, "yes") || opt_showfreq == null)
-                {
-                    //this is default
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR: showfreq must be = yes, no or all");
-                    throw new GekkoException();
-                }
-
-                if (!G.Equal(this.opt_mute, "yes"))
-                {
-                    if (names.Count > 0)
-                    {
-                        G.Writeln();
-                        G.Writeln(G.GetListWithCommas(names));
-                    }
-                }
-
-                if (this.names2 != null)
-                {                    
-                    List<string> dest = O.Restrict(this.names2, true, true, false, false);
-                    if (dest.Count > 1)
-                    {
-                        G.Writeln2("*** ERROR: Expected 1 item as destination list");
-                        throw new GekkoException();
-                    }
-                    O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
-
-                    G.Writeln2("Put " + names.Count + " matching items into list " + G.TransformListfileName(dest[0]));
-                }                
-                else
+                if (isCountCommand)
                 {
                     G.Writeln2("Found " + names.Count + " matching items");
+                }
+                else
+                {
+
+                    if (G.Equal(opt_showbank, "all"))
+                    {
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            //This will add first-name (e.g. 'Work') if it is not there
+                            names[i] = G.Chop_AddBank(names[i], Program.databanks.GetFirst().name);
+                        }
+                    }
+                    else if (G.Equal(opt_showbank, "no"))
+                    {
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            //This will remove any bank
+                            names[i] = G.Chop_RemoveBank(names[i]);
+                        }
+                    }
+                    else if (G.Equal(opt_showbank, "yes") || opt_showbank == null)
+                    {
+                        //this is default
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: showbank must be = yes, no or all");
+                        throw new GekkoException();
+                    }
+
+                    if (G.Equal(opt_showfreq, "all"))
+                    {
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            //This will add current freq (e.g. '!a') if it is not there
+                            names[i] = G.Chop_AddFreq(names[i], G.GetFreq(Program.options.freq));
+                        }
+                    }
+                    else if (G.Equal(opt_showfreq, "no"))
+                    {
+                        for (int i = 0; i < names.Count; i++)
+                        {
+                            //This will remove any freq
+                            names[i] = G.Chop_RemoveFreq(names[i]);
+                        }
+                    }
+                    else if (G.Equal(opt_showfreq, "yes") || opt_showfreq == null)
+                    {
+                        //this is default
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: showfreq must be = yes, no or all");
+                        throw new GekkoException();
+                    }
+
+                    if (!G.Equal(this.opt_mute, "yes"))
+                    {
+                        if (names.Count > 0)
+                        {
+                            G.Writeln();
+                            G.Writeln(G.GetListWithCommas(names));
+                        }
+                    }
+
+                    if (this.names2 != null)
+                    {
+                        List<string> dest = O.Restrict(this.names2, true, true, false, false);
+                        if (dest.Count > 1)
+                        {
+                            G.Writeln2("*** ERROR: Expected 1 item as destination list");
+                            throw new GekkoException();
+                        }
+                        O.AddIVariableWithOverwriteFromString(dest[0], new List(names));
+
+                        G.Writeln2("Put " + names.Count + " matching items into list " + G.TransformListfileName(dest[0]));
+                    }
+                    else
+                    {
+                        G.Writeln2("Found " + names.Count + " matching items");
+                    }
                 }
             }
 
             
 
         }
+
 
         public class Rebase
         {
@@ -9948,13 +9974,19 @@ namespace Gekko
             public string opt_cols = null;
             public string opt_respect = null;
             public string opt_op = null;
-            public string type = null;  //THIS IS NOT WORKING PROPERLY!!
+            public string opt_all = null;            
+            public string type = null; //write or export
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
 
-                GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect);
-
+                GekkoSmplSimple truncate = Program.HandleRespectPeriod(this.t1, this.t2, this.opt_respect, this.opt_all, this.type);
+                if (truncate != null)
+                {
+                    this.t1 = truncate.t1;
+                    this.t2 = truncate.t2;
+                }                
+                
                 Program.Write(this);
             }
         }

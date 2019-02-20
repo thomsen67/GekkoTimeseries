@@ -2343,6 +2343,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | collapse             SEMICOLON!
 						  | compare              SEMICOLON!
 						  | copy                 SEMICOLON!
+						  | count                SEMICOLON!
 						  | create               SEMICOLON!
 						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!
@@ -2584,6 +2585,15 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 						  | PRINT (EQUAL yesNo)? -> ^(ASTOPT_STRING_PRINT yesNo?)
 					//	  | TYPE EQUAL name -> ^(ASTOPT_STRING_TYPE name)
 						  ;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// COUNT
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+count:                      COUNT countOpt1? assignmentType seqOfBankvarnames2 -> ^({token("ASTCOUNT", ASTCOUNT, input.LT(1).Line)} ^(ASTPLACEHOLDER countOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
+countOpt1:                  ISNOTQUAL | leftAngle countOpt1h* RIGHTANGLE -> ^(ASTOPT1 countOpt1h*);							
+countOpt1h:                 BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes											  
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // CREATE
@@ -3177,6 +3187,8 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | DATECELL '=' expression -> ^(ASTOPT_STRING_DATECELL expression)
 						  | METHOD '=' name -> ^(ASTOPT_STRING_METHOD name)
 						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)						  
+						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
+						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3394,7 +3406,9 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | GCM (EQUAL yesNo)? -> ^(ASTOPT_STRING_GCM yesNo?)
 						  | OP EQUAL exportType -> ^(ASTOPT_STRING_OP exportType)							  				
 						  | FLAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_FLAT yesNo?)
-						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
+						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)	
+						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
+						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------

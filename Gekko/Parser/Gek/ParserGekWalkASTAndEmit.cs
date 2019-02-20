@@ -3301,15 +3301,14 @@ namespace Gekko.Parser.Gek
                         }
                         break;                        
                     case "ASTINDEX":  //the INDEX command
+                    case "ASTCOUNT":  //the COUNT command
                         {
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
-
                             if (node[0][0] != null) node.Code.A(node[0][0].Code);  //options
-                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);
-                            //if (node[2][0] != null) node.Code.A("o" + Num(node) + ".type = " + node[2][0].Code + ";" + G.NL);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);                            
                             if (node[2][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[2][0].Text + "`;");
                             if (node[3] != null) node.Code.A("o" + Num(node) + ".names1 = " + node[3].Code + ";" + G.NL);
-                            
+                            if (node.Text != "ASTINDEX") node.Code.A("o" + Num(node) + ".isCountCommand = true;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -3386,13 +3385,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
-                    case "ASTCOUNT":  //the COUNT command
-                        {                            
-                            node.Code.A("O.Count o" + Num(node) + " = new O.Count();" + G.NL);                            
-                            node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                        }
-                        break;
+                    //case "ASTCOUNT":  //the COUNT command
+                    //    {                            
+                    //        node.Code.A("O.Count o" + Num(node) + " = new O.Count();" + G.NL);                            
+                    //        node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
+                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                    //    }
+                    //    break;
                     //case "ASTINDEXERALONE":  //indexer with nothing at the left: [a*], not #z[a*]. For ASTINDEXER, see "["
                     //    {
                     //        //Only 1 dimension supported                        
@@ -5461,6 +5460,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".fileName = " + node[2].Code + ";" + G.NL);
                             if(!node[3].Code.IsNull()) node.Code.A("o" + Num(node) + ".list1 = " + node[3].Code + ";" + G.NL);
                             if (!node[4].Code.IsNull()) node.Code.A("o" + Num(node) + ".list2 = " + node[4].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

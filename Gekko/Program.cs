@@ -135,6 +135,7 @@ namespace Gekko
 
     public class GekkoSmplSimple
     {
+        //public bool allObservations = false;
         public GekkoTime t1 = GekkoTime.tNull;
         public GekkoTime t2 = GekkoTime.tNull;
         public GekkoSmplSimple(GekkoTime t1, GekkoTime t2)
@@ -142,6 +143,11 @@ namespace Gekko
             this.t1 = t1;
             this.t2 = t2;
         }
+
+        //public GekkoSmplSimple(bool allObservations)
+        //{
+        //    this.allObservations = allObservations;
+        //}
     }
 
     public class GekkoSmpl2
@@ -16924,7 +16930,7 @@ namespace Gekko
                 }
             }
 
-            GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, o.opt_respect);
+            GekkoSmplSimple truncate = HandleRespectPeriod(o.t1, o.t2, o.opt_respect, null, "copy");
 
             foreach (ToFrom output in outputs)
             {
@@ -16983,23 +16989,52 @@ namespace Gekko
 
         }
 
-        public static GekkoSmplSimple HandleRespectPeriod(GekkoTime t1, GekkoTime t2, string respect)
+        public static GekkoSmplSimple HandleRespectPeriod(GekkoTime t1, GekkoTime t2, string respect, string all, string type)
         {
+            //type = copy, read, import, write, export
             GekkoSmplSimple truncate = null;
             if (t1.IsNull())
             {
+                //No time period, READ or IMPORT
                 if (G.Equal(respect, "yes"))
                 {
+                    if (G.Equal(type, "import") || G.Equal(type, "export"))
+                    {
+                        G.Writeln2("*** ERROR: You cannot use " + type.ToUpper() + "<respect>");
+                        throw new GekkoException();
+                    }
+                    //COPY<respect>, READ<respect>, WRITE<respect>
                     truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+                }
+                else if (G.Equal(all, "yes"))
+                {
+                    if (G.Equal(type, "copy") || G.Equal(type, "read") || G.Equal(type, "write"))
+                    {
+                        G.Writeln2("*** ERROR: You cannot use " + type.ToUpper() + "<all>");
+                        throw new GekkoException();
+                    }
+                    //IMPORT<all> or EXPORT<all>
+                    //truncate = new GekkoSmplSimple(true);
+                }
+                else
+                {
+                    //truncate = new GekkoSmplSimple(true);
                 }
             }
             else
             {
+                //time period, READ<2010 2020> or IMPORT<2010 2020>                
                 if (G.Equal(respect, "yes"))
                 {
+                    //READ<2010 2020 respect>
                     G.Writeln2("*** ERROR: You cannot mix dates and 'respect' in the option field");
+                    throw new GekkoException();                    
+                }                
+                else if (G.Equal(all, "yes"))
+                {
+                    //IMPORT<2010 2020 all>
+                    G.Writeln2("*** ERROR: You cannot mix dates and 'all' in the option field");
                     throw new GekkoException();
-                    //truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
                 }
                 else
                 {
