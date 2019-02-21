@@ -8092,7 +8092,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
             I("CREATE gdp3;");
             I("SERIES gdp3 = 100;");
             I("STRING %s = 'dp';");
@@ -9287,7 +9287,7 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
             I("DISP<2010 2010 info>fy;");
             FAIL("DISP<2010 2011 info>fy;");
         }
@@ -13296,7 +13296,7 @@ namespace UnitTests
         private static void Setup_Exceptions_Test()
         {
             I("RESET; TIME 2001 2010; OPTION databank search = yes;");
-            I("OPEN temp; UNLOCK temp; CLEAR temp;");
+            I("OPEN <create> temp; UNLOCK temp; CLEAR temp;");
             I("temp:x1 = 5;");
         }
 
@@ -13340,17 +13340,16 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                Setup_Exceptions_Test();
-                I("TIME 2006 2006;");
-                I("WRITE <respect> temp:x1 file=temp2;");
-                I("RESET; READ temp2;");
-                _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
-            }
+
+            Setup_Exceptions_Test();
+            I("TIME 2005 2006;");
+            I("WRITE <respect> temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
 
             // === READ ===
             Setup_Exceptions_Test();
@@ -13369,33 +13368,31 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                Setup_Exceptions_Test();
-                I("WRITE temp:x1 file=temp2;");
-                I("TIME 2005 2006;");
-                I("RESET; READ <respect> temp2;");
-                _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
-            }
+
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; TIME 2005 2006; READ <respect> temp2;");
+            _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
+
 
             //IMPORT/EXPORT are tested here, for safety, since the internals are the same as READ/WRITE
 
             // === EXPORT ===
 
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                Setup_Exceptions_Test();
-                I("TIME 2005 2006;");
-                I("EXPORT <all> temp:x1 file=temp2;");
-                I("RESET; READ temp2;");
-                _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
-            }
+
+
+            Setup_Exceptions_Test();
+            I("TIME 2005 2006;");
+            I("EXPORT <all> temp:x1 file=temp2;");
+            I("RESET; READ temp2;");
+            _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+
 
             Setup_Exceptions_Test();
             I("TIME 2005 2006;");
@@ -13417,13 +13414,12 @@ namespace UnitTests
 
 
             // === IMPORT ===
-            Setup_Exceptions_Test();            
+            Setup_Exceptions_Test();
             I("WRITE temp:x1 file=temp2;");
-            I("TIME 2005 2006;");
-            I("RESET; IMPORT temp2;");
+            I("RESET; TIME 2005 2006; IMPORT temp2;");
             _AssertSeries(First(), "x1!a", 2004, double.NaN, sharedDelta);
             _AssertSeries(First(), "x1!a", 2005, 5d, sharedDelta);
-            _AssertSeries(First(), "x1!a", 2016, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
             Setup_Exceptions_Test();  //time is 2001-10
@@ -13434,18 +13430,16 @@ namespace UnitTests
             _AssertSeries(First(), "x1!a", 2006, 5d, sharedDelta);
             _AssertSeries(First(), "x1!a", 2007, double.NaN, sharedDelta);
 
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                Setup_Exceptions_Test();
-                I("WRITE temp:x1 file=temp2;");
-                I("TIME 2005 2006;");
-                I("RESET; IMPORT <all> temp2;");
-                _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
-                _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
-            }
-                       
+
+            Setup_Exceptions_Test();
+            I("WRITE temp:x1 file=temp2;");
+            I("RESET; TIME 2005 2006; IMPORT <all> temp2;");
+            _AssertSeries(First(), "x1!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2001, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2010, 5d, sharedDelta);
+            _AssertSeries(First(), "x1!a", 2011, double.NaN, sharedDelta);
+
+
         }
 
 
@@ -13818,11 +13812,11 @@ namespace UnitTests
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
                 Globals.databanksAsProtobuffers = false;
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 if (i == 1) First().Trim();
                 I("WRITE temp\\small_old;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>small2; CLONE;");
+                I("READ<tsd>small2;");
                 if (i == 1) First().Trim();
                 I("WRITE temp\\small2_old;");
 
@@ -13830,11 +13824,11 @@ namespace UnitTests
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
                 Globals.databanksAsProtobuffers = true;
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 if (i == 1) First().Trim();
                 I("WRITE temp\\small_new;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>small2; CLONE;");
+                I("READ<tsd>small2;");
                 if (i == 1) First().Trim();
                 I("WRITE temp\\small2_new;");
 
@@ -13847,9 +13841,9 @@ namespace UnitTests
                 //TSD
                 I("RESET;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 if (i == 1) First().Trim();
-                I("IMPORT<tsd>small2; CLONE;");
+                I("IMPORT<tsd all>small2; CLONE;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper();
 
@@ -13875,19 +13869,19 @@ namespace UnitTests
 
                 //TSD
                 I("RESET;");
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 if (i == 1) First().Trim();
-                I("IMPORT<tsd>small2; CLONE;");
+                I("IMPORT<tsd all>small2; CLONE;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper();
                 if (i == 1) First().Trim();
-                I("EXPORT <tsd> temp\\all;");
+                I("EXPORT <tsd all> temp\\all;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>temp\\all; CLONE;");
+                I("READ<tsd>temp\\all;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper();
 
@@ -13895,17 +13889,17 @@ namespace UnitTests
                 //only subset written
                 I("RESET;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 if (i == 1) First().Trim();
-                I("IMPORT<tsd>small2; CLONE;");
+                I("IMPORT<tsd all>small2; CLONE;");
                 if (i == 1) First().Trim();
-                I("EXPORT <tsd> fy1, one file=temp\\subset;");
+                I("EXPORT <tsd all> fy1, one file=temp\\subset;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper();
                 if (i == 1) First().Trim();
                 I("RESET;");
                 if (i == 1) First().Trim();
-                I("CLEAR<first>; IMPORT<tsd>temp\\subset; CLONE;");
+                I("READ<tsd>temp\\subset;");
                 Assert.AreEqual(First().storage.Count, 2);
                 Assert.AreEqual(Program.databanks.GetRef().storage.Count, 2);
 
@@ -13962,7 +13956,7 @@ namespace UnitTests
                 I("EXPORT<2002 2002 tsd> temp\\timetrunc;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper2();
-                I("CLEAR<first>; IMPORT<tsd>temp\\timetrunc; CLONE;");
+                I("READ<tsd>temp\\timetrunc;");
                 if (i == 1) First().Trim();
                 DatabanksTestHelper3();
 
@@ -14015,26 +14009,26 @@ namespace UnitTests
                 foreach (string freq in freqs)
                 {
                     I("OPTION freq " + freq + ";");
-                    I("CLEAR<first>; IMPORT<tsd>small; CLONE;;");
-                    I("EXPORT <csv> temp\\small_" + freq + ";");
-                    I("CLEAR<first>; IMPORT<tsd>small2; CLONE;");
-                    I("EXPORT <csv> temp\\small2_" + freq + ";");
+                    I("READ<tsd>small;");
+                    I("EXPORT <csv all> temp\\small_" + freq + ";");
+                    I("READ<tsd>small2;");
+                    I("EXPORT <csv all> temp\\small2_" + freq + ";");
                 }
 
                 I("RESET;");
 
-                I("CLEAR<first>; IMPORT<csv>temp\\small_a; CLONE;");
+                I("READ<csv>temp\\small_a;");
                 I("OPTION freq q;");
-                I("IMPORT<csv>temp\\small_q; CLONE;");
+                I("IMPORT<csv all>temp\\small_q; CLONE;");
                 I("OPTION freq m;");
-                I("IMPORT<csv>temp\\small_m; CLONE;");
+                I("IMPORT<csv all>temp\\small_m; CLONE;");
 
                 I("OPTION freq a;");
-                I("IMPORT<csv>temp\\small2_a; CLONE;");
+                I("IMPORT<csv all>temp\\small2_a; CLONE;");
                 I("OPTION freq q;");
-                I("IMPORT<csv>temp\\small2_q; CLONE;");
+                I("IMPORT<csv all>temp\\small2_q; CLONE;");
                 I("OPTION freq m;");
-                I("IMPORT<csv>temp\\small2_m; CLONE;");
+                I("IMPORT<csv all>temp\\small2_m; CLONE;");
 
                 I("OPTION freq a;");
                 DatabanksTestHelper();
@@ -14053,26 +14047,26 @@ namespace UnitTests
                 foreach (string freq in freqs)
                 {
                     I("OPTION freq " + freq + ";");
-                    I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
-                    I("EXPORT <prn> temp\\small_" + freq + ";");
-                    I("CLEAR<first>; IMPORT<tsd>small2; CLONE;");
-                    I("EXPORT <prn> temp\\small2_" + freq + ";");
+                    I("READ<tsd>small;");
+                    I("EXPORT <prn all> temp\\small_" + freq + ";");
+                    I("READ<tsd>small2;");
+                    I("EXPORT <prn all> temp\\small2_" + freq + ";");
                 }
 
                 I("RESET;");
 
-                I("CLEAR<first>; IMPORT<prn>temp\\small_a; CLONE;");
+                I("READ<prn>temp\\small_a;");
                 I("OPTION freq q;");
-                I("IMPORT<prn>temp\\small_q; CLONE;");
+                I("IMPORT<prn all>temp\\small_q; CLONE;");
                 I("OPTION freq m;");
-                I("IMPORT<prn>temp\\small_m; CLONE;");
+                I("IMPORT<prn all>temp\\small_m; CLONE;");
 
                 I("OPTION freq a;");
-                I("IMPORT<prn>temp\\small2_a; CLONE;");
+                I("IMPORT<prn all>temp\\small2_a; CLONE;");
                 I("OPTION freq q;");
-                I("IMPORT<prn>temp\\small2_q; CLONE;");
+                I("IMPORT<prn all>temp\\small2_q; CLONE;");
                 I("OPTION freq m;");
-                I("IMPORT<prn>temp\\small2_m; CLONE;");
+                I("IMPORT<prn all>temp\\small2_m; CLONE;");
 
                 I("OPTION freq a;");
                 DatabanksTestHelper();
@@ -16002,7 +15996,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("IMPORT <px> data;");
+            I("IMPORT <px all> data;");
             _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
@@ -16024,7 +16018,7 @@ namespace UnitTests
             //Another px-file, with blanks and parentheses in stub
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("IMPORT <px> prod01;");            
+            I("IMPORT <px all> prod01;");            
             _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC!m", EFreq.M, 2017, 3, 119.9d, sharedDelta);
             _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001!m", EFreq.M, 2017, 3, 106.5d, sharedDelta);
             
@@ -17827,7 +17821,7 @@ namespace UnitTests
                 I("MODEL dec09_tony;");
 
                 // ----- First some tests that have been problematic before: ------------------------------
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");  //TT changed 20-01-2013
+                I("REad<tsd>lang10;");  //TT changed 21-02-2019
                 I("SERIES<2008 2008> tg += 0.03;");
                 I("sim <2008 2010>;");
                 u = Data("fcp", 2008, "a"); Assert.AreEqual(u.q, -0.87, 0.01d); //%
@@ -17836,7 +17830,7 @@ namespace UnitTests
                 u = Data("q", 2008, "a"); Assert.AreEqual(u.q, -0.20, 0.01d); //%
                 u = Data("q", 2009, "a"); Assert.AreEqual(u.q, -0.20, 0.01d); //%
                 u = Data("q", 2010, "a"); Assert.AreEqual(u.q, -0.31, 0.01d); //%
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("SERIES <2010 2025> boil *= 1.10;");
                 I("sim <2010 2025>;");
                 u = Data("boil", 2010, "a"); Assert.AreEqual(u.q, 10d, 0.01d); //%
@@ -17847,7 +17841,7 @@ namespace UnitTests
                 u = Data("fy", 2013, "a"); Assert.AreEqual(u.q, -0.14, 0.01d); //%
                 u = Data("fy", 2014, "a"); Assert.AreEqual(u.q, -0.16, 0.01d); //%
                 u = Data("fy", 2025, "a"); Assert.AreEqual(u.q, -0.14, 0.01d); //%
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("PRT pws_cf, pws_cr, pws_lse;");
                 I("SERIES <2010 2010> pws_lse *= 1.1;");
@@ -17860,7 +17854,7 @@ namespace UnitTests
                 // ----- Problematic tests end ----------------------------------------------------------------
 
                 //--- b3 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> jcpuxh  += 1000;");
                 I("SIM <2010 2010>;");
                 u = Data("cpuxh", 2010, "a"); Assert.AreEqual(u.q, 0.14, 0.01d); //%
@@ -17869,14 +17863,14 @@ namespace UnitTests
                 u = Data("cbu", 2010, "a"); Assert.AreEqual(u.q, 0.1059, 0.001d); //%
 
                 //--- b4 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> jrcpuxh  += 0.01000;");
                 I("SIM <2010 2040>;");
                 u = Data("cpuxh", 2010, "a"); Assert.AreEqual(u.q, 1.03, 0.01d); //%
                 u = Data("cpuxh", 2040, "a"); Assert.AreEqual(u.q, -0.11, 0.01d); //%
 
                 //--- b5 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> JRcpuxh  += 0.01;");
                 I("SERIES <2010 2040> JRcpuxhw  += 0.01;");
                 I("SIM <2010 2040>;");
@@ -17889,7 +17883,7 @@ namespace UnitTests
                 u = Data("cpuxh", 2040, "a"); Assert.AreEqual(u.q, 0.14, 0.01d); //%
 
                 //--- c1 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2040> iwdm  += 0.01;");
                 I("SIM <2010 2040>;");
                 u = Data("iwb30", 2010, "a"); Assert.AreEqual(u.m, 0.01, 0.0001d); //%
@@ -17898,7 +17892,7 @@ namespace UnitTests
                 u = Data("phk", 2010, "a"); Assert.AreEqual(u.q, -4.6, 0.1); //%
 
                 //--- c2 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("prt rpibhe, drpibhe;");
                 I("SERIES <2010 2015> Zrpibhe  = 0.07;");
                 I("SIM <2010 2040>;");
@@ -17909,14 +17903,14 @@ namespace UnitTests
                 u = Data("fy", 2011, "a"); Assert.AreEqual(u.q, 0.80, 0.01); //%
 
                 //--- c3 ----
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> nhlo = 30;");
                 I("SIM <2010 2010>;");
                 u = Data("buibhx", 2010, "a"); Assert.AreEqual(u.m, 0.0080, 0.0001); //%
                 u = Data("phk", 2010, "a"); Assert.AreEqual(u.q, -4.49, 0.01); //%
 
                 // d1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ;");
                 I("PRT <2010 2010> pe59, fe59;");
                 I("PRT 100*500/E59;");
                 I("SERIES <2010 2010> jrfe59  += 0.0013255;");
@@ -17925,17 +17919,17 @@ namespace UnitTests
                 u = Data("fe59", 2010, "a"); Assert.AreEqual(u.m, 460.74, 0.01);
 
                 // d2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> fImo  += 500;");
                 I("SIM <2010 2010>;");
                 u = Data("fm", 2010, "a"); Assert.AreEqual(u.m, 326.47, 0.01);
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> fIbo  += 500;");
                 I("SIM <2010 2010>;");
                 u = Data("fm", 2010, "a"); Assert.AreEqual(u.m, 255.28, 0.01);
 
                 // d3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2011 2011> fee2  *= 0.919;");
                 I("SERIES <2011 2011> fee59 *= 0.878;");
                 I("SERIES <2011 2011> feesq *= 0.843;");
@@ -17950,7 +17944,7 @@ namespace UnitTests
                 u = Data("lna", 2011, "a"); Assert.AreEqual(u.q, -0.38, 0.01);  //%
 
                 // e1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;" );
                 I("RUN e1.cmd;");
                 I("TIME 2010 2010;");
                 I("PRT -200/fCe*1000;");
@@ -17967,7 +17961,7 @@ namespace UnitTests
                 u = Data("xne_ce", 2010, "a"); Assert.AreEqual(u.m, -102.64, 0.01);
 
                 // e2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("TIME 2010 2010;");
                 I("SERIES dfcp = 1;");
                 I("SERIES dfcs = 1;");
@@ -17979,7 +17973,7 @@ namespace UnitTests
                 u = Data("cp", 2010, "a"); Assert.AreEqual(u.m, 1010, 1);
 
                 // e3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("TIME 2010 2010;");
                 I("SERIES dfcp = 1;");
                 I("SERIES dfcv = 1;");
@@ -17991,7 +17985,7 @@ namespace UnitTests
                 u = Data("q", 2010, "a"); Assert.AreEqual(u.m, 0.595, 0.002);
 
                 // e4
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("TIME 2010 2010;");
                 I("PRT pe59;");
                 I("SERIES <2010 2010> jdpe59 += -0.010796;");
@@ -18000,7 +17994,7 @@ namespace UnitTests
                 u = Data("fe59", 2020, "a"); Assert.AreEqual(u.q, 1.842, 0.001);
 
                 // f1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES dtp1 = 1;");
                 I("SERIES dtp2 = 1;");
                 I("LIST #tve = ztvea, ztveb, ztvee, ztveh, ztvene, ztvenf, ztveng, ztvenz, ztveqf, ztveqz, ztveqs;");
@@ -18010,14 +18004,14 @@ namespace UnitTests
                 u = Data("spp_vep", 2010, "a"); Assert.AreEqual(u.q, 9.686, 0.001);
 
                 // f2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010> jrfxnf  += 0.01;");
                 I("sim< 2010 2040>;");
                 u = Data("xnf", 2010, "a"); Assert.AreEqual(u.m, 1321, 1);
                 u = Data("e01", 2010, "a"); Assert.AreEqual(u.m, 1121, 1);
 
                 // f3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("RUN f3.cmd;");
                 I("SERIES<2010 2040> {#dtl} *= 1.01;");
                 I("SIM <2010 2040>;");
@@ -18032,13 +18026,13 @@ namespace UnitTests
 
 
                 // f4
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2040> jiwlo  += 0.01;");
                 I("SIM <2010 2040>;");
                 u = Data("uimp", 2010, "a"); Assert.AreEqual(u.q, 4.892, 0.001);
 
                 // g1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2040> Dlna  = 1;");
                 I("SERIES <2010 2040> Zlna  *= 1.01;");
                 I("SIM <2010 2040>;");
@@ -18047,7 +18041,7 @@ namespace UnitTests
                 u = Data("pwnzw", 2010, "a"); Assert.AreEqual(u.q, 0.411, 0.001);
 
                 // g2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2040>dlna  = 1;");
                 I("SERIES <2010 2040>zlna  *= 1.01;");
                 I("SIM <2010 2040>;");
@@ -18056,38 +18050,38 @@ namespace UnitTests
 
 
                 // g3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES<2010 2040 > JRuimnz += .01;");
                 I("SIM;");
                 I("PRT ((pxnz/pwnzw)/(@pxnz/@pwnzw)-1)*100;");
                 u = Data("pwnzw", 2010, "a"); Assert.AreEqual(u.q, 0.0477, 0.001);
 
                 // h1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2010 >jrlna += .05;");
                 I("SIM <2010 2040>;");
                 u = Data("lna", 2010, "a"); Assert.AreEqual(u.q, 5.401, 0.001);
                 u = Data("lna", 2040, "a"); Assert.AreEqual(u.q, -0.774, 0.001);
 
                 // h2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2040> ur2  += 10;");
                 I("SIM <2010 2040>;");
                 u = Data("ua", 2010, "a"); Assert.AreEqual(u.m, 7.605, 0.001);
                 u = Data("q", 2040, "a"); Assert.AreEqual(u.m, 10.150, 0.001);
 
                 // h3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("SERIES <2010 2020> dlisa  = 1;");
                 I("SIM <2010 2020>;");
                 u = Data("lna", 2020, "a"); Assert.AreEqual(u.q, -4.316, 0.001);
                 u = Data("btyd", 2020, "a"); Assert.AreEqual(u.q, -12.763, 0.001);
 
                 // i2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10; ");
                 I("time 2010 2010;");
                 I("prt fce, 500/fce;");
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("SERIES dtp2 = 1;");
                 I("SERIES ztpce += 0.0133;");
@@ -18095,7 +18089,7 @@ namespace UnitTests
                 u = Data("fce", 2010, "a"); Assert.AreEqual(u.q, -0.410, 0.001);
 
                 // i3a
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("SERIES dtp2 = 1;");
                 I("ENDO ztpce;");
@@ -18107,7 +18101,7 @@ namespace UnitTests
                 u = Data("tpce", 2010, "a"); Assert.AreEqual(u.m, 0.0152, 0.0001);
 
                 // i3b
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("SERIES dtp2 = 1;");
                 I("ENDO ztpce;");
@@ -18121,21 +18115,21 @@ namespace UnitTests
 
                 // Opg J
                 // j1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("SERIES <2010 2010> fibo  += 1000;");
                 I("SIM <2010 2020>;");
                 u = Data("tf_o_z", 2010, "a"); Assert.AreEqual(u.m, 1364, 1);
                 u = Data("tfn_o", 2010, "a"); Assert.AreEqual(u.m, -821, 1);
 
                 // j2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("PRT 0.001/iwbdm;");
                 I("SERIES <2010 2020>kiwbdm  += 0.0283;");
                 I("SIM <2010 2020>;");
                 u = Data("iwbz", 2010, "a"); Assert.AreEqual(u.m, 0.00099899, 0.00001);
 
                 // j3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("PRT tfs_x_os;");
                 I("SERIES tfs_x_os += -1000;");
@@ -18144,7 +18138,7 @@ namespace UnitTests
                 u = Data("wn_osslog", 2010, "a"); Assert.AreEqual(u.m, 1046, 1);
 
                 // k1
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("SERIES <2010 2010>jdfvmo  += 1000;");
                 I("SIM <2010 2040>;");
                 I("TIME 2010 2010;");
@@ -18152,7 +18146,7 @@ namespace UnitTests
                 u = Data("Y", 2010, "a"); Assert.AreEqual(u.m, 1086, 1);
 
                 // k2
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("PRT spg;");
                 I("PRT 0.25*(40000/spg);");
@@ -18161,7 +18155,7 @@ namespace UnitTests
                 u = Data("fCp", 2010, "a"); Assert.AreEqual(u.q, 1.3446, 0.001);
 
                 // k3
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("PRT pibo;");
                 I("PRT 40000/pibo;");
@@ -18171,7 +18165,7 @@ namespace UnitTests
                 u = Data("Q", 2010, "a"); Assert.AreEqual(u.m, 35.858, 0.001);
 
                 // k4
-                I("CLEAR<first>; IMPORT<tsd>lang10; CLONE;");
+                I("READ<tsd>lang10;");
                 I("TIME 2010 2010;");
                 I("PRT 47/Ha*100;");
                 I("SERIES <2010 2040>JHa  += 47;");

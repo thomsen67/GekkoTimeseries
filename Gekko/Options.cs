@@ -46,6 +46,7 @@ Additionally, there are model, solve, equation options.
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
 
         //public bool bugfix_px = true;
+        public bool bugfix_import_export = false;
         public bool bugfix_download = true;
         public bool bugfix_speedup = true;  //decomp <2020 2050> sum(#a, npop[#a]+npop[#a]+npop[#a]+npop[#a]+npop[#a]) --> speedup of factor 2.5. The more arithmetics and periods, the more speedup compared to GetData() and SetData()
 

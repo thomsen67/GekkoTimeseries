@@ -16995,7 +16995,7 @@ namespace Gekko
             GekkoSmplSimple truncate = null;
             if (t1.IsNull())
             {
-                //No time period, READ or IMPORT
+                //No time period
                 if (G.Equal(respect, "yes"))
                 {
                     if (G.Equal(type, "import") || G.Equal(type, "export"))
@@ -17018,7 +17018,13 @@ namespace Gekko
                 }
                 else
                 {
-                    //truncate = new GekkoSmplSimple(true);
+                    if (!Program.options.bugfix_import_export)
+                    {
+                        if (G.Equal(type, "import") || G.Equal(type, "export"))
+                        {
+                            truncate = new GekkoSmplSimple(Globals.globalPeriodStart, Globals.globalPeriodEnd);
+                        }
+                    }
                 }
             }
             else
