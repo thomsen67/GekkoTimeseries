@@ -15587,21 +15587,41 @@ namespace Gekko
         public static void Ini(P p)
         {
             string s = "gekko.ini";
+                       
             List<string> folders = new List<string>();
+            folders.Add(G.GetProgramDir());
+            string fileName2 = FindFile(s, folders, false);  //also calls CreateFullPathAndFileName()
+            if (fileName2 == null)
+            {
+                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
+            }
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
+            }
+
+            folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            string fileName2 = FindFile(s, folders);  //also calls CreateFullPathAndFileName()
+            fileName2 = FindFile(s, folders, true);  //also calls CreateFullPathAndFileName()
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
                 return;  //used for gekko.ini file
             }
-            Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-            Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-            Program.EmitCodeFromANTLR("", fileName2, false, p);
-            G.Writeln();
-            G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+            }
         }
 
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
@@ -16764,7 +16784,7 @@ namespace Gekko
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
-            if (Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 // FUNCTION f( name %x); PRT @{%x}; END; f(y);
                 // FUNCTION f( string %x); PRT @{%x}; END; f('y');
@@ -25324,7 +25344,7 @@ namespace Gekko
             CrossThreadStuff.CopyButtonEnabled(false);
             //Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = false;  //this logic can be removed in a couple of years (maybe in 2015)
             G.Writeln();
-            G.Writeln("Clearing options, databanks, models, lists, scalars and matrices");
+            G.Writeln("Clearing options, databanks, models, scalars, lists, collections and procedures/functions");
             if (ini) G.Writeln("INI files ('" + Globals.autoExecCmdFileName + "') will be run");
             else G.Writeln("No INI files ('" + Globals.autoExecCmdFileName + "') will be run");
             G.Writeln("Use CLS to clear the output window, and CUT to close plot/decomp windows.");

@@ -5488,7 +5488,7 @@ namespace UnitTests
             I("RESET; MODE sim;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
-            I("IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
             I("TIME 2006 2008;");
             I("SIM;");
             I("CLONE;");
@@ -9300,7 +9300,7 @@ namespace UnitTests
             I("OPTION solve gauss dump = yes;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
             I("SIM<2006 2006>;");
             I("ITERSHOW <2010 2010>fy;");
         }
@@ -10219,7 +10219,7 @@ namespace UnitTests
                 I("RESET;");
                 //if (i == 0) I("OPTION databank logic = aremos;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-                I("CLEAR<first>; IMPORT<tsd>small; CLONE;");
+                I("READ<tsd>small;");
                 I("OPEN <tsd> small;");
                 I("SERIES <1999 2004> fy1 = 100;");
                 I("SERIES <1999 2004> xx1 = small:fy1-fy1;");
@@ -11187,7 +11187,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
                         
             I("LIST #a = fxa, fxb, pcp, tg, pxqz;");
             I("LIST #a1 = #a['fX*'];              //pattern in #a list");
@@ -15441,7 +15441,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            I("CLEAR<first>; IMPORT<tsd>jul05; CLONE;");
+            I("READ<tsd>jul05;");
             I("time 2010 2015;");
             I("string %a = 'b';");
             I("string %b = 'c';");
@@ -16667,7 +16667,7 @@ namespace UnitTests
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
-            I("import<tsd>meta;");
+            I("import<tsd all>meta;");
             I("DOC y label='' source='' stamp='';");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "");
@@ -16707,7 +16707,7 @@ namespace UnitTests
         {
             I("reset;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\meta';");
-            I("import<tsd>meta;");
+            I("import<tsd all>meta;");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "label");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "2/yyyy");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.stamp, "12/25/15");
@@ -16716,9 +16716,9 @@ namespace UnitTests
             _AssertSeries(First(), "y", 2001, 1d / 3d, 0.0000001d);
             _AssertSeries(First(), "y", 2002, 1d / 3d, 0.0000001d);
             _AssertSeries(First(), "y", 2003, double.NaN, 0d);
-            I("export<tsd>metaTemp;");
+            I("export<tsd all>metaTemp;");
             I("reset;");
-            I("import<tsd>metaTemp;");
+            I("import<tsd all>metaTemp;");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.label, "label");
             Assert.AreEqual((First().GetIVariable("y!a") as Series).meta.source, "2/yyyy");
             if (Globals.UNITTESTFOLLOWUP)

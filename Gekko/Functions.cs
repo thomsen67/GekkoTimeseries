@@ -2597,12 +2597,21 @@ namespace Gekko
             }
         }
 
-        public static IVariable search(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        public static IVariable index(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO also for lists
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO
+
             string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
-            int i = s1.IndexOf(s2);            
-            return new ScalarVal(i + 1);
+            int i = s1.IndexOf(s2, StringComparison.CurrentCultureIgnoreCase);            
+            return new ScalarVal(i + 1);  //return 0 if not found
         }
 
         public static IVariable startswith(GekkoSmpl smpl, IVariable x1, IVariable x2)
