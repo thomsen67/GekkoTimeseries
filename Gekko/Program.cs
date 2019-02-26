@@ -3205,6 +3205,9 @@ namespace Gekko
                         }
                     }
                     ts2.meta.label = ts1.label;
+                    ts2.meta.stamp = ts1.stamp;
+                    ts2.meta.source = ts1.source;
+
                     deserializedDatabank.AddIVariableWithOverwrite(ts2);
                 }
             }
@@ -7860,6 +7863,20 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
             }
 
+            string settings_icon_filename = null;
+            try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
+            if (settings_icon_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: icon_filename not found"); throw new GekkoException();
+            }
+
+            string settings_logo_filename = null;
+            try { settings_logo_filename = (string)jsonTree["logo_filename"]; } catch { }
+            if (settings_logo_filename == null)
+            {
+                G.Writeln2("*** ERROR: JSON: logo_filename not found"); throw new GekkoException();
+            }
+
             string settings_vars_foldername = null;
             try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
             if (settings_vars_foldername == null)
@@ -7909,6 +7926,19 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
             }
 
+            string settings_vis_source_fra_databank = null;
+            try { settings_vis_source_fra_databank = (string)jsonTree["vis_source_fra_databank"]; } catch { }
+            if (settings_vis_source_fra_databank == null)
+            {
+                G.Writeln2("*** ERROR: JSON: vis_source_fra_databank found"); throw new GekkoException();
+            }
+
+            object[] settings_ekstrafiler = null;
+            try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
+            if (settings_ekstrafiler == null)
+            {
+                G.Writeln2("*** ERROR: JSON: ekstrafiler"); throw new GekkoException();
+            }
 
             // -------------------------------------------------------------
 
@@ -7924,6 +7954,8 @@ namespace Gekko
             files.Add(settings_dok_filename);
             files.Add(settings_est_filename);
             files.Add(settings_flowchart_filename);
+            files.Add(settings_icon_filename);
+            files.Add(settings_logo_filename);
             files.Add(browserFolder);
             files.Add(settings_vars_foldername);
             foreach (string file in files)
@@ -7946,6 +7978,21 @@ namespace Gekko
             filesToCopy.Add(settings_index_filename);
             filesToCopy.Add(settings_css_filename);
             filesToCopy.Add(settings_flowchart_filename);
+            filesToCopy.Add(settings_icon_filename);
+            filesToCopy.Add(settings_logo_filename);
+            foreach (object o in settings_ekstrafiler)
+            {
+                string s = null;
+                try
+                {
+                    s = (string)o;
+                }
+                catch (Exception e)
+                {
+                    G.Writeln2("*** ERROR: JSON: ekstrafiler"); throw new GekkoException();
+                }
+                if (s != null) filesToCopy.Add(s);
+            }
 
             foreach (string fileToCopy in filesToCopy)
             {
@@ -7956,7 +8003,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: '" + fileNameIndex + "' was not found");
                     throw new GekkoException();
                 }
-                File.Copy(fileNameIndex, fileNameIndex2);
+                File.Copy(fileNameIndex, fileNameIndex2, true);
             }
 
             Program.obeyCommandCalledFromGUI(settings_commands, new P());
@@ -7972,7 +8019,7 @@ namespace Gekko
             string bank1 = Path.GetFileName(Program.databanks.GetFirst().FileNameWithPath);
             string bank2 = Path.GetFileName(Program.databanks.GetRef().FileNameWithPath);
 
-            List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError) as List;
+            List ml = O.GetIVariableFromString("#all", O.ECreatePossibilities.NoneReportError, true) as List;
             List<string> vars = O.GetListOfStringsFromIVariable(ml);
 
             if (Globals.runningOnTTComputer)
@@ -7980,7 +8027,7 @@ namespace Gekko
                 DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
-                    vars = new List<string> { "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn" };
+                    vars = new List<string> { "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
                 }
             }
 
@@ -8046,7 +8093,7 @@ namespace Gekko
                         {
                             if (a[i2].type == ETokenType.Word)
                             {
-                                if (i2 - 1 >= 0 && a[i2].leftblanks == null && (a[i2 - 1].s == Globals.symbolCollection.ToString() || a[i2 - 1].s == Globals.symbolScalar.ToString()))
+                                if (i2 - 1 >= 0 && a[i2].leftblanks == 0 && (a[i2 - 1].s == Globals.symbolCollection.ToString() || a[i2 - 1].s == Globals.symbolScalar.ToString()))
                                 {
                                     //skip a #x or %x                                 }
                                     continue;
@@ -8084,8 +8131,14 @@ namespace Gekko
             foreach (string var in vars)
             {
                 StringBuilder sb = new StringBuilder();
-                Series ts1 = Program.databanks.GetFirst().GetIVariable(var + "!") as Series;
-                Series ts2 = Program.databanks.GetRef().GetIVariable(var + "!") as Series;
+                Series ts1 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
+
+                if (ts1 == null)
+                {
+                    G.Writeln2("*** ERROR: Could not find series " + var + " in databank " + Program.databanks.GetFirst().name);
+                }
+
+                Series ts2 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
                 string jName = null;  //name of possible j-led
                 bool jNameAutoGen = false;
 
@@ -8177,16 +8230,19 @@ namespace Gekko
 
                 if (ts1.meta.label != null) WriteHtml(sb, "Label: " + ts1.meta.label);
 
-                if (ts1.meta.source != null)
+                if (G.Equal(settings_vis_source_fra_databank, "ja"))
                 {
-                    //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
-                    string src2 = ts1.meta.source.Trim();
-                    if (src2 != "")
+                    if (ts1.meta.source != null)
                     {
-                        int i = src2.IndexOf("(hash ");
-                        if (i > -1)
-                            src2 = src2.Substring(0, i);
-                        WriteHtml(sb, "Seneste beregning: " + src2);
+                        //We keep the SERIES (or SER), there may be options etc. But we capitalize it.
+                        string src2 = ts1.meta.source.Trim();
+                        if (src2 != "")
+                        {
+                            int i = src2.IndexOf("(hash ");
+                            if (i > -1)
+                                src2 = src2.Substring(0, i);
+                            WriteHtml(sb, "Seneste beregning: " + src2);
+                        }
                     }
                 }
 
@@ -8204,15 +8260,17 @@ namespace Gekko
                 if (tuples != null)
                 {
                     int counter = -1;
-                    sb.Append("<table cellpadding = `0` cellspacing = `0` width = `800px` border = `0`>");
+                    sb.Append("<table style=`margin: 0px; padding: 0px; border: 0px; width = 800px;`>");
                     foreach (Tuple<string, string> tuple in tuples)
                     {
                         counter++;
                         string s = null;
                         if (counter == 0) s = "Dokumentation:&nbsp;&nbsp;";
                         sb.Append("<tr>");
-                        sb.Append("<td width = `1%`>" + s + "</td>");
-                        sb.Append("<td width = `99%`><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
+                        //sb.Append("<td width = `1%`>" + s + "</td>");
+                        //sb.Append("<td width = `99%`><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
+                        sb.Append("<td>" + s + "</td>");
+                        sb.Append("<td><a href = `" + tuple.Item1 + "`>" + tuple.Item2 + "</a></td>");
                         sb.Append("</tr>");
                     }
                     sb.Append("</table>");
@@ -8332,124 +8390,12 @@ namespace Gekko
                 int max = Program.options.print_disp_maxlines;
                 if (hasFilter || Program.options.print_disp_maxlines == -1) max = int.MaxValue;
 
-                // --------------------------------------------------------------------
-                // Left-side
-                // --------------------------------------------------------------------
-                if (true)
-                {
-                    GekkoTime t = GekkoTime.tNull;
-                    O.Prt o0 = new O.Prt();
+                string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + var;
+                string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + var;
 
-                    o0.t1 = plotStart;
-                    o0.t2 = plotEnd;
-
-                    o0.prtType = "plot";
-                    o0.opt_filename = subFolder + "\\" + var.ToLower() + ".svg";
-
-                    o0.opt_xlineafter = plot_line;
-
-                    {
-                        List<int> bankNumbers = null;
-
-                        if (ts2 != null)
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.labelGiven = new List<string>() { bank2.ToLower().Replace(".gbk", "") + ":" + var };
-                            ope0.linetype = "lines";
-                            ope0.dashtype = "3";
-
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
-                                if(bankNumber==1) ts11 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
-                                ope0.variable[bankNumber] = ts11;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.labelGiven = new List<string>() { bank1.ToLower().Replace(".gbk", "") + ":" + var };
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
-                                if (bankNumber == 1) ts11 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
-                                ope0.variable[bankNumber] = ts11;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-
-                    }
-
-                    o0.Exe();
-
-                }
-
-                if (true)
-                {
-                    GekkoTime t = GekkoTime.tNull;
-                    O.Prt o0 = new O.Prt();
-
-                    o0.t1 = plotStart;
-                    o0.t2 = print_end;
-
-                    o0.prtType = "plot";
-                    o0.opt_filename = subFolder + "\\" + var.ToLower() + "___p" + ".svg";
-
-                    o0.opt_xlineafter = plot_line;
-
-                    //will always keep a window of at least -1% to 1%, and will cut outside -100% to 100%.
-                    o0.opt_yminhard = -100d;
-                    o0.opt_ymaxhard = 100d;
-                    o0.opt_yminsoft = -1d;
-                    o0.opt_ymaxsoft = 1d;
-
-                    {
-                        List<int> bankNumbers = null;
-
-                        o0.operators = new List<OptString>();
-                        o0.operators.Add(new OptString("p", "yes"));
-
-                        if (ts2 != null)
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.labelGiven = new List<string>() { bank2.ToLower().Replace(".gbk", "") + ":" + var };
-                            ope0.linetype = "lines";
-                            ope0.dashtype = "3";
-
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
-                                if (bankNumber == 1) ts11 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
-                                ope0.variable[bankNumber] = ts11;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-
-                        {
-                            O.Prt.Element ope0 = new O.Prt.Element();
-                            ope0.labelGiven = new List<string>() { bank1.ToLower().Replace(".gbk", "") + ":" + var };
-                            bankNumbers = O.Prt.GetBankNumbers(null, Program.GetElementOperators(o0, ope0));
-                            foreach (int bankNumber in bankNumbers)
-                            {
-                                Series ts11 = Program.databanks.GetFirst().GetIVariable(var + "!a") as Series;
-                                if (bankNumber == 1) ts11 = Program.databanks.GetRef().GetIVariable(var + "!a") as Series;
-                                ope0.variable[bankNumber] = ts11;
-                            }
-                            o0.prtElements.Add(ope0);
-                        }
-
-                    }
-
-                    o0.Exe();
-                }
-
+                Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
+                Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                
                 sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
 
                 sb.AppendLine("<p/>");
@@ -8509,7 +8455,7 @@ namespace Gekko
                 x.AppendLine("<html>");
                 x.AppendLine("  <head>");
                 x.AppendLine("    <link rel=`stylesheet` href=`..\\" + settings_css_filename + @"` type=`text/css`>");
-                x.AppendLine("    <link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
+                x.AppendLine("    <link rel = `shortcut icon` href = `..\\" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
                 x.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
                 x.AppendLine("    <title>" + var + "</title>");
                 x.AppendLine("  </head>");
@@ -8546,8 +8492,8 @@ namespace Gekko
             x2.AppendLine("<!DOCTYPE HTML PUBLIC `-//W3C//DTD HTML 4.01 Transitional//EN`>");
             x2.AppendLine("<html>");
             x2.AppendLine("  <head>");
-            x2.AppendLine("    <link rel=`stylesheet` href=`..\\" + settings_css_filename + "` type=`text/css`>");
-            x2.AppendLine("    <link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
+            x2.AppendLine("    <link rel=`stylesheet` href=`" + settings_css_filename + "` type=`text/css`>");
+            x2.AppendLine("    <link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x2.AppendLine("    <meta http-equiv=`Content-Type` content=`text/html; charset=iso-8859-1`>");
             x2.AppendLine("    <title>List of vars</title>");
             x2.AppendLine("  </head>");
@@ -8601,8 +8547,8 @@ namespace Gekko
             StringBuilder x3 = new StringBuilder();
             x3.AppendLine("<html>");
             x3.AppendLine("<head>");
-            x3.AppendLine("<link rel = `stylesheet` href = `..\\" + settings_css_filename + "` type = `text/css` >");
-            x3.AppendLine("<link rel = `shortcut icon` href = `https://dors.dk/sites/dors.dk/files/punkt-bomaerke.ico` type = `image/vnd.microsoft.icon`>");
+            x3.AppendLine("<link rel = `stylesheet` href = `" + settings_css_filename + "` type = `text/css` >");
+            x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
 
             x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
@@ -8966,7 +8912,7 @@ namespace Gekko
                                     string s7 = null;
                                     for (int i = startI; i < iEq; i++)
                                     {
-                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
+                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == 0 && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
                                         {
                                             s7 += listItem;  //no blanks
                                             i += 3;
@@ -8980,14 +8926,14 @@ namespace Gekko
                                     string s8 = null;
                                     for (int i = startI; i < th.Count; i++)
                                     {
-                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == null && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
+                                        if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == 0 && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
                                         {
-                                            s8 += th[i].leftblanks + listItem;  //with blanks
+                                            s8 += G.Blanks(th[i].leftblanks) + listItem;  //with blanks
                                             i += 3;
                                         }
                                         else
                                         {
-                                            s8 += th[i].leftblanks + th[i].s;
+                                            s8 += G.Blanks(th[i].leftblanks) + th[i].s;
                                         }
                                     }
 
@@ -9033,7 +8979,7 @@ namespace Gekko
         private static bool BrowserIsScalar(List<TokenHelper> th, int i)
         {
             //if token i+1 is a scalar name, %i or {i}
-            if ((th[i].s == Globals.symbolScalar.ToString() && th[i + 1].type == ETokenType.Word && th[i + 1].leftblanks == null) || (th[i].s == "{" && th[i + 1].type == ETokenType.Word && th[i + 2].s == "}"))
+            if ((th[i].s == Globals.symbolScalar.ToString() && th[i + 1].type == ETokenType.Word && th[i + 1].leftblanks == 0) || (th[i].s == "{" && th[i + 1].type == ETokenType.Word && th[i + 2].s == "}"))
             {
                 return true;
             }
@@ -9045,7 +8991,7 @@ namespace Gekko
             string s2 = null;
             for (int i = a1; i <= a2; i++)
             {
-                s2 += a[i].leftblanks + a[i].s;
+                s2 += G.Blanks(a[i].leftblanks) + a[i].s;
             }
 
             return s2;
@@ -9096,22 +9042,21 @@ namespace Gekko
                 int counter = -1;
                 for (int i = 0; i < a.Count; i++)
                 {
-
-
+                    
                     counter++;
                     //string s = tokens[i].s;
                     //if (s == "£") G.Writeln();
 
 
-                    if (a[i].leftblanks != null && a[i].leftblanks > 0)
+                    if (a[i].leftblanks > 0)
                     {
                         if (!html)
                         {
-                            G.Write(a[i].leftblanks);
+                            G.Write(G.Blanks(a[i].leftblanks));
                         }
                         else
                         {
-                            sb.Append(a[i].leftblanks);
+                            sb.Append(G.Blanks(a[i].leftblanks));
                         }
                     }
                     if (counter > 1 && a[i].type == ETokenType.Word && Program.model.varsAType.ContainsKey(a[i].s))
@@ -32765,21 +32710,21 @@ namespace Gekko
             foreach (string s in xlines)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = G.FromDateToFloating(gt) + GetXAdjustmentForInsideTics(isInside, highestFreq);                
+                double d = G.FromDateToFloating(gt) + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);                
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
                 GekkoTime gt = G.FromStringToDate(s);
-                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + +GetXAdjustmentForInsideTics(isInside, highestFreq);
+                double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
