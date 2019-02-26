@@ -17281,7 +17281,7 @@ namespace Gekko
                     {
                         if (bankLhs != null)
                         {
-                            G.Writeln2("*** ERROR: You cannot combine '***' wiht bank, frequency or index.");
+                            G.Writeln2("*** ERROR: You cannot combine '***' with bank, frequency or index.");
                             throw new GekkoException();
                         }
                         bankLhs = "*";
@@ -27811,8 +27811,12 @@ namespace Gekko
             {
                 double coeff = 1d / scaling[i] * beta[i];
 
-                //string s = TruncateTextWithDots(25, labels[i + 1]);
-                string s = TruncateTextWithDots(25, "...RHS LABEL");
+                string s = null;
+                if (i + 1 < o.expressionsText.Count)
+                {
+                    s = TruncateTextWithDots(25, G.ReplaceGlueNew(o.expressionsText[i + 1]));
+                }
+                else s = "CONSTANT";
                 tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
 
@@ -27849,8 +27853,7 @@ namespace Gekko
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
             G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
-            //G.Writeln(labels[0]);  //labels contain the LHS and all the RHS!       
-            G.Writeln("...LHS LABEL");  //labels contain the LHS and all the RHS!       
+            G.Writeln(G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
             G.Writeln("R2: " + Math.Round(r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4, MidpointRounding.AwayFromZero));
 
@@ -27971,7 +27974,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("ERROR: Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
+                    G.Writeln2("*** ERROR: Can only use SERIES, VAL, 1x1 MATRIX, or LISTs with these");
                     throw new GekkoException();
                 }
             }
@@ -28059,7 +28062,7 @@ namespace Gekko
             List<string> labels = new List<string>();
             for (int i = 0; i < input.Count; i++)
             {
-                labels.Add("Var " + (i + 1));
+                labels.Add("Variable " + (i + 1));
             }
             
             int n = GekkoTime.Observations(t1, t2);
@@ -28095,7 +28098,7 @@ namespace Gekko
                 int maxI; double max;
                 Max(out maxI, out max, x);
                 int width = 16;
-                G.Writeln("SERIES " + s);
+                G.Writeln(s);
                 G.Writeln("  " + n + " observations from " + t1.ToString() + " to " + t2.ToString());
                 G.Writeln("  Mean    = " + G.levelFormat(mean, width));
                 G.Writeln("  St.dev. = " + G.levelFormat(std, width));
@@ -28114,12 +28117,12 @@ namespace Gekko
                 Program.databanks.GetFirst().AddIVariableWithOverwrite("#corr", m);
 
                 G.Writeln2("Cross correlation based on " + k + " variables and " + n + " observations");
-                counter = 0;
-                foreach (string s in labels)
-                {
-                    counter++;
-                    G.Writeln("Variable " + counter + ": " + s);
-                }
+                //counter = 0;
+                //foreach (string s in labels)
+                //{
+                //    counter++;
+                //    G.Writeln("Variable " + counter + ": " + s);
+                //}
                 Program.ShowMatrix(m, Globals.symbolCollection + "corr");
             }
         }

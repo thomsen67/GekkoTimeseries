@@ -463,6 +463,7 @@ ASTCOMPARE2;
     ASTOLS;
     ASTOLSELEMENT;
     ASTOLSELEMENTS;
+	ASTOLSEXPRESSION;
     ASTOPD;
     ASTOPEN;
     ASTOPENHELPER;
@@ -2840,9 +2841,12 @@ modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 // OLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-ols:                        OLS olsOpt1? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
-                          | OLS olsOpt1? name? expression EQUAL expression (',' expression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) expression*)						  
+ols:                        OLS olsOpt1? olsExpression EQUAL olsExpression (',' olsExpression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
+                          | OLS olsOpt1? name? olsExpression EQUAL olsExpression (',' olsExpression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
 						    ;
+
+olsExpression:				expression -> ^({token("ASTOLSEXPRESSION¤"+($expression.text), ASTOLSEXPRESSION, 0)} expression);
+
 olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
 olsOpt1h:                   dates -> ^(ASTDATES dates)

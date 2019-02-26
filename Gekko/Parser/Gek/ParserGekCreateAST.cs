@@ -705,45 +705,45 @@ namespace Gekko.Parser.Gek
             {
                 bool flag = false;
 
-                if (ast.Text.Contains("¤"))
+                if (ast.Text.Contains(Globals.parserExpressionSeparator.ToString()))
                 {
-                    if (ast.Text.StartsWith("ASTMETA" + "¤"))  //Handles SERIES, that is ASTGENR/ASTUPD
+                    if (ast.Text.StartsWith("ASTMETA" + Globals.parserExpressionSeparator))  //Handles SERIES, that is ASTGENR/ASTUPD
                     {
                         flag = true;
                     }                    
-                    else if (ast.Text.StartsWith("ASTSHOW" + "¤"))
+                    else if (ast.Text.StartsWith("ASTSHOW" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTPRTELEMENT" + "¤"))
+                    else if (ast.Text.StartsWith("ASTPRTELEMENT" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTOLSELEMENT" + "¤"))
+                    else if (ast.Text.StartsWith("ASTOLSEXPRESSION" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTDECOMP" + "¤"))
+                    else if (ast.Text.StartsWith("ASTDECOMP" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTLIST" + "¤"))
+                    else if (ast.Text.StartsWith("ASTLIST" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTCURLY" + "¤"))
+                    else if (ast.Text.StartsWith("ASTCURLY" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTINDEXERELEMENT" + "¤"))
+                    else if (ast.Text.StartsWith("ASTINDEXERELEMENT" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTINDEXERELEMENTIDENT" + "¤"))
+                    else if (ast.Text.StartsWith("ASTINDEXERELEMENTIDENT" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
-                    else if (ast.Text.StartsWith("ASTCOMPARE2" + "¤"))
+                    else if (ast.Text.StartsWith("ASTCOMPARE2" + Globals.parserExpressionSeparator))
                     {
                         flag = true;
                     }
@@ -751,7 +751,7 @@ namespace Gekko.Parser.Gek
                 
                 if (flag)
                 {
-                    string[] ss = ast.Text.Split('¤');
+                    string[] ss = ast.Text.Split(Globals.parserExpressionSeparator);
                     //for (int i = 0; i < ss.Length; i++)
                     //{                        
                     //    ss[i] = G.ReplaceGlueNew(ss[i]);                        

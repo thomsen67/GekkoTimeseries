@@ -15476,7 +15476,7 @@ namespace UnitTests
             _AssertScalarString(First(), "%s", "bb");
             I("string %s = replace(%s1, %s2, 'xx');                      //replace %s2 with 'xx' in %s1");
             _AssertScalarString(First(), "%s", "aa xx cc");
-            I("val %n = search(%s1, %s2);                                //find pos of %s2 in %s1");
+            I("val %n = index(%s1, %s2);                                //find pos of %s2 in %s1");
             _AssertScalarVal(First(), "%n", 4);
             I("string %s = strip(%s1, %s2);                              //remove %s2 from %s1");
             _AssertScalarString(First(), "%s", "aa  cc");

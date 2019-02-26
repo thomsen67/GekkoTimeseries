@@ -1164,10 +1164,15 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".expressions = new List<IVariable>();" + G.NL);
                             for (int i = 3; i < node.ChildrenCount(); i++)
                             {
-                                node.Code.A("o" + Num(node) + ".expressions.Add(" + node[i].Code + ");" + G.NL);
+                                node.Code.A("o" + Num(node) + ".expressions.Add(" + node[i][0].Code + ");" + G.NL);
                             }
-                            //node.Code.A("o" + Num(node) + ".lhs = " + node[3].Code).End();
-                            //node.Code.A("o" + Num(node) + ".rhs = " + node[4].Code).End();
+
+                            node.Code.A("o" + Num(node) + ".expressionsText = new List<string>();" + G.NL);
+                            for (int i = 3; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".expressionsText.Add(@`" + node[i].specialExpressionAndLabelInfo[1] + "`);" + G.NL);
+                            }
+
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -6079,11 +6084,7 @@ namespace Gekko.Parser.Gek
 
             bool isGoto = false;
             if (w.wh != null && w.wh.isGotoOrTarget) isGoto = true;
-            if(w.wh?.localFuncs!=null)
-            {
-
-            }
-
+            
             if (!isGoto)
             {                
 

@@ -570,6 +570,7 @@ namespace Gekko
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
+        public static char parserExpressionSeparator = '¤';
         public static string lagIndicator = "¤";
         public static string leftParenthesisIndicator = "[";
         public static string rightParenthesisIndicator = "]";
