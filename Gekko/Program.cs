@@ -7793,6 +7793,8 @@ namespace Gekko
 
         public static void Browser()
         {
+            bool jsmFix = true;
+
             G.Writeln2("Starting html browser generation");
             DateTime dt0 = DateTime.Now;
 
@@ -7856,12 +7858,12 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: est_filename not found"); throw new GekkoException();
             }
 
-            string settings_flowchart_filename = null;
-            try { settings_flowchart_filename = (string)jsonTree["flowchart_filename"]; } catch { }
-            if (settings_flowchart_filename == null)
-            {
-                G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
-            }
+            //string settings_flowchart_filename = null;
+            //try { settings_flowchart_filename = (string)jsonTree["flowchart_filename"]; } catch { }
+            //if (settings_flowchart_filename == null)
+            //{
+            //    G.Writeln2("*** ERROR: JSON: flowchart_filename not found"); throw new GekkoException();
+            //}
 
             string settings_icon_filename = null;
             try { settings_icon_filename = (string)jsonTree["icon_filename"]; } catch { }
@@ -7870,12 +7872,12 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: icon_filename not found"); throw new GekkoException();
             }
 
-            string settings_logo_filename = null;
-            try { settings_logo_filename = (string)jsonTree["logo_filename"]; } catch { }
-            if (settings_logo_filename == null)
-            {
-                G.Writeln2("*** ERROR: JSON: logo_filename not found"); throw new GekkoException();
-            }
+            //string settings_logo_filename = null;
+            //try { settings_logo_filename = (string)jsonTree["logo_filename"]; } catch { }
+            //if (settings_logo_filename == null)
+            //{
+            //    G.Writeln2("*** ERROR: JSON: logo_filename not found"); throw new GekkoException();
+            //}
 
             string settings_vars_foldername = null;
             try { settings_vars_foldername = (string)jsonTree["vars_foldername"]; } catch { }
@@ -7926,13 +7928,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: JSON: print_end not found"); throw new GekkoException();
             }
 
-            string settings_vis_source_fra_databank = null;
-            try { settings_vis_source_fra_databank = (string)jsonTree["vis_source_fra_databank"]; } catch { }
-            if (settings_vis_source_fra_databank == null)
-            {
-                G.Writeln2("*** ERROR: JSON: vis_source_fra_databank found"); throw new GekkoException();
-            }
-
+            bool settings_show_source = true;
+            try { settings_show_source = (bool)jsonTree["show_source"]; } catch { }
+            
             object[] settings_ekstrafiler = null;
             try { settings_ekstrafiler = (object[])jsonTree["ekstrafiler"]; } catch { }
             if (settings_ekstrafiler == null)
@@ -7953,9 +7951,9 @@ namespace Gekko
             files.Add(settings_css_filename);
             files.Add(settings_dok_filename);
             files.Add(settings_est_filename);
-            files.Add(settings_flowchart_filename);
+            //files.Add(settings_flowchart_filename);
             files.Add(settings_icon_filename);
-            files.Add(settings_logo_filename);
+            //files.Add(settings_logo_filename);
             files.Add(browserFolder);
             files.Add(settings_vars_foldername);
             foreach (string file in files)
@@ -7977,9 +7975,9 @@ namespace Gekko
             List<string> filesToCopy = new List<string>();
             filesToCopy.Add(settings_index_filename);
             filesToCopy.Add(settings_css_filename);
-            filesToCopy.Add(settings_flowchart_filename);
+            //filesToCopy.Add(settings_flowchart_filename);
             filesToCopy.Add(settings_icon_filename);
-            filesToCopy.Add(settings_logo_filename);
+            //filesToCopy.Add(settings_logo_filename);
             foreach (object o in settings_ekstrafiler)
             {
                 string s = null;
@@ -8230,7 +8228,7 @@ namespace Gekko
 
                 if (ts1.meta.label != null) WriteHtml(sb, "Label: " + ts1.meta.label);
 
-                if (G.Equal(settings_vis_source_fra_databank, "ja"))
+                if (settings_show_source)
                 {
                     if (ts1.meta.source != null)
                     {
@@ -8393,8 +8391,17 @@ namespace Gekko
                 string l1 = bank1.ToLower().Replace(".gbk", "") + ":" + var;
                 string l2 = bank2.ToLower().Replace(".gbk", "") + ":" + var;
 
-                Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
-                Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                if (ts2 == null)
+                {
+                    //only plot the series from Work
+                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                }
+                else
+                {
+                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " > @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + ".svg;", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + plotStart.ToString() + " " + plotEnd.ToString() + " " + "xlineafter = " + plot_line.ToString() + " yminhard = -100 ymaxhard = 100 yminsoft = -1 ymaxsoft = 1  p> @" + var + " '" + l2 + "' <type = lines dashtype = '3'>, " + var + " '" + l1 + "' file=" + subFolder + "\\" + var.ToLower() + "___p" + ".svg;", new P());
+                }
                 
                 sb.AppendLine("<img src = `" + var.ToLower() + ".svg" + "`>");
 
@@ -8551,7 +8558,7 @@ namespace Gekko
             x3.AppendLine("<link rel = `shortcut icon` href = `" + settings_icon_filename + "` type = `image/vnd.microsoft.icon`>");
             x3.AppendLine("</head>");
 
-            x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
+            //x3.AppendLine("<script LANGUAGE = `JavaScript` SRC = `variable.js` ></script>");
             x3.AppendLine("<script LANGUAGE = `JavaScript` > <!-- ");
 
             string s1 = null;
@@ -8561,6 +8568,18 @@ namespace Gekko
                 string[] ss = s.Split('¤');
                 s1 += "`" + ss[0] + "`" + ", ";
                 s2 += "`" + ss[1] + "`" + ", ";
+            }
+
+            string write = null;            
+            string join = null;
+            if (jsmFix)
+            {
+                write = "document.write";
+            }
+            else
+            {
+                write = "content.push";
+                join = "document.body.innerHTML = content.join(``);";                
             }
 
             string js = @"
@@ -8585,7 +8604,7 @@ namespace Gekko
                 tekst = document.form1.tekst.value;
                 fundet = false;
 
-                content.push(`Søgning efter variablen: '` + tekst + `'<br><br>`);
+                " + write + @"(`Søgning efter variablen: '` + tekst + `'<br><br>`);
 
                 for (var i = 0; i < antal; i++)
                 {
@@ -8594,8 +8613,8 @@ namespace Gekko
                     {
                         fundet = true;
 
-                        content.push(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
-                        content.push(`<br>` + beskriv[i] + `<br><hr><br>`);
+                        " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                        " + write + @"(`<br>` + beskriv[i] + `<br><hr><br>`);
                     } //endif
                 } //endfor
 
@@ -8607,20 +8626,20 @@ namespace Gekko
                         if (tekst1.toUpperCase() != tekst.toUpperCase())
                         {
                             fundet = true;
-                            content.push(`<a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
-                            content.push(`<br>` + beskriv[i] + `<br><br>`);
+                            " + write + @"(`<a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none;'>` + varnavn[i] + `</a>`);
+                            " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
                         } //endif
                     } //endif
                 } //endfor
 
                 if (fundet == false)
                 {
-                    content.push(`... gav intet resultat.<br>`);
+                    " + write + @"(`... gav intet resultat.<br>`);
                 } //endif
-                content.push(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+                " + write + @"(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
                 tekst1.free;
                 tekst.free;
-                document.body.innerHTML = content.join(``);
+                " + join + @"
             }  //endfunction
 
             function check(event) {
@@ -8638,7 +8657,7 @@ namespace Gekko
             tekst2 = new String;
             tekst = document.form2.tekst.value;
 
-            content.push(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
+            " + write + @"(`Søgeresultat<br>Søgning efter teksten: '` + tekst + `' i variabelliste<br><br>`);
             fundet = false;
             for (var i = 0; i < antal; i++)
             {
@@ -8646,18 +8665,19 @@ namespace Gekko
                 if (tekst2.toUpperCase().indexOf(tekst.toUpperCase()) != -1)
                 {
                     fundet = true;
-                    content.push(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
-                    content.push(`<br>` + beskriv[i] + `<br><br>`);
+                    " + write + @"(`<b><a href=" + settings_vars_foldername + @"/` + varnavn[i] + `.html style='text-decoration:none'>` + varnavn[i] + `</a></b>`);
+                    " + write + @"(`<br>` + beskriv[i] + `<br><br>`);
                 } //endif
             } //endfor
             if (fundet == false)
             {
-                content.push(`... gav intet resultat.<br>`);
+                " + write + @"(`... gav intet resultat.<br>`);
             } //endif
-            content.push(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
+            " + write + @"(`<br><br><a href=" + settings_find_filename + @">Søg igen</a> <br> <a href=" + settings_index_filename + @">Gå til hovedside</a>`);
             tekst.free;
             tekst2.free;
-            document.body.innerHTML = content.join(``);
+
+            " + join + @"
         }  //endfunction
 
         function check2(event) {
@@ -17884,7 +17904,8 @@ namespace Gekko
 
             if (s == null)
             {
-                s = "I_OVERVIEW";
+                //s = "I_OVERVIEW";
+                s = "introduction";
                 //G.WriteDirs("large");
             }
             string s2 = s;
