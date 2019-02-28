@@ -4543,7 +4543,7 @@ namespace Gekko
                 {
                     if (tableName == null)
                     {
-                        tableName = line.Substring(matrixString.Length).Replace("\"", "").Replace(";", "").Trim();
+                        tableName = G.HandleQuoteInQuote(line.Substring(matrixString.Length)).Replace(";", "").Trim();
                     }
                 }
                 else
@@ -8025,7 +8025,7 @@ namespace Gekko
                 DialogResult result = MessageBox.Show("Only a few vars?", "Vars", MessageBoxButtons.YesNo, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result == DialogResult.Yes)
                 {
-                    vars = new List<string> { "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
+                    vars = new List<string> { "aaa", "fcp", "PHK", "jphk", "fee", "Jfee", "fy", "tg", "peesq", "ktiorn", "tfon" };
                 }
             }
 
@@ -8153,12 +8153,13 @@ namespace Gekko
                 {
                     if (line != "")
                     {
-                        WriteHtmlColor(sb, line);
+                        string line2 = Program.SpecialXmlChars(line);
+                        WriteHtmlColor(sb, line2);
                     }
                 }
 
                 string explanation = null;
-                if (varExpl != null && varExpl.Count > 0) explanation = varExpl[0];
+                if (varExpl != null && varExpl.Count > 0) explanation = G.HandleQuoteInQuote(varExpl[0], true);
                 vars2.Add(var + "¤" + explanation);
 
                 StringBuilder sb4 = new StringBuilder();
@@ -8523,7 +8524,7 @@ namespace Gekko
             {
                 List<string> varExpl = Program.GetVariableExplanation(var2);
                 string expl = "";
-                if (varExpl != null && varExpl.Count > 0) expl = varExpl[0];
+                if (varExpl != null && varExpl.Count > 0) expl = Program.SpecialXmlChars(varExpl[0]);
 
                 x2.Append("<tr>");
                 x2.Append("<td width = `20%`>");

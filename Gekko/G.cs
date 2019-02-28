@@ -77,19 +77,19 @@ namespace Gekko
             return rv;
         }
 
-//        public static bool IsDebugSession
-//        {
-//            get
-//            {
-//#if DEBUG
-//                return true;
-//#else
-//            return false;
-//#endif
-//            }
-//        }
+        //        public static bool IsDebugSession
+        //        {
+        //            get
+        //            {
+        //#if DEBUG
+        //                return true;
+        //#else
+        //            return false;
+        //#endif
+        //            }
+        //        }
 
-         public static bool IsDebugSession
+        public static bool IsDebugSession
         {
             //Cannot get this to work...
             get
@@ -130,10 +130,10 @@ namespace Gekko
         {
             //NumberStyles.AllowDecimalPoint|NumberStyles.AllowExponent|NumberStyles.AllowLeadingSign
             return double.TryParse(s, NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d);
-        }        
+        }
 
         public static double ParseIntoDouble(string s, bool reportError)
-        {            
+        {
             double d = double.NaN;
             bool ok = G.TryParseIntoDouble(s, out d);
             if (ok) return d;
@@ -165,7 +165,7 @@ namespace Gekko
         /// </summary>
         /// <param name="val">Input string</param>
         /// <returns>Output string</returns>
-        
+
         public static string Add0Ifmissing(string val)
         {
             string val1 = "";
@@ -186,7 +186,7 @@ namespace Gekko
             }
             return val1;
         }
-        
+
         //
         /// <summary>
         /// If input is "b[1234]", 1234 is returned
@@ -200,7 +200,7 @@ namespace Gekko
             int zzz = int.Parse(yyy);
             return zzz;
         }
-        
+
         //TODO: should be done as a struct
         /// <summary>
         /// Extracts "fY" and "-2" from "fY¤-2"
@@ -211,7 +211,7 @@ namespace Gekko
         public static void ExtractVariableAndLag(string key, out string variable, out int lag)
         {
             //NOTE: some vars are of this type: @fy¤¤2001q3    = absolute time (in base)
-            int indx = key.IndexOf(Globals.lagIndicator);            
+            int indx = key.IndexOf(Globals.lagIndicator);
             variable = key.Substring(0, indx - 0);
             string lag1 = key.Substring(indx + 1, key.Length - (indx + 1));
             lag = int.Parse(lag1);  //TODO: error handling
@@ -226,11 +226,11 @@ namespace Gekko
             culprit = eh.lhsWithLagIndicator;
             return culprit;
         }
-        
+
         //will include lag indicator (¤)
         public static string FromBNumberToVarname2(int i)
         {
-            string culprit = Program.model.varsBTypeInverted[i];            
+            string culprit = Program.model.varsBTypeInverted[i];
             return culprit;
         }
 
@@ -253,7 +253,7 @@ namespace Gekko
             //NOTE: OK with this: some vars are of this type: fy¤¤2001q3 = absolute time
             int indx = key.IndexOf(Globals.lagIndicator);
             variable = key.Substring(0, indx - 0);
-            lag = key.Substring(indx + 1, key.Length - (indx + 1));            
+            lag = key.Substring(indx + 1, key.Length - (indx + 1));
         }
 
         public static AllFreqsHelper ConvertDateFreqsToAllFreqs(GekkoTime t1, GekkoTime t2)
@@ -381,7 +381,7 @@ namespace Gekko
         //{
         //    //DELETE SOON many places, keep in DISP etc.
         //    //Use RemoveFreqFromName() instead
-                        
+
         //    int i = s.IndexOf(Globals.freqIndicator);
         //    if (i == 0)
         //    {
@@ -394,13 +394,13 @@ namespace Gekko
         //    }
         //    return s;  //annual            
         //}
-                
-        
+
+
 
         public static EFreq GetFreqFromName(string s)
         {
             string f = G.Chop_GetFreq(s);
-            if(f==null)
+            if (f == null)
             {
                 G.Writeln2("*** ERROR: freq problem");
                 throw new GekkoException();
@@ -408,7 +408,7 @@ namespace Gekko
             else
             {
                 return G.GetFreq(f);
-            }                     
+            }
         }
 
         public static bool Chop_HasFreq(string s)
@@ -435,7 +435,7 @@ namespace Gekko
         // ===========================================================================================================================
         // ========================= functions to manipulate bankvarnames with indexes start =========================================
         // ===========================================================================================================================
-        
+
         //See equivalent method in Functions.cs
         public static string Chop_GetBank(string s1)
         {
@@ -484,7 +484,7 @@ namespace Gekko
         //See equivalent method in Functions.cs
         public static string Chop_GetFullName(string bank, string name, string freq, string[] index)
         {
-            string s = O.UnChop(bank, name, freq, index);            
+            string s = O.UnChop(bank, name, freq, index);
             return s;
         }
 
@@ -533,7 +533,7 @@ namespace Gekko
         public static string Chop_ReplaceBank(string s1, string s2, string s3)
         {
             string bank, name, freq; string[] index;
-            O.Chop(s1, out bank, out name, out freq, out index);            
+            O.Chop(s1, out bank, out name, out freq, out index);
             if (G.Equal(s2, bank)) bank = s3;
             return O.UnChop(bank, name, freq, index);
         }
@@ -680,7 +680,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Expected missing = error, m, zero or skip");
                 throw new GekkoException();
             }
-            
+
         }
 
         public static string GetFreq(EFreq eFreq)
@@ -729,7 +729,7 @@ namespace Gekko
                 if (rest.Contains("'") || rest.Contains(Globals.symbolCollection.ToString())) variable = key;  //if input is x['a', 'z'] or x[#i, #j], etc.
                 else variable = key.Substring(0, indx - 0);
             }
-            else variable = key;            
+            else variable = key;
             return variable;
         }
 
@@ -747,7 +747,7 @@ namespace Gekko
                 s = s.Substring(1, s.Length - 2);
             }
             return s;
-        }        
+        }
 
         public static string StripQuotes2(string s)
         {
@@ -809,14 +809,14 @@ namespace Gekko
         }
 
         public static string SecondsFormat(double milliseconds)
-        {            
-            double total = milliseconds / 1000d;            
+        {
+            double total = milliseconds / 1000d;
             string s = total.ToString("0.00") + " sec";
             if (total >= 60d)
             {
                 string min = "";
                 string sec = "";
-                int minutes = (int)total / 60;                
+                int minutes = (int)total / 60;
                 min += minutes;
                 int seconds = (int)total % 60;
                 if (seconds <= 9) sec += "0";
@@ -829,14 +829,14 @@ namespace Gekko
         //----------- used in prt statement start -----------------------------------
 
         public static string levelFormat(double level1, int width)
-        {            
+        {
             string levelFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.0000}", level1);
             if (double.IsNaN(level1)) levelFormatted = Globals.printNaNIndicator;
             return G.Blanks(width - levelFormatted.Length) + levelFormatted;
         }
 
         public static string pchFormat(double pch1, int width)
-        {            
+        {
             string pchFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.00}", pch1);
             if (double.IsNaN(pch1) || pchFormatted.Length > width)
             {
@@ -848,7 +848,7 @@ namespace Gekko
         }
 
         public static string dlogFormat(double input, int width)
-        {            
+        {
             string dlogFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + width + ":0.0000}", input);
             if (double.IsNaN(input) || dlogFormatted.Length > width)
             {
@@ -868,7 +868,7 @@ namespace Gekko
 
 
         public static bool LooksLikeSimpleList(string s)
-        {            
+        {
             //Should looke like "#mylist2"
             for (int i = 0; i < s.Length; i++)
             {
@@ -878,10 +878,10 @@ namespace Gekko
                 if (i >= 2 && !(G.IsLetterOrDigitOrUnderscore(c))) return false;
             }
             return true;
-        }        
+        }
 
         public static int CountCharsInString(string source, string cc)
-        {            
+        {
             int count = 0;
             foreach (char c in source)
                 if (c == cc[0]) count++;
@@ -899,7 +899,7 @@ namespace Gekko
             }
             return levelFormatted;
         }
-        
+
         public static string levelFormatOld(double level1)
         {
             return levelFormatOld(level1, 14);
@@ -915,7 +915,7 @@ namespace Gekko
 
         public static string IntFormat(int input, int width)
         {
-            string formatted = input.ToString();            
+            string formatted = input.ToString();
             return G.Blanks(width - formatted.Length) + formatted;
         }
 
@@ -931,8 +931,8 @@ namespace Gekko
             string pchFormatted = String.Format(System.Globalization.CultureInfo.InvariantCulture, "{0," + widthM2 + ":0.00}", pch1);
             if (double.IsNaN(pch1) || pchFormatted.Length > widthM1) pchFormatted = "******";
             return G.Blanks(width - pchFormatted.Length) + pchFormatted;
-        }        
-        
+        }
+
         public static string dateFormat(string date, int width)
         {
             //this format is left-adjusted, so we get this:
@@ -1024,7 +1024,7 @@ namespace Gekko
             int ii = -12345;
             TspUtilityFindWord(out ii, 1, al, alType, i, relativePosition);
             return ii;
-        }                
+        }
 
         public static void CloneDatabank(Databank newDatabank, Databank originalDatabank)
         {
@@ -1040,7 +1040,7 @@ namespace Gekko
                 IVariable ivCopy = kvp.Value.DeepClone(null);
                 newDatabank.AddIVariable(kvp.Key, ivCopy);
             }
-        }        
+        }
 
         public static string ReplaceFirstOccurrence(string original, string oldValue, string newValue)
         {
@@ -1158,7 +1158,7 @@ namespace Gekko
         public static int CompareNaturalIgnoreCase(string strA, string strB)
         {
             return CompareNatural(strA, strB, CultureInfo.CurrentCulture, CompareOptions.IgnoreCase);
-        }       
+        }
 
         public static int CompareNatural(string strA, string strB, CultureInfo culture, CompareOptions options)
         {
@@ -1302,7 +1302,7 @@ namespace Gekko
             foreach (string line in linesInput)
             {
                 sb.AppendLine(line);
-            }            
+            }
             return sb;
         }
 
@@ -1552,7 +1552,7 @@ namespace Gekko
                 else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
             }
             return varnameWithFreq;
-        }        
+        }
 
         public static bool IsLetterOrUnderscore(char c)
         {
@@ -1578,7 +1578,19 @@ namespace Gekko
             }
             return d;
         }
-        
+
+        public static string HandleQuoteInQuote(string s)
+        {
+            return HandleQuoteInQuote(s, false);
+        }
+
+        public static string HandleQuoteInQuote(string s, bool special)
+        {
+            if (special) s = s.Replace("\"", "\\\"");  //inside js in html
+            else s = s.Replace("\"", "\"\"");
+            return s;
+        }
+
         public static GekkoTime FromStringToDate(string s)
         {
             return FromStringToDate(s, false);

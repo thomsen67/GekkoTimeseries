@@ -5615,7 +5615,7 @@ namespace Gekko.Parser.Gek
                             string s = G.StripQuotes(node[0].Text);
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
-                            s = s.Replace("\"", "\"\"");
+                            s = G.HandleQuoteInQuote(s);
                             //node.Code.CA("new ScalarString(ScalarString.SubstituteScalarsInString(@`" + s + "`, true, false))");
                             node.Code.CA("O.HandleString(new ScalarString(@`" + s + "`))");
                         }
@@ -5627,7 +5627,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //always uneven number of items
                                 //if there are 5 items, i will be 0, 2, 4, where 4 is the last.
-                                string s1 = node[i].Text.Substring(1, node[i].Text.Length - 2).Replace("\"", "\"\"");
+                                string s1 = G.HandleQuoteInQuote(node[i].Text.Substring(1, node[i].Text.Length - 2));
                                 string s2 = null;
                                 string add = null;
                                 if (i + 1 < node.ChildrenCount()) add = ".Add(smpl, " + node[i + 1].Code.ToString() + ")";
@@ -6128,7 +6128,7 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
-        }
+        }                
 
         private static string GetFuncArgumentCode(ASTNode node, int i)
         {
