@@ -3013,6 +3013,9 @@ namespace Gekko
                                             //---------------------------------------------------------
                                             // x = Series Array Super
                                             //---------------------------------------------------------
+
+                                            create = true;  //always create a fresh one, if there is an array-series on the RHS. Does not make sense to merge into existing array-series
+
                                             if (isArraySubSeries)
                                             {
                                                 G.Writeln2("*** ERROR: You cannot put an array-series inside an array-series");

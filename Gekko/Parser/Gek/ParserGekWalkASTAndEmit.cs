@@ -657,6 +657,31 @@ namespace Gekko.Parser.Gek
 
                             s = G.AddSigil(s, type);  //see also #980753275
 
+                            if (G.Equal(type, "series"))
+                            {
+                                if (G.Chop_HasSigil(s))
+                                {
+                                    G.Writeln2("*** ERROR: Did not expect '" + s[0] + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else if (G.Equal(type, "val") || G.Equal(type, "date") || G.Equal(type, "string"))
+                            {
+                                if (s[0] != Globals.symbolScalar)
+                                {
+                                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolScalar + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
+                                    throw new GekkoException();
+                                }
+                            }
+                            else if (G.Equal(type, "list") || G.Equal(type, "map") || G.Equal(type, "matrix"))
+                            {
+                                if (s[0] != Globals.symbolCollection)
+                                {
+                                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolCollection + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
+                                    throw new GekkoException();
+                                }
+                            }
+
                             if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             if (node.functionDefAnchor.ContainsKey(s))
                             {
@@ -2426,6 +2451,7 @@ namespace Gekko.Parser.Gek
                             {
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
+                                    //ASTNode child = 
                                     if (Globals.functionFuncArguments)
                                     {
                                         vars += ",  GekkoArg " + node.functionDef[i].Item2 + "_func"; //type is checked later on

@@ -8324,6 +8324,22 @@ namespace UnitTests
         [TestMethod]
         public void _Test_FunctionAndProcedureVariants()
         {
+            //Test of types and sigils
+            FAIL("FUNCTION string f(series %x); RETURN ''; END;");
+            FAIL("FUNCTION string f(series #x); RETURN ''; END;");
+            FAIL("FUNCTION string f(val x); RETURN ''; END;");
+            FAIL("FUNCTION string f(val #x); RETURN ''; END;");
+            FAIL("FUNCTION string f(date x); RETURN ''; END;");
+            FAIL("FUNCTION string f(date #x); RETURN ''; END;");
+            FAIL("FUNCTION string f(string x); RETURN ''; END;");
+            FAIL("FUNCTION string f(string #x); RETURN ''; END;");
+            FAIL("FUNCTION string f(list x); RETURN ''; END;");
+            FAIL("FUNCTION string f(list %x); RETURN ''; END;");
+            FAIL("FUNCTION string f(map x); RETURN ''; END;");
+            FAIL("FUNCTION string f(map %x); RETURN ''; END;");
+            FAIL("FUNCTION string f(matrix x); RETURN ''; END;");
+            FAIL("FUNCTION string f(matrix %x); RETURN ''; END;");
+
             // ----------- user defined functions
 
             //0 arg, 0 return
