@@ -7697,7 +7697,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
-            //Same data as for Test__R()
+            //Same data as for Test__R(), cf. OLS help page
             I("CREATE lna1, pcp, bul1;");
             I("SERIES <1998 2010> lna1 = data(' 166.223000  173.221000  179.571000  187.343000  194.888000  202.959000  209.426000  215.134000  222.716000  230.520000  238.518000  246.654000  254.991000 ');");
             I("SERIES <1998 2010> pcp  = data(' 0.9502030   0.9699920   1.0000000   1.0235000   1.0401100   1.0605400   1.0754700   1.0977800   1.1121200   1.1314800   1.1513000   1.1717600   1.1871600  ');");
@@ -7706,14 +7706,21 @@ namespace UnitTests
             Series xx1 = O.GetIVariableFromString("lna1!a", O.ECreatePossibilities.NoneReportError) as Series;
             Series xx2 = O.GetIVariableFromString("pcp!a", O.ECreatePossibilities.NoneReportError) as Series;
             Series xx3 = O.GetIVariableFromString("bul1!a", O.ECreatePossibilities.NoneReportError) as Series;
-
-
+            
             I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.144517"));  //stupid test, must be done better...
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.613875"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.186740"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("-0.350908"));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.0298039"));
+
+            Globals.unitTestScreenOutput.Clear();
+            I("#r = [1, 1, 0, 0, 0, 0.80; 0, 0, 1, -1, 0, 0];");
+            I("OLS <2000 2010> dlog(lna1) = dlog(pcp), dlog(pcp.1), bul1, bul1.1 impose=#r;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.167642"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.632358"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("-0.0863480"));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("0.0291952"));
             
             I("time 2000 2010;");
             I("create s0, s1, s2, s3, s4, s5;");

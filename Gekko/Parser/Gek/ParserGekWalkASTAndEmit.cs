@@ -1159,7 +1159,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Ols o" + Num(node) + " = new O.Ols();" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);
                             if(!node[1].Code.IsNull()) node.Code.A("o" + Num(node) + ".name = " + node[1].Code).End();
-                            if (!node[2].Code.IsNull()) node.Code.A("o" + Num(node) + ".impose = " + node[2].Code).End();
+                            if (node[2].ChildrenCount() > 0 ) node.Code.A("o" + Num(node) + ".impose = " + node[2][0].Code).End();
 
                             node.Code.A("o" + Num(node) + ".expressions = new List<IVariable>();" + G.NL);
                             for (int i = 3; i < node.ChildrenCount(); i++)

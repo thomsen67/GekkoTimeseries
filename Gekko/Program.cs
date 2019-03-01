@@ -27587,11 +27587,7 @@ namespace Gekko
 
             int n = GekkoTime.Observations(t1, t2);
             int m = rhs_unfolded.Count + constant;  //explanatory vars including constant     
-            if (n <= m)
-            {
-                G.Writeln2("*** ERROR: There are " + m + " variables with only " + n + " observations");
-                throw new GekkoException();
-            }
+            
             double[,] x = new double[n, m];  //includes constant if it is there, does not include lhs
             double[] y = new double[n];
 
@@ -27670,6 +27666,14 @@ namespace Gekko
                 }
             }
 
+            int n_restrict = restrict.GetLength(0);
+
+            if (n <= m - n_restrict)
+            {
+                G.Writeln2("*** ERROR: There are " + m + " variables and " + n_restrict + " restrictions with only " + n + " observations");
+                throw new GekkoException();
+            }
+
             //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
             //if it detects k = 0, it just calls same procedure as alglib.lsfit.lsfitlinear()
             try
@@ -27679,9 +27683,15 @@ namespace Gekko
             catch (Exception e)
             {
                 if (e.Message != null && e.Message != "")
+                {
                     G.Writeln2("*** ERROR: " + e.Message);
+                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                }
                 if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
+                {
                     G.Writeln2("*** ERROR: " + e.InnerException.Message);
+                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                }
                 throw;
             }
 
