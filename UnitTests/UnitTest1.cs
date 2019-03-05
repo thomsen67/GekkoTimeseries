@@ -5027,6 +5027,26 @@ namespace UnitTests
         [TestMethod]
         public void _Test_For()
         {
+                                   
+
+            //syntax fail: test of types and sigils
+            FAIL("FOR(series %x = (1, 2)); END;");
+            FAIL("FOR(series #x = (1, 2)); END;");
+            FAIL("FOR(val x = (1, 2)); END;");
+            FAIL("FOR(val #x = (1, 2)); END;");
+            FAIL("FOR(date x = (1, 2)); END;");
+            FAIL("FOR(date #x = (1, 2)); END;");
+            FAIL("FOR(string x = (1, 2)); END;");
+            FAIL("FOR(string #x = (1, 2)); END;");
+            FAIL("FOR(list x = (1, 2)); END;");
+            FAIL("FOR(list %x = (1, 2)); END;");
+            FAIL("FOR(map x = (1, 2)); END;");
+            FAIL("FOR(map %x = (1, 2)); END;");
+            FAIL("FOR(matrix x = (1, 2)); END;");
+            FAIL("FOR(matrix %x = (1, 2)); END;");
+
+            I("RESET; %sum = 0; for(val %x = (10, 12, 14, 16)); %sum += %x; end;");
+            _AssertScalarVal(First(), "%sum", 52d, sharedDelta);
             I("reset; for string %i = ('a', 'b'); tell '' + %i; end;");
             if (Globals.UNITTESTFOLLOWUP_important)
             {
@@ -6619,6 +6639,9 @@ namespace UnitTests
         {
             //See also Test__Indexer
 
+            //should work, not fail. Object x needs to be replaced, this is testing it.
+            I("RESET; x = 100; x = series(2); x[a, b] = 100;");
+            
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
@@ -8324,7 +8347,11 @@ namespace UnitTests
         [TestMethod]
         public void _Test_FunctionAndProcedureVariants()
         {
-            //Test of types and sigils
+            //run-time fail
+            FAIL("RESET; function val f(val %x); return 'a'; end; val %y = f(3+1);");  //returns wrong type
+            FAIL("RESET; function val f(string %x); return 1; end; val %y = f(3+1);");  //has wrong type argument
+
+            //syntax fail: test of types and sigils
             FAIL("FUNCTION string f(series %x); RETURN ''; END;");
             FAIL("FUNCTION string f(series #x); RETURN ''; END;");
             FAIL("FUNCTION string f(val x); RETURN ''; END;");

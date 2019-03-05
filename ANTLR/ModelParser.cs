@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2017-04-28 15:07:55
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2019-03-04 11:30:50
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -67,9 +67,9 @@ public partial class ModelParser : Parser
 		"Modelblock", 
 		"Double", 
 		"Integer", 
+		"AssignVar", 
 		"Ident", 
 		"MOD", 
-		"AssignVar", 
 		"STARS", 
 		"HAT", 
 		"DIGIT", 
@@ -120,7 +120,7 @@ public partial class ModelParser : Parser
     public const int ASTPOW = 38;
     public const int ASTMODELBLOCK = 22;
     public const int ASTVARIABLE = 28;
-    public const int MOD = 45;
+    public const int MOD = 46;
     public const int LETTER = 55;
     public const int LOG = 4;
     public const int AFTER2 = 8;
@@ -173,7 +173,7 @@ public partial class ModelParser : Parser
     public const int X = 82;
     public const int ASTAFTER2 = 24;
     public const int Z = 84;
-    public const int Ident = 44;
+    public const int Ident = 45;
     public const int ASTEXPRESSION = 29;
     public const int VARLIST = 10;
     public const int ASTLAGFUNCTION = 32;
@@ -186,7 +186,7 @@ public partial class ModelParser : Parser
     public const int ASTVARIABLELAGLEAD = 35;
     public const int ASTFUNCTION = 31;
     public const int ASTAFTER = 23;
-    public const int AssignVar = 46;
+    public const int AssignVar = 44;
     public const int Exponent = 50;
     public const int ASTVARLIST = 40;
     public const int ASTFRMLCODE = 30;
@@ -219,7 +219,7 @@ public partial class ModelParser : Parser
         public ModelParser(ITokenStream input, RecognizerSharedState state)
     		: base(input, state) {
             InitializeCyclicDFAs();
-            this.state.ruleMemo = new Hashtable[68+1];
+            this.state.ruleMemo = new Hashtable[70+1];
              
              
         }
@@ -815,7 +815,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          code, expression2, genrLeftSide
+            	// elements:          expression2, genrLeftSide, code
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1007,13 +1007,13 @@ public partial class ModelParser : Parser
             	{
             	    int LA3_1 = input.LA(2);
 
-            	    if ( (LA3_1 == 86) )
-            	    {
-            	        alt3 = 2;
-            	    }
-            	    else if ( (LA3_1 == 85) )
+            	    if ( (LA3_1 == 85) )
             	    {
             	        alt3 = 1;
+            	    }
+            	    else if ( (LA3_1 == 86) )
+            	    {
+            	        alt3 = 2;
             	    }
             	    else 
             	    {
@@ -1028,13 +1028,13 @@ public partial class ModelParser : Parser
             	{
             	    int LA3_2 = input.LA(2);
 
-            	    if ( (LA3_2 == 86) )
-            	    {
-            	        alt3 = 2;
-            	    }
-            	    else if ( (LA3_2 == 85) )
+            	    if ( (LA3_2 == 85) )
             	    {
             	        alt3 = 1;
+            	    }
+            	    else if ( (LA3_2 == 86) )
+            	    {
+            	        alt3 = 2;
             	    }
             	    else 
             	    {
@@ -1381,7 +1381,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "val"
-    // Model.g:167:1: val : VAL Ident '=' ( MINUS )? number -> ^( ASTVAL Ident number ( MINUS )? ) ;
+    // Model.g:167:1: val : VAL scalar '=' ( MINUS )? number -> ^( ASTVAL scalar number ( MINUS )? ) ;
     public ModelParser.val_return val() // throws RecognitionException [1]
     {   
         ModelParser.val_return retval = new ModelParser.val_return();
@@ -1390,20 +1390,20 @@ public partial class ModelParser : Parser
         object root_0 = null;
 
         IToken VAL24 = null;
-        IToken Ident25 = null;
         IToken char_literal26 = null;
         IToken MINUS27 = null;
+        ModelParser.scalar_return scalar25 = default(ModelParser.scalar_return);
+
         ModelParser.number_return number28 = default(ModelParser.number_return);
 
 
         object VAL24_tree=null;
-        object Ident25_tree=null;
         object char_literal26_tree=null;
         object MINUS27_tree=null;
         RewriteRuleTokenStream stream_VAL = new RewriteRuleTokenStream(adaptor,"token VAL");
-        RewriteRuleTokenStream stream_Ident = new RewriteRuleTokenStream(adaptor,"token Ident");
         RewriteRuleTokenStream stream_MINUS = new RewriteRuleTokenStream(adaptor,"token MINUS");
         RewriteRuleTokenStream stream_85 = new RewriteRuleTokenStream(adaptor,"token 85");
+        RewriteRuleSubtreeStream stream_scalar = new RewriteRuleSubtreeStream(adaptor,"rule scalar");
         RewriteRuleSubtreeStream stream_number = new RewriteRuleSubtreeStream(adaptor,"rule number");
         try 
     	{
@@ -1411,19 +1411,21 @@ public partial class ModelParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // Model.g:167:5: ( VAL Ident '=' ( MINUS )? number -> ^( ASTVAL Ident number ( MINUS )? ) )
-            // Model.g:167:7: VAL Ident '=' ( MINUS )? number
+            // Model.g:167:5: ( VAL scalar '=' ( MINUS )? number -> ^( ASTVAL scalar number ( MINUS )? ) )
+            // Model.g:167:7: VAL scalar '=' ( MINUS )? number
             {
             	VAL24=(IToken)Match(input,VAL,FOLLOW_VAL_in_val679); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_VAL.Add(VAL24);
 
-            	Ident25=(IToken)Match(input,Ident,FOLLOW_Ident_in_val681); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_Ident.Add(Ident25);
-
+            	PushFollow(FOLLOW_scalar_in_val681);
+            	scalar25 = scalar();
+            	state.followingStackPointer--;
+            	if (state.failed) return retval;
+            	if ( (state.backtracking==0) ) stream_scalar.Add(scalar25.Tree);
             	char_literal26=(IToken)Match(input,85,FOLLOW_85_in_val683); if (state.failed) return retval; 
             	if ( (state.backtracking==0) ) stream_85.Add(char_literal26);
 
-            	// Model.g:167:21: ( MINUS )?
+            	// Model.g:167:22: ( MINUS )?
             	int alt4 = 2;
             	int LA4_0 = input.LA(1);
 
@@ -1453,7 +1455,7 @@ public partial class ModelParser : Parser
 
 
             	// AST REWRITE
-            	// elements:          MINUS, number, Ident
+            	// elements:          number, MINUS, scalar
             	// token labels:      
             	// rule labels:       retval
             	// token list labels: 
@@ -1464,16 +1466,16 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 167:35: -> ^( ASTVAL Ident number ( MINUS )? )
+            	// 167:36: -> ^( ASTVAL scalar number ( MINUS )? )
             	{
-            	    // Model.g:167:38: ^( ASTVAL Ident number ( MINUS )? )
+            	    // Model.g:167:39: ^( ASTVAL scalar number ( MINUS )? )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVAL, "ASTVAL"), root_1);
 
-            	    adaptor.AddChild(root_1, stream_Ident.NextNode());
+            	    adaptor.AddChild(root_1, stream_scalar.NextTree());
             	    adaptor.AddChild(root_1, stream_number.NextTree());
-            	    // Model.g:167:60: ( MINUS )?
+            	    // Model.g:167:62: ( MINUS )?
             	    if ( stream_MINUS.HasNext() )
             	    {
             	        adaptor.AddChild(root_1, stream_MINUS.NextNode());
@@ -1514,6 +1516,82 @@ public partial class ModelParser : Parser
     }
     // $ANTLR end "val"
 
+    public class scalar_return : ParserRuleReturnScope
+    {
+        private object tree;
+        override public object Tree
+        {
+        	get { return tree; }
+        	set { tree = (object) value; }
+        }
+    };
+
+    // $ANTLR start "scalar"
+    // Model.g:168:1: scalar : ( AssignVar | Ident );
+    public ModelParser.scalar_return scalar() // throws RecognitionException [1]
+    {   
+        ModelParser.scalar_return retval = new ModelParser.scalar_return();
+        retval.Start = input.LT(1);
+        int scalar_StartIndex = input.Index();
+        object root_0 = null;
+
+        IToken set29 = null;
+
+        object set29_tree=null;
+
+        try 
+    	{
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 11) ) 
+    	    {
+    	    	return retval; 
+    	    }
+            // Model.g:168:7: ( AssignVar | Ident )
+            // Model.g:
+            {
+            	root_0 = (object)adaptor.GetNilNode();
+
+            	set29 = (IToken)input.LT(1);
+            	if ( (input.LA(1) >= AssignVar && input.LA(1) <= Ident) ) 
+            	{
+            	    input.Consume();
+            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set29));
+            	    state.errorRecovery = false;state.failed = false;
+            	}
+            	else 
+            	{
+            	    if ( state.backtracking > 0 ) {state.failed = true; return retval;}
+            	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            	    throw mse;
+            	}
+
+
+            }
+
+            retval.Stop = input.LT(-1);
+
+            if ( (state.backtracking==0) )
+            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+    	// Conversion of the second argument necessary, but harmless
+    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+
+        }
+        finally 
+    	{
+            if ( state.backtracking > 0 ) 
+            {
+            	Memoize(input, 11, scalar_StartIndex); 
+            }
+        }
+        return retval;
+    }
+    // $ANTLR end "scalar"
+
     public class simpleFunction_return : ParserRuleReturnScope
     {
         private object tree;
@@ -1525,7 +1603,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "simpleFunction"
-    // Model.g:173:1: simpleFunction : ident '(' ident ')' -> ^( ASTSIMPLEFUNCTION ident ident ) ;
+    // Model.g:174:1: simpleFunction : ident '(' ident ')' -> ^( ASTSIMPLEFUNCTION ident ident ) ;
     public ModelParser.simpleFunction_return simpleFunction() // throws RecognitionException [1]
     {   
         ModelParser.simpleFunction_return retval = new ModelParser.simpleFunction_return();
@@ -1533,42 +1611,42 @@ public partial class ModelParser : Parser
         int simpleFunction_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal30 = null;
-        IToken char_literal32 = null;
-        ModelParser.ident_return ident29 = default(ModelParser.ident_return);
+        IToken char_literal31 = null;
+        IToken char_literal33 = null;
+        ModelParser.ident_return ident30 = default(ModelParser.ident_return);
 
-        ModelParser.ident_return ident31 = default(ModelParser.ident_return);
+        ModelParser.ident_return ident32 = default(ModelParser.ident_return);
 
 
-        object char_literal30_tree=null;
-        object char_literal32_tree=null;
+        object char_literal31_tree=null;
+        object char_literal33_tree=null;
         RewriteRuleTokenStream stream_RP = new RewriteRuleTokenStream(adaptor,"token RP");
         RewriteRuleTokenStream stream_86 = new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleSubtreeStream stream_ident = new RewriteRuleSubtreeStream(adaptor,"rule ident");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 11) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 12) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:174:2: ( ident '(' ident ')' -> ^( ASTSIMPLEFUNCTION ident ident ) )
-            // Model.g:174:4: ident '(' ident ')'
+            // Model.g:175:2: ( ident '(' ident ')' -> ^( ASTSIMPLEFUNCTION ident ident ) )
+            // Model.g:175:4: ident '(' ident ')'
             {
-            	PushFollow(FOLLOW_ident_in_simpleFunction715);
-            	ident29 = ident();
+            	PushFollow(FOLLOW_ident_in_simpleFunction726);
+            	ident30 = ident();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_ident.Add(ident29.Tree);
-            	char_literal30=(IToken)Match(input,86,FOLLOW_86_in_simpleFunction717); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_86.Add(char_literal30);
+            	if ( (state.backtracking==0) ) stream_ident.Add(ident30.Tree);
+            	char_literal31=(IToken)Match(input,86,FOLLOW_86_in_simpleFunction728); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_86.Add(char_literal31);
 
-            	PushFollow(FOLLOW_ident_in_simpleFunction719);
-            	ident31 = ident();
+            	PushFollow(FOLLOW_ident_in_simpleFunction730);
+            	ident32 = ident();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_ident.Add(ident31.Tree);
-            	char_literal32=(IToken)Match(input,RP,FOLLOW_RP_in_simpleFunction721); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal32);
+            	if ( (state.backtracking==0) ) stream_ident.Add(ident32.Tree);
+            	char_literal33=(IToken)Match(input,RP,FOLLOW_RP_in_simpleFunction732); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal33);
 
 
 
@@ -1584,9 +1662,9 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 174:24: -> ^( ASTSIMPLEFUNCTION ident ident )
+            	// 175:24: -> ^( ASTSIMPLEFUNCTION ident ident )
             	{
-            	    // Model.g:174:27: ^( ASTSIMPLEFUNCTION ident ident )
+            	    // Model.g:175:27: ^( ASTSIMPLEFUNCTION ident ident )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTSIMPLEFUNCTION, "ASTSIMPLEFUNCTION"), root_1);
@@ -1620,7 +1698,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 11, simpleFunction_StartIndex); 
+            	Memoize(input, 12, simpleFunction_StartIndex); 
             }
         }
         return retval;
@@ -1638,7 +1716,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "function"
-    // Model.g:177:1: function : ident '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION ident expression ( expression )* ) ;
+    // Model.g:178:1: function : ident '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION ident expression ( expression )* ) ;
     public ModelParser.function_return function() // throws RecognitionException [1]
     {   
         ModelParser.function_return retval = new ModelParser.function_return();
@@ -1646,19 +1724,19 @@ public partial class ModelParser : Parser
         int function_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal34 = null;
-        IToken char_literal36 = null;
-        IToken char_literal38 = null;
-        ModelParser.ident_return ident33 = default(ModelParser.ident_return);
+        IToken char_literal35 = null;
+        IToken char_literal37 = null;
+        IToken char_literal39 = null;
+        ModelParser.ident_return ident34 = default(ModelParser.ident_return);
 
-        ModelParser.expression_return expression35 = default(ModelParser.expression_return);
+        ModelParser.expression_return expression36 = default(ModelParser.expression_return);
 
-        ModelParser.expression_return expression37 = default(ModelParser.expression_return);
+        ModelParser.expression_return expression38 = default(ModelParser.expression_return);
 
 
-        object char_literal34_tree=null;
-        object char_literal36_tree=null;
-        object char_literal38_tree=null;
+        object char_literal35_tree=null;
+        object char_literal37_tree=null;
+        object char_literal39_tree=null;
         RewriteRuleTokenStream stream_RP = new RewriteRuleTokenStream(adaptor,"token RP");
         RewriteRuleTokenStream stream_86 = new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleTokenStream stream_87 = new RewriteRuleTokenStream(adaptor,"token 87");
@@ -1666,35 +1744,35 @@ public partial class ModelParser : Parser
         RewriteRuleSubtreeStream stream_ident = new RewriteRuleSubtreeStream(adaptor,"rule ident");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 12) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 13) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:177:10: ( ident '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION ident expression ( expression )* ) )
-            // Model.g:177:12: ident '(' ( expression ( ',' expression )* )? ')'
+            // Model.g:178:10: ( ident '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION ident expression ( expression )* ) )
+            // Model.g:178:12: ident '(' ( expression ( ',' expression )* )? ')'
             {
-            	PushFollow(FOLLOW_ident_in_function742);
-            	ident33 = ident();
+            	PushFollow(FOLLOW_ident_in_function753);
+            	ident34 = ident();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_ident.Add(ident33.Tree);
-            	char_literal34=(IToken)Match(input,86,FOLLOW_86_in_function744); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_86.Add(char_literal34);
+            	if ( (state.backtracking==0) ) stream_ident.Add(ident34.Tree);
+            	char_literal35=(IToken)Match(input,86,FOLLOW_86_in_function755); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_86.Add(char_literal35);
 
-            	// Model.g:177:22: ( expression ( ',' expression )* )?
+            	// Model.g:178:22: ( expression ( ',' expression )* )?
             	int alt6 = 2;
             	alt6 = dfa6.Predict(input);
             	switch (alt6) 
             	{
             	    case 1 :
-            	        // Model.g:177:24: expression ( ',' expression )*
+            	        // Model.g:178:24: expression ( ',' expression )*
             	        {
-            	        	PushFollow(FOLLOW_expression_in_function748);
-            	        	expression35 = expression();
+            	        	PushFollow(FOLLOW_expression_in_function759);
+            	        	expression36 = expression();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
-            	        	if ( (state.backtracking==0) ) stream_expression.Add(expression35.Tree);
-            	        	// Model.g:177:35: ( ',' expression )*
+            	        	if ( (state.backtracking==0) ) stream_expression.Add(expression36.Tree);
+            	        	// Model.g:178:35: ( ',' expression )*
             	        	do 
             	        	{
             	        	    int alt5 = 2;
@@ -1709,16 +1787,16 @@ public partial class ModelParser : Parser
             	        	    switch (alt5) 
             	        		{
             	        			case 1 :
-            	        			    // Model.g:177:36: ',' expression
+            	        			    // Model.g:178:36: ',' expression
             	        			    {
-            	        			    	char_literal36=(IToken)Match(input,87,FOLLOW_87_in_function751); if (state.failed) return retval; 
-            	        			    	if ( (state.backtracking==0) ) stream_87.Add(char_literal36);
+            	        			    	char_literal37=(IToken)Match(input,87,FOLLOW_87_in_function762); if (state.failed) return retval; 
+            	        			    	if ( (state.backtracking==0) ) stream_87.Add(char_literal37);
 
-            	        			    	PushFollow(FOLLOW_expression_in_function753);
-            	        			    	expression37 = expression();
+            	        			    	PushFollow(FOLLOW_expression_in_function764);
+            	        			    	expression38 = expression();
             	        			    	state.followingStackPointer--;
             	        			    	if (state.failed) return retval;
-            	        			    	if ( (state.backtracking==0) ) stream_expression.Add(expression37.Tree);
+            	        			    	if ( (state.backtracking==0) ) stream_expression.Add(expression38.Tree);
 
             	        			    }
             	        			    break;
@@ -1737,8 +1815,8 @@ public partial class ModelParser : Parser
 
             	}
 
-            	char_literal38=(IToken)Match(input,RP,FOLLOW_RP_in_function760); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal38);
+            	char_literal39=(IToken)Match(input,RP,FOLLOW_RP_in_function771); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal39);
 
 
 
@@ -1754,16 +1832,16 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 177:60: -> ^( ASTFUNCTION ident expression ( expression )* )
+            	// 178:60: -> ^( ASTFUNCTION ident expression ( expression )* )
             	{
-            	    // Model.g:177:63: ^( ASTFUNCTION ident expression ( expression )* )
+            	    // Model.g:178:63: ^( ASTFUNCTION ident expression ( expression )* )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION, "ASTFUNCTION"), root_1);
 
             	    adaptor.AddChild(root_1, stream_ident.NextTree());
             	    adaptor.AddChild(root_1, stream_expression.NextTree());
-            	    // Model.g:177:94: ( expression )*
+            	    // Model.g:178:94: ( expression )*
             	    while ( stream_expression.HasNext() )
             	    {
             	        adaptor.AddChild(root_1, stream_expression.NextTree());
@@ -1797,7 +1875,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 12, function_StartIndex); 
+            	Memoize(input, 13, function_StartIndex); 
             }
         }
         return retval;
@@ -1815,7 +1893,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "functionLogExp"
-    // Model.g:178:1: functionLogExp : logExp '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION logExp expression ( expression )* ) ;
+    // Model.g:179:1: functionLogExp : logExp '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION logExp expression ( expression )* ) ;
     public ModelParser.functionLogExp_return functionLogExp() // throws RecognitionException [1]
     {   
         ModelParser.functionLogExp_return retval = new ModelParser.functionLogExp_return();
@@ -1823,19 +1901,19 @@ public partial class ModelParser : Parser
         int functionLogExp_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal40 = null;
-        IToken char_literal42 = null;
-        IToken char_literal44 = null;
-        ModelParser.logExp_return logExp39 = default(ModelParser.logExp_return);
+        IToken char_literal41 = null;
+        IToken char_literal43 = null;
+        IToken char_literal45 = null;
+        ModelParser.logExp_return logExp40 = default(ModelParser.logExp_return);
 
-        ModelParser.expression_return expression41 = default(ModelParser.expression_return);
+        ModelParser.expression_return expression42 = default(ModelParser.expression_return);
 
-        ModelParser.expression_return expression43 = default(ModelParser.expression_return);
+        ModelParser.expression_return expression44 = default(ModelParser.expression_return);
 
 
-        object char_literal40_tree=null;
-        object char_literal42_tree=null;
-        object char_literal44_tree=null;
+        object char_literal41_tree=null;
+        object char_literal43_tree=null;
+        object char_literal45_tree=null;
         RewriteRuleTokenStream stream_RP = new RewriteRuleTokenStream(adaptor,"token RP");
         RewriteRuleTokenStream stream_86 = new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleTokenStream stream_87 = new RewriteRuleTokenStream(adaptor,"token 87");
@@ -1843,35 +1921,35 @@ public partial class ModelParser : Parser
         RewriteRuleSubtreeStream stream_logExp = new RewriteRuleSubtreeStream(adaptor,"rule logExp");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 13) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 14) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:178:15: ( logExp '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION logExp expression ( expression )* ) )
-            // Model.g:178:17: logExp '(' ( expression ( ',' expression )* )? ')'
+            // Model.g:179:15: ( logExp '(' ( expression ( ',' expression )* )? ')' -> ^( ASTFUNCTION logExp expression ( expression )* ) )
+            // Model.g:179:17: logExp '(' ( expression ( ',' expression )* )? ')'
             {
-            	PushFollow(FOLLOW_logExp_in_functionLogExp780);
-            	logExp39 = logExp();
+            	PushFollow(FOLLOW_logExp_in_functionLogExp791);
+            	logExp40 = logExp();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_logExp.Add(logExp39.Tree);
-            	char_literal40=(IToken)Match(input,86,FOLLOW_86_in_functionLogExp782); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_86.Add(char_literal40);
+            	if ( (state.backtracking==0) ) stream_logExp.Add(logExp40.Tree);
+            	char_literal41=(IToken)Match(input,86,FOLLOW_86_in_functionLogExp793); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_86.Add(char_literal41);
 
-            	// Model.g:178:28: ( expression ( ',' expression )* )?
+            	// Model.g:179:28: ( expression ( ',' expression )* )?
             	int alt8 = 2;
             	alt8 = dfa8.Predict(input);
             	switch (alt8) 
             	{
             	    case 1 :
-            	        // Model.g:178:30: expression ( ',' expression )*
+            	        // Model.g:179:30: expression ( ',' expression )*
             	        {
-            	        	PushFollow(FOLLOW_expression_in_functionLogExp786);
-            	        	expression41 = expression();
+            	        	PushFollow(FOLLOW_expression_in_functionLogExp797);
+            	        	expression42 = expression();
             	        	state.followingStackPointer--;
             	        	if (state.failed) return retval;
-            	        	if ( (state.backtracking==0) ) stream_expression.Add(expression41.Tree);
-            	        	// Model.g:178:41: ( ',' expression )*
+            	        	if ( (state.backtracking==0) ) stream_expression.Add(expression42.Tree);
+            	        	// Model.g:179:41: ( ',' expression )*
             	        	do 
             	        	{
             	        	    int alt7 = 2;
@@ -1886,16 +1964,16 @@ public partial class ModelParser : Parser
             	        	    switch (alt7) 
             	        		{
             	        			case 1 :
-            	        			    // Model.g:178:42: ',' expression
+            	        			    // Model.g:179:42: ',' expression
             	        			    {
-            	        			    	char_literal42=(IToken)Match(input,87,FOLLOW_87_in_functionLogExp789); if (state.failed) return retval; 
-            	        			    	if ( (state.backtracking==0) ) stream_87.Add(char_literal42);
+            	        			    	char_literal43=(IToken)Match(input,87,FOLLOW_87_in_functionLogExp800); if (state.failed) return retval; 
+            	        			    	if ( (state.backtracking==0) ) stream_87.Add(char_literal43);
 
-            	        			    	PushFollow(FOLLOW_expression_in_functionLogExp791);
-            	        			    	expression43 = expression();
+            	        			    	PushFollow(FOLLOW_expression_in_functionLogExp802);
+            	        			    	expression44 = expression();
             	        			    	state.followingStackPointer--;
             	        			    	if (state.failed) return retval;
-            	        			    	if ( (state.backtracking==0) ) stream_expression.Add(expression43.Tree);
+            	        			    	if ( (state.backtracking==0) ) stream_expression.Add(expression44.Tree);
 
             	        			    }
             	        			    break;
@@ -1914,8 +1992,8 @@ public partial class ModelParser : Parser
 
             	}
 
-            	char_literal44=(IToken)Match(input,RP,FOLLOW_RP_in_functionLogExp798); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal44);
+            	char_literal45=(IToken)Match(input,RP,FOLLOW_RP_in_functionLogExp809); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal45);
 
 
 
@@ -1931,16 +2009,16 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 178:66: -> ^( ASTFUNCTION logExp expression ( expression )* )
+            	// 179:66: -> ^( ASTFUNCTION logExp expression ( expression )* )
             	{
-            	    // Model.g:178:69: ^( ASTFUNCTION logExp expression ( expression )* )
+            	    // Model.g:179:69: ^( ASTFUNCTION logExp expression ( expression )* )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTFUNCTION, "ASTFUNCTION"), root_1);
 
             	    adaptor.AddChild(root_1, stream_logExp.NextTree());
             	    adaptor.AddChild(root_1, stream_expression.NextTree());
-            	    // Model.g:178:101: ( expression )*
+            	    // Model.g:179:101: ( expression )*
             	    while ( stream_expression.HasNext() )
             	    {
             	        adaptor.AddChild(root_1, stream_expression.NextTree());
@@ -1974,7 +2052,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 13, functionLogExp_StartIndex); 
+            	Memoize(input, 14, functionLogExp_StartIndex); 
             }
         }
         return retval;
@@ -1992,7 +2070,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "lagFunction"
-    // Model.g:180:1: lagFunction : '(' expression ')' '(' numberPlusMinus ')' -> ^( ASTLAGFUNCTION expression numberPlusMinus ) ;
+    // Model.g:181:1: lagFunction : '(' expression ')' '(' numberPlusMinus ')' -> ^( ASTLAGFUNCTION expression numberPlusMinus ) ;
     public ModelParser.lagFunction_return lagFunction() // throws RecognitionException [1]
     {   
         ModelParser.lagFunction_return retval = new ModelParser.lagFunction_return();
@@ -2000,53 +2078,53 @@ public partial class ModelParser : Parser
         int lagFunction_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal45 = null;
-        IToken char_literal47 = null;
+        IToken char_literal46 = null;
         IToken char_literal48 = null;
-        IToken char_literal50 = null;
-        ModelParser.expression_return expression46 = default(ModelParser.expression_return);
+        IToken char_literal49 = null;
+        IToken char_literal51 = null;
+        ModelParser.expression_return expression47 = default(ModelParser.expression_return);
 
-        ModelParser.numberPlusMinus_return numberPlusMinus49 = default(ModelParser.numberPlusMinus_return);
+        ModelParser.numberPlusMinus_return numberPlusMinus50 = default(ModelParser.numberPlusMinus_return);
 
 
-        object char_literal45_tree=null;
-        object char_literal47_tree=null;
+        object char_literal46_tree=null;
         object char_literal48_tree=null;
-        object char_literal50_tree=null;
+        object char_literal49_tree=null;
+        object char_literal51_tree=null;
         RewriteRuleTokenStream stream_RP = new RewriteRuleTokenStream(adaptor,"token RP");
         RewriteRuleTokenStream stream_86 = new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleSubtreeStream stream_expression = new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_numberPlusMinus = new RewriteRuleSubtreeStream(adaptor,"rule numberPlusMinus");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 14) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 15) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:180:13: ( '(' expression ')' '(' numberPlusMinus ')' -> ^( ASTLAGFUNCTION expression numberPlusMinus ) )
-            // Model.g:180:15: '(' expression ')' '(' numberPlusMinus ')'
+            // Model.g:181:13: ( '(' expression ')' '(' numberPlusMinus ')' -> ^( ASTLAGFUNCTION expression numberPlusMinus ) )
+            // Model.g:181:15: '(' expression ')' '(' numberPlusMinus ')'
             {
-            	char_literal45=(IToken)Match(input,86,FOLLOW_86_in_lagFunction823); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_86.Add(char_literal45);
+            	char_literal46=(IToken)Match(input,86,FOLLOW_86_in_lagFunction834); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_86.Add(char_literal46);
 
-            	PushFollow(FOLLOW_expression_in_lagFunction825);
-            	expression46 = expression();
+            	PushFollow(FOLLOW_expression_in_lagFunction836);
+            	expression47 = expression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_expression.Add(expression46.Tree);
-            	char_literal47=(IToken)Match(input,RP,FOLLOW_RP_in_lagFunction827); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal47);
+            	if ( (state.backtracking==0) ) stream_expression.Add(expression47.Tree);
+            	char_literal48=(IToken)Match(input,RP,FOLLOW_RP_in_lagFunction838); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal48);
 
-            	char_literal48=(IToken)Match(input,86,FOLLOW_86_in_lagFunction829); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_86.Add(char_literal48);
+            	char_literal49=(IToken)Match(input,86,FOLLOW_86_in_lagFunction840); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_86.Add(char_literal49);
 
-            	PushFollow(FOLLOW_numberPlusMinus_in_lagFunction831);
-            	numberPlusMinus49 = numberPlusMinus();
+            	PushFollow(FOLLOW_numberPlusMinus_in_lagFunction842);
+            	numberPlusMinus50 = numberPlusMinus();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus49.Tree);
-            	char_literal50=(IToken)Match(input,RP,FOLLOW_RP_in_lagFunction833); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal50);
+            	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus50.Tree);
+            	char_literal51=(IToken)Match(input,RP,FOLLOW_RP_in_lagFunction844); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_RP.Add(char_literal51);
 
 
 
@@ -2062,9 +2140,9 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 180:58: -> ^( ASTLAGFUNCTION expression numberPlusMinus )
+            	// 181:58: -> ^( ASTLAGFUNCTION expression numberPlusMinus )
             	{
-            	    // Model.g:180:61: ^( ASTLAGFUNCTION expression numberPlusMinus )
+            	    // Model.g:181:61: ^( ASTLAGFUNCTION expression numberPlusMinus )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTLAGFUNCTION, "ASTLAGFUNCTION"), root_1);
@@ -2098,7 +2176,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 14, lagFunction_StartIndex); 
+            	Memoize(input, 15, lagFunction_StartIndex); 
             }
         }
         return retval;
@@ -2116,7 +2194,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "expression"
-    // Model.g:182:1: expression : additiveExpression ;
+    // Model.g:183:1: expression : additiveExpression ;
     public ModelParser.expression_return expression() // throws RecognitionException [1]
     {   
         ModelParser.expression_return retval = new ModelParser.expression_return();
@@ -2124,26 +2202,26 @@ public partial class ModelParser : Parser
         int expression_StartIndex = input.Index();
         object root_0 = null;
 
-        ModelParser.additiveExpression_return additiveExpression51 = default(ModelParser.additiveExpression_return);
+        ModelParser.additiveExpression_return additiveExpression52 = default(ModelParser.additiveExpression_return);
 
 
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 15) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 16) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:182:12: ( additiveExpression )
-            // Model.g:184:4: additiveExpression
+            // Model.g:183:12: ( additiveExpression )
+            // Model.g:185:4: additiveExpression
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_additiveExpression_in_expression859);
-            	additiveExpression51 = additiveExpression();
+            	PushFollow(FOLLOW_additiveExpression_in_expression870);
+            	additiveExpression52 = additiveExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, additiveExpression51.Tree);
+            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, additiveExpression52.Tree);
 
             }
 
@@ -2165,7 +2243,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 15, expression_StartIndex); 
+            	Memoize(input, 16, expression_StartIndex); 
             }
         }
         return retval;
@@ -2183,7 +2261,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "additiveExpression"
-    // Model.g:186:1: additiveExpression : multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* ;
+    // Model.g:187:1: additiveExpression : multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* ;
     public ModelParser.additiveExpression_return additiveExpression() // throws RecognitionException [1]
     {   
         ModelParser.additiveExpression_return retval = new ModelParser.additiveExpression_return();
@@ -2191,31 +2269,31 @@ public partial class ModelParser : Parser
         int additiveExpression_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken set53 = null;
-        ModelParser.multiplicativeExpression_return multiplicativeExpression52 = default(ModelParser.multiplicativeExpression_return);
+        IToken set54 = null;
+        ModelParser.multiplicativeExpression_return multiplicativeExpression53 = default(ModelParser.multiplicativeExpression_return);
 
-        ModelParser.multiplicativeExpression_return multiplicativeExpression54 = default(ModelParser.multiplicativeExpression_return);
+        ModelParser.multiplicativeExpression_return multiplicativeExpression55 = default(ModelParser.multiplicativeExpression_return);
 
 
-        object set53_tree=null;
+        object set54_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 16) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 17) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:186:21: ( multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* )
-            // Model.g:186:23: multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )*
+            // Model.g:187:21: ( multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )* )
+            // Model.g:187:23: multiplicativeExpression ( ( PLUS | MINUS ) multiplicativeExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression868);
-            	multiplicativeExpression52 = multiplicativeExpression();
+            	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression879);
+            	multiplicativeExpression53 = multiplicativeExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, multiplicativeExpression52.Tree);
-            	// Model.g:186:48: ( ( PLUS | MINUS ) multiplicativeExpression )*
+            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, multiplicativeExpression53.Tree);
+            	// Model.g:187:48: ( ( PLUS | MINUS ) multiplicativeExpression )*
             	do 
             	{
             	    int alt9 = 2;
@@ -2230,14 +2308,14 @@ public partial class ModelParser : Parser
             	    switch (alt9) 
             		{
             			case 1 :
-            			    // Model.g:186:50: ( PLUS | MINUS ) multiplicativeExpression
+            			    // Model.g:187:50: ( PLUS | MINUS ) multiplicativeExpression
             			    {
-            			    	set53=(IToken)input.LT(1);
-            			    	set53 = (IToken)input.LT(1);
+            			    	set54=(IToken)input.LT(1);
+            			    	set54 = (IToken)input.LT(1);
             			    	if ( (input.LA(1) >= PLUS && input.LA(1) <= MINUS) ) 
             			    	{
             			    	    input.Consume();
-            			    	    if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot((object)adaptor.Create(set53), root_0);
+            			    	    if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot((object)adaptor.Create(set54), root_0);
             			    	    state.errorRecovery = false;state.failed = false;
             			    	}
             			    	else 
@@ -2247,11 +2325,11 @@ public partial class ModelParser : Parser
             			    	    throw mse;
             			    	}
 
-            			    	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression879);
-            			    	multiplicativeExpression54 = multiplicativeExpression();
+            			    	PushFollow(FOLLOW_multiplicativeExpression_in_additiveExpression890);
+            			    	multiplicativeExpression55 = multiplicativeExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
-            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, multiplicativeExpression54.Tree);
+            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, multiplicativeExpression55.Tree);
 
             			    }
             			    break;
@@ -2285,7 +2363,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 16, additiveExpression_StartIndex); 
+            	Memoize(input, 17, additiveExpression_StartIndex); 
             }
         }
         return retval;
@@ -2303,7 +2381,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "multiplicativeExpression"
-    // Model.g:188:1: multiplicativeExpression : powerExpression ( ( MULT | DIV | MOD ) powerExpression )* ;
+    // Model.g:189:1: multiplicativeExpression : powerExpression ( ( MULT | DIV | MOD ) powerExpression )* ;
     public ModelParser.multiplicativeExpression_return multiplicativeExpression() // throws RecognitionException [1]
     {   
         ModelParser.multiplicativeExpression_return retval = new ModelParser.multiplicativeExpression_return();
@@ -2311,31 +2389,31 @@ public partial class ModelParser : Parser
         int multiplicativeExpression_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken set56 = null;
-        ModelParser.powerExpression_return powerExpression55 = default(ModelParser.powerExpression_return);
+        IToken set57 = null;
+        ModelParser.powerExpression_return powerExpression56 = default(ModelParser.powerExpression_return);
 
-        ModelParser.powerExpression_return powerExpression57 = default(ModelParser.powerExpression_return);
+        ModelParser.powerExpression_return powerExpression58 = default(ModelParser.powerExpression_return);
 
 
-        object set56_tree=null;
+        object set57_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 17) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 18) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:188:28: ( powerExpression ( ( MULT | DIV | MOD ) powerExpression )* )
-            // Model.g:188:30: powerExpression ( ( MULT | DIV | MOD ) powerExpression )*
+            // Model.g:189:28: ( powerExpression ( ( MULT | DIV | MOD ) powerExpression )* )
+            // Model.g:189:30: powerExpression ( ( MULT | DIV | MOD ) powerExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression892);
-            	powerExpression55 = powerExpression();
+            	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression903);
+            	powerExpression56 = powerExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, powerExpression55.Tree);
-            	// Model.g:188:46: ( ( MULT | DIV | MOD ) powerExpression )*
+            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, powerExpression56.Tree);
+            	// Model.g:189:46: ( ( MULT | DIV | MOD ) powerExpression )*
             	do 
             	{
             	    int alt10 = 2;
@@ -2350,14 +2428,14 @@ public partial class ModelParser : Parser
             	    switch (alt10) 
             		{
             			case 1 :
-            			    // Model.g:188:48: ( MULT | DIV | MOD ) powerExpression
+            			    // Model.g:189:48: ( MULT | DIV | MOD ) powerExpression
             			    {
-            			    	set56=(IToken)input.LT(1);
-            			    	set56 = (IToken)input.LT(1);
+            			    	set57=(IToken)input.LT(1);
+            			    	set57 = (IToken)input.LT(1);
             			    	if ( (input.LA(1) >= MULT && input.LA(1) <= DIV) || input.LA(1) == MOD ) 
             			    	{
             			    	    input.Consume();
-            			    	    if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot((object)adaptor.Create(set56), root_0);
+            			    	    if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot((object)adaptor.Create(set57), root_0);
             			    	    state.errorRecovery = false;state.failed = false;
             			    	}
             			    	else 
@@ -2367,11 +2445,11 @@ public partial class ModelParser : Parser
             			    	    throw mse;
             			    	}
 
-            			    	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression905);
-            			    	powerExpression57 = powerExpression();
+            			    	PushFollow(FOLLOW_powerExpression_in_multiplicativeExpression916);
+            			    	powerExpression58 = powerExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
-            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, powerExpression57.Tree);
+            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, powerExpression58.Tree);
 
             			    }
             			    break;
@@ -2405,7 +2483,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 17, multiplicativeExpression_StartIndex); 
+            	Memoize(input, 18, multiplicativeExpression_StartIndex); 
             }
         }
         return retval;
@@ -2423,7 +2501,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "powerExpression"
-    // Model.g:190:1: powerExpression : unaryExpression ( pow unaryExpression )* ;
+    // Model.g:191:1: powerExpression : unaryExpression ( pow unaryExpression )* ;
     public ModelParser.powerExpression_return powerExpression() // throws RecognitionException [1]
     {   
         ModelParser.powerExpression_return retval = new ModelParser.powerExpression_return();
@@ -2431,31 +2509,31 @@ public partial class ModelParser : Parser
         int powerExpression_StartIndex = input.Index();
         object root_0 = null;
 
-        ModelParser.unaryExpression_return unaryExpression58 = default(ModelParser.unaryExpression_return);
+        ModelParser.unaryExpression_return unaryExpression59 = default(ModelParser.unaryExpression_return);
 
-        ModelParser.pow_return pow59 = default(ModelParser.pow_return);
+        ModelParser.pow_return pow60 = default(ModelParser.pow_return);
 
-        ModelParser.unaryExpression_return unaryExpression60 = default(ModelParser.unaryExpression_return);
+        ModelParser.unaryExpression_return unaryExpression61 = default(ModelParser.unaryExpression_return);
 
 
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 18) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 19) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:190:19: ( unaryExpression ( pow unaryExpression )* )
-            // Model.g:190:21: unaryExpression ( pow unaryExpression )*
+            // Model.g:191:19: ( unaryExpression ( pow unaryExpression )* )
+            // Model.g:191:21: unaryExpression ( pow unaryExpression )*
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	PushFollow(FOLLOW_unaryExpression_in_powerExpression918);
-            	unaryExpression58 = unaryExpression();
+            	PushFollow(FOLLOW_unaryExpression_in_powerExpression929);
+            	unaryExpression59 = unaryExpression();
             	state.followingStackPointer--;
             	if (state.failed) return retval;
-            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, unaryExpression58.Tree);
-            	// Model.g:190:37: ( pow unaryExpression )*
+            	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, unaryExpression59.Tree);
+            	// Model.g:191:37: ( pow unaryExpression )*
             	do 
             	{
             	    int alt11 = 2;
@@ -2470,18 +2548,18 @@ public partial class ModelParser : Parser
             	    switch (alt11) 
             		{
             			case 1 :
-            			    // Model.g:190:39: pow unaryExpression
+            			    // Model.g:191:39: pow unaryExpression
             			    {
-            			    	PushFollow(FOLLOW_pow_in_powerExpression922);
-            			    	pow59 = pow();
+            			    	PushFollow(FOLLOW_pow_in_powerExpression933);
+            			    	pow60 = pow();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
-            			    	if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot(pow59.Tree, root_0);
-            			    	PushFollow(FOLLOW_unaryExpression_in_powerExpression925);
-            			    	unaryExpression60 = unaryExpression();
+            			    	if ( state.backtracking == 0 ) root_0 = (object)adaptor.BecomeRoot(pow60.Tree, root_0);
+            			    	PushFollow(FOLLOW_unaryExpression_in_powerExpression936);
+            			    	unaryExpression61 = unaryExpression();
             			    	state.followingStackPointer--;
             			    	if (state.failed) return retval;
-            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, unaryExpression60.Tree);
+            			    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, unaryExpression61.Tree);
 
             			    }
             			    break;
@@ -2515,7 +2593,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 18, powerExpression_StartIndex); 
+            	Memoize(input, 19, powerExpression_StartIndex); 
             }
         }
         return retval;
@@ -2533,7 +2611,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "unaryExpression"
-    // Model.g:192:1: unaryExpression : ( primaryExpression | MINUS primaryExpression -> ^( NEGATE primaryExpression ) );
+    // Model.g:193:1: unaryExpression : ( primaryExpression | MINUS primaryExpression -> ^( NEGATE primaryExpression ) );
     public ModelParser.unaryExpression_return unaryExpression() // throws RecognitionException [1]
     {   
         ModelParser.unaryExpression_return retval = new ModelParser.unaryExpression_return();
@@ -2541,26 +2619,26 @@ public partial class ModelParser : Parser
         int unaryExpression_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken MINUS62 = null;
-        ModelParser.primaryExpression_return primaryExpression61 = default(ModelParser.primaryExpression_return);
+        IToken MINUS63 = null;
+        ModelParser.primaryExpression_return primaryExpression62 = default(ModelParser.primaryExpression_return);
 
-        ModelParser.primaryExpression_return primaryExpression63 = default(ModelParser.primaryExpression_return);
+        ModelParser.primaryExpression_return primaryExpression64 = default(ModelParser.primaryExpression_return);
 
 
-        object MINUS62_tree=null;
+        object MINUS63_tree=null;
         RewriteRuleTokenStream stream_MINUS = new RewriteRuleTokenStream(adaptor,"token MINUS");
         RewriteRuleSubtreeStream stream_primaryExpression = new RewriteRuleSubtreeStream(adaptor,"rule primaryExpression");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 19) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 20) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:193:4: ( primaryExpression | MINUS primaryExpression -> ^( NEGATE primaryExpression ) )
+            // Model.g:194:4: ( primaryExpression | MINUS primaryExpression -> ^( NEGATE primaryExpression ) )
             int alt12 = 2;
             int LA12_0 = input.LA(1);
 
-            if ( ((LA12_0 >= LOG && LA12_0 <= VARLIST) || (LA12_0 >= Double && LA12_0 <= Ident) || LA12_0 == AssignVar || LA12_0 == 86) )
+            if ( ((LA12_0 >= LOG && LA12_0 <= VARLIST) || (LA12_0 >= Double && LA12_0 <= Ident) || LA12_0 == 86) )
             {
                 alt12 = 1;
             }
@@ -2579,29 +2657,29 @@ public partial class ModelParser : Parser
             switch (alt12) 
             {
                 case 1 :
-                    // Model.g:193:6: primaryExpression
+                    // Model.g:194:6: primaryExpression
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_primaryExpression_in_unaryExpression940);
-                    	primaryExpression61 = primaryExpression();
+                    	PushFollow(FOLLOW_primaryExpression_in_unaryExpression951);
+                    	primaryExpression62 = primaryExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, primaryExpression61.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, primaryExpression62.Tree);
 
                     }
                     break;
                 case 2 :
-                    // Model.g:194:10: MINUS primaryExpression
+                    // Model.g:195:10: MINUS primaryExpression
                     {
-                    	MINUS62=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_unaryExpression951); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_MINUS.Add(MINUS62);
+                    	MINUS63=(IToken)Match(input,MINUS,FOLLOW_MINUS_in_unaryExpression962); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_MINUS.Add(MINUS63);
 
-                    	PushFollow(FOLLOW_primaryExpression_in_unaryExpression953);
-                    	primaryExpression63 = primaryExpression();
+                    	PushFollow(FOLLOW_primaryExpression_in_unaryExpression964);
+                    	primaryExpression64 = primaryExpression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_primaryExpression.Add(primaryExpression63.Tree);
+                    	if ( (state.backtracking==0) ) stream_primaryExpression.Add(primaryExpression64.Tree);
 
 
                     	// AST REWRITE
@@ -2616,9 +2694,9 @@ public partial class ModelParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 194:34: -> ^( NEGATE primaryExpression )
+                    	// 195:34: -> ^( NEGATE primaryExpression )
                     	{
-                    	    // Model.g:194:37: ^( NEGATE primaryExpression )
+                    	    // Model.g:195:37: ^( NEGATE primaryExpression )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(NEGATE, "NEGATE"), root_1);
@@ -2653,7 +2731,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 19, unaryExpression_StartIndex); 
+            	Memoize(input, 20, unaryExpression_StartIndex); 
             }
         }
         return retval;
@@ -2671,7 +2749,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "primaryExpression"
-    // Model.g:196:1: primaryExpression : ( '(' expression ')' | value );
+    // Model.g:197:1: primaryExpression : ( '(' expression ')' | value );
     public ModelParser.primaryExpression_return primaryExpression() // throws RecognitionException [1]
     {   
         ModelParser.primaryExpression_return retval = new ModelParser.primaryExpression_return();
@@ -2679,23 +2757,23 @@ public partial class ModelParser : Parser
         int primaryExpression_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal64 = null;
-        IToken char_literal66 = null;
-        ModelParser.expression_return expression65 = default(ModelParser.expression_return);
+        IToken char_literal65 = null;
+        IToken char_literal67 = null;
+        ModelParser.expression_return expression66 = default(ModelParser.expression_return);
 
-        ModelParser.value_return value67 = default(ModelParser.value_return);
+        ModelParser.value_return value68 = default(ModelParser.value_return);
 
 
-        object char_literal64_tree=null;
-        object char_literal66_tree=null;
+        object char_literal65_tree=null;
+        object char_literal67_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 20) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 21) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:197:4: ( '(' expression ')' | value )
+            // Model.g:198:4: ( '(' expression ')' | value )
             int alt13 = 2;
             int LA13_0 = input.LA(1);
 
@@ -2703,7 +2781,7 @@ public partial class ModelParser : Parser
             {
                 alt13 = 1;
             }
-            else if ( ((LA13_0 >= LOG && LA13_0 <= VARLIST) || (LA13_0 >= Double && LA13_0 <= Ident) || LA13_0 == AssignVar) )
+            else if ( ((LA13_0 >= LOG && LA13_0 <= VARLIST) || (LA13_0 >= Double && LA13_0 <= Ident)) )
             {
                 alt13 = 2;
             }
@@ -2718,30 +2796,30 @@ public partial class ModelParser : Parser
             switch (alt13) 
             {
                 case 1 :
-                    // Model.g:197:6: '(' expression ')'
+                    // Model.g:198:6: '(' expression ')'
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	char_literal64=(IToken)Match(input,86,FOLLOW_86_in_primaryExpression980); if (state.failed) return retval;
-                    	PushFollow(FOLLOW_expression_in_primaryExpression983);
-                    	expression65 = expression();
+                    	char_literal65=(IToken)Match(input,86,FOLLOW_86_in_primaryExpression991); if (state.failed) return retval;
+                    	PushFollow(FOLLOW_expression_in_primaryExpression994);
+                    	expression66 = expression();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, expression65.Tree);
-                    	char_literal66=(IToken)Match(input,RP,FOLLOW_RP_in_primaryExpression985); if (state.failed) return retval;
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, expression66.Tree);
+                    	char_literal67=(IToken)Match(input,RP,FOLLOW_RP_in_primaryExpression996); if (state.failed) return retval;
 
                     }
                     break;
                 case 2 :
-                    // Model.g:198:6: value
+                    // Model.g:199:6: value
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_value_in_primaryExpression993);
-                    	value67 = value();
+                    	PushFollow(FOLLOW_value_in_primaryExpression1004);
+                    	value68 = value();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, value67.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, value68.Tree);
 
                     }
                     break;
@@ -2765,7 +2843,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 20, primaryExpression_StartIndex); 
+            	Memoize(input, 21, primaryExpression_StartIndex); 
             }
         }
         return retval;
@@ -2783,7 +2861,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "value"
-    // Model.g:200:1: value : ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar );
+    // Model.g:201:1: value : ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar );
     public ModelParser.value_return value() // throws RecognitionException [1]
     {   
         ModelParser.value_return retval = new ModelParser.value_return();
@@ -2791,38 +2869,38 @@ public partial class ModelParser : Parser
         int value_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken Integer68 = null;
-        IToken Double69 = null;
-        ModelParser.functionLogExp_return functionLogExp70 = default(ModelParser.functionLogExp_return);
+        IToken Integer69 = null;
+        IToken Double70 = null;
+        ModelParser.functionLogExp_return functionLogExp71 = default(ModelParser.functionLogExp_return);
 
-        ModelParser.variableWithLagOrLead_return variableWithLagOrLead71 = default(ModelParser.variableWithLagOrLead_return);
+        ModelParser.variableWithLagOrLead_return variableWithLagOrLead72 = default(ModelParser.variableWithLagOrLead_return);
 
-        ModelParser.function_return function72 = default(ModelParser.function_return);
+        ModelParser.function_return function73 = default(ModelParser.function_return);
 
-        ModelParser.assignVar_return assignVar73 = default(ModelParser.assignVar_return);
+        ModelParser.assignVar_return assignVar74 = default(ModelParser.assignVar_return);
 
 
-        object Integer68_tree=null;
-        object Double69_tree=null;
+        object Integer69_tree=null;
+        object Double70_tree=null;
         RewriteRuleTokenStream stream_Double = new RewriteRuleTokenStream(adaptor,"token Double");
         RewriteRuleTokenStream stream_Integer = new RewriteRuleTokenStream(adaptor,"token Integer");
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 21) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 22) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:201:2: ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar )
+            // Model.g:202:2: ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar )
             int alt14 = 6;
             alt14 = dfa14.Predict(input);
             switch (alt14) 
             {
                 case 1 :
-                    // Model.g:201:5: Integer
+                    // Model.g:202:5: Integer
                     {
-                    	Integer68=(IToken)Match(input,Integer,FOLLOW_Integer_in_value1007); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_Integer.Add(Integer68);
+                    	Integer69=(IToken)Match(input,Integer,FOLLOW_Integer_in_value1018); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_Integer.Add(Integer69);
 
 
 
@@ -2838,9 +2916,9 @@ public partial class ModelParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 201:15: -> ^( ASTINTEGER Integer )
+                    	// 202:15: -> ^( ASTINTEGER Integer )
                     	{
-                    	    // Model.g:201:18: ^( ASTINTEGER Integer )
+                    	    // Model.g:202:18: ^( ASTINTEGER Integer )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTINTEGER, "ASTINTEGER"), root_1);
@@ -2856,10 +2934,10 @@ public partial class ModelParser : Parser
                     }
                     break;
                 case 2 :
-                    // Model.g:202:4: Double
+                    // Model.g:203:4: Double
                     {
-                    	Double69=(IToken)Match(input,Double,FOLLOW_Double_in_value1022); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_Double.Add(Double69);
+                    	Double70=(IToken)Match(input,Double,FOLLOW_Double_in_value1033); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_Double.Add(Double70);
 
 
 
@@ -2875,9 +2953,9 @@ public partial class ModelParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 202:15: -> ^( ASTDOUBLE Double )
+                    	// 203:15: -> ^( ASTDOUBLE Double )
                     	{
-                    	    // Model.g:202:18: ^( ASTDOUBLE Double )
+                    	    // Model.g:203:18: ^( ASTDOUBLE Double )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTDOUBLE, "ASTDOUBLE"), root_1);
@@ -2893,54 +2971,54 @@ public partial class ModelParser : Parser
                     }
                     break;
                 case 3 :
-                    // Model.g:203:4: functionLogExp
+                    // Model.g:204:4: functionLogExp
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_functionLogExp_in_value1039);
-                    	functionLogExp70 = functionLogExp();
+                    	PushFollow(FOLLOW_functionLogExp_in_value1050);
+                    	functionLogExp71 = functionLogExp();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, functionLogExp70.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, functionLogExp71.Tree);
 
                     }
                     break;
                 case 4 :
-                    // Model.g:204:4: variableWithLagOrLead
+                    // Model.g:205:4: variableWithLagOrLead
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_variableWithLagOrLead_in_value1063);
-                    	variableWithLagOrLead71 = variableWithLagOrLead();
+                    	PushFollow(FOLLOW_variableWithLagOrLead_in_value1074);
+                    	variableWithLagOrLead72 = variableWithLagOrLead();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, variableWithLagOrLead71.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, variableWithLagOrLead72.Tree);
 
                     }
                     break;
                 case 5 :
-                    // Model.g:205:4: function
+                    // Model.g:206:4: function
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_function_in_value1075);
-                    	function72 = function();
+                    	PushFollow(FOLLOW_function_in_value1086);
+                    	function73 = function();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, function72.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, function73.Tree);
 
                     }
                     break;
                 case 6 :
-                    // Model.g:206:6: assignVar
+                    // Model.g:207:6: assignVar
                     {
                     	root_0 = (object)adaptor.GetNilNode();
 
-                    	PushFollow(FOLLOW_assignVar_in_value1083);
-                    	assignVar73 = assignVar();
+                    	PushFollow(FOLLOW_assignVar_in_value1094);
+                    	assignVar74 = assignVar();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, assignVar73.Tree);
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, assignVar74.Tree);
 
                     }
                     break;
@@ -2964,7 +3042,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 21, value_StartIndex); 
+            	Memoize(input, 22, value_StartIndex); 
             }
         }
         return retval;
@@ -2982,7 +3060,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "assignVar"
-    // Model.g:209:1: assignVar : AssignVar -> ^( ASTASSIGNVAR AssignVar ) ;
+    // Model.g:210:1: assignVar : AssignVar -> ^( ASTASSIGNVAR AssignVar ) ;
     public ModelParser.assignVar_return assignVar() // throws RecognitionException [1]
     {   
         ModelParser.assignVar_return retval = new ModelParser.assignVar_return();
@@ -2990,22 +3068,22 @@ public partial class ModelParser : Parser
         int assignVar_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken AssignVar74 = null;
+        IToken AssignVar75 = null;
 
-        object AssignVar74_tree=null;
+        object AssignVar75_tree=null;
         RewriteRuleTokenStream stream_AssignVar = new RewriteRuleTokenStream(adaptor,"token AssignVar");
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 22) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 23) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:209:11: ( AssignVar -> ^( ASTASSIGNVAR AssignVar ) )
-            // Model.g:209:13: AssignVar
+            // Model.g:210:11: ( AssignVar -> ^( ASTASSIGNVAR AssignVar ) )
+            // Model.g:210:13: AssignVar
             {
-            	AssignVar74=(IToken)Match(input,AssignVar,FOLLOW_AssignVar_in_assignVar1094); if (state.failed) return retval; 
-            	if ( (state.backtracking==0) ) stream_AssignVar.Add(AssignVar74);
+            	AssignVar75=(IToken)Match(input,AssignVar,FOLLOW_AssignVar_in_assignVar1105); if (state.failed) return retval; 
+            	if ( (state.backtracking==0) ) stream_AssignVar.Add(AssignVar75);
 
 
 
@@ -3021,9 +3099,9 @@ public partial class ModelParser : Parser
             	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
             	root_0 = (object)adaptor.GetNilNode();
-            	// 209:23: -> ^( ASTASSIGNVAR AssignVar )
+            	// 210:23: -> ^( ASTASSIGNVAR AssignVar )
             	{
-            	    // Model.g:209:26: ^( ASTASSIGNVAR AssignVar )
+            	    // Model.g:210:26: ^( ASTASSIGNVAR AssignVar )
             	    {
             	    object root_1 = (object)adaptor.GetNilNode();
             	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTASSIGNVAR, "ASTASSIGNVAR"), root_1);
@@ -3056,7 +3134,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 22, assignVar_StartIndex); 
+            	Memoize(input, 23, assignVar_StartIndex); 
             }
         }
         return retval;
@@ -3074,7 +3152,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "variableWithLagOrLead"
-    // Model.g:211:1: variableWithLagOrLead : ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) );
+    // Model.g:212:1: variableWithLagOrLead : ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) );
     public ModelParser.variableWithLagOrLead_return variableWithLagOrLead() // throws RecognitionException [1]
     {   
         ModelParser.variableWithLagOrLead_return retval = new ModelParser.variableWithLagOrLead_return();
@@ -3082,25 +3160,25 @@ public partial class ModelParser : Parser
         int variableWithLagOrLead_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken char_literal77 = null;
-        IToken char_literal79 = null;
-        IToken char_literal81 = null;
-        IToken char_literal83 = null;
-        ModelParser.ident_return ident75 = default(ModelParser.ident_return);
-
+        IToken char_literal78 = null;
+        IToken char_literal80 = null;
+        IToken char_literal82 = null;
+        IToken char_literal84 = null;
         ModelParser.ident_return ident76 = default(ModelParser.ident_return);
 
-        ModelParser.numberPlusMinus_return numberPlusMinus78 = default(ModelParser.numberPlusMinus_return);
+        ModelParser.ident_return ident77 = default(ModelParser.ident_return);
 
-        ModelParser.ident_return ident80 = default(ModelParser.ident_return);
+        ModelParser.numberPlusMinus_return numberPlusMinus79 = default(ModelParser.numberPlusMinus_return);
 
-        ModelParser.numberPlusMinus_return numberPlusMinus82 = default(ModelParser.numberPlusMinus_return);
+        ModelParser.ident_return ident81 = default(ModelParser.ident_return);
+
+        ModelParser.numberPlusMinus_return numberPlusMinus83 = default(ModelParser.numberPlusMinus_return);
 
 
-        object char_literal77_tree=null;
-        object char_literal79_tree=null;
-        object char_literal81_tree=null;
-        object char_literal83_tree=null;
+        object char_literal78_tree=null;
+        object char_literal80_tree=null;
+        object char_literal82_tree=null;
+        object char_literal84_tree=null;
         RewriteRuleTokenStream stream_RP = new RewriteRuleTokenStream(adaptor,"token RP");
         RewriteRuleTokenStream stream_86 = new RewriteRuleTokenStream(adaptor,"token 86");
         RewriteRuleTokenStream stream_88 = new RewriteRuleTokenStream(adaptor,"token 88");
@@ -3109,23 +3187,23 @@ public partial class ModelParser : Parser
         RewriteRuleSubtreeStream stream_numberPlusMinus = new RewriteRuleSubtreeStream(adaptor,"rule numberPlusMinus");
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 23) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 24) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:212:4: ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) )
+            // Model.g:213:4: ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) )
             int alt15 = 3;
             alt15 = dfa15.Predict(input);
             switch (alt15) 
             {
                 case 1 :
-                    // Model.g:212:6: ident
+                    // Model.g:213:6: ident
                     {
-                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1115);
-                    	ident75 = ident();
+                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1126);
+                    	ident76 = ident();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_ident.Add(ident75.Tree);
+                    	if ( (state.backtracking==0) ) stream_ident.Add(ident76.Tree);
 
 
                     	// AST REWRITE
@@ -3140,9 +3218,9 @@ public partial class ModelParser : Parser
                     	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
 
                     	root_0 = (object)adaptor.GetNilNode();
-                    	// 212:13: -> ^( ASTVARIABLE ident FALSE )
+                    	// 213:13: -> ^( ASTVARIABLE ident FALSE )
                     	{
-                    	    // Model.g:212:16: ^( ASTVARIABLE ident FALSE )
+                    	    // Model.g:213:16: ^( ASTVARIABLE ident FALSE )
                     	    {
                     	    object root_1 = (object)adaptor.GetNilNode();
                     	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLE, "ASTVARIABLE"), root_1);
@@ -3159,80 +3237,28 @@ public partial class ModelParser : Parser
                     }
                     break;
                 case 2 :
-                    // Model.g:213:8: ident '(' numberPlusMinus ')'
+                    // Model.g:214:8: ident '(' numberPlusMinus ')'
                     {
-                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1135);
-                    	ident76 = ident();
+                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1146);
+                    	ident77 = ident();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_ident.Add(ident76.Tree);
-                    	char_literal77=(IToken)Match(input,86,FOLLOW_86_in_variableWithLagOrLead1137); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_86.Add(char_literal77);
+                    	if ( (state.backtracking==0) ) stream_ident.Add(ident77.Tree);
+                    	char_literal78=(IToken)Match(input,86,FOLLOW_86_in_variableWithLagOrLead1148); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_86.Add(char_literal78);
 
-                    	PushFollow(FOLLOW_numberPlusMinus_in_variableWithLagOrLead1139);
-                    	numberPlusMinus78 = numberPlusMinus();
+                    	PushFollow(FOLLOW_numberPlusMinus_in_variableWithLagOrLead1150);
+                    	numberPlusMinus79 = numberPlusMinus();
                     	state.followingStackPointer--;
                     	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus78.Tree);
-                    	char_literal79=(IToken)Match(input,RP,FOLLOW_RP_in_variableWithLagOrLead1141); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_RP.Add(char_literal79);
+                    	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus79.Tree);
+                    	char_literal80=(IToken)Match(input,RP,FOLLOW_RP_in_variableWithLagOrLead1152); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_RP.Add(char_literal80);
 
 
 
                     	// AST REWRITE
-                    	// elements:          ident, numberPlusMinus
-                    	// token labels:      
-                    	// rule labels:       retval
-                    	// token list labels: 
-                    	// rule list labels:  
-                    	// wildcard labels: 
-                    	if ( (state.backtracking==0) ) {
-                    	retval.Tree = root_0;
-                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
-
-                    	root_0 = (object)adaptor.GetNilNode();
-                    	// 213:38: -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE )
-                    	{
-                    	    // Model.g:213:41: ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE )
-                    	    {
-                    	    object root_1 = (object)adaptor.GetNilNode();
-                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLELAGLEAD, "ASTVARIABLELAGLEAD"), root_1);
-
-                    	    adaptor.AddChild(root_1, stream_ident.NextTree());
-                    	    adaptor.AddChild(root_1, stream_numberPlusMinus.NextTree());
-                    	    adaptor.AddChild(root_1, (object)adaptor.Create(FALSE, "FALSE"));
-
-                    	    adaptor.AddChild(root_0, root_1);
-                    	    }
-
-                    	}
-
-                    	retval.Tree = root_0;retval.Tree = root_0;}
-                    }
-                    break;
-                case 3 :
-                    // Model.g:214:8: ident '[' numberPlusMinus ']'
-                    {
-                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1163);
-                    	ident80 = ident();
-                    	state.followingStackPointer--;
-                    	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_ident.Add(ident80.Tree);
-                    	char_literal81=(IToken)Match(input,88,FOLLOW_88_in_variableWithLagOrLead1165); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_88.Add(char_literal81);
-
-                    	PushFollow(FOLLOW_numberPlusMinus_in_variableWithLagOrLead1167);
-                    	numberPlusMinus82 = numberPlusMinus();
-                    	state.followingStackPointer--;
-                    	if (state.failed) return retval;
-                    	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus82.Tree);
-                    	char_literal83=(IToken)Match(input,89,FOLLOW_89_in_variableWithLagOrLead1169); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_89.Add(char_literal83);
-
-
-
-                    	// AST REWRITE
-                    	// elements:          ident, numberPlusMinus
+                    	// elements:          numberPlusMinus, ident
                     	// token labels:      
                     	// rule labels:       retval
                     	// token list labels: 
@@ -3262,6 +3288,58 @@ public partial class ModelParser : Parser
                     	retval.Tree = root_0;retval.Tree = root_0;}
                     }
                     break;
+                case 3 :
+                    // Model.g:215:8: ident '[' numberPlusMinus ']'
+                    {
+                    	PushFollow(FOLLOW_ident_in_variableWithLagOrLead1174);
+                    	ident81 = ident();
+                    	state.followingStackPointer--;
+                    	if (state.failed) return retval;
+                    	if ( (state.backtracking==0) ) stream_ident.Add(ident81.Tree);
+                    	char_literal82=(IToken)Match(input,88,FOLLOW_88_in_variableWithLagOrLead1176); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_88.Add(char_literal82);
+
+                    	PushFollow(FOLLOW_numberPlusMinus_in_variableWithLagOrLead1178);
+                    	numberPlusMinus83 = numberPlusMinus();
+                    	state.followingStackPointer--;
+                    	if (state.failed) return retval;
+                    	if ( (state.backtracking==0) ) stream_numberPlusMinus.Add(numberPlusMinus83.Tree);
+                    	char_literal84=(IToken)Match(input,89,FOLLOW_89_in_variableWithLagOrLead1180); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_89.Add(char_literal84);
+
+
+
+                    	// AST REWRITE
+                    	// elements:          ident, numberPlusMinus
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 215:38: -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE )
+                    	{
+                    	    // Model.g:215:41: ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE )
+                    	    {
+                    	    object root_1 = (object)adaptor.GetNilNode();
+                    	    root_1 = (object)adaptor.BecomeRoot((object)adaptor.Create(ASTVARIABLELAGLEAD, "ASTVARIABLELAGLEAD"), root_1);
+
+                    	    adaptor.AddChild(root_1, stream_ident.NextTree());
+                    	    adaptor.AddChild(root_1, stream_numberPlusMinus.NextTree());
+                    	    adaptor.AddChild(root_1, (object)adaptor.Create(FALSE, "FALSE"));
+
+                    	    adaptor.AddChild(root_0, root_1);
+                    	    }
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
+                    }
+                    break;
 
             }
             retval.Stop = input.LT(-1);
@@ -3282,7 +3360,7 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 23, variableWithLagOrLead_StartIndex); 
+            	Memoize(input, 24, variableWithLagOrLead_StartIndex); 
             }
         }
         return retval;
@@ -3300,7 +3378,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "numberPlusMinus"
-    // Model.g:217:1: numberPlusMinus : ( MINUS | PLUS ) ( Integer | Double ) ;
+    // Model.g:218:1: numberPlusMinus : ( MINUS | PLUS ) ( Integer | Double ) ;
     public ModelParser.numberPlusMinus_return numberPlusMinus() // throws RecognitionException [1]
     {   
         ModelParser.numberPlusMinus_return retval = new ModelParser.numberPlusMinus_return();
@@ -3308,39 +3386,25 @@ public partial class ModelParser : Parser
         int numberPlusMinus_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken set84 = null;
         IToken set85 = null;
+        IToken set86 = null;
 
-        object set84_tree=null;
         object set85_tree=null;
+        object set86_tree=null;
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 24) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 25) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:217:18: ( ( MINUS | PLUS ) ( Integer | Double ) )
-            // Model.g:217:21: ( MINUS | PLUS ) ( Integer | Double )
+            // Model.g:218:18: ( ( MINUS | PLUS ) ( Integer | Double ) )
+            // Model.g:218:21: ( MINUS | PLUS ) ( Integer | Double )
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	set84 = (IToken)input.LT(1);
-            	if ( (input.LA(1) >= PLUS && input.LA(1) <= MINUS) ) 
-            	{
-            	    input.Consume();
-            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set84));
-            	    state.errorRecovery = false;state.failed = false;
-            	}
-            	else 
-            	{
-            	    if ( state.backtracking > 0 ) {state.failed = true; return retval;}
-            	    MismatchedSetException mse = new MismatchedSetException(null,input);
-            	    throw mse;
-            	}
-
             	set85 = (IToken)input.LT(1);
-            	if ( (input.LA(1) >= Double && input.LA(1) <= Integer) ) 
+            	if ( (input.LA(1) >= PLUS && input.LA(1) <= MINUS) ) 
             	{
             	    input.Consume();
             	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set85));
@@ -3353,70 +3417,8 @@ public partial class ModelParser : Parser
             	    throw mse;
             	}
 
-
-            }
-
-            retval.Stop = input.LT(-1);
-
-            if ( (state.backtracking==0) )
-            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
-            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
-        }
-        catch (RecognitionException re) 
-    	{
-            ReportError(re);
-            Recover(input,re);
-    	// Conversion of the second argument necessary, but harmless
-    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
-
-        }
-        finally 
-    	{
-            if ( state.backtracking > 0 ) 
-            {
-            	Memoize(input, 24, numberPlusMinus_StartIndex); 
-            }
-        }
-        return retval;
-    }
-    // $ANTLR end "numberPlusMinus"
-
-    public class logExp_return : ParserRuleReturnScope
-    {
-        private object tree;
-        override public object Tree
-        {
-        	get { return tree; }
-        	set { tree = (object) value; }
-        }
-    };
-
-    // $ANTLR start "logExp"
-    // Model.g:219:1: logExp : ( LOG | EXP );
-    public ModelParser.logExp_return logExp() // throws RecognitionException [1]
-    {   
-        ModelParser.logExp_return retval = new ModelParser.logExp_return();
-        retval.Start = input.LT(1);
-        int logExp_StartIndex = input.Index();
-        object root_0 = null;
-
-        IToken set86 = null;
-
-        object set86_tree=null;
-
-        try 
-    	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 25) ) 
-    	    {
-    	    	return retval; 
-    	    }
-            // Model.g:219:7: ( LOG | EXP )
-            // Model.g:
-            {
-            	root_0 = (object)adaptor.GetNilNode();
-
             	set86 = (IToken)input.LT(1);
-            	if ( (input.LA(1) >= LOG && input.LA(1) <= EXP) ) 
+            	if ( (input.LA(1) >= Double && input.LA(1) <= Integer) ) 
             	{
             	    input.Consume();
             	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set86));
@@ -3450,14 +3452,14 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 25, logExp_StartIndex); 
+            	Memoize(input, 25, numberPlusMinus_StartIndex); 
             }
         }
         return retval;
     }
-    // $ANTLR end "logExp"
+    // $ANTLR end "numberPlusMinus"
 
-    public class ident_return : ParserRuleReturnScope
+    public class logExp_return : ParserRuleReturnScope
     {
         private object tree;
         override public object Tree
@@ -3467,20 +3469,18 @@ public partial class ModelParser : Parser
         }
     };
 
-    // $ANTLR start "ident"
-    // Model.g:221:1: ident : ( Ident | extraTokens );
-    public ModelParser.ident_return ident() // throws RecognitionException [1]
+    // $ANTLR start "logExp"
+    // Model.g:220:1: logExp : ( LOG | EXP );
+    public ModelParser.logExp_return logExp() // throws RecognitionException [1]
     {   
-        ModelParser.ident_return retval = new ModelParser.ident_return();
+        ModelParser.logExp_return retval = new ModelParser.logExp_return();
         retval.Start = input.LT(1);
-        int ident_StartIndex = input.Index();
+        int logExp_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken Ident87 = null;
-        ModelParser.extraTokens_return extraTokens88 = default(ModelParser.extraTokens_return);
+        IToken set87 = null;
 
-
-        object Ident87_tree=null;
+        object set87_tree=null;
 
         try 
     	{
@@ -3488,120 +3488,16 @@ public partial class ModelParser : Parser
     	    {
     	    	return retval; 
     	    }
-            // Model.g:221:9: ( Ident | extraTokens )
-            int alt16 = 2;
-            int LA16_0 = input.LA(1);
-
-            if ( (LA16_0 == Ident) )
-            {
-                alt16 = 1;
-            }
-            else if ( ((LA16_0 >= LOG && LA16_0 <= VARLIST)) )
-            {
-                alt16 = 2;
-            }
-            else 
-            {
-                if ( state.backtracking > 0 ) {state.failed = true; return retval;}
-                NoViableAltException nvae_d16s0 =
-                    new NoViableAltException("", 16, 0, input);
-
-                throw nvae_d16s0;
-            }
-            switch (alt16) 
-            {
-                case 1 :
-                    // Model.g:221:12: Ident
-                    {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	Ident87=(IToken)Match(input,Ident,FOLLOW_Ident_in_ident1238); if (state.failed) return retval;
-                    	if ( state.backtracking == 0 )
-                    	{Ident87_tree = (object)adaptor.Create(Ident87);
-                    		adaptor.AddChild(root_0, Ident87_tree);
-                    	}
-
-                    }
-                    break;
-                case 2 :
-                    // Model.g:221:20: extraTokens
-                    {
-                    	root_0 = (object)adaptor.GetNilNode();
-
-                    	PushFollow(FOLLOW_extraTokens_in_ident1242);
-                    	extraTokens88 = extraTokens();
-                    	state.followingStackPointer--;
-                    	if (state.failed) return retval;
-                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, extraTokens88.Tree);
-
-                    }
-                    break;
-
-            }
-            retval.Stop = input.LT(-1);
-
-            if ( (state.backtracking==0) )
-            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
-            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
-        }
-        catch (RecognitionException re) 
-    	{
-            ReportError(re);
-            Recover(input,re);
-    	// Conversion of the second argument necessary, but harmless
-    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
-
-        }
-        finally 
-    	{
-            if ( state.backtracking > 0 ) 
-            {
-            	Memoize(input, 26, ident_StartIndex); 
-            }
-        }
-        return retval;
-    }
-    // $ANTLR end "ident"
-
-    public class frmlEnding_return : ParserRuleReturnScope
-    {
-        private object tree;
-        override public object Tree
-        {
-        	get { return tree; }
-        	set { tree = (object) value; }
-        }
-    };
-
-    // $ANTLR start "frmlEnding"
-    // Model.g:225:1: frmlEnding : ( '$' | ';' );
-    public ModelParser.frmlEnding_return frmlEnding() // throws RecognitionException [1]
-    {   
-        ModelParser.frmlEnding_return retval = new ModelParser.frmlEnding_return();
-        retval.Start = input.LT(1);
-        int frmlEnding_StartIndex = input.Index();
-        object root_0 = null;
-
-        IToken set89 = null;
-
-        object set89_tree=null;
-
-        try 
-    	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 27) ) 
-    	    {
-    	    	return retval; 
-    	    }
-            // Model.g:225:12: ( '$' | ';' )
+            // Model.g:220:7: ( LOG | EXP )
             // Model.g:
             {
             	root_0 = (object)adaptor.GetNilNode();
 
-            	set89 = (IToken)input.LT(1);
-            	if ( (input.LA(1) >= 90 && input.LA(1) <= 91) ) 
+            	set87 = (IToken)input.LT(1);
+            	if ( (input.LA(1) >= LOG && input.LA(1) <= EXP) ) 
             	{
             	    input.Consume();
-            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set89));
+            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set87));
             	    state.errorRecovery = false;state.failed = false;
             	}
             	else 
@@ -3632,7 +3528,189 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 27, frmlEnding_StartIndex); 
+            	Memoize(input, 26, logExp_StartIndex); 
+            }
+        }
+        return retval;
+    }
+    // $ANTLR end "logExp"
+
+    public class ident_return : ParserRuleReturnScope
+    {
+        private object tree;
+        override public object Tree
+        {
+        	get { return tree; }
+        	set { tree = (object) value; }
+        }
+    };
+
+    // $ANTLR start "ident"
+    // Model.g:222:1: ident : ( Ident | extraTokens );
+    public ModelParser.ident_return ident() // throws RecognitionException [1]
+    {   
+        ModelParser.ident_return retval = new ModelParser.ident_return();
+        retval.Start = input.LT(1);
+        int ident_StartIndex = input.Index();
+        object root_0 = null;
+
+        IToken Ident88 = null;
+        ModelParser.extraTokens_return extraTokens89 = default(ModelParser.extraTokens_return);
+
+
+        object Ident88_tree=null;
+
+        try 
+    	{
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 27) ) 
+    	    {
+    	    	return retval; 
+    	    }
+            // Model.g:222:9: ( Ident | extraTokens )
+            int alt16 = 2;
+            int LA16_0 = input.LA(1);
+
+            if ( (LA16_0 == Ident) )
+            {
+                alt16 = 1;
+            }
+            else if ( ((LA16_0 >= LOG && LA16_0 <= VARLIST)) )
+            {
+                alt16 = 2;
+            }
+            else 
+            {
+                if ( state.backtracking > 0 ) {state.failed = true; return retval;}
+                NoViableAltException nvae_d16s0 =
+                    new NoViableAltException("", 16, 0, input);
+
+                throw nvae_d16s0;
+            }
+            switch (alt16) 
+            {
+                case 1 :
+                    // Model.g:222:12: Ident
+                    {
+                    	root_0 = (object)adaptor.GetNilNode();
+
+                    	Ident88=(IToken)Match(input,Ident,FOLLOW_Ident_in_ident1249); if (state.failed) return retval;
+                    	if ( state.backtracking == 0 )
+                    	{Ident88_tree = (object)adaptor.Create(Ident88);
+                    		adaptor.AddChild(root_0, Ident88_tree);
+                    	}
+
+                    }
+                    break;
+                case 2 :
+                    // Model.g:222:20: extraTokens
+                    {
+                    	root_0 = (object)adaptor.GetNilNode();
+
+                    	PushFollow(FOLLOW_extraTokens_in_ident1253);
+                    	extraTokens89 = extraTokens();
+                    	state.followingStackPointer--;
+                    	if (state.failed) return retval;
+                    	if ( state.backtracking == 0 ) adaptor.AddChild(root_0, extraTokens89.Tree);
+
+                    }
+                    break;
+
+            }
+            retval.Stop = input.LT(-1);
+
+            if ( (state.backtracking==0) )
+            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+    	// Conversion of the second argument necessary, but harmless
+    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+
+        }
+        finally 
+    	{
+            if ( state.backtracking > 0 ) 
+            {
+            	Memoize(input, 27, ident_StartIndex); 
+            }
+        }
+        return retval;
+    }
+    // $ANTLR end "ident"
+
+    public class frmlEnding_return : ParserRuleReturnScope
+    {
+        private object tree;
+        override public object Tree
+        {
+        	get { return tree; }
+        	set { tree = (object) value; }
+        }
+    };
+
+    // $ANTLR start "frmlEnding"
+    // Model.g:226:1: frmlEnding : ( '$' | ';' );
+    public ModelParser.frmlEnding_return frmlEnding() // throws RecognitionException [1]
+    {   
+        ModelParser.frmlEnding_return retval = new ModelParser.frmlEnding_return();
+        retval.Start = input.LT(1);
+        int frmlEnding_StartIndex = input.Index();
+        object root_0 = null;
+
+        IToken set90 = null;
+
+        object set90_tree=null;
+
+        try 
+    	{
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 28) ) 
+    	    {
+    	    	return retval; 
+    	    }
+            // Model.g:226:12: ( '$' | ';' )
+            // Model.g:
+            {
+            	root_0 = (object)adaptor.GetNilNode();
+
+            	set90 = (IToken)input.LT(1);
+            	if ( (input.LA(1) >= 90 && input.LA(1) <= 91) ) 
+            	{
+            	    input.Consume();
+            	    if ( state.backtracking == 0 ) adaptor.AddChild(root_0, (object)adaptor.Create(set90));
+            	    state.errorRecovery = false;state.failed = false;
+            	}
+            	else 
+            	{
+            	    if ( state.backtracking > 0 ) {state.failed = true; return retval;}
+            	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            	    throw mse;
+            	}
+
+
+            }
+
+            retval.Stop = input.LT(-1);
+
+            if ( (state.backtracking==0) )
+            {	retval.Tree = (object)adaptor.RulePostProcessing(root_0);
+            	adaptor.SetTokenBoundaries(retval.Tree, (IToken) retval.Start, (IToken) retval.Stop);}
+        }
+        catch (RecognitionException re) 
+    	{
+            ReportError(re);
+            Recover(input,re);
+    	// Conversion of the second argument necessary, but harmless
+    	retval.Tree = (object)adaptor.ErrorNode(input, (IToken) retval.Start, input.LT(-1), re);
+
+        }
+        finally 
+    	{
+            if ( state.backtracking > 0 ) 
+            {
+            	Memoize(input, 28, frmlEnding_StartIndex); 
             }
         }
         return retval;
@@ -3650,7 +3728,7 @@ public partial class ModelParser : Parser
     };
 
     // $ANTLR start "pow"
-    // Model.g:233:1: pow : ( STARS -> ASTPOW | HAT -> ASTPOW );
+    // Model.g:234:1: pow : ( STARS -> ASTPOW | HAT -> ASTPOW );
     public ModelParser.pow_return pow() // throws RecognitionException [1]
     {   
         ModelParser.pow_return retval = new ModelParser.pow_return();
@@ -3658,21 +3736,21 @@ public partial class ModelParser : Parser
         int pow_StartIndex = input.Index();
         object root_0 = null;
 
-        IToken STARS90 = null;
-        IToken HAT91 = null;
+        IToken STARS91 = null;
+        IToken HAT92 = null;
 
-        object STARS90_tree=null;
-        object HAT91_tree=null;
+        object STARS91_tree=null;
+        object HAT92_tree=null;
         RewriteRuleTokenStream stream_HAT = new RewriteRuleTokenStream(adaptor,"token HAT");
         RewriteRuleTokenStream stream_STARS = new RewriteRuleTokenStream(adaptor,"token STARS");
 
         try 
     	{
-    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 28) ) 
+    	    if ( (state.backtracking > 0) && AlreadyParsedRule(input, 29) ) 
     	    {
     	    	return retval; 
     	    }
-            // Model.g:233:9: ( STARS -> ASTPOW | HAT -> ASTPOW )
+            // Model.g:234:9: ( STARS -> ASTPOW | HAT -> ASTPOW )
             int alt17 = 2;
             int LA17_0 = input.LA(1);
 
@@ -3695,39 +3773,10 @@ public partial class ModelParser : Parser
             switch (alt17) 
             {
                 case 1 :
-                    // Model.g:233:17: STARS
+                    // Model.g:234:17: STARS
                     {
-                    	STARS90=(IToken)Match(input,STARS,FOLLOW_STARS_in_pow1338); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_STARS.Add(STARS90);
-
-
-
-                    	// AST REWRITE
-                    	// elements:          
-                    	// token labels:      
-                    	// rule labels:       retval
-                    	// token list labels: 
-                    	// rule list labels:  
-                    	// wildcard labels: 
-                    	if ( (state.backtracking==0) ) {
-                    	retval.Tree = root_0;
-                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
-
-                    	root_0 = (object)adaptor.GetNilNode();
-                    	// 233:24: -> ASTPOW
-                    	{
-                    	    adaptor.AddChild(root_0, (object)adaptor.Create(ASTPOW, "ASTPOW"));
-
-                    	}
-
-                    	retval.Tree = root_0;retval.Tree = root_0;}
-                    }
-                    break;
-                case 2 :
-                    // Model.g:234:17: HAT
-                    {
-                    	HAT91=(IToken)Match(input,HAT,FOLLOW_HAT_in_pow1361); if (state.failed) return retval; 
-                    	if ( (state.backtracking==0) ) stream_HAT.Add(HAT91);
+                    	STARS91=(IToken)Match(input,STARS,FOLLOW_STARS_in_pow1349); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_STARS.Add(STARS91);
 
 
 
@@ -3744,6 +3793,35 @@ public partial class ModelParser : Parser
 
                     	root_0 = (object)adaptor.GetNilNode();
                     	// 234:24: -> ASTPOW
+                    	{
+                    	    adaptor.AddChild(root_0, (object)adaptor.Create(ASTPOW, "ASTPOW"));
+
+                    	}
+
+                    	retval.Tree = root_0;retval.Tree = root_0;}
+                    }
+                    break;
+                case 2 :
+                    // Model.g:235:17: HAT
+                    {
+                    	HAT92=(IToken)Match(input,HAT,FOLLOW_HAT_in_pow1372); if (state.failed) return retval; 
+                    	if ( (state.backtracking==0) ) stream_HAT.Add(HAT92);
+
+
+
+                    	// AST REWRITE
+                    	// elements:          
+                    	// token labels:      
+                    	// rule labels:       retval
+                    	// token list labels: 
+                    	// rule list labels:  
+                    	// wildcard labels: 
+                    	if ( (state.backtracking==0) ) {
+                    	retval.Tree = root_0;
+                    	RewriteRuleSubtreeStream stream_retval = new RewriteRuleSubtreeStream(adaptor, "rule retval", retval!=null ? retval.Tree : null);
+
+                    	root_0 = (object)adaptor.GetNilNode();
+                    	// 235:24: -> ASTPOW
                     	{
                     	    adaptor.AddChild(root_0, (object)adaptor.Create(ASTPOW, "ASTPOW"));
 
@@ -3772,34 +3850,20 @@ public partial class ModelParser : Parser
     	{
             if ( state.backtracking > 0 ) 
             {
-            	Memoize(input, 28, pow_StartIndex); 
+            	Memoize(input, 29, pow_StartIndex); 
             }
         }
         return retval;
     }
     // $ANTLR end "pow"
 
-    // $ANTLR start "synpred30_Model"
-    public void synpred30_Model_fragment() {
-        // Model.g:203:4: ( functionLogExp )
-        // Model.g:203:4: functionLogExp
-        {
-        	PushFollow(FOLLOW_functionLogExp_in_synpred30_Model1039);
-        	functionLogExp();
-        	state.followingStackPointer--;
-        	if (state.failed) return ;
-
-        }
-    }
-    // $ANTLR end "synpred30_Model"
-
     // $ANTLR start "synpred31_Model"
     public void synpred31_Model_fragment() {
-        // Model.g:204:4: ( variableWithLagOrLead )
-        // Model.g:204:4: variableWithLagOrLead
+        // Model.g:204:4: ( functionLogExp )
+        // Model.g:204:4: functionLogExp
         {
-        	PushFollow(FOLLOW_variableWithLagOrLead_in_synpred31_Model1063);
-        	variableWithLagOrLead();
+        	PushFollow(FOLLOW_functionLogExp_in_synpred31_Model1050);
+        	functionLogExp();
         	state.followingStackPointer--;
         	if (state.failed) return ;
 
@@ -3809,17 +3873,31 @@ public partial class ModelParser : Parser
 
     // $ANTLR start "synpred32_Model"
     public void synpred32_Model_fragment() {
-        // Model.g:205:4: ( function )
-        // Model.g:205:4: function
+        // Model.g:205:4: ( variableWithLagOrLead )
+        // Model.g:205:4: variableWithLagOrLead
         {
-        	PushFollow(FOLLOW_function_in_synpred32_Model1075);
-        	function();
+        	PushFollow(FOLLOW_variableWithLagOrLead_in_synpred32_Model1074);
+        	variableWithLagOrLead();
         	state.followingStackPointer--;
         	if (state.failed) return ;
 
         }
     }
     // $ANTLR end "synpred32_Model"
+
+    // $ANTLR start "synpred33_Model"
+    public void synpred33_Model_fragment() {
+        // Model.g:206:4: ( function )
+        // Model.g:206:4: function
+        {
+        	PushFollow(FOLLOW_function_in_synpred33_Model1086);
+        	function();
+        	state.followingStackPointer--;
+        	if (state.failed) return ;
+
+        }
+    }
+    // $ANTLR end "synpred33_Model"
 
     // Delegated rules
 
@@ -3841,13 +3919,13 @@ public partial class ModelParser : Parser
    	    state.failed = false;
    	    return success;
    	}
-   	public bool synpred30_Model() 
+   	public bool synpred31_Model() 
    	{
    	    state.backtracking++;
    	    int start = input.Mark();
    	    try 
    	    {
-   	        synpred30_Model_fragment(); // can never throw exception
+   	        synpred31_Model_fragment(); // can never throw exception
    	    }
    	    catch (RecognitionException re) 
    	    {
@@ -3859,13 +3937,13 @@ public partial class ModelParser : Parser
    	    state.failed = false;
    	    return success;
    	}
-   	public bool synpred31_Model() 
+   	public bool synpred33_Model() 
    	{
    	    state.backtracking++;
    	    int start = input.Mark();
    	    try 
    	    {
-   	        synpred31_Model_fragment(); // can never throw exception
+   	        synpred33_Model_fragment(); // can never throw exception
    	    }
    	    catch (RecognitionException re) 
    	    {
@@ -3908,8 +3986,8 @@ public partial class ModelParser : Parser
     const string DFA6_specialS =
         "\x0a\uffff}>";
     static readonly string[] DFA6_transitionS = {
-            "\x07\x01\x01\uffff\x01\x01\x05\uffff\x01\x09\x17\uffff\x03"+
-            "\x01\x01\uffff\x01\x01\x27\uffff\x01\x01",
+            "\x07\x01\x01\uffff\x01\x01\x05\uffff\x01\x09\x17\uffff\x04"+
+            "\x01\x28\uffff\x01\x01",
             "",
             "",
             "",
@@ -3947,7 +4025,7 @@ public partial class ModelParser : Parser
 
         override public string Description
         {
-            get { return "177:22: ( expression ( ',' expression )* )?"; }
+            get { return "178:22: ( expression ( ',' expression )* )?"; }
         }
 
     }
@@ -3965,8 +4043,8 @@ public partial class ModelParser : Parser
     const string DFA8_specialS =
         "\x0a\uffff}>";
     static readonly string[] DFA8_transitionS = {
-            "\x07\x01\x01\uffff\x01\x01\x05\uffff\x01\x09\x17\uffff\x03"+
-            "\x01\x01\uffff\x01\x01\x27\uffff\x01\x01",
+            "\x07\x01\x01\uffff\x01\x01\x05\uffff\x01\x09\x17\uffff\x04"+
+            "\x01\x28\uffff\x01\x01",
             "",
             "",
             "",
@@ -4004,7 +4082,7 @@ public partial class ModelParser : Parser
 
         override public string Description
         {
-            get { return "178:28: ( expression ( ',' expression )* )?"; }
+            get { return "179:28: ( expression ( ',' expression )* )?"; }
         }
 
     }
@@ -4012,40 +4090,28 @@ public partial class ModelParser : Parser
     const string DFA14_eotS =
         "\x27\uffff";
     const string DFA14_eofS =
-        "\x03\uffff\x03\x07\x21\uffff";
+        "\x03\uffff\x03\x08\x21\uffff";
     const string DFA14_minS =
-        "\x01\x04\x02\uffff\x03\x0b\x09\uffff\x01\x00\x0a\uffff\x01\x00"+
-        "\x09\uffff\x01\x00\x02\uffff";
+        "\x01\x04\x02\uffff\x03\x0b\x01\uffff\x01\x00\x12\uffff\x02\x00"+
+        "\x0b\uffff";
     const string DFA14_maxS =
-        "\x01\x2e\x02\uffff\x03\x5b\x09\uffff\x01\x00\x0a\uffff\x01\x00"+
-        "\x09\uffff\x01\x00\x02\uffff";
+        "\x01\x2d\x02\uffff\x03\x5b\x01\uffff\x01\x00\x12\uffff\x02\x00"+
+        "\x0b\uffff";
     const string DFA14_acceptS =
-        "\x01\uffff\x01\x01\x01\x02\x03\uffff\x01\x06\x01\x04\x1d\uffff"+
-        "\x01\x03\x01\x05";
+        "\x01\uffff\x01\x01\x01\x02\x03\uffff\x01\x06\x01\uffff\x01\x04"+
+        "\x1c\uffff\x01\x03\x01\x05";
     const string DFA14_specialS =
-        "\x0f\uffff\x01\x00\x0a\uffff\x01\x01\x09\uffff\x01\x02\x02\uffff}>";
+        "\x07\uffff\x01\x00\x12\uffff\x01\x01\x01\x02\x0b\uffff}>";
     static readonly string[] DFA14_transitionS = {
-            "\x02\x03\x05\x05\x1f\uffff\x01\x02\x01\x01\x01\x04\x01\uffff"+
-            "\x01\x06",
+            "\x02\x03\x05\x05\x1f\uffff\x01\x02\x01\x01\x01\x06\x01\x04",
             "",
             "",
-            "\x02\x07\x01\uffff\x02\x07\x02\uffff\x01\x07\x1a\uffff\x01"+
-            "\x07\x01\uffff\x02\x07\x25\uffff\x01\x0f\x02\x07\x01\uffff\x02"+
-            "\x07",
-            "\x02\x07\x01\uffff\x02\x07\x02\uffff\x01\x07\x1a\uffff\x01"+
-            "\x07\x01\uffff\x02\x07\x25\uffff\x01\x1a\x02\x07\x01\uffff\x02"+
-            "\x07",
-            "\x02\x07\x01\uffff\x02\x07\x02\uffff\x01\x07\x1a\uffff\x01"+
-            "\x07\x01\uffff\x02\x07\x25\uffff\x01\x24\x02\x07\x01\uffff\x02"+
-            "\x07",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
+            "\x02\x08\x01\uffff\x02\x08\x02\uffff\x01\x08\x1b\uffff\x03"+
+            "\x08\x25\uffff\x01\x07\x02\x08\x01\uffff\x02\x08",
+            "\x02\x08\x01\uffff\x02\x08\x02\uffff\x01\x08\x1b\uffff\x03"+
+            "\x08\x25\uffff\x01\x1a\x02\x08\x01\uffff\x02\x08",
+            "\x02\x08\x01\uffff\x02\x08\x02\uffff\x01\x08\x1b\uffff\x03"+
+            "\x08\x25\uffff\x01\x1b\x02\x08\x01\uffff\x02\x08",
             "",
             "\x01\uffff",
             "",
@@ -4058,6 +4124,15 @@ public partial class ModelParser : Parser
             "",
             "",
             "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\x01\uffff",
             "\x01\uffff",
             "",
             "",
@@ -4068,7 +4143,6 @@ public partial class ModelParser : Parser
             "",
             "",
             "",
-            "\x01\uffff",
             "",
             ""
     };
@@ -4099,7 +4173,7 @@ public partial class ModelParser : Parser
 
         override public string Description
         {
-            get { return "200:1: value : ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar );"; }
+            get { return "201:1: value : ( Integer -> ^( ASTINTEGER Integer ) | Double -> ^( ASTDOUBLE Double ) | functionLogExp | variableWithLagOrLead | function | assignVar );"; }
         }
 
     }
@@ -4112,20 +4186,20 @@ public partial class ModelParser : Parser
         switch ( s )
         {
                	case 0 : 
-                   	int LA14_15 = input.LA(1);
+                   	int LA14_7 = input.LA(1);
 
                    	 
-                   	int index14_15 = input.Index();
+                   	int index14_7 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred30_Model()) ) { s = 37; }
+                   	if ( (synpred31_Model()) ) { s = 37; }
 
-                   	else if ( (synpred31_Model()) ) { s = 7; }
+                   	else if ( (synpred32_Model()) ) { s = 8; }
 
-                   	else if ( (synpred32_Model()) ) { s = 38; }
+                   	else if ( (synpred33_Model()) ) { s = 38; }
 
                    	 
-                   	input.Seek(index14_15);
+                   	input.Seek(index14_7);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 1 : 
@@ -4135,27 +4209,27 @@ public partial class ModelParser : Parser
                    	int index14_26 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred31_Model()) ) { s = 7; }
+                   	if ( (synpred32_Model()) ) { s = 8; }
 
-                   	else if ( (synpred32_Model()) ) { s = 38; }
+                   	else if ( (synpred33_Model()) ) { s = 38; }
 
                    	 
                    	input.Seek(index14_26);
                    	if ( s >= 0 ) return s;
                    	break;
                	case 2 : 
-                   	int LA14_36 = input.LA(1);
+                   	int LA14_27 = input.LA(1);
 
                    	 
-                   	int index14_36 = input.Index();
+                   	int index14_27 = input.Index();
                    	input.Rewind();
                    	s = -1;
-                   	if ( (synpred31_Model()) ) { s = 7; }
+                   	if ( (synpred32_Model()) ) { s = 8; }
 
-                   	else if ( (synpred32_Model()) ) { s = 38; }
+                   	else if ( (synpred33_Model()) ) { s = 38; }
 
                    	 
-                   	input.Seek(index14_36);
+                   	input.Seek(index14_27);
                    	if ( s >= 0 ) return s;
                    	break;
         }
@@ -4168,23 +4242,21 @@ public partial class ModelParser : Parser
     const string DFA15_eotS =
         "\x17\uffff";
     const string DFA15_eofS =
-        "\x01\uffff\x02\x03\x14\uffff";
+        "\x01\uffff\x02\x05\x14\uffff";
     const string DFA15_minS =
         "\x01\x04\x02\x0b\x14\uffff";
     const string DFA15_maxS =
-        "\x01\x2c\x02\x5b\x14\uffff";
+        "\x01\x2d\x02\x5b\x14\uffff";
     const string DFA15_acceptS =
-        "\x03\uffff\x01\x01\x07\uffff\x01\x03\x01\x02\x0a\uffff";
+        "\x03\uffff\x01\x02\x01\x03\x01\x01\x11\uffff";
     const string DFA15_specialS =
         "\x17\uffff}>";
     static readonly string[] DFA15_transitionS = {
-            "\x07\x02\x21\uffff\x01\x01",
-            "\x02\x03\x01\uffff\x02\x03\x02\uffff\x01\x03\x1a\uffff\x01"+
-            "\x03\x01\uffff\x02\x03\x25\uffff\x01\x0c\x01\x03\x01\x0b\x01"+
-            "\uffff\x02\x03",
-            "\x02\x03\x01\uffff\x02\x03\x02\uffff\x01\x03\x1a\uffff\x01"+
-            "\x03\x01\uffff\x02\x03\x25\uffff\x01\x0c\x01\x03\x01\x0b\x01"+
-            "\uffff\x02\x03",
+            "\x07\x02\x22\uffff\x01\x01",
+            "\x02\x05\x01\uffff\x02\x05\x02\uffff\x01\x05\x1b\uffff\x03"+
+            "\x05\x25\uffff\x01\x03\x01\x05\x01\x04\x01\uffff\x02\x05",
+            "\x02\x05\x01\uffff\x02\x05\x02\uffff\x01\x05\x1b\uffff\x03"+
+            "\x05\x25\uffff\x01\x03\x01\x05\x01\x04\x01\uffff\x02\x05",
             "",
             "",
             "",
@@ -4233,7 +4305,7 @@ public partial class ModelParser : Parser
 
         override public string Description
         {
-            get { return "211:1: variableWithLagOrLead : ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) );"; }
+            get { return "212:1: variableWithLagOrLead : ( ident -> ^( ASTVARIABLE ident FALSE ) | ident '(' numberPlusMinus ')' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) | ident '[' numberPlusMinus ']' -> ^( ASTVARIABLELAGLEAD ident numberPlusMinus FALSE ) );"; }
         }
 
     }
@@ -4251,10 +4323,10 @@ public partial class ModelParser : Parser
     public static readonly BitSet FOLLOW_AFTER2_in_expr2515 = new BitSet(new ulong[]{0x00000200000003C0UL,0x000000000C000000UL});
     public static readonly BitSet FOLLOW_frmlEnding_in_expr2517 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_frmlEnding_in_expr2532 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_FRML_in_frml565 = new BitSet(new ulong[]{0x00001000000007F0UL});
-    public static readonly BitSet FOLLOW_code_in_frml567 = new BitSet(new ulong[]{0x00001000000007F0UL});
+    public static readonly BitSet FOLLOW_FRML_in_frml565 = new BitSet(new ulong[]{0x00002000000007F0UL});
+    public static readonly BitSet FOLLOW_code_in_frml567 = new BitSet(new ulong[]{0x00002000000007F0UL});
     public static readonly BitSet FOLLOW_genrLeftSide_in_frml569 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000200000UL});
-    public static readonly BitSet FOLLOW_85_in_frml571 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_85_in_frml571 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
     public static readonly BitSet FOLLOW_expression2_in_frml573 = new BitSet(new ulong[]{0x00000200000003C0UL,0x000000000C000000UL});
     public static readonly BitSet FOLLOW_frmlEnding_in_frml575 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_genrLeftSide2_in_genrLeftSide611 = new BitSet(new ulong[]{0x0000000000000002UL});
@@ -4263,77 +4335,78 @@ public partial class ModelParser : Parser
     public static readonly BitSet FOLLOW_ident_in_code637 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_expression_in_expression2652 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_set_in_number667 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_VAL_in_val679 = new BitSet(new ulong[]{0x0000100000000000UL});
-    public static readonly BitSet FOLLOW_Ident_in_val681 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000200000UL});
+    public static readonly BitSet FOLLOW_VAL_in_val679 = new BitSet(new ulong[]{0x0000300000000000UL});
+    public static readonly BitSet FOLLOW_scalar_in_val681 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000200000UL});
     public static readonly BitSet FOLLOW_85_in_val683 = new BitSet(new ulong[]{0x00000C0000001000UL});
     public static readonly BitSet FOLLOW_MINUS_in_val685 = new BitSet(new ulong[]{0x00000C0000001000UL});
     public static readonly BitSet FOLLOW_number_in_val688 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_simpleFunction715 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_86_in_simpleFunction717 = new BitSet(new ulong[]{0x00001000000007F0UL});
-    public static readonly BitSet FOLLOW_ident_in_simpleFunction719 = new BitSet(new ulong[]{0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_RP_in_simpleFunction721 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_function742 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_86_in_function744 = new BitSet(new ulong[]{0x00005C00000417F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_function748 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_87_in_function751 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_function753 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_RP_in_function760 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_logExp_in_functionLogExp780 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_86_in_functionLogExp782 = new BitSet(new ulong[]{0x00005C00000417F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_functionLogExp786 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_87_in_functionLogExp789 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_functionLogExp791 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
-    public static readonly BitSet FOLLOW_RP_in_functionLogExp798 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_86_in_lagFunction823 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_lagFunction825 = new BitSet(new ulong[]{0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_RP_in_lagFunction827 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_86_in_lagFunction829 = new BitSet(new ulong[]{0x0000000000001800UL});
-    public static readonly BitSet FOLLOW_numberPlusMinus_in_lagFunction831 = new BitSet(new ulong[]{0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_RP_in_lagFunction833 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_additiveExpression_in_expression859 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression868 = new BitSet(new ulong[]{0x0000000000001802UL});
-    public static readonly BitSet FOLLOW_set_in_additiveExpression872 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_set_in_scalar0 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_simpleFunction726 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_86_in_simpleFunction728 = new BitSet(new ulong[]{0x00002000000007F0UL});
+    public static readonly BitSet FOLLOW_ident_in_simpleFunction730 = new BitSet(new ulong[]{0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_RP_in_simpleFunction732 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_function753 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_86_in_function755 = new BitSet(new ulong[]{0x00003C00000417F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_function759 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_87_in_function762 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_function764 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_RP_in_function771 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_logExp_in_functionLogExp791 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_86_in_functionLogExp793 = new BitSet(new ulong[]{0x00003C00000417F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_functionLogExp797 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_87_in_functionLogExp800 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_functionLogExp802 = new BitSet(new ulong[]{0x0000000000040000UL,0x0000000000800000UL});
+    public static readonly BitSet FOLLOW_RP_in_functionLogExp809 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_86_in_lagFunction834 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_lagFunction836 = new BitSet(new ulong[]{0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_RP_in_lagFunction838 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_86_in_lagFunction840 = new BitSet(new ulong[]{0x0000000000001800UL});
+    public static readonly BitSet FOLLOW_numberPlusMinus_in_lagFunction842 = new BitSet(new ulong[]{0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_RP_in_lagFunction844 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_additiveExpression_in_expression870 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression879 = new BitSet(new ulong[]{0x0000000000001802UL});
-    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression892 = new BitSet(new ulong[]{0x000020000000C002UL});
-    public static readonly BitSet FOLLOW_set_in_multiplicativeExpression896 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression905 = new BitSet(new ulong[]{0x000020000000C002UL});
-    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression918 = new BitSet(new ulong[]{0x0001800000000002UL});
-    public static readonly BitSet FOLLOW_pow_in_powerExpression922 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression925 = new BitSet(new ulong[]{0x0001800000000002UL});
-    public static readonly BitSet FOLLOW_primaryExpression_in_unaryExpression940 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_MINUS_in_unaryExpression951 = new BitSet(new ulong[]{0x00005C00000007F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_primaryExpression_in_unaryExpression953 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_86_in_primaryExpression980 = new BitSet(new ulong[]{0x00005C00000017F0UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_expression_in_primaryExpression983 = new BitSet(new ulong[]{0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_RP_in_primaryExpression985 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_value_in_primaryExpression993 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Integer_in_value1007 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Double_in_value1022 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_functionLogExp_in_value1039 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableWithLagOrLead_in_value1063 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_function_in_value1075 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_assignVar_in_value1083 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_AssignVar_in_assignVar1094 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1115 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1135 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
-    public static readonly BitSet FOLLOW_86_in_variableWithLagOrLead1137 = new BitSet(new ulong[]{0x0000000000001800UL});
-    public static readonly BitSet FOLLOW_numberPlusMinus_in_variableWithLagOrLead1139 = new BitSet(new ulong[]{0x0000000000040000UL});
-    public static readonly BitSet FOLLOW_RP_in_variableWithLagOrLead1141 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1163 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000001000000UL});
-    public static readonly BitSet FOLLOW_88_in_variableWithLagOrLead1165 = new BitSet(new ulong[]{0x0000000000001800UL});
-    public static readonly BitSet FOLLOW_numberPlusMinus_in_variableWithLagOrLead1167 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
-    public static readonly BitSet FOLLOW_89_in_variableWithLagOrLead1169 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_set_in_numberPlusMinus1203 = new BitSet(new ulong[]{0x00000C0000000000UL});
-    public static readonly BitSet FOLLOW_set_in_numberPlusMinus1209 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_additiveExpression883 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_multiplicativeExpression_in_additiveExpression890 = new BitSet(new ulong[]{0x0000000000001802UL});
+    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression903 = new BitSet(new ulong[]{0x000040000000C002UL});
+    public static readonly BitSet FOLLOW_set_in_multiplicativeExpression907 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_powerExpression_in_multiplicativeExpression916 = new BitSet(new ulong[]{0x000040000000C002UL});
+    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression929 = new BitSet(new ulong[]{0x0001800000000002UL});
+    public static readonly BitSet FOLLOW_pow_in_powerExpression933 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_unaryExpression_in_powerExpression936 = new BitSet(new ulong[]{0x0001800000000002UL});
+    public static readonly BitSet FOLLOW_primaryExpression_in_unaryExpression951 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_MINUS_in_unaryExpression962 = new BitSet(new ulong[]{0x00003C00000007F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_primaryExpression_in_unaryExpression964 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_86_in_primaryExpression991 = new BitSet(new ulong[]{0x00003C00000017F0UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_expression_in_primaryExpression994 = new BitSet(new ulong[]{0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_RP_in_primaryExpression996 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_value_in_primaryExpression1004 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Integer_in_value1018 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Double_in_value1033 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_functionLogExp_in_value1050 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableWithLagOrLead_in_value1074 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_function_in_value1086 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_assignVar_in_value1094 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_AssignVar_in_assignVar1105 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1126 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1146 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000000400000UL});
+    public static readonly BitSet FOLLOW_86_in_variableWithLagOrLead1148 = new BitSet(new ulong[]{0x0000000000001800UL});
+    public static readonly BitSet FOLLOW_numberPlusMinus_in_variableWithLagOrLead1150 = new BitSet(new ulong[]{0x0000000000040000UL});
+    public static readonly BitSet FOLLOW_RP_in_variableWithLagOrLead1152 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_ident_in_variableWithLagOrLead1174 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000001000000UL});
+    public static readonly BitSet FOLLOW_88_in_variableWithLagOrLead1176 = new BitSet(new ulong[]{0x0000000000001800UL});
+    public static readonly BitSet FOLLOW_numberPlusMinus_in_variableWithLagOrLead1178 = new BitSet(new ulong[]{0x0000000000000000UL,0x0000000002000000UL});
+    public static readonly BitSet FOLLOW_89_in_variableWithLagOrLead1180 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_set_in_numberPlusMinus1214 = new BitSet(new ulong[]{0x00000C0000000000UL});
+    public static readonly BitSet FOLLOW_set_in_numberPlusMinus1220 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_set_in_logExp0 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_Ident_in_ident1238 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_extraTokens_in_ident1242 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_Ident_in_ident1249 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_extraTokens_in_ident1253 = new BitSet(new ulong[]{0x0000000000000002UL});
     public static readonly BitSet FOLLOW_set_in_frmlEnding0 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_STARS_in_pow1338 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_HAT_in_pow1361 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_functionLogExp_in_synpred30_Model1039 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_variableWithLagOrLead_in_synpred31_Model1063 = new BitSet(new ulong[]{0x0000000000000002UL});
-    public static readonly BitSet FOLLOW_function_in_synpred32_Model1075 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_STARS_in_pow1349 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_HAT_in_pow1372 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_functionLogExp_in_synpred31_Model1050 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_variableWithLagOrLead_in_synpred32_Model1074 = new BitSet(new ulong[]{0x0000000000000002UL});
+    public static readonly BitSet FOLLOW_function_in_synpred33_Model1086 = new BitSet(new ulong[]{0x0000000000000002UL});
 
 }
 }

@@ -666,7 +666,9 @@ namespace Gekko
                     }
                     else
                     {
-                        vals.Add(key, value);
+                        string key2 = key;
+                        if (!key.StartsWith(Globals.symbolScalar.ToString())) key2 = Globals.symbolScalar + key;
+                        vals.Add(key2, value);
                     }
                 }
             }
@@ -3070,7 +3072,8 @@ namespace Gekko
 
         private static string HandleModelVal(ASTNode equationNode, WalkerHelper2 wh2)
         {
-            string key = equationNode.GetChild(0).Text.Substring(1);
+            //string key = equationNode.GetChild(0).Text.Substring(1);
+            string key = equationNode.GetChild(0).Text;
             string value = null;
             if (wh2.vals == null || !wh2.vals.TryGetValue(key, out value))
             {

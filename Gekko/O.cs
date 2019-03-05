@@ -860,94 +860,107 @@ namespace Gekko
         {
             counter++;
             bool rv = false;
-            if (x.Type() == EVariableType.Val)
-            {
-                ScalarVal x_val = x as ScalarVal;
-                ScalarVal max_val = max as ScalarVal;
-                if (max_val == null)
-                {
-                    G.Writeln2("*** ERROR: Expected max value to be VAL type, you may try the val() function");
-                    throw new GekkoException();
-                }
-                ScalarVal step_val = null;
-                if (step == null) step_val = Globals.scalarVal1;
-                else step_val = step as ScalarVal;
-                if (step_val == null)
-                {
-                    G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
-                    throw new GekkoException();
-                }
-                if (step_val.val > 0)
-                {
-                    //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
-                    //max typically has step/1000000 added, so it might be 11.000002
-                    rv = x_val.val <= max_val.val + step_val.val / 1000000d;
-                }
-                else
-                {
-                    rv = x_val.val >= max_val.val + step_val.val / 1000000;
-                    //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
-                    //max typically has step/1000000 added, so it might be 0.999998
-                }
-            }
-            else if (x.Type() == EVariableType.Date)
-            {
-                ScalarDate x_date = x as ScalarDate;
-                ScalarDate max_date = max as ScalarDate;
-                if (max_date == null)
-                {
-                    G.Writeln2("*** ERROR: Expected max value to be DATE type, you may try the date() function");
-                    throw new GekkoException();
-                }
-                ScalarVal step_val = null;
-                if (step == null) step_val = Globals.scalarVal1;
-                else step_val = step as ScalarVal;
-                if (step_val == null)
-                {
-                    G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
-                    throw new GekkoException();
-                }
-                int step_int = O.ConvertToInt(step_val);
-                if (step_int == 0)
-                {
-                    G.Writeln2("*** ERROR: Step value cannot be 0");
-                    throw new GekkoException();
-                }
 
-                //GekkoTime gt = x_date.date.Add(step_int);
-                if (step_val.val > 0)
-                {
-                    return x_date.date.SmallerThanOrEqual(max_date.date);
-                }
-                else
-                {
-                    return x_date.date.LargerThanOrEqual(max_date.date);
-                }
-            }
-            else if (x.Type() == EVariableType.String)
+            if (max == null && step == null)
             {
-                if (max != null)
-                {
-                    G.Writeln2("*** ERROR: string loops do not have TO argument");
-                    throw new GekkoException();
-                }
-                if (step != null)
-                {
-                    G.Writeln2("*** ERROR: string loops do not have STEP/BY argument");
-                    throw new GekkoException();
-                }
+                //looping over a list like FOR <type> %i = (<item1>, item2, ...)
+
                 List start_list = start as List;
-
                 if (start_list == null)
                 {
                     G.Writeln2("*** ERROR: Expected FOR to loop over list, not a " + G.GetTypeString(start) + " type");
                     throw new GekkoException();
                 }
 
-                if (counter <= start_list.list.Count) rv = true;
-
+                if (x.Type() == EVariableType.Val)
+                {
+                    if (counter <= start_list.list.Count) rv = true;
+                }
+                else if (x.Type() == EVariableType.Date)
+                {
+                    if (counter <= start_list.list.Count) rv = true;
+                }
+                else if (x.Type() == EVariableType.String)
+                {
+                    if (counter <= start_list.list.Count) rv = true;
+                }
+                else throw new GekkoException();
             }
-            else throw new GekkoException();
+        
+            else
+            {
+                //looping from ... to ... by
+                if (x.Type() == EVariableType.Val)
+                {
+                    ScalarVal x_val = x as ScalarVal;
+                    ScalarVal max_val = max as ScalarVal;
+                    if (max_val == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected max value to be VAL type, you may try the val() function");
+                        throw new GekkoException();
+                    }
+                    ScalarVal step_val = null;
+                    if (step == null) step_val = Globals.scalarVal1;
+                    else step_val = step as ScalarVal;
+                    if (step_val == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
+                        throw new GekkoException();
+                    }
+                    if (step_val.val > 0)
+                    {
+                        //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
+                        //max typically has step/1000000 added, so it might be 11.000002
+                        rv = x_val.val <= max_val.val + step_val.val / 1000000d;
+                    }
+                    else
+                    {
+                        rv = x_val.val >= max_val.val + step_val.val / 1000000;
+                        //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
+                        //max typically has step/1000000 added, so it might be 0.999998
+                    }
+                }
+                else if (x.Type() == EVariableType.Date)
+                {
+                    ScalarDate x_date = x as ScalarDate;
+                    ScalarDate max_date = max as ScalarDate;
+                    if (max_date == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected max value to be DATE type, you may try the date() function");
+                        throw new GekkoException();
+                    }
+                    ScalarVal step_val = null;
+                    if (step == null) step_val = Globals.scalarVal1;
+                    else step_val = step as ScalarVal;
+                    if (step_val == null)
+                    {
+                        G.Writeln2("*** ERROR: Expected step value to be VAL type, you may try the val() function");
+                        throw new GekkoException();
+                    }
+                    int step_int = O.ConvertToInt(step_val);
+                    if (step_int == 0)
+                    {
+                        G.Writeln2("*** ERROR: Step value cannot be 0");
+                        throw new GekkoException();
+                    }
+
+                    //GekkoTime gt = x_date.date.Add(step_int);
+                    if (step_val.val > 0)
+                    {
+                        return x_date.date.SmallerThanOrEqual(max_date.date);
+                    }
+                    else
+                    {
+                        return x_date.date.LargerThanOrEqual(max_date.date);
+                    }
+                }
+                else if (x.Type() == EVariableType.String)
+                {
+                    G.Writeln2("*** ERROR: string loops cannot be of ... TO ... BY ... type");
+                    throw new GekkoException();
+                }
+                else throw new GekkoException();
+            }
             return rv;
         }
 

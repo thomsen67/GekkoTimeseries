@@ -3341,8 +3341,7 @@ target2:                    TARGET ident -> ^(ASTTARGET ident);
 // TELL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-tell:					    TELL ('<' NOCR? '>')? expression -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} expression NOCR?);
-//tell:					    TELL seqItem7 -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} seqItem7);
+tell:					    TELL ('<' NOCR? '>')? expression? -> ^({token("ASTTELL", ASTTELL, input.LT(1).Line)} ^(ASTPLACEHOLDER expression?) NOCR?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // TIME

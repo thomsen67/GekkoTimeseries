@@ -164,7 +164,8 @@ expression2	:	expression -> ^(ASTEXPRESSION expression);
 
 number: (Double|Integer);
 
-val : VAL Ident '=' MINUS? number -> ^(ASTVAL Ident number MINUS?);
+val : VAL scalar '=' MINUS? number -> ^(ASTVAL scalar number MINUS?);
+scalar:  AssignVar | Ident;
 
 //-------------------------------------------------------------------------
 //----------------------------- expressions start -------------------------

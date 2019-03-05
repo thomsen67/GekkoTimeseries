@@ -623,6 +623,7 @@ namespace Gekko.Parser.Gek
                 case "ASTFOR":
                     {
                         List<string> varnames = GetForLoopVariables(node);  //TODO: more than 1...
+                                                
                         foreach (string varname in varnames)
                         {
                             if (node.forLoopAnchor == null) node.forLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -657,30 +658,7 @@ namespace Gekko.Parser.Gek
 
                             s = G.AddSigil(s, type);  //see also #980753275
 
-                            if (G.Equal(type, "series"))
-                            {
-                                if (G.Chop_HasSigil(s))
-                                {
-                                    G.Writeln2("*** ERROR: Did not expect '" + s[0] + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
-                                    throw new GekkoException();
-                                }
-                            }
-                            else if (G.Equal(type, "val") || G.Equal(type, "date") || G.Equal(type, "string"))
-                            {
-                                if (s[0] != Globals.symbolScalar)
-                                {
-                                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolScalar + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
-                                    throw new GekkoException();
-                                }
-                            }
-                            else if (G.Equal(type, "list") || G.Equal(type, "map") || G.Equal(type, "matrix"))
-                            {
-                                if (s[0] != Globals.symbolCollection)
-                                {
-                                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolCollection + "' on variable " + s + " (type is " + type + ", def function/procedure '" + functionName + "')");
-                                    throw new GekkoException();
-                                }
-                            }
+                            CheckTypeInFunctionDefProcedureDefForDef(functionName, type, s);
 
                             if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             if (node.functionDefAnchor.ContainsKey(s))
@@ -1433,11 +1411,16 @@ namespace Gekko.Parser.Gek
                     case "ASTTELL":
                         {
                             string s = "false";
+                            string ss = "new ScalarString(``)";
                             if (node.ChildrenCount() > 1)
                             {
-                                s = "true";
+                                s = "true";                                
                             }
-                            node.Code.A("Program.Tell(O.ConvertToString(" + node[0].Code + "), " + s + ");");                            
+                            if (node[0].ChildrenCount() == 1)
+                            {
+                                ss = node[0][0].Code.ToString();
+                            }
+                            node.Code.A("Program.Tell(O.ConvertToString(" + ss + "), " + s + ");");                            
                         }
                         break;
                     case "ASTSYS":
@@ -2130,6 +2113,10 @@ namespace Gekko.Parser.Gek
 
                             if (node[0].ChildrenCount() == 1)
                             {
+                                string type = node[0][0][0][0].Text;
+
+                                CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[0]);
+
                                 int i = 0;
                                 string codeStart, codeEnd2, codeStep;
                                 GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
@@ -6154,7 +6141,37 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
-        }                
+        }
+
+        private static void CheckTypeInFunctionDefProcedureDefForDef(string functionName, string type, string s)
+        {
+            string x = " (type is " + type + ", def function/procedure '" + functionName + "')";
+            if(functionName=="for-loop") x = " (type is " + type + ", for loop definition)";
+            if (G.Equal(type, "series"))
+            {
+                if (G.Chop_HasSigil(s))
+                {
+                    G.Writeln2("*** ERROR: Did not expect '" + s[0] + "' on variable " + s + x);
+                    throw new GekkoException();
+                }
+            }
+            else if (G.Equal(type, "val") || G.Equal(type, "date") || G.Equal(type, "string"))
+            {
+                if (s[0] != Globals.symbolScalar)
+                {
+                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolScalar + "' on variable " + s + x);
+                    throw new GekkoException();
+                }
+            }
+            else if (G.Equal(type, "list") || G.Equal(type, "map") || G.Equal(type, "matrix"))
+            {
+                if (s[0] != Globals.symbolCollection)
+                {
+                    G.Writeln2("*** ERROR: Expected '" + Globals.symbolCollection + "' on variable " + s + x);
+                    throw new GekkoException();
+                }
+            }
+        }
 
         private static string GetFuncArgumentCode(ASTNode node, int i)
         {
