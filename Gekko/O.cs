@@ -1531,8 +1531,17 @@ namespace Gekko
                 
                 List<string> names = Program.Search(new List(new List<string>() { varnameWithFreq }), frombank, EVariableType.Var);
 
-                List<IVariable> names2 = new List<IVariable>();
+                if (Globals.fixWildcardLabel)
+                {
+                    smpl.labelRecordedPieces = new List<RecordedPieces>();
+                    for (int i = 0; i < names.Count; i++)
+                    {
+                        RecordedPieces r = new RecordedPieces("wildcard", new ScalarString(names[i]));
+                        smpl.labelRecordedPieces.Add(r);
+                    }
+                }
 
+                List<IVariable> names2 = new List<IVariable>();
                 foreach (string name in names)
                 {
                     names2.Add(O.GetIVariableFromString(name, ECreatePossibilities.NoneReportError));
@@ -9172,8 +9181,8 @@ namespace Gekko
                             //not series (including array-series and vals)                                                        
                             if (this.prtElements[0].variable[0].Type() == EVariableType.List && ((List)this.prtElements[0].variable[0]).list.Count == 0)
                             {
-                                G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
-                                G.Writeln("[empty list]");
+                                //G.Writeln2(Program.RemoveSplitter(this.prtElements[0].labelGiven[0]));
+                                G.Writeln2("[empty list]");
                             }
                             else if (this.prtElements[0].variable[0] == null || this.prtElements[0].variable[1] != null)
                             {

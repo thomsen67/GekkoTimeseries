@@ -29679,141 +29679,154 @@ namespace Gekko
             //label is only added if --> counter % nn == nn - 1
 
             int nn = labelRecordedPieces.Count / n;  //how many inserts like <q m p> per column
-            if (labelRecordedPieces.Count % n != 0) Mismatch(); //only shown on TT computer
-            
-            //
-            // for instance PRT <n p> x[#i], #i = a, b, c.
-            // 
-            // here n = 3, and we expect 3 recorded pieces for simple x[#i], could be 6 if it was x[#i]/y[#i]
-            // the option <n p> does not produce more recorded pieces, <n p n p n p> would not require more
-            // calculations, just after-processiong. If there is a <m> or <q> only the first one (for First
-            // bank) will be run.
-            //
-            // hence nn will most likely count how many pieces are inserted for each printed variable (may
-            // be a array element), for instance 1 for x[#i], 2 for x[#i]/y[#i], etc.
-            //
-            // counter counts recordedPieces and runs from 0 ... 2 inclusive.
-            //
-            // 0  'a'      0 % 1 == 0
-            // 1  'b'      1 % 1 == 0
-            // 2  'c'      2 % 1 == 0
-
-            // 0  'a'      0 % 2 == 0
-            // 1  'b'      1 % 2 == 0
-            // 2  'c'      2 % 2 == 0
-            // 3  'a'      0 % 2 == 0
-            // 4  'b'      1 % 2 == 0
-            // 5  'c'      2 % 2 == 0
-
-            //
-            //
-
-            // ===========================================================
-
-
-            string[] result = new string[w[0].Length];
-            int ci = 0;
-            foreach (char c in w[0])
+            if (labelRecordedPieces.Count % n != 0)
             {
-                result[ci] = c.ToString();
-                ci++;
+                Mismatch(); //only shown on TT computer
             }
 
-            string tmp = w[1];
-            string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
-
-            string[] w3 = w2[3].Split(':');
-            int i1 = int.Parse(w3[0]);
-            int i2 = int.Parse(w3[1]);
-
-            //result is the raw label, char by char
-            //the indexes i1 and i2 show the line and pos in the input file
-            //now we are going to insert items from RecordLabel() into this result string.
-
-            //foreach recorded call of {} or [], via RecordLabel()
-                       
-
-            int counter = -1;
-            foreach (O.RecordedPieces piece in labelRecordedPieces)  //foreach RecordLabel()
+            if (Globals.fixWildcardLabel && labelRecordedPieces.Count > 0 && labelRecordedPieces[0].s == Globals.wildcardText)  //just testing first one
             {
-                counter++;
-                string[] ss = piece.s.Split('|');
-                int length = 0;
-                length = ss[0].Length;
-
-                string s2 = ss[1].Substring(1, ss[1].Length - 2);  //remove [ and ]                            
-                string[] sss = s2.Split(',');
-
-                string[] w4 = sss[3].Split(':');
-                int ii1 = int.Parse(w4[0]);
-                int ii2 = int.Parse(w4[1]);
-
-
-                bool skip = false;
-                if (i1 != ii1)
+                foreach (O.RecordedPieces r in labelRecordedPieces)
                 {
-                    //just skip it
-                    //TODO: what about multiline PRT expressions??
-                    skip = true;
+                    lbl.Add(r.iv.ConvertToString());
                 }
-
-                //if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
-                if (piece.iv.Type() == EVariableType.String)
-                {
-                    //good
-                }
-                else
-                {
-                    skip = true;
-                }
-
-                if (!skip)
-                {
-
-                    int offset = ii2 - i2;
-                    string xx = piece.iv.ConvertToString();
-
-                    result[offset] = xx;
-                    for (int ii = offset + 1; ii < offset + length; ii++)
-                    {
-                        result[ii] = null;
-                    }
-                    if (result[offset - 1] == "{" && result[offset + length] == "}")
-                    {
-                        result[offset - 1] = null;
-                        result[offset + length] = null;
-                    }
-                }
-
-                string u = null;
-                foreach (string s5 in result)
-                {
-                    if (s5 == null) continue;
-                    string s6 = s5;
-                    if (s5.Trim() != "") s6 = s5.Trim();  //just safety
-                    u = u + s6;
-                }
-                string result2 = G.ReplaceGlueNew(u);
-                //G.Writeln2("===> " + result2);
-
-                // ----------------------------------------------
-                // NOTE: The string[] result is outside the loop of recorded pieces
-                //       For each piece in the loop, something is put into the
-                //       result array. If there are 3 pieces for each label,
-                //       piece0, piece1 and piece2 should be put into the label
-                //       and after piece2 is done, it should be added to List<string> lbl.
-                //       That is the reason of counter % nn == nn - 1, in this case nn = 3,
-                //       so we need counter % 3 == 2, that is counter 
-                // ----------------------------------------------
-
-                if (counter % nn == nn - 1)
-                //if (counter % nn == 0)
-                {
-                    lbl.Add(result2);
-                }
-
             }
+            else
+            {
 
+                //
+                // for instance PRT <n p> x[#i], #i = a, b, c.
+                // 
+                // here n = 3, and we expect 3 recorded pieces for simple x[#i], could be 6 if it was x[#i]/y[#i]
+                // the option <n p> does not produce more recorded pieces, <n p n p n p> would not require more
+                // calculations, just after-processiong. If there is a <m> or <q> only the first one (for First
+                // bank) will be run.
+                //
+                // hence nn will most likely count how many pieces are inserted for each printed variable (may
+                // be a array element), for instance 1 for x[#i], 2 for x[#i]/y[#i], etc.
+                //
+                // counter counts recordedPieces and runs from 0 ... 2 inclusive.
+                //
+                // 0  'a'      0 % 1 == 0
+                // 1  'b'      1 % 1 == 0
+                // 2  'c'      2 % 1 == 0
+
+                // 0  'a'      0 % 2 == 0
+                // 1  'b'      1 % 2 == 0
+                // 2  'c'      2 % 2 == 0
+                // 3  'a'      0 % 2 == 0
+                // 4  'b'      1 % 2 == 0
+                // 5  'c'      2 % 2 == 0
+
+                //
+                //
+
+                // ===========================================================
+
+
+                string[] result = new string[w[0].Length];
+                int ci = 0;
+                foreach (char c in w[0])
+                {
+                    result[ci] = c.ToString();
+                    ci++;
+                }
+
+                string tmp = w[1];
+                string[] w2 = tmp.Substring(1, tmp.Length - 2).Split(',');
+
+                string[] w3 = w2[3].Split(':');
+                int i1 = int.Parse(w3[0]);
+                int i2 = int.Parse(w3[1]);
+
+                //result is the raw label, char by char
+                //the indexes i1 and i2 show the line and pos in the input file
+                //now we are going to insert items from RecordLabel() into this result string.
+
+                //foreach recorded call of {} or [], via RecordLabel()
+
+
+                int counter = -1;
+                foreach (O.RecordedPieces piece in labelRecordedPieces)  //foreach RecordLabel()
+                {
+                    counter++;
+                    string[] ss = piece.s.Split('|');
+                    int length = 0;
+                    length = ss[0].Length;
+
+                    string s2 = ss[1].Substring(1, ss[1].Length - 2);  //remove [ and ]                            
+                    string[] sss = s2.Split(',');
+
+                    string[] w4 = sss[3].Split(':');
+                    int ii1 = int.Parse(w4[0]);
+                    int ii2 = int.Parse(w4[1]);
+
+
+                    bool skip = false;
+                    if (i1 != ii1)
+                    {
+                        //just skip it
+                        //TODO: what about multiline PRT expressions??
+                        skip = true;
+                    }
+
+                    //if (y.iv.Type() == EVariableType.Date || y.iv.Type() == EVariableType.String || y.iv.Type() == EVariableType.Val)
+                    if (piece.iv.Type() == EVariableType.String)
+                    {
+                        //good
+                    }
+                    else
+                    {
+                        skip = true;
+                    }
+
+                    if (!skip)
+                    {
+
+                        int offset = ii2 - i2;
+                        string xx = piece.iv.ConvertToString();
+
+                        result[offset] = xx;
+                        for (int ii = offset + 1; ii < offset + length; ii++)
+                        {
+                            result[ii] = null;
+                        }
+                        if (result[offset - 1] == "{" && result[offset + length] == "}")
+                        {
+                            result[offset - 1] = null;
+                            result[offset + length] = null;
+                        }
+                    }
+
+                    string u = null;
+                    foreach (string s5 in result)
+                    {
+                        if (s5 == null) continue;
+                        string s6 = s5;
+                        if (s5.Trim() != "") s6 = s5.Trim();  //just safety
+                        u = u + s6;
+                    }
+                    string result2 = G.ReplaceGlueNew(u);
+                    //G.Writeln2("===> " + result2);
+
+                    // ----------------------------------------------
+                    // NOTE: The string[] result is outside the loop of recorded pieces
+                    //       For each piece in the loop, something is put into the
+                    //       result array. If there are 3 pieces for each label,
+                    //       piece0, piece1 and piece2 should be put into the label
+                    //       and after piece2 is done, it should be added to List<string> lbl.
+                    //       That is the reason of counter % nn == nn - 1, in this case nn = 3,
+                    //       so we need counter % 3 == 2, that is counter 
+                    // ----------------------------------------------
+
+                    if (counter % nn == nn - 1)
+                    //if (counter % nn == 0)
+                    {
+                        lbl.Add(result2);
+                    }
+
+                }
+            }
 
             return lbl;
         }

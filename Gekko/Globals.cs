@@ -385,6 +385,8 @@ namespace Gekko
         public static bool printOnlyErrors = true;  //normally false
 
         public const string freelists = "|||";
+        public static bool fixWildcardLabel = true;
+        public static string wildcardText = "wildcard";
 
         public const string reportInterior1 = "O.ReportInterior(smpl, ";
         public const string reportInterior2 = ")";
