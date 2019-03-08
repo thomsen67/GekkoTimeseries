@@ -1976,7 +1976,56 @@ namespace UnitTests
 
         }
 
-
+        [TestMethod]
+        public void _Test_WildcardPrint()
+        {
+            I("time 2001 2001;");
+            I("abc = 3;");
+            I("acd = 6;");
+            I("option freq q;");
+            I("abc = 1;");
+            I("clone;");
+            I("acd = 2;");
+            I("%abc = 2;");
+            I("%acd = 3;");
+            I("option freq a;");
+            I("PRT <n> {'*'};");
+            Table table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.GetColMaxNumber(), 2 + 1);
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "acd");            
+            I("PRT <n> {'*b*'};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.GetColMaxNumber(), 1 + 1);
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
+            I("PRT <n> {'*!*'};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.GetColMaxNumber(), 4 + 1);
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "abc!q");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "acd");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "acd!q");
+            I("PRT <n> {'*b*!*'};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.GetColMaxNumber(), 2 + 1);
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "abc!q");
+            I("PRT <n> {'*:*!*'};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.GetColMaxNumber(), 7 + 1);
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "abc!q");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "acd");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "acd!q");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "Ref:abc");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "Ref:abc!q");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "Ref:acd");
+            
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("PRT <n> {'%a*'};");  //should unfold
+            }
+        }
 
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()
