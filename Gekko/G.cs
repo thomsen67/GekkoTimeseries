@@ -1324,6 +1324,7 @@ namespace Gekko
             }
             return output;
         }
+        
 
         public static StreamWriter GekkoStreamWriter(FileStream fs2)
         {

@@ -76,6 +76,14 @@ namespace Gekko
     //    }
     //}
 
+    public enum assignmantTypeLhs
+    {
+        Inactive,
+        Active,
+        Series,
+        Nonseries
+    }
+
     public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1;
@@ -170,6 +178,7 @@ namespace Gekko
         //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
+        public assignmantTypeLhs lhsAssignmentType = assignmantTypeLhs.Inactive;
 
         public GekkoSmpl()
         {
@@ -39181,7 +39190,7 @@ namespace Gekko
             {
                 //Gekko.TranslatedCode.CodeLines(new P());
                 TranslatedCode xx = new TranslatedCode();
-                TranslatedCode. CodeLines(new P());
+                TranslatedCode.CodeLines(new P());
             }
         }
 

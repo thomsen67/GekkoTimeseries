@@ -1979,6 +1979,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_WildcardPrint()
         {
+            I("reset;");
             I("time 2001 2001;");
             I("abc = 3;");
             I("acd = 6;");
@@ -2025,6 +2026,254 @@ namespace UnitTests
             {
                 I("PRT <n> {'%a*'};");  //should unfold
             }
+        }
+
+        [TestMethod]
+        public void _Test_SeriesDynamicLaggedEndogenous()
+        {
+            //maybe test period should be 2001-2004, not 2001-2003
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x[+1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // with ^= instead of =
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 201d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 292d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 191d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 272d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x[+1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 181d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // ========================================
+            // ======== with dynamic option ===========
+            // ========================================
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x = x[+1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // with ^= instead of =
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 201d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 403d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 191d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 272d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("x ^= x[+1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 181d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // ========================================
+            // ======== with <dynamic> ================
+            // ========================================
+
+            I("reset;");            
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("<dynamic> x = x[-1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");            
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("<dynamic> x = x + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 91d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");            
+            I("time 2001 2003;");
+            I("x = (100, 90, 80);");
+            I("time 2002 2003;");
+            I("<dynamic> x = x[+1] + 1;");
+            _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 81d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
+
+            // ========================================
+            // ======== testing val just in case... ===
+            // ========================================
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("%v = 100;");
+            I("%v = %v + 1;");  //if something wrong with option series dynamic, this will run too many times
+            _AssertScalarVal(First(), "%v", 101d);
+
+            // ========================================
+            // ======== testing map ===================
+            // ========================================
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("#m = (%v = 100);");
+            I("#m.%v = #m.%v + 1;");  //if something wrong with option series dynamic, this will run too many times            
+            Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertScalarVal(m, "%v", 101d);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("#m = (x = 100);");
+            I("time 2002 2003;");
+            I("#m.x = #m.x[-1] + 1;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;            
+            _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2003, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");
+            I("option series dynamic = yes;");
+            I("time 2001 2003;");
+            I("#m = (x = 100);");
+            I("time 2002 2003;");
+            I("#m.x = #m.x[-1] + 1;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
+
+            I("reset;");            
+            I("time 2001 2003;");
+            I("#m = (x = 100);");
+            I("time 2002 2003;");
+            I("<dynamic> #m.x = #m.x[-1] + 1;");
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
+            _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
+            _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
+            _AssertSeries(m, "x!a", 2003, 102d, sharedDelta);
+            _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
+
         }
 
         [TestMethod]

@@ -3642,8 +3642,21 @@ namespace Gekko.Parser.Gek
                                 
                             }
                             else
-                            {                                
+                            {
                                 //This only happens for x3 in x1.x2.x3.x4 = ..., the last indexer on the LHS
+
+                                //for example:
+
+                                //For instance: #m1.#m2.#m3.x4 = ...
+                                //This will produce code similar to this (in reality longer, but same structure):
+                                //---------------------------------------------
+                                //IVariable FIND_M1 = O.Lookup(smpl, null, null, "#m1", null, null, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null);
+                                //IVariable FIND_M2 = O.Indexer(null, smpl, O.EIndexerType.Dot, FIND_M1, (O.scalarStringHash).Add(smpl, (new ScalarString("m2"))));
+                                //IVariable FIND_M3 = O.Indexer(null, smpl, O.EIndexerType.Dot, FIND_M2, (O.scalarStringHash).Add(smpl, (new ScalarString("m3"))));
+                                //O.IndexerSetData(smpl, FIND_M3, ivTmpvar5, o0, (new ScalarString("x4")));
+                                //---------------------------------------------
+                                //So a lookup on the first container, then index and index, and finally indexersetdata()
+
                                 node.Code.A("O.IndexerSetData(smpl, ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(OperatorHelper(node, -12345) + ", ").A(indexes).A(")");
 
                             }
@@ -3997,27 +4010,22 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTASSIGNMENT":
-                        {                            
+                        {
+                            string number = "_" + ++Globals.counter;
+
                             string operatorType = "ASTPLACEHOLDER";
                             if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
 
+                            GekkoSB sb = new GekkoSB();
+                            
                             if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE")  //the last convers function/procedure, but also IF and FOR indentation
                             {
                                 //only for the top-most node, that is, only 1 time
                                 //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
-                                node.Code.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
+                                sb.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
                             }
-
-                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count>0)
-                            {
-                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
-                                }
-                            }                                                       
-
                             string type = HandleVar(node[3].Text);  //2 is options   
-                            GetCodeFromAllChildren(node, node[2]);                         
+                            GetCodeFromAllChildren(sb, node[2]);
                             if (G.Equal(type, "STRING2")) type = "string";
                             string ivTempVar = SearchUpwardsInTree4(node[0]);
                             if (ivTempVar == null)
@@ -4031,32 +4039,79 @@ namespace Gekko.Parser.Gek
 
                             if (operatorType == "ASTHAT2")
                             {
-                                node.Code.A("o" + Num(node) + ".opt_d = `yes`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_d = `yes`;" + G.NL);
                             }
                             else if (operatorType == "ASTPERCENT2")
                             {
-                                node.Code.A("o" + Num(node) + ".opt_p = `yes`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_p = `yes`;" + G.NL);
                             }
                             else if (operatorType == "ASTHASH2")
                             {
-                                node.Code.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
                             }
-                            
-                            node.Code.A(OperatorHelper(null, -Globals.smplOffset)).End();
-                            node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                            node.Code.A(OperatorHelper(null, Globals.smplOffset)).End();
 
-                            //node.Code.A("O.AssignmentHelper(smpl, " + ivTempVar + ", " + temp + ", o" + Num(node) + "); " + G.NL);
-
-                            node.Code.A(node[0].Code).End();
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("}"+G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                 }
                             }
+
+                            GekkoSB sb1 = new GekkoSB();
+                            GekkoSB sb2 = new GekkoSB();
+                                                       
+                            if (true)
+                            {
+
+                                sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+
+                                sb2.A(sb1); //cloning
+
+                                //sb1.A(sb);
+                                //sb2.A(sb);
+
+                                sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+
+                                //more complicated probing for sb2
+                                sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
+                                sb2.A("O.Dynamic1(smpl);" + G.NL);
+                                sb2.A(node[0].Code).End();
+                                sb2.A("return O.Dynamic2(smpl);" + G.NL);
+                                //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+                            }
+
+                            if (Globals.series_dynamic)
+                            {
+                                //node.Code.A(sb);
+
+                                node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
+                                node.Code.A(sb1);
+                                node.Code.A("};" + G.NL);  //end of action
+
+                                node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
+                                node.Code.A(sb2);
+                                node.Code.A("};" + G.NL);  //end of action
+
+                                node.Code.A("O.RunAssigmentMaybeDynamic(smpl, assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                            }
+
+                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
+                            {
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
+                                {
+                                    node.Code.A("}" + G.NL);
+                                }
+                            }
+
+                            string ss = null;                            
+                            if (w.wh.localFuncs != null) ss = w.wh.localFuncs.ToString();
+                            w.wh.localFuncs = new GekkoStringBuilder();
+                            w.wh.localFuncs.Append(sb.ToString() + G.NL + ss);
+                                                        
                         }
                         break;
                     case "ASTPERCENT":
@@ -7263,6 +7318,15 @@ namespace Gekko.Parser.Gek
             foreach (ASTNode child in node.ChildrenIterator())
             {
                 receiver.Code.A(child.Code + G.NL);
+            }
+        }
+
+        private static void GetCodeFromAllChildren(GekkoSB receiver, ASTNode node)
+        {
+            if (node == null) return;
+            foreach (ASTNode child in node.ChildrenIterator())
+            {
+                receiver.A(child.Code + G.NL);
             }
         }
 

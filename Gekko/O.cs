@@ -2259,8 +2259,21 @@ namespace Gekko
         }
 
 
+        public static bool Dynamic2(GekkoSmpl smpl)
+        {
+            bool rv = false;
+            if (smpl.lhsAssignmentType == assignmantTypeLhs.Series) rv = true;
+            smpl.lhsAssignmentType = assignmantTypeLhs.Inactive;  //inactive            
+            return rv;
+        }
 
-        
+        public static void Dynamic1(GekkoSmpl smpl)
+        {
+            smpl.lhsAssignmentType = assignmantTypeLhs.Active;  //charged
+        }
+
+
+
 
         public static IVariable LookupHelperLeftsideOLD(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
         {
@@ -2413,8 +2426,16 @@ namespace Gekko
 
         private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType type, O.Assignment options)
         {
-            //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y
+            //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
+
+            if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
+            {
+                //active
+                if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
+                else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
+                return;  //is just a probe on the type of the lhs, so we return without changing anything!
+            }
 
             if (ib != null && ib.BankType() == EBankType.Normal)
             {
@@ -2472,6 +2493,8 @@ namespace Gekko
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A A
                     // Starts with '%'
+
+                    //smpl.omitDynamicSeries = true;
 
                     if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date || type == EVariableType.Var)
                     {
@@ -2632,6 +2655,8 @@ namespace Gekko
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B B
                     // Starts with '#'
+
+                    //smpl.omitDynamicSeries = true;
 
                     if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map || type == EVariableType.Var)
                     {
@@ -3402,6 +3427,31 @@ namespace Gekko
             G.ServiceMessage("LIST " + listfileName + " updated ", null);
         }
 
+        public static bool CheckForDynamicSeries(IVariable i1, IVariable i2)
+        {
+            return i1.Type() == EVariableType.Series && !G.Chop_HasSigil(i2.ConvertToString());
+        }
+
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
+        {
+            if ((Program.options.series_dynamic || G.Equal(o.opt_dynamic, "yes")) && check_20())
+            {
+                GekkoTime tt1_20 = smpl.t1;
+                GekkoTime tt2_20 = smpl.t2;
+                foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                {
+                    smpl.t1 = t_20;
+                    smpl.t2 = t_20;
+                    assign_20();
+                }
+                smpl.t1 = tt1_20;
+                smpl.t2 = tt2_20;
+            }
+            else
+            {
+                assign_20();
+            }
+        }
 
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
         {
@@ -7013,6 +7063,37 @@ namespace Gekko
             }
         }
 
+        //public static void DynamicHelper0(GekkoSmpl smpl, out GekkoTime t1, out GekkoTime t2)
+        //{
+        //    t1 = smpl.t1;
+        //    t2 = smpl.t2;
+        //    smpl.omitDynamicSeries = false;
+        //}
+
+        //public static void DynamicHelper3(GekkoSmpl smpl, GekkoTime t1, GekkoTime t2)
+        //{
+        //    if (Program.options.series_dynamic)
+        //    {
+        //        smpl.t1 = t1;
+        //        smpl.t2 = t2;
+        //        smpl.omitDynamicSeries = false;
+        //    }
+        //}
+
+        //public static bool DynamicHelper2(GekkoSmpl smpl)
+        //{
+        //    return !Program.options.series_dynamic || smpl.omitDynamicSeries;
+        //}
+
+        //public static void DynamicHelper1(GekkoSmpl smpl, GekkoTime t)
+        //{
+        //    if (Program.options.series_dynamic)
+        //    {
+        //        smpl.t1 = t;
+        //        smpl.t2 = t;
+        //    }
+        //}
+
         //public class Val
         //{
         //    public static void Q(string s)
@@ -7962,6 +8043,7 @@ namespace Gekko
             public string opt_source = null;
             public string opt_units = null;
             public string opt_stamp = null;
+            public string opt_dynamic = null;
         }
 
         public class Accept

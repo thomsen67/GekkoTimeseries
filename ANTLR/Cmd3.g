@@ -77,6 +77,7 @@ tokens {
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
+	ASTOPT_STRING_DYNAMIC;
 	ASTOPT_STRING_BROWSER;
     ASTOPT_STRING_PRINT;
 	ASTOPT_STRING_TOBANK;
@@ -999,6 +1000,7 @@ Y2                    = 'Y2'                       ;
     DIFF              = 'DIFF';
     DIFPRT           = 'DIFPRT'          ;
     DING             = 'DING';
+	DYNAMIC             = 'DYNAMIC';
     DIRECT = 'DIRECT';
     DISP             = 'DISP'            ;
     DISPLAY          = 'DISPLAY'         ;
@@ -1604,6 +1606,7 @@ d.Add("Y" ,Y);
                                         d.Add("diff"  , DIFF      );
                                         d.Add("difprt"  , DIFPRT      );
                                         d.Add("ding"    , DING      );
+										d.Add("dynamic"    , DYNAMIC      );
                                         d.Add("DIRECT", DIRECT);
                                         d.Add("disp"    , DISP      );
                                         d.Add("display" , DISPLAY   );
@@ -2482,6 +2485,7 @@ seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | SOURCE EQUAL expression -> ^(ASTOPT_STRING_SOURCE expression)
 						  | STAMP EQUAL expression -> ^(ASTOPT_STRING_STAMP expression)							  
 					      | UNITS EQUAL expression -> ^(ASTOPT_STRING_UNITS expression)							  				
+						  | DYNAMIC (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYNAMIC yesNo?)		
 						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3582,6 +3586,8 @@ optionType:
 			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
 
+             | SERIES DYNAMIC '='? yesNoSimple -> SERIES DYNAMIC ^(ASTBOOL yesNoSimple)
+
 			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 
@@ -4068,6 +4074,7 @@ ident2: 					Ident |
   DIF|
   DIGITS|
   DING|
+  DYNAMIC|
   DIRECT|
   DISPLAY|
   DOTS|
@@ -4498,6 +4505,7 @@ ident3: 					Ident |
   DIF|
   DIGITS|
   DING|
+  DYNAMIC|
   DIRECT|
   DISPLAY|
   DOTS|
