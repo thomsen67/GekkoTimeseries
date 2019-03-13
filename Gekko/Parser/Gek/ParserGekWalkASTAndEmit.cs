@@ -4018,7 +4018,7 @@ namespace Gekko.Parser.Gek
 
                             GekkoSB sb = new GekkoSB();
                             
-                            if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE")  //the last convers function/procedure, but also IF and FOR indentation
+                            if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE" || node.Parent.Text == "ASTMAPITEM")  //the last convers function/procedure, but also IF and FOR indentation
                             {
                                 //only for the top-most node, that is, only 1 time
                                 //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
@@ -4107,11 +4107,16 @@ namespace Gekko.Parser.Gek
                                 }
                             }
 
-                            string ss = null;                            
-                            if (w.wh.localFuncs != null) ss = w.wh.localFuncs.ToString();
+                            string localFuncCode = "";                            
+                            if (w.wh.localFuncs != null) localFuncCode = w.wh.localFuncs.ToString();
+                            if (!localFuncCode.Contains(sb.ToString()))
+                            {
+                                //A hack: check that the assignment of the same object is not already there. The hack should be relatively safe.
+                                localFuncCode = sb.ToString() + G.NL + localFuncCode;
+                            }
                             w.wh.localFuncs = new GekkoStringBuilder();
-                            w.wh.localFuncs.Append(sb.ToString() + G.NL + ss);
-                                                        
+                            w.wh.localFuncs.Append(localFuncCode);
+
                         }
                         break;
                     case "ASTPERCENT":

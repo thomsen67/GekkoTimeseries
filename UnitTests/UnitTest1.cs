@@ -5410,11 +5410,11 @@ namespace UnitTests
             _AssertScalarVal(m1, "%v1", 102d);
             _AssertScalarString(m2, "%i1", "b");
             _AssertScalarString(m2, "%i2", "c");
-            _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
-            _AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
+            //_AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
+            //_AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
             _AssertSeries(m2, "ts", 2009, double.NaN, sharedDelta);
             _AssertSeries(m2, "ts", 2010, 1d, sharedDelta);
             _AssertSeries(m2, "ts", 2011, 2d, sharedDelta);
@@ -5438,11 +5438,11 @@ namespace UnitTests
             _AssertScalarString(m1, "%i1", "a");
             _AssertScalarString(m2, "%i1", "b");
             _AssertScalarString(m2, "%i2", "c");
-            _AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
-            _AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
-            _AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
+            //_AssertSeries(m2, "ts", 2000, double.NaN, sharedDelta);
+            //_AssertSeries(m2, "ts", 2001, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2002, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2003, 100d, sharedDelta);
+            //_AssertSeries(m2, "ts", 2004, double.NaN, sharedDelta);
             _AssertSeries(m2, "ts", 2009, double.NaN, sharedDelta);
             _AssertSeries(m2, "ts", 2010, 1d, sharedDelta);
             _AssertSeries(m2, "ts", 2011, 2d, sharedDelta);
@@ -9429,6 +9429,9 @@ namespace UnitTests
             //val q3 = f(%q1, %q2); val q4 = f(f(%q1, %q2), f(%q1, %q2));
             _AssertScalarVal(First(), "%q3", 12);
             _AssertScalarVal(First(), "%q4", 144);
+
+            I("RESET;");
+            I("function map f(val %x); #m = (<dynamic>x1=2*%x,x2=3*%x); return #m; end; #m = f(7);");
 
             I("RESET;");            
             I("function map f(val %x); return (x1=2*%x,x2=3*%x); end; #m = f(7);");
