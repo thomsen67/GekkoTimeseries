@@ -14,7 +14,8 @@ namespace Gekko
         public string string2;
         //public IVariable pointerTo = null;  //used in case the string points to for instance a timeseries. Only used inside a GENR/PRT statement, inside the implicit timeloop (where we can be sure that the string itself does not change value). Is set to null again after the time loop.
         //public bool _isName = false;
-        
+        public bool isFromSeqOfBankvarnames = false; //do not protobuf this
+
         private ScalarString()
         {
             //only because protobuf needs it, not for outside use
@@ -406,7 +407,16 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
+            double d = double.NaN; bool b = double.TryParse(this.string2, out d);
+            if (this.isFromSeqOfBankvarnames && b)
+            {
+
+                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
+                G.Writeln("           'naked' list without parentheses, like #m = 1, 2, 3;. In such naked lists,");
+                G.Writeln("           the items are always treated as strings. You should perhaps add enclosing");
+                G.Writeln("           parentheses, corresponding to #m = (1, 2, 3);");
+            }
             throw new GekkoException();
         }
 
@@ -417,8 +427,17 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
-            G.Writeln2("*** ERROR: Could not convert the STRING " + this.string2 + " directly into a DATE.");
-            G.Writeln("           You may try the date() conversion function.");            
+            G.Writeln2("*** ERROR: Could not convert the string '" + this.string2 + "' directly into a date.");
+            G.Writeln("           You may try the date() conversion function.");
+            GekkoTime gt = G.FromStringToDate(this.string2);            
+            if (this.isFromSeqOfBankvarnames && !gt.IsNull())
+            {
+                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
+                G.Writeln("           'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
+                G.Writeln("           naked lists, the items are always treated as strings. You should perhaps ");
+                G.Writeln("           add enclosing parentheses, corresponding to #m = (2020q1, 2020q2, 2020q3);");
+            }
+            throw new GekkoException();
             throw new GekkoException();
         }
 
@@ -496,7 +515,9 @@ namespace Gekko
 
         public IVariable DeepClone(GekkoSmplSimple truncate)
         {
-            return new ScalarString(this.string2);
+            ScalarString ss = new ScalarString(this.string2);
+            ss.isFromSeqOfBankvarnames = this.isFromSeqOfBankvarnames;
+            return ss;
         }
 
         public void DeepTrim()

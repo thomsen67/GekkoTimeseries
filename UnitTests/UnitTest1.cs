@@ -5325,7 +5325,12 @@ namespace UnitTests
         [TestMethod]
         public void _Test_For()
         {
-                                   
+            //IVariable forloop_xe7dke6cj_14 = null;
+            //int counter15 = 0;
+            //IVariable xxx = O.ExplodeIvariablesSeqFor(new List(new List<IVariable> { new ScalarString("a"), new ScalarString("b"), new ScalarString("c"), new ScalarString("d") }));
+            //for (O.IterateStart(ref forloop_xe7dke6cj_14, xxx); O.IterateContinue(forloop_xe7dke6cj_14, xxx, null, null, ref counter15); O.IterateStep(forloop_xe7dke6cj_14, xxx, null, counter15))
+            //{
+            //}
 
             //syntax fail: test of types and sigils
             FAIL("FOR(series %x = (1, 2)); END;");
@@ -5345,14 +5350,13 @@ namespace UnitTests
 
             I("RESET; %sum = 0; for(val %x = (10, 12, 14, 16)); %sum += %x; end;");
             _AssertScalarVal(First(), "%sum", 52d, sharedDelta);
+
             I("reset; for string %i = ('a', 'b'); tell '' + %i; end;");
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                I("reset; for val %i = (1, 2); tell '' + %i; end;");
-                I("reset; for date %i = (2001q1, 2001q3); tell '' + %i; end;");
-                I("reset; series a = 100, series b = 200; for series %i = (a, b); prt %i; end;");
-                I("reset; series a = 100, series b = 200; for string %i = ('a', 'b'); prt {%i}; end;");
-            }
+            
+            I("reset; for val %i = (1, 2); tell '' + %i; end;");
+            I("reset; for date %i = (2001q1, 2001q3) ; tell '' + %i; end;");
+            I("reset; series a = 100; series b = 200; for series i = (a, b); prt i; end;");
+            I("reset; series a = 100; series b = 200; for string %i = ('a', 'b'); prt {%i}; end;");
 
             //parallel for loop
             I("#m1 = ('a', 'b');");

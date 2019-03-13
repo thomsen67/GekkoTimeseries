@@ -51,6 +51,8 @@ namespace Gekko
 
         public static bool modeIntendedWarning = false;
 
+        public static bool fixFOr = true;
+
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" }};
 

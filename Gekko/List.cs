@@ -206,7 +206,7 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
@@ -364,7 +364,9 @@ namespace Gekko
                     }
                 }
             }
-            return new List(temp);
+            List l = new List(temp);
+            l.isFromSeqOfBankvarnames = this.isFromSeqOfBankvarnames;
+            return l;
         }
 
         public void DeepTrim()

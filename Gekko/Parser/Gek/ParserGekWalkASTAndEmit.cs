@@ -2113,6 +2113,8 @@ namespace Gekko.Parser.Gek
 
                             if (node[0].ChildrenCount() == 1)
                             {
+                                O.ELoopType loopType = LoopType(node, 0);
+
                                 string type = node[0][0][0][0].Text;
 
                                 CheckTypeInFunctionDefProcedureDefForDef("for-loop", type, varnames[0]);
@@ -2123,8 +2125,9 @@ namespace Gekko.Parser.Gek
                                 string temp = "counter" + ++Globals.counter;
                                 node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
                                 node.Code.A("int " + temp + " = 0").End();
-                                node.Code.A("for (O.IterateStart(ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
-                                node.Code.A("{").End();                                
+                                string loopType2 = "O.ELoopType." + loopType.ToString();
+                                node.Code.A("for (O.IterateStart(" + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + loopType2 + ", " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
+                                node.Code.A("{").End();
                                 node.Code.A(node[1].Code);
                                 node.Code.A("}").End();
                             }
@@ -2134,9 +2137,10 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("List<List<IVariable>> " + listsname + " = new List<List<IVariable>>()").End();
                                 for (int i = 0; i < node[0].ChildrenCount(); i++)
                                 {
+                                    O.ELoopType loopType = LoopType(node, 0);
                                     string codeStart, codeEnd2, codeStep;
                                     GetCodes(node, i, out codeStart, out codeEnd2, out codeStep);
-                                    if (codeEnd2 != "null" || codeStep != "null")
+                                    if (loopType == O.ELoopType.ForTo)
                                     {
                                         G.Writeln2("*** ERROR: You cannot use TO or STEP/BY in a parallel loop");
                                         throw new GekkoException();
@@ -6201,6 +6205,15 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static O.ELoopType LoopType(ASTNode node, int i)
+        {
+            O.ELoopType loopType = O.ELoopType.ForTo;
+            if (node[0][i].Text == "ASTFORTYPE1") loopType = O.ELoopType.ForTo;  //superflous, but just to state it
+            else if (node[0][i].Text == "ASTFORTYPE2") loopType = O.ELoopType.List;
+            else throw new GekkoException();
+            return loopType;
         }
 
         private static void CheckTypeInFunctionDefProcedureDefForDef(string functionName, string type, string s)

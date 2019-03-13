@@ -1599,9 +1599,14 @@ namespace Gekko
 
         public static GekkoTime FromStringToDate(string s, bool allowKForQuarters)
         {
+            return FromStringToDate(s, allowKForQuarters, true);
+        }
+
+        public static GekkoTime FromStringToDate(string s, bool allowKForQuarters, bool reportError)
+        {
             //To do the reverse: see G.FromDateToString()            
 
-            GekkoTime t;
+            GekkoTime t = GekkoTime.tNull;
 
             {
                 int i = -12345;
@@ -1623,8 +1628,12 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
             else if (s.EndsWith("a", StringComparison.OrdinalIgnoreCase))
@@ -1637,8 +1646,12 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
 
@@ -1651,15 +1664,23 @@ namespace Gekko
                     int q1 = int.Parse(temp1[1]);
                     if (q1 < 1 || q1 > 4)
                     {
-                        G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
-                        throw new GekkoException();
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
                     }
                     t = new GekkoTime(EFreq.Q, y1, q1);
                 }
                 catch (Exception e)
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
             else if (allowKForQuarters && (s.Contains("k") || s.Contains("K")))
@@ -1671,15 +1692,23 @@ namespace Gekko
                     int q1 = int.Parse(temp1[1]);
                     if (q1 < 1 || q1 > 4)
                     {
-                        G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
-                        throw new GekkoException();
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
                     }
                     t = new GekkoTime(EFreq.Q, y1, q1);
                 }
                 catch (Exception e)
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
             else if (s.Contains("m") || s.Contains("M"))
@@ -1691,15 +1720,23 @@ namespace Gekko
                     int m1 = int.Parse(temp1[1]);
                     if (m1 < 1 || m1 > 12)
                     {
-                        G.Writeln("*** ERROR: should have months from 1 to and including 12");
-                        throw new GekkoException();
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
                     }
                     t = new GekkoTime(EFreq.M, y1, m1);
                 }
                 catch (Exception e)
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
             else if (s.Contains("u") || s.Contains("U"))  //ttfreq
@@ -1720,14 +1757,22 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    G.Writeln("*** ERROR: timeperiod " + s + " not valid");
-                    throw new GekkoException();
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
                 }
             }
             else
             {
-                G.Writeln2("*** ERROR: Could not understand the timeperiod: " + s);
-                throw new GekkoException();
+                if (reportError)
+                {
+                    G.Writeln2("*** ERROR: Could not understand the timeperiod: " + s);
+                    throw new GekkoException();
+                }
+                else return GekkoTime.tNull;
             }
             return t;
         }
@@ -2210,7 +2255,7 @@ namespace Gekko
 
         public static string GetTypeString(IVariable input)
         {
-            return input.Type().ToString().ToUpper();
+            return input.Type().ToString().ToLower();
         }
 
         static public string ReplaceString(string str, string oldValue, string newValue, bool onlyFirst)

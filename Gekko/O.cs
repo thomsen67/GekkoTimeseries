@@ -71,6 +71,12 @@ namespace Gekko
         public static ScalarString scalarStringColon = new ScalarString(Globals.symbolBankColon.ToString());
         public static ScalarString scalarStringExclamation = new ScalarString(Globals.freqIndicator.ToString());
 
+        public enum ELoopType
+        {
+            ForTo,
+            List
+        }
+
         public enum EIndexerType
         {
             None,
@@ -350,6 +356,16 @@ namespace Gekko
         {
             List m = new List(ExplodeIvariablesHelper(iv));
             m.isFromSeqOfBankvarnames = true;
+
+            foreach (IVariable child in m.list)
+            {
+                ScalarString child_string = child as ScalarString;  //should always be so
+                if (child_string != null)
+                {
+                    child_string.isFromSeqOfBankvarnames = true;
+                }
+            }
+
             return m;
 
         }
@@ -707,90 +723,38 @@ namespace Gekko
             Program.options.series_normal_print_missing = r2;
         }
 
-        //public static ScalarString SetStringData(IVariable name, IVariable rhs, bool isName)
-        //{
-        //    //Returns the IVariable it finds here (or creates)
-        //    string name2 = name.ConvertToString();
-        //    string value = rhs.ConvertToString();
-        //    IVariable lhs = null;
-        //    if (Program.scalars.TryGetValue(name2, out lhs))
-        //    {
-        //        //Scalar is already existing                
-        //        if (lhs.Type() == EVariableType.String)
-        //        {
-        //            //Already existing lhs is a STRING, inject into it. Injecting is faster than recreating an object.                    
-        //            ((ScalarString)lhs).string2 = value;
-        //            //((ScalarString)lhs)._isName = isName;
-        //        }
-        //        else
-        //        {
-        //            //The object has to die and be recreated, since it is of a wrong type.                                
-        //            Program.scalars.Remove(name2);
-        //            lhs = new ScalarString(value);
-        //            Program.scalars.Add(name2, lhs);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //Scalar does not exist beforehand  
-        //        lhs = new ScalarString(value);
-        //        Program.scalars.Add(name2, lhs);
-        //    }
-        //    return (ScalarString)lhs;
-        //}
-
-        //public static ScalarDate SetDateData(IVariable name, IVariable rhs)
-        //{
-        //    //Returns the IVariable it finds here (or creates)
-        //    string name2 = name.ConvertToString();
-        //    GekkoTime value = O.ConvertToDate(rhs);
-        //    IVariable lhs = null;
-        //    if (Program.scalars.TryGetValue(name2, out lhs))
-        //    {
-        //        //Scalar is already existing                
-        //        if (lhs.Type() == EVariableType.Date)
-        //        {
-        //            //Already existing lhs is a DATE, inject into it. Injecting is faster than recreating an object.
-        //            ((ScalarDate)lhs).date = value;
-        //        }
-        //        else
-        //        {
-        //            //The object has to die and be recreated, since it is of a wrong type.                                
-        //            Program.scalars.Remove(name2);
-        //            lhs = new ScalarDate(value);
-        //            Program.scalars.Add(name2, lhs);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        //Scalar does not exist beforehand            
-        //        lhs = new ScalarDate(value);
-        //        Program.scalars.Add(name2, lhs);
-        //    }
-        //    return (ScalarDate)lhs;
-        //}
-
-        public static void IterateStep(IVariable x, IVariable start, IVariable step, int counter)
+        
+        public static void IterateStep(ELoopType loopType, ref IVariable x, IVariable start, IVariable step, int counter)
         {
-            if (x.Type() == EVariableType.Val)
+            if (loopType == O.ELoopType.ForTo)
             {
-                ScalarVal step_val = null;
-                if (step == null) step_val = Globals.scalarVal1;
-                else step_val = step as ScalarVal;
-                ScalarVal x_val = x as ScalarVal;
-                x_val.val += step_val.val;
+
+                if (x.Type() == EVariableType.Val)
+                {
+                    ScalarVal step_val = null;
+                    if (step == null) step_val = Globals.scalarVal1;
+                    else step_val = step as ScalarVal;
+                    ScalarVal x_val = x as ScalarVal;
+                    x_val.val += step_val.val;
+                }
+                else if (x.Type() == EVariableType.Date)
+                {
+                    ScalarVal step_val = null;
+                    if (step == null) step_val = Globals.scalarVal1;
+                    else step_val = step as ScalarVal;
+                    ScalarDate x_date = x as ScalarDate;
+                    x_date.date = x_date.date.Add(G.ConvertToInt(step_val.val));
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Loop type problem");
+                    throw new GekkoException();
+                }
             }
-            else if (x.Type() == EVariableType.Date)
+            else
             {
-                ScalarVal step_val = null;
-                if (step == null) step_val = Globals.scalarVal1;
-                else step_val = step as ScalarVal;
-                ScalarDate x_date = x as ScalarDate;
-                x_date.date = x_date.date.Add(G.ConvertToInt(step_val.val));
-            }
-            else if (x.Type() == EVariableType.String)
-            {
-                //it is tested previously that step = null and start is metalist
+
+                //it is tested previously that start is list
                 List start_list = start as List;
                 if (counter >= start_list.list.Count)
                 {
@@ -798,70 +762,71 @@ namespace Gekko
                 }
                 else
                 {
-                    ScalarString x_string = x as ScalarString;
-                    ScalarString item = start_list.list[counter] as ScalarString;
-                    if (item == null)
-                    {
-                        G.Writeln2("*** ERROR: list element " + (counter + 1) + " is not a STRING");
-                        throw new GekkoException();
-                    }
-                    x_string.string2 = item.string2;
+                    //ScalarString x_string = x as ScalarString;
+                    //ScalarString item = start_list.list[counter] as ScalarString;
+                    //if (item == null)
+                    //{
+                    //    G.Writeln2("*** ERROR: list element " + (counter + 1) + " is not a STRING");
+                    //    throw new GekkoException();
+                    //}
+                    //x_string.string2 = item.string2;
+
+                    IVariable item = start_list.list[counter];
+                    x = item.DeepClone(null);  //necessary to clone?? Note sure... but safest to do
                 }
-            }
-            else throw new GekkoException();
+            }         
         }
 
-        public static void IterateStart(ref IVariable x, IVariable start)
+        public static void IterateStart(ELoopType loopType, ref IVariable x, IVariable start)
         {
             if (x == null)
             {
-                if (start.Type() == EVariableType.Val)
-                {
-                    x = new ScalarVal(((ScalarVal)start).val);
-                }
-                else if (start.Type() == EVariableType.Date)
-                {
-                    x = new ScalarDate(((ScalarDate)start).date);
-                }
-                else if (start.Type() == EVariableType.String)
-                {
-                    x = new ScalarString(((ScalarString)start).string2);
-                }
-                else if (start.Type() == EVariableType.List)
-                {
-                    List start_list = start as List;
-                    if (start_list.list.Count == 0)
+                if(loopType==ELoopType.ForTo) {
+
+                    if (start.Type() == EVariableType.Val)
                     {
-                        G.Writeln2("*** ERROR: Empty list");
-                        throw new GekkoException();
+                        x = new ScalarVal(((ScalarVal)start).val);
                     }
-                    if (false)
+                    else if (start.Type() == EVariableType.Date)
                     {
-                        ScalarString xx = start_list.list[0] as ScalarString;
-                        if (xx == null)
-                        {
-                            G.Writeln2("*** ERROR: list element 1 is not a STRING");
-                            throw new GekkoException();
-                        }
-                        x = new Gekko.ScalarString(xx.string2);
+                        x = new ScalarDate(((ScalarDate)start).date);
                     }
                     else
                     {
-                        x = start_list.list[0].DeepClone(null);
-                    }
-                    
-                    //x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
+                        G.Writeln2("*** ERROR: FOR ... = ... TO ... loop must begin with val or date, not " + start.Type().ToString().ToLower());
+                        throw new GekkoException();
+                    }                    
                 }
-                else throw new GekkoException();
+                else
+                {
+
+                    if (start.Type() == EVariableType.List)
+                    {
+
+                        List start_list = start as List;
+                        if (start_list.list.Count == 0)
+                        {
+                            G.Writeln2("*** ERROR: Empty list");
+                            throw new GekkoException();
+                        }
+                        x = start_list.list[0].DeepClone(null);//x = start_list.list[0];  ----------------> FAIL, sideeffect because then the first item in the list will change when x changes....!!!
+
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: FOR ... = ... loop must have a list to iterate over, not a " + start.Type().ToString().ToLower());
+                        throw new GekkoException();
+                    }
+                }                
             }
         }
 
-        public static bool IterateContinue(IVariable x, IVariable start, IVariable max, IVariable step, ref int counter)
+        public static bool IterateContinue(ELoopType loopType, IVariable x, IVariable start, IVariable max, IVariable step, ref int counter)
         {
             counter++;
             bool rv = false;
 
-            if (max == null && step == null)
+            if (loopType == ELoopType.List)
             {
                 //looping over a list like FOR <type> %i = (<item1>, item2, ...)
 
@@ -870,23 +835,9 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Expected FOR to loop over list, not a " + G.GetTypeString(start) + " type");
                     throw new GekkoException();
-                }
-
-                if (x.Type() == EVariableType.Val)
-                {
-                    if (counter <= start_list.list.Count) rv = true;
-                }
-                else if (x.Type() == EVariableType.Date)
-                {
-                    if (counter <= start_list.list.Count) rv = true;
-                }
-                else if (x.Type() == EVariableType.String)
-                {
-                    if (counter <= start_list.list.Count) rv = true;
-                }
-                else throw new GekkoException();
+                }                
+                if (counter <= start_list.list.Count) rv = true;                
             }
-        
             else
             {
                 //looping from ... to ... by
@@ -954,47 +905,46 @@ namespace Gekko
                         return x_date.date.LargerThanOrEqual(max_date.date);
                     }
                 }
-                else if (x.Type() == EVariableType.String)
+                else
                 {
-                    G.Writeln2("*** ERROR: string loops cannot be of ... TO ... BY ... type");
+                    G.Writeln2("*** ERROR: Expected iterator in FOR ... = ... TO ... to be of val or date type");
                     throw new GekkoException();
-                }
-                else throw new GekkoException();
+                }       
             }
             return rv;
         }
 
 
 
-        public static bool ContinueIterating(double i, double max, double step) {
-            if (step > 0)
-            {
-                //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
-                //max typically has step/1000000 added, so it might be 11.000002
-                return i <= max;
-            }
-            else
-            {
-                return i >= max;
-                //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
-                //max typically has step/1000000 added, so it might be 0.999998
-            }
-        }
+        //public static bool ContinueIterating(int loopType, double i, double max, double step) {
+        //    if (step > 0)
+        //    {
+        //        //for instance: FOR VAL i = 1 to 11 by 2; (1, 3, 5, 7, 9, 11)
+        //        //max typically has step/1000000 added, so it might be 11.000002
+        //        return i <= max;
+        //    }
+        //    else
+        //    {
+        //        return i >= max;
+        //        //for instance: FOR VAL i = 11 to 1 by -2; (11, 9, 7, 5, 3, 1)
+        //        //max typically has step/1000000 added, so it might be 0.999998
+        //    }
+        //}
 
-        //used in "FOR date d = ..."
-        public static bool ContinueIterating(GekkoTime x, GekkoTime y, int step)
-        {
-            bool rv = false;
-            if (step > 0)
-            {
-                if (x.SmallerThanOrEqual(y)) rv = true;
-            }
-            else
-            {
-                if (x.LargerThanOrEqual(y)) rv = true;
-            }
-            return rv;
-        }
+        ////used in "FOR date d = ..."
+        //public static bool ContinueIterating(int loopType, GekkoTime x, GekkoTime y, int step)
+        //{
+        //    bool rv = false;
+        //    if (step > 0)
+        //    {
+        //        if (x.SmallerThanOrEqual(y)) rv = true;
+        //    }
+        //    else
+        //    {
+        //        if (x.LargerThanOrEqual(y)) rv = true;
+        //    }
+        //    return rv;
+        //}
 
         
 

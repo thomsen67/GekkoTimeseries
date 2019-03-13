@@ -98,7 +98,7 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a VAL from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 

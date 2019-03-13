@@ -31,6 +31,8 @@ options {
 
 tokens {
 	ASTDOLLAR;
+	ASTFORTYPE1;
+	ASTFORTYPE2;
 	ASTLOCAL;
 	ASTCOLON;
 	ASTL0;
@@ -2718,12 +2720,12 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						  | FOR leftParen (forHelper2 ','?)+ ')' SEMICOLON? functionStatements END -> ^({token("ASTFOR", ASTFOR, input.LT(1).Line)} ^(ASTPLACEHOLDER forHelper2+) functionStatements)
 						    ;
 
-forHelper2:                 xx expression TO expression2 (BY expression3)? -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | xx seqOfBankvarnamesAtLeast2 -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
-                          | xx expression -> ^(ASTPLACEHOLDER xx ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+forHelper2:                 forLhs expression TO expression2 (BY expression3)? -> ^(ASTFORTYPE1 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
+                          | forLhs seqOfBankvarnamesAtLeast2 -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | forLhs expression -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
 
-xx:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTPLACEHOLDER svarname);
+forLhs:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(ASTPLACEHOLDER svarname);
                           
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // FUNCTION
