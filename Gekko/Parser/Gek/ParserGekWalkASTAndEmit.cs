@@ -5439,15 +5439,19 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(AddOperator("q", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
-                        break;                    
+                        break;
                     case "ASTDECOMP":
                         {
                             node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);                            
-                            string givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);
-                            givenLabel = G.StripQuotes(givenLabel);                            
-                            node.Code.A("o" + Num(node) + ".label = @`" + givenLabel + "`;" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTEVAL":
+                        {
+                            node.Code.A("Globals.expression = (smpl) => " + node[0].Code + ";" + G.NL);
+                            node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                         }
                         break;
                     case "ASTDECOMPITEMS":

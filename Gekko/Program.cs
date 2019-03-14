@@ -12239,7 +12239,7 @@ namespace Gekko
                     rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
                 }
 
-                string s = "DECOMP " + rhs;
+                string s = "EVAL " + rhs;
                 //Program.obeyCommandCalledFromGUI("decomp pm*fm;", new P());
                 try
                 {
@@ -12249,7 +12249,11 @@ namespace Gekko
                 {
 
                 }
-                return;
+
+                decompOptions.expression = Globals.expression;
+                decompOptions.expressionOld = Globals.expressionText;
+
+                
 
             }
 

@@ -265,6 +265,7 @@ ASTCOMPARE2;
     ASTDATES;
     ASTDATESSTATEMENT;
     ASTDATESTATEMENT;
+	ASTEVAL;
     ASTDECOMP;
     ASTDECOMPITEMS;
     ASTDECOMPTYPE;
@@ -995,6 +996,7 @@ Y2                    = 'Y2'                       ;
     DEC              = 'DEC';
     DECIMALSEPARATOR = 'DECIMALSEPARATOR';
     DECOMP           = 'DECOMP'          ;
+	EVAL           = 'EVAL'          ;
     DELETE           = 'DELETE'          ;
     DETAILS          = 'DETAILS';
     DIALOG           = 'DIALOG'          ;
@@ -1601,6 +1603,7 @@ d.Add("Y" ,Y);
                                         d.Add("dec"     , DEC );
                                         d.Add("decimalseparator"       , DECIMALSEPARATOR    );
                                         d.Add("decomp"  , DECOMP    );
+										d.Add("eval"  , EVAL    );
                                         d.Add("delete"  , DELETE    );
                                         d.Add("details"  , DETAILS   );
                                         d.Add("dialog"  , DIALOG      );
@@ -2353,6 +2356,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | create               SEMICOLON!
 						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!
+						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
 						  | doc                  SEMICOLON!
@@ -2627,6 +2631,8 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				    name -> ^(ASTOPT_STRING_PRTCODE name);
+
+eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, input.LT(1).Line)} expression);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DELETE
@@ -3906,6 +3912,7 @@ ident2: 					Ident |
   CUT|
   DATE|
   DECOMP|
+  EVAL|
   DELETE|
   DISP|
   DOC|
