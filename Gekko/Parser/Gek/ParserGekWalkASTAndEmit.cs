@@ -5445,19 +5445,24 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             GetCodeFromAllChildren(node);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTEVAL":
                         {
-                            node.Code.A("Globals.expression = (smpl) => " + node[0].Code + ";" + G.NL);
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            string methodName = "Evalcode" + ++Globals.counter;
+                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());
+                            node.Code.A("Globals.expression = " + methodName + "();" + G.NL);
                         }
                         break;
                     case "ASTDECOMPITEMS":
                         {
                             node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".expression = () => " + node[0].Code + ";" + G.NL);                                                        
+                            //node.Code.A("o" + Num(node) + ".expression = (smpl) => " + node[0].Code + ";" + G.NL);
+                            string methodName = "Evalcode" + ++Globals.counter;
+                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());                            
+                            node.Code.A("o" + Num(node) + ".expression = " + methodName + "();" + G.NL);
                         }
                         break;
                     case "ASTUNFIX":
@@ -6197,6 +6202,13 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static void StashIntoLocalMethod(W w, string c, string s0)
+        {
+            w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
+            //if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+            //w.wh.localFuncs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
         }
 
         private static O.ELoopType LoopType(ASTNode node, int i)

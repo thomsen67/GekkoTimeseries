@@ -8286,7 +8286,7 @@ namespace Gekko
             public GekkoSmpl smplForFunc = null;
             public string variable = null;
             public string expressionCs = null;
-            public Func<IVariable> expression = null;
+            public Func<GekkoSmpl, IVariable> expression = null;
             public string opt_prtcode = null;
             public string label = null;
 

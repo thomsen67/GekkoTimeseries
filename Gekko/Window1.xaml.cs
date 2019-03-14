@@ -1493,7 +1493,7 @@ namespace Gekko
         public bool isPercentageType = false;
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
-        public Func<IVariable> expression = null;
+        public Func<GekkoSmpl, IVariable> expression = null;
         public List<Dictionary<string, string>> precedents;  //only != null for expressions
         public string type;  //not used yet (UDVALG or DECOMP)
         //public GekkoParserTimePeriod tp;

@@ -35622,9 +35622,9 @@ namespace Gekko
                     Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     //Function call start --------------
-                    O.AdjustSmpl(o.smplForFunc, 0);
-                    y0a = o.expression(); funcCounter++;  //this call fills Globals.precedents with variables
-                    O.AdjustSmpl(o.smplForFunc, 1);
+                    O.AdjustSmpl(smpl, 0);
+                    y0a = o.expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
+                    O.AdjustSmpl(smpl, 1);
                     //Function call end   --------------
 
                     List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
@@ -35668,11 +35668,11 @@ namespace Gekko
                     if (usesRef)
                     {
                         //Function call start --------------
-                        O.AdjustSmpl(o.smplForFunc, 0);
+                        O.AdjustSmpl(smpl, 0);
                         o.smplForFunc.bankNumber = 1;
-                        y0aRef = o.expression(); funcCounter++;
+                        y0aRef = o.expression(smpl); funcCounter++;
                         o.smplForFunc.bankNumber = 0;
-                        O.AdjustSmpl(o.smplForFunc, 1);
+                        O.AdjustSmpl(smpl, 1);
                         //Function call end   --------------
 
                         y0aRef_series = y0aRef as Series;
@@ -35761,12 +35761,12 @@ namespace Gekko
                                             x_series.SetData(t1, x_after);
 
                                             //Function call start --------------
-                                            O.AdjustSmpl(o.smplForFunc, 0);
-                                            if (j == 1) o.smplForFunc.bankNumber = 1;
+                                            O.AdjustSmpl(smpl, 0);
+                                            if (j == 1) smpl.bankNumber = 1;
                                             IVariable y1 = null;
-                                            y1 = o.expression(); funcCounter++;
-                                            if (j == 1) o.smplForFunc.bankNumber = 0;
-                                            O.AdjustSmpl(o.smplForFunc, 1);
+                                            y1 = o.expression(smpl); funcCounter++;
+                                            if (j == 1) smpl.bankNumber = 0;
+                                            O.AdjustSmpl(smpl, 1);
                                             //Function call end   --------------
 
                                             Series y1_series = y1 as Series;
