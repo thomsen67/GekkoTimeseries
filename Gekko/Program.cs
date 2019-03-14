@@ -12207,6 +12207,52 @@ namespace Gekko
             //decompOptions.isCalledFromDecompWindow = false;
             Window1 w = new Window1(decompOptions);
             Globals.windowsDecomp.Add(w);
+
+            if (decompOptions.expressionOld == null && decompOptions.variable != null)
+            {
+                decompOptions.expressionOld = decompOptions.variable;
+            }
+
+            if (G.IsSimpleToken(decompOptions.expressionOld, true))
+            {
+                decompOptions.variable = G.Chop_RemoveFreq(decompOptions.expressionOld);
+                decompOptions.expressionOld = null;
+                decompOptions.expression = null;
+                if (Program.model == null)
+                {
+                    G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
+                    throw new GekkoException();
+                }
+                EquationHelper found = Program.FindEquationByMeansOfVariableName(decompOptions.variable);
+                if (found == null)
+                {
+                    G.Writeln2("*** ERROR: DECOMP: Could not find variable '" + decompOptions.variable + "' as left-hand side in model");
+                    throw new GekkoException();
+                }
+                string[] ss = found.equationText.Split('=');
+                //string s = "DECOMP " + decompOptions.variable + " = " + ss[1] + ";";
+                string rhs = ss[1].Trim();
+                if (rhs.EndsWith("$")) rhs = rhs.Substring(0, rhs.Length - 1) + ";";  //only replace last $, not other $
+                for (int i = 1; i < 20; i++)
+                {
+                    rhs = rhs.Replace("(-" + i + ")", "[-" + i + "]");
+                    rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
+                }
+
+                string s = "DECOMP " + rhs;
+                //Program.obeyCommandCalledFromGUI("decomp pm*fm;", new P());
+                try
+                {
+                    Program.obeyCommandCalledFromGUI(s, new P());
+                }
+                catch (Exception e)
+                {
+
+                }
+                return;
+
+            }
+
             if (decompOptions.expressionOld != null)
             {
                 w.Title = "Decompose expression";
@@ -35573,7 +35619,7 @@ namespace Gekko
 
                     //Function call start --------------
                     O.AdjustSmpl(o.smplForFunc, 0);
-                    y0a = o.expression(); funcCounter++;
+                    y0a = o.expression(); funcCounter++;  //this call fills Globals.precedents with variables
                     O.AdjustSmpl(o.smplForFunc, 1);
                     //Function call end   --------------
 
@@ -35856,356 +35902,356 @@ namespace Gekko
 
         }
 
-        public static Table DecomposeNEWEXPERIMENTAL(DecompOptions o)
-        {
-            //
-            //
-            //
-            //                 Ref   -- m -->      Work
-            //
-            //                   ^                    ^
-            //                   |                    |
-            //                  rd                    d
-            //                   |                    |
-            //            
-            //                 Ref[-1]             Work[-1]
-            //
-            //
+        //public static Table DecomposeNEWEXPERIMENTAL(DecompOptions o)
+        //{
+        //    //
+        //    //
+        //    //
+        //    //                 Ref   -- m -->      Work
+        //    //
+        //    //                   ^                    ^
+        //    //                   |                    |
+        //    //                  rd                    d
+        //    //                   |                    |
+        //    //            
+        //    //                 Ref[-1]             Work[-1]
+        //    //
+        //    //
 
-            //G.Writeln("Decompstart");
+        //    //G.Writeln("Decompstart");
 
-            DateTime dt = DateTime.Now;
+        //    DateTime dt = DateTime.Now;
 
-            string code1 = o.prtOptionLower;
-            string code2 = null;
-            if (code1.StartsWith("s"))
-            {
-                code1 = code1.Substring(1);
-                code2 = "s";
-            }
+        //    string code1 = o.prtOptionLower;
+        //    string code2 = null;
+        //    if (code1.StartsWith("s"))
+        //    {
+        //        code1 = code1.Substring(1);
+        //        code2 = "s";
+        //    }
 
-            o.isPercentageType = false;
-            if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
-            {
-                o.isPercentageType = true;
-            }
+        //    o.isPercentageType = false;
+        //    if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+        //    {
+        //        o.isPercentageType = true;
+        //    }
 
-            Table tab = new Table();
+        //    Table tab = new Table();
 
-            //string type = "d";  //d or m
-            GekkoTime per1 = o.t1;
-            GekkoTime per2 = o.t2;
+        //    //string type = "d";  //d or m
+        //    GekkoTime per1 = o.t1;
+        //    GekkoTime per2 = o.t2;
 
-            GekkoSmpl smpl = new GekkoSmpl(per1, per2);
-            Func<IVariable> decomp = o.expression;
-            IVariable y0a = null;
-            IVariable y0aRef = null;
+        //    GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+        //    Func<IVariable> decomp = o.expression;
+        //    IVariable y0a = null;
+        //    IVariable y0aRef = null;
 
-            DecompDict cellsGradQuo = new DecompDict();
-            DecompDict cellsGradRef = new DecompDict();
-            DecompDict cellsQuo = new DecompDict();            
-            DecompDict cellsRef = new DecompDict();
-            DecompDict cellsContribD = new DecompDict();
-            DecompDict cellsContribDRef = new DecompDict();
-            DecompDict cellsContribM = new DecompDict();
+        //    DecompDict cellsGradQuo = new DecompDict();
+        //    DecompDict cellsGradRef = new DecompDict();
+        //    DecompDict cellsQuo = new DecompDict();            
+        //    DecompDict cellsRef = new DecompDict();
+        //    DecompDict cellsContribD = new DecompDict();
+        //    DecompDict cellsContribDRef = new DecompDict();
+        //    DecompDict cellsContribM = new DecompDict();
 
-            //G.Writeln("decomp1");
-            //for (int i = 0; i < 100000; i++)
-            //{
-            //    IVariable y1 = decomp();
-            //}
-            //G.Writeln("decomp2");
+        //    //G.Writeln("decomp1");
+        //    //for (int i = 0; i < 100000; i++)
+        //    //{
+        //    //    IVariable y1 = decomp();
+        //    //}
+        //    //G.Writeln("decomp2");
 
-            int perLag = -2;
-            string lhs = "Expression value";
+        //    int perLag = -2;
+        //    string lhs = "Expression value";
 
-            try
-            {
-                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        //    try
+        //    {
+        //        Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-                //Function call start --------------
-                O.AdjustSmpl(o.smplForFunc, 0);
-                y0a = decomp();
-                O.AdjustSmpl(o.smplForFunc, 1);
-                //Function call end   --------------
+        //        //Function call start --------------
+        //        O.AdjustSmpl(o.smplForFunc, 0);
+        //        y0a = decomp();
+        //        O.AdjustSmpl(o.smplForFunc, 1);
+        //        //Function call end   --------------
 
-                List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
-                if (true)
-                {
-                    List<string> ss = Globals.precedents.Keys.ToList<string>();
-                    ss.Sort(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in ss)
-                    {
-                        IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+        //        List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
+        //        if (true)
+        //        {
+        //            List<string> ss = Globals.precedents.Keys.ToList<string>();
+        //            ss.Sort(StringComparer.OrdinalIgnoreCase);
+        //            foreach (string s in ss)
+        //            {
+        //                IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
-                        if (x.Type() == EVariableType.Series)
-                        {
-                            Series ivTemp_series = x as Series;
-                            if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series                                
-                            decompPrecedents.Add(new DecompPrecedent(s, x));
-                        }
-                        else if (x.Type() == EVariableType.Val)
-                        {
-                            decompPrecedents.Add(new DecompPrecedent(s, x));
-                        }
-                    }
-                }
+        //                if (x.Type() == EVariableType.Series)
+        //                {
+        //                    Series ivTemp_series = x as Series;
+        //                    if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series                                
+        //                    decompPrecedents.Add(new DecompPrecedent(s, x));
+        //                }
+        //                else if (x.Type() == EVariableType.Val)
+        //                {
+        //                    decompPrecedents.Add(new DecompPrecedent(s, x));
+        //                }
+        //            }
+        //        }
 
-                Series y0a_series = y0a as Series;
-                if (y0a == null)
-                {
-                    G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
-                    throw new GekkoException();
-                }
-                Series y0_series = y0a_series;
-                if (y0a_series.type != ESeriesType.Light)
-                {
-                    y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
-                }
+        //        Series y0a_series = y0a as Series;
+        //        if (y0a == null)
+        //        {
+        //            G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
+        //            throw new GekkoException();
+        //        }
+        //        Series y0_series = y0a_series;
+        //        if (y0a_series.type != ESeriesType.Light)
+        //        {
+        //            y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+        //        }
 
-                //Function call start --------------
-                O.AdjustSmpl(o.smplForFunc, 0);
-                o.smplForFunc.bankNumber = 1;
-                y0aRef = decomp();
-                o.smplForFunc.bankNumber = 0;
-                O.AdjustSmpl(o.smplForFunc, 1);
-                //Function call end   --------------
+        //        //Function call start --------------
+        //        O.AdjustSmpl(o.smplForFunc, 0);
+        //        o.smplForFunc.bankNumber = 1;
+        //        y0aRef = decomp();
+        //        o.smplForFunc.bankNumber = 0;
+        //        O.AdjustSmpl(o.smplForFunc, 1);
+        //        //Function call end   --------------
 
-                Series y0aRef_series = y0aRef as Series;
-                if (y0aRef == null)
-                {
-                    G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
-                    throw new GekkoException();
-                }
-                Series y0Ref_series = y0aRef_series;
-                if (y0aRef_series.type != ESeriesType.Light)
-                {
-                    y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
-                }
+        //        Series y0aRef_series = y0aRef as Series;
+        //        if (y0aRef == null)
+        //        {
+        //            G.Writeln2("*** ERROR: DECOMP expects the expression to be of series type");
+        //            throw new GekkoException();
+        //        }
+        //        Series y0Ref_series = y0aRef_series;
+        //        if (y0aRef_series.type != ESeriesType.Light)
+        //        {
+        //            y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
+        //        }
 
-                foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(perLag), per2))
-                {
-                    cellsQuo[lhs].SetData(t, y0_series.GetData(smpl, t));
-                    cellsContribD[lhs].SetData(t, y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
-                    if (y0Ref_series != null)
-                    {
-                        cellsRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t));
-                        cellsContribM[lhs].SetData(t, y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
-                        cellsContribDRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t.Add(-1)));
-                    }
-                }
+        //        foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(perLag), per2))
+        //        {
+        //            cellsQuo[lhs].SetData(t, y0_series.GetData(smpl, t));
+        //            cellsContribD[lhs].SetData(t, y0_series.GetData(smpl, t) - y0_series.GetData(smpl, t.Add(-1)));
+        //            if (y0Ref_series != null)
+        //            {
+        //                cellsRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t));
+        //                cellsContribM[lhs].SetData(t, y0_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t));
+        //                cellsContribDRef[lhs].SetData(t, y0Ref_series.GetData(smpl, t) - y0Ref_series.GetData(smpl, t.Add(-1)));
+        //            }
+        //        }
 
-                double eps = Globals.newtonSmallNumber;
+        //        double eps = Globals.newtonSmallNumber;
 
-                if (decompPrecedents.Count > 0)
-                {
+        //        if (decompPrecedents.Count > 0)
+        //        {
 
-                    GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        //            GekkoDictionary<string, int> vars = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-                    int iVar = -1;
+        //            int iVar = -1;
 
-                    DecompHelper3[] store = new Gekko.DecompHelper3[decompPrecedents.Count];
-                    for (int ii = 0; ii < store.Length; ii++)
-                    {
-                        store[ii] = new DecompHelper3();
-                    }
+        //            DecompHelper3[] store = new Gekko.DecompHelper3[decompPrecedents.Count];
+        //            for (int ii = 0; ii < store.Length; ii++)
+        //            {
+        //                store[ii] = new DecompHelper3();
+        //            }
 
-                    foreach (DecompPrecedent dp in decompPrecedents)
-                    {
-                        iVar++;
+        //            foreach (DecompPrecedent dp in decompPrecedents)
+        //            {
+        //                iVar++;
 
-                        Series xRef_series = null;
-                        IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
-                        if (dpx.Type() == EVariableType.Series)
-                        {
-                            //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
-                            xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
-                        }
+        //                Series xRef_series = null;
+        //                IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
+        //                if (dpx.Type() == EVariableType.Series)
+        //                {
+        //                    //could also use smpl.bankNumber = 1 to do this, but then GetIVariableFromString should use smpl.bankNumbe 
+        //                    xRef_series = O.GetIVariableFromString(G.Chop_SetBank(dp.s, "Ref"), O.ECreatePossibilities.NoneReportError) as Series;
+        //                }
 
-                        foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
-                        {
+        //                foreach (GekkoTime t1 in new GekkoTimeIterator(per1.Add(-O.MaxLag()), per2.Add(O.MaxLead())))
+        //                {
 
-                            // --------------------------------------------
-                            // This is where the decomposition takes place
-                            // --------------------------------------------
+        //                    // --------------------------------------------
+        //                    // This is where the decomposition takes place
+        //                    // --------------------------------------------
 
-                            for (int j = 0; j < 2; j++)
-                            {
-                                if (dpx.Type() == EVariableType.Series)
-                                {
-                                    Series x_series = null;
-                                    Series y_series = null;
-                                    if (j == 0)
-                                    {
-                                        x_series = dpx as Series;
-                                        y_series = y0_series;
-                                    }
-                                    else
-                                    {
-                                        x_series = xRef_series;
-                                        y_series = y0Ref_series;
-                                    }
-                                    double x_before = x_series.GetData(smpl, t1);
-                                    try
-                                    {
-                                        double x_after = x_before + eps;
-                                        x_series.SetData(t1, x_after);
+        //                    for (int j = 0; j < 2; j++)
+        //                    {
+        //                        if (dpx.Type() == EVariableType.Series)
+        //                        {
+        //                            Series x_series = null;
+        //                            Series y_series = null;
+        //                            if (j == 0)
+        //                            {
+        //                                x_series = dpx as Series;
+        //                                y_series = y0_series;
+        //                            }
+        //                            else
+        //                            {
+        //                                x_series = xRef_series;
+        //                                y_series = y0Ref_series;
+        //                            }
+        //                            double x_before = x_series.GetData(smpl, t1);
+        //                            try
+        //                            {
+        //                                double x_after = x_before + eps;
+        //                                x_series.SetData(t1, x_after);
 
-                                        //Function call start --------------
-                                        O.AdjustSmpl(o.smplForFunc, 0);
-                                        if (j == 1) o.smplForFunc.bankNumber = 1;
+        //                                //Function call start --------------
+        //                                O.AdjustSmpl(o.smplForFunc, 0);
+        //                                if (j == 1) o.smplForFunc.bankNumber = 1;
 
-                                        IVariable y1 = decomp();
+        //                                IVariable y1 = decomp();
 
-                                        //Series y1 = y_series.DeepClone(null) as Series;
-                                        //for (int i = 0; i < y1.data.dataArray.Length; i++)
-                                        //{
-                                        //    y1.data.dataArray[i] *= 1.01;
-                                        //}
+        //                                //Series y1 = y_series.DeepClone(null) as Series;
+        //                                //for (int i = 0; i < y1.data.dataArray.Length; i++)
+        //                                //{
+        //                                //    y1.data.dataArray[i] *= 1.01;
+        //                                //}
 
 
-                                        if (j == 1) o.smplForFunc.bankNumber = 0;
-                                        O.AdjustSmpl(o.smplForFunc, 1);
-                                        //Function call end   --------------
+        //                                if (j == 1) o.smplForFunc.bankNumber = 0;
+        //                                O.AdjustSmpl(o.smplForFunc, 1);
+        //                                //Function call end   --------------
 
-                                        Series y1_series = y1 as Series;
+        //                                Series y1_series = y1 as Series;
 
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
-                                        {
-                                            double y0_double = y_series.GetData(smpl, t2);
-                                            double y1_double = y1_series.GetData(smpl, t2);
-                                            double grad = (y1_double - y0_double) / eps;
-                                            int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                            
+        //                                foreach (GekkoTime t2 in new GekkoTimeIterator(per1.Add(perLag), per2.Add(0)))
+        //                                {
+        //                                    double y0_double = y_series.GetData(smpl, t2);
+        //                                    double y1_double = y1_series.GetData(smpl, t2);
+        //                                    double grad = (y1_double - y0_double) / eps;
+        //                                    int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                            
                                             
                                             
-                                            //string name = G.Chop_FreqRemove(dp.s, per1.freq);
+        //                                    //string name = G.Chop_FreqRemove(dp.s, per1.freq);
 
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            //TODO
-                                            double contrib = double.NaN;
-                                            if (G.isNumericalError(grad) || grad == 0d)
-                                            {
-                                                //ignore
-                                            }
-                                            else
-                                            {
-                                                double dd0 = x_series.GetData(smpl, t1);
-                                                double dd1 = x_series.GetData(smpl, t1.Add(-1));
-                                                contrib = grad * (dd0 - dd1);
-                                                //G.Writeln(x_series.name + " has contrib " + t1.ToString() + " --> " + contrib + "   " + lag);
-                                            }
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    //TODO
+        //                                    double contrib = double.NaN;
+        //                                    if (G.isNumericalError(grad) || grad == 0d)
+        //                                    {
+        //                                        //ignore
+        //                                    }
+        //                                    else
+        //                                    {
+        //                                        double dd0 = x_series.GetData(smpl, t1);
+        //                                        double dd1 = x_series.GetData(smpl, t1.Add(-1));
+        //                                        contrib = grad * (dd0 - dd1);
+        //                                        //G.Writeln(x_series.name + " has contrib " + t1.ToString() + " --> " + contrib + "   " + lag);
+        //                                    }
                                             
-                                            //vars[0] here could be a lag
-                                            if (G.isNumericalError(contrib) || contrib == 0d)
-                                            {
-                                                //ignore
-                                            }
-                                            else
-                                            {
-                                                if (j == 0)
-                                                {
-                                                    if (store[iVar].vars[0] == null) store[iVar].vars[0] = new Series(Program.options.freq, G.Chop_AddFreq("decomphelper", G.GetFreq(Program.options.freq)));
-                                                    double d = store[iVar].vars[0].GetData(smpl, t2);
-                                                    double contrib2 = contrib;
-                                                    if (!G.isNumericalError(d))
-                                                    {
-                                                        contrib2 += d;
-                                                    }
-                                                    store[iVar].vars[0].SetData(t2, contrib2);
-                                                }
-                                            }                                            
-                                        }
-                                    }
-                                    finally
-                                    {
-                                        x_series.SetData(t1, x_before);
-                                    }
-                                }
-                                else if (dpx.Type() == EVariableType.Val)
-                                {
-                                    //TODO
-                                }
-                                else
-                                {
-                                    //skip other types, this includes matrices
-                                    //so an expression with a matrix that changes from Work to Ref is
-                                    //not decomoposed as regards to this matrix
-                                    //(we would have to shock each cell in the matrix...)
-                                }
+        //                                    //vars[0] here could be a lag
+        //                                    if (G.isNumericalError(contrib) || contrib == 0d)
+        //                                    {
+        //                                        //ignore
+        //                                    }
+        //                                    else
+        //                                    {
+        //                                        if (j == 0)
+        //                                        {
+        //                                            if (store[iVar].vars[0] == null) store[iVar].vars[0] = new Series(Program.options.freq, G.Chop_AddFreq("decomphelper", G.GetFreq(Program.options.freq)));
+        //                                            double d = store[iVar].vars[0].GetData(smpl, t2);
+        //                                            double contrib2 = contrib;
+        //                                            if (!G.isNumericalError(d))
+        //                                            {
+        //                                                contrib2 += d;
+        //                                            }
+        //                                            store[iVar].vars[0].SetData(t2, contrib2);
+        //                                        }
+        //                                    }                                            
+        //                                }
+        //                            }
+        //                            finally
+        //                            {
+        //                                x_series.SetData(t1, x_before);
+        //                            }
+        //                        }
+        //                        else if (dpx.Type() == EVariableType.Val)
+        //                        {
+        //                            //TODO
+        //                        }
+        //                        else
+        //                        {
+        //                            //skip other types, this includes matrices
+        //                            //so an expression with a matrix that changes from Work to Ref is
+        //                            //not decomoposed as regards to this matrix
+        //                            //(we would have to shock each cell in the matrix...)
+        //                        }
 
-                                //decompContributions.Add(dh);
-                                //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
-                            }
-                        }
-                    }
+        //                        //decompContributions.Add(dh);
+        //                        //decompHelpers.Add(key + "," + t.ToString(), decompContributions);  //key for instance "Work,2010"
+        //                    }
+        //                }
+        //            }
                                         
-                    List<string> vars2 = new List<string>();
-                    for (int ii = 0; ii < store.Length; ii++)
-                    {
-                        if (store[ii].vars[0] != null)
-                        {
-                            vars2.Add(decompPrecedents[ii].s);
-                            cellsContribD.storage.Add(decompPrecedents[ii].s, store[ii].vars[0]);
-                        }
-                    }
-                    vars2.Insert(0, lhs);
+        //            List<string> vars2 = new List<string>();
+        //            for (int ii = 0; ii < store.Length; ii++)
+        //            {
+        //                if (store[ii].vars[0] != null)
+        //                {
+        //                    vars2.Add(decompPrecedents[ii].s);
+        //                    cellsContribD.storage.Add(decompPrecedents[ii].s, store[ii].vars[0]);
+        //                }
+        //            }
+        //            vars2.Insert(0, lhs);
 
-                    tab.writeOnce = true;
+        //            tab.writeOnce = true;
 
-                    if (false)
-                    {
-                        int i = 0;
-                        foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
-                        {
-                            i++;
-                            int j = 0;
-                            foreach (string s in vars2)
-                            {
-                                if (s == lhs) continue;
-                                j++;
+        //            if (false)
+        //            {
+        //                int i = 0;
+        //                foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+        //                {
+        //                    i++;
+        //                    int j = 0;
+        //                    foreach (string s in vars2)
+        //                    {
+        //                        if (s == lhs) continue;
+        //                        j++;
 
-                                double vQuo = cellsQuo[s].GetData(smpl, t2);
-                                double vRef = cellsRef[s].GetData(smpl, t2);
-                                double vQuoLag = cellsQuo[s].GetData(smpl, t2.Add(-1));
-                                double vRefLag = cellsRef[s].GetData(smpl, t2.Add(-1));
-                                double vGradQuoLag = cellsGradQuo[s].GetData(smpl, t2.Add(-1));
-                                double vGradQuo = cellsGradQuo[s].GetData(smpl, t2);
-                                double vGradRef = cellsGradRef[s].GetData(smpl, t2);
-                                double vGradRefLag = cellsGradRef[s].GetData(smpl, t2.Add(-1));
+        //                        double vQuo = cellsQuo[s].GetData(smpl, t2);
+        //                        double vRef = cellsRef[s].GetData(smpl, t2);
+        //                        double vQuoLag = cellsQuo[s].GetData(smpl, t2.Add(-1));
+        //                        double vRefLag = cellsRef[s].GetData(smpl, t2.Add(-1));
+        //                        double vGradQuoLag = cellsGradQuo[s].GetData(smpl, t2.Add(-1));
+        //                        double vGradQuo = cellsGradQuo[s].GetData(smpl, t2);
+        //                        double vGradRef = cellsGradRef[s].GetData(smpl, t2);
+        //                        double vGradRefLag = cellsGradRef[s].GetData(smpl, t2.Add(-1));
 
-                                double dContribM = vGradRef * (vQuo - vRef);
-                                double dContribD = vGradQuoLag * (vQuo - vQuoLag);
-                                double dContribDRef = vGradRefLag * (vRef - vRefLag);
+        //                        double dContribM = vGradRef * (vQuo - vRef);
+        //                        double dContribD = vGradQuoLag * (vQuo - vQuoLag);
+        //                        double dContribDRef = vGradRefLag * (vRef - vRefLag);
 
-                                cellsContribM[s].SetData(t2, dContribM);
-                                cellsContribD[s].SetData(t2, dContribD);
-                                cellsContribDRef[s].SetData(t2, dContribDRef);
-                            }
-                        }
-                    }
-                    //G.Writeln("Putintotable1");
-                    DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, vars2);
-                    //G.Writeln("Putintotable2");
-                }
+        //                        cellsContribM[s].SetData(t2, dContribM);
+        //                        cellsContribD[s].SetData(t2, dContribD);
+        //                        cellsContribDRef[s].SetData(t2, dContribDRef);
+        //                    }
+        //                }
+        //            }
+        //            //G.Writeln("Putintotable1");
+        //            DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, vars2);
+        //            //G.Writeln("Putintotable2");
+        //        }
 
-            }
-            finally
-            {
-                //Important: makes sure is is *always* nulled after a DECOMP
-                Globals.precedents = null;
-            }
+        //    }
+        //    finally
+        //    {
+        //        //Important: makes sure is is *always* nulled after a DECOMP
+        //        Globals.precedents = null;
+        //    }
 
-            G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds));
+        //    G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds));
 
-            return tab;
+        //    return tab;
 
-        }
+        //}
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {

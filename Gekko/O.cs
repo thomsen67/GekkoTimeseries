@@ -8276,10 +8276,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Unsupported type (" + input.Type().ToString() + "), for SHOW");
                     throw new GekkoException();
                 }
-
             }
-
-
         }
 
         public class Decomp

@@ -5439,27 +5439,15 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A(AddOperator("q", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
-                        break;
-                    //case "ASTTRIMVARS":
-                    //    {
-                    //        node.Code.A("Program.Trimvars();" + G.NL);
-                    //    }
-                    //    break;
-
+                        break;                    
                     case "ASTDECOMP":
                         {
-                            //string cs = helper.decompExpressionCs.Replace("`", "\\\"");
-                            //cs = cs.Replace(G.NL, "");
-                            //node.Code.A("Program.Decomp(`" + helper.decompType.ToLower() + "`, " + helper.timePeriod + ", `" + helper.prtOption + "`, `" + cs + "`, precedents, expression);");                            
-                            node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);
-                            
+                            node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);                            
                             string givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]);
-                            givenLabel = G.StripQuotes(givenLabel);
-                            //givenLabel = Globals.labelCheatString + givenLabel;
-                            node.Code.A("o" + Num(node) + ".label = `" + givenLabel + "`;" + G.NL);                            
+                            givenLabel = G.StripQuotes(givenLabel);                            
+                            node.Code.A("o" + Num(node) + ".label = @`" + givenLabel + "`;" + G.NL);                            
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-
                         }
                         break;
                     case "ASTDECOMPITEMS":
