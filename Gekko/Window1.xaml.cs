@@ -1559,15 +1559,18 @@ namespace Gekko
             //d.decimalsLevel = this.decimalsLevel;
             d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
             d.dream = this.dream;
-            cellsGradQuo = null;
-            d.cellsGradRef = this.cellsGradRef;
-            d.cellsQuo = this.cellsQuo;
-            d.cellsRef = this.cellsRef;
-            d.cellsContribD = this.cellsContribD;
-            d.cellsContribDRef = this.cellsContribDRef;
-            d.cellsContribM = this.cellsContribM;
-            d.hasCalculatedQuo = this.hasCalculatedQuo;
-            d.hasCalculatedRef = this.hasCalculatedRef;
+            if (false)
+            {
+                cellsGradQuo = null;
+                d.cellsGradRef = this.cellsGradRef;
+                d.cellsQuo = this.cellsQuo;
+                d.cellsRef = this.cellsRef;
+                d.cellsContribD = this.cellsContribD;
+                d.cellsContribDRef = this.cellsContribDRef;
+                d.cellsContribM = this.cellsContribM;
+                d.hasCalculatedQuo = this.hasCalculatedQuo;
+                d.hasCalculatedRef = this.hasCalculatedRef;
+            }
             return d;
         }
     }

@@ -12251,9 +12251,8 @@ namespace Gekko
                 }
 
                 decompOptions.expression = Globals.expression;
-                decompOptions.expressionOld = Globals.expressionText;
-
-                
+                //decompOptions.expressionOld = Globals.expressionText;
+                decompOptions.expressionOld = found.equationText;
 
             }
 
@@ -14811,7 +14810,7 @@ namespace Gekko
                                         for (int ii = i - 1 - 1; ii >= 0; ii--)
                                         {
                                             //.... +123.45 loops through pure digits until + is met. Here number would be true.
-                                            if (glued3a.Contains(lineNewVersion[ii])) break;  //for instance a "," or "+" to delimit the number ('token')
+                                            if (glued3a.Contains(lineNewVersion[ii]) || lineNewVersion[ii] == ';') break;  //for instance a "," or "+" to delimit the number ('token'), or the ';' in #m = [1.2;2.3]
                                             if (!char.IsDigit(lineNewVersion[ii]))
                                             {
                                                 number = false;
