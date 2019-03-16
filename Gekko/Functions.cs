@@ -600,12 +600,7 @@ namespace Gekko
             List fix = new List(fixes);
             return fix;
         }
-
-        public static IVariable refname(GekkoSmpl smpl)
-        {
-            return new ScalarString(Program.databanks.GetRef().name);
-        }
-
+        
         public static IVariable bankfilename(GekkoSmpl smpl, IVariable x1)
         {
             return bankfilename(smpl, x1, new ScalarString(""));
@@ -644,12 +639,12 @@ namespace Gekko
         //    return new ScalarVal(y);
         //}
 
-        public static IVariable test(GekkoSmpl t, IVariable x1)
-        {
-            return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
-        }
+        //public static IVariable test(GekkoSmpl t, IVariable x1)
+        //{
+        //    return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
+        //}
 
-        public static IVariable errorhelper(GekkoSmpl t, IVariable x)
+        public static IVariable HELPER_error(GekkoSmpl t, IVariable x)
         {
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
@@ -682,6 +677,11 @@ namespace Gekko
             return new ScalarString(s1 + s2);
         }
 
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
         public static IVariable piece(GekkoSmpl smpl, IVariable x1, IVariable x2, IVariable x3)
         {
             G.Writeln2("*** ERROR: Rename: please use substring() instead of piece()");
@@ -2317,11 +2317,11 @@ namespace Gekko
             return pow(smpl, x1, x2);
         }
 
-        public static IVariable nothing(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
-        {            
-            Program.RevertSmpl(smplOriginal, smpl);
-            return x1;
-        }
+        //public static IVariable nothing(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
+        //{            
+        //    Program.RevertSmpl(smplOriginal, smpl);
+        //    return x1;
+        //}
 
         [MyCustom(Lag = "lag=1")]
         public static IVariable pch(GekkoSmpl2 smplOriginal, GekkoSmpl smpl, IVariable x1)
@@ -2597,6 +2597,17 @@ namespace Gekko
             }
         }
 
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        public static IVariable search(GekkoSmpl smpl, IVariable x1, IVariable x2)
+        {
+            G.Writeln2("*** ERROR: search() is now index() in Gekko 3.0");
+            throw new GekkoException();
+        }
+
         public static IVariable index(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             //TODO TODO TODO
@@ -2637,6 +2648,17 @@ namespace Gekko
             string s1 = O.ConvertToString(x1);
             string txt = Program.GetTextFromFileWithWait(s1);
             return new ScalarString(txt);
+        }
+
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        //OBSOLETE
+        public static IVariable trim(GekkoSmpl smpl, IVariable x1)
+        {
+            G.Writeln2("*** ERROR: trim() is now strip() in Gekko 3.0.");
+            throw new GekkoException();
         }
 
         public static IVariable strip(GekkoSmpl smpl, IVariable x1)

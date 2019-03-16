@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string versionInternal = "";
 
+        public static bool lagfix = true;
+
         //Using GekkoArg instead of IVariable as function parameters
         //with both false and true: below code is about 12.6 sec in debug mode --> 166.000 per second
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
@@ -72,7 +74,7 @@ namespace Gekko
         public static string objFunctionPlaceholder = "[obj-function-placeholder]";
 
         public static string isAProto = "Is_a_protobuffer_file";
-
+        
         public const int smplOffset = 2;       //<2026 2200 p> x = pch(@x); --> had to set it from 1 to 2...! 
         public const int smplInitStart = 0;  //could be -2
         public const int smplInitEnd = 0;

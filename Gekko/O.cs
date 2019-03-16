@@ -3753,17 +3753,18 @@ namespace Gekko
 
         public static void AdjustSmpl(GekkoSmpl smpl, int i)
         {
+            int add = 0;
             if (i == 0)
             {
-                smpl.t0 = smpl.t0.Add(-O.MaxLag());
-                smpl.t1 = smpl.t1.Add(-O.MaxLag());
+                smpl.t0 = smpl.t0.Add(-O.MaxLag() - add);
+                smpl.t1 = smpl.t1.Add(-O.MaxLag() - add);
                 smpl.t2 = smpl.t2.Add(O.MaxLead());
                 smpl.t3 = smpl.t3.Add(O.MaxLead());
             }
             else
             {
-                smpl.t0 = smpl.t0.Add(O.MaxLag());
-                smpl.t1 = smpl.t1.Add(O.MaxLag());
+                smpl.t0 = smpl.t0.Add(O.MaxLag() + add);
+                smpl.t1 = smpl.t1.Add(O.MaxLag() + add);
                 smpl.t2 = smpl.t2.Add(-O.MaxLead());
                 smpl.t3 = smpl.t3.Add(-O.MaxLead());
             }

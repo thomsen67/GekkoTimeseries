@@ -596,10 +596,10 @@ namespace Gekko
                 }
             }
             End:
-            if (Program.options.series_data_calc_missing == ESeriesMissing.Zero)
-            {
-                if (G.isNumericalError(rv)) rv = 0d;
-            }
+            //if (Program.options.series_data_calc_missing == ESeriesMissing.Zero)
+            //{
+            //    if (G.isNumericalError(rv)) rv = 0d;
+            //}
             return rv;
         }
 
@@ -1299,27 +1299,33 @@ namespace Gekko
         //pch(), dlog(), dif()
         public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a, int lag)
         {
+            //#9083245058
+
+            int xx = -lag;
+            if (Globals.lagfix) xx = 0;  //the return should have no lags, it is only the internals that are lagged
+
             //Functions like d() and pch() where lag is used
             Series rv_series;
+            rv_series = new Series(ESeriesType.Light, smpl.t0.Add(xx), smpl.t3); //should return a seies corresponding to t0-t3
+
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
-                rv_series = new Series(ESeriesType.Light, smpl.t0.Add(-lag), smpl.t3); //?? -1 or -lag??
+                               
 
                 if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
-                    GekkoTime window1 = smpl.t0.Add(-lag);//?? -1 or -lag??
-                    //GekkoTime window1 = smpl.t0;
+                    GekkoTime window1 = smpl.t0.Add(xx); //should return a seies corresponding to t0-t3                    
                     GekkoTime window2 = smpl.t3;
 
-                    int ia1 = rv_series.ResizeDataArray(window1); //t0-1
+                    int ia1 = rv_series.ResizeDataArray(window1);  //t0
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
-                    int ib1 = x1_series.ResizeDataArray(window1);  //t0-1
+                    int ib1 = x1_series.ResizeDataArray(window1);  //t0
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3
                     double[] arraya = rv_series.data.dataArray;
                     double[] arrayb = x1_series.data.dataArray;
                     for (int i = 0; i < lag; i++)
                     {
-                        arraya[i] = double.NaN;
+                        arraya[i] = double.NaN;  //arraya[0] = M
                     }
                     for (int i = lag; i < GekkoTime.Observations(window1, window2); i++)
                     {
@@ -1337,19 +1343,44 @@ namespace Gekko
             }
             else if (x1_series.type == ESeriesType.Light)
             {
-                //safe to alter the object itself, since it is temporary                
-                double[] temp = new double[x1_series.data.dataArray.Length];
-                for (int i = 0; i < lag; i++)
+                if (Globals.lagfix)
                 {
-                    temp[i] = double.NaN;
+                    int offset = GekkoTime.Observations(x1_series.data.anchorPeriod, rv_series.data.anchorPeriod) - 1;
+
+                    if (Globals.runningOnTTComputer && offset < 0)
+                    {
+                        G.Writeln2("*** ERROR: TT note: lag problem"); throw new GekkoException();
+                    }                                       
+                    
+                    for (int i = 0; i < rv_series.data.dataArray.Length; i++)
+                    {
+                        if (i - lag + offset < 0)
+                        {
+                            rv_series.data.dataArray[i] = double.NaN;
+                            G.Writeln2("*** ERROR: TT note: lag problem"); throw new GekkoException();
+                        }
+                        else
+                        {
+                            rv_series.data.dataArray[i] = a(x1_series.data.dataArray[i + offset], x1_series.data.dataArray[i - lag + offset]);
+                        }
+                    }                    
                 }
-                for (int i = 0 + lag; i < x1_series.data.dataArray.Length; i++)
+                else
                 {
-                    temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - lag]);
+                    //safe to alter the object itself, since it is temporary                
+                    double[] temp = new double[x1_series.data.dataArray.Length];
+                    for (int i = 0; i < lag; i++)
+                    {
+                        temp[i] = double.NaN;
+                    }
+                    for (int i = 0 + lag; i < x1_series.data.dataArray.Length; i++)
+                    {
+                        temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - lag]);
+                    }
+                    x1_series.data.dataArray = temp;  //has same size and same anchors            
+                    rv_series = x1_series;
+                    //rv_series.SetDirty(true);
                 }
-                x1_series.data.dataArray = temp;  //has same size and same anchors            
-                rv_series = x1_series;
-                //rv_series.SetDirty(true);
             }
             else
             {
@@ -1707,7 +1738,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: List with " + x2_list.Count() + " elements, expected " + smpl.Observations12() + " elements corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
                         throw new GekkoException();
                     }
-                    Series ts = new Series(ESeriesType.Light, smpl.t1, smpl.t2);  //new series light
+                    Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2); //new series light
                     int i = -1;
                     foreach (GekkoTime t in smpl.Iterate12())
                     {
@@ -1727,7 +1758,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: " + x2_matrix.DimensionsAsString() + " elements, expected a " + smpl.Observations12() + " x 1 matrix corresponding to " + smpl.t1.ToString() + "-" + smpl.t2.ToString());
                         throw new GekkoException();
                     }
-                    Series ts = new Series(ESeriesType.Light, smpl.t1, smpl.t2);  //new series light
+                    Series ts = new Series(ESeriesType.Light, smpl.t1.Add(-Globals.smplOffset), smpl.t2);  //new series light
                     
                     int i = -1;
                     foreach (GekkoTime t in smpl.Iterate12())

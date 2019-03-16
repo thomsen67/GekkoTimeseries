@@ -8957,7 +8957,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1a" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 10" + G.NL
-              + @"    [  10]:   %v = errorhelper('1a'); //line 10" + G.NL
+              + @"    [  10]:   %v = HELPER_error('1a'); //line 10" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 10)" + G.NL + G.NL;
@@ -8973,7 +8973,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1b" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 20" + G.NL
-              + @"    [  20]:   %v = errorhelper('1b'); //line 20" + G.NL
+              + @"    [  20]:   %v = HELPER_error('1b'); //line 20" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 20)" + G.NL + G.NL;
@@ -8989,7 +8989,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #1c" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p1.gcm', line 30" + G.NL
-              + @"    [  30]:   %v = errorhelper('1c'); //line 30" + G.NL
+              + @"    [  30]:   %v = HELPER_error('1c'); //line 30" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm (run-time error in line 30)" + G.NL + G.NL;
@@ -9005,7 +9005,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2a" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p2.gcm', line 40" + G.NL
-              + @"    [  40]:   %v = errorhelper('2a'); //line 40" + G.NL
+              + @"    [  40]:   %v = HELPER_error('2a'); //line 40" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
@@ -9022,7 +9022,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2b" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p2.gcm', line 50" + G.NL
-              + @"    [  50]:   %v = errorhelper('2b'); //line 50" + G.NL
+              + @"    [  50]:   %v = HELPER_error('2b'); //line 50" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
@@ -9039,7 +9039,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #2c" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p2.gcm', line 60" + G.NL
-              + @"    [  60]:   %v = errorhelper('2c'); //line 60" + G.NL
+              + @"    [  60]:   %v = HELPER_error('2c'); //line 60" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
@@ -9056,7 +9056,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #3" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p3.gcm', line 70" + G.NL
-              + @"    [  70]:   %v = errorhelper('3'); //line 70" + G.NL
+              + @"    [  70]:   %v = HELPER_error('3'); //line 70" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
@@ -9074,7 +9074,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #4" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p4.gcm', line 80" + G.NL
-              + @"    [  80]:   %v = errorhelper('4'); //line 80" + G.NL
+              + @"    [  80]:   %v = HELPER_error('4'); //line 80" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 11 calling -->" + G.NL
@@ -9092,7 +9092,7 @@ namespace UnitTests
             ss = G.NL +
                 @"*** ERROR: ErrorHelper #5" + G.NL
               + @"*** ERROR: Running file 'c:\Thomas\Gekko\regres\StackTrace\p5.gcm', line 90" + G.NL
-              + @"    [  90]:   %v = errorhelper('5'); //line 90" + G.NL
+              + @"    [  90]:   %v = HELPER_error('5'); //line 90" + G.NL
               + @"" + G.NL
               + @"    Call stack: Command line calling -->" + G.NL
               + @"    c:\Thomas\Gekko\regres\StackTrace\p1.gcm line 21 calling -->" + G.NL

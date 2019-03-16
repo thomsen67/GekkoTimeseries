@@ -4857,7 +4857,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else if (o == "series_data_ignoremissing")
                                 {
-                                    node.Code.A("G.Writeln2(`*** ERROR: Please use 'OPTION series data calc missing = zero;' instead`);");
+                                    node.Code.A("G.Writeln2(`*** ERROR: This option can no longer be used.`);");
                                     node.Code.A("throw new GekkoException();");
                                 }
     }
