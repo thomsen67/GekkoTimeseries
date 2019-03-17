@@ -1503,7 +1503,7 @@ namespace Gekko
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
         public bool showErrors = false;
-        public GekkoSmpl smplForFunc = null;
+        //public GekkoSmpl smplForFunc = null;
         //-------- tranformation start --------------
         public string guiDecompTransformationCode = "n";
         public bool guiDecompIsShares = false;

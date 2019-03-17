@@ -12037,7 +12037,7 @@ namespace Gekko
             decompOptions.t2 = o.t2;
             decompOptions.expressionOld = o.label;            
             decompOptions.expression = o.expression;
-            decompOptions.smplForFunc = o.smplForFunc;
+            //decompOptions.smplForFunc = o.smplForFunc;
             decompOptions.prtOptionLower = o.opt_prtcode.ToLower();            
             Decomp(decompOptions);
 
@@ -35734,9 +35734,9 @@ namespace Gekko
                     {
                         //Function call start --------------
                         O.AdjustSmpl(smpl, 0);
-                        o.smplForFunc.bankNumber = 1;
+                        smpl.bankNumber = 1;
                         y0aRef = o.expression(smpl); funcCounter++;
-                        o.smplForFunc.bankNumber = 0;
+                        smpl.bankNumber = 0;
                         O.AdjustSmpl(smpl, 1);
                         //Function call end   --------------
 

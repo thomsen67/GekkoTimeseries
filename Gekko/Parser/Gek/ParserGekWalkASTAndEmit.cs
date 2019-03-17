@@ -5458,7 +5458,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPITEMS":
                         {
-                            node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
                             //node.Code.A("o" + Num(node) + ".expression = (smpl) => " + node[0].Code + ";" + G.NL);
                             string methodName = "Evalcode" + ++Globals.counter;
                             StashIntoLocalMethod(w, methodName, node[0].Code.ToString());                            
