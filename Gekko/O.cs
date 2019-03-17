@@ -1284,7 +1284,7 @@ namespace Gekko
 
             //only adds freq if not there. No sigil is added for lhs vars here.
             string varnameWithFreq = G.AddFreq(varname, freq, type, settings.type);
-                        
+                                    
             if (Program.options.interface_alias)
             {
                 bool foundAlias = true;

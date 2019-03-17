@@ -2836,9 +2836,10 @@ namespace Gekko
                 
                 if (!Globals.tsdxVersions.Contains(databankVersion))
                 {
-                    G.Writeln2("*** ERROR: The databank version is unknown to this Gekko version (" + Globals.gekkoVersion + ")");
+                    G.Writeln2("*** ERROR: The databank version " + databankVersion + " is unknown to this Gekko version (" + Globals.gekkoVersion + ")");
                     G.Write("           Known databank versions: "); G.PrintListWithCommas(Globals.tsdxVersions, false);
                     G.Writeln("           The databank seems to have been written by Gekko version " + gekkoVersion);
+                    G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl);
                     throw new GekkoException();
                 }
 
@@ -12022,60 +12023,22 @@ namespace Gekko
         {
 
             //This is the starting point of a decomposition call
-            //Calls: Decomp(decompOptions);
-            //       DecompThreadFunction
-            //       w.RecalcCellsWithNewType();
-            //       Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
+            //Calls: Program.Decomp(decompOptions);
+            //       Program.DecompThreadFunction(Object o) --> doing stuff with EVal() function
+            //       Window1.RecalcCellsWithNewType();
+            //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
             //
-            //Actual calculation is in DecompHelper2()
+            //Actual calculation is in Decompose(DecompOptions o)
 
-            DecompOptions decompOptions = new DecompOptions();
+            //We need to merge DecompHelper2() into Decompose()
 
-            //type is "udvalg" or "decomp", but not used at the moment
-            //decompOptions.variable = variable;
-            //decompOptions.type = type;
+            DecompOptions decompOptions = new DecompOptions();                        
             decompOptions.t1 = o.t1;
             decompOptions.t2 = o.t2;
-            decompOptions.expressionOld = o.label;
-            //decompOptions.prtOption = prtOption;
-            //decompOptions.expressionOld = expressionCs;
+            decompOptions.expressionOld = o.label;            
             decompOptions.expression = o.expression;
             decompOptions.smplForFunc = o.smplForFunc;
-            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
-            //if (variable != null)
-            //{
-            //    if (Program.model == null)
-            //    {
-            //        G.Writeln();
-            //        G.Writeln("*** ERROR: No model is defined, needed for decomposition");
-            //        throw new GekkoException();
-            //    }
-            //    //decompOptions.vars = new List<string> { var.Replace("SIMPLE_DECOMP_VARIABLE:", "").Trim() };
-            //    Decomp(decompOptions);
-            //}
-            //else
-            //{
-            //    //uses expressionCs
-            //    if (false)
-            //    {
-            //        foreach (string s in precedents[0].Keys)
-            //        {
-            //            if (s.Contains(":"))
-            //            {
-            //                G.Writeln2("*** ERROR: You cannot decompose with a named databank (using ':')");
-            //                throw new GekkoException();
-            //            }
-            //            else if (s.Contains("@"))
-            //            {
-            //                G.Writeln2("*** ERROR: You cannot decompose with '@' (" + Globals.Ref + " bank indicator)");
-            //                throw new GekkoException();
-            //            }
-            //        }
-
-            //        //decompOptions.vars = new List<string> { var };
-            //        //decompOptions.isExpression = true;
-            //        decompOptions.precedents = precedents;
-            //    }
+            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();            
             Decomp(decompOptions);
 
         }
@@ -12256,28 +12219,102 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 string[] ss = found.equationText.Split('=');
-                //string s = "DECOMP " + decompOptions.variable + " = " + ss[1] + ";";
+                
+
+
                 string rhs = ss[1].Trim();
+
+                string lhsText = ss[0].Trim();
+                string[] ss0 = lhsText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (!G.Equal(ss0[0], "frml"))
+                {
+                    G.Writeln2("*** ERROR: Model equation '" + decompOptions.variable + "': Equation does not start with 'frml'");
+                    throw new GekkoException();
+                }                
+
+                string lhs = null;
+                for (int i = 2; i < ss0.Length; i++)
+                {
+                    lhs += ss0[i];
+                }
+                lhs = lhs.Trim();  //trimmed with no blanks                                                              
+
                 if (rhs.EndsWith("$")) rhs = rhs.Substring(0, rhs.Length - 1) + ";";  //only replace last $, not other $
+
+                rhs = rhs.Trim();
+                if (rhs.EndsWith(";")) rhs = rhs.Substring(0, rhs.Length - 1);
+
                 for (int i = 1; i < 20; i++)
                 {
                     rhs = rhs.Replace("(-" + i + ")", "[-" + i + "]");
                     rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
                 }
 
-                string s = "EVAL " + rhs;
-                //Program.obeyCommandCalledFromGUI("decomp pm*fm;", new P());
+                string type = "none";  //dlog, dif, diff, log
+                if (lhs.StartsWith("dlog(", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = "dlog";
+                    rhs = found.lhs + "[-1] * exp(" + rhs + ")";
+                }
+                else if (lhs.StartsWith("dif(", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = "dif";
+                    rhs = found.lhs + "[-1] + (" + rhs + ")";
+                }
+                else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = "diff";
+                    rhs = found.lhs + "[-1] + (" + rhs + ")";
+                }
+                else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+                {
+                    type = "log";
+                    rhs = "exp(" + rhs + ")";
+                }
+
+                if (found.equationCodeJ != "")
+                {
+                    if (found.equationCodeJadditive)
+                    {
+                        rhs = rhs + " + " + found.Jname;
+                    }
+                    if (found.equationCodeJmultiplicative)
+                    {
+                        rhs = "(" + rhs + ") * (1 + " + found.Jname + ")";
+                    }
+                    else
+                    {
+                        //should not happen
+                        G.Writeln2("*** ERROR: Problem with J-factors in equation " + found.lhs);
+                        throw new GekkoException();
+                    }
+                }
+
+                if (found.equationCodeD != "")
+                {                    
+                    rhs = "(1 - " + found.Dname + ") * (" + rhs + ") + " + found.Dname + " * " + found.Zname;                    
+                }
+                else
+                {
+                    if (found.equationCodeZ != "")
+                    {
+                        rhs = rhs + " + " + found.Zname;
+                    }
+                }
+
+                //rhs = found.lhs + " = " + rhs + ";";
+                rhs = rhs + ";";
+
                 try
                 {
-                    Program.obeyCommandCalledFromGUI(s, new P());
+                    Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
                 }
                 catch (Exception e)
                 {
 
                 }
 
-                decompOptions.expression = Globals.expression;
-                //decompOptions.expressionOld = Globals.expressionText;
+                decompOptions.expression = Globals.expression;                
                 decompOptions.expressionOld = found.equationText;
 
             }
@@ -35609,6 +35646,9 @@ namespace Gekko
 
             GekkoTime per1 = o.t1;
             GekkoTime per2 = o.t2;
+
+            bool isRaw = false;
+            if (o.prtOptionLower.StartsWith("x")) isRaw = true;
 
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
             IVariable y0a = null;
