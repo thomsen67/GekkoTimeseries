@@ -1323,13 +1323,17 @@ namespace Gekko
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3
                     double[] arraya = rv_series.data.dataArray;
                     double[] arrayb = x1_series.data.dataArray;
-                    for (int i = 0; i < lag; i++)
-                    {
-                        arraya[i] = double.NaN;  //arraya[0] = M
-                    }
-                    for (int i = lag; i < GekkoTime.Observations(window1, window2); i++)
-                    {
-                        //i starts in 1, that is, t0
+                    //for (int i = 0; i < lag; i++)
+                    //{
+                    //    arraya[i] = double.NaN;  //arraya[0] = M
+                    //}
+                    //for (int i = lag; i < GekkoTime.Observations(window1, window2); i++)
+                    //{
+                    //    //i starts in 1, that is, t0
+                    //    arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
+                    //}                    
+                    for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
+                    {                        
                         arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
                     }
                 }

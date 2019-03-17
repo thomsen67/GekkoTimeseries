@@ -6256,11 +6256,37 @@ namespace Gekko
 
         public static string NumberFormat(double d, string format2)
         {
-            string format = "{0:" + format2 + "}";  //0: is just that it is the first element in a list of numbers, perhaps even irrelevant here
+            string format = null;
+            if (format2.Contains(":"))
+            {
+                format = "{0," + format2 + "}";  //0, is just that it is the first element in a list of numbers
+            }
+            else
+            {
+                format = "{0,0:" + format2 + "}";  //0,0: first element, with 0 blanks padding
+            }
             string x = null;
             try
             {
                 x = String.Format(format, d);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: format() function failed. The internal error message is this:");
+                G.Writeln("           " + e.Message);
+                throw new GekkoException();
+            }
+            return x;
+        }
+
+        public static string StringFormat(string s, string format2)
+        {
+            string format = null;            
+            format = "{0," + format2 + "}";  //0, is just that it is the first element in a list of numbers
+            string x = null;
+            try
+            {
+                x = String.Format(format, s);
             }
             catch (Exception e)
             {

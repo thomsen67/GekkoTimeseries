@@ -2398,13 +2398,17 @@ namespace Gekko
             if (rhs.Type() == EVariableType.List)
             {
                 List rhs_list = rhs as List;
-                if (rhs_list.isFromSeqOfBankvarnames)
+                if (false)
                 {
-                    //a list def like #m = a, b, c; will be ok,
-                    //and also #m = a, b!q, b:x, y[a, b]
-                    //but for instance #m = %a, #m are not allowed since it is too confusing.
-                    //In such cases, use #m = (..., ...);
-                    rhs = O.Restrict2(rhs_list, true, false, true, true);  //only pure idents
+                    //This test is no longer necessary: the parser no longer allows #m = %x, %y; 
+                    if (rhs_list.isFromSeqOfBankvarnames)
+                    {
+                        //a list def like #m = a, b, c; will be ok,
+                        //and also #m = a, b!q, b:x, y[a, b]
+                        //but for instance #m = %a, #m are not allowed since it is too confusing.
+                        //In such cases, use #m = (..., ...);
+                        rhs = O.Restrict2(rhs_list, true, false, true, true);  //only pure idents
+                    }
                 }
             }
 

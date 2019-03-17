@@ -644,7 +644,8 @@ namespace Gekko
         //    return x1.Indexer(t, O.EIndexerType.IndexerLag, new ScalarVal(-2d));
         //}
 
-        public static IVariable HELPER_error(GekkoSmpl t, IVariable x)
+        //!NOTE: do not delete, use for unit tests
+        public static IVariable helper_error(GekkoSmpl t, IVariable x)
         {
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
@@ -2340,6 +2341,8 @@ namespace Gekko
             return null;
         }
 
+             
+
         public static IVariable seq(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             List<IVariable> mm = new List<IVariable>();
@@ -2544,11 +2547,32 @@ namespace Gekko
         
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {
-            double d = O.ConvertToVal(x1); //#875324397
             string format2 = O.ConvertToString(x2);
-            string x = Program.NumberFormat(d, format2);
-            ScalarString ss = new ScalarString(x);
-            return ss;
+            if (x1.Type() == EVariableType.Val)
+            {
+                double d = O.ConvertToVal(x1); //#875324397                
+                string x = Program.NumberFormat(d, format2);
+                return new ScalarString(x);
+            }
+            else if (x1.Type() == EVariableType.Date)
+            {                
+                string s = G.FromDateToString((x1 as ScalarDate).date);
+                string x = Program.StringFormat(s, format2);
+                return new ScalarString(x);
+            }
+            else if (x1.Type() == EVariableType.String)
+            {
+                string s = O.ConvertToString(x1);                
+                string x = Program.StringFormat(s, format2);
+                return new ScalarString(x);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: format() expects val, date or string type");
+                throw new GekkoException();
+            }
+                       
+
         }
 
         public static IVariable round(GekkoSmpl smpl, IVariable x1, IVariable round)

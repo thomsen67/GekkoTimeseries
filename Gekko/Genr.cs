@@ -16,111 +16,42 @@ namespace Gekko
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
 
-            O.Model o0 = new O.Model();
-            o0.p = p; o0.fileName = O.ConvertToString((new ScalarString("jul05a")));
+            O.Ols o0 = new O.Ols();
+            smpl.t0 = O.ConvertToDate(i33, O.GetDateChoices.FlexibleStart);
+            ;
+            smpl.t1 = O.ConvertToDate(i33, O.GetDateChoices.FlexibleStart);
+            ;
+            smpl.t2 = O.ConvertToDate(i34, O.GetDateChoices.FlexibleEnd);
+            ;
+            smpl.t3 = O.ConvertToDate(i34, O.GetDateChoices.FlexibleEnd);
+            ;
+            o0.t1 = O.ConvertToDate(i33, O.GetDateChoices.FlexibleStart);
+            ;
+            o0.t2 = O.ConvertToDate(i34, O.GetDateChoices.FlexibleEnd);
+            ;
 
+            o0.expressions = new List<IVariable>();
+            o0.expressions.Add(Functions.dlog(O.Smpl(smpl, -1), smpl, O.Lookup(smpl, null, null, "lna1", null, null, new LookupSettings(), EVariableType.Var, null)));
+            o0.expressions.Add(Functions.dlog(O.Smpl(smpl, -1), smpl, O.Lookup(smpl, null, null, "pcp", null, null, new LookupSettings(), EVariableType.Var, null)));
+            o0.expressions.Add(Functions.dlog(O.Smpl(smpl, -1), smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.Dot, i35), smpl, O.EIndexerType.Dot, O.Lookup(smpl, null, null, "pcp", null, null, new LookupSettings(), EVariableType.Var, null), i35)));
+            o0.expressions.Add(O.Lookup(smpl, null, null, "bul1", null, null, new LookupSettings(), EVariableType.Var, null));
+            o0.expressions.Add(O.Indexer(O.Indexer2(smpl, O.EIndexerType.Dot, i36), smpl, O.EIndexerType.Dot, O.Lookup(smpl, null, null, "bul1", null, null, new LookupSettings(), EVariableType.Var, null), i36));
+            o0.expressionsText = new List<string>();
+            o0.expressionsText.Add(@"dlog¨(lna1)");
+            o0.expressionsText.Add(@"dlog¨(pcp)");
+            o0.expressionsText.Add(@"dlog¨(pcp£.1)");
+            o0.expressionsText.Add(@"bul1");
+            o0.expressionsText.Add(@"bul1£.1");
             o0.Exe();
 
             //[[commandEnd]]0
-
-
-            //[[commandStart]]1
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-
-            O.Read o1 = new O.Read();
-            o1.p = p;
-            o1.type = @"read";
-            o1.fileName = O.ConvertToString((new ScalarString("jul05")));
-
-
-            o1.Exe();
-
-            //[[commandEnd]]1
-
-
-            //[[commandStart]]2
-            p.SetText(@"¤3"); O.InitSmpl(smpl, p);
-
-
-            O.Time o2 = new O.Time();
-            o2.t1 = O.ConvertToDate(i1, O.GetDateChoices.FlexibleStart);
-            ;
-            o2.t2 = O.ConvertToDate(i2, O.GetDateChoices.FlexibleEnd);
-            ;
-
-            o2.Exe();
-
-            //[[commandEnd]]2
-
-
-            //[[commandStart]]3
-            p.SetText(@"¤4"); O.InitSmpl(smpl, p);
-
-            O.Assignment o3 = new O.Assignment();
-
-
-            Action assign_7 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar3 = O.ListDefHelper(i4, null, i5, null, i6, null);
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "x", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
-                ;
-            };
-            Func<bool> check_7 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar3 = O.ListDefHelper(i4, null, i5, null, i6, null);
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar3.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "x", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_7, check_7, o3);
-
-            //[[commandEnd]]3
-
-
-            //[[commandStart]]4
-            p.SetText(@"¤5"); O.InitSmpl(smpl, p);
-
-            O.Assignment o4 = new O.Assignment();
-
-
-            Action assign_10 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar8 = O.Multiply(smpl, i9, Functions.dlog(O.Smpl(smpl, -1), smpl, O.Add(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null))));
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar8, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
-                ;
-            };
-            Func<bool> check_10 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar8 = O.Multiply(smpl, i9, Functions.dlog(O.Smpl(smpl, -1), smpl, O.Add(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null))));
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar8.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar8, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_10, check_10, o4);
-
-            //[[commandEnd]]4
         }
 
 
-        public static readonly ScalarVal i1 = new ScalarVal(2001d);
-        public static readonly ScalarVal i2 = new ScalarVal(2003d);
-        public static readonly ScalarVal i4 = new ScalarVal(1d);
-        public static readonly ScalarVal i5 = new ScalarVal(2d);
-        public static readonly ScalarVal i6 = new ScalarVal(3d);
-        public static readonly ScalarVal i9 = new ScalarVal(2d);
+        public static readonly ScalarVal i33 = new ScalarVal(2000d);
+        public static readonly ScalarVal i34 = new ScalarVal(2010d);
+        public static readonly ScalarVal i35 = new ScalarVal(1d);
+        public static readonly ScalarVal i36 = new ScalarVal(1d);
 
         public static void CodeLines(P p)
         {

@@ -2116,6 +2116,24 @@ expressionOrNothing:        expression -> expression
 						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
+// ------------------- naked list ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------------------------
+
+nakedList:  seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+);
+
+seqItemNaked:                  MINUS seqItem7Naked -> ^(ASTSEQITEMMINUS seqItem7Naked)
+							| seqItem7Naked							
+						      ;
+
+seqItem7Naked:                bank7Naked? name7 indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7) ^(ASTPLACEHOLDER indexer7Naked?));
+bank7Naked:					  AT GLUE -> ASTAT
+							| name7 COLON -> name7 ASTCOLON
+							  ;
+
+freq7Naked:				  GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;  
+indexer7Naked:			  leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name7+);
+
+// ------------------------------------------------------------------------------------------------------------------
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
@@ -2147,8 +2165,6 @@ wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
-
-seqOfBankvarnamesAtLeast2:  seqItem (COMMA2 seqItem)+ ->  ^(ASTBANKVARNAMELIST seqItem+);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
@@ -2434,24 +2450,24 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
-						  | assignmentType seriesOpt1? leftSide STAREQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
 						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
 
-						  | assignmentType seriesOpt1? leftSide percentEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
+						  | assignmentType seriesOpt1? leftSide percentEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
 						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
 
-						  | assignmentType seriesOpt1? leftSide HATEQUAL seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
+						  | assignmentType seriesOpt1? leftSide HATEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
 						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
 
-						  | assignmentType seriesOpt1? leftSide hashEqual seqOfBankvarnamesAtLeast2 -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) seqOfBankvarnamesAtLeast2 ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
+						  | assignmentType seriesOpt1? leftSide hashEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
 						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
 						  
 						    ;
@@ -2727,7 +2743,7 @@ for2:                       FOR           (forHelper2 ','?)+     SEMICOLON  func
 						    ;
 
 forHelper2:                 forLhs expression TO expression2 (BY expression3)? -> ^(ASTFORTYPE1 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER expression2) ^(ASTPLACEHOLDER expression3?))
-                          | forLhs seqOfBankvarnamesAtLeast2 -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER seqOfBankvarnamesAtLeast2) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
+                          | forLhs nakedList -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER nakedList) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                           | forLhs expression -> ^(ASTFORTYPE2 forLhs ^(ASTPLACEHOLDER expression) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER))
                             ;
 
