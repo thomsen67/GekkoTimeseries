@@ -1320,7 +1320,7 @@ namespace Gekko
                     int ia1 = rv_series.ResizeDataArray(window1);  //t0
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
                     int ib1 = x1_series.ResizeDataArray(window1);  //t0
-                    int ib2 = x1_series.ResizeDataArray(window2);  //t3
+                    int ib2 = x1_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ib1, array is enlarged not moved around
                     double[] arraya = rv_series.data.dataArray;
                     double[] arrayb = x1_series.data.dataArray;
                     //for (int i = 0; i < lag; i++)
@@ -1333,8 +1333,15 @@ namespace Gekko
                     //    arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
                     //}                    
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
-                    {                        
-                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
+                    {
+                        try
+                        {
+                            arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 }
                 else

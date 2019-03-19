@@ -3755,9 +3755,9 @@ namespace Gekko
             return s;
         }
 
-        public static void AdjustSmpl(GekkoSmpl smpl, int i)
+        public static void AdjustSmplForDecomp(GekkoSmpl smpl, int i)
         {
-            int add = 0;
+            int add = 2;
             if (i == 0)
             {
                 smpl.t0 = smpl.t0.Add(-O.MaxLag() - add);

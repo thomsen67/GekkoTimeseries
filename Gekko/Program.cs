@@ -12272,13 +12272,13 @@ namespace Gekko
                     rhs = "exp(" + rhs + ")";
                 }
 
-                if (found.equationCodeJ != "")
+                if (found.equationCodeJ != "" && found.equationCodeJ != "_" && found.equationCodeJ != "__")
                 {
                     if (found.equationCodeJadditive)
                     {
                         rhs = rhs + " + " + found.Jname;
                     }
-                    if (found.equationCodeJmultiplicative)
+                    else if (found.equationCodeJmultiplicative)
                     {
                         rhs = "(" + rhs + ") * (1 + " + found.Jname + ")";
                     }
@@ -12290,17 +12290,10 @@ namespace Gekko
                     }
                 }
 
-                if (found.equationCodeD != "")
+                if (found.equationCodeD != "" && found.equationCodeD != "_")
                 {                    
                     rhs = "(1 - " + found.Dname + ") * (" + rhs + ") + " + found.Dname + " * " + found.Zname;                    
-                }
-                else
-                {
-                    if (found.equationCodeZ != "")
-                    {
-                        rhs = rhs + " + " + found.Zname;
-                    }
-                }
+                }                
 
                 //rhs = found.lhs + " = " + rhs + ";";
                 rhs = rhs + ";";
@@ -12325,7 +12318,7 @@ namespace Gekko
             }
             else
             {
-                w.Title = "Decompose " + decompOptions.variable;
+                w.Title = "Decompose " + decompOptions.variable + "";
             }
             w.Tag = decompOptions;
 
@@ -35687,9 +35680,9 @@ namespace Gekko
                     Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     //Function call start --------------
-                    O.AdjustSmpl(smpl, 0);
+                    O.AdjustSmplForDecomp(smpl, 0);
                     y0a = o.expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
-                    O.AdjustSmpl(smpl, 1);
+                    O.AdjustSmplForDecomp(smpl, 1);
                     //Function call end   --------------
 
                     List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
@@ -35733,11 +35726,11 @@ namespace Gekko
                     if (usesRef)
                     {
                         //Function call start --------------
-                        O.AdjustSmpl(smpl, 0);
+                        O.AdjustSmplForDecomp(smpl, 0);
                         smpl.bankNumber = 1;
                         y0aRef = o.expression(smpl); funcCounter++;
                         smpl.bankNumber = 0;
-                        O.AdjustSmpl(smpl, 1);
+                        O.AdjustSmplForDecomp(smpl, 1);
                         //Function call end   --------------
 
                         y0aRef_series = y0aRef as Series;
@@ -35826,12 +35819,12 @@ namespace Gekko
                                             x_series.SetData(t1, x_after);
 
                                             //Function call start --------------
-                                            O.AdjustSmpl(smpl, 0);
+                                            O.AdjustSmplForDecomp(smpl, 0);
                                             if (j == 1) smpl.bankNumber = 1;
                                             IVariable y1 = null;
                                             y1 = o.expression(smpl); funcCounter++;
                                             if (j == 1) smpl.bankNumber = 0;
-                                            O.AdjustSmpl(smpl, 1);
+                                            O.AdjustSmplForDecomp(smpl, 1);
                                             //Function call end   --------------
 
                                             Series y1_series = y1 as Series;
@@ -35963,7 +35956,11 @@ namespace Gekko
                 Globals.precedents = null;
             }
 
-            if (funcCounter > 0) G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds) + " --> " + funcCounter + " evals");
+            if (funcCounter > 0)
+            {
+                G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds) + " --> " + funcCounter + " evals");
+                G.Writeln("+++ NOTE: DECOMP may contain glitchs until 3.0 is out of beta period.");
+            }
 
             DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);
             
