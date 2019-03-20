@@ -13,38 +13,36 @@ namespace Gekko
         public static void C0(GekkoSmpl smpl, P p)
         {
             //[[commandStart]]0
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-            IVariable listloopMovedStuff_4 = O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null);
-            IVariable listloopMovedStuff_5 = O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
-            IVariable listloopMovedStuff_6 = O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null);
+            p.SetText(@"¤3"); O.InitSmpl(smpl, p);
 
-            Func<IVariable> func8 = () =>
+            Func<GekkoSmpl, IVariable> Evalcode32 = (smpl5) =>
             {
-                var smplCommandRemember9 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-                Series temp7 = new Series(ESeriesType.Normal, Program.options.freq, null); temp7.SetZero(smpl);
-
-                foreach (IVariable listloop_i3 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, null)))
-                {
-                    temp7.InjectAdd(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_i3), smpl, O.EIndexerType.None, listloopMovedStuff_5, listloop_i3));
-
-                    labelCounter++;
-                }
-                labelCounter = 0;
-                smpl.command = smplCommandRemember9;
-                return temp7;
-
+                return O.Add(smpl5, O.Multiply(smpl5, O.Subtract(smpl5, i24, O.Lookup(smpl5, null, null, "Dphk", null, null, new LookupSettings(), EVariableType.Var, null)), O.Multiply(smpl5, O.Multiply(smpl5, O.Indexer(O.Indexer2(smpl5, O.EIndexerType.IndexerLag, O.Negate(smpl5, i25)
+), smpl5, O.EIndexerType.IndexerLag, O.Lookup(smpl5, null, null, "phk", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl5, i25)
+), Functions.exp(smpl5, O.Subtract(smpl5, O.Subtract(smpl5, O.Multiply(smpl5, d26, Functions.dlog(O.Smpl(smpl5, -1), smpl5, O.Divide(smpl5, O.Lookup(smpl5, null, null, "Cp4xh1", null, null, new LookupSettings(), EVariableType.Var, null), O.Multiply(smpl5, O.Lookup(smpl5, null, null, "U", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl5, null, null, "pcp4xhv1", null, null, new LookupSettings(), EVariableType.Var, null))))), O.Multiply(smpl5, d27, Functions.dlog(O.Smpl(smpl5, -1), smpl5, O.Divide(smpl5, O.Divide(smpl5, O.Lookup(smpl5, null, null, "pche", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl5, null, null, "phk", null, null, new LookupSettings(), EVariableType.Var, null)), O.Lookup(smpl5, null, null, "pcp4xhv1", null, null, new LookupSettings(), EVariableType.Var, null))))), O.Multiply(smpl5, d28, Functions.log(smpl5, O.Divide(smpl5, O.Indexer(O.Indexer2(smpl5, O.EIndexerType.IndexerLag, O.Negate(smpl5, i29)
+), smpl5, O.EIndexerType.IndexerLag, O.Lookup(smpl5, null, null, "fKbh", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl5, i29)
+), O.Indexer(O.Indexer2(smpl5, O.EIndexerType.IndexerLag, O.Negate(smpl5, i30)
+), smpl5, O.EIndexerType.IndexerLag, O.Lookup(smpl5, null, null, "fKbhw", null, null, new LookupSettings(), EVariableType.Var, null), O.Negate(smpl5, i30)
+))))))), O.Add(smpl5, i31, O.Lookup(smpl5, null, null, "JRphk", null, null, new LookupSettings(), EVariableType.Var, null)))), O.Multiply(smpl5, O.Lookup(smpl5, null, null, "Dphk", null, null, new LookupSettings(), EVariableType.Var, null), O.Lookup(smpl5, null, null, "Zphk", null, null, new LookupSettings(), EVariableType.Var, null)));
             };
 
-            Func<GekkoSmpl, IVariable> Evalcode10 = (smpl5) =>
-            {
-                return func8();
-            };
-
+            Globals.expressionText = @"(1 - Dphk) * ((phk[-1] * exp(1.15436*Dlog(Cp4xh1/(U*pcp4xhv1))
+                                           -0.407913*Dlog((pche/phk)/pcp4xhv1)
+                                           -0.576546*Log(fKbh[-1]/fKbhw[-1])    )) * (1 + JRphk)) + Dphk * Zphk";
+            Globals.expression = Evalcode32;
 
             //[[commandEnd]]0
         }
 
 
+        public static readonly ScalarVal i24 = new ScalarVal(1d);
+        public static readonly ScalarVal i25 = new ScalarVal(1d);
+        public static readonly ScalarVal d26 = new ScalarVal(1.15436d);
+        public static readonly ScalarVal d27 = new ScalarVal(0.407913d);
+        public static readonly ScalarVal d28 = new ScalarVal(0.576546d);
+        public static readonly ScalarVal i29 = new ScalarVal(1d);
+        public static readonly ScalarVal i30 = new ScalarVal(1d);
+        public static readonly ScalarVal i31 = new ScalarVal(1d);
 
         public static void CodeLines(P p)
         {

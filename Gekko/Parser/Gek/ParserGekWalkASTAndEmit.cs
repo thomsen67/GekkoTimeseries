@@ -5448,8 +5448,16 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());
-                            node.Code.A("Globals.expression = " + methodName + "();" + G.NL);
+                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
+                            node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
+                        }
+                        break;
+                    case "ASTDECOMP":
+                        {
+                            node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTDECOMPITEMS":
@@ -5457,8 +5465,8 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
                             //node.Code.A("o" + Num(node) + ".expression = (smpl) => " + node[0].Code + ";" + G.NL);
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());
-                            node.Code.A("o" + Num(node) + ".expression = " + methodName + "();" + G.NL);
+                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
+                            node.Code.A("o" + Num(node) + ".expression = " + methodName + ";" + G.NL);
                         }
                         break;
                     case "ASTUNFIX":
@@ -5700,7 +5708,7 @@ namespace Gekko.Parser.Gek
                                 string s1 = G.HandleQuoteInQuote(node[i].Text.Substring(1, node[i].Text.Length - 2));
                                 string s2 = null;
                                 string add = null;
-                                if (i + 1 < node.ChildrenCount()) add = ".Add(smpl, " + node[i + 1].Code.ToString() + ")";
+                                if (i + 1 < node.ChildrenCount()) add = ".Add(smpl, O.CurlyMethod(smpl, " + node[i + 1].Code.ToString() + "))";
 
                                 if (i >= 2) ss += ".Add(smpl, O.HandleString(new ScalarString(@`" + s1 + "`)))" + add;
                                 else ss += "O.HandleString(new ScalarString(@`" + s1 + "`))" + add;
@@ -6200,7 +6208,7 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void StashIntoLocalMethod(W w, string c, string s0)
+        private static void StashIntoLocalFuncs(W w, string c, string s0)
         {
             int fat = 5;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };

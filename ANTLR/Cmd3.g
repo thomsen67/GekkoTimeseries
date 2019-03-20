@@ -3698,6 +3698,8 @@ optionType:
              | SOLVE PRINT ITER '='? yesNoSimple -> SOLVE PRINT ITER ^(ASTBOOL yesNoSimple)
              | SOLVE STATIC '='? yesNoSimple -> SOLVE STATIC ^(ASTBOOL yesNoSimple)
              | SOLVE UNDO '='? yesNoSimple -> SOLVE UNDO ^(ASTBOOL yesNoSimple)
+
+			 | STRING2 INTERPOLATE FORMAT VAL '='? expression -> STRING2 INTERPOLATE FORMAT VAL ^(ASTSTRINGSIMPLE expression)
 			
 			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)
 			

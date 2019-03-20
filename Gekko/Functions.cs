@@ -2548,30 +2548,37 @@ namespace Gekko
         public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
         {
             string format2 = O.ConvertToString(x2);
-            if (x1.Type() == EVariableType.Val)
-            {
-                double d = O.ConvertToVal(x1); //#875324397                
-                string x = Program.NumberFormat(d, format2);
-                return new ScalarString(x);
-            }
-            else if (x1.Type() == EVariableType.Date)
+            try
             {                
-                string s = G.FromDateToString((x1 as ScalarDate).date);
-                string x = Program.StringFormat(s, format2);
-                return new ScalarString(x);
+                if (x1.Type() == EVariableType.Val)
+                {
+                    double d = O.ConvertToVal(x1); //#875324397                
+                    string x = Program.NumberFormat(d, format2);
+                    return new ScalarString(x);
+                }
+                else if (x1.Type() == EVariableType.Date)
+                {
+                    string s = G.FromDateToString((x1 as ScalarDate).date);
+                    string x = Program.StringFormat(s, format2);
+                    return new ScalarString(x);
+                }
+                else if (x1.Type() == EVariableType.String)
+                {
+                    string s = O.ConvertToString(x1);
+                    string x = Program.StringFormat(s, format2);
+                    return new ScalarString(x);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: format() expects val, date or string type");
+                    throw new GekkoException();
+                }
             }
-            else if (x1.Type() == EVariableType.String)
+            catch (Exception e)
             {
-                string s = O.ConvertToString(x1);                
-                string x = Program.StringFormat(s, format2);
-                return new ScalarString(x);
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: format() expects val, date or string type");
+                G.Writeln2("*** ERROR: Format '" + format2 + "' failed");
                 throw new GekkoException();
             }
-                       
 
         }
 

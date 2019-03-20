@@ -1829,6 +1829,17 @@ namespace Gekko
             return;
         }
 
+        public static IVariable CurlyMethod(GekkoSmpl smpl, IVariable x)
+        {
+            IVariable rv = null;
+            if (x.Type() == EVariableType.Val && Program.options.string_interpolate_format_val != "")
+            {                
+                rv = Functions.format(smpl, x, new ScalarString(Program.options.string_interpolate_format_val));                
+            }
+            else rv = x;
+            return rv;
+        }
+
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {            
             return GetIVariableFromString(fullname, type, false);  //no searching per default
@@ -8304,6 +8315,7 @@ namespace Gekko
             }
         }
 
+        
             
 
         //public class Info

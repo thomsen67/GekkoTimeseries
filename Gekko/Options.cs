@@ -239,6 +239,9 @@ Additionally, there are model, solve, equation options.
         public bool solve_print_details = false;
         public bool solve_print_iter = false;
         public bool solve_static = false;
+
+        public string string_interpolate_format_val = "";  //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
+        
         public int system_code_split = 20; //20 seems good
 
         public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
