@@ -132,10 +132,7 @@ namespace Gekko.Parser.Gek
             }
 
             compilerParams.GenerateExecutable = false;
-
-            Dictionary<string, string> providerOptions = new Dictionary<string, string> { { "CompilerVersion", "v7.0" } };
-            CSharpCodeProvider csCompiler = new CSharpCodeProvider(providerOptions);
-
+                        
             //code = ch.code + " ";
             Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        
 
