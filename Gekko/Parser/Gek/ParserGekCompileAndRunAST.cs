@@ -133,7 +133,7 @@ namespace Gekko.Parser.Gek
 
             compilerParams.GenerateExecutable = false;
 
-            Dictionary<string, string> providerOptions = new Dictionary<string, string> { { "CompilerVersion", "v4.0" } };
+            Dictionary<string, string> providerOptions = new Dictionary<string, string> { { "CompilerVersion", "v7.0" } };
             CSharpCodeProvider csCompiler = new CSharpCodeProvider(providerOptions);
 
             //code = ch.code + " ";

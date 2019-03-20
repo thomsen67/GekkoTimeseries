@@ -2711,8 +2711,9 @@ namespace Gekko.Parser.Gek
                                     sb1.Append(node.CodeSentFromSubTree);
                                 }
 
-                                sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
-                                //sb1.AppendLine("public static IVariable " + tempName + "(GekkoSmpl smpl" + parentListLoopVars1 + ") {");
+                                //sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
+                                sb1.AppendLine(iv + " " + funcName + "(" + parentListLoopVars1 + ")" + " {");
+
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Sum"));
@@ -2746,9 +2747,7 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //unfold
-                                    //sb1.AppendLine("O.ClearLabelHelper(smpl);"); //such loops are always the outermost, so we clear and record afterwards.
-                                    sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);
-                                    //sb1.AppendLine("O.AddLabelHelper(smpl);");
+                                    sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);                                    
                                 }
 
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
@@ -2769,9 +2768,12 @@ namespace Gekko.Parser.Gek
                                 sb1.AppendLine(GekkoSmplCommandHelper2(smplCommandNumber));  //resets command name to what it was previously
                                 sb1.AppendLine("return " + tempName + ";" + G.NL);
                                 sb1.AppendLine("};");  //method def, must end with ;
-                                //w.headerCs.Append(sb1);
+
+                                //node.Code.A(funcName + "()");
+                                                                
                                 if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
                                 w.wh.localFuncs.AppendLine(sb1.ToString());
+
                                 node.Code.A(funcName + "(" + parentListLoopVars2 + ")"); //functionname may be for instance temp27(smpl)
 
                             }
@@ -5451,18 +5453,19 @@ namespace Gekko.Parser.Gek
                     case "ASTEVAL":
                         {
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
-                            string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());
-                            node.Code.A("Globals.expression = " + methodName + "();" + G.NL);
+                            string methodName = "Evalcode" + ++Globals.counter;                            
+                            node.Code.A("Globals.expression = " + StashIntoLocalMethod(methodName, node[0].Code.ToString())+"; " + G.NL);
+                            //#09850329485
                         }
                         break;
                     case "ASTDECOMPITEMS":
                         {
                             //node.Code.A("o" + Num(node) + ".smplForFunc = smpl;" + G.NL);
                             //node.Code.A("o" + Num(node) + ".expression = (smpl) => " + node[0].Code + ";" + G.NL);
-                            string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalMethod(w, methodName, node[0].Code.ToString());                            
-                            node.Code.A("o" + Num(node) + ".expression = " + methodName + "();" + G.NL);
+                            string methodName = "Evalcode" + ++Globals.counter;                            
+                            //node.Code.A(StashIntoLocalMethod(methodName, node[0].Code.ToString()));
+                            node.Code.A("o" + Num(node) + ".expression = " + StashIntoLocalMethod(methodName, node[0].Code.ToString()) + ";" + G.NL);
+                            //#09850329485
                         }
                         break;
                     case "ASTUNFIX":
@@ -6204,9 +6207,27 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static void StashIntoLocalMethod(W w, string c, string s0)
+        private static string StashIntoLocalMethod(string c, string s0)
         {
-            w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
+            int fat = 5;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+            List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(s0, fat, tags1, tags2, null, null).storage;
+
+            //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(lines[listI + 1].Trim(), 5, true);
+            string ss = null;
+            for (int i2 = 0; i2 < a.Count; i2++)
+            {
+                if (a[i2].type == ETokenType.Word)
+                {
+                    if (a[i2].s == "smpl") a[i2].s = "smpl5";
+                }
+                ss += a[i2].ToString();
+            }
+            string ss2 = "(smpl5) => " + ss + ";" + G.NL;
+            return ss2;
+
+           // w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
             //if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
             //w.wh.localFuncs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
         }

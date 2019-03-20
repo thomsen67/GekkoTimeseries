@@ -16864,6 +16864,7 @@ namespace Gekko
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
+
             if (false && Globals.runningOnTTComputer)
             {
                 // FUNCTION f( name %x); PRT @{%x}; END; f(y);
