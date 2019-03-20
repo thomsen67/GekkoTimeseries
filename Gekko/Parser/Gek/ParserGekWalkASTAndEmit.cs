@@ -6217,13 +6217,15 @@ namespace Gekko.Parser.Gek
                 }
                 ss += a[i2].ToString();
             }
-            string ss2 = "(smpl5) => " + ss + ";" + G.NL;
+            //string ss2 = "(smpl5) => " + ss + ";" + G.NL;
             
-            w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
+            //w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
             
-            //if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-            //w.wh.localFuncs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
-            
+            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+            //w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + "() { return " + ss2 + ";" + G.NL + " } " + G.NL);
+
+            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (smpl5) => { return " + ss + ";" + G.NL + " };" + G.NL);
+
 
             // w.headerCs.Append("public static Func<GekkoSmpl, IVariable> " + c + "() { return " + "(smpl) => " + s0 + ";" + G.NL + " } " + G.NL);
             //if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
