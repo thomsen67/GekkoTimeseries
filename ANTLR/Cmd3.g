@@ -2654,7 +2654,12 @@ eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, i
 // DELETE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-delete:					    DELETE seqOfBankvarnames -> ^({token("ASTDELETE", ASTDELETE, input.LT(1).Line)} ^(ASTPLACEHOLDER seqOfBankvarnames));
+delete:						DELETE deleteOpt1? seqOfBankvarnames? -> ^({token("ASTDELETE", ASTDELETE, input.LT(1).Line)} ^(ASTOPT_ deleteOpt1?) ^(ASTPLACEHOLDER seqOfBankvarnames?));
+
+deleteOpt1:					ISNOTQUAL
+						  | leftAngle          deleteOpt1h* RIGHTANGLE -> ^(ASTOPT1 deleteOpt1h*)
+                            ;
+deleteOpt1h:			    NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // DISP
@@ -3573,6 +3578,7 @@ optionType:
              | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
+			 | MODEL TYPE '='? name -> MODEL TYPE ^(ASTSTRINGSIMPLE name)
 
 			 | PLOT question -> PLOT question	
 			 | PLOT ELEMENTS MAX '='? Integer -> PLOT ELEMENTS MAX ^(ASTINTEGER Integer)		 

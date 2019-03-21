@@ -1211,7 +1211,8 @@ namespace Gekko.Parser.Gek
                     case "ASTDELETE":
                         {
                             node.Code.A("O.Delete o" + Num(node) + " = new O.Delete();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".names = " + node[0][0].Code + ";" + G.NL);
+                            GetCodeFromAllChildren(node, node[0]);  //options
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                             break;

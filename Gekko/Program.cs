@@ -2345,14 +2345,29 @@ namespace Gekko
 
                 if (Program.options.solve_data_create_auto == true)
                 {
-                    //#i5432542345iou
-                    //if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))
-                    //{
-                    //    IVariable all2 = null; Program.scalars.TryGetValue(Globals.symbolCollection + "all", out all2);
-                    //    if (all2 == null) all2 = new List(new List<string>());
-                    //    List<string> all = O.GetStringList(O.GetList(all2));
-                    //    readInfo.createdVars = Program.CreateVariables(all, false);
-                    //}
+                    string freq = G.GetFreq(Program.options.freq);
+
+                    if (!open && (oRead.openType == EOpenType.First || oRead.openType == EOpenType.Normal))  //READ or READ<first>
+                    {
+                        IVariable all = Program.databanks.GetGlobal().GetIVariable("#all");
+                        if (all != null)
+                        {
+                            List all_list = all as List;
+                            if (all_list != null)
+                            {
+                                foreach (IVariable iv in all_list.list)
+                                {
+                                    ScalarString ss = iv as ScalarString;
+                                    if (ss == null) continue;
+                                    string s = ss.string2;
+                                    string s2 = G.Chop_GetName(s);
+                                    //This will create them if no already there
+                                    IVariable iv2 = O.GetIVariableFromString( O.UnChop("first", s2, freq,null), O.ECreatePossibilities.Can);
+                                    IVariable iv3 = O.GetIVariableFromString(O.UnChop("ref", s2, freq, null), O.ECreatePossibilities.Can);                                    
+                                }
+                            }
+                        }
+                    }
                 }
 
                 //Cleanup of local files
@@ -9953,7 +9968,8 @@ namespace Gekko
 
         public static void Unfix()  //formerly ClearGoals()
         {
-            if (!G.Equal(Program.options.interface_mode, "sim"))
+            if (G.Equal(Program.options.model_type, "gams"))
+            //if (!G.Equal(Program.options.interface_mode, "sim"))
             {
                 Unfix(Program.databanks.GetFirst(), "endo");
                 Unfix(Program.databanks.GetFirst(), "exo");
@@ -15965,9 +15981,7 @@ namespace Gekko
 
         public static void Disp(GekkoTime tStart, GekkoTime tEnd, List<string> list, bool showDetailed, bool showAllPeriods, bool clickedLink, O.Disp o)
         {
-            EVariableType type = EVariableType.Series;
-            bool gamsStyle = !G.Equal(Program.options.interface_mode, "sim");
-            bool gamsToGekko = !G.Equal(Program.options.interface_mode, "sim");
+            EVariableType type = EVariableType.Series;            
             int nonSeries = 0;
 
             GekkoSmpl smpl = new GekkoSmpl(tStart, tEnd);
@@ -16046,9 +16060,9 @@ namespace Gekko
 
                     string varnameWithoutFreq = G.Chop_RemoveFreq(var);
 
-                    if (gamsStyle)
+                    if (G.Equal(Program.options.model_type, "gams"))
                     {
-                        DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, gamsToGekko, ts, var, bank, varnameWithoutFreq);
+                        DispGams(tStart, tEnd, showDetailed, showAllPeriods, clickedLink, true, ts, var, bank, varnameWithoutFreq);
                     }
                     else
                     {
@@ -24107,7 +24121,24 @@ namespace Gekko
             }
         }
 
-        
+        public static void WriteFile(IVariable file2, IVariable x1)
+        {
+            string file = O.ConvertToString(file2);
+            string x = O.ConvertToString(x1);
+            string[] xx = x.Split(new string[] { "\\n" }, StringSplitOptions.None);
+            using (FileStream fs = WaitForFileStream(file, GekkoFileReadOrWrite.Write))
+            using (StreamWriter res = G.GekkoStreamWriter(fs))
+            {
+
+                for (int i = 0; i < xx.Length - 1; i++)
+                {
+                    res.WriteLine(xx[i]);
+                }
+                res.Write(xx[xx.Length - 1]);
+
+                res.Flush();
+            }
+        }
 
         private static void WriteTsdRecords(ref GekkoTime yr1, ref GekkoTime yr2, bool isCaps, List<ToFrom> list, Databank databank, bool isTsdx, string pathAndFilename, ref int count)
         {
@@ -27523,6 +27554,8 @@ namespace Gekko
 
         public static void Delete(List vars2)
         {
+
+
             List vars = O.Restrict2(vars2, true, true, true, false);
 
             List<ToFrom> list = SearchFromTo(vars, null, null, null, EWildcardSearchType.Delete, null);

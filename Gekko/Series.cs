@@ -382,6 +382,10 @@ namespace Gekko
         /// </exception>
         public void Truncate(GekkoTime start, GekkoTime end)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
+            // ----------------------------------------------------------------------------
+
             if (start.freq != end.freq)
             {
                 G.Writeln2("*** ERROR: Truncate start and end have different frequencies");
@@ -488,6 +492,10 @@ namespace Gekko
         /// </summary>
         public void Trim()
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET: does not use GekkoTime at all, so no problem. This is simple array trimming.
+            // ----------------------------------------------------------------------------
+            
             //DimensionCheck();
             if (this.data.dataArray == null) return;
             if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
@@ -1230,7 +1238,11 @@ namespace Gekko
 
         //minus, abs(), log(), exp(), sqrt()
         public static Series ArithmeticsSeries(GekkoSmpl smpl, Series x1_series, Func<double, double> a)
-        {            
+        {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
+            // ----------------------------------------------------------------------------
+
             Series rv_series;
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {
@@ -1281,6 +1293,10 @@ namespace Gekko
         //pch(), dlog(), dif()
         public static Series ArithmeticsSeriesLag(GekkoSmpl smpl, Series x1_series, Func<double, double, double> a, int lag)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
+            // ----------------------------------------------------------------------------
+            
             //#9083245058
 
             int xx = -lag;
@@ -1291,9 +1307,7 @@ namespace Gekko
             rv_series = new Series(ESeriesType.Light, smpl.t0.Add(xx), smpl.t3); //should return a seies corresponding to t0-t3
 
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
-            {
-                               
-
+            {                               
                 if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0.Add(xx); //should return a seies corresponding to t0-t3                    
@@ -1316,47 +1330,52 @@ namespace Gekko
                     //}                    
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
-                        try
-                        {
-                            arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
-                        }
-                        catch
-                        {
-
-                        }
+                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
                     }
                 }
                 else
                 {                    
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
+                        //timeless will just be 0 for dif()?
                         rv_series.SetData(t, a(x1_series.GetData(smpl, t), x1_series.GetData(smpl, t.Add(-lag))));
                     }
                 }
             }
             else if (x1_series.type == ESeriesType.Light)
             {
-                if (Globals.lagfix)
+                if (false)
                 {
+                    //this seems to be wrong
+
                     int offset = GekkoTime.Observations(x1_series.data.anchorPeriod, rv_series.data.anchorPeriod) - 1;
 
                     if (Globals.runningOnTTComputer && offset < 0)
                     {
-                        G.Writeln2("*** ERROR: TT note: lag problem"); throw new GekkoException();
-                    }                                       
-                    
+                        if (Globals.runningOnTTComputer)
+                        {
+                            G.Writeln2("*** ERROR: TT note: lag problem");
+                            throw new GekkoException();
+                        }
+                    }
+
                     for (int i = 0; i < rv_series.data.dataArray.Length; i++)
                     {
                         if (i - lag + offset < 0)
                         {
                             rv_series.data.dataArray[i] = double.NaN;
-                            G.Writeln2("*** ERROR: TT note: lag problem"); throw new GekkoException();
+                            if (Globals.runningOnTTComputer)
+                            {
+                                G.Writeln2("*** ERROR: TT note: lag problem");
+                                throw new GekkoException();
+                            }
                         }
                         else
                         {
                             rv_series.data.dataArray[i] = a(x1_series.data.dataArray[i + offset], x1_series.data.dataArray[i - lag + offset]);
                         }
-                    }                    
+                    }
+
                 }
                 else
                 {
@@ -1384,7 +1403,11 @@ namespace Gekko
         }
 
         public static Series ArithmeticsSeriesVal(GekkoSmpl smpl, Series x1_series, double x2_val, Func<double, double, double> a)
-        {
+        {            
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() and GetStartEndPeriod() which are safe
+            // ----------------------------------------------------------------------------
+
             if (x1_series.type == ESeriesType.ArraySuper)
             {
                 return ArithmeticsArraySeriesVal(smpl, x1_series, x2_val, a);
@@ -1433,6 +1456,10 @@ namespace Gekko
 
         private static Series ArithmeticsSeriesSeries(GekkoSmpl smpl, Series x1_series, Series x2_series, Func<double, double, double> a)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() and GetStartEndPeriod() which are safe
+            // ----------------------------------------------------------------------------
+            
             if (x1_series.type == ESeriesType.ArraySuper && x2_series.type == ESeriesType.ArraySuper)
             {
                 return ArithmeticsArraySeriesArraySeries(smpl, x1_series, x2_series, a);                
@@ -1782,8 +1809,7 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
-
-
+            
             if (x1.type == ESeriesType.Light)
             {
                 window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());

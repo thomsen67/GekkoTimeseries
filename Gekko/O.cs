@@ -561,8 +561,7 @@ namespace Gekko
             }
 
             int count = 0;
-
-            bool simMode = G.Equal(Program.options.interface_mode, "sim");
+            
             List<string> simModeVariables = new List<string>();  //only for sim-mode
 
             foreach (HandleEndoHelper h in helper)
@@ -579,7 +578,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    if (simMode)
+                    if (!G.Equal(Program.options.model_type, "gams"))
                     {
                         simModeVariables.Add(s);
                     }
@@ -676,7 +675,7 @@ namespace Gekko
                 }                
             }
 
-            if (simMode)
+            if (!G.Equal(Program.options.model_type, "gams"))
             {
                 if (type) Program.Endo(simModeVariables);
                 else Program.Exo(simModeVariables);

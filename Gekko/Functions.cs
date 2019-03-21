@@ -2674,11 +2674,16 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
-        public static IVariable getfile(GekkoSmpl smpl, IVariable x1)
+        public static IVariable readfile(GekkoSmpl smpl, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);
             string txt = Program.GetTextFromFileWithWait(s1);
             return new ScalarString(txt);
+        }
+
+        public static void writefile(GekkoSmpl smpl, IVariable file1, IVariable x1)
+        {
+            Program.WriteFile(file1, x1);            
         }
 
         //OBSOLETE
