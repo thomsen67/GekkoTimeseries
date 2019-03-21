@@ -3018,74 +3018,74 @@ namespace Gekko.Parser.Gek
                             node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), node[1].Code.ToString(), node[2].Code.ToString(), w, null));
                         }
                         break;
-                    case "ASTSERIES":
-                        {
+                    //case "ASTSERIES":
+                    //    {
                             
 
-                            //ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction
+                    //        //ASTNode node, string numNode, string childCodePeriod, string childCodeLhsName, string childCodeRhs, W w, string lhsFunction
 
-                            string childCodePeriod = "";  //FIXME                            
-                            string childCodeLhsName = node[0].Code.ToString();
-                            string childCodeRhs = node[1].Code.ToString();
-                            string numNode = Num(node);
-                            string nodeCode = null;
+                    //        string childCodePeriod = "";  //FIXME                            
+                    //        string childCodeLhsName = node[0].Code.ToString();
+                    //        string childCodeRhs = node[1].Code.ToString();
+                    //        string numNode = Num(node);
+                    //        string nodeCode = null;
                             
-                            if (w.wh.seriesHelperListNames != null)
-                            {
-                                foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
-                                {
-                                    nodeCode += EmitListLoopingCode(node, kvp);
-                                }
-                            }                            
+                    //        if (w.wh.seriesHelperListNames != null)
+                    //        {
+                    //            foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
+                    //            {
+                    //                nodeCode += EmitListLoopingCode(node, kvp);
+                    //            }
+                    //        }                            
 
-                            nodeCode += "O.SeriesDef o" + numNode + " = new O.SeriesDef();" + G.NL;
+                    //        nodeCode += "O.SeriesDef o" + numNode + " = new O.SeriesDef();" + G.NL;
 
-                            nodeCode += "o" + numNode + ".t1 = Globals.globalPeriodStart;";
-                            nodeCode += "o" + numNode + ".t2 = Globals.globalPeriodEnd;";
+                    //        nodeCode += "o" + numNode + ".t1 = Globals.globalPeriodStart;";
+                    //        nodeCode += "o" + numNode + ".t2 = Globals.globalPeriodEnd;";
                                                         
-                            nodeCode += childCodePeriod + G.NL;  //dates
+                    //        nodeCode += childCodePeriod + G.NL;  //dates
                             
-                            nodeCode += "smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
+                    //        nodeCode += "smpl = new GekkoSmpl(o" + numNode + ".t1, o" + numNode + ".t2);" + G.NL;
 
-                            nodeCode += "o" + numNode + ".p = p;" + G.NL;
+                    //        nodeCode += "o" + numNode + ".p = p;" + G.NL;
 
-                            nodeCode += EmitLocalCacheForTimeLooping(w);
+                    //        nodeCode += EmitLocalCacheForTimeLooping(w);
 
-                            nodeCode += "o" + numNode + ".lhs = " + childCodeLhsName + ";" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
+                    //        nodeCode += "o" + numNode + ".lhs = " + childCodeLhsName + ";" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
 
-                            //NB NB NB
-                            //NB NB NB
-                            //NB NB NB   EmitLocalCacheForTimeLooping should perhaps be only RHS for series???
-                            //NB NB NB   it contains the lhs variable too --> superfluous!
-                            //NB NB NB
+                    //        //NB NB NB
+                    //        //NB NB NB
+                    //        //NB NB NB   EmitLocalCacheForTimeLooping should perhaps be only RHS for series???
+                    //        //NB NB NB   it contains the lhs variable too --> superfluous!
+                    //        //NB NB NB
 
-                            //nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
+                    //        //nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + childCodeRhs + ");" + G.NL;
 
-                            nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", GekkoExpression1(" + Globals.smpl + ", 1, p));" + G.NL;
+                    //        nodeCode += "o" + numNode + ".rhs = O.ConvertToTimeSeriesLight(" + Globals.smpl + ", GekkoExpression1(" + Globals.smpl + ", 1, p));" + G.NL;
 
-                            w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl " + Globals.smpl + ", int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
+                    //        w.headerExpressions.Append("public static IVariable GekkoExpression1(GekkoSmpl " + Globals.smpl + ", int bankNumber, P p) {" + G.NL + EmitLocalCacheForTimeLooping(w) + G.NL + "return " + childCodeRhs + ";" + G.NL + "}" + G.NL);
 
-                            if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
-                            {
-                                //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
-                                nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
-                            }
-                            nodeCode += "o" + numNode + ".Exe();" + G.NL;
+                    //        if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
+                    //        {
+                    //            //specialExpressionAndLabelInfo[0] should be "ASTMETA" here
+                    //            nodeCode += "o" + numNode + ".meta = @`" + G.ReplaceGlueNew(node.Parent.specialExpressionAndLabelInfo[1]) + "`;" + G.NL;
+                    //        }
+                    //        nodeCode += "o" + numNode + ".Exe();" + G.NL;
 
-                            node.Code.A(Globals.GekkoSmplNull);
+                    //        node.Code.A(Globals.GekkoSmplNull);
 
-                            if (w.wh.seriesHelperListNames != null)
-                            {
-                                foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
-                                {
-                                    nodeCode += "}" + G.NL;
-                                }
-                            }
+                    //        if (w.wh.seriesHelperListNames != null)
+                    //        {
+                    //            foreach (KeyValuePair<string, string> kvp in w.wh.seriesHelperListNames)
+                    //            {
+                    //                nodeCode += "}" + G.NL;
+                    //            }
+                    //        }
 
-                            node.Code.A(nodeCode);
+                    //        node.Code.A(nodeCode);
 
-                        }
-                        break;                    
+                    //    }
+                    //    break;                    
                     case "ASTSERIESLHS":
                         {
 

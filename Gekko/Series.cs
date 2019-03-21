@@ -154,26 +154,7 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-
-        // ----------------------------------------------------
-        // --------------object functions start----------------
-        // ----------------------------------------------------
-
-        public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .append() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        public IVariable extend(bool isLhs, GekkoSmpl smpl, IVariable x)
-        {
-            G.Writeln2("*** ERROR: Object method .extend() not available for type " + G.GetTypeString(this));
-            throw new GekkoException();
-        }
-
-        // ----------------------------------------------------
-        // --------------object functions end------------------
-        // ----------------------------------------------------
+        
         public string GetName()
         {
             //if (this.name == null && Globals.runningOnTTComputer)
@@ -358,6 +339,7 @@ namespace Gekko
             //ok that dataArray is null to start out with
         }
 
+        //used in dynamic code for list loops
         public void SetZero(GekkoSmpl smpl)
         {
             foreach (GekkoTime t in smpl.Iterate03())
@@ -541,6 +523,10 @@ namespace Gekko
             //set smpl = null if tooSmall/tooLarge is irrelevant (no light series used)
         public double GetData(GekkoSmpl smpl, GekkoTime t)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
+            // ----------------------------------------------------------------------------
+
             //Instead of GetData(null, t), please use GetDataNonLight(t)
             double rv = double.NaN;
             if (this.freq != t.freq)
@@ -651,6 +637,10 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and period do not match.</exception>
         public void SetData(GekkoTime t, double value)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in ResizeDataArray() which is safe
+            // ----------------------------------------------------------------------------
+            
             if (this.type == ESeriesType.Timeless)
             {
                 //Should not normally be used.
@@ -680,6 +670,7 @@ namespace Gekko
                 //Get the array index corresponding to the period. If this index is out of array bounds, the array will
                 //be resized (1.5 times larger).
                 int index = ResizeDataArray(t, true);
+                //the index is offset safe
                 this.data.dataArray[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.
@@ -711,6 +702,10 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         private double[] GetDataSequenceAbstract(out int index1, out int index2, GekkoTime gt1, GekkoTime gt2, bool setStartEndPeriods, bool clone)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
+            // ----------------------------------------------------------------------------
+
             //generic method, not for outside use
 
             if (this.type == ESeriesType.Timeless)
@@ -738,7 +733,7 @@ namespace Gekko
 
             if (this.data.dataArray == null)
             {
-                InitDataArray(gt1);
+                InitDataArray(gt1);  //fills a new dataArray with NaN's so no risk regarding offset etc.
             };
 
             index1 = GetArrayIndex(gt1);
@@ -840,6 +835,10 @@ namespace Gekko
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
         public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
         {
+            // ------------------------------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() and ResizeDataArray() which are safe
+            // ------------------------------------------------------------------------------------------------
+                                 
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #3");
@@ -952,26 +951,7 @@ namespace Gekko
             }
             return GetPeriod(this.meta.lastPeriodPositionInArray);
         }
-
-        public GekkoTime GetArrayFirstPeriod()
-        {
-            if (this.type == ESeriesType.Timeless || this.data.dataArray == null)
-            {
-                G.Writeln2("*** ERROR: Series error #235");
-                throw new GekkoException();
-            }
-            return GetPeriod(0);
-        }
-
-        public GekkoTime GetArrayLastPeriod()
-        {
-            if (this.type == ESeriesType.Timeless || this.data.dataArray == null)
-            {
-                G.Writeln2("*** ERROR: Series error #325");
-                throw new GekkoException();
-            }
-            return GetPeriod(this.data.dataArray.Length - 1);
-        }
+               
 
         public GekkoTime GetRealDataPeriodFirst()
         {
@@ -1032,6 +1012,10 @@ namespace Gekko
         /// <returns>The period (GekkoTime).</returns>
         public GekkoTime GetPeriod(int indexInDataArray)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
+            // ----------------------------------------------------------------------------
+
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #7");
@@ -1084,19 +1068,26 @@ namespace Gekko
         //Not intended for outside use
         public int GetArrayIndex(GekkoTime gt)
         {
-            int rv = FromGekkoTimeToArrayIndex(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub), this.GetAnchorPeriodPositionInArray());
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
+            // ----------------------------------------------------------------------------
+
+            int rv = FromGekkoTimeToArrayIndexAbstract(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub), this.GetAnchorPeriodPositionInArray());
             return rv;
         }
 
-        public static GekkoTime FromArrayIndexToGekkoTime(int i, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
+        //NOT for outside use, note that it is not safe regarding .dataOffsetLag!
+        private static int FromGekkoTimeToArrayIndexAbstract(GekkoTime gt, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
         {
-            int dif = i - anchorPeriodPositionInArray;
-            GekkoTime rv = anchorPeriod.Add(dif);
-            return rv;
-        }
+            // ----------------------------------------------------------------------------
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!! NOTE: OFFSET UNSAFE !!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // ----------------------------------------------------------------------------
 
-        public static int FromGekkoTimeToArrayIndex(GekkoTime gt, GekkoTime anchorPeriod, int anchorPeriodPositionInArray)
-        {
+            //Static method not relying on the Series object
+            //NO .dataOffsetLag here, must be added afterwards
+
             if (gt.freq != anchorPeriod.freq)
             {
                 G.Writeln2("*** ERROR: Frequency mismatch");
@@ -1119,22 +1110,20 @@ namespace Gekko
                 else if (anchorPeriod.freq == EFreq.M) subPeriods = 12;
                 else if (anchorPeriod.freq == EFreq.U) subPeriods = 1;
                 //For quarterly data for instance, each super period amounts to 4 observations. Therefore the multiplication.
-                int offset = subPeriods * (gt.super - anchorPeriod.super) + (gt.sub - anchorPeriod.sub);
-                int index = anchorPeriodPositionInArray + offset;
+                int dif = subPeriods * (gt.super - anchorPeriod.super) + (gt.sub - anchorPeriod.sub);
+                int index = anchorPeriodPositionInArray + dif;
                 rv = index;
             }
 
             return rv;
-        }
-
-        public GekkoTime FromArrayIndexToGekkoTime(int i)
-        {
-            return FromArrayIndexToGekkoTime(i, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
-        }
+        }        
 
         public int FromGekkoTimeToArrayIndex(GekkoTime gt)
         {
-            return FromGekkoTimeToArrayIndex(gt, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
+            // ----------------------------------------------------------------------------
+            return FromGekkoTimeToArrayIndexAbstract(gt, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
         }
 
         
@@ -1145,6 +1134,10 @@ namespace Gekko
 
         private int ResizeDataArray(GekkoTime gt, bool adjustStartEndDates)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
+            // ----------------------------------------------------------------------------
+            
             int index = GetArrayIndex(gt);
             while (index < 0 || index >= this.data.dataArray.Length)
             {
@@ -1207,21 +1200,7 @@ namespace Gekko
                 this.data.anchorPeriod = t;
             }
         }
-
-        public double GetDataFromIndex(int i)
-        {
-            if (i < 0 || i >= this.data.dataArray.Length)
-            {
-                if (this.type == ESeriesType.Light)
-                {
-                    G.Writeln2("*** ERROR: Series access");
-                    throw new GekkoException();
-                }
-                return double.NaN;
-            }
-            return this.data.dataArray[i];
-        }
-
+        
         public static string GetHashCodeFromIvariables(IVariable[] indexes)
         {
             string hash = null;
@@ -1800,6 +1779,11 @@ namespace Gekko
 
         private static void GetStartEndPeriod(GekkoSmpl smpl, Series x1, ref GekkoTime window1, ref GekkoTime window2)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
+            // ----------------------------------------------------------------------------
+
+
             if (x1.type == ESeriesType.Light)
             {
                 window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
@@ -1951,6 +1935,10 @@ namespace Gekko
 
         public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
+            // ----------------------------------------------------------------------------
+            // OFFSET SAFE: dataOffsetLag is handled directly
+            // ----------------------------------------------------------------------------
+
             IVariable rv = null;
 
             if (this.type == ESeriesType.ArraySuper)
