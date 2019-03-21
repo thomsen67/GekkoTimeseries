@@ -6941,7 +6941,7 @@ namespace UnitTests
         {
             //See also Test__Indexer
 
-            //should work, not fail. Object x needs to be replaced, this is testing it.
+            //Object x needs to be replaced, this is testing it.
             I("RESET; x = 100; x = series(2); x[a, b] = 100;");
             
             I("RESET;");
@@ -13243,6 +13243,115 @@ namespace UnitTests
             u = Data("xx", 2001, 1, "m"); Assert.AreEqual(u.w, double.NaN);
 
         }
+
+        
+
+        [TestMethod]
+        public void _Test_TimeSeries2()
+        {
+            //Implicitly testing .dataOffsetLag field from Series
+
+            void Helper1(double x)
+            {
+                _AssertSeries(First(), "y", 2000, double.NaN, sharedDelta);
+                if (x == 0d) _AssertSeries(First(), "y", 2001, 101, sharedDelta);
+                else _AssertSeries(First(), "y", 2001, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y", 2002, 202 + x, sharedDelta);
+                _AssertSeries(First(), "y", 2003, 303 + x, sharedDelta);
+                _AssertSeries(First(), "y", 2004, 404 + x, sharedDelta);
+                _AssertSeries(First(), "y", 2005, double.NaN, sharedDelta);
+            }  
+            
+            void Init()
+            {
+                I("RESET;");
+                I("function series lag1(series x); return x[-1]; end;");
+                I("function series lag1a(series x); return (x+0)[-1]; end;");
+                I("TIME 2001 2004;");
+                I("x1 = (1, 2, 3, 4);");
+                I("x2 = (100, 200, 300, 400);");
+            }            
+            
+            //first has lag, zero combi
+            Init(); I("y = x1[-1] + x2;"); Helper1(-1d);
+            Init(); I("y = (0+x1)[-1] + x2;"); Helper1(-1d);
+            Init(); I("y = x1[-1] + (x2+0);"); Helper1(-1d);
+            Init(); I("y = (0+x1)[-1] + (x2+0);"); Helper1(-1d);
+
+            //second has lag, zero combi
+            Init(); I("y = x1 + x2[-1];"); Helper1(-100d);
+            Init(); I("y = (0+x1) + x2[-1];"); Helper1(-100d);
+            Init(); I("y = x1 + (0+x2)[-1];"); Helper1(-100d);
+            Init(); I("y = (0+x1) + (x2+0)[-1];"); Helper1(-100d);
+
+            //both have lags, zero combi
+            Init(); I("y = x1[-1] + x2[-1];"); Helper1(-101d);
+            Init(); I("y = (0+x1)[-1] + x2[-1];"); Helper1(-101d);
+            Init(); I("y = x1[-1] + (0+x2)[-1];"); Helper1(-101d);
+            Init(); I("y = (0+x1)[-1] + (0+x2)[-1];"); Helper1(-101d);
+
+            // ======== same, with lag() ===============================
+
+            //first has lag, zero combi
+            Init(); I("y = lag(x1, 1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag(0+x1, 1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag(x1, 1) + (x2+0);"); Helper1(-1d);
+            Init(); I("y = lag(0+x1, 1) + (x2+0);"); Helper1(-1d);
+
+            //second has lag, zero combi
+            Init(); I("y = x1 + lag(x2, 1);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag(x2, 1);"); Helper1(-100d);
+            Init(); I("y = x1 + lag(0+x2, 1);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag(x2+0, 1);"); Helper1(-100d);
+
+            //both have lags, zero combi
+            Init(); I("y = lag(x1, 1) + lag(x2, 1);"); Helper1(-101d);
+            Init(); I("y = lag(0+x1, 1) + lag(x2, 1);"); Helper1(-101d);
+            Init(); I("y = lag(x1, 1) + lag(0+x2, 1);"); Helper1(-101d);
+            Init(); I("y = lag(0+x1, 1) + lag(0+x2, 1);"); Helper1(-101d);
+
+            // ======== same, with lag1() ===============================
+
+            //first has lag, zero combi
+            Init(); I("y = lag1(x1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag1(0+x1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag1(x1) + (x2+0);"); Helper1(-1d);
+            Init(); I("y = lag1(0+x1) + (x2+0);"); Helper1(-1d);
+
+            //second has lag, zero combi
+            Init(); I("y = x1 + lag1(x2);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag1(x2);"); Helper1(-100d);
+            Init(); I("y = x1 + lag1(0+x2);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag1(x2+0);"); Helper1(-100d);
+
+            //both have lags, zero combi
+            Init(); I("y = lag1(x1) + lag1(x2);"); Helper1(-101d);
+            Init(); I("y = lag1(0+x1) + lag1(x2);"); Helper1(-101d);
+            Init(); I("y = lag1(x1) + lag1(0+x2);"); Helper1(-101d);
+            Init(); I("y = lag1(0+x1) + lag1(0+x2);"); Helper1(-101d);
+
+            // ======== same, with lag1a() ===============================
+
+            //first has lag, zero combi
+            Init(); I("y = lag1a(x1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag1a(0+x1) + x2;"); Helper1(-1d);
+            Init(); I("y = lag1a(x1) + (x2+0);"); Helper1(-1d);
+            Init(); I("y = lag1a(0+x1) + (x2+0);"); Helper1(-1d);
+
+            //second has lag, zero combi
+            Init(); I("y = x1 + lag1a(x2);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag1a(x2);"); Helper1(-100d);
+            Init(); I("y = x1 + lag1a(0+x2);"); Helper1(-100d);
+            Init(); I("y = (0+x1) + lag1a(x2+0);"); Helper1(-100d);
+
+            //both have lags, zero combi
+            Init(); I("y = lag1a(x1) + lag1a(x2);"); Helper1(-101d);
+            Init(); I("y = lag1a(0+x1) + lag1a(x2);"); Helper1(-101d);
+            Init(); I("y = lag1a(x1) + lag1a(0+x2);"); Helper1(-101d);
+            Init(); I("y = lag1a(0+x1) + lag1a(0+x2);"); Helper1(-101d);
+
+        }
+        
 
         [TestMethod]
         public void _Test_TimeSeries()

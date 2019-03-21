@@ -129,8 +129,11 @@ namespace Gekko
         public int dimensions = 0;  //non-time dimensions: default is 0 which is same as normal timeseries, also used in IsArrayTimeseries()
         [ProtoMember(10)]
         public ESeriesType type = ESeriesType.Normal;  //default
-        
-        public int dataOffsetLag = 0;  //only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
+
+        [ProtoMember(11)]
+        //BEWARE: Be careful when using .dataOffsetLag! #772439872435
+        private int dataOffsetLag = 0;  //Added in protobuf for ultra-safety, should not be necessary. Only used in Series Light, to create lags/leads, never stored in protobuf since Series Light are never stored there
+
         public MapMultidimItem mmi = null;  //only used for array-subseries, pointing to its indices, the 'a', 'b' in x['a', 'b'].
         public ESeriesMissing isNotFoundArraySubSeries = ESeriesMissing.Error; //used when for instance x['a'] does not hit anything
 
@@ -1991,6 +1994,7 @@ namespace Gekko
                         temp.data = this.data;
                         int ii = i;
                         if (indexerType == O.EIndexerType.Dot) ii = -i;
+                        //BEWARE: Be careful when using .dataOffsetLag! #772439872435
                         temp.dataOffsetLag = this.dataOffsetLag + ii;
                         rv = temp;
                     }
@@ -2443,6 +2447,7 @@ namespace Gekko
         public int GetAnchorPeriodPositionInArray()
         {
             //this.data is not null when this is called
+            //BEWARE: Be careful when using .dataOffsetLag! #772439872435
             return this.data.anchorPeriodPositionInArray + this.dataOffsetLag;  //.dataOffset changed from 0 to -1 is same as x[-1]
         }
 
@@ -2476,6 +2481,8 @@ namespace Gekko
             Series tsCopy = new Series(this.freq, this.name);  //this will create t½he .meta object - the .data object is always there
 
             tsCopy.type = this.type;
+            
+            //BEWARE: Be careful when using .dataOffsetLag! #772439872435
             tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases
 
             //.data field is always there
@@ -2582,17 +2589,16 @@ namespace Gekko
     public class SeriesDataInformation
     {
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
+        //BEWARE: Be careful about .dataOffsetLag when using the array! #772439872435
         public double[] dataArray = null;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
+
         [ProtoMember(2)]
         public GekkoTime anchorPeriod = GekkoTime.tNull;
+
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
         public int anchorPeriodPositionInArray = -123454321;
 
-        //public double[] GetDataArray_BEWARE_REMEMBER_DIRTY_AND_PROTECT()
-        //{
-        //    return this.dataArray;
-        //}
     }    
 
     [ProtoContract]
