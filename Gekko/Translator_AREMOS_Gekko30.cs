@@ -1612,6 +1612,183 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "list"))
             {
+                List<TokenHelper> l1 = new List<TokenHelper>();
+                List<TokenHelper> l2 = new List<TokenHelper>();
+                List<TokenHelper> l3 = new List<TokenHelper>();
+
+                string result1 = "";
+                string result2 = "";
+                string result3 = "";
+
+                int i1 = FindS(line, "=");
+                if (i1 > -12345)
+                {
+                    for (int i = 0; i <= i1; i++) l1.Add(line[i]);
+                    int i2 = FindS(line, i1 + 1, new string[] { "prefix", "suffix", "trim", "sort", "strip" });
+                    if (i2 != -12345)
+                    {
+                        for (int i = i1 + 1; i < i2; i++) l2.Add(line[i]);
+                        for (int i = i2; i < line.Count; i++) l3.Add(line[i]);
+                    }
+                    else
+                    {
+                        for (int i = i1 + 1; i < line.Count - 1; i++) l2.Add(line[i]);
+                        if (GetS(line, line.Count - 1) == ";")
+                        {
+                            //should be so
+                            l3.Add(line[line.Count - 1]);
+                        }
+                        else
+                        {
+                            //hmmm?
+                            l2.Add(line[line.Count - 1]);
+                        }
+                    }
+
+                    //l1, l2, l3 have been done
+
+                    List<string> items = new List<string>();
+                    string s = "";
+                    foreach (TokenHelper item in l2)
+                    {
+                        if (item.s == ",")
+                        {
+                            items.Add(s.Trim(new char[] { ' ' })); //keep newline
+                            s = "";
+                        }
+                        else
+                        {
+                            s += item.ToString();
+                        }
+                    }
+                    items.Add(s);  //last item
+
+                    //items are elements from l2
+
+                    //test if items are simple
+                    bool simple = true;
+                    foreach(string s2 in items)
+                    {
+                        bool curly = false;
+                        for (int ic = 0; ic < s2.Length; ic++)
+                        {
+                            if (s2[ic] == '{') curly = true;
+                            if (s2[ic] == '}') curly = false;
+                            if (curly || G.IsLetterOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
+                            {
+                                //ok
+                            }
+                            else
+                            {
+                                simple = false;  //could break here but never mind
+                            }
+                        }
+                    }
+
+                    //doing result1 here
+                    if (Equal(l1, 1, "listfile"))
+                    {
+                        //list listfile m = ...  --> #(listfile m) = ... 
+                        result1 = "#(listfile " + l1[2] + ") = ";
+                    }
+                    else
+                    {
+                        for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
+                        result1 = "#" + result1;
+                    }
+
+                    //do result3 here
+                    int iSpecial = -12345;
+                    for (int i = 0; i < l3.Count; i++)
+                    {
+                        int j = l3.Count - 1;
+                        if (l3[i].s == "prefix")
+                        {
+                            iSpecial = i;
+                            j = FindS(l3, "suffix");
+                            int j0 = j;
+                            if (j == -12345) j = l3.Count - 1;
+                            l3[i].leftblanks = 0;
+                            l3[i].s = "." + l3[i].s + "(";
+                            l3[i + 1].s = "";
+                            l3[j].s = ")" + l3[j].s;
+
+                            if (j0 != -12345)
+                            {
+                                l3[j].leftblanks = 0;
+                                l3[j].s = "." + l3[j].s + "(";
+                                if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
+                                l3[j + 1].s = "";
+                                l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
+                            }
+                        }
+                        else if (l3[i].s == "suffix")
+                        {
+                            iSpecial = i;
+                            j = FindS(l3, "prefix");
+                            int j0 = j;
+                            if (j == -12345) j = l3.Count - 1;
+                            l3[i].leftblanks = 0;
+                            l3[i].s = "." + l3[i].s + "(";
+                            l3[i + 1].s = "";
+                            l3[j].s = ")" + l3[j].s;
+
+                            if (j0 != -12345)
+                            {
+                                l3[j].leftblanks = 0;
+                                l3[j].s = "." + l3[j].s + "(";
+                                if (l3[j].s.StartsWith(".)")) l3[j].s = ")." + l3[j].s.Substring(2);  //a hack
+                                l3[j + 1].s = "";
+                                l3[l3.Count - 1].s = ")" + l3[l3.Count - 1].s;
+                            }
+                        }
+                        else if (l3[i].s == "trim")
+                        {
+                            iSpecial = i;
+                            l3[i].leftblanks = 0;
+                            l3[i].s = "." + "unique" + "(";
+                            l3[j].s = ")" + l3[j].s;
+                        }
+                        else if (l3[i].s == "sort")
+                        {
+                            iSpecial = i;
+                            l3[i].leftblanks = 0;
+                            l3[i].s = "." + l3[i].s + "(";
+                            l3[j].s = ")" + l3[j].s;
+                        }
+                        else if (l3[i].s == "strip")
+                        {
+                            iSpecial = i;
+                            l3[i].leftblanks = 0;
+                            l3[i].s = "." + "replaceinside" + "(";
+                            l3[i + 1].s = "";
+                            l3[j].s = ", '')" + l3[j].s;
+                        }
+                    }
+                    for (int i = 0; i < l3.Count; i++)
+                    {
+                        result3 += l3[i].ToString();
+                    }
+
+                    if (simple && result3.Trim() == ";")  //no prefix etc.
+                    {
+                        result2 = G.GetListWithCommas(items);  //naked list
+                    }
+                    else
+                    {
+                        bool first = true;
+                        foreach (string s2 in items)
+                        {
+                            if (first) result2 += " + ";
+                            if (G.IsSimpleToken(s2.Trim())) result2 += "('" + s2 + "',)";
+                            first = false;
+                        }
+                    }
+                }
+            }
+
+            else if (G.Equal(line[pos].s, "list"))
+            {
                 string name = line[pos + 1].s;
 
                 if (Equal(line, 1, "listfile"))
@@ -1715,7 +1892,7 @@ namespace Gekko
                 {
                     line[pos].s = "#";
                     line[pos + 1].leftblanks = 0;
-                }                
+                }
             }
 
             else if (G.Equal(line[pos].s, "p") || G.Equal(line[pos].s, "prt") || G.Equal(line[pos].s, "pri") || G.Equal(line[pos].s, "print") || G.Equal(line[pos].s, "show"))

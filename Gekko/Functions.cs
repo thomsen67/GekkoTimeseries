@@ -3598,21 +3598,9 @@ namespace Gekko
 
         private static void FunctionError(string s, IVariable x)
         {
-            G.Writeln2("*** ERROR: Object method ." + s + "() does not allow a " + G.GetTypeString(x) + " variable");
+            G.Writeln2("*** ERROR: Function " + s + "() does not allow a " + G.GetTypeString(x) + " variable");
             throw new GekkoException();
         }
-
-        //public static IVariable extend_naked(GekkoSmpl smpl, List ths, IVariable x)
-        //{
-        //    List x_list = x as List;
-        //    if (x_list == null)
-        //    {
-        //        G.Writeln2("*** ERROR: Object method .extend() expects a LIST argument, got " + G.GetTypeString(x));
-        //        throw new GekkoException();
-        //    }
-        //    ths.list.AddRange(x_list.list);
-        //    return new GekkoNull();
-        //}
 
     }
 }
