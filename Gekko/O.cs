@@ -10066,12 +10066,13 @@ namespace Gekko
         {
             public string fileName = null;
             public string opt_gekko18 = null;
+            public string opt_gekko20 = null;
             public string opt_aremos = null;
             public void Exe()
             {
-                if (opt_aremos == null && opt_gekko18 == null)
+                if (opt_aremos == null && opt_gekko18 == null && opt_gekko20 == null)
                 {
-                    G.Writeln2("*** ERROR: Please use <gekko18> or <aremos> to state the language");
+                    G.Writeln2("*** ERROR: Please use <gekko20>, <gekko18> or <aremos> to state the language");
                     throw new GekkoException();
                 }
                 string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, ".cmd"));
@@ -10088,6 +10089,19 @@ namespace Gekko
                 if (G.Equal(opt_gekko18, "yes"))
                 {                    
                     string ss = Translators.Translate1(true, xxx);
+                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(ss);
+                        sw.Flush();
+                        sw.Close();
+                    }
+                    G.Writeln2("Translated file into: " + zz);
+                    G.Writeln("Please note that the translated file is 2.0 not 3.0 syntax");
+                }
+                else if (G.Equal(opt_gekko20, "yes"))
+                {
+                    string ss = Translator_Gekko20_Gekko30.Translate(xx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {

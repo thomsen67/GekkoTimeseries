@@ -562,6 +562,7 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_FROM;
     ASTOPT_STRING_GBK;
     ASTOPT_STRING_GEKKO18;
+	ASTOPT_STRING_GEKKO20;
     ASTOPT_STRING_GEOMETRIC;
 	ASTOPT_STRING_OVERLAY;
     ASTOPT_STRING_GNUPLOT;
@@ -1063,6 +1064,7 @@ Y2                    = 'Y2'                       ;
     GDIF           = 'GDIF';
     GDIFF           = 'GDIFF';
     GEKKO18 = 'GEKKO18';
+	GEKKO20 = 'GEKKO20';
     GENR             = 'GENR'            ;
     GEOMETRIC = 'GEOMETRIC';
 	OVERLAY = 'OVERLAY';
@@ -1669,6 +1671,7 @@ d.Add("Y" ,Y);
                                         d.Add("gdif"    , GDIF   );
                                         d.Add("gdiff"    , GDIFF   );
                                         d.Add("GEKKO18", GEKKO18);
+										d.Add("GEKKO20", GEKKO20);
                                         d.Add("genr"    , GENR      );
                                         d.Add("GEOMETRIC", GEOMETRIC);
 										d.Add("OVERLAY", OVERLAY);
@@ -3406,7 +3409,8 @@ unfix:					    UNFIX -> ^({token("ASTUNFIX", ASTUNFIX, input.LT(1).Line)});
 
 translate: TRANSLATE translateOpt1? fileName -> ^({token("ASTTRANSLATE", ASTTRANSLATE, input.LT(1).Line)} translateOpt1?  ^(ASTHANDLEFILENAME fileName?));
 translateOpt1: ISNOTQUAL | leftAngle        translateOpt1h* RIGHTANGLE -> translateOpt1h*;						
-translateOpt1h: GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
+translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
+						  | GEKKO20 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO20 yesNo?)
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
 						  ;	
 
@@ -4159,6 +4163,7 @@ ident2: 					Ident |
   GDXOPT|
   GDX|
   GEKKO18|
+  GEKKO20|
   GENR|
   GMS|
   GMULPRT|
@@ -4590,6 +4595,7 @@ ident3: 					Ident |
   GDXOPT|
   GDX|
   GEKKO18|
+  GEKKO20|
   GENR|
   GMS|
   //GMULPRT|

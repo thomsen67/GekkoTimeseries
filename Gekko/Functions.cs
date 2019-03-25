@@ -1438,11 +1438,11 @@ namespace Gekko
 
         public static IVariable unpack(GekkoSmpl smpl, IVariable x)
         {
-            return unpack(smpl, null, null, x);
+            return unpack(smpl, x, null, null);
         }
 
         //Converts matrix to timeseries
-        public static IVariable unpack(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable x)
+        public static IVariable unpack(GekkoSmpl smpl, IVariable x, IVariable t1, IVariable t2)
         {
             //from matrix to timeseries
             //smpl is not used

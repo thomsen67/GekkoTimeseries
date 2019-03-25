@@ -605,7 +605,7 @@ namespace UnitTests
             I("option print width = 1000000;");
 
             I("compare;");  //should work without params            
-            I("%s = getfile('compare_databanks.txt');");
+            I("%s = readfile('compare_databanks.txt');");
             string ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
             //_AssertScalarString
@@ -687,7 +687,7 @@ namespace UnitTests
             // ---------------------------------------
 
             I("compare<2001 2001>;");  //should work without params            
-            I("%s = getfile('compare_databanks.txt');");
+            I("%s = readfile('compare_databanks.txt');");
             ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 5 common series, there are differences regarding 2 of them"));
             //_AssertScalarString
@@ -765,7 +765,7 @@ namespace UnitTests
             // ---------------------------------------
             
             I("compare<2001 2001>xx;");  //should work without params            
-            I("%s = getfile('compare_databanks.txt');");
+            I("%s = readfile('compare_databanks.txt');");
             ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 4 common series, there are differences regarding 1 of them"));
             //_AssertScalarString
@@ -823,7 +823,7 @@ namespace UnitTests
             I("#r = ('xx',);");  //should work without params            
 
             I("compare<2001 2001>{#r};");  //should work without params            
-            I("%s = getfile('compare_databanks.txt');");
+            I("%s = readfile('compare_databanks.txt');");
             ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
             Assert.IsTrue(ss.Contains("Out of the 4 common series, there are differences regarding 1 of them"));
             //_AssertScalarString
@@ -3193,6 +3193,7 @@ namespace UnitTests
             {
 
                 I("reset;");
+                I("option model type = gams;");
                 I("%s1 = 'a';");
                 I("string %s2 = 'x';");
                 I("#a = ('a', 'b');");
@@ -8183,7 +8184,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#beta", 3, 1, 0.613875, 0.000001d);
             _AssertMatrix(First(), "#beta", 4, 1, 0.186740, 0.000001d);
             _AssertMatrix(First(), "#beta", 5, 1, -0.350908, 0.000001d);
-            I("s0fit = unpack(2000, 2010, #yfit[.., 1]);");
+            I("s0fit = #yfit[.., 1].unpack(2000, 2010);");
             //TODO: check s0fit above
 
             //testing without target
@@ -14073,6 +14074,7 @@ namespace UnitTests
         {
             //No real test here, TODO...!
             I("reset;");
+            I("option model type = gams;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks';");
             I("read <gdx> testfix;"); //See c:\Thomas\Gekko\GekkoCS\Diverse\GAMS\testfix.gms
             I("time 2001 2003;");
@@ -15259,7 +15261,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy1", 2001, 6d, sharedDelta);
             _AssertSeries(First(), "yy1", 2002, 7d, sharedDelta);
             _AssertSeries(First(), "yy1", 2003, double.NaN, sharedDelta);
-            I("yy2 = unpack(2000, 2002, #b[.., 2]);");
+            I("yy2 = #b[.., 2].unpack(2000, 2002);");
             _AssertSeries(First(), "yy2", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy2", 2000, 15d, sharedDelta);
             _AssertSeries(First(), "yy2", 2001, 16d, sharedDelta);
@@ -15296,7 +15298,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 3, 7d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
-            I("yy2 = unpack(2000m1, 2000m3, #b[.., 2]);");
+            I("yy2 = #b[.., 2].unpack(2000m1, 2000m3);");
             _AssertSeries(First(), "yy2", EFreq.M, 1999, 12, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 1, 15d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
