@@ -157,7 +157,7 @@ Additionally, there are model, solve, equation options.
 
         // -------- new options regarding missings start ---------------------
 
-        public bool series_dynamic = false;
+        public bool series_dyn = false;
 
         //public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
         

@@ -2040,9 +2040,9 @@ namespace Gekko
                             for (int i = op_i + 1; i < line.Count; i++) rhs += line[i].ToString();
                             rhs = rhs.Trim();
 
-                            if (name == "ua_s")
-                            {
-                            }
+                            //if (name == "ua_s")
+                            //{
+                            //}
 
                             int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
 

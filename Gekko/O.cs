@@ -3398,7 +3398,7 @@ namespace Gekko
 
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
         {
-            if ((Program.options.series_dynamic || G.Equal(o.opt_dynamic, "yes")) && check_20())
+            if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
             {
                 GekkoTime tt1_20 = smpl.t1;
                 GekkoTime tt2_20 = smpl.t2;
@@ -8008,7 +8008,7 @@ namespace Gekko
             public string opt_source = null;
             public string opt_units = null;
             public string opt_stamp = null;
-            public string opt_dynamic = null;
+            public string opt_dyn = null;
         }
 
         public class Accept
