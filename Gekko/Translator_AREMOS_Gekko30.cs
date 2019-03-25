@@ -1971,17 +1971,18 @@ namespace Gekko
                 //SER y[2000] = ... --> ok
                 //SER %m = ... --> {%m}
                 //SER %m|x = ... --> {%m}x
+                //SER x = x[-1] + ... --> <dynamic>
 
 
                 line[pos].s = ""; line[pos + 1].leftblanks = 0;
 
-                int ii = 2;
+                int ii = 1;
                 var o = FindOptionField(line);
-                if (o.Item1 != -12345) ii = o.Item2 + 2;  //for instance the '=' series <2010 2020> x = 
+                if (o.Item1 != -12345) ii = o.Item2 + 1;  //for instance the '=' series <2010 2020> x = 
 
                 int op_i = -12345;
                 op_i = FindS(line, ii, new string[] { "=", "^", "%", "+", "*", "#" });  //cannot match series #m = ... or series <2010 2020> #m = ...
-
+                
                 if (op_i != -12345)
                 {
                     if (op_i == 3)
@@ -2010,10 +2011,10 @@ namespace Gekko
                         }
                     }
 
-
-
-                    if (FindS(line, op_i + 1, "=") == -12345)
+                    int itemp = FindS(line, op_i + 1, "=");
+                    if (itemp == -12345)
                     {
+                        //there is not an '=' following, so it is the last equals sign (or other operator)
                         //x%y = will not have % replaced with %=
                         //problem: x%y % 3 will be wrong
                         if (line[op_i].s == "^") line[op_i].s = "^=";
@@ -2021,6 +2022,51 @@ namespace Gekko
                         else if (line[op_i].s == "+") line[op_i].s = "+=";
                         else if (line[op_i].s == "*") line[op_i].s = "*=";
                         else if (line[op_i].s == "#") line[op_i].s = "#=";
+                    }
+                    else
+                    {
+                        op_i = itemp;
+                    }
+
+
+                    if (true)
+                    {
+                        try
+                        {
+                            string name = null;
+                            for (int i = ii; i < op_i; i++) name += line[i].ToString();
+                            name = name.Trim();
+                            string rhs = null;
+                            for (int i = op_i + 1; i < line.Count; i++) rhs += line[i].ToString();
+                            rhs = rhs.Trim();
+
+                            if (name == "ua_s")
+                            {
+                            }
+
+                            int start = rhs.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase);
+
+                            while (start >= 0)
+                            {
+                                if (start - 1 > 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '}' || rhs[start - 1] == '|' || rhs[start - 1] == '%'))
+                                {
+                                    //ignore
+                                }
+                                else
+                                {
+                                    if (rhs[start + name.Length - 1 + 1] == '.' || (rhs[start + name.Length - 1 + 1] == '[' && rhs[start + name.Length - 1 + 2] == '-'))
+                                    {
+                                        //lhs is seen on rhs --> use <dynamic> for safety
+                                        //will have no effect on y = y + 1, only on y = y[-1] + 1, or lag functions, y[2010] etc.
+                                        AddToOptionField(line, 1, "dyn");
+                                        AddComment(line, "Note: <dyn> added");
+                                        break;
+                                    }
+                                }
+                                start = rhs.IndexOf(name, start + 1, StringComparison.OrdinalIgnoreCase);
+                            }
+                        }
+                        catch { };
                     }
 
                     bool comma = false;

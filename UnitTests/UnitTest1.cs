@@ -2102,11 +2102,11 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             // ========================================
-            // ======== with dynamic option ===========
+            // ======== with dyn option ===========
             // ========================================
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2118,7 +2118,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2130,7 +2130,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2144,7 +2144,7 @@ namespace UnitTests
             // with ^= instead of =
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2156,7 +2156,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2168,7 +2168,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2180,14 +2180,14 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
             // ========================================
-            // ======== with <dynamic> ================
+            // ======== with <dyn> ================
             // ========================================
 
             I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("<dynamic> x = x[-1] + 1;");
+            I("<dyn> x = x[-1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
@@ -2198,7 +2198,7 @@ namespace UnitTests
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("<dynamic> x = x + 1;");
+            I("<dyn> x = x + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 91d, sharedDelta);
@@ -2209,7 +2209,7 @@ namespace UnitTests
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("<dynamic> x = x[+1] + 1;");
+            I("<dyn> x = x[+1] + 1;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 81d, sharedDelta);
@@ -2221,9 +2221,9 @@ namespace UnitTests
             // ========================================
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("%v = 100;");
-            I("%v = %v + 1;");  //if something wrong with option series dynamic, this will run too many times
+            I("%v = %v + 1;");  //if something wrong with option series dyn, this will run too many times
             _AssertScalarVal(First(), "%v", 101d);
 
             // ========================================
@@ -2231,9 +2231,9 @@ namespace UnitTests
             // ========================================
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("#m = (%v = 100);");
-            I("#m.%v = #m.%v + 1;");  //if something wrong with option series dynamic, this will run too many times            
+            I("#m.%v = #m.%v + 1;");  //if something wrong with option series dyn, this will run too many times            
             Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertScalarVal(m, "%v", 101d);
 
@@ -2250,7 +2250,7 @@ namespace UnitTests
             _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
 
             I("reset;");
-            I("option series dynamic = yes;");
+            I("option series dyn = yes;");
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
@@ -2266,7 +2266,7 @@ namespace UnitTests
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
-            I("<dynamic> #m.x = #m.x[-1] + 1;");
+            I("<dyn> #m.x = #m.x[-1] + 1;");
             m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
@@ -9436,7 +9436,7 @@ namespace UnitTests
             _AssertScalarVal(First(), "%q4", 144);
 
             I("RESET;");
-            I("function map f(val %x); #m = (<dynamic>x1=2*%x,x2=3*%x); return #m; end; #m = f(7);");
+            I("function map f(val %x); #m = (<dyn>x1=2*%x,x2=3*%x); return #m; end; #m = f(7);");
 
             I("RESET;");            
             I("function map f(val %x); return (x1=2*%x,x2=3*%x); end; #m = f(7);");
