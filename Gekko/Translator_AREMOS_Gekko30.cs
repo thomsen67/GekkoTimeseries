@@ -1397,6 +1397,23 @@ namespace Gekko
                     line[i + 1].s = "";
                 }
 
+                if (Equal(line, i, "difference") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    line[i].s = "except";
+                }
+                else if (Equal(line, i, "search") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    line[i].s = "index";
+                }
+                else if (Equal(line, i, "strip") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    line[i].s = "replace";
+                }
+                else if (Equal(line, i, "trim") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    line[i].s = "strip";
+                }
+
             }
         }
 
@@ -1612,6 +1629,19 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "list"))
             {
+                //remove list<direct>
+                if (line.Count > 3 && line[1].s == "<" && G.Equal(line[2].s, "direct") && line[3].s == ">")
+                {
+                    line.RemoveAt(1);
+                    line.RemoveAt(1);
+                    line.RemoveAt(1);
+                }
+                
+                //so much is changed here that we have to run this one manually first
+                HandleExpressionsRecursive(line, line);
+
+                //TODO: list<direct>
+
                 List<TokenHelper> l1 = new List<TokenHelper>();
                 List<TokenHelper> l2 = new List<TokenHelper>();
                 List<TokenHelper> l3 = new List<TokenHelper>();
@@ -1667,13 +1697,13 @@ namespace Gekko
 
                     //test if items are simple
                     bool simple = true;
-                    foreach(string s2 in items)
+                    foreach(string s3 in items)
                     {
+                        string s2 = s3.Trim();
                         bool curly = false;
                         for (int ic = 0; ic < s2.Length; ic++)
                         {
-                            if (s2[ic] == '{') curly = true;
-                            if (s2[ic] == '}') curly = false;
+                            if (s2[ic] == '{') curly = true;                            
                             if (curly || G.IsLetterOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
                             {
                                 //ok
@@ -1682,6 +1712,7 @@ namespace Gekko
                             {
                                 simple = false;  //could break here but never mind
                             }
+                            if (s2[ic] == '}') curly = false;
                         }
                     }
 
@@ -1694,7 +1725,7 @@ namespace Gekko
                     else
                     {
                         for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
-                        result1 = "#" + result1;
+                        result1 = "#" + result1.TrimStart();
                     }
 
                     //do result3 here
@@ -1779,108 +1810,33 @@ namespace Gekko
                         bool first = true;
                         foreach (string s2 in items)
                         {
-                            if (first) result2 += " + ";
+                            if (!first) result2 += " + ";
                             if (G.IsSimpleToken(s2.Trim())) result2 += "('" + s2 + "',)";
+                            else result2 += s2;
                             first = false;
                         }
                     }
-                }
-            }
 
-            else if (G.Equal(line[pos].s, "list"))
-            {
-                string name = line[pos + 1].s;
-
-                if (Equal(line, 1, "listfile"))
-                {
-                    //list listfile m = ...  --> #(listfile m) = ... 
-                    line[pos + 1].s = "#(listfile ";
-                    int j = FindS(line, 2, "=");
-                    if (j != -12345) line[j - 1].s += ")";
-                    line[pos].s = "";
-                    line[pos + 1].leftblanks = 0;
-                }
-
-                else if (Equal(line, 2, "="))
-                {
-                    line[pos].s = "#";
-                    line[pos + 1].leftblanks = 0;
-                }
-
-                int ii = FindS(line, "=");
-                if (ii != -12345)
-                {
-                    int iSpecial = -12345;
-
-                    //list m1 = #m2 prefix = 'a' suffix = 'b' --> #m2.prefix('a').suffix('b')
-                    for (int i = ii + 1; i < line.Count; i++)
+                    for (int i = 1; i < line.Count; i++)
                     {
-                        int j = line.Count - 1;
-                        if (line[i].s == "prefix")
-                        {
-                            iSpecial = i;
-                            j = FindS(line, "suffix");
-                            int j0 = j;
-                            if (j == -12345) j = line.Count - 1;
-                            line[i].leftblanks = 0;
-                            line[i].s = "." + line[i].s + "(";
-                            line[i + 1].s = "";
-                            line[j].s = ")" + line[j].s;
+                        line[i].s = ""; line[i].leftblanks = 0; line[i].subnodes = null; 
+                        
+                    }
+                    line[0].leftblanks = 0;
 
-                            if (j0 != -12345)
-                            {
-                                line[j].leftblanks = 0;
-                                line[j].s = "." + line[j].s + "(";
-                                if (line[j].s.StartsWith(".)")) line[j].s = ")." + line[j].s.Substring(2);  //a hack
-                                line[j + 1].s = "";
-                                line[line.Count - 1].s = ")" + line[line.Count - 1].s;
-                            }
-                        }
-                        else if (line[i].s == "suffix")
-                        {
-                            iSpecial = i;
-                            j = FindS(line, "prefix");
-                            int j0 = j;
-                            if (j == -12345) j = line.Count - 1;
-                            line[i].leftblanks = 0;
-                            line[i].s = "." + line[i].s + "(";
-                            line[i + 1].s = "";
-                            line[j].s = ")" + line[j].s;
 
-                            if (j0 != -12345)
-                            {
-                                line[j].leftblanks = 0;
-                                line[j].s = "." + line[j].s + "(";
-                                if (line[j].s.StartsWith(".)")) line[j].s = ")." + line[j].s.Substring(2);  //a hack
-                                line[j + 1].s = "";
-                                line[line.Count - 1].s = ")" + line[line.Count - 1].s;
-                            }
-                        }
-                        else if (line[i].s == "trim")
-                        {
-                            iSpecial = i;
-                            line[i].leftblanks = 0;
-                            line[i].s = "." + "unique" + "(";
-                            line[j].s = ")" + line[j].s;
-                        }
-                        else if (line[i].s == "sort")
-                        {
-                            iSpecial = i;
-                            line[i].leftblanks = 0;
-                            line[i].s = "." + line[i].s + "(";
-                            line[j].s = ")" + line[j].s;
-                        }
-                        else if (line[i].s == "strip")
-                        {
-                            iSpecial = i;
-                            line[i].leftblanks = 0;
-                            line[i].s = "." + "replaceinside" + "(";
-                            line[i + 1].s = "";
-                            line[j].s = ", '')" + line[j].s;
-                        }
+                    if (result3.Trim() == ";")
+                    {
+                        line[0].s = result1 + result2 + result3;
+                    }
+                    else
+                    {
+                        line[0].s = result1 + " (" + result2.TrimStart(new char[] { ' ' }) + ")" + result3;
                     }
                 }
             }
+
+            
 
             else if (G.Equal(line[pos].s, FromTo("mat", "matrix")) != null)
             {
