@@ -2048,7 +2048,7 @@ namespace Gekko
 
                             while (start >= 0)
                             {
-                                if (start - 1 > 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '}' || rhs[start - 1] == '|' || rhs[start - 1] == '%'))
+                                if (start - 1 >= 0 && (G.IsLetterOrDigitOrUnderscore(rhs[start - 1]) || rhs[start - 1] == '}' || rhs[start - 1] == '|' || rhs[start - 1] == '%'))
                                 {
                                     //ignore
                                 }
@@ -2098,12 +2098,19 @@ namespace Gekko
                             }
                         }
                     }
-
-
+                    if (line.Count > 1 && line[0].s == "" && line[0].subnodes == null)
+                    {                        
+                        line[0].leftblanks = 0;
+                        if (line[1].subnodes != null)
+                        {
+                            line[1].subnodes[0].leftblanks = 0;
+                        }
+                        else
+                        {
+                            line[1].leftblanks = 0;
+                        }
+                    }
                 }
-
-
-
             }
 
             else if (G.Equal(line[pos].s, "val"))
