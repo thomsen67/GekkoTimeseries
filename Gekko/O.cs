@@ -10110,6 +10110,7 @@ namespace Gekko
                         sw.Close();
                     }
                     G.Writeln2("Translated file into: " + zz);
+                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
                 }
                 else if (G.Equal(opt_aremos, "yes"))
                 {
@@ -10124,6 +10125,7 @@ namespace Gekko
                             sw.Close();
                         }
                         G.Writeln2("Translated file into: " + zz);
+                        G.Writeln("Translate comments: see /* TRANSLATE: .... */");
                     }
                     else
                     {

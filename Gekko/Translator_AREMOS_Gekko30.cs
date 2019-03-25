@@ -334,7 +334,7 @@ namespace Gekko
                 }
                 if (GetS(line, i) == "#" && GetS(line, i + 1) == "#")
                 {
-                    AddComment(topline, "Please note that ##x in Gekko is %{%x} or #{%x}");
+                    AddComment(topline, "Note that ##x in Gekko is %{%x} or #{%x}");
                 }
 
                 if (!(GetS(line, i) == "#" || (GetS(line, i) == "%")) && GetType(line, i + 1) == ETokenType.Word)
@@ -997,7 +997,7 @@ namespace Gekko
         private static void AddComment(List<TokenHelper> line, string s)
         {
             
-            string s2 = " /* " + s + " */";
+            string s2 = " /* TRANSLATE: " + s + " */";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
             foreach(TokenHelper th2 in line)
@@ -1247,9 +1247,18 @@ namespace Gekko
             {
                 //Takes care of the first part of the line,
                 //option field etc.
-                //Records names of assigns, lists and matrices                
-                HandleCommandName(line);
-                HandleExpressionsRecursive(line, line);
+                //Records names of assigns, lists and matrices     
+                try
+                {
+                    HandleCommandName(line);
+                    HandleExpressionsRecursive(line, line);
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: The translator crashed unexpectedly on line " + line[0].line);
+                    G.Writeln("    You may try commenting out that line with //");
+                    throw new GekkoException();
+                }
             }
 
             foreach (List<TokenHelper> line in temp)
@@ -1295,19 +1304,7 @@ namespace Gekko
 
         public static void HandleExpressionsRecursive(List<TokenHelper> line, List<TokenHelper> topline)
         {
-            try
-            {
-                if (line[0].leftblanks == 0 && line[0].s == "[" && line[1].s == "0" && line[2].s == "]")
-                {
-                    line[0].leftblanks = 0;
-                    line[0].s = ".length()";
-                    line[1].s = "";
-                    line[1].leftblanks = 0;
-                    line[2].s = "";
-                    line[2].leftblanks = 0;
-                }
-            }
-            catch { };
+            
 
             for (int i = 0; i < line.Count; i++)
             {
@@ -1317,29 +1314,36 @@ namespace Gekko
                     continue;
                 }
 
-                //bool isSeries = G.Equal(line[0].s, FromTo("ser", "series")) != null;
+                try
+                {
+                    if (line[i + 0].leftblanks == 0 && line[i + 0].s == "[" && line[i + 1].s == "0" && line[i + 2].s == "]")
+                    {
+                        line[i + 0].leftblanks = 0;
+                        line[i + 0].s = ".length()";
+                        line[i + 1].s = "";
+                        line[i + 1].leftblanks = 0;
+                        line[i + 2].s = "";
+                        line[i + 2].leftblanks = 0;
+                    }
+                }
+                catch { };
 
-                // ------------- start of real stuff ---------------------------
-                               
+                try
+                {
+                    if (line[i + 0].s == "%" && line[i + 1].type == ETokenType.Word && line[i + 2].s == "\\")
+                    {
+                        line[i + 0].s = "";
+                        line[i + 1].s = "{%" + line[i + 1].s + "}";
+                    }
 
-                //if (Equal(line, i, FromTo("strip", "strip")))
-                //{
-                //    if (topline[0].meta.commandName == "list")
-                //    {
-                //        if (GetS(line, i + 1) != "(")
-                //        {
-                //            AddComment(topline, "For #m1 = #m2 strip %s, use #m1 = #m2.replaceinside(%s, '', 1)");
-                //        }
-                //    }
-                //}
-
-                //TODO TODO TODO
-                //TODO TODO TODO
-                //TODO TODO TODO   matrix .... || ---> ;   but only in matrix
-                //TODO TODO TODO
-                //TODO TODO TODO
-
-
+                    if (line[i + 0].s == "\\" && line[i + 1].s == "%" && line[i + 2].type == ETokenType.Word)
+                    {
+                        line[i + 1].s = "";
+                        line[i + 2].s = "{%" + line[i + 2].s + "}";
+                    }
+                }
+                catch { };
+                
                 //quotes, interpolate                
                 if (line[i].s.StartsWith("'") && line[i].s.EndsWith("'"))
                 {
@@ -1405,13 +1409,34 @@ namespace Gekko
                 {
                     line[i].s = "index";
                 }
+                else if (Equal(line, i, "piece") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    line[i].s = "substring";
+                }
                 else if (Equal(line, i, "strip") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
                     line[i].s = "replace";
+                    AddComment(line, "strip(x) is replace(x, '')");
                 }
                 else if (Equal(line, i, "trim") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
                 {
                     line[i].s = "strip";
+                }
+                else if (Equal(line, i, "hpfilter") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    AddComment(line, "hpfilter(): note changed arg order regarding periods");
+                }
+                else if (Equal(line, i, "unpack") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    AddComment(line, "unpack(): note changed arg order regarding periods");
+                }
+                else if (Equal(line, i, "avgt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    AddComment(line, "avgt(): note changed arg order regarding periods");
+                }
+                else if (Equal(line, i, "sumt") && i + 1 < line.Count && line[i + 1].subnodes != null && line[i + 1].subnodes[0].s == "(")
+                {
+                    AddComment(line, "sumt(): note changed arg order regarding periods");
                 }
 
             }
@@ -1510,7 +1535,7 @@ namespace Gekko
 
             if (G.Equal(line[pos].s, FromTo("compare", "compare")) != null)
             {
-                AddComment(line, "Note that COMPARE has changed syntax, see the help files");
+                AddComment(line, "COMPARE has changed syntax, see the help files");
             }
 
             else if (G.Equal(line[pos].s, "collapse"))
@@ -1554,41 +1579,12 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "download"))
             {
-                AddComment(line, "Note that DOWNLOAD requires quotes around url");
+                AddComment(line, "DOWNLOAD requires quotes around url");
             }
 
             else if (G.Equal(line[pos].s, "export"))
             {
-                AddComment(line, "Note: For EXPORT without dates, use EXPORT<all>");
-            }
-
-            else if (G.Equal(line[pos].s, FromTo("for", "for")) != null)
-            {
-
-                int eq = FindS(line, "=");
-
-                if (eq == 2)
-                {
-                    //either FOR s = a, b, c...
-                    string type = "string";
-                    string name = line[pos + 1].s;
-                    line[pos + 1].s = type + " " + "%" + name;
-
-                    while (true)
-                    {
-                        eq = FindS(line, eq + 1, "=");
-                        if (eq == -12345) break;
-                        type = "string";
-                        name = line[eq - 1].s;
-                        line[eq - 1].s = type + " " + "%" + name;
-                    }
-                }
-                else
-                {
-                    //or     FOR date d = 100...
-                    line[pos + 2].s = "%" + line[pos + 2].s;
-                }
-
+                AddComment(line, "For EXPORT without dates, use EXPORT<all>");                
             }
 
             else if (G.Equal(line[pos].s, "function"))
@@ -1611,7 +1607,7 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, "import"))
             {
-                AddComment(line, "Note: For IMPORT without dates, use IMPORT<all>");
+                AddComment(line, "For IMPORT without dates, use IMPORT<all>");
             }
 
             else if (G.Equal(line[pos].s, FromTo("ind", "index")) != null)
@@ -1627,8 +1623,43 @@ namespace Gekko
 
             }
 
-            else if (G.Equal(line[pos].s, "list"))
+            else if (G.Equal(line[pos].s, "list") || G.Equal(line[pos].s, "for"))  //NOTE: for must have been done above
             {
+                bool list = false;
+                if (G.Equal(line[pos].s, "list")) list = true;
+
+                bool isParallel = false;
+
+                if (!list)
+                {
+                    
+                    int eq = FindS(line, "=");
+
+                    if (eq == 2)
+                    {
+                        //either FOR s = a, b, c...
+                        string type = "string";
+                        string name = line[pos + 1].s;
+                        line[pos + 1].s = type + " " + "%" + name;
+
+                        while (true)
+                        {
+                            eq = FindS(line, eq + 1, "=");
+                            if (eq == -12345) break;
+                            isParallel = true;
+                            type = "string";
+                            name = line[eq - 1].s;
+                            line[eq - 1].s = type + " " + "%" + name;
+                        }
+                    }
+                    else
+                    {
+                        //or     FOR date d = 100...
+                        line[pos + 2].s = "%" + line[pos + 2].s;
+                    }
+
+                }
+
                 //remove list<direct>
                 if (line.Count > 3 && line[1].s == "<" && G.Equal(line[2].s, "direct") && line[3].s == ">")
                 {
@@ -1678,20 +1709,33 @@ namespace Gekko
                     //l1, l2, l3 have been done
 
                     List<string> items = new List<string>();
+                    List<string> itemsExtra = new List<string>();
                     string s = "";
+                    string sExtra = "";
                     foreach (TokenHelper item in l2)
                     {
                         if (item.s == ",")
                         {
-                            items.Add(s.Trim(new char[] { ' ' })); //keep newline
+                            int count = s.TakeWhile(Char.IsWhiteSpace).Count();
+                            items.Add(s.Trim());
+                            itemsExtra.Add(sExtra + G.Blanks(count));
                             s = "";
+                            sExtra = "";
                         }
                         else
                         {
-                            s += item.ToString();
+                            if (item.type == ETokenType.EOL || item.type == ETokenType.EOF || item.type == ETokenType.Comment)
+                            {
+                                sExtra += item.ToString();
+                            }
+                            else
+                            {
+                                s += item.ToString();
+                            }
                         }
                     }
                     items.Add(s);  //last item
+                    itemsExtra.Add(sExtra);
 
                     //items are elements from l2
 
@@ -1700,11 +1744,11 @@ namespace Gekko
                     foreach(string s3 in items)
                     {
                         string s2 = s3.Trim();
-                        bool curly = false;
+                        bool curly = false;                        
                         for (int ic = 0; ic < s2.Length; ic++)
-                        {
+                        {                            
                             if (s2[ic] == '{') curly = true;                            
-                            if (curly || G.IsLetterOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
+                            if (curly || G.IsLetterOrDigitOrUnderscore(s2[ic]) || s2[ic] == '-' || s2[ic] == '\r' || s2[ic] == '\n')
                             {
                                 //ok
                             }
@@ -1717,15 +1761,22 @@ namespace Gekko
                     }
 
                     //doing result1 here
-                    if (Equal(l1, 1, "listfile"))
+                    if (list)
                     {
-                        //list listfile m = ...  --> #(listfile m) = ... 
-                        result1 = "#(listfile " + l1[2] + ") = ";
+                        if (Equal(l1, 1, "listfile"))
+                        {
+                            //list listfile m = ...  --> #(listfile m) = ... 
+                            result1 = "#(listfile " + l1[2] + ") = ";
+                        }
+                        else
+                        {
+                            for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
+                            result1 = "#" + result1.TrimStart();
+                        }
                     }
                     else
                     {
-                        for (int i = 1; i < l1.Count; i++) result1 += l1[i].ToString();
-                        result1 = "#" + result1.TrimStart();
+                        for (int i = 0; i < l1.Count; i++) result1 += l1[i].ToString();
                     }
 
                     //do result3 here
@@ -1801,18 +1852,37 @@ namespace Gekko
                         result3 += l3[i].ToString();
                     }
 
-                    if (simple && result3.Trim() == ";")  //no prefix etc.
+                    if ((simple || isParallel) && result3.Trim() == ";")  //no prefix etc.
                     {
-                        result2 = G.GetListWithCommas(items);  //naked list
+                        if (items.Count == 1 && G.IsSimpleToken(items[0].Trim()))  //test of issimple... probably superfluous
+                        {
+                            //one-element list like list m = a;
+                            result2 = itemsExtra[0] + "(" + "'" + items[0].Trim() + "',)";
+                        }
+                        else
+                        {
+                            bool first = true;
+                            for (int ij = 0; ij < items.Count; ij++)
+                            {                                
+                                string s2 = items[ij];
+                                if (!first) result2 += ",";
+                                result2 += itemsExtra[ij] + s2;
+                                first = false;
+                            }
+                        }
                     }
                     else
                     {
                         bool first = true;
-                        foreach (string s2 in items)
+                        for (int ij = 0; ij < items.Count; ij++)
                         {
-                            if (!first) result2 += " + ";
-                            if (G.IsSimpleToken(s2.Trim())) result2 += "('" + s2 + "',)";
-                            else result2 += s2;
+                            string s2 = items[ij];
+                            if (!first) result2 += "+";
+                            if (G.IsSimpleToken(s2.Trim()))
+                            {
+                                result2 += itemsExtra[ij] + "('" + s2.Trim() + "',)";
+                            }
+                            else result2 += itemsExtra[ij] + s2;
                             first = false;
                         }
                     }
@@ -2044,29 +2114,7 @@ namespace Gekko
             return rv;
         }
 
-        private static void AddBracesAroundWildcard(List<TokenHelper> line, int start, int end)
-        {
-            bool ok = true;
-            if (end - start > 1)
-            {
-                for (int i = start + 1; i <= end; i++)
-                {
-                    if (GetLeftblanks(line, i) > 0)
-                    {
-                        ok = false;
-                        break;
-                    }
-                }
-            }
-
-            if (ok)
-            {
-                line.Insert(start, new TokenHelper(1, "{'"));
-                line[start + 1].leftblanks = 0;
-                line.Insert(end + 2, new TokenHelper(0, "'}"));
-                AddComment(line, "{'...'}-braces mandatory, will be fixed");
-            }
-        }
+        
 
         private static bool IsEmptyToken(List<TokenHelper> line, int i)
         {
@@ -2079,8 +2127,7 @@ namespace Gekko
 
         private static void AddComment(List<TokenHelper> line, string s)
         {
-
-            string s2 = " /* " + s + " */";
+            string s2 = " /* TRANSLATE: " + s + " */";
             TokenHelper th = new TokenHelper(s2);
             bool ok = true;
             foreach (TokenHelper th2 in line)
