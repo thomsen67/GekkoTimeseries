@@ -4833,7 +4833,16 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("G.Writeln(`+++ NOTE: Reorder: you must issue a MODEL statement afterwards, for this option to take effect.`);");
                                     node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
+
                                 }
+                                else if (o == "series_dyn")
+                                {
+                                    node.Code.A("G.Writeln();");
+                                    node.Code.A("G.Writeln(`+++ NOTE: The dyn option is experimental and will be removed at some point, so please only use it`);");
+                                    node.Code.A("G.Writeln(`+++       for experiments, and use SERIES<dyn> instead in productin code. At a later point,`);");
+                                    node.Code.A("G.Writeln(`+++       a BLOCK<dyn>; ...; END; will be provided, before the final release of Gekko 3.0.`);");
+                                }
+                                
                                 //if (o == "databank_file_format")
                                 //{
                                 //    node.Code.A("Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = true;");

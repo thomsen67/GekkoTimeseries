@@ -8256,7 +8256,7 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-
+                                
                 if (G.Equal(this.opt_info, "yes"))
                 {
                     Program.Info(this.t1, this.t2, iv);                    
