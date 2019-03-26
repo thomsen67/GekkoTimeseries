@@ -845,6 +845,7 @@ namespace Gekko
 
         private void Mouse_Down(object sender, MouseEventArgs e)
         {
+            //#98732498724
             TextBlock tb = (TextBlock)sender;
             Border b = (Border)(tb.Parent);
             DockPanel dp = (DockPanel)(b.Parent);
@@ -874,7 +875,6 @@ namespace Gekko
                 d.isSubWindow = true;
 
                 Program.Decomp(d);
-                //Program.Decomp(null, this.decompOptions.tp, this.decompOptions.prtOption, vars);
             }
             else
             {
@@ -1152,9 +1152,19 @@ namespace Gekko
                 this.decompOptions.prtOptionLower = transformationCodeAugmented;
                                 
                 table = Program.Decompose(this.decompOptions);
+
+                if (true && Globals.runningOnTTComputer)
+                {
+                    DecompOptions o2 = new DecompOptions();
+                    
+
+                }
+                
+
+                
                 
                 string s = FindEquationText(this.decompOptions);
-                //if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
+                
                 equation.Text = s;
 
                 //

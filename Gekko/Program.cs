@@ -12044,6 +12044,8 @@ namespace Gekko
             //       Window1.RecalcCellsWithNewType();
             //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
             //
+            //CLICKING: Mouse_Down(), cf. #98732498724
+            //
             //Actual calculation is in Decompose(DecompOptions o)
 
             //We need to merge DecompHelper2() into Decompose()
@@ -16883,6 +16885,14 @@ namespace Gekko
             {
                 // FUNCTION f( name %x); PRT @{%x}; END; f(y);
                 // FUNCTION f( string %x); PRT @{%x}; END; f('y');
+
+                Func<GekkoSmpl, IVariable> Evalcode832 = (smpl5) =>
+               {
+                   //return O.Add(x1, x2);
+                   //x2 = O.Add(x3, x4);
+                   //return O.Add(x1, O.Add(x3, x4));
+                   return null;
+               };
 
                 if (false)
                 {
@@ -35993,7 +36003,7 @@ namespace Gekko
             if (funcCounter > 0)
             {
                 G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - dt).TotalMilliseconds) + " --> " + funcCounter + " evals");
-                G.Writeln("+++ NOTE: DECOMP may contain glitchs until 3.0 is out of beta period.");
+                G.Writeln("+++ NOTE: DECOMP may contain glitches until 3.0 is out of beta period.");
             }
 
             DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);

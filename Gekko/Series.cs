@@ -2395,39 +2395,11 @@ namespace Gekko
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] indexes)
         {
-            if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
-            {
-                int i = O.ConvertToInt(indexes[0]);
-                if (IsLagOrLead(i))
-                {
-                    G.Writeln2("*** ERROR: You cannot use lags or lead on left-hand side of an expression");
-                    throw new GekkoException();
-                }
-                else
-                {
-                    if (this.freq == EFreq.A || this.freq == EFreq.U)
-                    {
-                        double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
-                        GekkoTime t = new GekkoTime(this.freq, i, 1);
-                        this.SetData(t, d);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
-                        throw new GekkoException();
-                    }
-                }
-            }
-            else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
-            {
-                double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
-                this.SetData(((ScalarDate)(indexes[0])).date, d);  //will fail with an error if freqs do not match
-            }
-            else 
+            if (this.type == ESeriesType.ArraySuper)
             {
                 //Will fail with an error if not all indexes are of STRING type     
                 bool rhsIsTimeless = false;
-                if (rhsExpression.Type() == EVariableType.Series && (rhsExpression as Series).type == ESeriesType.Timeless) rhsIsTimeless = true;                           
+                if (rhsExpression.Type() == EVariableType.Series && (rhsExpression as Series).type == ESeriesType.Timeless) rhsIsTimeless = true;
                 IVariable iv = this.FindArraySeries(smpl, indexes, true, rhsIsTimeless, null);  //if not found, it will be created (since we are on the lhs) and inherit the timeless status from this timeseries.
                 Series ts = iv as Series;
                 if (ts == null)
@@ -2437,6 +2409,42 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 O.LookupHelperLeftside(smpl, ts, rhsExpression, EVariableType.Var, options);                
+            }
+            else
+            {
+                if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Val)
+                {
+                    int i = O.ConvertToInt(indexes[0]);
+                    if (IsLagOrLead(i))
+                    {
+                        G.Writeln2("*** ERROR: You cannot use lags or lead on left-hand side of an expression");
+                        throw new GekkoException();
+                    }
+                    else
+                    {
+                        if (this.freq == EFreq.A || this.freq == EFreq.U)
+                        {
+                            double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
+                            GekkoTime t = new GekkoTime(this.freq, i, 1);
+                            this.SetData(t, d);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: You cannot []-index a " + G.GetFreqString(this.freq) + " SERIES with [" + i + "]");
+                            throw new GekkoException();
+                        }
+                    }
+                }
+                else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
+                {
+                    double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
+                    this.SetData(((ScalarDate)(indexes[0])).date, d);  //will fail with an error if freqs do not match
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: A normal series on the left-hand side must be []-indexed with date or val");
+                    throw new GekkoException();
+                }
             }
         }
 

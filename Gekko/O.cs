@@ -10075,7 +10075,9 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Please use <gekko20>, <gekko18> or <aremos> to state the language");
                     throw new GekkoException();
                 }
-                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, ".cmd"));
+                string extension = ".cmd";
+                if (G.Equal(opt_gekko18, "yes") || G.Equal(opt_gekko20, "yes")) extension = ".gcm";
+                string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, extension));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
                 List<string> xxx = G.ExtractLinesFromText(xx);                
                 if (zfilename.ToLower().EndsWith(".cmd") || zfilename.ToLower().EndsWith("." + Globals.extensionCommand)) 
@@ -10126,6 +10128,7 @@ namespace Gekko
                         }
                         G.Writeln2("Translated file into: " + zz);
                         G.Writeln("Translate comments: see /* TRANSLATE: .... */");
+                        G.Writeln("Note that <dyn> is not automatically set in SERIES (like in the Gekko 2.0 translator).");
                     }
                     else
                     {
