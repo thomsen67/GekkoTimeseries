@@ -1154,18 +1154,11 @@ namespace Gekko
 
                 if (true && Globals.runningOnTTComputer)
                 {
-                    string var2 = "x2";
-                    EquationHelper found = Program.DecompEval(var2);
-                    DecompOptions d3 = this.decompOptions.Clone();
-                    d3.variable = var2;
-                    d3.expression = Globals.expression;
-                    d3.expressionOld = found.equationText;
-                    Table table2 = Program.Decompose(d3);
-                    //foreach (string s2 in table2.PrintText()) G.Writeln(s2);
-
-                    bool adjust = true;
-
-                    table = TableSubstitute(table, var2, table2);
+                    
+                    Table table3 = DecompSubstitute(table, "x1");
+                    table3 = DecompSubstitute(table3, "x2");
+                    table3 = DecompSubstitute(table3, "x3");
+                    table = table3;
 
                 }
 
@@ -1194,7 +1187,19 @@ namespace Gekko
             }
         }
 
-        private static Table TableSubstitute(Table table1, string var, Table table2)
+        private Table DecompSubstitute(Table table, string var2)
+        {
+            EquationHelper found = Program.DecompEval(var2);
+            DecompOptions d3 = this.decompOptions.Clone();
+            d3.variable = var2;
+            d3.expression = Globals.expression;
+            d3.expressionOld = found.equationText;
+            Table table2 = Program.Decompose(d3);
+            Table table3 = TableSubstitute(table, var2, table2, true);
+            return table3;
+        }
+
+        private static Table TableSubstitute(Table table1, string var, Table table2, bool scale)
         {
             //We have a table like (for x)
             //        2020  2021
@@ -1216,7 +1221,7 @@ namespace Gekko
             //  x11     20    30
             //  x12     80    70
             //  x2     400   400
-
+                        
             Table rv = new Table();
             rv.writeOnce = true;
 
@@ -1239,17 +1244,60 @@ namespace Gekko
                     //not first row
                     Cell c1temp = table1.Get(i, 1);
                     if (c1temp.CellText.TextData[0].Trim() == var)
-                    {                        
+                    {
+                        int rowStart = 3;
+                        int colStart = 2;
+
+                        List<double> scalings = null;
+                        if (scale)
+                        {                            
+
+                            scalings = new List<double>();
+                            for (int jj = colStart; jj <= table2.GetColMaxNumber(); jj++)
+                            {
+                                Cell temp1 = table1.Get(i, jj);
+                                if (temp1 == null || temp1.cellType != CellType.Number)
+                                {
+                                    G.Writeln2("*** ERROR: Table merge problem");
+                                    throw new GekkoException();
+                                }
+                                double original = temp1.number;
+
+                                double rowsum = 0d;
+                                for (int ii = rowStart; ii <= table2.GetRowMaxNumber(); ii++)
+                                {
+                                    Cell temp2 = table2.Get(ii, jj);
+                                    if (temp2 == null || temp2.cellType != CellType.Number)
+                                    {
+                                        G.Writeln2("*** ERROR: Table merge problem");
+                                        throw new GekkoException();
+                                    }
+                                    rowsum += temp2.number;
+                                }
+                                scalings.Add(original / rowsum);
+                            }                            
+                        }
+                        
                         //insert rows from table 2
-                        for (int ii = 1; ii <= table2.GetRowMaxNumber(); ii++)
-                        {
+                        for (int ii = rowStart; ii <= table2.GetRowMaxNumber(); ii++)
+                        {                            
                             irv++;
                             for (int jj = 1; jj <= table2.GetColMaxNumber(); jj++)
                             {
                                 Cell temp = table2.Get(ii, jj);
-                                if (temp != null) rv.Set(new Coord(irv, jj), temp);
+                                if (jj == 1) temp.CellText.TextData[0] = "    " + temp.CellText.TextData[0];
+                                else
+                                {
+                                    if (temp != null)
+                                    {
+                                        if (scale) temp.number = temp.number * scalings[jj - 2];
+
+                                    }
+                                }
+                                rv.Set(new Coord(irv - 1, jj), temp);
                             }
                         }
+                        i++;  //skip this row in table1
                     }
                 }
 
