@@ -865,9 +865,17 @@ namespace Gekko
                 string var = c.CellText.TextData[0];
 
                 string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
-                
-                //List<string> vars = new List<string>();
-                //vars.Add(var2);
+
+                if (true && Globals.runningOnTTComputer)
+                {
+                    EquationHelper found = Program.DecompEval(var2);
+                    DecompOptions d3 = this.decompOptions.Clone();
+                    d3.variable = var2;
+                    d3.expression = Globals.expression;
+                    d3.expressionOld = found.equationText;                    
+                    Table table = Program.Decompose(d3);
+                    foreach (string s in table.PrintText()) G.Writeln(s);
+                }
 
                 DecompOptions d = this.decompOptions.Clone();
                 //d.vars = vars;   
@@ -1498,6 +1506,9 @@ namespace Gekko
 
     public class DecompOptions
     {
+        //public bool onlyTable = false;
+        //public Table table = null;
+
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
         public bool isPercentageType = false;

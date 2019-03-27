@@ -12212,8 +12212,13 @@ namespace Gekko
         {
             DecompOptions decompOptions = (DecompOptions)o;
             //decompOptions.isCalledFromDecompWindow = false;
-            Window1 w = new Window1(decompOptions);
-            Globals.windowsDecomp.Add(w);
+
+            Window1 w = null;
+            if (true)
+            {
+                w = new Window1(decompOptions);
+                Globals.windowsDecomp.Add(w);
+            }
 
             if (decompOptions.expressionOld == null && decompOptions.variable != null)
             {
@@ -12230,102 +12235,9 @@ namespace Gekko
                     G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
                     throw new GekkoException();
                 }
-                EquationHelper found = Program.FindEquationByMeansOfVariableName(decompOptions.variable);
-                if (found == null)
-                {
-                    G.Writeln2("*** ERROR: DECOMP: Could not find variable '" + decompOptions.variable + "' as left-hand side in model");
-                    throw new GekkoException();
-                }
-                string[] ss = found.equationText.Split('=');
-                
 
-
-                string rhs = ss[1].Trim();
-
-                string lhsText = ss[0].Trim();
-                string[] ss0 = lhsText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (!G.Equal(ss0[0], "frml"))
-                {
-                    G.Writeln2("*** ERROR: Model equation '" + decompOptions.variable + "': Equation does not start with 'frml'");
-                    throw new GekkoException();
-                }                
-
-                string lhs = null;
-                for (int i = 2; i < ss0.Length; i++)
-                {
-                    lhs += ss0[i];
-                }
-                lhs = lhs.Trim();  //trimmed with no blanks                                                              
-
-                if (rhs.EndsWith("$")) rhs = rhs.Substring(0, rhs.Length - 1) + ";";  //only replace last $, not other $
-
-                rhs = rhs.Trim();
-                if (rhs.EndsWith(";")) rhs = rhs.Substring(0, rhs.Length - 1);
-
-                for (int i = 1; i < 20; i++)
-                {
-                    rhs = rhs.Replace("(-" + i + ")", "[-" + i + "]");
-                    rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
-                }
-
-                string type = "none";  //dlog, dif, diff, log
-                if (lhs.StartsWith("dlog(", StringComparison.OrdinalIgnoreCase))
-                {
-                    type = "dlog";
-                    rhs = found.lhs + "[-1] * exp(" + rhs + ")";
-                }
-                else if (lhs.StartsWith("dif(", StringComparison.OrdinalIgnoreCase))
-                {
-                    type = "dif";
-                    rhs = found.lhs + "[-1] + (" + rhs + ")";
-                }
-                else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
-                {
-                    type = "diff";
-                    rhs = found.lhs + "[-1] + (" + rhs + ")";
-                }
-                else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
-                {
-                    type = "log";
-                    rhs = "exp(" + rhs + ")";
-                }
-
-                if (found.equationCodeJ != "" && found.equationCodeJ != "_" && found.equationCodeJ != "__")
-                {
-                    if (found.equationCodeJadditive)
-                    {
-                        rhs = rhs + " + " + found.Jname;
-                    }
-                    else if (found.equationCodeJmultiplicative)
-                    {
-                        rhs = "(" + rhs + ") * (1 + " + found.Jname + ")";
-                    }
-                    else
-                    {
-                        //should not happen
-                        G.Writeln2("*** ERROR: Problem with J-factors in equation " + found.lhs);
-                        throw new GekkoException();
-                    }
-                }
-
-                if (found.equationCodeD != "" && found.equationCodeD != "_")
-                {                    
-                    rhs = "(1 - " + found.Dname + ") * (" + rhs + ") + " + found.Dname + " * " + found.Zname;                    
-                }                
-
-                //rhs = found.lhs + " = " + rhs + ";";
-                rhs = rhs + ";";
-
-                try
-                {
-                    Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
-                }
-                catch (Exception e)
-                {
-
-                }
-
-                decompOptions.expression = Globals.expression;                
+                EquationHelper found = DecompEval(decompOptions.variable);
+                decompOptions.expression = Globals.expression;
                 decompOptions.expressionOld = found.equationText;
 
             }
@@ -12355,6 +12267,104 @@ namespace Gekko
                 w.Close();  //probably superfluous
                 w = null;  //probably superfluous
             }
+        }
+
+        public static EquationHelper DecompEval(string variable)
+        {
+            EquationHelper found = Program.FindEquationByMeansOfVariableName(variable);
+            if (found == null)
+            {
+                G.Writeln2("*** ERROR: DECOMP: Could not find variable '" + variable + "' as left-hand side in model");
+                throw new GekkoException();
+            }
+            string[] ss = found.equationText.Split('=');
+
+            string rhs = ss[1].Trim();
+
+            string lhsText = ss[0].Trim();
+            string[] ss0 = lhsText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!G.Equal(ss0[0], "frml"))
+            {
+                G.Writeln2("*** ERROR: Model equation '" + variable + "': Equation does not start with 'frml'");
+                throw new GekkoException();
+            }
+
+            string lhs = null;
+            for (int i = 2; i < ss0.Length; i++)
+            {
+                lhs += ss0[i];
+            }
+            lhs = lhs.Trim();  //trimmed with no blanks                                                              
+
+            if (rhs.EndsWith("$")) rhs = rhs.Substring(0, rhs.Length - 1) + ";";  //only replace last $, not other $
+
+            rhs = rhs.Trim();
+            if (rhs.EndsWith(";")) rhs = rhs.Substring(0, rhs.Length - 1);
+
+            for (int i = 1; i < 20; i++)
+            {
+                rhs = rhs.Replace("(-" + i + ")", "[-" + i + "]");
+                rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
+            }
+
+            string type = "none";  //dlog, dif, diff, log
+            if (lhs.StartsWith("dlog(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "dlog";
+                rhs = found.lhs + "[-1] * exp(" + rhs + ")";
+            }
+            else if (lhs.StartsWith("dif(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "dif";
+                rhs = found.lhs + "[-1] + (" + rhs + ")";
+            }
+            else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "diff";
+                rhs = found.lhs + "[-1] + (" + rhs + ")";
+            }
+            else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "log";
+                rhs = "exp(" + rhs + ")";
+            }
+
+            if (found.equationCodeJ != "" && found.equationCodeJ != "_" && found.equationCodeJ != "__")
+            {
+                if (found.equationCodeJadditive)
+                {
+                    rhs = rhs + " + " + found.Jname;
+                }
+                else if (found.equationCodeJmultiplicative)
+                {
+                    rhs = "(" + rhs + ") * (1 + " + found.Jname + ")";
+                }
+                else
+                {
+                    //should not happen
+                    G.Writeln2("*** ERROR: Problem with J-factors in equation " + found.lhs);
+                    throw new GekkoException();
+                }
+            }
+
+            if (found.equationCodeD != "" && found.equationCodeD != "_")
+            {
+                rhs = "(1 - " + found.Dname + ") * (" + rhs + ") + " + found.Dname + " * " + found.Zname;
+            }
+
+            //rhs = found.lhs + " = " + rhs + ";";
+            rhs = rhs + ";";
+
+            try
+            {
+                Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return found;
         }
 
         public static O.Prt PrtSnippet(string s, string s2)
