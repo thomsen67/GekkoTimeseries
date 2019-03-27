@@ -13683,6 +13683,16 @@ namespace Gekko
                     }
                 }
 
+                if (s2.Length == 3)
+                {
+                    string sub = s2;
+                    if (G.Equal(sub, "sub"))
+                    {
+                        if (Globals.decompSubstitute == true) Globals.decompSubstitute = false;
+                        else Globals.decompSubstitute = true;
+                        return "";
+                    }
+                }
 
                 if (s2.Length == 11)
                 {
@@ -13722,6 +13732,7 @@ namespace Gekko
                         return "";   //no need for the parser to chew on this afterwards!
                     }
                 }
+
 
                 
                 if (s2.Length == 7)

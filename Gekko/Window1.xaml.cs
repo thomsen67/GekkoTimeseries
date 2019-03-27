@@ -865,12 +865,20 @@ namespace Gekko
                 string var = c.CellText.TextData[0];
 
                 string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
+                                
+                DecompOptions d = this.decompOptions.Clone();                                
 
-                
-                DecompOptions d = this.decompOptions.Clone();
-                //d.vars = vars;   
-                d.variable = var2;
-                d.isSubWindow = true;
+                if (d.isSubst)
+                {
+                    //d.variable is the same
+                    d.subst.Add(var2);
+                    d.isSubWindow = true;
+                }
+                else
+                {
+                    d.variable = var2;
+                    d.isSubWindow = true;
+                }
 
                 Program.Decomp(d);
             }
@@ -1031,6 +1039,11 @@ namespace Gekko
                     }
                 }
 
+                
+                              
+
+                
+                               
                 //Setting defaults
                 radioButton21.IsEnabled = true;
                 radioButton21.Opacity = 1.0;
@@ -1084,6 +1097,11 @@ namespace Gekko
                 if (this.decompOptions.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
+
+                if (this.decompOptions.isSubst) subst.IsChecked = true;
+                if (this.decompOptions.isSort) sort.IsChecked = true;
+                if (this.decompOptions.isPool) pool.IsChecked = true;
+
 
                 if (this.decompOptions.guiDecompIsBaseline)
                 {
@@ -1152,14 +1170,12 @@ namespace Gekko
 
                 table = Program.Decompose(this.decompOptions);
 
-                if (true && Globals.runningOnTTComputer)
+                if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
                 {
-                    
-                    Table table3 = DecompSubstitute(table, "x1");
-                    table3 = DecompSubstitute(table3, "x2");
-                    table3 = DecompSubstitute(table3, "x3");
-                    table = table3;
-
+                    foreach (string var in this.decompOptions.subst)
+                    {
+                        table = DecompSubstitute(table, var);
+                    }
                 }
 
                 string s = FindEquationText(this.decompOptions);
@@ -1622,8 +1638,44 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions.showErrors = false;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType();                
             }
+        }
+
+        private void Sort_Checked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isSort = false;
+            if (sort.IsChecked == true) this.decompOptions.isSort = true;
+        }
+
+        private void Pool_Checked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isPool = false;
+            if (pool.IsChecked == true) this.decompOptions.isPool = true;
+        }
+
+        private void Subst_Checked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isSubst = false;
+            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
+        }
+
+        private void Sort_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isSort = false;
+            if (sort.IsChecked == true) this.decompOptions.isSort = true;
+        }
+
+        private void Pool_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isPool = false;
+            if (pool.IsChecked == true) this.decompOptions.isPool = true;
+        }
+
+        private void Subst_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.decompOptions.isSubst = false;
+            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
         }
     }
 
@@ -1635,6 +1687,10 @@ namespace Gekko
 
     public class DecompOptions
     {
+        public bool isSubst = false;
+        public bool isPool = false;
+        public bool isSort = false;
+
         //public bool onlyTable = false;
         //public Table table = null;
 
@@ -1654,6 +1710,9 @@ namespace Gekko
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
         public bool showErrors = false;
         //public GekkoSmpl smplForFunc = null;
+
+        public List<string> subst = new List<string>();
+
         //-------- tranformation start --------------
         public string guiDecompTransformationCode = "n";
         public bool guiDecompIsShares = false;
@@ -1709,6 +1768,15 @@ namespace Gekko
             //d.decimalsLevel = this.decimalsLevel;
             d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
             d.dream = this.dream;
+
+            d.isSort = this.isSort;
+            d.isSubst = this.isSubst;
+            d.isPool = this.isPool;
+            foreach(string s in this.subst)
+            {
+                d.subst.Add(s);
+            }
+
             if (false)
             {
                 cellsGradQuo = null;
