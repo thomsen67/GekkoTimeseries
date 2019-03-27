@@ -866,17 +866,7 @@ namespace Gekko
 
                 string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
 
-                if (true && Globals.runningOnTTComputer)
-                {
-                    EquationHelper found = Program.DecompEval(var2);
-                    DecompOptions d3 = this.decompOptions.Clone();
-                    d3.variable = var2;
-                    d3.expression = Globals.expression;
-                    d3.expressionOld = found.equationText;                    
-                    Table table = Program.Decompose(d3);
-                    foreach (string s in table.PrintText()) G.Writeln(s);
-                }
-
+                
                 DecompOptions d = this.decompOptions.Clone();
                 //d.vars = vars;   
                 d.variable = var2;
@@ -1158,19 +1148,27 @@ namespace Gekko
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
                 this.decompOptions.prtOptionLower = transformationCodeAugmented;
-                                
+
+
                 table = Program.Decompose(this.decompOptions);
 
                 if (true && Globals.runningOnTTComputer)
                 {
-                    DecompOptions o2 = new DecompOptions();
-                    
+                    string var2 = "x2";
+                    EquationHelper found = Program.DecompEval(var2);
+                    DecompOptions d3 = this.decompOptions.Clone();
+                    d3.variable = var2;
+                    d3.expression = Globals.expression;
+                    d3.expressionOld = found.equationText;
+                    Table table2 = Program.Decompose(d3);
+                    //foreach (string s2 in table2.PrintText()) G.Writeln(s2);
+
+                    bool adjust = true;
+
+                    Table table3 = TableSubstitute(table, var2, table2);
 
                 }
-                
 
-                
-                
                 string s = FindEquationText(this.decompOptions);
                 
                 equation.Text = s;
@@ -1194,6 +1192,86 @@ namespace Gekko
 
 
             }
+        }
+
+        private static Table TableSubstitute(Table table1, string var, Table table2)
+        {
+            //We have a table like (for x)
+            //        2020  2021
+            //  expr   500   600
+            //  x1     100   200
+            //  x2     400   400
+
+            //and a table like (for x1)
+
+            //        2020  2021
+            //  expr   100   100
+            //  x11     20    30
+            //  x12     80    70
+
+            //We insert:
+
+            //        2020  2021
+            //  expr   500   600
+            //  x11     20    30
+            //  x12     80    70
+            //  x2     400   400
+
+            Table rv = new Table();
+            rv.writeOnce = true;
+
+            var = var.Trim();
+
+            int rowOffset = 0;
+
+            if (table1.GetColMaxNumber() != table2.GetColMaxNumber())
+            {
+                G.Writeln2("*** ERROR: Table merge problem");
+                throw new GekkoException();
+            }
+
+            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+            {
+                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                {
+                    Cell c1 = null; table1.GetData().TryGetValue(new Coord(i, j), out c1);
+                    Cell c2 = null; table2.GetData().TryGetValue(new Coord(i, j), out c2);
+
+                    bool subst = false;
+                    if (i > 1 && j == 1)
+                    {
+                        //first column and not first row
+                        if (c1.CellText.TextData[0].Trim() == var) subst = true;
+                    }
+
+                    if (i == 1 && j > 1)
+                    {
+                        //first row and not first column
+                        //test that dates conform, only row merging                        
+                        if (c1 == null || c2 == null || c1.cellType != CellType.Date || c2.cellType != CellType.Date || c1.date != c2.date)
+                        {
+                            G.Writeln2("*** ERROR: Table merge problem");
+                            throw new GekkoException();
+                        }
+                    }
+
+                    if (subst)
+                    {
+                        for (int ii = 1; ii <= table2.GetRowMaxNumber(); ii++)
+                        {
+                            //for each row in table2
+                            rv.GetData().Add(new Coord(i + ii, j), c1);
+                        }
+                        rowOffset += table2.GetRowMaxNumber();
+                    }
+                    else
+                    {
+                        rv.GetData().Add(new Coord(i + rowOffset, j), c1);
+                    }
+                }
+            }
+
+            return rv;
         }
 
         private void ClearGrid()

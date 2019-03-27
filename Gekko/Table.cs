@@ -46,6 +46,11 @@ namespace Gekko
         public bool writeOnce = false;  //if true, an exception will be raised if trying to overwrite a cell with a new value (borders not counting)
         public string type = "print";  //"print" or "table"
 
+        public Dictionary<Coord, Cell> GetData()
+        {
+            return _data;
+        }
+
         public int GetRowMaxNumber()
         {
             return _rowMaxNumber;
