@@ -1039,11 +1039,11 @@ namespace Gekko
                     }
                 }
 
-                
-                              
 
-                
-                               
+
+
+
+
                 //Setting defaults
                 radioButton21.IsEnabled = true;
                 radioButton21.Opacity = 1.0;
@@ -1178,8 +1178,12 @@ namespace Gekko
                     }
                 }
 
+                if (this.decompOptions.isSort)
+                {                    
+                    table = TableSort(table);
+                }
+
                 string s = FindEquationText(this.decompOptions);
-                
                 equation.Text = s;
 
                 //
@@ -1338,6 +1342,85 @@ namespace Gekko
                 }
             }
 
+            return rv;
+        }
+
+        private static Table TableSort(Table table1)
+        {
+            //We have a table like (for x)
+            //        2020  2021
+            //  a      500   600
+            //  c      100   200
+            //  b      400   400
+
+            //Sort:
+
+            //        2020  2021
+            //  a      500   600
+            //  b      400   400
+            //  c      100   200
+
+            //a¤2, c¤3, b¤4 --> a¤2, b¤4, c¤3
+            //tofrom: (2, 2), (3, 4), (4, 3)
+            
+            Table rv = new Table();
+            rv.writeOnce = true;
+
+            List<string> names = new List<string>();
+
+            for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
+            {
+                Cell c = table1.Get(i, 1);
+                names.Add(c.CellText.TextData[0].Trim() + "¤" + i);  //remove indentation here
+            }
+            names.Sort(StringComparer.OrdinalIgnoreCase);
+            //names.Reverse();
+
+            List<int> fromTo = new List<int>();
+            if (false)
+            {
+                for (int i = 0; i < names.Count; i++)
+                {
+                    string[] ss = names[i].Split('¤');
+                    fromTo.Add(int.Parse(ss[1]));  //from array index + 2 to element value.
+                }
+            }
+            else
+            {
+                for (int i = 0; i < names.Count; i++)
+                {
+                    fromTo.Add(-12345);
+                }
+                for (int i = 0; i < names.Count; i++)
+                {
+                    string[] ss = names[i].Split('¤');
+                    fromTo[int.Parse(ss[1]) - 2] = i + 2;
+                }
+            }
+
+            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+            {
+                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                {
+                    Cell c = table1.Get(i, j);
+                    
+                    if (c == null) continue;
+                    if (i == 1) rv.Set(new Coord(i, j), c);
+                    else
+                    {
+                        rv.Set(new Coord(fromTo[i - 2], j), c);
+                        //if (j == 1) G.Writeln2("Should be row " + i + " --> " + fromTo[i - 2]);
+                        //G.Writeln2("---------------");
+                        //G.Writeln2("---------------");
+                        //G.Writeln2("---------------");
+                        //G.Writeln2("Adding " + fromTo[i - 2] + " " + j);
+                        //rv.PrintCellsForDebug();
+                        
+
+                    }
+                }
+            }
+            //foreach (string s in rv.PrintText()) G.Writeln(s);
             return rv;
         }
 

@@ -1286,21 +1286,21 @@ namespace Gekko
 
         public void PrintCellsForDebug()
         {
-            Console.WriteLine("==================================================");
-            Console.WriteLine("Number of cells: " + this._data.Count);
-            Console.WriteLine("Rows: " + this._rowMaxNumber);
-            Console.WriteLine("Cols: " + this._colMaxNumber);
-            Console.WriteLine("---");
+            G.Writeln("==================================================");
+            G.Writeln("Number of cells: " + this._data.Count);
+            G.Writeln("Rows: " + this._rowMaxNumber);
+            G.Writeln("Cols: " + this._colMaxNumber);
+            G.Writeln("---");
             foreach (KeyValuePair<int, RowInfo> kvp in this._rows)
             {
-                Console.WriteLine("Row #" + kvp.Key + ": max col = " + kvp.Value.ColMaxNumber + " render max height = " + kvp.Value.renderingStuffRow.maxHeight);
+                G.Writeln("Row #" + kvp.Key + ": max col = " + kvp.Value.ColMaxNumber + " render max height = " + kvp.Value.renderingStuffRow.maxHeight);
             }
-            Console.WriteLine("---");
+            G.Writeln("---");
             foreach (KeyValuePair<int, ColInfo> kvp in this._cols)
             {
-                Console.WriteLine("Col #" + kvp.Key + ": max row = " + kvp.Value.RowMaxNumber + " render max width = " + kvp.Value.renderingStuffCol.maxWidth);
+                G.Writeln("Col #" + kvp.Key + ": max row = " + kvp.Value.RowMaxNumber + " render max width = " + kvp.Value.renderingStuffCol.maxWidth);
             }
-            Console.WriteLine("---");
+            G.Writeln("---");
             foreach (KeyValuePair<Coord, Cell> kvp in this._data)
             {
                 string lines = "";
@@ -1315,11 +1315,11 @@ namespace Gekko
                     //if (kvp.Value.renderingStuff.lineType == LineType.None) lines = "<none>";
                     lines = " is a render-cell";
                 }
-                if (lines != "" && lines != "<none>") Console.WriteLine(kvp.Key.Row + "," + kvp.Key.Col + " = " + text + "   line = " + lines);
-                else Console.WriteLine(kvp.Key.Row + "," + kvp.Key.Col + " = " + text);
+                if (lines != "" && lines != "<none>") G.Writeln(kvp.Key.Row + "," + kvp.Key.Col + " = " + text + "   line = " + lines);
+                else G.Writeln(kvp.Key.Row + "," + kvp.Key.Col + " = " + text);
             }
-            Console.WriteLine("==================================================");
-            Console.WriteLine();
+            G.Writeln("==================================================");
+            G.Writeln();
         }
 
         private static List<CoordAndCell> GetListOfKeyValuePairs(Table table)
