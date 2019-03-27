@@ -1222,7 +1222,7 @@ namespace Gekko
 
             var = var.Trim();
 
-            int rowOffset = 0;
+            int irv = 0;
 
             if (table1.GetColMaxNumber() != table2.GetColMaxNumber())
             {
@@ -1232,23 +1232,22 @@ namespace Gekko
 
             for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
             {
-                bool subst = false;
-
+                irv++;
+                
                 if (i > 1)
                 {
                     //not first row
-                    Cell c1temp = null; table1.GetData().TryGetValue(new Coord(i, 1), out c1temp);
+                    Cell c1temp = table1.Get(i, 1);
                     if (c1temp.CellText.TextData[0].Trim() == var)
-                    {
-                        rowOffset++;
+                    {                        
                         //insert rows from table 2
                         for (int ii = 1; ii <= table2.GetRowMaxNumber(); ii++)
                         {
-                            rowOffset++;
+                            irv++;
                             for (int jj = 1; jj <= table2.GetColMaxNumber(); jj++)
                             {
-                                Cell temp = null; table2.GetData().TryGetValue(new Coord(ii, jj), out temp);
-                                if (temp != null) rv.GetData().Add(new Coord(i + rowOffset, jj), temp);
+                                Cell temp = table2.Get(ii, jj);
+                                if (temp != null) rv.Set(new Coord(irv, jj), temp);
                             }
                         }
                     }
@@ -1256,9 +1255,8 @@ namespace Gekko
 
                 for (int j = 1; j <= table1.GetColMaxNumber(); j++)
                 {
-                    Cell c1 = null; table1.GetData().TryGetValue(new Coord(i, j), out c1);
-                    Cell c2 = null; table2.GetData().TryGetValue(new Coord(i, j), out c2);                                       
-                    
+                    Cell c1 = table1.Get(i, j);
+                    Cell c2 = table2.Get(i, j);                    
 
                     if (i == 1 && j > 1)
                     {
@@ -1270,7 +1268,8 @@ namespace Gekko
                             throw new GekkoException();
                         }
                     }
-                    if (c1 != null) rv.GetData().Add(new Coord(i + rowOffset, j), c1);
+                    if (c1 != null) rv.Set(new Coord(irv, j), c1);
+                    
                     
                 }
             }
