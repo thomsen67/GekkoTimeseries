@@ -3535,6 +3535,7 @@ optionType:
 			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
 			 | BUGFIX SPEEDUP '='? yesNoSimple -> BUGFIX SPEEDUP ^(ASTBOOL yesNoSimple)
+			 | BUGFIX GBK '='? yesNoSimple -> BUGFIX GBK ^(ASTBOOL yesNoSimple)
 
              //| CALC question -> CALC question
              //| CALC IGNOREMISSINGVARS  '='? yesNoSimple -> CALC IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)  //addresses both UPD and GENR

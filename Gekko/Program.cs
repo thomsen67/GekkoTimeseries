@@ -24316,14 +24316,60 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            int gap = Globals.waitFileGap;  //2 seconds
-            int totalTime = Globals.waitFileTotalTime;  //600 seconds
-            int repeats = totalTime / gap;
-
             DirectoryInfo folderInfo = new DirectoryInfo(folder);
 
-            for (int i = 0; i < repeats; i++)
+            if (Program.options.bugfix_gbk)
             {
+                //old way
+
+                int gap = Globals.waitFileGap;  //2 seconds
+                int totalTime = Globals.waitFileTotalTime;  //600 seconds
+                int repeats = totalTime / gap;
+
+                for (int i = 0; i < repeats; i++)
+                {
+                    if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
+                    try
+                    {
+                        string sevenzPath = null;
+                        if (G.IsUnitTesting())
+                        {
+                            sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        }
+                        else
+                        {
+                            sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
+                        }
+                        SevenZipExtractor.SetLibraryPath(sevenzPath);
+                        SevenZipCompressor tmp = new SevenZipCompressor();
+                        tmp.ArchiveFormat = OutArchiveFormat.Zip;
+                        //tmp.CompressionLevel = CompressionLevel.Low;  //could be better than .Fast??
+                        tmp.CompressionLevel = SevenZip.CompressionLevel.Fast;
+                        if (zipFileName.ToLower().EndsWith("." + Globals.extensionDatabank + "") && Program.options.databank_file_gbk_compress == false)
+                        {
+                            tmp.CompressionLevel = SevenZip.CompressionLevel.None;
+                        }
+                        if (!System.IO.Directory.Exists(folderInfo.FullName))
+                        {
+                            G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible
+                            break;
+                        }
+                        tmp.CompressDirectory(folderInfo.FullName, zipFileName);
+                    }
+                    catch (Exception e)
+                    {
+                        //G.Writeln("+++ WARNING: Problem trying to zip folder '" + folder + "' into zip-file '" + zipFileName + "'. Retrying... (" + (i * gap) + " seconds)");                        
+                        G.Writeln("+++ WARNING: Zip-file '" + zipFileName + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
+                        System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
+                        continue;
+                    }                    
+                    break;
+                }
+            }
+            else
+            {
+                //new way
+
                 if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
                 try
                 {
@@ -24347,35 +24393,36 @@ namespace Gekko
                     }
                     if (!System.IO.Directory.Exists(folderInfo.FullName))
                     {
-                        G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible
-                        break;
+                        G.Writeln("+++ WARNING: zip file could not be created");  //should not be possible                        
                     }
-                    tmp.CompressDirectory(folderInfo.FullName, zipFileName);
-                }
-                catch (Exception e)
-                {
-                    //G.Writeln("+++ WARNING: Problem trying to zip folder '" + folder + "' into zip-file '" + zipFileName + "'. Retrying... (" + (i * gap) + " seconds)");
-                    G.Writeln("+++ WARNING: Zip-file '" + zipFileName + "' seems blocked. Retrying... (" + (i * gap) + " seconds)");
-                    System.Threading.Thread.Sleep(gap * 1000);  //1 seconds
-                    continue;
-                }
-
-                //This folder name is in a user specific temp folder (typically on user's hard disk). The folder only lives for a very short time.
-                //So it would be very unlikely that any file inside should be blocked.
-                try
-                {
-                    if (System.IO.Directory.Exists(folderInfo.FullName))
+                    
+                    using (FileStream fs = Program.WaitForFileStream(zipFileName, Program.GekkoFileReadOrWrite.Write))
                     {
-                        System.IO.Directory.Delete(folderInfo.FullName, true);
+                        tmp.CompressDirectory(folderInfo.FullName, fs);
                     }
                 }
                 catch (Exception e)
                 {
-                    //do nothing
+                    string msg = null;
+                    if (e.InnerException != null) msg = e.InnerException.Message;
+                    G.Writeln("+++ WARNING: Writing " + zipFileName + " failed, error: " + e.InnerException);
+                    throw new GekkoException();
                 }
-                break;
             }
-            //return zipFileName;
+
+            try
+            {
+                if (System.IO.Directory.Exists(folderInfo.FullName))
+                {
+                    System.IO.Directory.Delete(folderInfo.FullName, true);
+                }
+            }
+            catch (Exception e)
+            {
+                //do nothing
+            }
+
+
         }
 
         //Only used for reading TSDX files, much more specific than WaitForZipRead()
