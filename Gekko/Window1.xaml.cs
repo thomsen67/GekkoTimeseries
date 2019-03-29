@@ -1183,6 +1183,11 @@ namespace Gekko
                     table = TableSort(table);
                 }
 
+                if (this.decompOptions.isPool)
+                {
+                    table = TablePool(table);
+                }
+
                 string s = FindEquationText(this.decompOptions);
                 equation.Text = s;
 
@@ -1362,7 +1367,7 @@ namespace Gekko
 
             //a¤2, c¤3, b¤4 --> a¤2, b¤4, c¤3
             //tofrom: (2, 2), (3, 4), (4, 3)
-            
+
             Table rv = new Table();
             rv.writeOnce = true;
 
@@ -1377,50 +1382,100 @@ namespace Gekko
             //names.Reverse();
 
             List<int> fromTo = new List<int>();
-            if (false)
+
+
+            for (int i = 0; i < names.Count; i++)
             {
-                for (int i = 0; i < names.Count; i++)
-                {
-                    string[] ss = names[i].Split('¤');
-                    fromTo.Add(int.Parse(ss[1]));  //from array index + 2 to element value.
-                }
+                fromTo.Add(-12345);
             }
-            else
+            for (int i = 0; i < names.Count; i++)
             {
-                for (int i = 0; i < names.Count; i++)
-                {
-                    fromTo.Add(-12345);
-                }
-                for (int i = 0; i < names.Count; i++)
-                {
-                    string[] ss = names[i].Split('¤');
-                    fromTo[int.Parse(ss[1]) - 2] = i + 2;
-                }
+                string[] ss = names[i].Split('¤');
+                fromTo[int.Parse(ss[1]) - 2] = i + 2;
             }
+
 
             for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
             {
                 for (int j = 1; j <= table1.GetColMaxNumber(); j++)
                 {
                     Cell c = table1.Get(i, j);
-                    
+
                     if (c == null) continue;
                     if (i == 1) rv.Set(new Coord(i, j), c);
                     else
                     {
                         rv.Set(new Coord(fromTo[i - 2], j), c);
-                        //if (j == 1) G.Writeln2("Should be row " + i + " --> " + fromTo[i - 2]);
-                        //G.Writeln2("---------------");
-                        //G.Writeln2("---------------");
-                        //G.Writeln2("---------------");
-                        //G.Writeln2("Adding " + fromTo[i - 2] + " " + j);
-                        //rv.PrintCellsForDebug();
-                        
-
                     }
                 }
             }
-            //foreach (string s in rv.PrintText()) G.Writeln(s);
+
+            return rv;
+        }
+
+        private static Table TablePool(Table table1)
+        {
+            //We have a table like (for x)
+            //        2020  2021
+            //  a1     500   600
+            //  a2     100   200
+
+            //Becomes
+            //        2020  2021
+            //  a      600   200
+
+            table1 = new Table();
+            table1.Set(new Coord(1, 2), null, double.NaN, CellType.Date, null);
+            table1.Set(new Coord(2, 1), "a", double.NaN, CellType.Text, null);
+            table1.Set(new Coord(2, 2), null, 500d, CellType.Number, null);
+            table1.Set(new Coord(3, 1), "a", double.NaN, CellType.Text, null);
+            table1.Set(new Coord(3, 2), null, 100d, CellType.Number, null);
+
+
+            Table rv = new Table();
+            rv.writeOnce = true;
+
+            List<string> names = new List<string>();
+
+            string current = "";
+            int iCurrent = 1;
+
+            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
+            {
+                string name = null;
+                Cell cc = table1.Get(i, 1);
+                if (cc != null) name = cc.CellText.TextData[0];
+                if (i > 1 && name != current)
+                {
+                    current = name;
+                    iCurrent++;
+                }
+                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
+                {
+                    Cell c = table1.Get(i, j);
+                    if (i == 1)
+                    {
+                        if (c != null) rv.Set(new Coord(i, j), c);  //first line
+                    }
+                    else
+                    {
+                        if (name == current)
+                        {
+                            if(j>1)
+                            {
+                                Cell cellCurrent = table1.Get(iCurrent, j);
+                                double dd = c.number;
+                                cellCurrent.number += dd;
+                            }
+                        }
+                        else
+                        {                            
+                            rv.Set(new Coord(iCurrent, j), c);
+                        }
+                    }                    
+                }
+            }
+            
             return rv;
         }
 
