@@ -2455,7 +2455,16 @@ namespace Gekko.Parser.Gek
                                     {
                                         string f = "f1";
                                         if (node.functionDef[i].Item1.ToLower() == "name") f = "f2";
-                                        typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(smpl)" + ", " + (i + 1) + ");" + G.NL;
+
+                                        if (i < 2)
+                                        {
+                                            //special <%t1 %t2> arguments
+                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func, smpl, " + (i + 1) + ");" + G.NL;
+                                        }
+                                        else
+                                        {
+                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(smpl)" + ", " + (i + 1) + ");" + G.NL;
+                                        }
                                     }
                                     else
                                     {
@@ -2864,9 +2873,16 @@ namespace Gekko.Parser.Gek
                                     
                                     string args = null;
 
-                                    for (int i = 0; i < node[1].ChildrenCount(); i++)
+                                    if (node[1].ChildrenCount() == 0)
                                     {
-                                        args = FunctionHelper2(node[1], args, i);
+                                        args += ", null, null";
+                                    }
+                                    else
+                                    {
+                                        for (int i = 0; i < node[1].ChildrenCount(); i++)
+                                        {
+                                            args = FunctionHelper2(node[1], args, i);
+                                        }
                                     }
 
                                     for (int i = 1; i < node.ChildrenCount(); i++)  //first item is function name
@@ -2878,7 +2894,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         args = FunctionHelper2(node, args, i);
                                     }
-                                    int numberOfArguments = node[1].ChildrenCount() + node.ChildrenCount() - 2;
+                                    int numberOfArguments = 2 + node.ChildrenCount() - 2;
 
                                     //TODO TODO TODO
                                     // the 'extra' parameter indicating lag to come

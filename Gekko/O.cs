@@ -6330,6 +6330,31 @@ namespace Gekko
             return x;
         }
 
+        public static IVariable TypeCheck_date(GekkoArg ga, GekkoSmpl smpl, int position)
+        {
+            if (ga == null)
+            {
+                if (position == 1)
+                {
+                    return new ScalarDate(smpl.t1);
+                }
+                else if (position == 2)
+                {
+                    return new ScalarDate(smpl.t2);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Internal error #8073437598232");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                IVariable x = ga.f1(smpl);
+                return TypeCheck_date(x, position);
+            }
+        }
+
         public static IVariable TypeCheck_date(IVariable x, int position)
         {
             if (x.Type() != EVariableType.Date)

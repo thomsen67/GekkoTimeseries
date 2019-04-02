@@ -92,9 +92,15 @@ namespace Gekko
 
     public class GekkoArg
     {
-        public Func<GekkoSmpl, IVariable> f1;
-        public Func<GekkoSmpl, IVariable> f2;
+        public Func<GekkoSmpl, IVariable> f1 = null;
+        public Func<GekkoSmpl, IVariable> f2 = null;
         public EGekkoArg type = EGekkoArg.Normal;  //Special: inside <...>
+
+        //public GekkoArg()
+        //{
+
+        //}
+
         public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
         {
             this.f1 = f1; //original

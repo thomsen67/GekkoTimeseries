@@ -2100,13 +2100,20 @@ mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 //listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
-function:                   ident leftParenGlue fargs? RIGHTPAREN -> ^(ASTFUNCTION ident fargs?);
+function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs);
 objectFunction:             ident leftParenGlue fargs? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs?);
 specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
 						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
 						    ;
 fargs1:    					specialArg | expression;
-fargs:						(fargs1 (',' expression)*)? -> fargs1 expression*
+//fargs:						(fargs1 (',' expression)*)? -> fargs1 expression*
+						    
+
+fargs:                      -> ^(ASTSPECIALARGS)
+						  | ISNOTQUAL -> ^(ASTSPECIALARGS)
+						  | ISNOTQUAL (',' expression)* -> ^(ASTSPECIALARGS) expression*
+						  | leftAngleNo2 dates? RIGHTANGLE (',' expression)* -> ^(ASTSPECIALARGS dates?) expression*
+						  | expression (',' expression)* -> ^(ASTSPECIALARGS) expression+
 						    ;
 
 					
