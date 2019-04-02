@@ -2741,14 +2741,14 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
-                                {
-                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + node[2].Code.ToString() + ");" + G.NL);
+                                {                                    
+                                    sb1.AppendLine(tempName + ".InjectAdd(smpl, " + node[3].Code.ToString() + ");" + G.NL);
                                     sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
                                 else
                                 {
                                     //unfold
-                                    sb1.AppendLine(tempName + ".Add(" + node[2].Code.ToString() + ");" + G.NL);                                    
+                                    sb1.AppendLine(tempName + ".Add(" + node[3].Code.ToString() + ");" + G.NL);                                    
                                 }
 
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
@@ -6682,23 +6682,24 @@ namespace Gekko.Parser.Gek
             string[] rv = null;
             if (true)
             {
-                if (node.ChildrenCount() == 3)
+                if (node.ChildrenCount() == 3 + 1)
                 {
-                    if (node[1].Text == "ASTLISTDEF")  //ZXCVB
+                    int ii = 2;
+                    if (node[ii].Text == "ASTLISTDEF")  //ZXCVB
                     {
                         //TODO: CHECK types of rv[i], are they all simple #i, #j, ...?
 
-                        rv = new string[node[1].ChildrenCount()];
-                        for (int i = 0; i < node[1].ChildrenCount(); i++)
+                        rv = new string[node[ii].ChildrenCount()];
+                        for (int i = 0; i < node[ii].ChildrenCount(); i++)
                         {
                             //rv[i] = GetSimpleHashName(node[1][i]);
-                            rv[i] = GetSimpleHashName(node[1][i][0]);  //ZXCVB
+                            rv[i] = GetSimpleHashName(node[ii][i][0]);  //ZXCVB
                         }
                     }
                     else
                     {
                         rv = new string[1];
-                        rv[0] = GetSimpleHashName(node[1]);
+                        rv[0] = GetSimpleHashName(node[ii]);
                     }
                 }
             }
