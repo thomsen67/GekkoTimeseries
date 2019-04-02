@@ -5059,11 +5059,11 @@ namespace Gekko
         {
             if (name.StartsWith(Globals.procedure))
             {
-                G.Writeln2("*** ERROR: Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + n + " arguments");
+                G.Writeln2("*** ERROR: Cannot find procedure '" + name.Substring(Globals.procedure.Length) + "' with " + (n - 2) + " arguments");
             }
             else
             {
-                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + n + " arguments");
+                G.Writeln2("*** ERROR: Cannot find user function '" + name + "()' with " + (n - 2) + " arguments");
             }
         }
 

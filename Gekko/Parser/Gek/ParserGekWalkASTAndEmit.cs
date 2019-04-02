@@ -645,7 +645,7 @@ namespace Gekko.Parser.Gek
                         string returnType = node[0].Text;
                         string functionName = GetFunctionName2(node);  //node[1]
 
-                        if (node[2][0].Text == "ASTSPECIALARGSDEF")
+                        if (node[2][0] != null && node[2][0].Text == "ASTSPECIALARGSDEF")
                         {
                             foreach (ASTNode child in node[2][0].ChildrenIterator())
                             {
@@ -2873,12 +2873,6 @@ namespace Gekko.Parser.Gek
                                     string aa1, aa2;
                                     FunctionHelper10(args, out aa1, out aa2);
 
- //                                   GekkoSmpl smpl = null;
- //                                   IVariable tmp = Functions.lag(O.Smpl(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(),
- //EVariableType.Var, null)), smpl, null, null, O.Smpl(smpl, O.Lookup(smpl, null, null, "x", null,
- //null, new LookupSettings(), EVariableType.Var, null)), O.Lookup(smpl, null, null, "x", null, null,
- //new LookupSettings(), EVariableType.Var, null),null);
-
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
@@ -2887,7 +2881,7 @@ namespace Gekko.Parser.Gek
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
                                         //same as the other???                                        
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A("" + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
+                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
                                     else
@@ -2906,7 +2900,7 @@ namespace Gekko.Parser.Gek
 
                                     List<string> args = new List<string>();
 
-                                    if (node[1].ChildrenCount() == 0)
+                                    if (node[1] == null || node[1].ChildrenCount() == 0)
                                     {
                                         //args += ", null, null";
                                         args.Add("null");
@@ -2929,7 +2923,10 @@ namespace Gekko.Parser.Gek
                                         }
                                         FunctionHelper2(node, args, i);
                                     }
-                                    int numberOfArguments = 2 + node.ChildrenCount() - 2;
+
+                                    //int numberOfArguments = 2 + node.ChildrenCount() - 2;
+                                    int numberOfArguments = args.Count;
+                                    
 
                                     //TODO TODO TODO
                                     // the 'extra' parameter indicating lag to come

@@ -2811,7 +2811,7 @@ forLhs:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 functionDef:				FUNCTION typeRv ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} typeRv ident functionArg functionStatements);
-functionArg:                (functionArgElement1 (',' functionArgElement)*)? tripleDot? -> ^(ASTPLACEHOLDER functionArgElement1 functionArgElement* tripleDot?);						  
+functionArg:                (functionArgElement1? (',' functionArgElement)*)? tripleDot? -> ^(ASTPLACEHOLDER functionArgElement1? functionArgElement* tripleDot?);						  
 functionArgElement1:        functionArgTime | functionArgElement;
 functionArgTime:            leftAngleNo2 functionArgElement ',' functionArgElement RIGHTANGLE -> ^(ASTSPECIALARGSDEF functionArgElement functionArgElement);
 functionArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
@@ -2820,7 +2820,7 @@ functionStatements2:        functionStatements;  //alias
 typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
-objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
+objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident fargs)));
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3009,7 +3009,7 @@ functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("AS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, input.LT(1).Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
-procedureArg:                (procedureArgElement (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
+procedureArg:                (procedureArgElement? (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
 procedureArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
 

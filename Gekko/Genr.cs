@@ -6,30 +6,22 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-public class TranslatedCode
-{
-public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-public static int labelCounter;
-public static void C0(GekkoSmpl smpl, P p) {
-//[[commandStart]]0
-p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-
-
-//Functions.writefile(smpl, , O.HandleString(new ScalarString(@"HejHej")));
-
-//[[commandEnd]]0
-}
+    public class TranslatedCode
+    {
+        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+        public static int labelCounter;
 
 
 
-public static void CodeLines(P p)
-{
-GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+        public static void CodeLines(P p)
+        {
+            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
+            Functions.setdomains(smpl, null, null, O.Lookup(smpl, null, null, "a", null, null, new LookupSettings(), EVariableType.Var, null), O.ListDefHelper(O.HandleString(new ScalarString(@"#s")), null));
 
-C0(smpl, p);
+            //[[commandEnd]]0
 
 
 
-}
-}
+        }
+    }
 }
