@@ -443,13 +443,14 @@ namespace Gekko.Parser.Gek
                         }
                         xx.Sort(StringComparer.OrdinalIgnoreCase);
 
-                        //here: onfolding 1 list (#m)
+                        //here: unfolding 1 list (#m)
 
                         //    ASTPRTELEMENT
                         // 0    ASTEXPRESSION
                         // 1      ASTFUNCTION    <----------- our insert begins here
                         // 2        ASTIDENT  
                         // 3          unfold
+                        // 3a       ASTSPECIALARGS
                         // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
                         // 5          ASTPLACEHOLDER
                         // 6          ASTVARNAME
@@ -466,10 +467,12 @@ namespace Gekko.Parser.Gek
                         ASTNode n1 = new ASTNode("ASTFUNCTION", true);
                         ASTNode n2 = new ASTNode("ASTIDENT", true);
                         ASTNode n3 = new ASTNode("unfold", true);
+                        ASTNode n3a = new ASTNode("ASTSPECIALARGSDEF", true);
 
                         n0.Add(n1);
                         n1.Add(n2);
                         n2.Add(n3);
+                        n1.Add(n3a);
 
                         ASTNode list = new ASTNode("ASTLISTDEF", true);                        
 
