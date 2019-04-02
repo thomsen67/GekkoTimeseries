@@ -654,7 +654,9 @@ namespace Gekko.Parser.Gek
                         }
                         else
                         {
-
+                            if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
+                            node.functionDef.Add(new Tuple<string, string>("date", Globals.functionArgName + ++Globals.counter));
+                            node.functionDef.Add(new Tuple<string, string>("date", Globals.functionArgName + ++Globals.counter));
                         }
 
                         foreach (ASTNode child in node[2].ChildrenIterator())
@@ -2417,8 +2419,10 @@ namespace Gekko.Parser.Gek
                                 functionNameLower = Globals.procedure + functionNameLower;
                             }
 
-                            int numberOfArguments = node[2][0].ChildrenCount() + node[2].ChildrenCount() - 1;
-                            
+                            //int numberOfArguments = node[2][0].ChildrenCount() + node[2].ChildrenCount() - 1;
+                            int numberOfArguments = node.functionDef.Count;
+
+
                             string internalName = "FunctionDef" + ++Globals.counter;
 
                             GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
@@ -2829,7 +2833,7 @@ namespace Gekko.Parser.Gek
                                             //ignore
                                         }
                                     }
-                                    
+
                                     List<string> args = new List<string>();
 
                                     if (node[1].ChildrenCount() == 0)
@@ -2852,13 +2856,12 @@ namespace Gekko.Parser.Gek
                                         FunctionHelper3(node, ref extra, lagIndex, lagIndexOffset, args, i);
                                     }
 
-                                    string aa1 = G.GetListWithCommas(args.GetRange(0, 2));
-                                    string aa2 = G.GetListWithCommas(args.GetRange(2, args.Count - 2));
-                                    if (args.Count - 2 > 0) aa2 = ", " + aa2;
+                                    string aa1, aa2;
+                                    FunctionHelper10(args, out aa1, out aa2);
 
                                     int numberOfArguments = 2 + node.ChildrenCount() - 2;
                                     if (node.Text == "ASTOBJECTFUNCTION")
-                                    {                                        
+                                    {
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
                                     }
@@ -2870,7 +2873,8 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
+                                        //node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
+                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(aa1 + aa2).A(")");
                                     }
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
@@ -2880,18 +2884,20 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //User defined function or procedure
-                                    
-                                    string args = null;
+
+                                    List<string> args = new List<string>();
 
                                     if (node[1].ChildrenCount() == 0)
                                     {
-                                        args += ", null, null";
+                                        //args += ", null, null";
+                                        args.Add("null");
+                                        args.Add("null");
                                     }
                                     else
                                     {
                                         for (int i = 0; i < node[1].ChildrenCount(); i++)
                                         {
-                                            args = FunctionHelper2(node[1], args, i);
+                                            FunctionHelper2(node[1], args, i);
                                         }
                                     }
 
@@ -2902,7 +2908,7 @@ namespace Gekko.Parser.Gek
                                             //just so that ASTSPECIALARGS is easy to find, else could loop from i = 2
                                             continue;
                                         }
-                                        args = FunctionHelper2(node, args, i);
+                                        FunctionHelper2(node, args, i);
                                     }
                                     int numberOfArguments = 2 + node.ChildrenCount() - 2;
 
@@ -2910,23 +2916,24 @@ namespace Gekko.Parser.Gek
                                     // the 'extra' parameter indicating lag to come
                                     //
 
-
+                                    string aa1, aa2;
+                                    FunctionHelper10(args, out aa1, out aa2);
 
                                     string fl = "O.FunctionLookup";
                                     if (Globals.functionFuncArguments) fl = "O.FunctionLookupNew";
 
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {                                        
                                         //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else
                                     {
-                                        node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(args).A(")");
+                                        node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1 + aa2).A(")");
                                     }
                                     
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
@@ -6233,6 +6240,13 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static void FunctionHelper10(List<string> args, out string aa1, out string aa2)
+        {
+            aa1 = G.GetListWithCommas(args.GetRange(0, 2));
+            aa2 = G.GetListWithCommas(args.GetRange(2, args.Count - 2));
+            if (args.Count - 2 > 0) aa2 = ", " + aa2;
+        }
+
         private static void FunctionHelper3(ASTNode node, ref string extra, int lagIndex, int lagIndexOffset, List<string> args, int i)
         {
             if (lagIndex == i)
@@ -6253,20 +6267,20 @@ namespace Gekko.Parser.Gek
             //args += ", " + node[i].Code;
         }
 
-        private static string FunctionHelper2(ASTNode node, string args, int i)
+        private static void FunctionHelper2(ASTNode node, List<string> args, int i)
         {
             if (Globals.functionFuncArguments)
             {
                 string result = GetFuncArgumentCode(node, i);
-                args += ", " + result;
+                args.Add(result);
+                //args += ", " + result;
             }
             else
             {
-                if (false && Globals.runningOnTTComputer) args += ", " + node[i].AlternativeCode;
-                else args += ", " + node[i].Code;
+                args.Add(node[i].Code.ToString());
             }
 
-            return args;
+            //return args;
         }
 
         private static void FunctionHelper4(ASTNode node, string functionName, ASTNode child)
