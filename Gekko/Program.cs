@@ -84,14 +84,28 @@ namespace Gekko
         Nonseries
     }
 
+    public enum EGekkoArg
+    {
+        Normal,
+        Special
+    }
+
     public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1;
         public Func<GekkoSmpl, IVariable> f2;
+        public EGekkoArg type = EGekkoArg.Normal;  //Special: inside <...>
         public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
         {
-            this.f1 = f1;
-            this.f2 = f2;
+            this.f1 = f1; //original
+            this.f2 = f2; //alternative code, used for what??
+            this.type = EGekkoArg.Normal;
+        }
+        public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2, EGekkoArg type)
+        {
+            this.f1 = f1; //original
+            this.f2 = f2; //alternative code, used for what??
+            this.type = type;
         }
     }
 

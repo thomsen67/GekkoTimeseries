@@ -34,6 +34,7 @@ tokens {
 	ASTFORTYPE1;
 	ASTFORTYPE2;
 	ASTLOCAL;
+	ASTARGS;
 	ASTCOLON;
 	ASTL0;
 	ASTL1;
@@ -46,7 +47,9 @@ tokens {
 	ASTCNAME;
 	ASTHASH2;
 	ASTPERCENT2;
+	ASTSPECIALARGS;
 	ASTDOTORINDEXER;
+	ASTSPECIALARGSDEF;
 	ASTBANKVARNAME;
 	ASTBANKVARNAME2;
 	ASTHASH;
@@ -2097,8 +2100,15 @@ mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 //listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
-function:                   ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTFUNCTION ident expression*);
-objectFunction:             ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident expression*);
+function:                   ident leftParenGlue fargs? RIGHTPAREN -> ^(ASTFUNCTION ident fargs?);
+objectFunction:             ident leftParenGlue fargs? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs?);
+specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
+						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
+						    ;
+fargs1:    					specialArg | expression;
+fargs:						(fargs1 (',' expression)*)? -> fargs1 expression*
+						    ;
+
 					
 dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //must use parentheses now, else stuff like y $ x = 100 is too confusing.
 					//	  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis								
@@ -2349,7 +2359,10 @@ ifOperator:		            ISEQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR1)
 			              | ISLARGEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR5)
 						  | ISSMALLEROREQUAL -> ^(ASTIFOPERATOR ASTIFOPERATOR6)
 						  | IN -> ^(ASTIFOPERATOR ASTIFOPERATOR7)
-			              ;
+			                ;
+
+//                          Arguments of type f(), f(<2001 2002>), f(2), f(<2001 2002>, 2), ...
+
 						  
 /*------------------------------------------------------------------
  * PARSER RULES
@@ -2787,7 +2800,9 @@ forLhs:                         type svarname EQUAL -> ^(ASTPLACEHOLDER type) ^(
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 functionDef:				FUNCTION typeRv ident leftParenGlue functionArg RIGHTPAREN SEMICOLON functionStatements END -> ^({token("ASTFUNCTIONDEF2", ASTFUNCTIONDEF2, input.LT(1).Line)} typeRv ident functionArg functionStatements);
-functionArg:                (functionArgElement (',' functionArgElement)*)? -> ^(ASTPLACEHOLDER functionArgElement*);
+functionArg:                (functionArgElement1 (',' functionArgElement)*)? tripleDot? -> ^(ASTPLACEHOLDER functionArgElement1 functionArgElement* tripleDot?);						  
+functionArgElement1:        functionArgTime | functionArgElement;
+functionArgTime:            leftAngleNo2 functionArgElement ',' functionArgElement RIGHTANGLE -> ^(ASTSPECIALARGSDEF functionArgElement functionArgElement);
 functionArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
 functionStatements2:        functionStatements;  //alias
@@ -2795,6 +2810,7 @@ typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
 objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident expression*)));
+
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO
@@ -3921,6 +3937,7 @@ doubleVerticalBar:          GLUE? (DOUBLEVERTICALBAR1 | DOUBLEVERTICALBAR2);
 
 doubleDot:                  GLUEDOT? DOT GLUEDOT DOT;
 doubleDot2:                 GLUEDOT? DOT GLUEDOT? DOT; //can accept two dots with space between
+tripleDot:                  GLUEDOT? DOT GLUEDOT DOT GLUEDOT DOT;
 
 double2:                    double2Helper -> ^(ASTDOUBLE double2Helper);
 double2Helper:              Double            //0.123 or 25e+12
