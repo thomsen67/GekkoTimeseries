@@ -649,7 +649,7 @@ namespace Gekko.Parser.Gek
                         {
                             foreach (ASTNode child in node[2][0].ChildrenIterator())
                             {
-                                FunctionDefHelper(node, functionName, child);
+                                FunctionHelper4(node, functionName, child);
                             }
                         }
                         else
@@ -663,7 +663,7 @@ namespace Gekko.Parser.Gek
                             {
                                 continue;
                             }
-                            FunctionDefHelper(node, functionName, child);
+                            FunctionHelper4(node, functionName, child);
                         }
                         string ftype = null;
                         if (node.Text == "ASTPROCEDUREDEF") ftype = "void";
@@ -2831,24 +2831,26 @@ namespace Gekko.Parser.Gek
                                     }
 
                                     string args = null;
-                                    for (int i = 1; i < node.ChildrenCount(); i++)
+
+                                    if (node[1].ChildrenCount() == 0)
                                     {
-                                        if (lagIndex == i)
-                                        {
-                                            if (lagIndexOffset == 0)
-                                            {
-                                                extra = "O.Smpl(smpl, " + node[i].Code + "), ";
-                                            }
-                                            else
-                                            {
-                                                extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
-                                            }
-                                        }
-
-                                        args += ", " + node[i].Code;
-
+                                        //args += ", null, null";
+                                        args += ", new ScalarDate(smpl.t1), new ScalarDate(smpl.t2)";
                                     }
-                                    int numberOfArguments = node.ChildrenCount() - 1;
+                                    else
+                                    {
+                                        for (int i = 0; i < node[1].ChildrenCount(); i++)
+                                        {
+                                            FunctionHelper3(node[1], ref extra, lagIndex, lagIndexOffset, ref args, i);
+                                        }
+                                    }
+
+                                    for (int i = 2; i < node.ChildrenCount(); i++)
+                                    {
+                                        FunctionHelper3(node, ref extra, lagIndex, lagIndexOffset, ref args, i);
+                                    }
+                                    
+                                    int numberOfArguments = 2 + node.ChildrenCount() - 2;
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {                                     
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
@@ -6221,6 +6223,23 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static void FunctionHelper3(ASTNode node, ref string extra, int lagIndex, int lagIndexOffset, ref string args, int i)
+        {
+            if (lagIndex == i)
+            {
+                if (lagIndexOffset == 0)
+                {
+                    extra = "O.Smpl(smpl, " + node[i].Code + "), ";
+                }
+                else
+                {
+                    extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
+                }
+            }
+
+            args += ", " + node[i].Code;
+        }
+
         private static string FunctionHelper2(ASTNode node, string args, int i)
         {
             if (Globals.functionFuncArguments)
@@ -6237,7 +6256,7 @@ namespace Gekko.Parser.Gek
             return args;
         }
 
-        private static void FunctionDefHelper(ASTNode node, string functionName, ASTNode child)
+        private static void FunctionHelper4(ASTNode node, string functionName, ASTNode child)
         {
             string type = child[0].Text;
             string sigil = null;

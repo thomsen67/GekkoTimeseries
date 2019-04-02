@@ -57,6 +57,12 @@ namespace Gekko
             }
         }
 
+        public static IVariable slet(GekkoSmpl smpl, IVariable t1, IVariable t2, IVariable ths)
+        {
+            G.Writeln2("--- " + O.ConvertToVal(ths));
+            return ths;
+        }
+
         public static IVariable getyear(GekkoSmpl smpl, IVariable ths)
         {
             if (ths.Type() != EVariableType.Date)
