@@ -2874,7 +2874,7 @@ namespace Gekko.Parser.Gek
                                     else
                                     {
                                         //node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
-                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(aa1 + aa2).A(")");
+                                        node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + ", ").A(aa1 + aa2).A(")");
                                     }
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
