@@ -4830,7 +4830,7 @@ namespace Gekko
 
         public static IVariable In(GekkoSmpl smpl, IVariable x, IVariable y)
         {
-            return Functions.contains(smpl, y, x);
+            return Functions.contains(smpl, null, null, y, x);
         }
 
         public static bool IsTrue(GekkoSmpl smpl, IVariable x)

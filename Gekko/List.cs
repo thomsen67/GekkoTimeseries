@@ -238,7 +238,7 @@ namespace Gekko
             {
                 case EVariableType.List:
                     {
-                        return Functions.extend(smpl, this, x);
+                        return Functions.extend(smpl, null, null, this, x);
                     }
                     break;
                 case EVariableType.String:
@@ -262,7 +262,7 @@ namespace Gekko
                     break;
             }
 
-            return Functions.extend(smpl, this, x);
+            return Functions.extend(smpl, null, null, this, x);
         }
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)

@@ -21,7 +21,7 @@ namespace Gekko
             Action assign_21 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar19 = Functions.slet(smpl, new ScalarDate(smpl.t1), new ScalarDate(smpl.t2), i20);
+                IVariable ivTmpvar19 = null; // Functions.slet(smpl, new ScalarDate(smpl.t1), new ScalarDate(smpl.t2), i20);
                 O.AdjustT0(smpl, 2);
                 O.Lookup(smpl, null, null, "%y", null, ivTmpvar19, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
                 ;
@@ -29,7 +29,7 @@ namespace Gekko
             Func<bool> check_21 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar19 = Functions.slet(smpl, new ScalarDate(smpl.t1), new ScalarDate(smpl.t2), i20);
+                IVariable ivTmpvar19 = null; // Functions.slet(smpl, new ScalarDate(smpl.t1), new ScalarDate(smpl.t2), i20);
                 O.AdjustT0(smpl, 2);
                 if (ivTmpvar19.Type() != EVariableType.Series) return false;
                 O.Dynamic1(smpl);

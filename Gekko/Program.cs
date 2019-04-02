@@ -30454,7 +30454,7 @@ namespace Gekko
 
                                 if (helper.iv.Type() == EVariableType.String || helper.iv.Type() == EVariableType.Date || helper.iv.Type() == EVariableType.Val)
                                 {
-                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit.list, ((ScalarString)Functions.tostring(null, helper.iv)).string2);
+                                    HandleLabelsInsertIVariables(token, tokenListCommaSplit.list, ((ScalarString)Functions.tostring(null, null, null, helper.iv)).string2);
                                 }
                             }
 

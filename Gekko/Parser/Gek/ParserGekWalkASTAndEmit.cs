@@ -2834,8 +2834,8 @@ namespace Gekko.Parser.Gek
 
                                     if (node[1].ChildrenCount() == 0)
                                     {
-                                        //args += ", null, null";
-                                        args += ", new ScalarDate(smpl.t1), new ScalarDate(smpl.t2)";
+                                        args += ", null, null";
+                                        //args += ", new ScalarDate(smpl.t1), new ScalarDate(smpl.t2)";
                                     }
                                     else
                                     {
