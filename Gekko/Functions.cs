@@ -580,7 +580,7 @@ namespace Gekko
 
         }
 
-        public static IVariable getendoexo(GekkoSmpl smpl)
+        public static IVariable getendoexo(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             Databank databank = Program.databanks.GetFirst();
 
@@ -645,7 +645,7 @@ namespace Gekko
         //}
 
         //!NOTE: do not delete, use for unit tests
-        public static IVariable helper_error(GekkoSmpl t, IVariable x)
+        public static IVariable helper_error(GekkoSmpl smpl, IVariable x)
         {
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
@@ -765,19 +765,19 @@ namespace Gekko
             return result;
         }
 
-        public static IVariable hpfilter(GekkoSmpl t, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda)
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda)
         {
-            return hpfilter(t, _t1, _t2, rightSide, null, null, ilambda, Globals.scalarVal0);
+            return hpfilter(smpl, _t1, _t2, rightSide, null, null, ilambda, Globals.scalarVal0);
         }
 
-        public static IVariable hpfilter(GekkoSmpl t, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda)
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda)
         {
-            return hpfilter(t, _t1, _t2, rightSide, per1, per2, ilambda, Globals.scalarVal0);
+            return hpfilter(smpl, _t1, _t2, rightSide, per1, per2, ilambda, Globals.scalarVal0);
         }
 
-        public static IVariable hpfilter(GekkoSmpl t, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda, IVariable ilog)
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
-            return hpfilter(t, _t1, _t2, rightSide, null, null, ilambda, ilog);
+            return hpfilter(smpl, _t1, _t2, rightSide, null, null, ilambda, ilog);
         }
 
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda, IVariable ilog)
@@ -1222,10 +1222,10 @@ namespace Gekko
             return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Max);
         }
 
-        public static IVariable m(GekkoSmpl smpl)
+        public static IVariable m(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             //alias
-            return miss(smpl);
+            return miss(smpl, _t1, _t2);
         }
 
         public static IVariable m(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
@@ -1235,7 +1235,7 @@ namespace Gekko
         }
 
         //missing value
-        public static IVariable miss(GekkoSmpl smpl)
+        public static IVariable miss(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return Globals.scalarValMissing;
         }
@@ -1609,7 +1609,7 @@ namespace Gekko
             return new ScalarVal(i);
         }
 
-        public static IVariable rnorm(GekkoSmpl t, IVariable means, IVariable vcov)
+        public static IVariable rnorm(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable means, IVariable vcov)
         {
             //Maybe it is stupid that we are using stddev versus matrix of covariance
 
@@ -1642,7 +1642,7 @@ namespace Gekko
                 //https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
                 for (int i = 0; i < n; i++)
                 {
-                    double random = O.ConvertToVal(rnorm(t, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
+                    double random = O.ConvertToVal(rnorm(smpl, null, null, Globals.scalarVal0, Globals.scalarVal1)); //could be sped up by interfacing to the interior of the method
                     randoms[i, 0] = random;
                 }
 
@@ -1708,7 +1708,7 @@ namespace Gekko
             return tmp;
         }
 
-        public static IVariable runif(GekkoSmpl smpl)
+        public static IVariable runif(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             double u2 = Globals.random.NextDouble();
             return new ScalarVal(u2);
@@ -1950,7 +1950,7 @@ namespace Gekko
         }
     
 
-        public static IVariable percentile(GekkoSmpl t, IVariable x1, IVariable percent)
+        public static IVariable percentile(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable percent)
         {
             //Mimics Excel's percentile function, see unit tests
             if (G.IsGekkoNull(x1)) return x1;
@@ -2026,7 +2026,7 @@ namespace Gekko
             throw new GekkoException();
         }
 
-        public static IVariable time(GekkoSmpl smpl)
+        public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             Series x = new Series(ESeriesType.Light, smpl.t0.freq, null);
             foreach (GekkoTime t in smpl.Iterate03())
@@ -2194,7 +2194,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable map(GekkoSmpl smpl)
+        public static IVariable map(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             //empty map
             Map rv = new Map();
@@ -2545,7 +2545,7 @@ namespace Gekko
             return i;
         }        
         
-        public static IVariable format(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             string format2 = O.ConvertToString(x2);
             try
@@ -3170,37 +3170,37 @@ namespace Gekko
             }
         }
 
-        public static IVariable gekkoversion(GekkoSmpl smpl)
+        public static IVariable gekkoversion(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {            
             return new ScalarString(Globals.gekkoVersion);
         }
 
-        public static IVariable currentfreq(GekkoSmpl smpl)
+        public static IVariable currentfreq(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(G.GetFreq(Program.options.freq));
         }
 
-        public static IVariable currentperstart(GekkoSmpl smpl)
+        public static IVariable currentperstart(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarDate(Globals.globalPeriodStart);
         }
 
-        public static IVariable currentperend(GekkoSmpl smpl)
+        public static IVariable currentperend(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarDate(Globals.globalPeriodEnd);
         }
 
-        public static IVariable currentdatetime(GekkoSmpl smpl)
+        public static IVariable currentdatetime(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(Program.GetDateTimeStamp());
         }
 
-        public static IVariable currenttime(GekkoSmpl smpl)
+        public static IVariable currenttime(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarString(Program.GetTimeStamp());
         }
 
-        public static IVariable currentdate(GekkoSmpl smpl)
+        public static IVariable currentdate(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             //See also #80927435209843
             return new ScalarString(Program.GetDateStamp());
@@ -3334,7 +3334,7 @@ namespace Gekko
         // LIST functions start
         // -----------------------------------
 
-        public static IVariable union(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable union(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og tilføjer dem fra b (uden dubletter). Hvis dubletter i b skal med, skal der bruges komma...
             List<string> lx1 = Program.GetListOfStringsFromList(x1);
@@ -3358,7 +3358,7 @@ namespace Gekko
             return new List(union);
         }               
 
-        public static IVariable except(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable except(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis ikke i b.
             List<string> lx1 = Program.GetListOfStringsFromList(x1);
@@ -3380,7 +3380,7 @@ namespace Gekko
             return new List(difference);
         }
 
-        public static IVariable intersect(GekkoSmpl t, IVariable x1, IVariable x2)
+        public static IVariable intersect(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
             List<string> lx1 = Program.GetListOfStringsFromList(x1);

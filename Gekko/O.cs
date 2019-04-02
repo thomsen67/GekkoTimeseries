@@ -321,12 +321,12 @@ namespace Gekko
 
         public static IVariable Union(GekkoSmpl smpl, IVariable x, IVariable y)
         {
-            return Functions.union(smpl, x, y);
+            return Functions.union(smpl, null, null, x, y);
         }        
 
         public static IVariable Intersect(GekkoSmpl smpl, IVariable x, IVariable y)
         {
-            return Functions.intersect(smpl, x, y);
+            return Functions.intersect(smpl, null, null, x, y);
         }
 
         public static string ResolvePath(string fileName2)
@@ -1833,7 +1833,7 @@ namespace Gekko
             IVariable rv = null;
             if (x.Type() == EVariableType.Val && Program.options.string_interpolate_format_val != "")
             {                
-                rv = Functions.format(smpl, x, new ScalarString(Program.options.string_interpolate_format_val));                
+                rv = Functions.format(smpl, null, null, x, new ScalarString(Program.options.string_interpolate_format_val));                
             }
             else rv = x;
             return rv;

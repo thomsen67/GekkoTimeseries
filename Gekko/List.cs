@@ -271,12 +271,12 @@ namespace Gekko
             {
                 case EVariableType.List:
                     {
-                        return Functions.except(t, this, x);
+                        return Functions.except(t, null, null, this, x);
                     }
                     break;
                 case EVariableType.String:
                     {
-                        return Functions.except(t, this, new List(new List<IVariable> { x }));
+                        return Functions.except(t, null, null, this, new List(new List<IVariable> { x }));
                     }
                     break;
                 default:
@@ -294,12 +294,12 @@ namespace Gekko
             {
                 case EVariableType.List:
                     {
-                        return Functions.intersect(t, this, x);
+                        return Functions.intersect(t, null, null, this, x);
                     }
                     break;
                 case EVariableType.String:
                     {
-                        return Functions.intersect(t, this, new List(new List<IVariable> { x }));
+                        return Functions.intersect(t, null, null, this, new List(new List<IVariable> { x }));
                     }
                     break;
                 default:

@@ -2851,20 +2851,22 @@ namespace Gekko.Parser.Gek
                                     {
                                         FunctionHelper3(node, ref extra, lagIndex, lagIndexOffset, args, i);
                                     }
-                                    
+
+                                    string aa1 = G.GetListWithCommas(args.GetRange(0, 2));
+                                    string aa2 = G.GetListWithCommas(args.GetRange(2, args.Count - 2));
+                                    if (args.Count - 2 > 0) aa2 = ", " + aa2;
+
                                     int numberOfArguments = 2 + node.ChildrenCount() - 2;
                                     if (node.Text == "ASTOBJECTFUNCTION")
-                                    {
-                                        
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(", " + G.GetListWithCommas(args)).A(")");
+                                    {                                        
+                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
-
-
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
+                                        //same as the other???                                        
+                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A("" + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
-                                        node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(", " + G.GetListWithCommas(args)).A(")");
                                     }
                                     else
                                     {
@@ -2907,6 +2909,8 @@ namespace Gekko.Parser.Gek
                                     //TODO TODO TODO
                                     // the 'extra' parameter indicating lag to come
                                     //
+
+
 
                                     string fl = "O.FunctionLookup";
                                     if (Globals.functionFuncArguments) fl = "O.FunctionLookupNew";
