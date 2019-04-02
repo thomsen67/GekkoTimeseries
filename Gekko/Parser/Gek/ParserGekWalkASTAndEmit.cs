@@ -2854,6 +2854,9 @@ namespace Gekko.Parser.Gek
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {                                     
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
+                                        //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
+
+
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
                                     {
