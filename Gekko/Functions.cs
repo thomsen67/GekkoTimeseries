@@ -2418,7 +2418,7 @@ namespace Gekko
             return null;
         }
 
-        [MyCustom(Lag = "lag=[2]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        [MyCustom(Lag = "lag=[4]")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable lag(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable ilag)
         {
             if (G.IsGekkoNull(x1)) return x1;
@@ -2426,7 +2426,7 @@ namespace Gekko
             return O.Indexer(smpl2, smpl, O.EIndexerType.IndexerLag, x1, O.Negate(smpl, ilag));
         }
 
-        [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        [MyCustom(Lag = "lag=[4]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable movsum(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable ilags)
         {
             if (G.IsGekkoNull(x1)) return x1;
@@ -2434,7 +2434,7 @@ namespace Gekko
             return MovAvgSum(smpl, x1, ilags, false);            
         }
 
-        [MyCustom(Lag = "lag=[2]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
+        [MyCustom(Lag = "lag=[4]-1")]  //remember Program.RevertSmpl(), remember: -1-based, starts at -1, then 0, then 1, ...
         public static IVariable movavg(GekkoSmpl2 smpl2, GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable ilags)
         {
             if (G.IsGekkoNull(x1)) return x1;

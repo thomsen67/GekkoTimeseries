@@ -2847,13 +2847,27 @@ namespace Gekko.Parser.Gek
                                     {
                                         for (int i = 0; i < node[1].ChildrenCount(); i++)
                                         {
-                                            FunctionHelper3(node[1], ref extra, lagIndex, lagIndexOffset, args, i);
+                                            //FunctionHelper3(node[1], lagIndex, lagIndexOffset, args, i);
+                                            args.Add(node[1][i].Code.ToString());
                                         }
                                     }
 
                                     for (int i = 2; i < node.ChildrenCount(); i++)
                                     {
-                                        FunctionHelper3(node, ref extra, lagIndex, lagIndexOffset, args, i);
+                                        //FunctionHelper3(node, lagIndex, lagIndexOffset, args, i);
+                                        args.Add(node[i].Code.ToString());
+                                    }
+
+                                    if (lagIndex >= 3)
+                                    {
+                                        if (lagIndexOffset == 0)
+                                        {
+                                            extra = "O.Smpl(smpl, " + node[lagIndex - 1].Code + "), ";
+                                        }
+                                        else
+                                        {
+                                            extra = "O.Smpl(smpl, O.Add(smpl, " + node[lagIndex - 1].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
+                                        }
                                     }
 
                                     string aa1, aa2;
@@ -6252,25 +6266,11 @@ namespace Gekko.Parser.Gek
             if (args.Count - 2 > 0) aa2 = ", " + aa2;
         }
 
-        private static void FunctionHelper3(ASTNode node, ref string extra, int lagIndex, int lagIndexOffset, List<string> args, int i)
-        {
-            if (lagIndex == i)
-            {
-                if (lagIndexOffset == 0)
-                {
-                    extra = "O.Smpl(smpl, " + node[i].Code + "), ";
-                    //args.Add("O.Smpl(smpl, " + node[i].Code + ")");
-
-                }
-                else
-                {
-                    extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
-                    //args.Add("O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d)))");
-                }
-            }
-            args.Add(node[i].Code.ToString());
-            //args += ", " + node[i].Code;
-        }
+        //private static void FunctionHelper3(ASTNode node, int lagIndex, int lagIndexOffset, List<string> args, int i)
+        //{            
+        //    args.Add(node[i].Code.ToString());
+        //    //args += ", " + node[i].Code;
+        //}
 
         private static void FunctionHelper2(ASTNode node, List<string> args, int i)
         {
