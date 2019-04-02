@@ -2859,7 +2859,12 @@ namespace Gekko.Parser.Gek
                                     string aa1, aa2;
                                     FunctionHelper10(args, out aa1, out aa2);
 
-                                    int numberOfArguments = 2 + node.ChildrenCount() - 2;
+ //                                   GekkoSmpl smpl = null;
+ //                                   IVariable tmp = Functions.lag(O.Smpl(smpl, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(),
+ //EVariableType.Var, null)), smpl, null, null, O.Smpl(smpl, O.Lookup(smpl, null, null, "x", null,
+ //null, new LookupSettings(), EVariableType.Var, null)), O.Lookup(smpl, null, null, "x", null, null,
+ //new LookupSettings(), EVariableType.Var, null),null);
+
                                     if (node.Text == "ASTOBJECTFUNCTION")
                                     {
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
@@ -6253,14 +6258,14 @@ namespace Gekko.Parser.Gek
             {
                 if (lagIndexOffset == 0)
                 {
-                    //extra = "O.Smpl(smpl, " + node[i].Code + "), ";
-                    args.Add("O.Smpl(smpl, " + node[i].Code + ")");
+                    extra = "O.Smpl(smpl, " + node[i].Code + "), ";
+                    //args.Add("O.Smpl(smpl, " + node[i].Code + ")");
 
                 }
                 else
                 {
-                    //extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
-                    args.Add("O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d)))");
+                    extra = "O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
+                    //args.Add("O.Smpl(smpl, O.Add(smpl, " + node[i].Code + ", new ScalarVal(" + lagIndexOffset + "d)))");
                 }
             }
             args.Add(node[i].Code.ToString());

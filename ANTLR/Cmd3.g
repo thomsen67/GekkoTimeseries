@@ -2101,13 +2101,11 @@ mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
 function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs);
-objectFunction:             ident leftParenGlue fargs? RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs?);
+objectFunction:             ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs);
 specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
 						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
 						    ;
-fargs1:    					specialArg | expression;
-//fargs:						(fargs1 (',' expression)*)? -> fargs1 expression*
-						    
+fargs1:    					specialArg | expression;						    
 
 fargs:                      -> ^(ASTSPECIALARGS)
 						  | ISNOTQUAL -> ^(ASTSPECIALARGS)
@@ -2116,6 +2114,12 @@ fargs:                      -> ^(ASTSPECIALARGS)
 						  | expression (',' expression)* -> ^(ASTSPECIALARGS) expression+
 						    ;
 
+fargs_proc:                  -> ^(ASTSPECIALARGS)
+						  | ISNOTQUAL -> ^(ASTSPECIALARGS)
+						  | ISNOTQUAL expression* -> ^(ASTSPECIALARGS) expression*
+						  | leftAngleNo2 dates? RIGHTANGLE expression* -> ^(ASTSPECIALARGS dates?) expression*
+						  | expression+ -> ^(ASTSPECIALARGS) expression+
+						    ;
 					
 dollarConditional:          LEFTPAREN logicalOr RIGHTPAREN -> ^(ASTDOLLARCONDITIONAL logicalOr)  //must use parentheses now, else stuff like y $ x = 100 is too confusing.
 					//	  | bankvarnameindex -> ^(ASTDOLLARCONDITIONALVARIABLE bankvarnameindex)  //does not need parenthesis								
@@ -2997,8 +3001,8 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-procedure:					identWithoutCommand expression* -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand expression*);  
-functionNaked:              ident leftParenGlue (expression (',' expression)*)? RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident expression*);      
+procedure:					identWithoutCommand fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand fargs_proc);  
+functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident fargs);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE DEFINITION
