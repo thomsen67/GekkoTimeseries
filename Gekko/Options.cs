@@ -128,6 +128,8 @@ Additionally, there are model, solve, equation options.
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
         public string plot_using = ""; //a global template
+
+
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_elements_max = 400;
         public int print_fields_ndec = 4;
@@ -148,7 +150,7 @@ Additionally, there are model, solve, equation options.
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
         public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
-
+        
         public string r_exe_folder = "";  //there will probably be more R options later on
         public string r_exe_path = "";  //old name
 

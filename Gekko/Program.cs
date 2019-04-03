@@ -29061,6 +29061,7 @@ namespace Gekko
                 //23. SUM4Q             Qsum           
                 //24. ANNUAL     A
 
+                EPrtCollapseTypes collapse = GetCollapseType(o);
 
                 //remember there is a label column which gets number 1
                 for (int year = y1; year <= y2; year++)
@@ -29191,7 +29192,7 @@ namespace Gekko
                         }
                     }
 
-                    if (true)  // ------------------------------------------------------------- (5)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (5)
                     {
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
@@ -29319,7 +29320,7 @@ namespace Gekko
                         }
                     }
 
-                    if (true)  // ------------------------------------------------------------- (10)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (10)
                     {
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
@@ -29461,7 +29462,7 @@ namespace Gekko
                         }
                     }
 
-                    if (true)  // ------------------------------------------------------------- (15)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (15)
                     {
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
@@ -29593,7 +29594,7 @@ namespace Gekko
                         }
                     }
 
-                    if (true)  // ------------------------------------------------------------- (20)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (20)
                     {
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
@@ -29630,7 +29631,7 @@ namespace Gekko
                     }
 
 
-                    if (true)  // ------------------------------------------------------------- (21)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (21)
                     {
                         if ((type != EPrintTypes.Plot && freqs[3]))
                         {
@@ -29686,7 +29687,7 @@ namespace Gekko
                     }
 
 
-                    if (true)  // ------------------------------------------------------------- (23)
+                    if (collapse != EPrtCollapseTypes.None)  // ------------------------------------------------------------- (23)
                     {
                         if ((type != EPrintTypes.Plot && freqs[2]))
                         {

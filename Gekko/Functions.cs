@@ -754,7 +754,7 @@ namespace Gekko
             return hpfilter(smpl, per1, per2, rightSide, ilambda, Globals.scalarVal0);
         }
 
-        //legacy: do not delete yet
+        //legacy: do not delete fyet
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda, IVariable ilog)
         {
             return hpfilter(smpl, per1, per2, rightSide, ilambda, ilog);

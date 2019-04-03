@@ -215,7 +215,7 @@ namespace Gekko
         
         public static bool UNITTESTFOLLOWUP = false;
         public static bool UNITTESTFOLLOWUP_important = false;
-
+                
         public static string restartSnippet = "restart; mode data;";
 
         public static int firstPeriodPositionInArrayNull = int.MaxValue;
