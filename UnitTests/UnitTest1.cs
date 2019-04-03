@@ -15130,7 +15130,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#x", 2, 3, 8d, sharedDelta);
             _AssertMatrix(First(), "#x", 2, 4, 9d, sharedDelta);
             _AssertMatrix(First(), "#x", 2, 5, 10d, sharedDelta);
-
+                        
             _AssertMatrix(First(), "#x", 3, 1, 11d, sharedDelta);
             _AssertMatrix(First(), "#x", 3, 2, 12d, sharedDelta);
             _AssertMatrix(First(), "#x", 3, 3, 17d, sharedDelta);
@@ -15229,7 +15229,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#b", "cols", 1);
             _AssertMatrix(First(), "#b", 1, 1, 3d, sharedDelta);
             _AssertMatrix(First(), "#b", 2, 1, 7d, sharedDelta);
-
+            
             // -------- pack and unpack ---------
 
             I("RESET;");
@@ -15240,6 +15240,9 @@ namespace UnitTests
             _AssertMatrix(First(), "#b", "rows", 3);
             _AssertMatrix(First(), "#b", "cols", 2);
             _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
+
+            //return;
+
             _AssertMatrix(First(), "#b", 2, 1, 6d, sharedDelta);
             _AssertMatrix(First(), "#b", 3, 1, 7d, sharedDelta);
             _AssertMatrix(First(), "#b", 1, 2, 15d, sharedDelta);
@@ -15255,19 +15258,23 @@ namespace UnitTests
             _AssertMatrix(First(), "#c", 1, 2, 15d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
             _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
+                        
             I("yy1 = unpack(#b[.., 1]);");
             _AssertSeries(First(), "yy1", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy1", 2000, 5d, sharedDelta);
             _AssertSeries(First(), "yy1", 2001, 6d, sharedDelta);
             _AssertSeries(First(), "yy1", 2002, 7d, sharedDelta);
             _AssertSeries(First(), "yy1", 2003, double.NaN, sharedDelta);
+
+            //return;
+
             I("yy2 = #b[.., 2].unpack(2000, 2002);");
             _AssertSeries(First(), "yy2", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy2", 2000, 15d, sharedDelta);
             _AssertSeries(First(), "yy2", 2001, 16d, sharedDelta);
             _AssertSeries(First(), "yy2", 2002, 17d, sharedDelta);
             _AssertSeries(First(), "yy2", 2003, double.NaN, sharedDelta);
-
+                        
             I("RESET;");
             I("OPTION freq m;;");
             I("TIME 2010 2020;");
@@ -15293,6 +15300,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#c", 2, 2, 16d, sharedDelta);
             _AssertMatrix(First(), "#c", 3, 2, 17d, sharedDelta);
             I("yy1 = unpack(#b[.., 1]);");
+                        
             _AssertSeries(First(), "yy1", EFreq.M, 1999, 12, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 1, 5d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
@@ -15304,7 +15312,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 3, 17d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 4, double.NaN, sharedDelta);
-
+            
             // -------------- divide(), multiply()
             I("RESET;");
             I("#a = [1, 2, 3 ; 4, 5, 6];");
@@ -15344,6 +15352,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#c", 2, 1, 4d * 2d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 2, 5d * 3d, sharedDelta);
             _AssertMatrix(First(), "#c", 2, 3, 6d * 4d, sharedDelta);
+            
             FAIL("#c = multiply(#b, #a);");  //not the other way around
             I("#c = divide(#a, #b);");
             _AssertMatrix(First(), "#c", "rows", 2);

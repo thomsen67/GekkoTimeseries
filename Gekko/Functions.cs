@@ -645,7 +645,7 @@ namespace Gekko
         //}
 
         //!NOTE: do not delete, use for unit tests
-        public static IVariable helper_error(GekkoSmpl smpl, IVariable x)
+        public static IVariable helper_error(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
             string s = O.ConvertToString(x);
             if (s == Globals.errorHelper)
@@ -1438,7 +1438,7 @@ namespace Gekko
 
         public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            return unpack(smpl, x, null, null);
+            return unpack(smpl, _t1, _t2, x, null, null);
         }
 
         //Converts matrix to timeseries
