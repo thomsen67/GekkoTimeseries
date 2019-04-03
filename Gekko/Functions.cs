@@ -722,87 +722,62 @@ namespace Gekko
             return new ScalarString(s);
         }
 
-        //public static void HELPER_HandleLasp(GekkoTuple.Tuple2 tuple, IVariable p, IVariable q) {
-        //    //This is pretty bad style, but the content of the tuple is put into p and q...
-
-        //    Series tsp1 = O.GetTimeSeries(p);
-        //    Series tsq1 = O.GetTimeSeries(q);
-
-        //    Series tsp2 = O.GetTimeSeries(tuple.tuple0);
-        //    Series tsq2 = O.GetTimeSeries(tuple.tuple1);
-
-        //    tsp2.name = tsp1.name;
-        //    tsq2.name = tsq1.name;
-
-        //    tsp1.meta.parentDatabank.RemoveVariable(tsp1.name);
-        //    tsq1.meta.parentDatabank.RemoveVariable(tsq1.name);
-
-        //    tsp1.meta.parentDatabank.AddVariable(tsp2);
-        //    tsq1.meta.parentDatabank.AddVariable(tsq2);
-        //}
-
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
 
+        //legacy: do not delete yet
         public static IVariable laspchain(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            IVariable result = Program.Laspeyres("laspchain", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1.ConvertToDate(O.GetDateChoices.Strict), t2.ConvertToDate(O.GetDateChoices.Strict));
-            return result;
+            return laspchain(smpl, t1, t2, plist, xlist, date);
         }
 
         public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), Globals.globalPeriodStart, Globals.globalPeriodEnd);
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1, t2);
             return result;
         }
 
+        //legacy: do not delete yet
         public static IVariable laspfixed(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable t1, IVariable t2, IVariable plist, IVariable xlist, IVariable date)
         {
-            IVariable result = Program.Laspeyres("laspfixed", plist, xlist, date.ConvertToDate(O.GetDateChoices.Strict), t1.ConvertToDate(O.GetDateChoices.Strict), t2.ConvertToDate(O.GetDateChoices.Strict));
-            return result;
+            return laspfixed(smpl, t1, t2, plist, xlist, date);
+        }
+
+        //legacy: do not delete yet
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda)
+        {
+            return hpfilter(smpl, per1, per2, rightSide, ilambda, Globals.scalarVal0);
+        }
+
+        //legacy: do not delete yet
+        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda, IVariable ilog)
+        {
+            return hpfilter(smpl, per1, per2, rightSide, ilambda, ilog);
         }
 
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda)
         {
-            return hpfilter(smpl, _t1, _t2, rightSide, null, null, ilambda, Globals.scalarVal0);
-        }
-
-        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda)
-        {
-            return hpfilter(smpl, _t1, _t2, rightSide, per1, per2, ilambda, Globals.scalarVal0);
-        }
+            return hpfilter(smpl, _t1, _t2, rightSide, ilambda, Globals.scalarVal0);
+        }        
 
         public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable ilambda, IVariable ilog)
         {
-            return hpfilter(smpl, _t1, _t2, rightSide, null, null, ilambda, ilog);
-        }
-
-        public static IVariable hpfilter(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable rightSide, IVariable per1, IVariable per2, IVariable ilambda, IVariable ilog)
-        {
-            GekkoTime tStart = GekkoTime.tNull;
-            GekkoTime tEnd = GekkoTime.tNull;
-            if (per1 == null && per2 == null)
-            {
-                tStart = Globals.globalPeriodStart;
-                tEnd = Globals.globalPeriodEnd;
-            }
-            else
-            {
-                tStart = O.ConvertToDate(per1);
-                tEnd = O.ConvertToDate(per2);
-            }
-
-            int obs = GekkoTime.Observations(tStart, tEnd);
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+                        
+            int obs = GekkoTime.Observations(t1, t2);
 
             double lambda = O.ConvertToVal(ilambda);
             double log = O.ConvertToVal(ilog);
 
             Series rhs = O.ConvertToSeries(rightSide) as Series;
 
-            Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+            //Series lhs = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+            Series lhs = new Series(ESeriesType.Light, t1, t2);
 
             bool isLog = false;
             if (log == 0d)
@@ -828,7 +803,7 @@ namespace Gekko
             double[] input = new double[obs];
 
             int counter = -1;
-            foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+            foreach (GekkoTime gt in new GekkoTimeIterator(t1, t2))
             {
                 counter++;
                 if (isLog)
@@ -845,7 +820,7 @@ namespace Gekko
             double[] output = hpf.HPFilter(input, lambda);
 
             counter = -1;
-            foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+            foreach (GekkoTime gt in new GekkoTimeIterator(t1, t2))
             {
                 counter++;
                 if (isLog)
@@ -889,10 +864,18 @@ namespace Gekko
         //Converts timeseries to matrix
         public static IVariable pack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] vars)
         {
-            GekkoTime gt1 = Globals.globalPeriodStart;
-            GekkoTime gt2 = Globals.globalPeriodEnd;
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             int offset = 0;
-            int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);
+            if (_t1 == null && _t2 == null && ((vars[0].Type() == EVariableType.Date || vars[0].Type() == EVariableType.Val) && (vars[1].Type() == EVariableType.Date || vars[1].Type() == EVariableType.Val)))
+            {
+                //legacy: do not delete yet
+                //seems like two dates first
+                offset = 2;
+                t1 = O.ConvertToDate(vars[0]);
+                t2 = O.ConvertToDate(vars[1]);
+            }
+
+            int obs = GekkoTime.Observations(t1, t2);
 
             List<IVariable> temp = new List<IVariable>();
             for (int i = offset; i < vars.Length; i++)
@@ -901,31 +884,7 @@ namespace Gekko
             }
 
             List<Series> tss = Program.UnfoldAsSeries(smpl, temp);
-
-            //List<Series> tss = new List<Series>();
-            //for (int j = offset; j < vars.Length; j++)
-            //{
-            //    if (vars[j].Type() == EVariableType.List)
-            //    {
-            //        foreach (IVariable iv in ((List)vars[j]).list)
-            //        {
-            //            string s = O.ConvertToString(iv);
-            //            Series tmp = Program.GetTimeSeriesFromString(s, O.ECreatePossibilities.NoneReturnNull);
-            //            tss.Add(tmp);
-            //        }
-            //    }
-            //    else if (vars[j].Type() == EVariableType.Series)
-            //    {
-            //        //LIGHTFIXME
-            //        tss.Add((Series)vars[j]);
-            //    }
-            //    else
-            //    {
-            //        G.Writeln2("*** ERROR: Expected timeseries or list as argument");
-            //        throw new GekkoException();
-            //    }
-            //}
-
+        
             int n = tss.Count;
             if (n < 1)
             {
@@ -935,14 +894,12 @@ namespace Gekko
 
             Matrix m = new Matrix(obs, n);
 
-            //    List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
-
             int varcount = -1;
             foreach (Series ts in tss)
             {
                 varcount++;
                 int counter = -1;
-                foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                foreach (GekkoTime gt in new GekkoTimeIterator(t1, t2))
                 {
                     counter++;
                     m.data[counter, varcount] = ts.GetData(smpl, gt);
@@ -1436,25 +1393,20 @@ namespace Gekko
             return m;
         }
 
-        public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        //legacy, do not delete yet
+        public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable per1, IVariable per2)
         {
-            return unpack(smpl, _t1, _t2, x, null, null);
+            return unpack(smpl, per1, per2, x);
         }
 
-        //Converts matrix to timeseries
-        public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable t1, IVariable t2)
+            //Converts matrix to timeseries
+        public static IVariable unpack(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            //from matrix to timeseries
-            //smpl is not used
-            GekkoTime gt1 = Globals.globalPeriodStart;
-            GekkoTime gt2 = Globals.globalPeriodEnd;
-            if (t1 != null)
-            {
-                gt1 = O.ConvertToDate(t1);
-                gt2 = O.ConvertToDate(t2);
-            }
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
-            int obs = GekkoTime.Observations(gt1, gt2);
+            //from matrix to timeseries            
+            
+            int obs = GekkoTime.Observations(t1, t2);
 
             Matrix m = O.ConvertToMatrix(x);
 
@@ -1470,49 +1422,12 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            return O.CreateTimeSeriesFromMatrix(new GekkoSmpl(gt1, gt2), m);
+            return O.CreateTimeSeriesFromMatrix(new GekkoSmpl(t1, t2), m);
 
-            //GekkoTime gt1 = Globals.globalPeriodStart;
-            //GekkoTime gt2 = Globals.globalPeriodEnd;
-            //int offset = 0;
-            //int obs = PackHelper(vars, ref gt1, ref gt2, ref offset);
-
-            //int n = vars.Length - offset;
-            //if (n < 1)
-            //{
-            //    G.Writeln2("*** ERROR: No matrix given");
-            //    throw new GekkoException();
-            //}
-            //else if (n > 1)
-            //{
-            //    G.Writeln2("*** ERROR: Only 1 matrix should be given");
-            //    throw new GekkoException();
-            //}
-            //Matrix m = O.GetMatrix(vars[offset]);
-
-            //if (m.data.GetLength(1) > 1)
-            //{
-            //    G.Writeln2("*** ERROR: The matrix provided should have 1 column only");
-            //    throw new GekkoException();
-            //}
-
-            //if (m.data.GetLength(0) != obs)
-            //{
-            //    G.Writeln2("*** ERROR: You provided " + obs + " periods for a matrix with " + m.data.GetLength(0) + " rows");
-            //    throw new GekkoException();
-            //}
-
-            //Series ts = new Series(Program.options.freq, null);
-            //int counter = -1;
-            //foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
-            //{
-            //    counter++;
-            //    ts.SetData(gt, m.data[counter, 0]);
-            //}
-            //return new MetaTimeSeries(ts);
+            
         }
 
-        private static int PackHelper(IVariable[] vars, ref GekkoTime gt1, ref GekkoTime gt2, ref int offset)
+        private static int Helper_Pack(IVariable[] vars, ref GekkoTime gt1, ref GekkoTime gt2, ref int offset)
         {
             if (vars.Length > 2)  //must be at least 1 variable
             {
@@ -1852,56 +1767,55 @@ namespace Gekko
             return tsl2;
         }
 
-        public static IVariable sumt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
-        {
-            IVariable iv = O.ConvertToSeriesMaybeConstant(smpl, x);
-            double d = 0d;
-            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-            {
-                d += (iv as Series).GetData(smpl, t);
-            }
-            return new ScalarVal(d);
-        }
-
+        //Legacy, do not delete yet
         public static IVariable sumt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable d1, IVariable d2)
         {
-            GekkoTime t1 = O.ConvertToDate(d1);
-            GekkoTime t2 = O.ConvertToDate(d2);
+            return sumt(smpl, d1, d2, x);
+        }
+
+        public static IVariable sumt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
             IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
             double d = 0d;
             foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
             {
-                d += (iv as Series).GetData(smplHere, t);
+                d += (iv as Series).GetData(smpl, t);
             }
             return new ScalarVal(d);
         }
+
+        //Legacy, do not delete yet
+        public static IVariable avgt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable d1, IVariable d2)
+        {
+            return avgt(smpl, d1, d2, x);
+        }        
 
         public static IVariable avgt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
         {
-            IVariable iv = O.ConvertToSeriesMaybeConstant(smpl, x);
-            double d = 0d;
-            foreach (GekkoTime t in new GekkoTimeIterator(smpl.t1, smpl.t2))
-            {
-                d += (iv as Series).GetData(smpl, t);
-            }
-            return new ScalarVal(d / GekkoTime.Observations(smpl.t1, smpl.t2));
-        }
-
-        public static IVariable avgt(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x, IVariable d1, IVariable d2)
-        {
-            GekkoTime t1 = O.ConvertToDate(d1);
-            GekkoTime t2 = O.ConvertToDate(d2);
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
 
             GekkoSmpl smplHere = new GekkoSmpl(t1, t2);
             IVariable iv = O.ConvertToSeriesMaybeConstant(smplHere, x);
             double d = 0d;
             foreach (GekkoTime t in new GekkoTimeIterator(smplHere.t1, smplHere.t2))
             {
-                d += (iv as Series).GetData(smplHere, t);
+                d += (iv as Series).GetData(smpl, t);
             }
             return new ScalarVal(d / GekkoTime.Observations(smplHere.t1, smplHere.t2));
+        }
+
+        private static void Helper_TimeOptionField(GekkoSmpl smpl, IVariable _t1, IVariable _t2, out GekkoTime t1, out GekkoTime t2)
+        {
+            t1 = smpl.t1;
+            t2 = smpl.t2;
+            if (_t1 != null && _t2 != null)
+            {
+                t1 = O.ConvertToDate(_t1);
+                t2 = O.ConvertToDate(_t2);
+            }
         }
 
         public static IVariable avg(GekkoSmpl smpl, IVariable _t1, IVariable _t2, params IVariable[] items)
@@ -2009,7 +1923,7 @@ namespace Gekko
         }
 
 
-        public static IVariable time(GekkoTime t)
+        public static IVariable helper_time(GekkoTime t)
         {
             if (t.freq == EFreq.A || t.freq == EFreq.U)
             {
@@ -2028,10 +1942,11 @@ namespace Gekko
 
         public static IVariable time(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
             Series x = new Series(ESeriesType.Light, smpl.t0.freq, null);
-            foreach (GekkoTime t in smpl.Iterate03())
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
             {
-                x.SetData(t, time(t).ConvertToVal());
+                x.SetData(t, helper_time(t).ConvertToVal());
             }
             return x;
         }

@@ -8650,6 +8650,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_FunctionAndProcedureVariants()
         {
+            //testing variants of functions and procedured, also UFCS etc.
+            //also tests <date %d1, date %d2> and <2001 2003> field combinations
+            
             //run-time fail
             FAIL("RESET; function val f(val %x); return 'a'; end; val %y = f(3+1);");  //returns wrong type
             FAIL("RESET; function val f(string %x); return 1; end; val %y = f(3+1);");  //has wrong type argument
@@ -8670,97 +8673,107 @@ namespace UnitTests
             FAIL("FUNCTION string f(matrix x); RETURN ''; END;");
             FAIL("FUNCTION string f(matrix %x); RETURN ''; END;");
 
-            // ----------- user defined functions
+            for (int i = 0; i < 4; i++)
+            {
+                string o1 = null; string o2 = null;
+                if (i == 1 || i == 3) o1 = "<date %d1, date %d2>";
+                if (i == 2 || i == 3) o2 = "<2001 2003>";
 
-            //0 arg, 0 return
-            I("RESET; CLS;");
-            I("FUNCTION void f(); TELL 'a1y'; END; f();");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a1y"));
+                string oo1 = null; string oo2 = null;
+                if (i == 1 || i == 3) oo1 = "<date %d1, date %d2>, ";
+                if (i == 2 || i == 3) oo2 = "<2001 2003>, ";
 
-            //1 arg, 0 return
-            I("RESET; CLS;");
-            I("FUNCTION void f(val %v); TELL 'a2y' + %v; END; f(1);");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a2y1"));
+                // ----------- user defined functions
 
-            //0 arg, 1 return
-            I("RESET; CLS;");
-            I("FUNCTION string f(); TELL 'a3y'; RETURN 'a3y'; END; %s = f();");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
-            _AssertScalarString(First(), "%s", "a3y");
-            I("CLS; f();"); //discards return value
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
+                //0 arg, 0 return
+                I("RESET; CLS;");
+                I("FUNCTION void f(" + o1 + "); TELL 'a1y'; END; f(" + o2 + ");");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a1y"));
 
-            //1 arg, 1 return
-            I("RESET; CLS;");
-            I("FUNCTION string f(val %v); TELL 'a4y' + %v; RETURN 'a4y' + %v; END; %s = f(1);");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
-            _AssertScalarString(First(), "%s", "a4y1");
-            I("CLS; f(1);"); //discards return value
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
+                //1 arg, 0 return
+                I("RESET; CLS;");
+                I("FUNCTION void f(" + oo1 + "val %v); TELL 'a2y' + %v; END; f(" + oo2 + "1);");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a2y1"));
 
-            // ----------- user defined procedures
+                //0 arg, 1 return
+                I("RESET; CLS;");
+                I("FUNCTION string f(" + o1 + "); TELL 'a3y'; RETURN 'a3y'; END; %s = f(" + o2 + ");");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
+                _AssertScalarString(First(), "%s", "a3y");
+                I("CLS; f();"); //discards return value
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a3y"));
 
-            //0 arg, 0 return
-            I("RESET; CLS;");
-            I("PROCEDURE f; TELL 'a5y'; END; f;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a5y"));
+                //1 arg, 1 return
+                I("RESET; CLS;");
+                I("FUNCTION string f(" + oo1 + "val %v); TELL 'a4y' + %v; RETURN 'a4y' + %v; END; %s = f(" + oo2 + "1);");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
+                _AssertScalarString(First(), "%s", "a4y1");
+                I("CLS; f(1);"); //discards return value
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a4y1"));
 
-            //1 arg, 0 return
-            I("RESET; CLS;");
-            I("PROCEDURE f val %v; TELL 'a6y' + %v; END; f 1;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a6y1"));
+                // ----------- user defined procedures
 
-            // ----------- user defined, as object functions
+                //0 arg, 0 return
+                I("RESET; CLS;");
+                I("PROCEDURE f" + o1 + "; TELL 'a5y'; END; f" + o2 + ";");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a5y"));
+
+                //1 arg, 0 return
+                I("RESET; CLS;");
+                I("PROCEDURE f " + oo1 + "val %v; TELL 'a6y' + %v; END; f " + o2 + "1;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a6y1"));
+
+                // ----------- user defined, as object functions
+
+                //1 arg, 0 return
+                I("RESET; CLS;");
+                I("FUNCTION void f(" + oo1 + "val %v); TELL 'a7y' + %v; END; %x = 1; %x.f(" + o2 + ");");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+                
+                //1 arg, 1 return
+                I("RESET; CLS;");
+                I("FUNCTION string f(" + oo1 + "val %v); TELL 'a8y' + %v; RETURN 'a8y' + %v; END; %x = 1; %s = %x.f(" + o2 + ");");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
+                _AssertScalarString(First(), "%s", "a8y1");
+
+                I("CLS; %zz = 1; %zz.f(" + o2 + ");"); //discards return value
+
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
 
 
-            //1 arg, 0 return
-            I("RESET; CLS;");
-            I("FUNCTION void f(val %v); TELL 'a7y' + %v; END; %x = 1; %x.f();");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a7y1"));
+                // ----------- inbuilt functions
 
+                //0 arg, 0 return
+                //hmmm, no current like that, but it does work!
 
-            //1 arg, 1 return
-            I("RESET; CLS;");
-            I("FUNCTION string f(val %v); TELL 'a8y' + %v; RETURN 'a8y' + %v; END; %x = 1; %s = %x.f();");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
-            _AssertScalarString(First(), "%s", "a8y1");
+                //0 arg, 1 return
+                I("reset;");
+                I("%v = runif(" + o2 + ");");
+                I("runif(" + o2 + ");");
 
-            I("CLS; %zz = 1; %zz.f();"); //discards return value
+                //2 arg, 0 return
+                I("reset;");
+                I("a = series(" + oo2 + "1);");
+                I("setdomains(" + oo2 + "a, ('#s',));");
 
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("a8y1"));
+                //1 arg, 1 return
+                I("reset;");
+                I("%v = log(" + oo2 + "1);");
+                I("log(" + oo2 + "1);");
 
+                // ----------- inbuilt functions, as object functions
 
-            // ----------- inbuilt functions
+                //2 arg, 0 return
+                I("reset;");
+                I("a = series(" + oo2 + "1);");
+                I("a.setdomains(" + oo2 + "('#s',));");
 
-            //0 arg, 0 return
-            //hmmm, no current like that, but it does work!
+                //1 arg, 1 return
+                I("reset;");
+                I("%v = 1.log(" + o2 + ");");
+                I("%zz = 1; %zz.log(" + o2 + ");");
 
-            //0 arg, 1 return
-            I("reset;");
-            I("%v = runif();");
-            I("runif();");
-
-            //2 arg, 0 return
-            I("reset;");
-            I("a = series(1);");
-            I("setdomains(a, ('#s',));");
-
-            //1 arg, 1 return
-            I("reset;");
-            I("%v = log(1);");
-            I("log(1);");
-
-            // ----------- inbuilt functions, as object functions
-
-            //2 arg, 0 return
-            I("reset;");
-            I("a = series(1);");
-            I("a.setdomains(('#s',));");
-
-            //1 arg, 1 return
-            I("reset;");
-            I("%v = 1.log();");
-            I("%zz = 1; %zz.log();");
+            }
 
         }
 
@@ -9220,19 +9233,19 @@ namespace UnitTests
             I("SERIES xx1 = avg({#m1});");
             _AssertSeries(First(), "xx1", 2010, 2012, 10d / 4d, sharedDelta);
 
-            if (Globals.UNITTESTFOLLOWUP)
+            if (true)
             {
 
                 //avgt()
-                I("VAL v1 = avgt(ts5);");
+                I("%v1 = avgt(ts5);");
                 _AssertScalarVal(First(), "%v1", 38d / 3d, sharedDelta);
-                I("VAL v1 = avgt(2011, 2012, ts5);");
-                AssertHelperScalarVal("v1", 28d / 2d, sharedDelta);
+                I("%v1 = avgt(<2011 2012>, ts5);");
+                _AssertScalarVal(First(), "%v1", 28d / 2d, sharedDelta);
 
                 //sumt()
-                I("VAL v1 = sumt(ts5);");
+                I("%v1 = sumt(ts5);");
                 _AssertScalarVal(First(), "%v1", 38d, sharedDelta);
-                I("VAL v1 = sumt(2011, 2012, ts5);");
+                I("%v1 = sumt(<2011 2012>, ts5);");
                 _AssertScalarVal(First(), "%v1", 28d, sharedDelta);
 
             }
@@ -15236,7 +15249,7 @@ namespace UnitTests
             I("TIME 2010 2020;");
             I("SERIES <2000 2002> xx1 = (5, 6, 7);");
             I("SERIES <2000 2002> xx2 = (15, 16, 17);");
-            I("#b = pack(2000, 2002, xx1, xx2);");
+            I("#b = pack(<2000  2002>, xx1, xx2);");
             _AssertMatrix(First(), "#b", "rows", 3);
             _AssertMatrix(First(), "#b", "cols", 2);
             _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
@@ -15268,7 +15281,7 @@ namespace UnitTests
 
             //return;
 
-            I("yy2 = #b[.., 2].unpack(2000, 2002);");
+            I("yy2 = #b[.., 2].unpack(<2000 2002>);");
             _AssertSeries(First(), "yy2", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy2", 2000, 15d, sharedDelta);
             _AssertSeries(First(), "yy2", 2001, 16d, sharedDelta);
@@ -15280,7 +15293,7 @@ namespace UnitTests
             I("TIME 2010 2020;");
             I("SERIES <2000m1 2000m3> xx1 = (5, 6, 7);");
             I("SERIES <2000m1 2000m3> xx2 = (15, 16, 17);");
-            I("#b = pack(2000m1, 2000m3, xx1, xx2);");
+            I("#b = pack(<2000m1 2000m3>, xx1, xx2);");
             _AssertMatrix(First(), "#b", "rows", 3);
             _AssertMatrix(First(), "#b", "cols", 2);
             _AssertMatrix(First(), "#b", 1, 1, 5d, sharedDelta);
@@ -15306,7 +15319,7 @@ namespace UnitTests
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 2, 6d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 3, 7d, sharedDelta);
             _AssertSeries(First(), "yy1", EFreq.M, 2000, 4, double.NaN, sharedDelta);
-            I("yy2 = #b[.., 2].unpack(2000m1, 2000m3);");
+            I("yy2 = #b[.., 2].unpack(<2000m1 2000m3>);");
             _AssertSeries(First(), "yy2", EFreq.M, 1999, 12, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 1, 15d, sharedDelta);
             _AssertSeries(First(), "yy2", EFreq.M, 2000, 2, 16d, sharedDelta);
@@ -17386,8 +17399,8 @@ namespace UnitTests
             I("TIME 1996 2004;");
             I("CREATE input;");
             I("SERIES input = data('1242 1353 1142 1255 1417 1312 1440 1422 1470');");
-            I("xx = hpfilter(input, 1996, 2004, 10, 0);");
-            I("xx2 = input.hpfilter(1996, 2004, 10);");
+            I("xx = hpfilter(<1996 2004>, input, 10, 0);");
+            I("xx2 = input.hpfilter(<1996 2004>, 10);");
             I("xx3 = hpfilter(input, 10, 0);");
             I("xx4 = input.hpfilter(10);");
             EqualTimeseries("xx", "xx2", 1996, 2004);
@@ -17410,7 +17423,7 @@ namespace UnitTests
             I("TIME 2000m1 2000m9;");
             I("CREATE input;");
             I("SERIES input = data('1242 1353 1142 1255 1417 1312 1440 1422 1470');");
-            I("SERIES xx = hpfilter(input, 2000m1, 2000m9, 10, 0);");
+            I("SERIES xx = hpfilter(<2000m1 2000m9>, input, 10, 0);");
             u = Data("xx", 1999, 12, "m"); Assert.AreEqual(u.w, double.NaN);
             u = Data("xx", 2000, 1, "m"); _AssertHelperTwoDoubles(u.w, 1239.848378d, 0.0001d);  //0.01% difference accepted
             u = Data("xx", 2000, 2, "m"); _AssertHelperTwoDoubles(u.w, 1255.015604d, 0.0001d);  //0.01% difference accepted

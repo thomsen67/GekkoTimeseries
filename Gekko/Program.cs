@@ -30706,7 +30706,7 @@ namespace Gekko
                 }
                 else
                 {
-                    double tt = ((ScalarVal)Functions.time(t)).val;
+                    double tt = ((ScalarVal)Functions.helper_time(t)).val;
                     if (freqColumn == EFreq.U || freqColumn == EFreq.A) tt += 0.5;
                     //table.SetNumber(i - 1, 2 * (j - 2) + 1, tt, format);  //j=2 -> 1, j=3 -> 3
                     //table.SetNumber(i - 1, 2 * (j - 2) + 2, (double)d, format);  //j=2 -> 2, j=3 -> 4
