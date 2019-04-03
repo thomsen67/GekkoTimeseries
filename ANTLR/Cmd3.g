@@ -2816,10 +2816,11 @@ functionArgElement1:        functionArgTime | functionArgElement;
 functionArgTime:            leftAngleNo2 functionArgElement ',' functionArgElement RIGHTANGLE -> ^(ASTSPECIALARGSDEF functionArgElement functionArgElement);
 functionArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 functionStatements:         statements2* -> ^(ASTFUNCTIONDEFCODE statements2*);
-functionStatements2:        functionStatements;  //alias
+functionStatements2:        functionStatements;  //alias in IF 
 typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
+
 objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident fargs)));
 
 
@@ -3008,8 +3009,15 @@ functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("AS
 // PROCEDURE DEFINITION
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+//procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, input.LT(1).Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
+//procedureArg:               (procedureArgElement? (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
+//procedureArgElement:        typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
+//procedureStatements:        statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
+
 procedureDef:				PROCEDURE identWithoutCommand procedureArg SEMICOLON procedureStatements END -> ^({token("ASTPROCEDUREDEF", ASTPROCEDUREDEF, input.LT(1).Line)} ASTPLACEHOLDER identWithoutCommand procedureArg procedureStatements);
-procedureArg:                (procedureArgElement? (',' procedureArgElement)*)? -> ^(ASTPLACEHOLDER procedureArgElement*);
+procedureArg:                (procedureArgElement1? (',' procedureArgElement)*)? tripleDot? -> ^(ASTPLACEHOLDER procedureArgElement1? procedureArgElement* tripleDot?);						  
+procedureArgElement1:        procedureArgTime | procedureArgElement;
+procedureArgTime:            leftAngleNo2 procedureArgElement ',' procedureArgElement RIGHTANGLE -> ^(ASTSPECIALARGSDEF procedureArgElement procedureArgElement);
 procedureArgElement:         typeArg svarname -> ^(ASTPLACEHOLDER typeArg svarname);
 procedureStatements:         statements2* -> ^(ASTPROCEDUREDEFCODE statements2*);
 
