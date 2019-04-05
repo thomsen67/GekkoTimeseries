@@ -802,8 +802,9 @@ namespace Gekko
 
             else if (G.Equal(line[pos].s, FromTo("ser", "series")) != null)
             {
-                line[pos].meta.commandName = "series";
-                
+                int lb = line[pos].leftblanks;
+
+                line[pos].meta.commandName = "series";                
 
                 int count1 = 0;
                 int count2 = 0;
@@ -837,6 +838,8 @@ namespace Gekko
                     line[pos].s = ""; //not needed
                     line[pos + 1].leftblanks = 0;
                 }
+
+                Translator_Gekko20_Gekko30.MoveOptionField(line, lb);
             }
 
             else if (G.Equal(line[pos].s, FromTo("set", "set")) != null)
@@ -1141,7 +1144,7 @@ namespace Gekko
         //public static GekkoDictionary<string, string> listMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         //public static GekkoDictionary<string, string> matrixMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         //public static GekkoDictionary<string, string> scalarMemory = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
+        
         public static string Translate(string input)
         {
             //difference() --> except()
@@ -1262,6 +1265,110 @@ namespace Gekko
             }
 
             foreach (List<TokenHelper> line in temp)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (TokenHelper tok in line)
+                {
+                    sb.Append(tok.ToString());
+                }
+                rv.Append(sb);
+            }
+
+            return rv.ToString();
+        }
+
+        public static string Move(string input)  //for translate<move>
+        {            
+            string txt = input;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+
+            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+
+            int counter = 0;
+
+            StringBuilder rv = new StringBuilder();
+            List<List<TokenHelper>> statements2 = new List<List<TokenHelper>>();
+            List<TokenHelper> statement = new List<TokenHelper>();
+            foreach (TokenHelper tok in tokens2.subnodes.storage)
+            {
+                statement.Add(tok);
+                if (tok.s == ";")
+                {
+                    statements2.Add(statement);
+                    statement = new List<TokenHelper>();
+                }
+            }
+            statements2.Add(statement);            
+
+            foreach (List<TokenHelper> line in statements2)
+            {
+                  
+                try
+                {
+                    HandleMove(line);                    
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: The translator crashed unexpectedly on line " + line[0].line);
+                    G.Writeln("    You may try commenting out that line with //");
+                    throw new GekkoException();
+                }
+            }
+
+            foreach (List<TokenHelper> line in statements2)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (TokenHelper tok in line)
+                {
+                    sb.Append(tok.ToString());
+                }
+                rv.Append(sb);
+            }
+
+            return rv.ToString();
+        }
+
+        public static string Remove(string input)  //for translate<move>
+        {
+            string txt = input;
+            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            var tags2 = new List<string>() { "//" };
+
+            TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, null, null);
+
+            int counter = 0;
+
+            StringBuilder rv = new StringBuilder();
+            List<List<TokenHelper>> statements2 = new List<List<TokenHelper>>();
+            List<TokenHelper> statement = new List<TokenHelper>();
+            foreach (TokenHelper tok in tokens2.subnodes.storage)
+            {
+                statement.Add(tok);
+                if (tok.s == ";")
+                {
+                    statements2.Add(statement);
+                    statement = new List<TokenHelper>();
+                }
+            }
+            statements2.Add(statement);
+
+            foreach (List<TokenHelper> line in statements2)
+            {
+
+                try
+                {
+                    HandleRemove(line);
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: The translator crashed unexpectedly on line " + line[0].line);
+                    G.Writeln("    You may try commenting out that line with //");
+                    throw new GekkoException();
+                }
+            }
+
+            foreach (List<TokenHelper> line in statements2)
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (TokenHelper tok in line)
@@ -1973,6 +2080,7 @@ namespace Gekko
                 //SER %m|x = ... --> {%m}x
                 //SER x = x[-1] + ... --> <dynamic>
 
+                int lb = line[pos].leftblanks;
 
                 line[pos].s = ""; line[pos + 1].leftblanks = 0;
 
@@ -1982,7 +2090,7 @@ namespace Gekko
 
                 int op_i = -12345;
                 op_i = FindS(line, ii, new string[] { "=", "^", "%", "+", "*", "#" });  //cannot match series #m = ... or series <2010 2020> #m = ...
-                
+
                 if (op_i != -12345)
                 {
                     if (op_i == 3)
@@ -2099,7 +2207,7 @@ namespace Gekko
                         }
                     }
                     if (line.Count > 1 && line[0].s == "" && line[0].subnodes == null)
-                    {                        
+                    {
                         line[0].leftblanks = 0;
                         if (line[1].subnodes != null)
                         {
@@ -2111,6 +2219,10 @@ namespace Gekko
                         }
                     }
                 }
+
+                //move the option field
+                MoveOptionField(line, lb);
+
             }
 
             else if (G.Equal(line[pos].s, "val"))
@@ -2138,6 +2250,123 @@ namespace Gekko
             SetLineStartRecursive(line, line);
             
 
+        }
+
+        public static void HandleMove(List<TokenHelper> line)
+        {
+            int pos = 0;
+            
+            if (true)
+            {               
+                //move the option field
+                MoveOptionField(line, -12345); //signals that it is for translate<move>
+            }
+
+        }
+
+        public static void HandleRemove(List<TokenHelper> line)
+        {
+            int pos = 0;
+
+            if (true)
+            {
+                //move the option field
+                RemoveParentheses(line);
+            }
+
+        }
+        public static void MoveOptionField(List<TokenHelper> line, int lb)
+        {
+            bool move = false;
+            if (lb == -12345)
+            {
+                move = true;
+                lb = 0;
+            }
+
+            if (move && G.Equal(line[0].s, "if")) return;  //for instance if(x<1 && y>2 && < == 2)...  Probably superfluous, since the (...) is a sub-nest.
+
+            int op_1 = -12345;
+            int op_2 = -12345;
+            int op_3 = -12345;
+            op_1 = FindS(line, 0, new string[] { "<" });
+            if (op_1 != -12345) op_2 = FindS(line, op_1, new string[] { ">" });
+            if (op_2 != -12345) op_3 = FindS(line, op_2, new string[] { "=" });
+            
+            if (op_1 == -12345 || op_2 == -12345 || op_3 == -12345)
+            {
+                //do nothing
+            }
+            else
+            {
+                if (FindS(line, op_3 + 1, new string[] { "=" }) != -12345) return;  //no meaning if there is an extra '=' after the assignment '='
+                //now we have ... < ... > ... = ...                    
+                //                1     2     3
+                //we need to move the stuff between 2 and 3 to before 1.
+                List <TokenHelper> clone = new List<TokenHelper>();
+                clone.AddRange(line);
+                line.Clear();
+
+                if (clone[op_1].leftblanks == 0) clone[op_1].leftblanks = 1;
+                if (clone[op_3].leftblanks == 0) clone[op_3].leftblanks = 1;
+
+                line.AddRange(clone.GetRange(0, op_1 - 0));
+                line.AddRange(clone.GetRange(op_2 + 1, op_3 - op_2 - 1));
+                line.AddRange(clone.GetRange(op_1, op_2 - op_1 + 1));
+                line.AddRange(clone.GetRange(op_3, clone.Count - op_3));
+
+                if (true)
+                {
+                    if (line[0].s == null || line[0].s == "")
+                    {
+                        line[0].leftblanks = 0;
+                        line[1].leftblanks = lb;
+                    }
+                    else
+                    {
+                        line[0].leftblanks = lb;
+
+                    }
+                }
+            }
+        }
+
+        public static void RemoveParentheses(List<TokenHelper> line)
+        {               
+            int op_1 = FindS(line, 0, new string[] { "=" });
+            if (op_1 != -12345)
+            {
+                if (FindS(line, op_1 + 1, new string[] { "=" }) != -12345) return;  //this would be strange
+                if (line[op_1 + 1].SubnodesType() == "(")
+                {                        
+                    if (AreAllItemsSimpleNumbers(line[op_1 + 1].SplitCommas(true)))
+                    {
+                        //more than 1 items, and alle are simple numbers
+                        line[op_1 + 1].subnodes.storage[0].s = "";
+                        line[op_1 + 1].subnodes.storage[line[op_1 + 1].subnodes.storage.Count - 1].s = "";
+                    }
+                }
+            }
+        }
+
+        private static bool AreAllItemsSimpleNumbers(List<TokenHelperComma> xx)
+        {
+            bool ok = true;
+            if (xx.Count < 2) ok = false;  //only > 1 item
+            if (ok)
+            {
+                foreach (TokenHelperComma xxx in xx)
+                {
+                    string s = xxx.list.ToString();
+                    double slet;
+                    if (!double.TryParse(s, out slet))
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+            return ok;
         }
 
         private static int FindS(List<TokenHelper> line, string s)

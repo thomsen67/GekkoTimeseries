@@ -256,9 +256,7 @@ namespace Gekko
         /// Note that the commas are preserved as the second part of the tuple.
         /// The last item (or the 1 item if there is only 1) will have null as second part of tuple.
         /// </summary>
-        /// <returns></returns>
-
-            
+        /// <returns></returns>           
 
         public List<TokenHelperComma> SplitCommas(bool firstLast)
         {

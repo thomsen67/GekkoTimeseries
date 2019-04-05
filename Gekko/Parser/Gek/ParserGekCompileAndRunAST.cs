@@ -259,7 +259,7 @@ namespace Gekko.Parser.Gek
                     if (q.Count == 1 && d.Count == 1)
                     {
                         int ii = int.Parse(d[0]);
-                        if (ii > 0) G.Writeln("*** The function " + q[0] + " does not accept " + (ii - 1) + " arguments", Color.Red);
+                        if (ii > 0) G.Writeln("*** The function " + q[0] + " does not accept " + (ii - 1 - 2) + " arguments", Color.Red);
                         else G.Writeln("*** Problem with the function  " + q[0] + "", Color.Red);
                     }
                 }

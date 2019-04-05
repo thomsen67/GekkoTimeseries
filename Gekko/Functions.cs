@@ -656,6 +656,16 @@ namespace Gekko
             return Globals.scalarVal0;
         }
 
+        //!NOTE: do not delete, use for unit tests
+        public static IVariable helper_period(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            //y <2004 2005> = f(<2003 2006>, f(<2002 2007>, x));
+
+            GekkoTime t1, t2; Helper_TimeOptionField(smpl, _t1, _t2, out t1, out t2);
+            Series ts = new Series(ESeriesType.Light, t1, t2);
+            return ts;
+        }
+
         public static IVariable isopen(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
             string s1 = O.ConvertToString(x1);

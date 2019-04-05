@@ -377,7 +377,7 @@ namespace Gekko
 
         //is recursive
         private static List<IVariable> ExplodeIvariablesHelper(IVariable iv)
-        {
+        {            
             List<IVariable> temp = new List<IVariable>();
             if (iv.Type() == EVariableType.List)
             {
@@ -10093,15 +10093,17 @@ namespace Gekko
             public string opt_gekko18 = null;
             public string opt_gekko20 = null;
             public string opt_aremos = null;
+            public string opt_move = null;
+            public string opt_remove = null;
             public void Exe()
             {
-                if (opt_aremos == null && opt_gekko18 == null && opt_gekko20 == null)
+                if (opt_aremos == null && opt_gekko18 == null && opt_gekko20 == null && opt_move == null && opt_remove == null)
                 {
-                    G.Writeln2("*** ERROR: Please use <gekko20>, <gekko18> or <aremos> to state the language");
+                    G.Writeln2("*** ERROR: Please use <gekko20>, <gekko18>, <aremos>, <move>, <remove>");
                     throw new GekkoException();
                 }
-                string extension = ".cmd";
-                if (G.Equal(opt_gekko18, "yes") || G.Equal(opt_gekko20, "yes")) extension = ".gcm";
+                string extension = ".gcm";
+                if (G.Equal(opt_aremos, "yes")) extension = ".cmd";
                 string zfilename = Program.CreateFullPathAndFileName(Program.AddExtension(this.fileName, extension));
                 string xx = Program.GetTextFromFileWithWait(zfilename);
                 List<string> xxx = G.ExtractLinesFromText(xx);                
@@ -10129,6 +10131,32 @@ namespace Gekko
                 else if (G.Equal(opt_gekko20, "yes"))
                 {
                     string ss = Translator_Gekko20_Gekko30.Translate(xx);
+                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(ss);
+                        sw.Flush();
+                        sw.Close();
+                    }
+                    G.Writeln2("Translated file into: " + zz);
+                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
+                }
+                else if (G.Equal(opt_remove, "yes"))
+                {
+                    string ss = Translator_Gekko20_Gekko30.Remove(xx);
+                    using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.Write(ss);
+                        sw.Flush();
+                        sw.Close();
+                    }
+                    G.Writeln2("Translated file into: " + zz);
+                    G.Writeln("Translate comments: see /* TRANSLATE: .... */");
+                }
+                else if (G.Equal(opt_move, "yes"))
+                {
+                    string ss = Translator_Gekko20_Gekko30.Move(xx);
                     using (FileStream fs = Program.WaitForFileStream(zz, Program.GekkoFileReadOrWrite.Write))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {

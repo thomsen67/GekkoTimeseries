@@ -182,6 +182,8 @@ Additionally, there are model, solve, equation options.
         // -------- new options regarding missings end ---------------------
 
         public string sheet_engine = "internal";
+        public string sheet_collapse = "none";  //avg or total or none
+        public string sheet_freq = "simple";  //pretty or simple
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
         public bool sheet_mulprt_pch = false;  //q

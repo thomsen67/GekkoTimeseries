@@ -41,6 +41,7 @@ tokens {
 	ASTGLOBAL;
 	ASTIN;
 	ASTCURLYALONE;
+	ASTNUMBERLIST;
 	ASTOBJECTFUNCTION;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
@@ -537,6 +538,8 @@ ASTOPT_STRING_Y2;
 
 	ASTOPT_STRING_DUMP;
 	ASTOPT_STRING_BANK;
+	ASTOPT_STRING_MOVE;
+	ASTOPT_STRING_REMOVE;
 	ASTOPT_STRING_ADDBANK;
 	ASTOPT_STRING_SHOWBANK;
 	ASTOPT_STRING_SHOWFREQ;
@@ -956,6 +959,8 @@ Y2                    = 'Y2'                       ;
     CLIP            = 'CLIP'           ;
     CLIPBOARD            = 'CLIPBOARD'           ;
     CLONE = 'CLONE';
+	MOVE = 'MOVE';
+	REMOVE = 'REMOVE';
     CLOSE            = 'CLOSE';
     CLOSEALL         = 'CLOSEALL'        ;
     CLOSEBANKS       = 'CLOSEBANKS'        ;
@@ -1564,6 +1569,8 @@ d.Add("Y" ,Y);
                                         d.Add("clip"   , CLIP       );
                                         d.Add("clipboard"   , CLIPBOARD       );
                                         d.Add("CLONE", CLONE);
+										d.Add("MOVE", MOVE);
+										d.Add("REMOVE", REMOVE);
                                         d.Add("close"  , CLOSE );
                                         d.Add("closeall", CLOSEALL  );
                                         d.Add("closebanks", CLOSEBANKS  );
@@ -2144,10 +2151,16 @@ expressionOrNothing:        expression -> expression
 // ------------------- naked list ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-nakedList:  seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+);
+//nakedList:					   seqOfNumbers
+//							 | seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+)
+//							   ;
+
+nakedList:					   seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+)
+							   ;
 
 seqItemNaked:                  MINUS seqItem7Naked -> ^(ASTSEQITEMMINUS seqItem7Naked)
-							| seqItem7Naked							
+							| seqItem7Naked		
+							| seqNumber
 						      ;
 
 seqItem7Naked:                bank7Naked? name7 indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7) ^(ASTPLACEHOLDER indexer7Naked?));
@@ -2161,6 +2174,13 @@ indexer7Naked:			  leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
+
+seqNumber:                    MINUS? double2 -> ^(ASTNUMBER MINUS? double2)
+						    | MINUS? Integer -> ^(ASTNUMBER MINUS? Integer)
+							  ;
+//seqOfNumbers:                 seqNumber (COMMA2 seqNumber)* ->  ^(ASTNUMBERLIST seqNumber+);
+
+// ----------------------------------------------------------------------------------
 
 seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 							| seqItem7 doubleDot2 seqItem7 -> ^(ASTRANGEWITHBANK seqItem7 seqItem7)
@@ -3472,6 +3492,8 @@ translateOpt1: ISNOTQUAL | leftAngle        translateOpt1h* RIGHTANGLE -> transl
 translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 yesNo?)
 						  | GEKKO20 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO20 yesNo?)
 						  | AREMOS (EQUAL yesNo)? -> ^(ASTOPT_STRING_AREMOS yesNo?)
+						  | MOVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MOVE yesNo?)  //not shown in documentation etc.
+						  | REMOVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_REMOVE yesNo?)  //not shown in documentation etc.
 						  ;	
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3699,6 +3721,8 @@ optionType:
 			 | SERIES DATA TABLE MISSING '=' optionSeriesMissing -> SERIES DATA TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
 			 			 
 			 | SHEET question -> SHEET question
+			 | SHEET COLLAPSE '='? optionPrintCollapse ->  SHEET COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)			 
+			 | SHEET FREQ '='? optionPrintFreq ->  SHEET FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)             
 			 | SHEET ENGINE '='? optionSheetEngine -> SHEET ENGINE ^(ASTSTRINGSIMPLE optionSheetEngine)
 			 | SHEET MULPRT (GDIF|GDIFF) '='? yesNoSimple -> SHEET MULPRT GDIF ^(ASTBOOL yesNoSimple)
              | SHEET MULPRT ABS '='? yesNoSimple -> SHEET MULPRT ABS ^(ASTBOOL yesNoSimple)
@@ -3991,7 +4015,7 @@ ident2: 					Ident |
   CHECKOFF|
   CLEAR|
   CLIP|
-  CLONE|
+  CLONE|  
   CLOSE|
   CLS|
   COLLAPSE|
@@ -4135,6 +4159,8 @@ ident2: 					Ident |
   CLOSEALL|
   CLOSEBANKS|
   CODE|
+  MOVE|
+  REMOVE|
   COLNAMES|
   COLORS|
   COLS|
@@ -4567,6 +4593,8 @@ ident3: 					Ident |
   CLOSEALL|
   CLOSEBANKS|
   CODE|
+  MOVE|
+  REMOVE|
   COLNAMES|
   COLORS|
   COLS|
@@ -4957,6 +4985,7 @@ expression4:                expression | ;  //alias
 fragment NEWLINE2:          '\n' ;
 fragment NEWLINE3:          '\r\n' ;
 fragment DIGIT:             '0'..'9' ;
+fragment DIGITNOTZERO:      '1'..'9' ;
 fragment LETTER:            'a'..'z'|'A'..'Z';
 
 HTTP:                       H_ T_ T_ P_  ':' ('//');  // 'catch HTTP://' before COMMENT interferes with the '//'
@@ -4970,12 +4999,12 @@ COMMENT_MULTILINE:          '/*' (options {greedy=false;}: COMMENT_MULTILINE | .
                             //for instance a38x
 Ident:                      (LETTER|'_') (DIGIT|LETTER|'_')*  { $type = CheckKeywordsTable(Text); };
                             //for instance 12345
-Integer:                    DIGIT+  ;
-                            //for instance 25e12
-DigitsEDigits:              DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk!
+Integer:                    DIGITNOTZERO DIGIT*;
+                            //for instance 25e12, but not 007
+DigitsEDigits:              DIGITNOTZERO DIGIT*  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk! Does not allow 007e10, but 2e0015 is ok
                             //for instance 2012q3
-DateDef:                    DIGIT+ ( A_ | Q_ | M_ | U_ ) DIGIT+  //for instance 2000q2 or 2003m11
-					      | DIGIT+ ( A_ | U_ )  //2010a or 18u
+DateDef:                    DIGITNOTZERO DIGIT* ( A_ | Q_ | M_ | U_ ) DIGITNOTZERO DIGIT*  //for instance 2000q2 or 2003m11
+					      | DIGITNOTZERO DIGIT* ( A_ | U_ )  //2010a or 18u
 						    ;  
                             //for instance 05a, everything not captured by Ident, Integer, DigitsEDigits, Datedef.
 IdentStartingWithInt:       (DIGIT|LETTER|'_')+;

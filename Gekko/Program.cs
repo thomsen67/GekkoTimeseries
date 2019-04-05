@@ -29036,6 +29036,11 @@ namespace Gekko
                 bool showAllFreqsEachYear = true;
                 if (type == EPrintTypes.Sheet) showAllFreqsEachYear = false;  //SHEET <2010q2 2010q3> should not show q1 and q3
 
+                bool pretty = false;
+                if (type == EPrintTypes.Sheet && G.Equal(Program.options.sheet_freq, "pretty")) pretty = true;
+                if (type == EPrintTypes.Print && G.Equal(Program.options.print_freq, "pretty")) pretty = true;
+                
+
                 // 1. 2003 (label)       
                 // 2. 2003q1            Q         
                 // 3. 2003m1                 M
@@ -29061,15 +29066,27 @@ namespace Gekko
                 //23. SUM4Q             Qsum           
                 //24. ANNUAL     A
 
-                EPrtCollapseTypes collapse = GetCollapseType(o);
+                EPrtCollapseTypes collapse = GetCollapseType(o, type);
+                if (pretty == false) collapse = EPrtCollapseTypes.None;  //switched off for non-pretty
+
+                bool showRowWithYear = pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A);
 
                 //remember there is a label column which gets number 1
                 for (int year = y1; year <= y2; year++)
                 {
 
+                    string uglyYear = null; if (!pretty) uglyYear = year.ToString();                    
+
                     if (type != EPrintTypes.Plot) // ------------------------------------------------------------- (1)
                     {
-                        i++;
+                        //if (pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A)) i++;
+
+                        //if (!pretty && year != y1 && !(sameFreq == EFreq.U || sameFreq == EFreq.A))
+                        
+                        if (pretty || year == y1 || (sameFreq == EFreq.U || sameFreq == EFreq.A))
+                        {
+                            i++;
+                        }
                         if (year == y1)
                         {
                             if (j <= 1)
@@ -29101,32 +29118,33 @@ namespace Gekko
                                 }
                             }
                         }
-                        i++;
 
-
-
-                        //Non-plots have a first column with dates, plots have such a column for each series
-                        //if (j == 1)  //then iv == null
+                        if (showRowWithYear)
                         {
-                            // --------------------------                                
-                            // --------------------------
-                            if ((sameFreq == EFreq.U || sameFreq == EFreq.A) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.U && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.U, year, 1))) || (Globals.globalPeriodTimeFilters2[0].freq == EFreq.A && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.A, year, 1)))))
+
+                            i++;
+
+                            //Non-plots have a first column with dates, plots have such a column for each series
+                            //if (j == 1)  //then iv == null
                             {
-                                //kind of hack for annual to omit year if the year is filtered out
-                                i--;
-                            }
-                            else
-                            {
-                                if (j == 1)
+                                // --------------------------                                
+                                // --------------------------
+                                if ((sameFreq == EFreq.U || sameFreq == EFreq.A) && Globals.globalPeriodTimeFilters2.Count > 0 && ((Globals.globalPeriodTimeFilters2[0].freq == EFreq.U && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.U, year, 1))) || (Globals.globalPeriodTimeFilters2[0].freq == EFreq.A && Program.ShouldFilterPeriod(new Gekko.GekkoTime(EFreq.A, year, 1)))))
                                 {
-                                    table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //kind of hack for annual to omit year if the year is filtered out
+                                    i--;
+                                }
+                                else
+                                {
+                                    if (j == 1)
+                                    {
+                                        table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                    }
                                 }
                             }
+
+                            if (sameFreq == EFreq.U || sameFreq == EFreq.A) i--; // #98075235874325
                         }
-
-
-
-                        if (sameFreq == EFreq.U || sameFreq == EFreq.A) i--; // #98075235874325
                     }
 
                     if (true)  // ------------------------------------------------------------- (2)
@@ -29141,7 +29159,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m1"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29161,7 +29179,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m2"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29182,7 +29200,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29218,7 +29236,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29239,7 +29257,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29268,7 +29286,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29289,7 +29307,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m5"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29310,7 +29328,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m6"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m6"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29346,7 +29364,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29367,7 +29385,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "q2"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29410,7 +29428,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m7"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m7"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29431,7 +29449,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m8"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m8"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29452,7 +29470,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m9"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m9"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29488,7 +29506,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29510,7 +29528,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "q3"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29542,7 +29560,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m10"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m10"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29563,7 +29581,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m11"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m11"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29584,7 +29602,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "m12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m12"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29620,7 +29638,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29657,7 +29675,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29677,7 +29695,7 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, "q4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "q4"); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
@@ -29713,7 +29731,7 @@ namespace Gekko
                             {
                                 if (j == 1)
                                 {
-                                    table.Set(i, j, "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    table.Set(i, j, uglyYear + "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                                 else
                                 {
@@ -29757,7 +29775,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    table.Set(i, j, "a");
+                                    table.Set(i, j, uglyYear + "a");
                                     if (rows) table.SetAlign(i, j, Align.Right);
                                 }
                             }
@@ -29768,8 +29786,7 @@ namespace Gekko
                             if (type != EPrintTypes.Plot && (sameFreq == EFreq.U || sameFreq == EFreq.A)) i = i - 1; // #98075235874325
                         }
                     }
-                }  //end of years
-                   //if (i > 1) G.Writeln(j + " " + i);
+                }  //end of years                   
                 if (j - 2 >= 0) colCounter[j - 2] = i;
             }  //end of iVarCounter
 
@@ -31079,7 +31096,7 @@ namespace Gekko
                 jj = virtualRows + numberOfLabelsLinesMax;
             }
             tab.Set(new Coord(ii, jj), "", var1, CellType.Number, "f" + width + "." + dec);
-            EPrtCollapseTypes collapse = GetCollapseType(o);
+            EPrtCollapseTypes collapse = GetCollapseType(o, EPrintTypes.Print);
             if (doAremosStuff && collapse != EPrtCollapseTypes.None)
             {
                 if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
@@ -31096,17 +31113,33 @@ namespace Gekko
             }
         }
 
-        private static EPrtCollapseTypes GetCollapseType(O.Prt o)
+        private static EPrtCollapseTypes GetCollapseType(O.Prt o, EPrintTypes type)
         {
             EPrtCollapseTypes collapse = EPrtCollapseTypes.None;
-            if (G.Equal(Program.options.print_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;
-            else if (G.Equal(Program.options.print_collapse, "total")) collapse = EPrtCollapseTypes.Total;
-            if (G.Equal(o.opt_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;  //overrides global options
-            else if (G.Equal(o.opt_collapse, "total")) collapse = EPrtCollapseTypes.Total;  //overrides global options
-            else if (G.Equal(o.opt_collapse, "yes"))
+
+            if (type == EPrintTypes.Print)
             {
-                if (G.Equal(Program.options.print_collapse, "none")) collapse = EPrtCollapseTypes.Total;  //default for PRT<collapse>, if no global option
+                if (G.Equal(Program.options.print_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;
+                else if (G.Equal(Program.options.print_collapse, "total")) collapse = EPrtCollapseTypes.Total;
+                if (G.Equal(o.opt_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;  //overrides global options
+                else if (G.Equal(o.opt_collapse, "total")) collapse = EPrtCollapseTypes.Total;  //overrides global options
+                else if (G.Equal(o.opt_collapse, "yes"))
+                {
+                    if (G.Equal(Program.options.print_collapse, "none")) collapse = EPrtCollapseTypes.Total;  //default for PRT<collapse>, if no global option
+                }
             }
+            else if (type == EPrintTypes.Sheet)
+            {
+                if (G.Equal(Program.options.sheet_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;
+                else if (G.Equal(Program.options.sheet_collapse, "total")) collapse = EPrtCollapseTypes.Total;
+                if (G.Equal(o.opt_collapse, "avg")) collapse = EPrtCollapseTypes.Avg;  //overrides global options
+                else if (G.Equal(o.opt_collapse, "total")) collapse = EPrtCollapseTypes.Total;  //overrides global options
+                else if (G.Equal(o.opt_collapse, "yes"))
+                {
+                    if (G.Equal(Program.options.sheet_collapse, "none")) collapse = EPrtCollapseTypes.Total;  //default for PRT<collapse>, if no global option
+                }
+            }
+
             return collapse;
         }
 
@@ -31196,7 +31229,7 @@ namespace Gekko
                 tab.SetAlign(iii, jjj, Align.Right);
             }
 
-            if (doAremosStuff && GetCollapseType(o) != EPrtCollapseTypes.None)
+            if (doAremosStuff && GetCollapseType(o, EPrintTypes.Print) != EPrtCollapseTypes.None)
             {
                 if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
                 {

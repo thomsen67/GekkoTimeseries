@@ -3300,6 +3300,7 @@ namespace UnitTests
         {
             //made by running the code and copy-pasting to Excel.
             I("reset;");
+            I("option print collapse = total;");
             I("time 2001 2003;");
             I("xx1 = (1,2,3);");
             I("xx2 = (4,5,6);");
@@ -17387,6 +17388,11 @@ namespace UnitTests
             _AssertSeries(First(), "y3", 2005, double.NaN, sharedDelta);
         }
 
+        [TestMethod]
+        public void _Test_PeriodInFunctionProcedure()
+        {
+
+        }
 
         [TestMethod]
         public void _Test_HPFilter()
