@@ -14,7 +14,7 @@ namespace Gekko
         public string string2;
         //public IVariable pointerTo = null;  //used in case the string points to for instance a timeseries. Only used inside a GENR/PRT statement, inside the implicit timeloop (where we can be sure that the string itself does not change value). Is set to null again after the time loop.
         //public bool _isName = false;
-        public bool isFromSeqOfBankvarnames = false; //do not protobuf this
+        public bool isFromNakedList = false; //do not protobuf this
 
         private ScalarString()
         {
@@ -409,7 +409,7 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
             double d = double.NaN; bool b = double.TryParse(this.string2, out d);
-            if (this.isFromSeqOfBankvarnames && b)
+            if (this.isFromNakedList && b)
             {
 
                 G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
@@ -430,7 +430,7 @@ namespace Gekko
             G.Writeln2("*** ERROR: Could not convert the string '" + this.string2 + "' directly into a date.");
             G.Writeln("           You may try the date() conversion function.");
             GekkoTime gt = G.FromStringToDate(this.string2);            
-            if (this.isFromSeqOfBankvarnames && !gt.IsNull())
+            if (this.isFromNakedList && !gt.IsNull())
             {
                 G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
                 G.Writeln("           'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
@@ -516,7 +516,7 @@ namespace Gekko
         public IVariable DeepClone(GekkoSmplSimple truncate)
         {
             ScalarString ss = new ScalarString(this.string2);
-            ss.isFromSeqOfBankvarnames = this.isFromSeqOfBankvarnames;
+            ss.isFromNakedList = this.isFromNakedList;
             return ss;
         }
 

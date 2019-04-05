@@ -1713,6 +1713,18 @@ namespace Gekko.Parser.Gek
                             node.Code.A(node[0].Code);
                         }
                         break;
+                    case "ASTNUMBER":
+                        {
+                            if (node.ChildrenCount() > 1 && node[1].Text == "ASTNUMBERMINUS")
+                            {
+                                node.Code.A("O.Minus(" + node[0].Code + ")");
+                            }
+                            else
+                            {
+                                node.Code.A(node[0].Code);
+                            }
+                        }
+                        break;
                     case "ASTDOUBLE":
                         {
                             //TODO TODO TODO
@@ -4212,8 +4224,11 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
-                    case "ASTBANKVARNAMELIST":                    
+                    case "ASTBANKVARNAMELIST":
+                    case "ASTNAKEDLIST":
                         {
+                            string naked = "false";
+                            if (node.Text == "ASTNAKEDLIST") naked = "true";
                             bool isFor = false;
                             ASTNode parent = node?.Parent?.Parent?.Parent?.Parent;
                             if (parent != null && parent.Text == "ASTFOR")
@@ -4221,13 +4236,13 @@ namespace Gekko.Parser.Gek
                                 isFor = true;
                             }
 
-                            string code = "O.ExplodeIvariablesSeq(new List(new List<IVariable> {";
-                            if (isFor) code = "O.ExplodeIvariablesSeqFor(new List(new List<IVariable> {";
+                            string code = "O.ExplodeIvariablesSeq(" + naked + ", new List(new List<IVariable> {";
+                            if (isFor) code = "O.ExplodeIvariablesSeqFor(" + naked + ", new List(new List<IVariable> {";
 
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.Text == "ASTSEQ7" || child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" || child.Text == "ASTSEQITEMMINUS")
+                                if (child.Text == "ASTNUMBER" || child.Text == "ASTSEQ7" || child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" || child.Text == "ASTSEQITEMMINUS")
                                 {
                                     name = child.Code.ToString();
                                 }

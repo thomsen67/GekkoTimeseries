@@ -345,29 +345,40 @@ namespace Gekko
             return rv;
         }
 
-        public static List ExplodeIvariablesSeqFor(IVariable iv)
+        public static List ExplodeIvariablesSeqFor(bool isNaked, IVariable iv)
         {
-            List m = ExplodeIvariablesSeq(iv);
+            List m = ExplodeIvariablesSeq(isNaked, iv);
             m = Restrict2(m, true, false, true, true);  //no sigils
             return m;
         }
 
-        public static List ExplodeIvariablesSeq(IVariable iv)
+        public static List ExplodeIvariablesSeq(bool isNaked, IVariable iv)
         {
             List m = new List(ExplodeIvariablesHelper(iv));
-            m.isFromSeqOfBankvarnames = true;
+            if (isNaked) m.isFromNakedList = true;
 
             foreach (IVariable child in m.list)
             {
                 ScalarString child_string = child as ScalarString;  //should always be so
                 if (child_string != null)
                 {
-                    child_string.isFromSeqOfBankvarnames = true;
+                    if (isNaked) child_string.isFromNakedList = true;
                 }
             }
 
             return m;
 
+        }
+
+        public static ScalarVal Minus(IVariable iv)
+        {
+            ScalarVal x = iv as ScalarVal;
+            if (x == null)
+            {
+                G.Writeln("*** ERROR: trying to use -x on a variable x that is not a value");
+                throw new GekkoException();
+            }
+            return new ScalarVal(-x.val);
         }
 
         public static List ExplodeIvariables(IVariable iv)
@@ -2407,19 +2418,7 @@ namespace Gekko
 
             if (rhs.Type() == EVariableType.List)
             {
-                List rhs_list = rhs as List;
-                if (false)
-                {
-                    //This test is no longer necessary: the parser no longer allows #m = %x, %y; 
-                    if (rhs_list.isFromSeqOfBankvarnames)
-                    {
-                        //a list def like #m = a, b, c; will be ok,
-                        //and also #m = a, b!q, b:x, y[a, b]
-                        //but for instance #m = %a, #m are not allowed since it is too confusing.
-                        //In such cases, use #m = (..., ...);
-                        rhs = O.Restrict2(rhs_list, true, false, true, true);  //only pure idents
-                    }
-                }
+                List rhs_list = rhs as List;                
             }
 
             bool isArraySubSeries = false;

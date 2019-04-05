@@ -11,7 +11,7 @@
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
+	naked
     You should have received a copy of the GNU General Public License
     along with this program (see the file COPYING in the root folder).
     Else, see <http://www.gnu.org/licenses/>.
@@ -32,11 +32,13 @@ options {
 tokens {
 	ASTDOLLAR;
 	ASTFORTYPE1;
+	ASTNUMBERMINUS;
 	ASTFORTYPE2;
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
 	ASTL0;
+	ASTNAKEDLIST;
 	ASTL1;
 	ASTGLOBAL;
 	ASTIN;
@@ -2155,12 +2157,12 @@ expressionOrNothing:        expression -> expression
 //							 | seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+)
 //							   ;
 
-nakedList:					   seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+)
+nakedList:					   seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTNAKEDLIST seqItemNaked+)
 							   ;
 
 seqItemNaked:                  MINUS seqItem7Naked -> ^(ASTSEQITEMMINUS seqItem7Naked)
-							| seqItem7Naked		
-							| seqNumber
+							| seqItem7Naked	(REP repN)?	-> seqItem7Naked repN?
+							| seqNumber (REP repN)? -> seqNumber repN?							
 						      ;
 
 seqItem7Naked:                bank7Naked? name7 indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7) ^(ASTPLACEHOLDER indexer7Naked?));
@@ -2175,8 +2177,9 @@ indexer7Naked:			  leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name
 // ------------------- flexible list --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-seqNumber:                    MINUS? double2 -> ^(ASTNUMBER MINUS? double2)
-						    | MINUS? Integer -> ^(ASTNUMBER MINUS? Integer)
+minus:                        MINUS -> ASTNUMBERMINUS;
+seqNumber:                    minus? double2 -> ^(ASTNUMBER double2 minus?)
+						    | minus? Integer -> ^(ASTNUMBER Integer minus?)
 							  ;
 //seqOfNumbers:                 seqNumber (COMMA2 seqNumber)* ->  ^(ASTNUMBERLIST seqNumber+);
 
@@ -4985,7 +4988,6 @@ expression4:                expression | ;  //alias
 fragment NEWLINE2:          '\n' ;
 fragment NEWLINE3:          '\r\n' ;
 fragment DIGIT:             '0'..'9' ;
-fragment DIGITNOTZERO:      '1'..'9' ;
 fragment LETTER:            'a'..'z'|'A'..'Z';
 
 HTTP:                       H_ T_ T_ P_  ':' ('//');  // 'catch HTTP://' before COMMENT interferes with the '//'
@@ -4999,12 +5001,12 @@ COMMENT_MULTILINE:          '/*' (options {greedy=false;}: COMMENT_MULTILINE | .
                             //for instance a38x
 Ident:                      (LETTER|'_') (DIGIT|LETTER|'_')*  { $type = CheckKeywordsTable(Text); };
                             //for instance 12345
-Integer:                    DIGITNOTZERO DIGIT*;
+Integer:                    DIGIT+;
                             //for instance 25e12, but not 007
-DigitsEDigits:              DIGITNOTZERO DIGIT*  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk! Does not allow 007e10, but 2e0015 is ok
+DigitsEDigits:              DIGIT+  ( E_ )  DIGIT+;  //for instance 25e12, problem is this can also be a name chunk! Does not allow 007e10, but 2e0015 is ok
                             //for instance 2012q3
-DateDef:                    DIGITNOTZERO DIGIT* ( A_ | Q_ | M_ | U_ ) DIGITNOTZERO DIGIT*  //for instance 2000q2 or 2003m11
-					      | DIGITNOTZERO DIGIT* ( A_ | U_ )  //2010a or 18u
+DateDef:                    DIGIT+ ( A_ | Q_ | M_ | U_ ) DIGIT+  //for instance 2000q2 or 2003m11
+					      | DIGIT+ ( A_ | U_ )  //2010a or 18u
 						    ;  
                             //for instance 05a, everything not captured by Ident, Integer, DigitsEDigits, Datedef.
 IdentStartingWithInt:       (DIGIT|LETTER|'_')+;

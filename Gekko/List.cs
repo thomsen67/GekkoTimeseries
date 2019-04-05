@@ -14,7 +14,7 @@ namespace Gekko
         //Used for pointing to Lists without having to create/clone them.      
 
         public bool isNameList = true;  //no protobuf
-        public bool isFromSeqOfBankvarnames = false;  //no protobuf
+        public bool isFromNakedList = false;  //no protobuf
 
         [ProtoMember(1)]
         public List<IVariable> list = null;  
@@ -365,7 +365,7 @@ namespace Gekko
                 }
             }
             List l = new List(temp);
-            l.isFromSeqOfBankvarnames = this.isFromSeqOfBankvarnames;
+            l.isFromNakedList = this.isFromNakedList;
             return l;
         }
 
