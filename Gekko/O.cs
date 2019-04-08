@@ -354,12 +354,31 @@ namespace Gekko
 
         public static List ExplodeIvariablesSeq(bool isNaked, IVariable iv)
         {
-            List m = new List(ExplodeIvariablesHelper(iv));
+            List m = null;
+            if (isNaked)
+            {
+                m = iv as List;
+                if (m == null)
+                {
+                    G.Writeln2("*** ERROR: Internal error related to naked lists");
+                    throw new GekkoException();
+                }
+            }
+            else
+            {
+                m = new List(ExplodeIvariablesHelper(iv));
+            }
+            
             if (isNaked)
             {
                 bool allNumbers = true;
                 for (int i = 0; i < m.list.Count; i += 2)
                 {
+                    if (m.list[i].Type() != EVariableType.Val && m.list[i].Type() != EVariableType.String)
+                    {
+                        G.Writeln2("*** ERROR: Naked lists only support val or string types");
+                        throw new GekkoException();
+                    }
                     if (m.list[i].Type() == EVariableType.Val) continue;
                     if (m.list[i].Type() == EVariableType.String)
                     {

@@ -85,7 +85,7 @@ namespace Gekko
         {
             if (ths.Type() != EVariableType.Date)
             {
-                G.Writeln2("*** ERROR: getyear() expects date input");
+                G.Writeln2("*** ERROR: getquarter() expects date input");
                 throw new GekkoException();
             }
 
