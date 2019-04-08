@@ -14955,13 +14955,13 @@ namespace UnitTests
 
             I("RESET; TIME 2001 2005;");
             I("xx1 = (1, 2, 3, 4, 5);");
-            I("#m = xx1;");  //autoconverted into matrix    WHY??? --> does not work anymore! Too easy to misunderstand as a 1-element naked list
+            //I("#m = xx1;");  //autoconverted into matrix    WHY??? --> does not work anymore! Too easy to misunderstand as a 1-element naked list
             I("#m = pack(xx1);");  //using proper method
             _AssertMatrix(First(), "#m", 1, 1, 1, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 2, 2, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 3, 3, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 4, 4, sharedDelta);
-            _AssertMatrix(First(), "#m", 1, 5, 5, sharedDelta);
+            _AssertMatrix(First(), "#m", 2, 1, 2, sharedDelta);
+            _AssertMatrix(First(), "#m", 3, 1, 3, sharedDelta);
+            _AssertMatrix(First(), "#m", 4, 1, 4, sharedDelta);
+            _AssertMatrix(First(), "#m", 5, 1, 5, sharedDelta);
 
             I("#m = [1, 2; 3, 4];");
             _AssertMatrix(First(), "#m", 1, 1, 1d, sharedDelta);

@@ -30121,10 +30121,15 @@ namespace Gekko
                 }
                 else if (x.Type() == EVariableType.Val)
                 {
+                    ////See also #83490837432, these should be merged/fusioned
                     //We use same format as for normal PRT of series, but the width is truncated regarding blanks
-                    double d = ((ScalarVal)x).val;                    
-                    string format = "f" + Program.options.print_fields_nwidth + "." + Program.options.print_fields_ndec + "";
-                    string s3 = G.FormatNumber(d, format, false, false).Trim();
+                    double d = ((ScalarVal)x).val;
+                    //string format = "f" + Program.options.print_fields_nwidth + "." + Program.options.print_fields_ndec + "";
+                    //G.FormatNumber(d, format, false, false).Trim();
+                    string z = "";
+                    for (int i = 0; i < Program.options.print_fields_ndec; i++) z += "#";
+                    string format = "0." + z;
+                    string s3 = d.ToString("0." + z, CultureInfo.InvariantCulture);
                     s += s3;
                 }
                 else
