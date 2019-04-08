@@ -2505,6 +2505,8 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;
 
+/*
+
 assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
 						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT¤"+($expression.text), ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
@@ -2548,8 +2550,57 @@ assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^({tok
 
 
 							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
+assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT¤"+($expression.text), ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)						 
+						    ;
+
+*/
+
+
+assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2)
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)   
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2)
+						  | assignmentType seriesOpt1? leftSide STAREQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)   
+						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2)
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)   
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2)
+						  | assignmentType seriesOpt1? leftSide percentEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)   
+						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2)
+						  | assignmentType seriesOpt1? leftSide HATEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)   
+						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2)
+						  | assignmentType seriesOpt1? leftSide hashEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)   
+						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2)
+
+
+						  | assignmentType leftSide seriesOpt1 EQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType leftSide seriesOpt1 EQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER)
+						  | assignmentType leftSide seriesOpt1 PLUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2)
+						  | assignmentType leftSide seriesOpt1 PLUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2)
+						  | assignmentType leftSide seriesOpt1 MINUSEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTMINUS2)   
+						  | assignmentType leftSide seriesOpt1 MINUSEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTMINUS2)
+						  | assignmentType leftSide seriesOpt1 STAREQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTSTAR2)   
+						  | assignmentType leftSide seriesOpt1 STAREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTSTAR2)
+						  | assignmentType leftSide seriesOpt1 DIVEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTDIV2)   
+						  | assignmentType leftSide seriesOpt1 DIVEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTDIV2)
+						  | assignmentType leftSide seriesOpt1 percentEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPERCENT2)   
+						  | assignmentType leftSide seriesOpt1 percentEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPERCENT2)
+						  | assignmentType leftSide seriesOpt1 HATEQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHAT2)   
+						  | assignmentType leftSide seriesOpt1 HATEQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHAT2)
+						  | assignmentType leftSide seriesOpt1 hashEqual nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2)   
+						  | assignmentType leftSide seriesOpt1 hashEqual expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2)
+						  
+						  //handle y<2001 2005>=100, where '>=' is a token
+						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL nakedList -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER) 
+						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL expression -> ^({token("ASTASSIGNMENT", ASTASSIGNMENT, input.LT(1).Line)} ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER)
+						  						  
+						    ;
+
+							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
 assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTASSIGNMENT ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType)						 
 						    ;
+
 
 
 

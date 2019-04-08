@@ -420,15 +420,25 @@ namespace Gekko
                 }
                 
                 m = ListDefHelper2(m.list.ToArray());  //ok that it is new
-                m.isFromNakedList = true;
+                //m.isFromNakedList = true;
             }
 
-            foreach (IVariable child in m.list)
+            if (isNaked)
             {
-                ScalarString child_string = child as ScalarString;  //should always be so
-                if (child_string != null)
+                //check that the items have same type
+                for (int i = 0; i < m.list.Count; i++)
                 {
-                    if (isNaked) child_string.isFromNakedList = true;
+                    if (i > 0 && m.list[i - 1].Type() != m.list[i].Type())
+                    {
+                        G.Writeln2("*** ERROR: Naked list elements #" + ((i - 1) + 1) + " and #" + (i + 1) + " have different type");
+                        G.Writeln("           Naked lists do not allow this, to avoid confusion. Please use a normal list definition.");
+                        throw new GekkoException();
+                    }
+                    ScalarString child_string = m.list[i] as ScalarString;  //should always be so
+                    if (child_string != null)
+                    {
+                        child_string.isFromNakedList = true;
+                    }
                 }
             }
 
@@ -2490,19 +2500,7 @@ namespace Gekko
             if (rhs.Type() == EVariableType.List)
             {
                 List rhs_list = rhs as List;
-                if (rhs_list.isFromNakedList)
-                {
-                    //check that the items have same type
-                    for (int i = 1; i < rhs_list.list.Count; i++)
-                    {
-                        if (rhs_list.list[i - 1].Type() != rhs_list.list[i].Type())
-                        {
-                            G.Writeln2("*** ERROR: Naked list elements #" + ((i - 1) + 1) + " and #" + (i + 1) + " have different type");
-                            G.Writeln("           Naked lists do not allow this, to avoid confusion. Please use a normal list definition.");
-                            throw new GekkoException();
-                        }
-                    }
-                }
+                
             }
 
             bool isArraySubSeries = false;

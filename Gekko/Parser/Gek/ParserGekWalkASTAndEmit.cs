@@ -4091,7 +4091,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //may be overwritten with explicit source
                                 //maybe later on introduce a #calc list with such meta information
-                                sb.A("o" + Num(node) + ".opt_source = `" + node.specialExpressionAndLabelInfo[1] + "`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_source = @`" + node.specialExpressionAndLabelInfo[1] + "`;" + G.NL);
                             }
 
                             string type = HandleVar(node[3].Text);  //2 is options   
