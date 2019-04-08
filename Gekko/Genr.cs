@@ -17,23 +17,72 @@ namespace Gekko
 
             O.Assignment o0 = new O.Assignment();
 
+            Func<Map> MapDef_mapTmpvar2 = () =>
+            {
+                Map mapTmpvar2 = new Map();
+                Action assign_4 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar3 = O.HandleString(new ScalarString(@"a"));
+                    O.AdjustT0(smpl, 2);
+                    O.Lookup(smpl, mapTmpvar2, null, "%i1", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                };
+                Func<bool> check_4 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar3 = O.HandleString(new ScalarString(@"a"));
+                    O.AdjustT0(smpl, 2);
+                    if (ivTmpvar3.Type() != EVariableType.Series) return false;
+                    O.Dynamic1(smpl);
+                    O.Lookup(smpl, mapTmpvar2, null, "%i1", null, ivTmpvar3, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                    return O.Dynamic2(smpl);
+                };
+                O.RunAssigmentMaybeDynamic(smpl, assign_4, check_4, o0);
+
+                Action assign_7 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar5 = i6;
+                    O.AdjustT0(smpl, 2);
+                    O.Lookup(smpl, mapTmpvar2, null, "%v1", null, ivTmpvar5, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                };
+                Func<bool> check_7 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar5 = i6;
+                    O.AdjustT0(smpl, 2);
+                    if (ivTmpvar5.Type() != EVariableType.Series) return false;
+                    O.Dynamic1(smpl);
+                    O.Lookup(smpl, mapTmpvar2, null, "%v1", null, ivTmpvar5, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                    return O.Dynamic2(smpl);
+                };
+                O.RunAssigmentMaybeDynamic(smpl, assign_7, check_7, o0);
+
+
+                return mapTmpvar2;
+            };
+
 
             Action assign_8 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar7 = O.ExplodeIvariablesSeq(true, new List(new List<IVariable> { new ScalarString("a"), null, new ScalarString("b"), null }));
+                IVariable ivTmpvar1 = MapDef_mapTmpvar2();
                 O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "#m", null, ivTmpvar7, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                O.Lookup(smpl, null, null, "#m", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
                 ;
             };
             Func<bool> check_8 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar7 = O.ExplodeIvariablesSeq(true, new List(new List<IVariable> { new ScalarString("a"), null, new ScalarString("b"), null }));
+                IVariable ivTmpvar1 = MapDef_mapTmpvar2();
                 O.AdjustT0(smpl, 2);
-                if (ivTmpvar7.Type() != EVariableType.Series) return false;
+                if (ivTmpvar1.Type() != EVariableType.Series) return false;
                 O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "#m", null, ivTmpvar7, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                O.Lookup(smpl, null, null, "#m", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
                 ;
                 return O.Dynamic2(smpl);
             };
@@ -43,6 +92,7 @@ namespace Gekko
         }
 
 
+        public static readonly ScalarVal i6 = new ScalarVal(100d);
 
         public static void CodeLines(P p)
         {
