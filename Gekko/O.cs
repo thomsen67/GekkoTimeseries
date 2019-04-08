@@ -3004,10 +3004,19 @@ namespace Gekko
 
                     if (!isArraySubSeries)
                     {
+                        lhs_series.meta.stamp = Program.GetDateStamp();
                         if (options?.opt_label != null) lhs_series.meta.label = O.ConvertToString(options.opt_label);
                         if (options?.opt_source != null) lhs_series.meta.source = O.ConvertToString(options.opt_source);
                         if (options?.opt_units != null) lhs_series.meta.units = O.ConvertToString(options.opt_units);
-                        if (options?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(options.opt_stamp);
+                        if (options?.opt_stamp != null) lhs_series.meta.stamp = O.ConvertToString(options.opt_stamp);  //will override
+
+                        if (!G.NullOrEmpty(lhs_series.meta.source))
+                        {
+                            if (lhs_series.meta.source.StartsWith("<[code]>"))
+                            {
+                                lhs_series.meta.source = smpl.t1.ToString() + "-" + smpl.t2.ToString() + ": " + lhs_series.meta.source.Replace("<[code]>", "");
+                            }
+                        }
                     }
                         
                     switch (rhs.Type())

@@ -4071,6 +4071,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A(AddOperator("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
+                    
                     case "ASTASSIGNMENT":
                         {
                             string number = "_" + ++Globals.counter;
@@ -4093,7 +4094,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //may be overwritten with explicit source
                                 //maybe later on introduce a #calc list with such meta information
-                                sb.A("o" + Num(node) + ".opt_source = @`" + node.specialExpressionAndLabelInfo[1] + "`;" + G.NL);
+                                sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
                             }
 
                             string type = HandleVar(node[3].Text);  //2 is options   
