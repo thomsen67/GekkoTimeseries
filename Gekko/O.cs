@@ -360,14 +360,50 @@ namespace Gekko
                 m = iv as List;
                 if (m == null)
                 {
-                    G.Writeln2("*** ERROR: Internal error related to naked lists");
+                    G.Writeln2("*** ERROR: Naked list internal error");
                     throw new GekkoException();
+                }
+                bool hasLlist = false;
+                for (int i = 0; i < m.list.Count; i += 2)
+                {
+                    if (m.list[i].Type() == EVariableType.List)
+                    {
+                        hasLlist = true;
+                        break;
+                    }
+                }
+                
+                if (hasLlist)
+                {
+                    List mm = new List();
+                    for (int i = 0; i < m.list.Count; i += 2)
+                    {                        
+                        if (m.list[i].Type() == EVariableType.List)
+                        {
+                            if (m.list[i + 1] != null)
+                            {
+                                G.Writeln2("*** ERROR: Rep not allowed for list inside naked list");
+                                throw new GekkoException();
+                            }
+                            foreach (IVariable x in (m.list[i] as List).list)
+                            {
+                                mm.Add(x);
+                                mm.Add(null);
+                            }
+                        }
+                        else
+                        {
+                            mm.Add(m.list[i]);
+                            mm.Add(m.list[i + 1]);
+                        }
+                    }
+                    m = mm;
                 }
             }
             else
             {
                 m = new List(ExplodeIvariablesHelper(iv));
-            }
+            }            
             
             if (isNaked)
             {
@@ -480,7 +516,7 @@ namespace Gekko
         {
             return new List(ExplodeIvariablesHelper(iv));
         }
-
+        
         //is recursive
         private static List<IVariable> ExplodeIvariablesHelper(IVariable iv)
         {            
@@ -4700,7 +4736,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '==' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '==' compare");
                 throw new GekkoException();
             }
             return rv;
@@ -4746,7 +4782,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<>' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '<>' compare");
                 throw new GekkoException();
             }
             return rv;
@@ -4781,7 +4817,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '<' compare");
                 throw new GekkoException();
             }
             return rv;                        
@@ -4816,7 +4852,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '<=' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '<=' compare");
                 throw new GekkoException();
             }
             return rv;
@@ -4851,7 +4887,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '>=' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '>=' compare");
                 throw new GekkoException();
             }
             return rv;
@@ -4886,7 +4922,7 @@ namespace Gekko
             else
             {
                 G.Writeln();
-                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(x) + " do not match for '>' compare");
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '>' compare");
                 throw new GekkoException();
             }
             return rv;
