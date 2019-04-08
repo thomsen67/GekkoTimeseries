@@ -4184,6 +4184,7 @@ namespace Gekko.Parser.Gek
                             // HACK HACK HACK
                             // HACK HACK HACK
                             // HACK HACK HACK
+                            //#6473443634
                             //A hack: check that the assignment of the same object is not already there. The hack should be relatively safe.
                             if (sb.ToString().Contains(ass))  //can probably only contain one of these
                             {
