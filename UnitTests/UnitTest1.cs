@@ -249,6 +249,26 @@ namespace UnitTests
         public static double sharedDelta = 0.00000000001d;  //precision for accepting
         double sharedTableDelta = 0.0001d;  //printing
 
+        private static void _AssertListVal(IBank db, string s, List<double> ss)
+        {
+            List iv_list = db.GetIVariable(s) as List;
+            if (iv_list.list.Count != ss.Count) Assert.IsFalse(true);
+            for (int i = 0; i < iv_list.list.Count; i++)
+            {
+                IVariable item = iv_list.list[i];
+                if (item.Type() == EVariableType.Val)
+                {
+                    double d1 = (item as ScalarVal).val;
+                    double d2 = ss[i];
+                    if (!G.Compare(d1, d2)) Assert.IsFalse(true);
+                }
+                else 
+                {
+                    Assert.IsFalse(true);
+                }                
+            }
+        }
+
         private static void _AssertListString(IBank db, string s, StringOrList ss)
         {
             List iv_list = db.GetIVariable(s) as List;
@@ -264,7 +284,8 @@ namespace UnitTests
                 if (item.Type() == EVariableType.String)
                 {
                     if (ss[i].s == null) Assert.IsFalse(true);
-                    if (!G.Equal(ss[i].s, item.ConvertToString())) Assert.IsFalse(true);
+                    if (!G.Equal(ss[i].s, item.ConvertToString()))
+                        Assert.IsFalse(true);
                 }
                 else if (item.Type() == EVariableType.List)
                 {
@@ -17451,6 +17472,79 @@ namespace UnitTests
                 UData u2 = Data(s2, t, "a");
                 Assert.AreEqual(u.w, u2.w);
             }
+        }
+
+        [TestMethod]
+        public void _Test_NakedListAndSeries()
+        {
+            I("RESET; MODE data;");
+            I("#m = a, b, -c, b:a rep 1+1, b:a[x, y], 0a, 01, 10;");  //note: blank removed in ...[x, y]
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x,y]", "0a", "01", "10"));
+            I("#m = ('a', 'b', '-c', 'b:a' rep 1+1, 'b:a[x, y]', '0a', '01', '10');");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x, y]", "0a", "01", "10"));
+
+            I("#m = 1.0, m(), 3 rep 2, 3.0e6;");
+            _AssertListVal(First(), "#m", new List<double> { 1d, double.NaN, 3d, 3d, 3e6d });
+            I("#m = (1.0, m(), 3 rep 2, 3.0e6);");
+            _AssertListVal(First(), "#m", new List<double> { 1d, double.NaN, 3d, 3d, 3e6d });
+
+            FAIL("#m = 1.0, m(), 3 rep 2, 3e6;");            
+            I("#m = (1.0, m(), 3 rep 2, 3e6);");
+            _AssertListVal(First(), "#m", new List<double> { 1d, double.NaN, 3d, 3d, 3e6d });
+
+            I("#m = 1, 2;");
+            _AssertListVal(First(), "#m", new List<double> { 1d, 2d });
+            I("#m = (1, 2);");
+            _AssertListVal(First(), "#m", new List<double> { 1d, 2d });
+
+            I("#m = 12, 02;");
+            _AssertListString(First(), "#m", new StringOrList("12", "02"));
+            I("#m = (12, 02);");
+            _AssertListVal(First(), "#m", new List<double> { 12d, 2d });
+
+            I("#m = 12, 1e5;");
+            _AssertListString(First(), "#m", new StringOrList("12", "1e5"));
+            I("#m = (12, 1e5);");
+            _AssertListVal(First(), "#m", new List<double> { 12d, 100000d });
+
+            I("#m = 12, 1.0e5;");
+            _AssertListVal(First(), "#m", new List<double> { 12d, 100000d });
+            I("#m = (12, 1.0e5);");
+            _AssertListVal(First(), "#m", new List<double> { 12d, 100000d });
+            
+            I("#m = ab7, 7dy, 638, 02e, 058, 1e5;");
+            _AssertListString(First(), "#m", new StringOrList("ab7", "7dy", "638", "02e", "058", "1e5"));
+
+            I("#m = 058, 1e5;");
+            _AssertListString(First(), "#m", new StringOrList("058", "1e5"));
+
+            //now with minus --------------
+
+            I("#m = -a, -b, c, -b:a rep 1+1, -b:a[x, y], -0a, -01, -10;");  //note: blank removed in ...[x, y]
+            _AssertListString(First(), "#m", new StringOrList("-a", "-b", "c", "-b:a", "-b:a", "-b:a[x,y]", "-0a", "-01", "-10"));
+            
+            I("#m = -1.0, m(), -3 rep 2, -3.0e6;");
+            _AssertListVal(First(), "#m", new List<double> { -1d, double.NaN, -3d, -3d, -3e6d });
+            
+            FAIL("#m = -1.0, m(), -3 rep 2, -3e6;");
+            
+            I("#m = -1, -2;");
+            _AssertListVal(First(), "#m", new List<double> { -1d, -2d });
+            
+            I("#m = -12, -02;");
+            _AssertListString(First(), "#m", new StringOrList("-12", "-02"));
+            
+            I("#m = -12, -1e5;");
+            _AssertListString(First(), "#m", new StringOrList("-12", "-1e5"));
+            
+            I("#m = -12, -1.0e5;");
+            _AssertListVal(First(), "#m", new List<double> { -12d, -100000d });
+            
+            I("#m = -ab7, -7dy, -638, -02e, -058, -1e5;");
+            _AssertListString(First(), "#m", new StringOrList("-ab7", "-7dy", "-638", "-02e", "-058", "-1e5"));
+
+            I("#m = -058, -1e5;");
+            _AssertListString(First(), "#m", new StringOrList("-058", "-1e5"));
         }
 
 

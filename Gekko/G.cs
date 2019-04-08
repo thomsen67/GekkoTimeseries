@@ -958,6 +958,104 @@ namespace Gekko
             return G.Blanks(width - dlogFormatted.Length) + dlogFormatted;
         }
 
+        //Used for PRT, TABLE, etc.
+        //See also #83490837432, these should be merged/fusioned
+        public static string FormatNumber(double number, string format, bool numberShouldShowAsN, bool isTable)
+        {
+            int maxLength = 15; //default
+            int decimals = 4; //default
+
+            try
+            {
+                string format2 = format.ToLower();  //F --> f
+                if (!format2.StartsWith("f"))
+                {
+                    G.Writeln("*** ERROR: Number format should start with 'f', e.g. 'f10.2': " + format);
+                    throw new GekkoException();
+                }
+                string format3 = format.Substring(1);
+                string[] format4 = format3.Split('.');
+                if (format4.Length != 2)
+                {
+                    G.Writeln("*** ERROR: Number format should contain a '.', e.g. 'f10.2': " + format);
+                    throw new GekkoException();
+                }
+                string f0 = format4[0];
+                string f1 = format4[1];
+                int ff0 = -12345;
+                if (int.TryParse(f0, out ff0))
+                {
+                    maxLength = ff0;
+                }
+                else
+                {
+                    G.Writeln("*** ERROR: Number format should contain numbers, e.g. 'f10.2': " + format);
+                    throw new GekkoException();
+                }
+                int ff1 = -12345;
+                if (int.TryParse(f1, out ff1))
+                {
+                    decimals = ff1;
+                }
+                else
+                {
+                    G.Writeln("*** ERROR: Number format should contain numbers, e.g. 'f10.2': " + format);
+                    throw new GekkoException();
+                }
+            }
+            catch
+            {
+                G.Writeln("*** ERROR: Number format: could not parse: " + format);
+                throw new GekkoException();
+            }
+
+            var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
+
+            if (isTable)
+            {
+                if (G.Equal(Program.options.table_decimalseparator, "comma"))
+                {
+                    nfi.NumberGroupSeparator = ".";
+                    nfi.NumberDecimalSeparator = ",";
+                }
+                else
+                {
+                    nfi.NumberGroupSeparator = ",";
+                    nfi.NumberDecimalSeparator = ".";
+                }
+            }
+
+            string s = "";
+            if (isTable && Program.options.table_thousandsseparator)
+            {
+                if (decimals > 0) s = number.ToString("#,0." + new string('0', decimals), nfi);
+                else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("#,0", nfi);
+                else s = number.ToString("#,0", nfi);
+            }
+            else
+            {
+                if (decimals > 0) s = number.ToString("0." + new string('0', decimals), nfi);
+                else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
+                else s = number.ToString("0", nfi);
+            }
+
+            if (s.Length > maxLength)
+                s = new string('*', maxLength);
+            if (s.Length < maxLength)
+                s = new string(' ', maxLength - s.Length) + s;
+
+            if (double.IsNaN(number) && numberShouldShowAsN)
+            {
+                s = new string(' ', s.Length - 1) + "N";  //non-existing
+            }
+            if (s.Trim() == "NaN")
+            {
+                s = new string(' ', s.Length - 1) + "M";
+            }
+
+            return s;
+        }
+
         public static string Blanks(int count)
         {
             if (count <= 0) return "";
@@ -1343,6 +1441,13 @@ namespace Gekko
             if (G.IsEnglishLetter(c) || char.IsDigit(c))
                 return true;
             else return false;
+        }
+
+        public static bool Compare(double d1, double d2)
+        {
+            if (double.IsNaN(d1) && double.IsNaN(d2)) return true;
+            if (d1 == d2) return true;
+            return false;
         }
 
         public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
@@ -2389,13 +2494,34 @@ namespace Gekko
             return IsIdent(s);
         }   
 
-        public static bool IsInteger(string s)
-        {            
+        public static bool IsInteger(string s, bool canHaveMinus)
+        {
+            bool first = true;
             foreach (char c in s)
             {
-                if (!char.IsDigit(c)) return false;
+                if (canHaveMinus)
+                {
+                    if (first)
+                    {
+                        if ((c != '-') && !char.IsDigit(c)) return false;
+                    }
+                    else
+                    {
+                        if (!char.IsDigit(c)) return false;
+                    }
+                }
+                else
+                {
+                    if (!char.IsDigit(c)) return false;
+                }
+                first = false;
             }
             return true;
+        }
+
+        public static bool IsInteger(string s)
+        {
+            return IsInteger(s, false);
         }
 
         public static bool IsIntegerTranslate(string s)

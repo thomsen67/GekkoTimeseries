@@ -4086,6 +4086,14 @@ namespace Gekko.Parser.Gek
                                 //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
                                 sb.A("O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL);
                             }
+
+                            if (node.specialExpressionAndLabelInfo != null)
+                            {
+                                //may be overwritten with explicit source
+                                //maybe later on introduce a #calc list with such meta information
+                                sb.A("o" + Num(node) + ".opt_source = `" + node.specialExpressionAndLabelInfo[1] + "`;" + G.NL);
+                            }
+
                             string type = HandleVar(node[3].Text);  //2 is options   
                             GetCodeFromAllChildren(sb, node[2]);
                             if (G.Equal(type, "STRING2")) type = "string";
@@ -4110,8 +4118,7 @@ namespace Gekko.Parser.Gek
                             else if (operatorType == "ASTHASH2")
                             {
                                 sb.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
-                            }
-
+                            }                            
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
                             {
@@ -4224,6 +4231,29 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
+                    case "ASTNAKEDLISTMISS":
+                        {
+                            string name = node[0][0].Text;
+                            if (G.Equal(name, "m") || G.Equal(name, "miss"))
+                            {
+                                node.Code.A("Globals.scalarValMissing, null");  //the null is: no rep
+                            }
+                        }
+                        break;
+
+                    case "ASTNAKEDLISTITEM":
+                        {
+                            if(node.ChildrenCount()>1)
+                            {
+                                node.Code.A(node[0].Code + ", " + node[1].Code);
+                            }
+                            else
+                            {
+                                node.Code.A(node[0].Code + ", " + "null");
+                            }
+                        }
+                        break;
+
                     case "ASTBANKVARNAMELIST":
                     case "ASTNAKEDLIST":
                         {
@@ -4242,7 +4272,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 string name = null;
-                                if (child.Text == "ASTNUMBER" || child.Text == "ASTSEQ7" || child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" || child.Text == "ASTSEQITEMMINUS")
+                                if (child.Text == "ASTNAKEDLISTMISS" || child.Text == "ASTNAKEDLISTITEM" || child.Text == "ASTSEQ7" || child.Text == "ASTWILDCARDWITHBANK" || child.Text == "ASTRANGEWITHBANK" || child.Text == "ASTSEQITEMMINUS")
                                 {
                                     name = child.Code.ToString();
                                 }
@@ -5368,7 +5398,8 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(Globals.GekkoSmplNull);
 
                         }
-                        break;
+                        break;                            
+                    
                     case "ASTOLSELEMENTS":
                     case "ASTPRTELEMENTS":
                         {

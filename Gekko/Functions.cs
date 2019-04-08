@@ -2470,6 +2470,8 @@ namespace Gekko
             return i;
         }        
         
+        //Used as function, but also for string interplation, like TELL 'Number is {%v}'.
+        //See also #83490837432, these should be merged/fusioned
         public static IVariable format(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             string format2 = O.ConvertToString(x2);

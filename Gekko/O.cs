@@ -355,7 +355,73 @@ namespace Gekko
         public static List ExplodeIvariablesSeq(bool isNaked, IVariable iv)
         {
             List m = new List(ExplodeIvariablesHelper(iv));
-            if (isNaked) m.isFromNakedList = true;
+            if (isNaked)
+            {
+                bool allNumbers = true;
+                for (int i = 0; i < m.list.Count; i += 2)
+                {
+                    if (m.list[i].Type() == EVariableType.Val) continue;
+                    if (m.list[i].Type() == EVariableType.String)
+                    {
+                        string ss = (m.list[i] as ScalarString).string2.Trim();                        
+                        double d; if (double.TryParse(ss, out d))
+                        {
+
+                            if (!ss.Contains("."))
+                            {
+                                if (G.IsInteger(ss, true))
+                                {
+                                    //good
+                                }
+                                else
+                                {
+                                    //stuff like 1e5
+                                    allNumbers = false;
+                                    break;
+                                }
+                            }
+
+                            if (ss.StartsWith("0") && ss.Length > 1 && char.IsDigit(ss[1]))
+                            {
+                                //we do not allow 07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
+                                allNumbers = false;
+                                break;
+                            }
+
+                                if (ss.StartsWith("-") && ss.Length > 2 && ss[1] == '0' && char.IsDigit(ss[2]))
+                            {
+                                //we do not allow -07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
+                                allNumbers = false;
+                                break;
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            allNumbers = false;
+                            break;
+                        }
+                    }
+                    allNumbers = false;
+                    break;
+                }
+
+                if (allNumbers)
+                {
+                    for (int i = 0; i < m.list.Count; i += 2)
+                    {
+                        if (m.list[i].Type() == EVariableType.Val) continue;
+                        if (m.list[i].Type() == EVariableType.String)
+                        {
+                            double d = double.Parse((m.list[i] as ScalarString).string2);  //must parse
+                            m.list[i] = new ScalarVal(d);
+                        }                        
+                    }
+                }
+                
+                m = ListDefHelper2(m.list.ToArray());  //ok that it is new
+                m.isFromNakedList = true;
+            }
 
             foreach (IVariable child in m.list)
             {
@@ -394,7 +460,7 @@ namespace Gekko
             {
                 foreach (IVariable temp2 in ((List)iv).list)
                 {
-                    if (temp2.Type() == EVariableType.List)
+                    if (temp2 != null && temp2.Type() == EVariableType.List)
                     {
                         List<IVariable> temp3 = ExplodeIvariablesHelper(temp2);
                         temp.AddRange(temp3);
@@ -977,6 +1043,11 @@ namespace Gekko
         }
 
         public static List ListDefHelper(params IVariable[] x)
+        {
+            return ListDefHelper2(x);
+        }
+
+        public static List ListDefHelper2(IVariable[] x)
         {
             //Note, these come in pairs:
             //#m = (1 rep 2, 3, 4) --> 1, 2, 3, null, 4, null
@@ -2395,7 +2466,7 @@ namespace Gekko
             LookupHelperLeftside(smpl, null, null, null, rhs, arraySubSeries, type, options);
         }
 
-        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType type, O.Assignment options)
+        private static void LookupHelperLeftside(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhs, Series arraySubSeries, EVariableType lhsType, O.Assignment options)
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
@@ -2418,13 +2489,26 @@ namespace Gekko
 
             if (rhs.Type() == EVariableType.List)
             {
-                List rhs_list = rhs as List;                
+                List rhs_list = rhs as List;
+                if (rhs_list.isFromNakedList)
+                {
+                    //check that the items have same type
+                    for (int i = 1; i < rhs_list.list.Count; i++)
+                    {
+                        if (rhs_list.list[i - 1].Type() != rhs_list.list[i].Type())
+                        {
+                            G.Writeln2("*** ERROR: Naked list elements #" + ((i - 1) + 1) + " and #" + (i + 1) + " have different type");
+                            G.Writeln("           Naked lists do not allow this, to avoid confusion. Please use a normal list definition.");
+                            throw new GekkoException();
+                        }
+                    }
+                }
             }
 
             bool isArraySubSeries = false;
             if (arraySubSeries != null) isArraySubSeries = true;
 
-            varnameWithFreq = G.AddSigil(varnameWithFreq, type);
+            varnameWithFreq = G.AddSigil(varnameWithFreq, lhsType);
 
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
@@ -2459,13 +2543,13 @@ namespace Gekko
 
                     //smpl.omitDynamicSeries = true;
 
-                    if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date || type == EVariableType.Var)
+                    if (lhsType == EVariableType.Val || lhsType == EVariableType.String || lhsType == EVariableType.Date || lhsType == EVariableType.Var)
                     {
                         //good
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolScalar + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
                         throw new GekkoException();
                     }
 
@@ -2483,7 +2567,7 @@ namespace Gekko
                                             //---------------------------------------------------------
                                             // %x = Series Timeless
                                             //---------------------------------------------------------
-                                            if (type == EVariableType.Val || type == EVariableType.Var)
+                                            if (lhsType == EVariableType.Val || lhsType == EVariableType.Var)
                                             {
                                                 // VAL %x = Series Timeless
                                                 IVariable lhsNew = new ScalarVal(rhsExpression_series.GetTimelessData());
@@ -2492,7 +2576,7 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                                             }
                                         }
                                         break;
@@ -2501,7 +2585,7 @@ namespace Gekko
                                             //---------------------------------------------------------
                                             // %x = Series Normal
                                             //---------------------------------------------------------                                        
-                                            ReportTypeError(varnameWithFreq, rhs, type);
+                                            ReportTypeError(varnameWithFreq, rhs, lhsType);
                                         }
                                         break;
                                 }
@@ -2514,13 +2598,13 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 //TODO: date %d = 2010.
 
-                                if (type == EVariableType.Val || type == EVariableType.Var)
+                                if (lhsType == EVariableType.Val || lhsType == EVariableType.Var)
                                 {
                                     IVariable lhsNew = new ScalarVal(((ScalarVal)rhs).val);
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                     G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
                                 }
-                                else if (type == EVariableType.Date)
+                                else if (lhsType == EVariableType.Date)
                                 {
                                     IVariable lhsNew = new ScalarDate(rhs.ConvertToDate(GetDateChoices.Strict));
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
@@ -2529,7 +2613,7 @@ namespace Gekko
                                 else
                                 {
                                     //STRING command will fail
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -2539,7 +2623,7 @@ namespace Gekko
                                 // %x = STRING
                                 //---------------------------------------------------------                            
 
-                                if (type == EVariableType.String || type == EVariableType.Var)
+                                if (lhsType == EVariableType.String || lhsType == EVariableType.Var)
                                 {
                                     IVariable lhsNew = new ScalarString(((ScalarString)rhs).string2);
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
@@ -2548,7 +2632,7 @@ namespace Gekko
                                 else
                                 {
                                     //DATE and VAL commands will fail
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
 
                             }
@@ -2559,7 +2643,7 @@ namespace Gekko
                                 // %x = DATE
                                 //---------------------------------------------------------
 
-                                if (type == EVariableType.Date || type == EVariableType.Var)
+                                if (lhsType == EVariableType.Date || lhsType == EVariableType.Var)
                                 {
                                     IVariable lhsNew = new ScalarDate(((ScalarDate)rhs).date);
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
@@ -2568,7 +2652,7 @@ namespace Gekko
                                 else
                                 {
                                     //STRING and VAL commands will fail
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
 
                             }
@@ -2578,7 +2662,7 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 // %x = LIST
                                 //---------------------------------------------------------
-                                ReportTypeError(varnameWithFreq, rhs, type);
+                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                             }
                             break;
                         case EVariableType.Map:
@@ -2587,7 +2671,7 @@ namespace Gekko
                                 // %x = MAP
                                 //---------------------------------------------------------
 
-                                ReportTypeError(varnameWithFreq, rhs, type);
+                                ReportTypeError(varnameWithFreq, rhs, lhsType);
 
                             }
                             break;
@@ -2596,9 +2680,16 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 // %x = MATRIX
                                 //---------------------------------------------------------                            
-                                IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
-                                AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
-                                G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+                                if (lhsType == EVariableType.Val || lhsType == EVariableType.Var)
+                                {
+                                    IVariable lhsNew = new ScalarVal(rhs.ConvertToVal());  //only 1x1 matrix will become VAL
+                                    AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+                                    G.ServiceMessage("VAL " + varnameWithFreq + " updated ", smpl.p);
+                                }
+                                else
+                                {                                    
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
+                                }
                             }
                             break;
                         default:
@@ -2621,13 +2712,13 @@ namespace Gekko
 
                     //smpl.omitDynamicSeries = true;
 
-                    if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map || type == EVariableType.Var)
+                    if (lhsType == EVariableType.List || lhsType == EVariableType.Matrix || lhsType == EVariableType.Map || lhsType == EVariableType.Var)
                     {
                         //good
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' with '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
                         throw new GekkoException();
                     }
 
@@ -2641,11 +2732,12 @@ namespace Gekko
                                     case ESeriesType.Normal:
                                         {
                                             //---------------------------------------------------------
-                                            // #x = Series Normal
+                                            // #x = Series Normal --> not allowed, but MATRIX #m = Series Normal is ok
                                             //---------------------------------------------------------
 
-                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                            {
+                                            //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
+                                            if (lhsType == EVariableType.Matrix)
+                                                {
 
                                                 // array    smpl          destination
                                                 // source
@@ -2685,7 +2777,7 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                                             }
                                         }
                                         break;
@@ -2693,11 +2785,12 @@ namespace Gekko
                                         {
 
                                             //---------------------------------------------------------
-                                            // #x = Series Light
+                                            // #x = Series Light --> not allowed, but MATRIX #m = Series Light is ok
                                             //---------------------------------------------------------
 
-                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                            {
+                                            //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
+                                            if (lhsType == EVariableType.Matrix)
+                                                {
 
                                                 //method will only work if smpl freq is same as series freq
                                                 int n = smpl.Observations12();
@@ -2724,18 +2817,19 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                                             }
                                         }
                                         break;
                                     case ESeriesType.Timeless:
                                         {
                                             //---------------------------------------------------------
-                                            // #x = Series Timeless
+                                            // #x = Series Timeless --> not allowed, but MATRIX #m = Series Timeless is ok
                                             //---------------------------------------------------------
 
-                                            if (type == EVariableType.Matrix || type == EVariableType.Var)
-                                            {
+                                            //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
+                                            if (lhsType == EVariableType.Matrix)
+                                                {
                                                 int n = smpl.Observations12();
                                                 double d = rhs_series.data.dataArray[0];
                                                 Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
@@ -2744,7 +2838,7 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                                             }
                                         }
                                         break;
@@ -2754,7 +2848,7 @@ namespace Gekko
                                             // #x = Series Array Super
                                             //---------------------------------------------------------
                                             {
-                                                ReportTypeError(varnameWithFreq, rhs, type);
+                                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                                             }
                                         }
                                         break;
@@ -2772,7 +2866,7 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 // #x = VAL
                                 //---------------------------------------------------------
-                                ReportTypeError(varnameWithFreq, rhs, type);
+                                ReportTypeError(varnameWithFreq, rhs, lhsType);
                             }
                             break;
                         case EVariableType.String:
@@ -2781,7 +2875,7 @@ namespace Gekko
                                 // #x = STRING
                                 //---------------------------------------------------------
 
-                                ReportTypeError(varnameWithFreq, rhs, type);
+                                ReportTypeError(varnameWithFreq, rhs, lhsType);
 
                             }
                             break;
@@ -2791,7 +2885,7 @@ namespace Gekko
                                 // #x = DATE
                                 //---------------------------------------------------------
 
-                                ReportTypeError(varnameWithFreq, rhs, type);
+                                ReportTypeError(varnameWithFreq, rhs, lhsType);
 
                             }
                             break;
@@ -2800,14 +2894,14 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 // #x = LIST
                                 //---------------------------------------------------------         
-                                if (type == EVariableType.List || type == EVariableType.Var)
+                                if (lhsType == EVariableType.List || lhsType == EVariableType.Var)
                                 {
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
                                     G.ServiceMessage("LIST " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -2817,14 +2911,14 @@ namespace Gekko
                                 // #x = MAP
                                 //---------------------------------------------------------
 
-                                if (type == EVariableType.Map || type == EVariableType.Var)
+                                if (lhsType == EVariableType.Map || lhsType == EVariableType.Var)
                                 {
                                     AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, rhs.DeepClone(null));
                                     G.ServiceMessage("MAP " + varnameWithFreq + " updated ", smpl.p);
                                 }
                                 else
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -2833,7 +2927,7 @@ namespace Gekko
                                 //---------------------------------------------------------
                                 // #x = MATRIX
                                 //---------------------------------------------------------
-                                if (type == EVariableType.Matrix || type == EVariableType.Var)
+                                if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                 {
                                     Matrix m = rhs.DeepClone(null) as Matrix;
                                     if (options.opt_colnames != null) m.colnames = new List<string>(Program.GetListOfStringsFromListOfIvariables(O.ConvertToList(options.opt_colnames).ToArray()));
@@ -2843,7 +2937,7 @@ namespace Gekko
                                 }
                                 else
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -2880,13 +2974,13 @@ namespace Gekko
                     }
 
                     //The indicated LHS type can only be series or var type, for instance SERIES x = ...  or VAR x = ...  or x = ...  . 
-                    if (type == EVariableType.Series || type == EVariableType.Var)
+                    if (lhsType == EVariableType.Series || lhsType == EVariableType.Var)
                     {
                         //good
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + type.ToString().ToUpper() + " type");
+                        G.Writeln2("*** ERROR: Name '" + varnameWithFreq + "' without '" + Globals.symbolScalar + "' or '" + Globals.symbolCollection + "' symbol cannot be of " + lhsType.ToString().ToUpper() + " type");
                         throw new GekkoException();
                     }
 
@@ -3093,53 +3187,14 @@ namespace Gekko
                                 G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             }
                             break;
-                        case EVariableType.String:
-                            {
-                                //---------------------------------------------------------
-                                // x = STRING
-                                //---------------------------------------------------------
-                                {
-                                    List converted = null;
-                                    string s = O.ConvertToString(rhs);
-                                    if (s.Trim().Contains(" "))
-                                    {
-                                        string[] ss = s.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                        foreach (string s2 in ss)
-                                        {
-                                            double v = double.NaN;
-                                            if (G.TryParseIntoDouble(s2, out v))
-                                            {
-                                                ScalarVal sv = new ScalarVal(v);
-                                                if (converted == null) converted = new List();
-                                                converted.Add(sv);
-                                            }
-                                            else
-                                            {
-                                                G.Writeln2("*** ERROR: Could not understand '" + s2 + "' as a number");
-                                                throw new GekkoException();
-                                            }
-                                        }
-                                    }
-
-                                    if (converted != null)
-                                    {
-                                        HelperListdata(smpl, lhs_series, operatorType, converted);
-                                        G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
-                                    }
-                                    else
-                                    {
-                                        ReportTypeError(varnameWithFreq, rhs, type);
-                                    }
-                                }
-                            }
-                            break;
+                        
                         case EVariableType.Date:
                             {
                                 //---------------------------------------------------------
                                 // x = DATE
                                 //---------------------------------------------------------
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -3154,15 +3209,6 @@ namespace Gekko
 
                                 HelperListdata(smpl, lhs_series, operatorType, rhs_list);
 
-
-                                //if (create)
-                                //{
-                                //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                //}
-                                //else
-                                //{
-                                //    //nothing to do, either already existing in bank/map or array-subseries
-                                //}
                                 G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                             }
                             break;
@@ -3172,7 +3218,7 @@ namespace Gekko
                                 // x = MAP
                                 //---------------------------------------------------------
                                 {
-                                    ReportTypeError(varnameWithFreq, rhs, type);
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType);
                                 }
                             }
                             break;
@@ -3238,14 +3284,7 @@ namespace Gekko
                                     }
 
                                 }
-                                //if (create)
-                                //{
-                                //    AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-                                //}
-                                //else
-                                //{
-                                //    //nothing to do, either already existing in bank/map or array-subseries
-                                //}
+                                
                                 G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
 
                             }
