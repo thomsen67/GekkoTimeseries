@@ -4699,9 +4699,19 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (counter == 0)
                                     {
-                                        node.Code.A("(" + child.Code + ")");                                        
+                                        node.Code.A("(" + child.Code + ")");
                                     }
-                                    else node.Code.A(".Add(smpl, " + child.Code + ")");
+                                    else
+                                    {
+                                        if (Globals.fixConcat)
+                                        {
+                                            node.Code.A(".Add(smpl, " + child.Code + ")");
+                                        }
+                                        else
+                                        {
+                                            node.Code.A(".Concat(smpl, " + child.Code + ")");
+                                        }
+                                    }
                                     counter++;
                                 }
                                 if (node.ChildrenCount() == 1 && node[0].Text == "ASTIDENT") node.nameSimpleIdent = node[0][0].Text;

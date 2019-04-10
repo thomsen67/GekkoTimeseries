@@ -2107,7 +2107,7 @@ map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> 
 mapHelper:                  mapHelper1 | mapHelper2;
 mapHelper1:                 (mapItem ',')* mapItem -> mapItem+;
 mapHelper2:                 (mapItem ',')+ -> mapItem+;
-mapItem:                    assignmentMap -> ^(ASTMAPITEM assignmentMap);
+mapItem:                    assignmentMap2 -> ^(ASTMAPITEM assignmentMap2);
 
 //listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
@@ -2501,6 +2501,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 assignment2:               assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment);
+assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignmentMap.text), ASTASSIGNMENT, input.LT(1).Line)} assignmentMap);
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 //NOTE: instead of expression, we could use prtElement, and get stuff in-substituted the same way. For now we do it more simple.

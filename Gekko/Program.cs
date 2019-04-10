@@ -29697,7 +29697,7 @@ namespace Gekko
         {
             if (Globals.runningOnTTComputer)
             {
-                G.Writeln2("*** ERROR: Mismatch");
+                G.Writeln2("*** ERROR: Mismatch (only TT computer)");
             }
         }
 

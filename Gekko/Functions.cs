@@ -3264,6 +3264,17 @@ namespace Gekko
         public static IVariable union(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             //tager dem der nu er i a (inkl. dubletter) og tilføjer dem fra b (uden dubletter). Hvis dubletter i b skal med, skal der bruges komma...
+
+            if (x1.Type() == EVariableType.List && x2.Type() == EVariableType.List)
+            {
+                //good
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: You can only use the union() function with two lists");
+                throw new GekkoException();
+            }
+
             List<string> lx1 = Program.GetListOfStringsFromList(x1);
             List<string> lx2 = Program.GetListOfStringsFromList(x2);
             List<string> union = new List<string>();
@@ -3309,6 +3320,16 @@ namespace Gekko
 
         public static IVariable intersect(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
+            if (x1.Type() == EVariableType.List && x2.Type() == EVariableType.List)
+            {
+                //good
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: You can only use the intersect() function with two lists");
+                throw new GekkoException();
+            }
+
             //tager dem der nu er i a (inkl. dubletter) og retainer dem hvis også i b.
             List<string> lx1 = Program.GetListOfStringsFromList(x1);
             List<string> lx2 = Program.GetListOfStringsFromList(x2);
@@ -3395,8 +3416,11 @@ namespace Gekko
         {
             return Math.Pow((1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))), (sigma / (1 - sigma))) * y / kappa * Math.Pow((Math.Pow((p1 / p2), (1 - sigma)) * Math.Pow((((Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma)))) / (1 - (Math.Exp(phi / sigma) / (1 + Math.Exp(phi / sigma))))), sigma) + 1), (sigma / (1 - sigma)));
         }
-
-        // ====================== object methods =======================================
+        
+        public static IVariable prepend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x)
+        {
+            return append(smpl, _t1, _t2, ths, Globals.scalarVal1, x);
+        }
 
         //see also the other append method
         public static IVariable append(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable x)
@@ -3421,7 +3445,13 @@ namespace Gekko
             temp.list.Insert(i - 1, x);            
             return temp;
         }
-                
+
+
+        public static IVariable preextend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable index, IVariable x)
+        {
+            return extend(smpl, _t1, _t2, ths, Globals.scalarVal1, x);
+        }
+
 
         //see also the other extend() method
         public static IVariable extend(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths, IVariable index, IVariable x)
