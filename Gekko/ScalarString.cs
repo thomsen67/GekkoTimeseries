@@ -457,10 +457,9 @@ namespace Gekko
                     }                    
                 case EVariableType.List:
                     {
-                        //This is only allowed for string scalar, for instance:
-                        // %s + #m. Like this, we can use {'b:' + #m} or b:{#m} to compose.
-                        //See also #786592387654
-                        return Operators.ScalarList.Add(t, this, x, false);
+                        G.Writeln2("*** ERROR: Adding a list and scalar with %s + #x is no longer legal");
+                        G.Writeln("           Please use #x.prefix(%s) instead.");
+                        throw new GekkoException();
                     }                    
                 case EVariableType.Series:
                     {
@@ -478,6 +477,42 @@ namespace Gekko
                 default:
                     {
                         G.Writeln2("*** ERROR: Type error regarding add.");                        
+                        throw new GekkoException();
+                    }
+            }
+        }
+
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {
+            switch (x.Type())
+            {
+                case EVariableType.String:
+                    {
+                        return new ScalarString(this.string2 + ((ScalarString)x).string2);
+                    }
+                case EVariableType.List:
+                    {
+                        //This is only allowed for string scalar, for instance:
+                        // %s + #m. Like this, we can use {'b:' + #m} or b:{#m} to compose.
+                        //See also #786592387654
+                        return Operators.ScalarList.Add(t, this, x, false);
+                    }
+                case EVariableType.Series:
+                    {
+                        G.Writeln2("*** ERROR: You cannot concatenate a string and a timeseries");
+                        throw new GekkoException();
+                    }
+                case EVariableType.Val:
+                    {
+                        return Operators.StringVal.Add(this, (ScalarVal)x, false);
+                    }
+                case EVariableType.Date:
+                    {
+                        return Operators.StringDate.Add(this, (ScalarDate)x, false);
+                    }
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Type error regarding concatenate.");
                         throw new GekkoException();
                     }
             }

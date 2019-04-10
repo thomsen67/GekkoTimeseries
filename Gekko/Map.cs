@@ -128,7 +128,13 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-        
+
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Type error regarding concat and MAP");
+            throw new GekkoException();
+        }
+
         public IVariable Negate(GekkoSmpl t)
         {
             G.Writeln2("*** ERROR: You cannot use minus with MAP");

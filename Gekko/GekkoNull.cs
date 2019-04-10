@@ -82,6 +82,12 @@ namespace Gekko
             return this;
         }
 
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {            
+            throw new GekkoException();
+        }
+
+
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
             return this;

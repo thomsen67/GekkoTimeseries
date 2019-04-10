@@ -97,18 +97,6 @@ namespace Gekko
                     newList.Add(temp);
                 }
 
-                //List<string> m = O.GetStringList(l);
-                //List<string> newList = new List<string>();
-                //if (!swap)
-                //{
-                //    newList.Add(s.string2);
-                //    newList.AddRange(m);
-                //}
-                //else
-                //{
-                //    newList.AddRange(m);
-                //    newList.Add(s.string2);
-                //}
                 return new List(newList);
             }
         }

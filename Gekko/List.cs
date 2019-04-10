@@ -180,9 +180,7 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");
                 throw new GekkoException();
             }
-        }
-
-        
+        }        
 
         public IVariable Negate(GekkoSmpl t)
         {
@@ -245,18 +243,57 @@ namespace Gekko
                 case EVariableType.Val:
                 case EVariableType.Date:
                     {
+                        G.Writeln2("*** ERROR: Adding a list and scalar with #x + %s is no longer legal");
+                        G.Writeln("           Please use #x.suffix(%s) instead.");
+                        throw new GekkoException();
+                    }
+                    break;
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Add to list not allowed for this type: " + G.GetTypeString(x));
+                        throw new GekkoException();
+                    }
+                    break;
+            }
+
+            return Functions.extend(smpl, null, null, this, x);
+        }
+
+        public IVariable Concat(GekkoSmpl smpl, IVariable x)
+        {
+            switch (x.Type())
+            {
+                case EVariableType.List:
+                    {
+                        List rv = new List();
+                        List x_list = x as List;
+                        foreach (IVariable iv1 in this.list)
+                        {
+                            foreach (IVariable iv2 in x_list.list)
+                            {
+                                rv.list.Add(iv1.Concat(smpl, iv2));
+                            }
+                        }
+
+                        return Functions.extend(smpl, null, null, this, x);
+                    }
+                    break;
+                case EVariableType.String:
+                case EVariableType.Val:
+                case EVariableType.Date:
+                    {
                         // #m + %s
                         //This corresponds somewhat to "broadcasting" in numpy
                         //Also a bit similar to x + %v, where %v is a value.
                         //We add scalar x to each element of list ths
-                        //This turns up in names like {#m + '!q'} or {#m}!q.
+                        //This turns up in names like {#m}!q.
                         //See also #786592387654
                         return Operators.ScalarList.Add(smpl, x, this, true);  //note: swapping
                     }
                     break;
                 default:
                     {
-                        G.Writeln2("*** ERROR: Add to list not allowed for this type: " + G.GetTypeString(x));
+                        G.Writeln2("*** ERROR: Concat to list not allowed for this type: " + G.GetTypeString(x));
                         throw new GekkoException();
                     }
                     break;

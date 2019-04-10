@@ -79,16 +79,18 @@ namespace Gekko
         
         IVariable Subtract(GekkoSmpl smpl, IVariable x);
 
-        IVariable Multiply(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Multiply(GekkoSmpl smpl, IVariable x); //returns a new object!
 
-        IVariable Divide(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Divide(GekkoSmpl smpl, IVariable x); //returns a new object!
 
-        IVariable Power(GekkoSmpl smpl, IVariable x); //returns a new object! z = x.Add(y) creates a new z (does not alter x or y).        
+        IVariable Power(GekkoSmpl smpl, IVariable x); //returns a new object!
 
         IVariable Negate(GekkoSmpl smpl); //returns a new object!
         
         IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] index); //returns a new object! t needs to be 1. argument.
-                
+
+        IVariable Concat(GekkoSmpl smpl, IVariable x); //returns a new object!
+        
         //void InjectAdd(GekkoSmpl smpl, IVariable x, IVariable y); //z.InjectAdd(x,y) inserts the sum of x and y into the z object.        
 
         double GetValOLD(GekkoSmpl smpl);

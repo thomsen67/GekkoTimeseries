@@ -519,6 +519,12 @@ namespace Gekko
             }
         }
 
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Type error regarding concat and MATRIX");
+            throw new GekkoException();
+        }
+
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
             switch (x.Type())

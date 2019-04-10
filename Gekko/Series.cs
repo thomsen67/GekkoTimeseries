@@ -606,6 +606,11 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Type error regarding concat and SERIES");
+            throw new GekkoException();
+        }
 
         public void SetTimelessData(double value)
         {

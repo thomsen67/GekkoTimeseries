@@ -96,6 +96,12 @@ namespace Gekko
             throw new GekkoException();
         }
 
+        public IVariable Concat(GekkoSmpl t, IVariable x)
+        {
+            G.Writeln2("*** ERROR: Type error regarding concat and Range class");
+            throw new GekkoException();
+        }
+
         public double ConvertToVal()
         {
             G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");

@@ -208,6 +208,37 @@ namespace Gekko
             }
         }
 
+        public IVariable Concat(GekkoSmpl smpl, IVariable input)
+        {
+            if (G.IsGekkoNull(input)) return input;
+            switch (input.Type())
+            {
+                case EVariableType.Val:
+                    {                        
+                        return new ScalarString(this.val.ToString() + ((ScalarVal)input).val.ToString());
+                    }
+                case EVariableType.Series:
+                    {
+                        G.Writeln2("*** ERROR: You cannot concatenate a SERIES and a SCALAR.");
+                        throw new GekkoException();
+                    }
+                case EVariableType.String:
+                    {
+                        return Operators.StringVal.Add((ScalarString)input, this, true);
+                    }
+                case EVariableType.Matrix:
+                    {
+                        G.Writeln2("*** ERROR: You cannot add a MATRIX and a SCALAR.");
+                        throw new GekkoException();
+                    }
+                default:
+                    {
+                        G.Writeln2("*** ERROR: Variable conversion error.");
+                        throw new GekkoException();
+                    }
+            }
+        }
+
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
             if (G.IsGekkoNull(input)) return input;
