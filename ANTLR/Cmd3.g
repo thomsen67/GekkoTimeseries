@@ -2101,6 +2101,8 @@ repN:						expression
 						  | star -> ASTREPSTAR
 						    ;
 
+repStar:					REP star;  //only used to allow y = 1 rep * without error
+
 map:                        leftParenNoGlue mapItem ',' mapHelper RIGHTPAREN -> ^(ASTMAPDEF mapItem mapHelper)
                           | leftParenNoGlue mapItem ','? RIGHTPAREN -> ^(ASTMAPDEF mapItem)   //the comma here is optional, not so for a list def.
 						    ;
@@ -2156,11 +2158,9 @@ expressionOrNothing:        expression -> expression
 // ------------------- naked list ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
-//nakedList:					   seqOfNumbers
-//							 | seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTBANKVARNAMELIST seqItemNaked+)
-//							   ;
-
-nakedList:					   seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTNAKEDLIST seqItemNaked+)
+nakedList:					  seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTNAKEDLIST seqItemNaked+)
+| seqItemNaked COMMA2 -> ^(ASTNAKEDLIST seqItemNaked)
+							
 							   ;
 
 seqItemNaked:                  MINUS seqItem7Naked 	(REP repN)?	-> ^(ASTNAKEDLISTITEM ^(ASTSEQITEMMINUS seqItem7Naked) repN?)
@@ -2507,48 +2507,48 @@ assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignme
 //NOTE: instead of expression, we could use prtElement, and get stuff in-substituted the same way. For now we do it more simple.
 
 assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER 
-						  | assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER
+						  | assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
-						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
+						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
 						  | assignmentType seriesOpt1? leftSide MINUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2   
-						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2
+						  | assignmentType seriesOpt1? leftSide MINUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTMINUS2
 						  | assignmentType seriesOpt1? leftSide STAREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2   
-						  | assignmentType seriesOpt1? leftSide STAREQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2
+						  | assignmentType seriesOpt1? leftSide STAREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTSTAR2
 						  | assignmentType seriesOpt1? leftSide DIVEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2   
-						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2
+						  | assignmentType seriesOpt1? leftSide DIVEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTDIV2
 						  | assignmentType seriesOpt1? leftSide percentEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2
-						  | assignmentType seriesOpt1? leftSide percentEqual expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2
+						  | assignmentType seriesOpt1? leftSide percentEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPERCENT2
 						  | assignmentType seriesOpt1? leftSide HATEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2  
-						  | assignmentType seriesOpt1? leftSide HATEQUAL expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2
+						  | assignmentType seriesOpt1? leftSide HATEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHAT2
 						  | assignmentType seriesOpt1? leftSide hashEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2  
-						  | assignmentType seriesOpt1? leftSide hashEqual expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2
+						  | assignmentType seriesOpt1? leftSide hashEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2
 
 
 						  | assignmentType leftSide seriesOpt1 EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
-						  | assignmentType leftSide seriesOpt1 EQUAL expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
+						  | assignmentType leftSide seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
 						  | assignmentType leftSide seriesOpt1 PLUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2
-						  | assignmentType leftSide seriesOpt1 PLUSEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2
+						  | assignmentType leftSide seriesOpt1 PLUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2
 						  | assignmentType leftSide seriesOpt1 MINUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTMINUS2  
-						  | assignmentType leftSide seriesOpt1 MINUSEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTMINUS2
+						  | assignmentType leftSide seriesOpt1 MINUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTMINUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTMINUS2
 						  | assignmentType leftSide seriesOpt1 STAREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTSTAR2   
-						  | assignmentType leftSide seriesOpt1 STAREQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTSTAR2
+						  | assignmentType leftSide seriesOpt1 STAREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTSTAR leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTSTAR2
 						  | assignmentType leftSide seriesOpt1 DIVEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTDIV2   
-						  | assignmentType leftSide seriesOpt1 DIVEQUAL expression -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTDIV2
+						  | assignmentType leftSide seriesOpt1 DIVEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTDIV leftSide expression) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTDIV2
 						  | assignmentType leftSide seriesOpt1 percentEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPERCENT2   
-						  | assignmentType leftSide seriesOpt1 percentEqual expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPERCENT2
+						  | assignmentType leftSide seriesOpt1 percentEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPERCENT2
 						  | assignmentType leftSide seriesOpt1 HATEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHAT2   
-						  | assignmentType leftSide seriesOpt1 HATEQUAL expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHAT2
+						  | assignmentType leftSide seriesOpt1 HATEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHAT2
 						  | assignmentType leftSide seriesOpt1 hashEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2  
-						  | assignmentType leftSide seriesOpt1 hashEqual expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2
+						  | assignmentType leftSide seriesOpt1 hashEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2
 						  
 						  //handle y<2001 2005>=100, where '>=' is a token
 						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER 
-						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL expression -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER
+						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER
 						  						  
 						    ;
 
 							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
-assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression -> ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType				 
+assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType				 
 						    ;
 
 

@@ -2296,6 +2296,38 @@ namespace UnitTests
 
         }
 
+
+        [TestMethod]
+        public void _Test_AgeLag()
+        {
+            //Test that age lags like x[#a-1] or x{#a-1} work as intended
+            
+            I("x = series(1);");
+            I("x[20] = 100;");
+            I("x[21] = 200;");
+            I("x[22] = 400;");
+            I("y = series(2);");
+            I("y[b, 20] = 100;");
+            I("y[b, 21] = 200;");
+            I("y[b, 22] = 400;");
+            I("x20 = 100;");
+            I("x21 = 200;");
+            I("x22 = 400;");
+            I("yb20 = 100;");
+            I("yb21 = 200;");
+            I("yb22 = 400;");
+            I("#a = seq(21, 22).strings();");
+            I("PRT <n> sum(#a, x[#a-1]);");
+            I("PRT <n> sum(#a, y[b,#a-1]);");
+            I("PRT <n> x[#a-1];");
+            I("PRT <n> y[b,#a-1];");
+            I("PRT <n> sum(#a, x{#a-1});");
+            I("PRT <n> sum(#a, yb{#a-1});");
+            I("PRT <n> x{#a-1};");
+            I("PRT <n> yb{#a-1};");
+
+        }
+
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()
         {
@@ -2390,19 +2422,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
-
-
-
-
-
-
-
-
-
-
-
-
-
+            
 
             //Test that only one col of data is written
             //so we are sure #m1 is not "free" but is soaked
@@ -2440,22 +2460,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                       
 
             /*             
                                   xx['a', 'x']    xx['a', 'y'] 

@@ -1480,7 +1480,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    //keep the s from abive
+                                    //keep the s from above
                                 }
                                 
                             }
@@ -3479,9 +3479,12 @@ namespace Gekko.Parser.Gek
                             if (node[1].Text == "ASTDOT")
                                 reportInterior = false;  //never for #x.??? type indexing
                             
-                            string indexes = null;
-                            string indexesReport = null;
-                            
+                            string indexes = null;  //DELETE THESE SOON!!!
+                            string indexesReport = null;  //DELETE THESE SOON!!!
+
+                            List<string> ix = new List<string>(); for (int i = 0; i < node[1].ChildrenCount(); i++) ix.Add(null);
+                            List<string> ixr = new List<string>(); for (int i = 0; i < node[1].ChildrenCount(); i++) ixr.Add(null);
+
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
                                 ASTNode child = node[1][i];
@@ -3512,20 +3515,24 @@ namespace Gekko.Parser.Gek
                                         {
                                             string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", false)";
                                             indexes += s;
+                                            ix[i] = s;
                                             if (reportInterior && !xxx)
                                             {
                                                 //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+                                                ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                             }
                                         }
                                         else
                                         {
                                             string s = "O.AddSpecial(smpl, " + internalName + ", " + child[0][1].Code + ", true)";
                                             indexes += s;
+                                            ix[i] = s;
                                             if (reportInterior && !xxx)
                                             {
                                                 //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                                 indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+                                                ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                             }
                                         }
                                     }
@@ -3533,10 +3540,12 @@ namespace Gekko.Parser.Gek
                                     {
                                         string s = node[1][i].Code.ToString();
                                         indexes += s;
+                                        ix[i] = s;
                                         if (reportInterior && !xxx)
                                         {
                                             //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
                                             indexesReport += Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
+                                            ixr[i] = Globals.reportLabel1 + s + ", `" + ReportLabelHelper(child) + "`" + Globals.reportLabel2;
                                         }
                                     }
                                     if (i < node[1].ChildrenCount() - 1)
@@ -3550,7 +3559,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-
+                                    //not plus or minus in indexer
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
                                     string internalFunction = null;
@@ -3563,12 +3572,12 @@ namespace Gekko.Parser.Gek
                                             internalFunction = two.s2;
                                         }
                                     }
-
-
+                                    
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
 
                                     indexes += s;  //always done as fallback      
+                                    ix[i] = s;
                                                                   
                                     if (reportInterior)
                                     {
@@ -3576,6 +3585,7 @@ namespace Gekko.Parser.Gek
                                         if (xxx)
                                         {
                                             indexesReport += s;
+                                            ixr[i] = s;
                                         }
                                         else
                                         {
@@ -3583,8 +3593,16 @@ namespace Gekko.Parser.Gek
                                             //indexesReport += Globals.reportInterior1 + s + ", " + i.ToString() + ", " + Globals.labelCounter + Globals.reportInterior2; //also reports the dim-number of the index, for instance for x['a', #m, %i]
 
                                             string temp = ReportLabelHelper(child);
-                                            if (temp != null) indexesReport += Globals.reportLabel1 + s + ", `" + temp + "`" + Globals.reportLabel2;
-                                            else indexesReport += s;
+                                            if (temp != null)
+                                            {
+                                                indexesReport += Globals.reportLabel1 + s + ", `" + temp + "`" + Globals.reportLabel2;
+                                                ixr[i] = Globals.reportLabel1 + s + ", `" + temp + "`" + Globals.reportLabel2;
+                                            }
+                                            else
+                                            {
+                                                indexesReport += s;
+                                                ixr[i] = s;
+                                            }
                                         }
                                     }
 
@@ -3597,7 +3615,8 @@ namespace Gekko.Parser.Gek
                                         }
                                     }
                                 }
-                            }
+                                if (ixr[i] == null) ixr[i] = ix[i];
+                            }  //end of i loop, for each child
 
                             string indexerType = "O.EIndexerType.None";
                             if (node[1].ChildrenCount() == 1)
@@ -3626,9 +3645,7 @@ namespace Gekko.Parser.Gek
 
                             if (ivTempVar == null)
                             {
-                                if (indexesReport == null) indexesReport = indexes;
-
-                                
+                                if (indexesReport == null) indexesReport = indexes;                                
 
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
                                 {
@@ -3660,7 +3677,14 @@ namespace Gekko.Parser.Gek
                                 }                                
                                 else
                                 {
-                                    node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
+                                    if (Globals.fixALag)
+                                    {
+                                        node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + G.GetListWithCommas(ix) + "), smpl, " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("O.Indexer(O.Indexer2(smpl, " + indexerType + "," + indexes + "), smpl, " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
+                                    }
 
                                     //this alternative code is only done for x[a] type of variables, not x.f() etc.
 

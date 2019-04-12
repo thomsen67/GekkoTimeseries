@@ -7919,11 +7919,7 @@ namespace Gekko
             {
                 if (G.Equal(opt_prot, "yes"))
                 {
-                    G.Writeln2("*** ERROR: OPEN<prot> is obsolete. In Gekko 2.1.1 and onwards, databanks");
-                    G.Writeln("           are always opened as 'protected' by default, unless you use", Color.Red);
-                    G.Writeln("           OPEN<edit>, or unless you afterwards use the UNLOCK command", Color.Red);
-                    G.Writeln("           to make the databank editable.", Color.Red);
-                    throw new GekkoException();
+                    G.Writeln2("+++ NOTE: The OPEN<prot> option is obsolete and can be omitted here.");
                 }
 
                 if (G.Equal(opt_prim, "yes"))

@@ -581,6 +581,8 @@ namespace Gekko
         public static string expressionText = null;
         public static Func<GekkoSmpl, IVariable> expression = null;
 
+        public static bool fixALag = true;
+
         public static bool fixConcat = true;
 
         public static int removeAllLags = 0;
