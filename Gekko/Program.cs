@@ -18904,9 +18904,9 @@ namespace Gekko
             //string txt = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "model.gms");
             string txt = textInputRaw;
             var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-            var tags2 = new List<string>() { "//" };
+            var tags2 = new List<string>() { "!!", "#" };
             var tags3 = new List<Tuple<string, string>>() { new Tuple<string, string>("$ontext", "$offtext") };
-            var tags4 = new List<string>() { "*", "#" };
+            var tags4 = new List<string>() { "*" };
 
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
             Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);

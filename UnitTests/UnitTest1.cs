@@ -2391,6 +2391,72 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //Test that only one col of data is written
+            //so we are sure #m1 is not "free" but is soaked
+            //up in the sum() function
+
+            /*
+                                       sum(#m1
+                                 , [#m1, 'x'])
+                          2010          5.0000        
+                          2011          7.0000        
+                          2012          9.0000        
+            */
+
+            //Globals.lastPrtOrMulprtTable = null;
+            I("p <n> sum(#m1, xx[#m1, x]);");
+            table = Globals.lastPrtOrMulprtTable;
+            
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m1");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], ", xx[#m1, x])");
+            Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
+
+            //Globals.lastPrtOrMulprtTable = null;            
+            I("p <n> sum(#m1, xx{#m1}x);");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "m1, xx{#m1}x)");
+            Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             /*             
                                   xx['a', 'x']    xx['a', 'y'] 
                           2010          1.0000          7.0000 
