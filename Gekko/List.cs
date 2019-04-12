@@ -261,6 +261,9 @@ namespace Gekko
 
         public IVariable Concat(GekkoSmpl smpl, IVariable x)
         {
+            G.Writeln2("*** ERROR: Concat to list not allowed for this type: " + G.GetTypeString(x));
+            throw new GekkoException();
+
             switch (x.Type())
             {
                 case EVariableType.List:
@@ -274,8 +277,7 @@ namespace Gekko
                                 rv.list.Add(iv1.Concat(smpl, iv2));
                             }
                         }
-
-                        return Functions.extend(smpl, null, null, this, x);
+                        return rv;
                     }
                     break;
                 case EVariableType.String:

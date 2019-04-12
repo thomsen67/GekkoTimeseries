@@ -492,6 +492,8 @@ namespace Gekko
                     }
                 case EVariableType.List:
                     {
+                        G.Writeln2("*** ERROR: Concat to string not allowed for this type: " + G.GetTypeString(x));
+                        throw new GekkoException();
                         //This is only allowed for string scalar, for instance:
                         // %s + #m. Like this, we can use {'b:' + #m} or b:{#m} to compose.
                         //See also #786592387654

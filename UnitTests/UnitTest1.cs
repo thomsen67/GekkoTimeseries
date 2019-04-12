@@ -346,8 +346,7 @@ namespace UnitTests
             //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
             I("#m = #m1 + #m2;");
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
-            I("#m = #m1 + 'f';");  //we have that {#m + 'f'} is same as {#m}f
-            //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));  //NO!
+            I("#m = #m1.suffix('f');");            
             _AssertListString(First(), "#m", new StringOrList("af", "bf", "cf"));
             I("#m = #m1.extend(#m2).extend(#m2);");
             _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
@@ -5388,15 +5387,7 @@ namespace UnitTests
             I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 = #m3 + (%s,); end;");
             _AssertListString(First(), "#m3", 1, "ax");
             _AssertListString(First(), "#m3", 2, "by");
-
-            I("#m3 = list();");
-            I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 = #m3 + %s; end;");
-            _AssertListSize(First(), "#m3", 0);  //a list + string appends string to each element in list
-
-            I("#m3 = list();");
-            I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 += %s; end;");
-            _AssertListSize(First(), "#m3", 0);  //a list + string appends string to each element in list
-
+            
             I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 = #m3.append(%s); end;");
             _AssertListString(First(), "#m3", 1, "ax");
             _AssertListString(First(), "#m3", 2, "by");
@@ -17483,6 +17474,22 @@ namespace UnitTests
         public void _Test_NakedListAndSeries()
         {
             I("RESET; MODE data;");
+
+            I("#m1 = a, b;");  
+            I("#m2 = x, y;");
+            I("#m = q{#m1}w{#m2}, b;");
+            _AssertListString(First(), "#m", new StringOrList("qawx", "qawy", "qbwx", "qbwy", "b"));
+            I("#m = q{#m1}{#m2}, b;");
+            _AssertListString(First(), "#m", new StringOrList("qax", "qay", "qbx", "qby", "b"));
+            I("#m = {#m1}{#m2}, b;");
+            _AssertListString(First(), "#m", new StringOrList("ax", "ay", "bx", "by", "b"));
+            I("#m = q{#m1}w, b;");
+            _AssertListString(First(), "#m", new StringOrList("qaw", "qbw", "b"));
+            I("#m = {#m1}w, b;");
+            _AssertListString(First(), "#m", new StringOrList("aw", "bw", "b"));
+            I("#m = {#m1}, b;");
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "b"));
+
             I("#m = a, b, -c, b:a rep 1+1, b:a[x, y], 0a, 01, 10;");  //note: blank removed in ...[x, y]
             _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x,y]", "0a", "01", "10"));
             I("#m = ('a', 'b', '-c', 'b:a' rep 1+1, 'b:a[x, y]', '0a', '01', '10');");

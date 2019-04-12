@@ -306,30 +306,16 @@ namespace Gekko.Parser.Gek
                     //               'i' 
                     //     ASTPLACEHOLDER
 
-                    if (false)
-                    {
-                        ASTNode cname = new ASTNode("ASTCNAME", true);
-                        //cname.Parent = name.Parent[0];
-                        name.Parent[0] = cname;
-                        ASTNode extraname = new ASTNode("ASTNAME", true);
-                        extraname.Add(new ASTNode("ASTIDENT", true));
-                        extraname[0].Add(new ASTNode("listfile___"));
-                        cname.Add(extraname);
-                        cname.Add(name);
-                    }
-                    else
-                    {
-                        ASTNode cname = new ASTNode("ASTCNAME", true);                        
-                        ASTNode extraname = new ASTNode("ASTNAME", true);
-                        extraname.Add(new ASTNode("ASTIDENT", true));
-                        extraname[0].Add(new ASTNode("listfile___"));
-                        cname.Add(extraname);
-                        cname.Add(name);
-                        //name.Parent[0] = cname;
-                        placeholder.RemoveLast();
-                        placeholder.Add(cname);
-                    }
 
+                    ASTNode cname = new ASTNode("ASTCNAME", true);
+                    ASTNode extraname = new ASTNode("ASTNAME", true);
+                    extraname.Add(new ASTNode("ASTIDENT", true));
+                    extraname[0].Add(new ASTNode("listfile___"));
+                    cname.Add(extraname);
+                    cname.Add(name);
+                    //name.Parent[0] = cname;
+                    placeholder.RemoveLast();
+                    placeholder.Add(cname);
 
                 }
                 node.Text = "ASTBANKVARNAME";
@@ -356,18 +342,18 @@ namespace Gekko.Parser.Gek
                             if (node2 == null || node2.Text == null) break;
                             if (node2.Text == "ASTFUNCTION" && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
                             {
-                                if (node2[1].Text == "ASTBANKVARNAME")
+                                if (node2[2].Text == "ASTBANKVARNAME")
                                 {
-                                    string s2 = GetSimpleName(node2[1]);
+                                    string s2 = GetSimpleName(node2[2]);
                                     if (G.Equal(s, s2))
                                     {
                                         //node2 = node2.Parent;
                                         goto Label;
                                     }
                                 }
-                                else if (node2[1].Text == "ASTLISTDEF")
+                                else if (node2[2].Text == "ASTLISTDEF")
                                 {
-                                    foreach (ASTNode node3 in node2[1].ChildrenIterator())
+                                    foreach (ASTNode node3 in node2[2].ChildrenIterator())
                                     {
                                         //string s2 = GetSimpleName(node3);
                                         string s2 = GetSimpleName(node3[0]);  //ZXCVB
@@ -521,23 +507,7 @@ namespace Gekko.Parser.Gek
                 }
             }
         }
-
-        //public static void WalkASTToFindVariables(ASTNode node, List<string>precedents)
-        //{
-        //    //before subnodes
-
-        //    if (node.Text == "ASTBANKVARNAME")
-        //    {
-        //        string code = node.Code.ToString();
-        //        precedents.Add(code);                
-        //    }
-        //    foreach (ASTNode child in node.ChildrenIterator())
-        //    {
-        //        WalkASTToFindVariables(child, precedents);
-        //    }
-        //    //after subnodes            
-        //}
-
+                
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
@@ -974,7 +944,15 @@ namespace Gekko.Parser.Gek
                                         string ss2 = null;
                                         if (!isFirst)
                                         {
-                                            ss1 = ".Add(null, ";
+                                            ss1 = null;
+                                            if (Globals.fixConcat)
+                                            {
+                                                ss1 = ".Concat(null, ";
+                                            }
+                                            else
+                                            {
+                                                ss1 = ".Add(null, ";
+                                            }
                                             ss2 = ")";
                                         }
                                         s += ss1 + node[i][j].Code.ToString() + ss2;
@@ -4582,7 +4560,14 @@ namespace Gekko.Parser.Gek
                                         //bank indicator  
                                         string bankNameCs = null;
                                         bankNameCs = node[0][0].Code.ToString();
-                                        nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
+                                        if (Globals.fixConcat)
+                                        {
+                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(smpl, O.scalarStringColon)" + ".Concat(smpl, " + node[1].Code + ")";
+                                        }
+                                        else
+                                        {
+                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Add(smpl, O.scalarStringColon)" + ".Add(smpl, " + node[1].Code + ")";
+                                        }
                                     }
                                     lookupCode = "O.Lookup(smpl, " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
                                                                         
@@ -4663,23 +4648,45 @@ namespace Gekko.Parser.Gek
                             
                             if (s0)
                             {
-                                if(s2)
+                                if (s2)
                                 {
                                     //%a!q, does not make sense...
-                                    node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
-                                }   
+                                    if (Globals.fixConcat)
+                                    {
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(smpl, " + node[1][0].Code + ")").A(".Concat(smpl, O.scalarStringTilde)").A(".Concat(smpl, " + node[2][0].Code + ")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
+                                    }
+                                }
                                 else
                                 {
                                     //%a
-                                    node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")");
+                                    if (Globals.fixConcat)
+                                    {
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(smpl, " + node[1][0].Code + ")");
+                                    }
+                                    else
+                                    {
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(smpl, " + node[1][0].Code + ")");
+                                    }
                                 }                         
                             }
                             else
                             {
-                                if(s2)
+                                if (s2)
                                 {
                                     //a!q
-                                    node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
+                                    if (Globals.fixConcat)
+                                    {
+                                        node.Code.A("(" + node[1][0].Code + ")").A(".Concat(smpl, O.scalarStringTilde)").A(".Concat(smpl, " + node[2][0].Code + ")");
+                                    }
+
+                                    else
+                                    {
+                                        node.Code.A("(" + node[1][0].Code + ")").A(".Add(smpl, O.scalarStringTilde)").A(".Add(smpl, " + node[2][0].Code + ")");
+                                    }
                                 }
                                 else
                                 {
@@ -4705,11 +4712,11 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (Globals.fixConcat)
                                         {
-                                            node.Code.A(".Add(smpl, " + child.Code + ")");
+                                            node.Code.A(".Concat(smpl, " + child.Code + ")");
                                         }
                                         else
-                                        {
-                                            node.Code.A(".Concat(smpl, " + child.Code + ")");
+                                        {                                            
+                                            node.Code.A(".Add(smpl, " + child.Code + ")");
                                         }
                                     }
                                     counter++;
