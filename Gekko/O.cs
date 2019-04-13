@@ -1691,6 +1691,7 @@ namespace Gekko
                                     //non-Ref lookup                                     
 
                                     rv = Program.databanks.GetVariableWithSearch(varnameWithFreq);
+
                                     if (rv == null)
                                     {
                                         if (settings.create == ECreatePossibilities.NoneReportError)
@@ -1735,7 +1736,7 @@ namespace Gekko
                                     else
                                     {
                                         db = Program.databanks.GetFirst();
-                                    }
+                                    }                                    
                                     rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                                 }
                             }

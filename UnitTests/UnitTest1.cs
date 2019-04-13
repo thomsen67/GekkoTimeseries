@@ -8098,6 +8098,21 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test__PassByValue()
+        {
+            I("function val f(matrix #x);  #x[1] = 1; return 1; end;");
+            I("#y1 = [2];");
+            I("%z = f(#y1);");
+            _AssertMatrix(First(), "#y1", 1, 1, 2d, sharedDelta);
+            I("option system clone = no;");
+            I("#y2 = [2];");
+            I("%z = f(#y2);");
+            _AssertMatrix(First(), "#y2", 1, 1, 1d, sharedDelta);
+        }
+
+
+
+        [TestMethod]
         public void _Test__Ols()
         {
             Databank work = First();
