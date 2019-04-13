@@ -1736,10 +1736,16 @@ namespace Gekko
                                     }
                                     else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
                                     {
-                                        //This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
-                                        //This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
-                                        G.Writeln2("*** ERROR: Internal error #98253298");
-                                        throw new GekkoException();
+                                        ////This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
+                                        ////This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
+                                        //G.Writeln2("*** ERROR: Internal error #98253298");
+                                        //throw new GekkoException();
+
+                                        //it is probably ok to create it here like this
+                                        //issue: what if it series is present in Local/Global
+                                        //never mind...
+                                        rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+                                        Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
                                     }
                                     else
                                     {
