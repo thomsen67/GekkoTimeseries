@@ -3804,6 +3804,7 @@ optionType:
 			 | STRING2 INTERPOLATE FORMAT VAL '='? expression -> STRING2 INTERPOLATE FORMAT VAL ^(ASTSTRINGSIMPLE expression)
 			
 			 | SYSTEM CODE SPLIT '='? Integer -> SYSTEM CODE SPLIT ^(ASTINTEGER Integer)
+			 | SYSTEM CLONE '='? yesNoSimple -> SYSTEM CLONE ^(ASTBOOL yesNoSimple)
 			
 			 | TABLE question -> TABLE question
              | TABLE HTML DATAWIDTH '='? numberIntegerOrDouble ->  TABLE HTML DATAWIDTH numberIntegerOrDouble

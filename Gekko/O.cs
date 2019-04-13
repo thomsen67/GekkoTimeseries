@@ -6342,8 +6342,8 @@ namespace Gekko
         // ------------------- type checks start ---------------------------
         // we do type checks as explicit functions since it is faster than using a switch
         // position -1: assignment like STRING %s = 123; where type fails
-        // posiion 0: return value type is wrong, for instance "return 123" in a "function string f(...)"
-        // poisition i > 0: function argument, for instance f(123) in a "function string f(string x)"
+        // position 0: return value type is wrong, for instance "return 123" in a "function string f(...)"
+        // position i > 0: function argument, for instance f(123) in a "function string f(string x)"
 
         public static IVariable TypeCheck_void(IVariable x, int position)
         {
@@ -6365,6 +6365,11 @@ namespace Gekko
                     else G.Writeln("*** ERROR: Argument #" + position + " should be SERIES type");
                     throw;
                 }
+            }
+            else
+            {
+                //cloning is probably reasonably fast, given data stored in arrays
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
             }
             return x;
         }
@@ -6491,11 +6496,15 @@ namespace Gekko
                     throw;
                 }
             }
+            else
+            {
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+            }
             return x;
         }
 
         public static IVariable TypeCheck_matrix(IVariable x, int position)
-        {
+        {            
             if (x.Type() != EVariableType.Matrix)
             {
                 try
@@ -6509,6 +6518,10 @@ namespace Gekko
                     else G.Writeln("*** ERROR: Argument #" + position + " should be MATRIX type");
                     throw;
                 }
+            }
+            else
+            {
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
             }
             return x;
         }
@@ -6529,11 +6542,17 @@ namespace Gekko
                     throw;
                 }
             }
+            else
+            {
+                if (position > 0 && Program.options.system_clone) x = x.DeepClone(null);
+            }
             return x;
         }
 
         public static IVariable TypeCheck_var(IVariable x, int position)
         {
+            //not possible???
+            //no cloning done here...
             return x;  //no checks
         }
 

@@ -261,13 +261,12 @@ namespace Gekko
 
         public IVariable Concat(GekkoSmpl smpl, IVariable x)
         {
-            G.Writeln2("*** ERROR: Concat to list not allowed for this type: " + G.GetTypeString(x));
-            throw new GekkoException();
-
+            
             switch (x.Type())
             {
                 case EVariableType.List:
                     {
+                        //should this be allowed, as in COPY {#b}:{#v} ... ? Does it even work?
                         List rv = new List();
                         List x_list = x as List;
                         foreach (IVariable iv1 in this.list)
@@ -284,11 +283,7 @@ namespace Gekko
                 case EVariableType.Val:
                 case EVariableType.Date:
                     {
-                        // #m + %s
-                        //This corresponds somewhat to "broadcasting" in numpy
-                        //Also a bit similar to x + %v, where %v is a value.
-                        //We add scalar x to each element of list ths
-                        //This turns up in names like {#m}!q.
+                        //This is only allowed for stuff like COPY b:{#m}!q etc.
                         //See also #786592387654
                         return Operators.ScalarList.Add(smpl, x, this, true);  //note: swapping
                     }

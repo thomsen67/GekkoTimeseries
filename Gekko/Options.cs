@@ -251,6 +251,7 @@ Additionally, there are model, solve, equation options.
         public string string_interpolate_format_val = "";  //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
         
         public int system_code_split = 20; //20 seems good
+        public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
 
         public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
         public string table_decimalseparator = "period";  //comma|period

@@ -491,11 +491,8 @@ namespace Gekko
                         return new ScalarString(this.string2 + ((ScalarString)x).string2);
                     }
                 case EVariableType.List:
-                    {
-                        G.Writeln2("*** ERROR: Concat to string not allowed for this type: " + G.GetTypeString(x));
-                        throw new GekkoException();
-                        //This is only allowed for string scalar, for instance:
-                        // %s + #m. Like this, we can use {'b:' + #m} or b:{#m} to compose.
+                    {                        
+                        //This is only allowed for stuff like COPY b:{#m} etc.
                         //See also #786592387654
                         return Operators.ScalarList.Add(t, this, x, false);
                     }
