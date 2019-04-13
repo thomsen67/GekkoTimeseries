@@ -40,7 +40,7 @@ namespace Gekko
             this.storage = new List<Databank>();
         }
 
-        public IVariable GetVariableWithSearch(string varName)
+        public IVariable GetVariableWithSearch(string varName, bool canSearch)
         {
             //check local bank
             IVariable rv = this.GetLocal().GetIVariable(varName);
@@ -57,6 +57,7 @@ namespace Gekko
             for (int i = 0; i < this.storage.Count; i++)
             {
                 if (i == 1) continue;  //The Ref databank IS NEVER SEARCHED!!
+                if (canSearch == false && i > 1) break;  //without seach, we never search normal OPENed databanks
                 Databank db2 = this.storage[i];
                 rv = db2.GetIVariable(varName);
                 if (rv != null)
