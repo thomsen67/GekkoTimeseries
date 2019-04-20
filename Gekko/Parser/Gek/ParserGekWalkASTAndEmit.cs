@@ -4154,9 +4154,9 @@ namespace Gekko.Parser.Gek
                                     string s5 = node[0].Code.ToString();
                                     s5 = s5.Replace(ivTempVar, "Globals.scalarValMissing");
 
-                                    sb2.A("O.Dynamic1(smpl);" + G.NL);
+                                    //sb2.A("O.Dynamic1(smpl);" + G.NL);
                                     sb2.A(s5).End();
-                                    sb2.A("O.Dynamic5(smpl);" + G.NL);
+                                    //sb2.A("O.Dynamic5(smpl);" + G.NL);
                                     //sb2.A("return true;" + G.NL);
                                     
 
@@ -4982,13 +4982,13 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("G.Writeln(`+++       (In command files, place this option before any MODEL statements).`);");
 
                                 }
-                                else if (o == "series_dyn")
-                                {
-                                    node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: The dyn option is experimental and will be removed at some point, so please only use it`);");
-                                    node.Code.A("G.Writeln(`+++       for experiments, and use SERIES<dyn> instead in productin code. At a later point,`);");
-                                    node.Code.A("G.Writeln(`+++       a BLOCK<dyn>; ...; END; will be provided, before the final release of Gekko 3.0.`);");
-                                }
+                                //else if (o == "series_dyn")
+                                //{
+                                //    node.Code.A("G.Writeln();");
+                                //    node.Code.A("G.Writeln(`+++ NOTE: The dyn option is experimental and will be removed at some point, so please only use it`);");
+                                //    node.Code.A("G.Writeln(`+++       for experiments, and use SERIES<dyn> instead in productin code. At a later point,`);");
+                                //    node.Code.A("G.Writeln(`+++       a BLOCK<dyn>; ...; END; will be provided, before the final release of Gekko 3.0.`);");
+                                //}
                                 
                                 //if (o == "databank_file_format")
                                 //{

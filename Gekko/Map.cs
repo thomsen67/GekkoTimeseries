@@ -98,7 +98,7 @@ namespace Gekko
             if (this.storage.ContainsKey(name)) this.storage.Remove(name);
         }
 
-        public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
+        public IVariable Indexer(GekkoSmpl smpl, O.EIndexerType indexerType, params IVariable[] indexes)
         {
             if (indexes.Length == 1)
             {
@@ -114,6 +114,7 @@ namespace Gekko
                         G.Writeln2("*** ERROR: The MAP does not contain the name '" + varnameWithFreq + "'");
                         throw new GekkoException();
                     }
+                    O.DynamicHelperRhs(smpl, rv);
                     return rv;
                 }                
                 else

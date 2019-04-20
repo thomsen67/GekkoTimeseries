@@ -184,6 +184,22 @@ namespace Gekko
         public GekkoTime t3 = GekkoTime.tNull;
     }
 
+    public class GekkoDyn
+    {
+        public assignmentTypeLhs lhsAssignmentType = assignmentTypeLhs.Inactive;
+        public IVariable lhsAssignmentVariable = null;
+        public bool lhsAssignmentHit = false;
+
+        public GekkoDyn DeepClone()
+        {
+            GekkoDyn clone = new GekkoDyn();
+            clone.lhsAssignmentType = this.lhsAssignmentType;
+            clone.lhsAssignmentHit = this.lhsAssignmentHit;
+            clone.lhsAssignmentVariable = this.lhsAssignmentVariable;
+            return clone;
+        }
+    }
+
     public class GekkoSmpl
     {
         public GekkoTime t0 = GekkoTime.tNull;  //start of the period for which the expressions are calculated (<= t1)
@@ -198,10 +214,7 @@ namespace Gekko
         //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
-        public assignmentTypeLhs lhsAssignmentType = assignmentTypeLhs.Inactive;
-        //public string lhsAssignmentName = null;
-        public IVariable lhsAssignmentVariable = null;
-        public bool lhsAssignmentHit = false;
+        public GekkoDyn dyn = null;        
 
         public GekkoSmpl()
         {

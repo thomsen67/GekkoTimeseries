@@ -1977,6 +1977,7 @@ namespace Gekko
                 if (indexerType == O.EIndexerType.None)
                 {
                     rv = this.FindArraySeries(smpl, indexes, false, false, null);  //last arg. not used
+                    O.DynamicHelperRhs(smpl, rv);
                 }
                 else
                 {
