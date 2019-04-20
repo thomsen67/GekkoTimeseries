@@ -191,7 +191,7 @@ namespace Gekko
         public GekkoTime t2 = GekkoTime.tNull;  //end of real sample, should normally not be leaded (then sumt() etc. will be wrong)
         public GekkoTime t3 = GekkoTime.tNull;  //end of the period for which the expressions are calculated (>= t2) 
         public GekkoError gekkoError = null; //only set to something, if the sample .t0 to .t3 is too tight       
-        public int gekkoErrorI = 0;
+        
         public int bankNumber = 0;  //0 is inactive, 1 is Ref databank, will only apply to series (vars without sigils)
         public GekkoSmplCommand command = GekkoSmplCommand.Unknown;
         //public List<O.LabelHelperIVariable> labelHelper = new List<O.LabelHelperIVariable>(); //not created all the time, so ok
@@ -199,7 +199,7 @@ namespace Gekko
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
         public assignmentTypeLhs lhsAssignmentType = assignmentTypeLhs.Inactive;
-        public string lhsAssignmentName = null;
+        //public string lhsAssignmentName = null;
         public IVariable lhsAssignmentVariable = null;
         public bool lhsAssignmentHit = false;
 

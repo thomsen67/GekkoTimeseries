@@ -2379,10 +2379,15 @@ namespace Gekko
                 smpl.t2 = Globals.globalPeriodEnd;
                 smpl.t3 = Globals.globalPeriodEnd.Add(Globals.smplInitEnd);
                 smpl.gekkoError = null;
-                smpl.gekkoErrorI = 0;
+                
                 smpl.bankNumber = 0;
                 //p.numberOfServiceMessages = 0;
                 smpl.p = p;
+
+                smpl.lhsAssignmentHit = false;
+                smpl.lhsAssignmentType = assignmentTypeLhs.Inactive;
+                smpl.lhsAssignmentVariable = null;
+
             }
         }
 
@@ -2416,18 +2421,18 @@ namespace Gekko
         }
 
 
-        public static void Dynamic3(GekkoSmpl smpl, IVariable name)
-        {
-            string s = G.Chop_GetNameAndFreq((name as ScalarString).string2);  //omit any bank            
-            s = G.Chop_FreqAdd(s, Program.options.freq);
-            smpl.lhsAssignmentName = s;
-        }
+        //public static void Dynamic3(GekkoSmpl smpl, IVariable name)
+        //{
+        //    string s = G.Chop_GetNameAndFreq((name as ScalarString).string2);  //omit any bank            
+        //    s = G.Chop_FreqAdd(s, Program.options.freq);
+        //    smpl.lhsAssignmentName = s;
+        //}
 
-        public static bool Dynamic4(GekkoSmpl smpl)
-        {
-            if (G.Chop_HasSigil(smpl.lhsAssignmentName)) return true;
-            return false;
-        }
+        //public static bool Dynamic4(GekkoSmpl smpl)
+        //{
+        //    if (G.Chop_HasSigil(smpl.lhsAssignmentName)) return true;
+        //    return false;
+        //}
 
 
         public static IVariable LookupHelperLeftsideOLD(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
@@ -3550,19 +3555,20 @@ namespace Gekko
             return i1.Type() == EVariableType.Series && !G.Chop_HasSigil(i2.ConvertToString());
         }
 
-        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Action check_20, O.Assignment o)
         {
             bool dyn = Program.options.series_dyn;
             if (Program.options.series_dyn && G.Equal(o.opt_dyn, "no")) dyn = false;
             else if (!Program.options.series_dyn && G.Equal(o.opt_dyn, "yes")) dyn = true;
                         
-            if (dyn && check_20())
+            if (dyn)
             {
                 //could be dynamic: <dyn> or option dyn is set,
                 //and the lhs has a name of series type (so vals etc. would not get here)
                 //Now we load the smpl, so that we afterwards can see whether the lhs
                 //is present on the rhs:
 
+                check_20();  //find the lhs
                 smpl.lhsAssignmentHit = false;
                 assign_20(); //will abort before rhs is assigned to lhs if the rhs contains the lhs
 
@@ -3590,8 +3596,7 @@ namespace Gekko
             else
             {
                 smpl.lhsAssignmentHit = false;
-                smpl.lhsAssignmentName = null;  //switched off
-
+                //smpl.lhsAssignmentName = null;  //switched off
                 assign_20();
             }
         }

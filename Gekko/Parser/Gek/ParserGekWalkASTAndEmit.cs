@@ -4157,7 +4157,7 @@ namespace Gekko.Parser.Gek
                                     sb2.A("O.Dynamic1(smpl);" + G.NL);
                                     sb2.A(s5).End();
                                     sb2.A("O.Dynamic5(smpl);" + G.NL);
-                                    sb2.A("return O.Dynamic7(smpl);" + G.NL);
+                                    //sb2.A("return true;" + G.NL);
                                     
 
                                 }
@@ -4168,7 +4168,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //node.Code.A(sb);
 
-                                node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
+                                node.Code.A("Action check" + number + " = () => {" + G.NL);  //start of action
                                 node.Code.A(sb2);
                                 node.Code.A("};" + G.NL);  //end of action
 
