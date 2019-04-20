@@ -1653,8 +1653,8 @@ namespace Gekko
             else
             {
 
-                if (smpl?.lhsAssignmentName != null && G.Equal(smpl.lhsAssignmentName, varnameWithFreq)) smpl.lhsAssignmentHit = true;
-
+                //if (smpl?.lhsAssignmentName != null && G.Equal(smpl.lhsAssignmentName, varnameWithFreq)) smpl.lhsAssignmentHit = true;
+                               
                 if (map == null)
                 {                    
                     
@@ -1788,6 +1788,9 @@ namespace Gekko
                     }
                 }
             }
+
+            if (smpl?.lhsAssignmentVariable != null && ReferenceEquals(smpl.lhsAssignmentVariable, rv)) smpl.lhsAssignmentHit = true;
+
             return rv;
         }
 
@@ -2387,19 +2390,19 @@ namespace Gekko
         public static bool Dynamic2(GekkoSmpl smpl)
         {
             bool rv = false;
-            if (smpl.lhsAssignmentType == assignmantTypeLhs.Series) rv = true;
-            smpl.lhsAssignmentType = assignmantTypeLhs.Inactive;  //inactive            
+            if (smpl.lhsAssignmentType == assignmentTypeLhs.Series) rv = true;
+            smpl.lhsAssignmentType = assignmentTypeLhs.Inactive;  //inactive            
             return rv;
         }
 
         public static void Dynamic1(GekkoSmpl smpl)
         {
-            smpl.lhsAssignmentType = assignmantTypeLhs.Active;  //charged
+            smpl.lhsAssignmentType = assignmentTypeLhs.Active;  //charged
         }
 
         public static void Dynamic5(GekkoSmpl smpl)
         {
-            smpl.lhsAssignmentType = assignmantTypeLhs.Inactive;  //charged
+            smpl.lhsAssignmentType = assignmentTypeLhs.Inactive;  //charged
         }
 
         public static bool Dynamic6(GekkoSmpl smpl)
@@ -2580,51 +2583,13 @@ namespace Gekko
         {
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
-
-            if (!Globals.fixDynamic)
-            {
-                if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
-                {
-                    //active
-                    if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
-                    else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
-                    return;  //is just a probe on the type of the lhs, so we return without changing anything!
-                }
-            }
-            else
-            {
-                if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
-                {
-                    if (varnameWithFreq.Contains(":") || varnameWithFreq.Contains("[") || (!G.Chop_HasSigil(varnameWithFreq) && !varnameWithFreq.Contains("!")))
-                    {
-                        G.Writeln2("*** ERROR: Internal error #9807439875");
-                        throw new GekkoException();
-                    }
-                    
-                    if (G.Chop_HasSigil(varnameWithFreq))
-                    {
-                        //do nothing
-                    }
-                    else
-                    {
-                        smpl.lhsAssignmentName = varnameWithFreq;
-                    }                    
-                    return;  //is just a probe on the type of the lhs, so we return without changing anything!
-                }
-            }
-
+                        
             if (ib != null && ib.BankType() == EBankType.Normal)
             {
                 //ib can be == null with an indexer on the lhs, like #m.#n.%s
                 Databank ib_databank = ib as Databank;
                 if (!ib_databank.editable) Program.ProtectError("You cannot add/change a variable in non-editable databank ('" + ib_databank.name + "'), see OPEN<edit> or UNLOCK");
                 ib_databank.isDirty = true;
-            }
-
-            if (rhs.Type() == EVariableType.List)
-            {
-                List rhs_list = rhs as List;
-                
             }
 
             bool isArraySubSeries = false;
@@ -2643,6 +2608,26 @@ namespace Gekko
                 {
                     //ib can be == null with an indexer on the lhs, like #m.#n.%s
                     lhs = ib.GetIVariable(varnameWithFreq); //may return null
+
+                    //TODO TODO TODO
+                    //TODO TODO TODO
+                    //TODO TODO TODO If the lhs is a scalar or collection, there is a double lookup in dictionary
+                    //TODO TODO TODO perhaps fix this speed issue later on
+                    //TODO TODO TODO
+
+                    if (Globals.fixDynamic2)
+                    {
+                        
+                        if (smpl.lhsAssignmentType == assignmentTypeLhs.Active)
+                        {
+                            if (lhs != null && lhs.Type() == EVariableType.Series)
+                            {
+                                smpl.lhsAssignmentVariable = lhs;
+                            }                            
+                            return;  //is just a probe on the type of the lhs, so we return without changing anything!
+                        }
+                    }
+
                 }
 
                 //We divide into three groups depending on LHS name:
@@ -3567,7 +3552,11 @@ namespace Gekko
 
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
         {
-            if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
+            bool dyn = Program.options.series_dyn;
+            if (Program.options.series_dyn && G.Equal(o.opt_dyn, "no")) dyn = false;
+            else if (!Program.options.series_dyn && G.Equal(o.opt_dyn, "yes")) dyn = true;
+                        
+            if (dyn && check_20())
             {
                 //could be dynamic: <dyn> or option dyn is set,
                 //and the lhs has a name of series type (so vals etc. would not get here)
@@ -3580,7 +3569,7 @@ namespace Gekko
                 if (smpl.lhsAssignmentHit)
                 {
                     smpl.lhsAssignmentHit = false;
-                    smpl.lhsAssignmentName = null;  //switched off
+                    smpl.lhsAssignmentVariable = null;  //switched off
 
                     GekkoTime tt1_20 = smpl.t1;
                     GekkoTime tt2_20 = smpl.t2;

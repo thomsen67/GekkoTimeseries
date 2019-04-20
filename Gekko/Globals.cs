@@ -582,7 +582,8 @@ namespace Gekko
         public static Func<GekkoSmpl, IVariable> expression = null;
 
         public static bool fixALag = true;
-        public static bool fixDynamic = true;
+        public static bool fixDynamic = false;
+        public static bool fixDynamic2 = true;
 
         public static bool fixConcat = true;
 

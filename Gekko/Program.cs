@@ -76,7 +76,7 @@ namespace Gekko
     //    }
     //}
 
-    public enum assignmantTypeLhs
+    public enum assignmentTypeLhs
     {
         Inactive,
         Active,
@@ -198,8 +198,9 @@ namespace Gekko
         //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
-        public assignmantTypeLhs lhsAssignmentType = assignmantTypeLhs.Inactive;
+        public assignmentTypeLhs lhsAssignmentType = assignmentTypeLhs.Inactive;
         public string lhsAssignmentName = null;
+        public IVariable lhsAssignmentVariable = null;
         public bool lhsAssignmentHit = false;
 
         public GekkoSmpl()

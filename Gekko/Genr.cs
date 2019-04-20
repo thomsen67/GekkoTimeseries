@@ -16,19 +16,10 @@ namespace Gekko
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
             O.Assignment o0 = new O.Assignment();
-            o0.opt_source = @"<[code]>y = x";
+            o0.opt_source = @"<[code]>y=y.1+1";
 
 
-            Action assign_23 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar22 = O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
-                O.AdjustT0(smpl, 2);
-                if (O.Dynamic6(smpl)) return;
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar22, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
-                ;
-            };
-            Func<bool> check_23 = () =>
+            Func<bool> check_28 = () =>
             {
                 O.Dynamic1(smpl);
                 O.Lookup(smpl, null, null, "y", null, Globals.scalarValMissing, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
@@ -36,12 +27,23 @@ namespace Gekko
                 O.Dynamic5(smpl);
                 return O.Dynamic7(smpl);
             };
-            O.RunAssigmentMaybeDynamic(smpl, assign_23, check_23, o0);
+            Action assign_28 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar25 = O.Add(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.Dot, i26), smpl, O.EIndexerType.Dot, O.Lookup(smpl, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), i26), i27);
+                O.AdjustT0(smpl, 2);
+                if (O.Dynamic6(smpl)) return;
+                O.Lookup(smpl, null, null, "y", null, ivTmpvar25, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+            };
+            O.RunAssigmentMaybeDynamic(smpl, assign_28, check_28, o0);
 
             //[[commandEnd]]0
         }
 
 
+        public static readonly ScalarVal i26 = new ScalarVal(1d);
+        public static readonly ScalarVal i27 = new ScalarVal(1d);
 
         public static void CodeLines(P p)
         {
