@@ -4138,24 +4138,64 @@ namespace Gekko.Parser.Gek
                                                        
                             if (true)
                             {
+                                
+                                if (Globals.fixDynamic)
+                                {
+                                    sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                    sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                    sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+                                    //sb2.A(sb1); //cloning
+                                    sb1.A("if(O.Dynamic6(smpl)) return;" + G.NL);  //then we do it step by step instead
+                                    sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+                                                                //more complicated probing for sb2                                                                        
 
-                                sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
-                                sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                                sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+                                    // -------------- check()
 
-                                sb2.A(sb1); //cloning
+                                    if (false) {
+                                        sb2.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                        sb2.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                        sb2.A(OperatorHelper(null, Globals.smplOffset)).End();
 
-                                //sb1.A(sb);
-                                //sb2.A(sb);
+                                        sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
+                                        
+                                    }
+                                    string s5 = node[0].Code.ToString();
+                                    s5 = s5.Replace(ivTempVar, "Globals.scalarValMissing");
 
-                                sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+                                    sb2.A("O.Dynamic1(smpl);" + G.NL);
+                                    sb2.A(s5).End();
+                                    sb2.A("O.Dynamic5(smpl);" + G.NL);
+                                    sb2.A("return O.Dynamic7(smpl);" + G.NL);
+                                    //sb2.A("return true;" + G.NL);
 
-                                //more complicated probing for sb2
-                                sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
-                                sb2.A("O.Dynamic1(smpl);" + G.NL);
-                                sb2.A(node[0].Code).End();
-                                sb2.A("return O.Dynamic2(smpl);" + G.NL);
-                                //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+
+                                    //string s3 = G.ReplaceFirstOccurrence(node[0].Code.ToString(), "O.Lookup(", "O.NameLookup(");
+                                    //s3 = s3.Replace(ivTempVar, "null");  //only doing a name lookup
+                                    //sb2.A("O.Dynamic3(smpl, " + s3 + ");" + G.NL);
+                                    //sb2.A("if (O.Dynamic4(smpl)) return false;" + G.NL);
+                                    //sb2.A("return true;" + G.NL);
+
+                                }
+                                else
+                                {
+                                    sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                    sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                    sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+
+                                    sb2.A(sb1); //cloning
+
+                                    sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+
+                                    //more complicated probing for sb2
+                                    sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
+                                    sb2.A("O.Dynamic1(smpl);" + G.NL);
+                                    sb2.A(node[0].Code).End();
+                                    sb2.A("return O.Dynamic2(smpl);" + G.NL);
+                                    //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+
+                                }
+
+
                             }
 
                             if (Globals.series_dynamic)

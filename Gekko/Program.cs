@@ -199,6 +199,8 @@ namespace Gekko
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
         public assignmantTypeLhs lhsAssignmentType = assignmantTypeLhs.Inactive;
+        public string lhsAssignmentName = null;
+        public bool lhsAssignmentHit = false;
 
         public GekkoSmpl()
         {

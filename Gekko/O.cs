@@ -1652,8 +1652,12 @@ namespace Gekko
             }
             else
             {
+
+                if (smpl?.lhsAssignmentName != null && G.Equal(smpl.lhsAssignmentName, varnameWithFreq)) smpl.lhsAssignmentHit = true;
+
                 if (map == null)
-                {
+                {                    
+                    
                     //It must be a databank then
                     if (dbName == null)
                     {
@@ -2393,7 +2397,34 @@ namespace Gekko
             smpl.lhsAssignmentType = assignmantTypeLhs.Active;  //charged
         }
 
+        public static void Dynamic5(GekkoSmpl smpl)
+        {
+            smpl.lhsAssignmentType = assignmantTypeLhs.Inactive;  //charged
+        }
 
+        public static bool Dynamic6(GekkoSmpl smpl)
+        {
+            return smpl.lhsAssignmentHit == true;
+        }
+
+        public static bool Dynamic7(GekkoSmpl smpl)
+        {
+            return true;
+        }
+
+
+        public static void Dynamic3(GekkoSmpl smpl, IVariable name)
+        {
+            string s = G.Chop_GetNameAndFreq((name as ScalarString).string2);  //omit any bank            
+            s = G.Chop_FreqAdd(s, Program.options.freq);
+            smpl.lhsAssignmentName = s;
+        }
+
+        public static bool Dynamic4(GekkoSmpl smpl)
+        {
+            if (G.Chop_HasSigil(smpl.lhsAssignmentName)) return true;
+            return false;
+        }
 
 
         public static IVariable LookupHelperLeftsideOLD(GekkoSmpl smpl, IBank ib, string varnameWithFreq, string freq, IVariable rhsExpression)
@@ -2550,12 +2581,36 @@ namespace Gekko
             //This is an assignment, for instance %x = 5, or x = (1, 2, 3), or bank:x = bank:y, or #m.x = (1, 2, 3).
             //Assignment is the hardest part of Lookup()
 
-            if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
+            if (!Globals.fixDynamic)
             {
-                //active
-                if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
-                else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
-                return;  //is just a probe on the type of the lhs, so we return without changing anything!
+                if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
+                {
+                    //active
+                    if (G.Chop_HasSigil(varnameWithFreq)) smpl.lhsAssignmentType = assignmantTypeLhs.Nonseries;
+                    else smpl.lhsAssignmentType = assignmantTypeLhs.Series;
+                    return;  //is just a probe on the type of the lhs, so we return without changing anything!
+                }
+            }
+            else
+            {
+                if (smpl.lhsAssignmentType == assignmantTypeLhs.Active)
+                {
+                    if (varnameWithFreq.Contains(":") || varnameWithFreq.Contains("[") || (!G.Chop_HasSigil(varnameWithFreq) && !varnameWithFreq.Contains("!")))
+                    {
+                        G.Writeln2("*** ERROR: Internal error #9807439875");
+                        throw new GekkoException();
+                    }
+                    
+                    if (G.Chop_HasSigil(varnameWithFreq))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        smpl.lhsAssignmentName = varnameWithFreq;
+                    }                    
+                    return;  //is just a probe on the type of the lhs, so we return without changing anything!
+                }
             }
 
             if (ib != null && ib.BankType() == EBankType.Normal)
@@ -3514,19 +3569,40 @@ namespace Gekko
         {
             if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
             {
-                GekkoTime tt1_20 = smpl.t1;
-                GekkoTime tt2_20 = smpl.t2;
-                foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                //could be dynamic: <dyn> or option dyn is set,
+                //and the lhs has a name of series type (so vals etc. would not get here)
+                //Now we load the smpl, so that we afterwards can see whether the lhs
+                //is present on the rhs:
+
+                smpl.lhsAssignmentHit = false;
+                assign_20(); //will abort before rhs is assigned to lhs if the rhs contains the lhs
+
+                if (smpl.lhsAssignmentHit)
                 {
-                    smpl.t1 = t_20;
-                    smpl.t2 = t_20;
-                    assign_20();
+                    smpl.lhsAssignmentHit = false;
+                    smpl.lhsAssignmentName = null;  //switched off
+
+                    GekkoTime tt1_20 = smpl.t1;
+                    GekkoTime tt2_20 = smpl.t2;
+                    foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    {
+                        smpl.t1 = t_20;
+                        smpl.t2 = t_20;
+                        assign_20();
+                    }
+                    smpl.t1 = tt1_20;
+                    smpl.t2 = tt2_20;
                 }
-                smpl.t1 = tt1_20;
-                smpl.t2 = tt2_20;
+                else
+                {
+                    //we are done, assign_20() did the job
+                }
             }
             else
             {
+                smpl.lhsAssignmentHit = false;
+                smpl.lhsAssignmentName = null;  //switched off
+
                 assign_20();
             }
         }
