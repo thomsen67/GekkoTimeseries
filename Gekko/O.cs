@@ -2366,14 +2366,9 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }
+        }        
 
         public static void InitSmpl(GekkoSmpl smpl, P p)
-        {
-            InitSmpl(smpl, 0, p);
-        }
-
-        public static void InitSmpl(GekkoSmpl smpl, int i, P p)
         {
             //called before each command is run
             if (smpl != null)
@@ -2602,6 +2597,7 @@ namespace Gekko
 
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
+                if (DynamicHelper2(smpl)) return; //is just a probe on the type of the lhs, so we return without changing anything!                    
                 WriteListFile(varnameWithFreq, rhs);
             }
             else
@@ -2613,17 +2609,17 @@ namespace Gekko
                     lhs = ib.GetIVariable(varnameWithFreq); //may return null                                       
                 }
 
-                if (Globals.fixDynamic2)
-                {
+                if (true)
+                {                                        
 
-                    //TODO TODO TODO
-                    //TODO TODO TODO
-                    //TODO TODO TODO If the lhs is a scalar or collection, there is a double lookup in dictionary
-                    //TODO TODO TODO perhaps fix this speed issue later on
-                    //TODO TODO TODO
-
-                    if (smpl.dyn != null && smpl.dyn.lhsAssignmentType == assignmentTypeLhs.Active)
+                    if (DynamicHelper2(smpl))
                     {
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO If the lhs is a scalar or collection, there is a double lookup in dictionary
+                        //TODO TODO TODO perhaps fix this speed issue later on
+                        //TODO TODO TODO
+
                         if (ib != null)
                         {
                             if (lhs != null && lhs.Type() == EVariableType.Series)
@@ -3453,6 +3449,11 @@ namespace Gekko
 
         }
 
+        private static bool DynamicHelper2(GekkoSmpl smpl)
+        {
+            return Globals.fixDynamic2 && smpl.dyn != null && smpl.dyn.lhsAssignmentType == assignmentTypeLhs.Active;
+        }
+
         public static void WriteListFile(string varnameWithFreq, IVariable rhs)
         {
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
@@ -3582,7 +3583,8 @@ namespace Gekko
                 check();  //find the lhs                
                 smpl.dyn.lhsAssignmentType = assignmentTypeLhs.Inactive;
                 assign(); //will abort before rhs is assigned to lhs if the rhs contains the lhs
-                bool hit = smpl.dyn.lhsAssignmentHit;
+                bool hit = false;
+                if (smpl.dyn != null) hit = smpl.dyn.lhsAssignmentHit;
                 smpl.dyn = clone;  //reverting, for instance if inside a map def
                 //------------------------------------------------------------
 

@@ -12403,27 +12403,27 @@ namespace Gekko
             return found;
         }
 
-        public static O.Prt PrtSnippet(string s, string s2)
-        {
-            CompilerResults cr;
-            CreatePrtSnippetDll(out cr, s, s2);
-            //O.Prt o = new O.Prt();
-            //Object[] args = new Object[1];
-            //args[0] = o;
-            O.Prt o = null;
-            try
-            {
-                Object ret = null;
-                ret = cr.CompiledAssembly.GetType("Gekko.PrtSnippet").InvokeMember("Snippet", BindingFlags.InvokeMethod, null, null, null);
-                o = (O.Prt)ret;
-                return o;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("ERROR: Some databanks or timeseries may be unavailable.\nPlease close the PLOT window and consult the error\nmessage in the Gekko output window.");
-            }
-            return o;
-        }
+        //public static O.Prt PrtSnippet(string s, string s2)
+        //{
+        //    CompilerResults cr;
+        //    CreatePrtSnippetDll(out cr, s, s2);
+        //    //O.Prt o = new O.Prt();
+        //    //Object[] args = new Object[1];
+        //    //args[0] = o;
+        //    O.Prt o = null;
+        //    try
+        //    {
+        //        Object ret = null;
+        //        ret = cr.CompiledAssembly.GetType("Gekko.PrtSnippet").InvokeMember("Snippet", BindingFlags.InvokeMethod, null, null, null);
+        //        o = (O.Prt)ret;
+        //        return o;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        MessageBox.Show("ERROR: Some databanks or timeseries may be unavailable.\nPlease close the PLOT window and consult the error\nmessage in the Gekko output window.");
+        //    }
+        //    return o;
+        //}
 
         public static List<string> TestSim(List<string> list, int start, int end)
         {
@@ -13082,39 +13082,39 @@ namespace Gekko
         }
 
 
-        private static void CreatePrtSnippetDll(out CompilerResults cr, string s, string s3)
-        {
-            StringBuilder s2 = new StringBuilder();
-            s2.AppendLine("using System;");
-            s2.AppendLine("using System.Collections.Generic;");
-            s2.AppendLine("using System.Text;");
-            s2.AppendLine("namespace Gekko");
-            s2.AppendLine("{");
-            s2.AppendLine("    public class PrtSnippet");
-            s2.AppendLine("    {");
-            s2.AppendLine(s3);
-            s2.AppendLine("public static O.Prt Snippet()");
-            s2.AppendLine("{");
-            s2.AppendLine(Globals.gekkoSmplInit);
-            s2.AppendLine(s);
-            s2.AppendLine("}");  //method
-            s2.AppendLine("}");  //class
-            s2.AppendLine("}");  //namespace
-            s2.Replace("`", Globals.QT);
-            CompilerParameters compilerParams = new CompilerParameters();
-            compilerParams = new CompilerParameters();
-            compilerParams.CompilerOptions = Globals.compilerOptions;
-            compilerParams.GenerateInMemory = false;
-            compilerParams.IncludeDebugInformation = false;
-            compilerParams.ReferencedAssemblies.Add("system.dll");
-            compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-            compilerParams.GenerateExecutable = false;
-            cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
-            if (cr.Errors.HasErrors)
-            {
-                throw new GekkoException();
-            }
-        }
+        //private static void CreatePrtSnippetDll(out CompilerResults cr, string s, string s3)
+        //{
+        //    StringBuilder s2 = new StringBuilder();
+        //    s2.AppendLine("using System;");
+        //    s2.AppendLine("using System.Collections.Generic;");
+        //    s2.AppendLine("using System.Text;");
+        //    s2.AppendLine("namespace Gekko");
+        //    s2.AppendLine("{");
+        //    s2.AppendLine("    public class PrtSnippet");
+        //    s2.AppendLine("    {");
+        //    s2.AppendLine(s3);
+        //    s2.AppendLine("public static O.Prt Snippet()");
+        //    s2.AppendLine("{");
+        //    s2.AppendLine(Globals.gekkoSmplInit);
+        //    s2.AppendLine(s);
+        //    s2.AppendLine("}");  //method
+        //    s2.AppendLine("}");  //class
+        //    s2.AppendLine("}");  //namespace
+        //    s2.Replace("`", Globals.QT);
+        //    CompilerParameters compilerParams = new CompilerParameters();
+        //    compilerParams = new CompilerParameters();
+        //    compilerParams.CompilerOptions = Globals.compilerOptions;
+        //    compilerParams.GenerateInMemory = false;
+        //    compilerParams.IncludeDebugInformation = false;
+        //    compilerParams.ReferencedAssemblies.Add("system.dll");
+        //    compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
+        //    compilerParams.GenerateExecutable = false;
+        //    cr = Globals.iCodeCompiler.CompileAssemblyFromSource(compilerParams, s2.ToString());
+        //    if (cr.Errors.HasErrors)
+        //    {
+        //        throw new GekkoException();
+        //    }
+        //}
 
         public static List<int> GetLeftsideBNumbers()
         {

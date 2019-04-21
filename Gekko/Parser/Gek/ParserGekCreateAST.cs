@@ -679,11 +679,12 @@ namespace Gekko.Parser.Gek
 
         private static void CodeSplitFlush(List<string> tempHelperForMethodsCs, List<string> mainCs, List<string> methodsCs, ref int nCi, ref int counterExtra)
         {
-            methodsCs.Add("public static void C" + nCi + "(P p) {" + G.NL); counterExtra++;
-            methodsCs.Add(Globals.gekkoSmplInit + G.NL); counterExtra++;
+            methodsCs.Add("public static void C" + nCi + "(GekkoSmpl smpl, P p) {" + G.NL); counterExtra++;
+            //methodsCs.Add(Globals.gekkoSmplInit + G.NL); counterExtra++;
+            methodsCs.Add(Globals.gekkoSmplInitCommand + G.NL); counterExtra++;            
             methodsCs.AddRange(tempHelperForMethodsCs);
             methodsCs.Add("}" + G.NL); counterExtra++;
-            mainCs.Add("C" + nCi + "(p);" + G.NL);
+            mainCs.Add("C" + nCi + "(smpl, p);" + G.NL);
             tempHelperForMethodsCs.Clear();
             nCi++;
         }        
