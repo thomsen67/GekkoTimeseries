@@ -1796,7 +1796,9 @@ namespace Gekko
 
         public static void DynamicHelperRhs(GekkoSmpl smpl, IVariable rv)
         {
-            if (smpl?.dyn?.lhsAssignmentVariable != null && ReferenceEquals(smpl.dyn.lhsAssignmentVariable, rv)) smpl.dyn.lhsAssignmentHit = true;
+            if (smpl == null || smpl.p == null) return;
+            int d = smpl.p.GetDepth();
+            if (smpl.dyn[d]?.lhsAssignmentVariable != null && ReferenceEquals(smpl.dyn[d].lhsAssignmentVariable, rv)) smpl.dyn[d].lhsAssignmentHit = true;
         }
 
 
@@ -2383,7 +2385,8 @@ namespace Gekko
                 //p.numberOfServiceMessages = 0;
                 smpl.p = p;
 
-                smpl.dyn = null;
+                int d = smpl.p.GetDepth();
+                smpl.dyn[d] = null;
 
             }
         }
@@ -2409,8 +2412,9 @@ namespace Gekko
 
         public static bool Dynamic6(GekkoSmpl smpl)
         {
-            if (smpl.dyn == null) return false;
-            return smpl.dyn.lhsAssignmentHit;
+            int d = smpl.p.GetDepth();
+            if (smpl.dyn[d] == null) return false;
+            return smpl.dyn[d].lhsAssignmentHit;
         }
         
 
@@ -2620,18 +2624,20 @@ namespace Gekko
                         //TODO TODO TODO perhaps fix this speed issue later on
                         //TODO TODO TODO
 
+                        int d = smpl.p.GetDepth();
+
                         if (ib != null)
                         {
                             if (lhs != null && lhs.Type() == EVariableType.Series)
                             {
-                                smpl.dyn.lhsAssignmentVariable = lhs;
+                                smpl.dyn[d].lhsAssignmentVariable = lhs;
                             }
                         }
                         else
                         {
                             if (arraySubSeries != null)
                             {
-                                smpl.dyn.lhsAssignmentVariable = arraySubSeries;
+                                smpl.dyn[d].lhsAssignmentVariable = arraySubSeries;
                             }
                         }
                         return;  //is just a probe on the type of the lhs, so we return without changing anything!
@@ -3449,9 +3455,10 @@ namespace Gekko
 
         }
 
-        private static bool DynamicHelper2(GekkoSmpl smpl)
+        public static bool DynamicHelper2(GekkoSmpl smpl)
         {
-            return Globals.fixDynamic2 && smpl.dyn != null && smpl.dyn.lhsAssignmentType == assignmentTypeLhs.Active;
+            int d = smpl.p.GetDepth();
+            return Globals.fixDynamic2 && smpl.dyn[d] != null && smpl.dyn[d].lhsAssignmentType == assignmentTypeLhs.Active;
         }
 
         public static void WriteListFile(string varnameWithFreq, IVariable rhs)
@@ -3564,28 +3571,29 @@ namespace Gekko
             return i1.Type() == EVariableType.Series && !G.Chop_HasSigil(i2.ConvertToString());
         }
 
-        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign, Action check, O.Assignment o)
+        public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign, Action check, bool isMapItem, O.Assignment o)
         {
             bool dyn = Program.options.series_dyn;
             if (Program.options.series_dyn && G.Equal(o.opt_dyn, "no")) dyn = false;
             else if (!Program.options.series_dyn && G.Equal(o.opt_dyn, "yes")) dyn = true;
                         
-            if (dyn)
+            if (dyn && !isMapItem)  //mapItem never considered to run dynamically
             {
                 //------------------------------------------------------------
                 //Here, smpl.dyn is created, and at the end is set to null (or what it was at the start)
                 //GekkoDyn is not created anywhere else
                 //------------------------------------------------------------
+                int d = smpl.p.GetDepth();                
                 GekkoDyn clone = null;
-                if (smpl.dyn != null) clone = smpl.dyn.DeepClone();  //stuff like #m = (y = 100)
-                smpl.dyn = new GekkoDyn();
-                smpl.dyn.lhsAssignmentType = assignmentTypeLhs.Active;
+                //if (smpl.dyn[d] != null) clone = smpl.dyn[d].DeepClone();  //stuff like #m = (y = 100)
+                smpl.dyn[d] = new GekkoDyn();
+                smpl.dyn[d].lhsAssignmentType = assignmentTypeLhs.Active;
                 check();  //find the lhs                
-                smpl.dyn.lhsAssignmentType = assignmentTypeLhs.Inactive;
+                smpl.dyn[d].lhsAssignmentType = assignmentTypeLhs.Inactive;
                 assign(); //will abort before rhs is assigned to lhs if the rhs contains the lhs
                 bool hit = false;
-                if (smpl.dyn != null) hit = smpl.dyn.lhsAssignmentHit;
-                smpl.dyn = clone;  //reverting, for instance if inside a map def
+                if (smpl.dyn[d] != null) hit = smpl.dyn[d].lhsAssignmentHit;
+                smpl.dyn[d] = clone;  //reverting, for instance if inside a map def
                 //------------------------------------------------------------
 
                 if (hit)

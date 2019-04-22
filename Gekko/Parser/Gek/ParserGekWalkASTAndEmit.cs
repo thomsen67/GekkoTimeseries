@@ -4078,6 +4078,9 @@ namespace Gekko.Parser.Gek
                         {
                             string number = "_" + ++Globals.counter;
 
+                            string isMapItem = "false";
+                            if (node.Parent != null && node.Parent.Text == "ASTMAPITEM") isMapItem = "true";
+
                             string operatorType = "ASTPLACEHOLDER";
                             if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
 
@@ -4175,9 +4178,9 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
                                 node.Code.A(sb1);
                                 node.Code.A("};" + G.NL);  //end of action
-                                                               
 
-                                node.Code.A("O.RunAssigmentMaybeDynamic(smpl, assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+
+                                node.Code.A("O.RunAssigmentMaybeDynamic(smpl, assign" + number + ", check" + number + ", " + isMapItem + ", " + "o" + Num(node) + ");" + G.NL);
                             }
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)

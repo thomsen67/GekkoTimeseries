@@ -366,6 +366,13 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: List index [" + i + "] out of range 1.." + this.list.Count);
                     throw new GekkoException();
+                }                
+                
+                if (O.DynamicHelper2(smpl))
+                {
+                    int d = smpl.p.GetDepth();
+                    if (this.list[i - 1].Type() == EVariableType.Series) smpl.dyn[d].lhsAssignmentVariable = this.list[i - 1];
+                    return;
                 }
                 this.list[i - 1] = rhsExpression.DeepClone(null);
             }

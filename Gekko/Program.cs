@@ -214,7 +214,7 @@ namespace Gekko
         //public List<List<O.LabelHelperIVariable>> labelHelper2 = new List<List<O.LabelHelperIVariable>>(); //not created all the time, so ok
         public List<O.RecordedPieces> labelRecordedPieces = new List<O.RecordedPieces>();
         public P p;
-        public GekkoDyn dyn = null;        
+        public GekkoDyn[] dyn = new GekkoDyn[200];  //stack depth of 200 should be ok
 
         public GekkoSmpl()
         {
