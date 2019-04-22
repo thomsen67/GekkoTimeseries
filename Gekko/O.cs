@@ -2355,14 +2355,9 @@ namespace Gekko
                 throw new GekkoException();
             }
             return rv;
-        }
+        }        
 
         public static void InitSmpl(GekkoSmpl smpl, P p)
-        {
-            InitSmpl(smpl, 0, p);
-        }
-
-        public static void InitSmpl(GekkoSmpl smpl, int i, P p)
         {
             //called before each command is run
             if (smpl != null)
@@ -2372,7 +2367,7 @@ namespace Gekko
                 smpl.t2 = Globals.globalPeriodEnd;
                 smpl.t3 = Globals.globalPeriodEnd.Add(Globals.smplInitEnd);
                 smpl.gekkoError = null;
-                smpl.gekkoErrorI = 0;
+                //smpl.gekkoErrorI = 0;
                 smpl.bankNumber = 0;
                 //p.numberOfServiceMessages = 0;
                 smpl.p = p;
