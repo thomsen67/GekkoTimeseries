@@ -2125,36 +2125,33 @@ namespace UnitTests
             // ======== with dyn option ===========
             // ========================================
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x = x[-1] + 1;");
+            I("block series dyn = yes; x = x[-1] + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x = x + 1;");
+            I("block series dyn = yes; x = x + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 91d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x = x[+1] + 1;");
+            I("block series dyn = yes; x = x[+1] + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 81d, sharedDelta);
@@ -2163,36 +2160,33 @@ namespace UnitTests
 
             // with ^= instead of =
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x ^= x[-1] + 1;");
+            I("block series dyn = yes; x ^= x[-1] + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 201d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 403d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x ^= x + 1;");
+            I("block series dyn = yes; x ^= x + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 191d, sharedDelta);
             _AssertSeries(First(), "x!a", 2003, 272d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
-            I("x ^= x[+1] + 1;");
+            I("block series dyn = yes; x ^= x[+1] + 1; end;");
             _AssertSeries(First(), "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "x!a", 2002, 181d, sharedDelta);
@@ -2240,20 +2234,16 @@ namespace UnitTests
             // ======== testing val just in case... ===
             // ========================================
 
-            I("reset;");
-            I("option series dyn = yes;");
-            I("%v = 100;");
-            I("%v = %v + 1;");  //if something wrong with option series dyn, this will run too many times
+            I("reset;");            
+            I("block series dyn = yes; %v = 100; %v = %v + 1; end;");  //if something wrong with option series dyn, this will run too many times
             _AssertScalarVal(First(), "%v", 101d);
 
             // ========================================
             // ======== testing map ===================
             // ========================================
 
-            I("reset;");
-            I("option series dyn = yes;");
-            I("#m = (%v = 100);");
-            I("#m.%v = #m.%v + 1;");  //if something wrong with option series dyn, this will run too many times            
+            I("reset;");            
+            I("block series dyn = yes; #m = (%v = 100); #m.%v = #m.%v + 1; end;");  //if something wrong with option series dyn, this will run too many times            
             Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertScalarVal(m, "%v", 101d);
 
@@ -2269,12 +2259,11 @@ namespace UnitTests
             _AssertSeries(m, "x!a", 2003, 101d, sharedDelta);
             _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");
-            I("option series dyn = yes;");
+            I("reset;");            
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
-            I("#m.x = #m.x[-1] + 1;");
+            I("block series dyn = yes; #m.x = #m.x[-1] + 1; end;");
             m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);

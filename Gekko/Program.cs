@@ -19890,9 +19890,11 @@ namespace Gekko
         {
             GekkoTime tStart = o.t1;
             GekkoTime tEnd = o.t2;
-
-            List<string> vars = O.Restrict(o.names, false, false, false, false);  //only allows plain vars (idents)
-
+            
+            List vars2 = O.Restrict2(o.names, false, false, false, false);   //only allows plain vars (idents)
+            List<ToFrom> vars = null;
+            if (vars2 != null) vars = SearchFromTo(vars2, null, null, null, EWildcardSearchType.Search, null);
+                        
             //GekkoTime tStart, tEnd; ConvertToGekkoTime(tp, out tStart, out tEnd);
 
             //vars = UnfoldLists(vars);
@@ -19992,9 +19994,9 @@ namespace Gekko
             if (vars != null)  //if filter is set
             {
                 hasFilter = true;
-                foreach (string s in vars)
+                foreach (ToFrom tf in vars)
                 {
-                    filter.Add(s, "");  //we are just using the keys, not values, therefore ""
+                    filter.Add(tf.s1, "");  //we are just using the keys, not values, therefore ""
                 }
             }
 
