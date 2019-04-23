@@ -2162,226 +2162,42 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
+                    case "ASTBLOCK":
+                        {                           
 
-                    //case "ASTFORVAL":
-                    //    {
-                    //        node.Code.A(Globals.splitSTOP);
-                            
-                    //        if (node[0].Text != "ASTFORLEFTSIDE" || node[1].Text != "ASTFORRIGHTSIDE" || node[2].Text != "ASTFORSTATEMENTS")
-                    //        {
-                    //            throw new GekkoException();
-                    //        }
-                    //        string nameSimpleIdent = node[0][0].nameSimpleIdent;
-                    //        if (nameSimpleIdent == null)
-                    //        {
-                    //            G.Writeln2("*** ERROR: Composed names not (yet) allowed for loop variables");
-                    //            throw new GekkoException();
-                    //        }
-                    //        string codeFrom = node[1][0].Code.ToString();
-                    //        string codeEnd = node[1][1].Code.ToString();
-                    //        string codeStep = null;
-                    //        ASTNode stepNode = node[1][2];
-                    //        if (stepNode == null) codeStep = "new ScalarVal(1d)";
-                    //        else codeStep = node[1][2].Code.ToString();
-                    //        string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"
-                    //        string tempName = "temp" + ++Globals.counter;                            
-                    //        string startName = "start" + ++Globals.counter;
-                    //        string endName = "end" + ++Globals.counter;
-                    //        string stepName = "step" + ++Globals.counter;
-                    //        //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
+                            string record = null;
+                            string alter = null;
+                            string play = null;                            
+                            bool first = true;
+                            foreach(ASTNode child in node[0].ChildrenIterator())
+                            {
+                                if (first)
+                                {
 
-                    //        string loopVariable = null;
-                    //        string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, "double.NaN", false, true, false);
-                                                        
-                    //        node.Code.A(setLoopStringCs + G.NL);                            
-                    //        node.Code.A("double " + stepName + " = " + codeStep + ".GetVal("+Globals.smpl+");" + G.NL);
-                    //        node.Code.A("double " + startName + " = " + codeFrom + ".GetVal("+Globals.smpl+");" + G.NL);
-                    //        node.Code.A("double " + endName + " = " + codeEnd + ".GetVal("+Globals.smpl+") + " + stepName + "/1000000d;" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
-                    //        node.Code.A("ScalarVal " + tempName + " = (ScalarVal)" + loopVariable + ";" + G.NL);
-                    //        node.Code.A("try {");                            
-                    //        node.Code.A("for (" + tempName + ".val = " + startName + " ; O.ContinueIterating(" + tempName + ".val, " + endName + ", " + stepName + "); " + tempName + ".val += " + stepName + ")");
-                    //        node.Code.A("{" + G.NL);
-                            
-                    //        node.Code.A(Globals.splitSTART);
-                    //        node.Code.A(statements);
-                    //        node.Code.A(Globals.splitSTOP);
-                            
-                    //        node.Code.A("}" + G.NL);
-                    //        node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
-                    //        node.Code.A("finally {" + G.NL);                            
-                    //        node.Code.A("O.RemoveScalar(`" + nameSimpleIdent + "`);" + G.NL);
-                    //        node.Code.A("}  //end of finally" + G.NL);  //end of finally   
+                                }
+                                else
+                                {
+                                    StringBuilder s = new StringBuilder();
+                                    string o = "";
+                                    CreateOptionVariable(child, true, s, ref o);
+                                    int n = ++Globals.counter;
+                                    record += "var record" + n + " = " + o + ";" + G.NL;  //var record117 = Program.options.freq;
+                                    alter += s.ToString();                                //Program.options.freq = EFreq.Q;
+                                    play += o + " = record" + n + ";" + G.NL;             //Program.options.freq = record117
+                                }
+                                first = false;
+                            }
+                            node.Code.A(record);
+                            node.Code.A(alter);
+                            //node.Code.A("try {" + G.NL);
+                            GetCodeFromAllChildren(node, node[1][0]);
+                            //node.Code.A("}" + G.NL);
+                            //node.Code.A("finally {" + G.NL);
+                            node.Code.A(play);
+                            //node.Code.A("}" + G.NL);
 
-                    //        node.Code.A(Globals.splitSTART);
-                    //    }
-                    //    break;
-
-                    //case "ASTFORDATE":
-                    //    {
-                    //        node.Code.A(Globals.splitSTOP);
-                            
-                    //        if (node[0].Text != "ASTFORLEFTSIDE" || node[1].Text != "ASTFORRIGHTSIDE" || node[2].Text != "ASTFORSTATEMENTS")
-                    //        {
-                    //            throw new GekkoException();
-                    //        }
-                    //        string nameSimpleIdent = node[0][0].nameSimpleIdent;
-                    //        if (nameSimpleIdent == null)
-                    //        {
-                    //            G.Writeln2("*** ERROR: Composed names not (yet) allowed for loop variables");
-                    //            throw new GekkoException();
-                    //        }
-                    //        string codeFrom = node[1][0].Code.ToString();
-                    //        string codeEnd = node[1][1].Code.ToString();
-                    //        string codeStep = null;
-                    //        ASTNode stepNode = node[1][2];
-                    //        if (stepNode == null) codeStep = "new ScalarVal(1d)";
-                    //        else codeStep = node[1][2].Code.ToString();
-                    //        string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"
-                    //        string tempName = "temp" + ++Globals.counter;
-                    //        string startName = "start" + ++Globals.counter;
-                    //        string endName = "end" + ++Globals.counter;
-                    //        string stepName = "step" + ++Globals.counter;
-                    //        //NOTE this will mean that the end and step are fixed when seeing the FOR. Should be ok. Alternative is crazy.                            
-
-                    //        string loopVariable = null;
-                    //        string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Date, "GekkoTime.tNull", false, true, false);                            
-                            
-                    //        node.Code.A(setLoopStringCs + G.NL);
-                    //        node.Code.A("int " + stepName + " = O.ConvertToInt(" + codeStep + ");" + G.NL);
-                    //        node.Code.A("GekkoTime " + startName + " = O.ConvertToDate(" + codeFrom + ", O.GetDateChoices.Strict);" + G.NL);
-                    //        node.Code.A("GekkoTime " + endName + " = O.ConvertToDate(" + codeEnd + ", O.GetDateChoices.Strict);" + G.NL);  //added a tiny bit of steplength, to guard against rounding errors
-                    //        node.Code.A("ScalarDate " + tempName + " = (ScalarDate)" + loopVariable + ";" + G.NL);
-                    //        node.Code.A("try {");
-                    //        node.Code.A("for (" + tempName + ".date = " + startName + " ; O.ContinueIterating(" + tempName + ".date, " + endName + ", " + stepName + "); " + tempName + ".date = O.ConvertToDate(" + tempName + ".Add(smpl, " + codeStep + "), O.GetDateChoices.Strict))");
-                    //        node.Code.A("{" + G.NL);
-
-                    //        node.Code.A(Globals.splitSTART);
-                    //        node.Code.A(statements);
-                    //        node.Code.A(Globals.splitSTOP);
-
-                    //        node.Code.A("}" + G.NL);
-                    //        node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
-                    //        node.Code.A("finally {" + G.NL);
-                    //        node.Code.A("O.RemoveScalar(`" + nameSimpleIdent + "`);" + G.NL);
-                    //        node.Code.A("}  //end of finally" + G.NL);  //end of finally 
-
-                    //        node.Code.A(Globals.splitSTART);
-                    //    }
-                    //    break;
-                    //case "ASTFORNAME":
-                    //case "ASTFORSTRING":
-                    //    {
-                    //        node.Code.A(Globals.splitSTOP);
-                            
-                    //        bool x = false;
-                    //        if (node.Text == "ASTFORNAME") x = true;
-                    //        if (node[0].Text != "ASTFORLEFTSIDE2" || node[1].Text != "ASTFORRIGHTSIDE2" || node[2].Text != "ASTFORSTATEMENTS")
-                    //        {
-                    //            throw new GekkoException();
-                    //        }
-
-                    //        int n0 = node[0].ChildrenCount();
-                    //        int n1 = node[1].ChildrenCount();
-                    //        if (n0 != n1) throw new GekkoException();  //is not possible anyway                            
-
-                    //        if (n0 == 1)
-                    //        {                               
-                                
-                    //            //Normal string loop
-                    //            string nameSimpleIdent = node[0][0].nameSimpleIdent;
-                    //            if (nameSimpleIdent == null)
-                    //            {
-                    //                G.Writeln2("*** ERROR: Composed names not allowed for loop variables");
-                    //                throw new GekkoException();
-                    //            }
-                    //            node.Code.A("O.ForString o" + Num(node) + " = new O.ForString();" + G.NL);
-                    //            string rightSide = node[1][0].Code.ToString();
-                    //            node.Code.A(rightSide);
-                    //            string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"                                                                                                                
-                    //            //string iName = "i" + ++Globals.counter;
-                    //            string tempName = "temp" + ++Globals.counter;
-                    //            node.Code.A("try {");
-                    //            node.Code.A("foreach(string " + tempName + " in o" + Num(node) + ".listItems) {" + G.NL);
-                    //            string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                    //            string setLoopStringCs = CacheRefScalarCs(out loopVariable, nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, tempName, x, true, false);                                
-                    //            node.Code.A(setLoopStringCs + G.NL);
-
-                    //            node.Code.A(Globals.splitSTART);
-                    //            node.Code.A(statements);
-                    //            node.Code.A(Globals.splitSTOP);
-                                
-                    //            node.Code.A("}" + G.NL);
-                    //            node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
-                    //            node.Code.A("finally {" + G.NL);
-                    //            //node.Code.A(loopVariable + " = null;" + G.NL; //invalidates pointer
-                    //            node.Code.A("O.RemoveScalar(`" + nameSimpleIdent + "`);" + G.NL);
-                    //            node.Code.A("}  //end of finally" + G.NL);  //end of finally
-                    //        }
-                    //        else
-                    //        {                               
-                                
-                    //            //Parallel string loop
-                    //            node.Code.A("O.ForString o" + Num(node) + " = new O.ForString();" + G.NL);
-                    //            for (int i = 0; i < n0; i++)
-                    //            {
-                    //                if (node[0][i].nameSimpleIdent == null)
-                    //                {
-                    //                    G.Writeln2("*** ERROR: Composed names not allowed for loop variables");
-                    //                    throw new GekkoException();
-                    //                }
-                    //                //node.Code.A("string s" + Num(node) + "_" + i + " = `" + node[0][i].nameSimpleIdent + "`;" + G.NL;
-                    //            }
-                    //            string nme = "test" + ++Globals.counter;
-                    //            string nme2 = "test" + ++Globals.counter;
-                    //            string nme3 = "test" + ++Globals.counter;
-
-                    //            node.Code.A("List<List<string>> " + nme + " = new List<List<string>>();" + G.NL);
-                    //            node.Code.A("List<string> " + nme2 + " = new List<string>();" + G.NL);
-                    //            for (int i = 0; i < n0; i++)
-                    //            {
-                    //                node.Code.A(node[1][i].Code);
-                    //                node.Code.A("List<string> x" + Num(node) + "_" + i + " = o" + Num(node) + ".listItems;" + G.NL);
-                    //                node.Code.A(nme + ".Add(x" + Num(node) + "_" + i + ");" + G.NL);
-                    //                node.Code.A(nme2 + ".Add(`" + node[0][i].nameSimpleIdent + "`);" + G.NL);
-                    //            }
-
-                    //            string statements = node[2].Code.ToString();  //has been done in "ASTFORSTATEMENTS"                                                                                                                                                
-                    //            string tempName = "temp" + ++Globals.counter;
-                    //            node.Code.A("try {" + G.NL);
-                    //            //node.Code.A("foreach(string " + tempName + " in o" + Num(node) + ".listItems) {" + G.NL;
-
-                    //            node.Code.A("int " + nme3 + "= O.ForListMax(" + nme + ");" + G.NL);
-                    //            node.Code.A("O.ForListCheck(" + nme2 + ");" + G.NL);
-
-                    //            //node.Code.A("for (int i = 0; i < " + nme3 + "; i++) {" + G.NL);
-                    //            node.Code.A("for (int i").A(Num(node)).A(" = 0; i").A(Num(node)).A(" < ").A(nme3).A("; i").A(Num(node)).A("++) {").A(G.NL);
-
-                    //            for (int i = 0; i < n0; i++)
-                    //            {
-                    //                string loopVariable = null; //The line below emits "O.SetValFromCache(..., tempName)", same as a "STRING x = ..." statement
-                    //                string setLoopStringCs = CacheRefScalarCs(out loopVariable, node[0][i].nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.String, "x" + Num(node) + "_" + i + "[i" + Num(node) + "]", true, true, false);
-                    //                node.Code.A(setLoopStringCs + G.NL);
-                    //            }
-
-                    //            node.Code.A(Globals.splitSTART);
-                    //            node.Code.A(statements);
-                    //            node.Code.A(Globals.splitSTOP);
-                                
-                    //            node.Code.A("}" + G.NL);
-                    //            //node.Code.A("}" + G.NL;
-                    //            node.Code.A("} //end of try" + G.NL);  //assign var is always removed, also in case of error
-                    //            node.Code.A("finally {" + G.NL);
-                    //            //node.Code.A(loopVariable + " = null;" + G.NL; //invalidates pointer
-                    //            for (int i = 0; i < n0; i++)
-                    //            {
-                    //                node.Code.A("O.RemoveScalar(`" + node[0][i].nameSimpleIdent + "`);" + G.NL);
-                    //            }
-                    //            node.Code.A("}  //end of finally" + G.NL);  //end of finally
-                    //        }
-
-                    //        node.Code.A(Globals.splitSTART);
-                    //    }
-                    //    break;
+                        }
+                        break;
 
                     case "ASTIF":
                         {
@@ -4938,7 +4754,7 @@ namespace Gekko.Parser.Gek
                                 string o = "";
                                 //Use GekkoStringBuilder??
                                 StringBuilder s = new StringBuilder();
-                                CreateOptionVariable(node, s, ref o);
+                                CreateOptionVariable(node, false, s, ref o);
                                 node.Code.A(s.ToString());
                                 if (o == "freq")
                                 {
@@ -7934,7 +7750,7 @@ namespace Gekko.Parser.Gek
             }
         }        
 
-        private static void CreateOptionVariable(ASTNode node, StringBuilder s, ref string o)
+        private static void CreateOptionVariable(ASTNode node, bool block, StringBuilder s, ref string o)
         {
             StringBuilder s1 = new StringBuilder();
             StringBuilder s1a = new StringBuilder();
@@ -8061,9 +7877,11 @@ namespace Gekko.Parser.Gek
                 }
                 else throw new GekkoException();
             }
-            o = s1.ToString();
+            
             s.Append(s2);
             s.Append(s1);
+            if (!block) o = s1.ToString();
+            else o = s2.ToString() + s1.ToString();
             s.Append(" = ");
             s.Append(s1a);
             s.AppendLine(";");                      
@@ -8080,7 +7898,7 @@ namespace Gekko.Parser.Gek
             s3.Replace("`", "");
             s3.Replace("true", "yes");
             s3.Replace("false", "no");
-            s.AppendLine("G.Writeln();");
+            if (!block) s.AppendLine("G.Writeln();");
             //#987350932752
             //s.AppendLine("G.Writeln(Program.SubstituteAssignVars(`" + s3.ToString() + "`));");
 
@@ -8094,7 +7912,7 @@ namespace Gekko.Parser.Gek
             sss = sss.Replace("false", "`no`");
             sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
             
-            s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
+            if(!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
             
         }
 

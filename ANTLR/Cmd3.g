@@ -39,6 +39,7 @@ tokens {
 	ASTARGS;
 	ASTCOLON;
 	ASTL0;
+	ASTBLOCKOPTION;
 	ASTNAKEDLISTITEM;
 	ASTNAKEDLIST;
 	ASTL1;
@@ -57,6 +58,7 @@ tokens {
 	ASTDOTORINDEXER;
 	ASTSPECIALARGSDEF;
 	ASTBANKVARNAME;
+	ASTBLOCK;
 	ASTBANKVARNAME2;
 	ASTHASH;
 	ASTPERCENT;
@@ -140,6 +142,7 @@ ASTOR;
 ASTAND;
 ASTNOT;
 ASTCOMPARE;
+ASTIF;
 ASTIFOPERATOR;
 ASTIFOPERATOR1;
 ASTIFOPERATOR;
@@ -1238,6 +1241,7 @@ Y2                    = 'Y2'                       ;
     REPLACE = 'REPLACE';
     RES              = 'RES'             ;
     RESET = 'RESET';
+	BLOCK = 'BLOCK';
     RESPECT = 'RESPECT';
     RESTART = 'RESTART';
     //RETURN           = 'RETURN'          ;
@@ -1848,6 +1852,7 @@ d.Add("Y" ,Y);
                                         d.Add("REPLACE"    , REPLACE     );
                                         d.Add("res"     , RES       );
                                         d.Add("RESET", RESET);
+										d.Add("BLOCK", BLOCK);
                                         d.Add("respect",RESPECT);
                                         d.Add("RESTART", RESTART);
 										d.Add("elements"  , ELEMENTS    );
@@ -2415,6 +2420,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | assignment2          SEMICOLON!
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
+						  | block                
 						  | checkoff             SEMICOLON!	
 			              | clear                SEMICOLON!		
 						  | clone                SEMICOLON!
@@ -2882,6 +2888,26 @@ help:					    HELP  name? -> ^({token("ASTHELP", ASTHELP, input.LT(1).Line)} nam
 if2:						IF leftParen logical rightParen functionStatements (ELSE functionStatements2)? END SEMICOLON -> ^({token("ASTIF", ASTIF, input.LT(1).Line)} logical ^(ASTIFSTATEMENTS functionStatements) ^(ASTELSESTATEMENTS functionStatements2?));
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// BLOCK
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTPLACEHOLDER functionStatements));
+
+blockOpt1:                  (leftAngle dates RIGHTANGLE)? (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_TYPE2 dates?) blockOpt1h*
+
+//						    | leftAngle2          (blockOpt1h (COMMA2 blockOpt1h)*)? RIGHTANGLE -> ^(ASTDATES_TYPE2) blockOpt1h*
+//						    | leftAngleNo2 dates  (COMMA2 blockOpt1h)* RIGHTANGLE -> ^(ASTDATES_TYPE2 dates) blockOpt1h*
+
+						  //| leftAngle2          (blockOpt1h) RIGHTANGLE -> ^(ASTDATES_TYPE2) blockOpt1h
+						  //| leftAngleNo2 dates? (blockOpt1h) RIGHTANGLE -> ^(ASTDATES_TYPE2 dates?) blockOpt1h
+
+						    ;
+
+blockOpt1h:                 SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
+						  | optionType -> ^(ASTBLOCKOPTION optionType)														
+							;
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
 // INDEX
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -3258,7 +3284,7 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //nam
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
-// REBASE
+// RENAME
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames renameOpt1?);
@@ -4087,6 +4113,7 @@ ident2: 					Ident |
   REBASE|
   RENAME|
   RESET|
+  BLOCK|
   RESTART|
   RETURN2|
   RUN|
