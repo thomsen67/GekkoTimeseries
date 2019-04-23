@@ -621,10 +621,11 @@ namespace Gekko
         public static bool revertSimpleJ = true;        
 
         public static string[] helpTopics = {  //this list corresponds to items in "Gekko commands" in the help files
-            //done december 2018
+            //done april 2019
 
                                                 "ACCEPT",
                                                 "ANALYZE",
+                                                "BLOCK",
                                                 "CHECKOFF",
 "CLEAR",
 "CLIP",
