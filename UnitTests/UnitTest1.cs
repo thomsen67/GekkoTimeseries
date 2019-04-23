@@ -4713,6 +4713,55 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Block()
+        {
+            I("RESET;");
+            I("TIME 2001 2003;");
+            I("BLOCK <2011 2013>; y = 100; END;");
+            _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2010, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y!a", 2011, 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2012, 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2013, 100d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2014, double.NaN, sharedDelta);
+            Assert.AreEqual(Globals.globalPeriodStart.super, 2001);
+            Assert.AreEqual(Globals.globalPeriodEnd.super, 2003);
+
+            //recursive
+            I("RESET;");
+            I("TIME 2001 2003;");
+            I("BLOCK <2011 2013>; y1 = 100; BLOCK <2021 2023>; y2 = 100; END; y3 = 100; END; y4 = 100;");
+            _AssertSeries(First(), "y1!a", 2011, 100d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2021, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2021, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y3!a", 2011, 100d, sharedDelta);
+            _AssertSeries(First(), "y3!a", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y3!a", 2021, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y4!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y4!a", 2011, double.NaN, sharedDelta);
+            _AssertSeries(First(), "y4!a", 2021, double.NaN, sharedDelta);
+
+            Globals.unitTestScreenOutput.Clear();
+            I("RESET;");
+            I("TIME 2001 2003;");
+            I("y1 = 1.17;");
+            I("y1 <2002 2003> %= 1.27, 1.37;");
+            I("y2 = 2.17;");
+            I("y2 <2002 2003> %= 2.27, 2.37;");
+            I("BLOCK print fields ndec = 1, print fields pdec = 1; PRT y1; END; PRT y2;");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.2 "));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.3 "));            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.2193 "));
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.27 "));
+
+        }
+
+        [TestMethod]
         public void _Test_CopyLogic()
         {
             //This also implicitly tests a lot of RENAME functionality,

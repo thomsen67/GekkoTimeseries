@@ -1622,7 +1622,8 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDATES":
-                    case "ASTDATES_TYPE2":
+                    case "ASTDATES_BLOCK":
+                    case "ASTDATES_TYPE2":                    
                         {
                             //what about G.GetStart/EndDate()??
                             //We use  O.GetDateChoices.FlexibleStart and  O.GetDateChoices.FlexibleEnd
@@ -1634,6 +1635,7 @@ namespace Gekko.Parser.Gek
                             if (ss1 == null)
                             {
                                 if (node.Text == "ASTDATES_TYPE2") s1 = "GekkoTime.tNull";
+                                else if (node.Text == "ASTDATES_BLOCK") s1 = "";
                                 else s1 = "Globals.globalPeriodStart";
                             }
                             else s1 = "O.ConvertToDate(" + ss1 + ", O.GetDateChoices.FlexibleStart);" + G.NL;
@@ -1643,31 +1645,38 @@ namespace Gekko.Parser.Gek
                             if (ss2 == null)
                             {
                                 if (node.Text == "ASTDATES_TYPE2") s2 = "GekkoTime.tNull";
+                                else if (node.Text == "ASTDATES_BLOCK") s2 = "";
                                 else s2 = "Globals.globalPeriodEnd";
                             }
                             else s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd);" + G.NL;
 
-                            if (node?.Parent?.Parent?.Parent?.Text == "ASTASSIGNMENT")
+                            if(node.Text == "ASTDATES_BLOCK")
                             {
-                                //assignment is a bit special
-                                node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
-                                node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
-                                node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
-                                node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
+                                node.Code.A(s1).A("¤").A(s2);  //will be splitted up later on
                             }
                             else
                             {
-                                if (node?.Parent?.Parent?.Text == "ASTOLS")  //so that the expressions get the right smpl period
+                                if (node?.Parent?.Parent?.Parent?.Text == "ASTASSIGNMENT")
                                 {
+                                    //assignment is a bit special
                                     node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
                                     node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
                                     node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
                                     node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
                                 }
+                                else
+                                {
+                                    if (node?.Parent?.Parent?.Text == "ASTOLS")  //so that the expressions get the right smpl period
+                                    {
+                                        node.Code.A("smpl.t0 = ").A(s1).A(";").A(G.NL);
+                                        node.Code.A("smpl.t1 = ").A(s1).A(";").A(G.NL);
+                                        node.Code.A("smpl.t2 = ").A(s2).A(";").A(G.NL);
+                                        node.Code.A("smpl.t3 = ").A(s2).A(";").A(G.NL);
+                                    }
 
-                                node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
-                                node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
-
+                                    node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
+                                    node.Code.A("o").A(Num(node)).A(".t2 = ").A(s2).A(";").A(G.NL);
+                                }
                             }
                         }
                         break;
@@ -2173,7 +2182,26 @@ namespace Gekko.Parser.Gek
                             {
                                 if (first)
                                 {
-
+                                    string ss = child.Code.ToString();
+                                    if (ss != null)
+                                    {
+                                        string[] sss = ss.Split('¤');
+                                        if (sss[0] == "" && sss[1] == "")
+                                        {
+                                            //do nothing, not time is given
+                                        }
+                                        else
+                                        {
+                                            int n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodStart;" + G.NL;  //var record117 = Globals.globalPeriodStart
+                                            alter += "Globals.globalPeriodStart = " + sss[0] + G.NL;               //Globals.globalPeriodStart = ...;
+                                            play += "Globals.globalPeriodStart = record" + n + ";" + G.NL;        //Globals.globalPeriodStart = record117
+                                            n = ++Globals.counter;
+                                            record += "var record" + n + " = Globals.globalPeriodEnd;" + G.NL;
+                                            alter += "Globals.globalPeriodEnd = " + sss[1] + G.NL;
+                                            play += "Globals.globalPeriodEnd = record" + n + ";" + G.NL;
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -4794,9 +4822,13 @@ namespace Gekko.Parser.Gek
                                 else if (o == "series_dyn")
                                 {
                                     node.Code.A("G.Writeln();");
-                                    node.Code.A("G.Writeln(`+++ NOTE: The dyn option is experimental and will be removed at some point, so please only use it`);");
-                                    node.Code.A("G.Writeln(`+++       for experiments, and use SERIES<dyn> instead in productin code. At a later point,`);");
-                                    node.Code.A("G.Writeln(`+++       a BLOCK<dyn>; ...; END; will be provided, before the final release of Gekko 3.0.`);");
+                                    node.Code.A("G.Writeln(`*** ERROR: Deprecated option`);");
+                                    node.Code.A("G.Writeln();");
+                                    node.Code.A("G.Writeln(`+++ NOTE: The 'dyn' option has been deprecated. Instead, you may use <dyn> on individual series`);");
+                                    node.Code.A("G.Writeln(`+++       statements, or use 'BLOCK series dyn = yes; ... ; END;' to set the option for several`);");
+                                    node.Code.A("G.Writeln(`+++       series statemens. See more in the help, under the BLOCK command.`);");
+                                    node.Code.A("G.Writeln();");
+                                    node.Code.A("throw new GekkoException();");
                                 }
                                 
                                 //if (o == "databank_file_format")
