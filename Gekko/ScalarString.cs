@@ -408,8 +408,18 @@ namespace Gekko
         public double ConvertToVal()
         {
             G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "')");
-            G.Writeln(Globals.stringConversionNote);
-
+            double d = double.NaN; bool b = double.TryParse(this.string2, out d);
+            if (this.isFromNakedList && b)
+            {
+                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
+                G.Writeln("           'naked' list without parentheses, like #m = 007, 1e5;. The items in a list like #m");
+                G.Writeln("           may look like values, but are treated as strings. You may use #m.vals() to convert the");
+                G.Writeln("           items into the numbers 7 and 100000. See more in the help on the 'Naked list' page");
+            }
+            else
+            {
+                G.Writeln(Globals.stringConversionNote);
+            }
             throw new GekkoException();
         }
 
@@ -427,8 +437,8 @@ namespace Gekko
             {
                 G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
                 G.Writeln("           'naked' list without parentheses, like #m = 2020q1, 2020q2, 2020q3;. In such");
-                G.Writeln("           naked lists, the items are always treated as strings. You should perhaps ");
-                G.Writeln("           add enclosing parentheses, corresponding to #m = (2020q1, 2020q2, 2020q3);");
+                G.Writeln("           naked lists, the items are treated as strings. You should perhaps ");
+                G.Writeln("           add enclosing parentheses, #m = (2020q1, 2020q2, 2020q3);");
             }
             throw new GekkoException();
             throw new GekkoException();
