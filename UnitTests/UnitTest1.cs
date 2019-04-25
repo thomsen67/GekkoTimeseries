@@ -4706,7 +4706,7 @@ namespace UnitTests
         {
             I("RESET;");
             I("TIME 2001 2003;");
-            I("BLOCK <2011 2013>; y = 100; END;");
+            I("BLOCK time 2011 2013; y = 100; END;");
             _AssertSeries(First(), "y!a", 2001, double.NaN, sharedDelta);
             _AssertSeries(First(), "y!a", 2002, double.NaN, sharedDelta);
             _AssertSeries(First(), "y!a", 2003, double.NaN, sharedDelta);
@@ -4721,7 +4721,7 @@ namespace UnitTests
             //recursive
             I("RESET;");
             I("TIME 2001 2003;");
-            I("BLOCK <2011 2013>; y1 = 100; BLOCK <2021 2023>; y2 = 100; END; y3 = 100; END; y4 = 100;");
+            I("BLOCK time 2011 2013; y1 = 100; BLOCK time 2021 2023; y2 = 100; END; y3 = 100; END; y4 = 100;");
             _AssertSeries(First(), "y1!a", 2011, 100d, sharedDelta);
             _AssertSeries(First(), "y1!a", 2001, double.NaN, sharedDelta);
             _AssertSeries(First(), "y1!a", 2021, double.NaN, sharedDelta);
@@ -8136,8 +8136,122 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test__PassByValue()
+        public void _Test_FunctionLocalTime_AndSomeBlock()
         {
+            // ============================================
+            // ============================================
+            // First we run a series using global TIME 2001-2001
+            // ============================================
+            // ============================================
+
+            //There as these combinations:
+            //
+            // 1. global time: TIME ...
+            // 2. local time: y <...> = ...
+            // 3. function time: y = f(<...>)
+            // 
+            // Inside the function, we can use a BLOCK %t1 %t2 or not (a or b)
+
+            //1 + b
+            I("RESET;");
+            I("function series f(); y = 100; return y; end;");
+            I("TIME 2001 2001;");
+            I("z = f();");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+
+            //1 + 3 + b
+            I("RESET;");
+            I("function series f(); y = 100; return y; end;");
+            I("TIME 2001 2001;");
+            I("z = f(<1991 1991>);");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+
+            //1 + 3 + b
+            I("RESET;");
+            I("function series f(<date %t1, date %t2>); y = 100; return y; end;");
+            I("TIME 2001 2001;");
+            I("z = f(<1991 1991>);");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+                        
+            //1 + 2 + a
+            I("RESET;");
+            I("function series f(<date %t1, date %t2>); block time %t1 %t2; y = 100; end; return y; end;");
+            I("TIME 2001 2001;");
+            I("z <1991 1991> = f();");
+            _AssertSeries(First(), "z!a", 1990, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
+
+            //1 + 3 + a
+            I("RESET;");
+            I("function series f(<date %t1, date %t2>); block time %t1 %t2; y = 100; end; return y;  end;");
+            I("TIME 2001 2001;");
+            I("z = f(<1991 1991>);");
+            _AssertSeries(First(), "z!a", 1990, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
+
+            //1 + 2 + 3 + a
+            I("RESET;");
+            I("function series f(<date %t1, date %t2>); block time %t1 %t2; y = 100; end; return y; end;");
+            I("TIME 2001 2001;");
+            I("z <1981 1981> = f(<1991 1991>);");
+            _AssertSeries(First(), "z!a", 1990, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
+
+            // ========== PROCEDURE =====================
+
+            //1 + b
+            I("RESET;");
+            I("procedure f; z = 100; end;");
+            I("TIME 2001 2001;");
+            I("f;");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+
+            //1 + 3 + b
+            I("RESET;");
+            I("procedure f; z = 100; end;");
+            I("TIME 2001 2001;");
+            I("f<1991 1991>;");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+
+            //1 + 3 + b
+            I("RESET;");
+            I("procedure f <date %t1, date %t2>; z = 100; end;");
+            I("TIME 2001 2001;");
+            I("f<1991 1991>;");
+            _AssertSeries(First(), "z!a", 2000, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 2002, double.NaN, sharedDelta);
+            
+            //1 + 3 + a
+            I("RESET;");
+            I("procedure f <date %t1, date %t2>; block time %t1 %t2; z = 100; end; end;");
+            I("TIME 2001 2001;");
+            I("f<1991 1991>;");
+            _AssertSeries(First(), "z!a", 1990, double.NaN, sharedDelta);
+            _AssertSeries(First(), "z!a", 1991, 100d, sharedDelta);
+            _AssertSeries(First(), "z!a", 1992, double.NaN, sharedDelta);
+
+
+
+        }
+
+        [TestMethod]
+        public void _Test_FunctionSideeffects()
+        {
+            I("RESET;");
             I("function val f(matrix #x);  #x[1] = 1; return 1; end;");
             I("#y1 = [2];");
             I("%z = f(#y1);");
@@ -8146,6 +8260,27 @@ namespace UnitTests
             I("#y2 = [2];");
             I("%z = f(#y2);");
             _AssertMatrix(First(), "#y2", 1, 1, 1d, sharedDelta);
+
+            I("RESET;");
+            I("function val f(series x);  x[2020] = 1; return 1; end;");
+            I("TIME 2020 2020;");
+            I("y1 = 2;");
+            I("%z = f(y1);");
+            _AssertSeries(First(), "y1!a", 2020, 2d, sharedDelta);            
+            I("option system clone = no;");
+            I("y1 = 2;");
+            I("%z = f(y1);");
+            _AssertSeries(First(), "y1!a", 2020, 1d, sharedDelta);
+
+            I("RESET;");
+            I("function val f(val %x);  %x = 1; return 1; end;");            
+            I("%y1 = 2;");
+            I("%z = f(%y1);");
+            _AssertScalarVal(First(), "%y1", 2d);            
+            I("option system clone = no;");
+            I("%y1 = 2;");
+            I("%z = f(%y1);");
+            _AssertScalarVal(First(), "%y1", 2d);  //scalars are always cloned as arguments, no side-effects
         }
 
 

@@ -2894,7 +2894,9 @@ if2:						IF leftParen logical rightParen functionStatements (ELSE functionState
 
 block:						BLOCK blockOpt1 SEMICOLON functionStatements END SEMICOLON -> ^({token("ASTBLOCK", ASTBLOCK, input.LT(1).Line)} ^(ASTPLACEHOLDER blockOpt1?) ^(ASTPLACEHOLDER functionStatements));
 
-blockOpt1:                  (leftAngle dates RIGHTANGLE)? (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_BLOCK dates?) blockOpt1h*
+blockOpt1:                  (TIME dates COMMA2) (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_BLOCK dates) blockOpt1h*
+						  | (TIME dates) -> ^(ASTDATES_BLOCK dates?)
+						  | (blockOpt1h (COMMA2 blockOpt1h)*)? -> ^(ASTDATES_BLOCK) blockOpt1h*
 						    ;
 
 blockOpt1h:                 SERIES DYN '='? yesNoSimple -> ^(ASTBLOCKOPTION SERIES DYN ^(ASTBOOL yesNoSimple))
