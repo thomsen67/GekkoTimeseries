@@ -14121,28 +14121,31 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2016   7777777"));
             Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2017   7777777"));
 
-            I("RESET;");
-            I("option freq q;");
-            I("time 2006q1 2009q4;");
-            I("SERIES xx=7777777;");
-            I("timefilter 2006q1,2006q3,2007q2,2007q4..2009q4 by 4;");
-            I("prt xx;");
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2006q1   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2006q2   7777777"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2006q3   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2006q4   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2007q1   7777777"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2007q2   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2007q3   7777777"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2007q4   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q1   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q2   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q3   7777777"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2008q4   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q1   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q2   7777777"));
-            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q3   7777777"));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2009q4   7777777"));
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("RESET;");
+                I("option freq q;");
+                I("time 2006q1 2009q4;");
+                I("SERIES xx=7777777;");
+                I("timefilter 2006q1,2006q3,2007q2,2007q4..2009q4 by 4;");
+                I("prt xx;");
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2006q1   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2006q2   7777777"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2006q3   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2006q4   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2007q1   7777777"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2007q2   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2007q3   7777777"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2007q4   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q1   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q2   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2008q3   7777777"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2008q4   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q1   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q2   7777777"));
+                Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("2009q3   7777777"));
+                Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2009q4   7777777"));
+            }
 
             I("RESET;");
             I("TIME 2000 2004;");
@@ -14150,7 +14153,7 @@ namespace UnitTests
             I("SERIES<2000 2004> xx %= 10;");
             I("TIMEFILTER 2000,2004;");
             I("PRT xx;");
-            Table tab = Globals.unitTestTablePointer;
+            Table tab = Globals.lastPrtOrMulprtTable;
             int counter = 0;
             TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
             TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
@@ -14162,42 +14165,48 @@ namespace UnitTests
             TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
             Assert.AreEqual(counter, tab.Count());
 
-            I("RESET;");
-            I("TIME 2000 2004;");
-            I("SERIES<1999 1999> xx = 100;");
-            I("SERIES<2000 2004> xx %= 10;");
-            I("TIMEFILTER 2000,2004;");
-            I("PRT<filter=avg> xx;");
-            tab = Globals.unitTestTablePointer;
-            counter = 0;
-            TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
-            TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
-            TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
-            TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
-            TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
-            TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
-            TestCell(ref counter, tab, 3, 2, CellType.Number, 140.39025d, sharedDelta);
-            TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
-            Assert.AreEqual(counter, tab.Count());
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("RESET;");
+                I("TIME 2000 2004;");
+                I("SERIES<1999 1999> xx = 100;");
+                I("SERIES<2000 2004> xx %= 10;");
+                I("TIMEFILTER 2000,2004;");
+                I("PRT<filter=avg> xx;");
+                tab = Globals.lastPrtOrMulprtTable;
+                counter = 0;
+                TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
+                TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
+                TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
+                TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
+                TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
+                TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
+                TestCell(ref counter, tab, 3, 2, CellType.Number, 140.39025d, sharedDelta);
+                TestCell(ref counter, tab, 3, 3, CellType.Number, 10d, sharedDelta);
+                Assert.AreEqual(counter, tab.Count());
+            }
 
-            I("RESET;");
-            I("TIME 2000 2004;");
-            I("SERIES<1999 1999> xx = 100;");
-            I("SERIES<2000 2003> xx %= 10;");
-            I("SERIES<2004 2004> xx %= 20;");
-            I("TIMEFILTER 2000,2004;");
-            I("PRT<filter=avg> xx;");
-            tab = Globals.unitTestTablePointer;
-            counter = 0;
-            TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
-            TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
-            TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
-            TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
-            TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
-            TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
-            TestCell(ref counter, tab, 3, 2, CellType.Number, 144.0505d, sharedDelta);
-            TestCell(ref counter, tab, 3, 3, CellType.Number, 12.4190d, 0.0001d);
-            Assert.AreEqual(counter, tab.Count());
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("RESET;");
+                I("TIME 2000 2004;");
+                I("SERIES<1999 1999> xx = 100;");
+                I("SERIES<2000 2003> xx %= 10;");
+                I("SERIES<2004 2004> xx %= 20;");
+                I("TIMEFILTER 2000,2004;");
+                I("PRT<filter=avg> xx;");
+                tab = Globals.lastPrtOrMulprtTable;
+                counter = 0;
+                TestCell(ref counter, tab, 1, 2, CellType.Text, "xx");
+                TestCell(ref counter, tab, 1, 3, CellType.Text, "%");
+                TestCell(ref counter, tab, 2, 1, CellType.Text, "2000");
+                TestCell(ref counter, tab, 2, 2, CellType.Number, 110d, sharedDelta);
+                TestCell(ref counter, tab, 2, 3, CellType.Number, 10d, sharedDelta);
+                TestCell(ref counter, tab, 3, 1, CellType.Text, "2001-2004");
+                TestCell(ref counter, tab, 3, 2, CellType.Number, 144.0505d, sharedDelta);
+                TestCell(ref counter, tab, 3, 3, CellType.Number, 12.4190d, 0.0001d);
+                Assert.AreEqual(counter, tab.Count());
+            }
         }
 
         private static void TestCell(ref int counter, Table tab, int row, int col, CellType type, string s)

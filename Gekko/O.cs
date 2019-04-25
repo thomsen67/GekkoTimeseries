@@ -407,59 +407,7 @@ namespace Gekko
             
             if (isNaked)
             {
-                bool allNumbers = true;
-                for (int i = 0; i < m.list.Count; i += 2)
-                {
-                    if (m.list[i].Type() != EVariableType.Val && m.list[i].Type() != EVariableType.String)
-                    {
-                        G.Writeln2("*** ERROR: Naked lists only support val or string types");
-                        throw new GekkoException();
-                    }
-                    if (m.list[i].Type() == EVariableType.Val) continue;
-                    if (m.list[i].Type() == EVariableType.String)
-                    {
-                        string ss = (m.list[i] as ScalarString).string2.Trim();                        
-                        double d; if (double.TryParse(ss, out d))
-                        {
-
-                            if (!ss.Contains("."))
-                            {
-                                if (G.IsInteger(ss, true))
-                                {
-                                    //good
-                                }
-                                else
-                                {
-                                    //stuff like 1e5
-                                    allNumbers = false;
-                                    break;
-                                }
-                            }
-
-                            if (ss.StartsWith("0") && ss.Length > 1 && char.IsDigit(ss[1]))
-                            {
-                                //we do not allow 07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
-                                allNumbers = false;
-                                break;
-                            }
-
-                                if (ss.StartsWith("-") && ss.Length > 2 && ss[1] == '0' && char.IsDigit(ss[2]))
-                            {
-                                //we do not allow -07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
-                                allNumbers = false;
-                                break;
-                            }
-                            continue;
-                        }
-                        else
-                        {
-                            allNumbers = false;
-                            break;
-                        }
-                    }
-                    allNumbers = false;
-                    break;
-                }
+                bool allNumbers = IsListAllNumbers(m, 2);
 
                 if (allNumbers)
                 {
@@ -470,10 +418,10 @@ namespace Gekko
                         {
                             double d = double.Parse((m.list[i] as ScalarString).string2);  //must parse
                             m.list[i] = new ScalarVal(d);
-                        }                        
+                        }
                     }
                 }
-                
+
                 m = ListDefHelper2(m.list.ToArray());  //ok that it is new
                 //m.isFromNakedList = true;
             }
@@ -499,6 +447,66 @@ namespace Gekko
 
             return m;
 
+        }
+
+        private static bool IsListAllNumbers(List m, int skip)
+        {
+            //if it returns true, all elements in the list should be understood as numbers
+            bool allNumbers = true;
+            for (int i = 0; i < m.list.Count; i += skip)
+            {
+                if (m.list[i].Type() != EVariableType.Val && m.list[i].Type() != EVariableType.String)
+                {
+                    G.Writeln2("*** ERROR: Naked lists only support val or string types");
+                    throw new GekkoException();
+                }
+                if (m.list[i].Type() == EVariableType.Val) continue;
+                if (m.list[i].Type() == EVariableType.String)
+                {
+                    string ss = (m.list[i] as ScalarString).string2.Trim();
+                    double d; if (double.TryParse(ss, out d))
+                    {
+
+                        if (!ss.Contains("."))
+                        {
+                            if (G.IsInteger(ss, true))
+                            {
+                                //good
+                            }
+                            else
+                            {
+                                //stuff like 1e5
+                                allNumbers = false;
+                                break;
+                            }
+                        }
+
+                        if (ss.StartsWith("0") && ss.Length > 1 && char.IsDigit(ss[1]))
+                        {
+                            //we do not allow 07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
+                            allNumbers = false;
+                            break;
+                        }
+
+                        if (ss.StartsWith("-") && ss.Length > 2 && ss[1] == '0' && char.IsDigit(ss[2]))
+                        {
+                            //we do not allow -07 as a number here. If present, all the elements will become strings, and have to be converted to values when put into series (or remain as strings if put into list)
+                            allNumbers = false;
+                            break;
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        allNumbers = false;
+                        break;
+                    }
+                }
+                allNumbers = false;
+                break;
+            }
+
+            return allNumbers;
         }
 
         public static ScalarVal Minus(IVariable iv)
@@ -1799,19 +1807,10 @@ namespace Gekko
             {
                 G.Writeln2("*** ERROR: Listfile " + fileName + " could not be found");
                 throw new GekkoException();
-            }
-            string listFile = Program.GetTextFromFileWithWait(fileNameTemp);
-            List<string> input = G.ExtractLinesFromText(listFile);
-
-            List<string> result = new List<string>();
+            }            
 
             List ml = GetRawListElements(fileName);
-            //if (result.Count == 1 && G.Equal(result[0], "null"))
-            //{
-            //    //LIST mylist = null; ---> empty list
-            //    result = new List<string>();
-            //}
-            //List ml = new List(result);
+            
             return ml;
         }
 
@@ -3397,6 +3396,8 @@ namespace Gekko
 
         public static void WriteListFile(string varnameWithFreq, IVariable rhs)
         {
+            //see also #98037532985
+
             string file = varnameWithFreq.Substring((Globals.symbolCollection + Globals.listfile + "___").Length);
             //List<string> temp = Program.GetListOfStringsFromList(rhs);
             
@@ -3414,6 +3415,10 @@ namespace Gekko
             using (FileStream fs = Program.WaitForFileStream(pathAndFilename, Program.GekkoFileReadOrWrite.Write))
             using (StreamWriter res = G.GekkoStreamWriter(fs))
             {
+                //This is quite strict, only names like a38 will be interpreted as 
+                //simple tokens that can avoid quotes. Any 007 or 1e5 string will
+                //fail here, even though they would be read as strings. Never mind.
+
                 bool allSimpleStringTokens = true;
                 foreach (IVariable iv in rhs_list.list)
                 {
@@ -4277,14 +4282,47 @@ namespace Gekko
 
         private static List GetRawListElements(string fileName)
         {
+            //see also #98037532985
+
+            //Naked list in Gekko:
+            //
+            // 12, 02 --> '12', '02', not 12, 2
+            // 12, 1e5 --> '12', '1e5'
+            // 0<digits> is not value. But 0 is value.
+            // And <int>E<int> is not value. But 2.0e5 isa value.
+            //
+            // Only tricky thing is that a list containg 007 or 1e5 will 
+            // be transformed into strings, not values. Especially regarding 
+            // 1e5 this can be confusing. But then the .vals() function can be used.
 
             TableLight table = Program.ReadCsvPrn(EDataFormat.Csv, fileName);
             
             int iMax = table.GetRowMaxNumber();
             int jMax = table.GetColMaxNumber();
+            
+            List temp = new List();
+            for (int i = 1; i <= iMax; i++)
+            {
+                for (int j = 1; j <= jMax; j++)
+                {
+                    CellLight cell = table.Get(i, j);
+                    if (cell.type == ECellLightType.String)
+                    {                        
+                        temp.Add(new ScalarString(cell.text));                        
+                    }
+                    else if (cell.type == ECellLightType.Double)
+                    {
+                        temp.Add(new ScalarVal(cell.data));
+                    }
+                    else if (cell.type == ECellLightType.None)
+                    {
+                        //skip    
+                    }
+                }
+            }
+            bool interpretAsNumbers = IsListAllNumbers(temp, 1);
 
             List m = new List();
-
             for (int i = 1; i <= iMax; i++)
             {
 
@@ -4306,15 +4344,24 @@ namespace Gekko
                         }
                         else
                         {
-                            double d;
-                            if (G.TryParseIntoDouble(cell.text, out d))
+                            if(interpretAsNumbers)
                             {
-                                m2.Add(new ScalarVal(d));
+                                double d;
+                                if (G.TryParseIntoDouble(cell.text, out d))
+                                {
+                                    m2.Add(new ScalarVal(d));
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: Internal error #8977436372887324");
+                                    throw new GekkoException();
+                                }
                             }
                             else
                             {
                                 m2.Add(new ScalarString(cell.text));
                             }
+                            
                         }
                     }
                     else if (cell.type == ECellLightType.Double)

@@ -222,7 +222,7 @@ namespace Gekko
         public static int lastPeriodPositionInArrayNull = int.MinValue;
 
         //public static bool isAlphaVersion = false;
-        public static bool isBetaVersion = true; 
+        public static bool isBetaVersion = false;   
         //public static bool isGammaVersion = false; 
         //public static bool isPreviewVersion = false; //for preview of 2.0        
         
