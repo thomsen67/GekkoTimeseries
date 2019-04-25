@@ -3268,6 +3268,16 @@ namespace Gekko
                                 }
                             }
                             break;
+                        case EVariableType.String:
+                            {
+                                //---------------------------------------------------------
+                                // x = STRING
+                                //---------------------------------------------------------
+                                {
+                                    ReportTypeError(varnameWithFreq, rhs, lhsType, 1);                                    
+                                }
+                            }
+                            break;
                         case EVariableType.List:
                             {
                                 //---------------------------------------------------------
@@ -3719,7 +3729,16 @@ namespace Gekko
 
         private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type)
         {
+            ReportTypeError(varnameWithFreq, rhs, type, 0);
+        }
+
+        private static void ReportTypeError(string varnameWithFreq, IVariable rhs, EVariableType type, int extra)
+        {
             G.Writeln2("*** ERROR: " + type.ToString().ToUpper() + " " + varnameWithFreq + " has a " + rhs.Type().ToString().ToUpper() + " on right-hand side");
+            if (extra == 1)
+            {
+                G.Writeln(Globals.stringConversionNote);
+            }
             throw new GekkoException();
         }
 

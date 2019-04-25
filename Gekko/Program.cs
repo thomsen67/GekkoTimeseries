@@ -3531,222 +3531,235 @@ namespace Gekko
                 //int datalines = 0;
                 Series ts = null;
 
+                int lineCounter = 0;
+
                 while ((line = sr.ReadLine()) != null)
                 {
-                    line = line.Replace("\0", " ");
-                    string lineTrim = line.Trim();
-                    if (lineTrim == "") continue;
+                    lineCounter++;
 
-                    if (nextState == 1)
+                    try
                     {
-                        varName = lineTrim;
-                        nextState = 2;
-                    }
 
-                    else if (nextState == 2)
-                    {
-                        //read expression
-                        string expr = line.Substring(0, 32).Trim();
+                        line = line.Replace("\0", " ");
+                        string lineTrim = line.Trim();
+                        if (lineTrim == "") continue;
 
-                        //read stamp
-                        string stamp = line.Substring(32, 8).Trim();
-                        //if (stamp.Length > 0)  //catcing is timeconsuming, and it does not work properly anyway
-                        //{
-                        //    try
-                        //    {
-                        //        // #80927435209843
-                        //        int i1 = int.Parse(stamp.Substring(0, 2)); //month
-                        //        int i2 = int.Parse(stamp.Substring(3, 2)); //day
-                        //        int i3 = int.Parse(stamp.Substring(6, 2)); //year
-                        //        if (i3 > 80) i3 = 1900 + i3;  //will work until 2080!
-                        //        else i3 = 2000 + i3;
-                        //        stamp = stamp.Substring(3, 2) + "-" + stamp.Substring(0, 2) + "-" + i3;
-                        //    }
-                        //    catch { };
-
-                        //}
-
-                        //read date
-                        int iiStart = 37;
-                        string date1 = line.Substring(iiStart + 7, 4);
-                        string date1sub = line.Substring(iiStart + 11, 2);
-                        string date2 = line.Substring(iiStart + 15, 4);
-                        string date2sub = line.Substring(iiStart + 19, 2);
-                        try
+                        if (nextState == 1)
                         {
-                            d1 = int.Parse(date1);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1 + "' as an int (start year)");
-                            throw new GekkoException();
-                        }
-                        try
-                        {
-                            d1sub = int.Parse(date1sub);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
-                            throw new GekkoException();
-                        }
-                        try
-                        {
-                            d2 = int.Parse(date2);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2 + "' as an int (end year)");
-                            throw new GekkoException();
-                        }
-                        try
-                        {
-                            d2sub = int.Parse(date2sub);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
-                            throw new GekkoException();
-                        }
-                        frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
-
-                        d1min = G.GekkoMin(d1, d1min);  //finding min and max years
-                        d2max = G.GekkoMax(d2, d2max);
-
-                        //preparing nextState = 3
-                        {
-
-                            bool ok = G.IsSimpleToken(varName);
-                            string label = null;
-                            if (!ok)
-                            {
-                                if (varName.Length >= 17)
-                                {
-                                    //Of this type, where the first 16 chars is the name, and the rest is the label
-                                    //gdp2            GDP in version 2, mia. DKK
-                                    string v1 = varName.Substring(0, 16).Trim();
-                                    string v2 = varName.Substring(16, varName.Length - 16).Trim();
-
-                                    if (!G.IsSimpleToken(v1))
-                                    {
-                                        G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
-                                        G.Writeln("         : " + v1);
-                                        G.Writeln("         : The name should contain letters, digits or underscore only");
-                                        G.Writeln("         : (It seems there is a label starting in position 17, this is ok)");
-                                        throw new GekkoException();
-                                    }
-
-                                    varName = v1;
-                                    label = v2;
-                                }
-                                else
-                                {
-
-                                    G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
-                                    G.Writeln("         : " + varName);
-                                    G.Writeln("         : The name should contain letters, digits or underscore only");
-                                    throw new GekkoException();
-                                }
-                            }
-
-                            countdata = 0;
-                            freq = G.GetFreq(frequency);
-                            obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub), new GekkoTime(freq, d2, d2sub));
-                            obsLeft = obs;
-                            ts = null;
-                            if (IsNonsenseVariableName(varName))
-                            {
-                                emptyWarnings++;
-                                ts = new Series(freq, varName);  //completely phoney, will not live after exit of this method: just so that we can continue
-                            }
-                            else
-                            {
-                                ts = FindOrCreateTimeSeriesInDataBank(databank, varName, freq);
-                            }
-                            if (label != null && label != "") ts.meta.label = label;
-                            if (expr != null && expr != "") ts.meta.source = expr;
-                            if (stamp != null && stamp != "") ts.meta.stamp = stamp;
-                            //datalines = 0;
-                            nextState = 3;
+                            varName = lineTrim;
+                            nextState = 2;
                         }
 
-                    }
-                    else if (nextState == 3)
-                    {
-                        int n = Math.Min(5, obsLeft);
-                        for (int i5 = 0; i5 < n; i5++)
+                        else if (nextState == 2)
                         {
-                            double ss = double.NaN;
-                            bool success = false;
-                            int width = 0;
-                            if (isTsdx)
-                            {
-                                width = 21;
-                            }
-                            else
-                            {
-                                width = 15;
-                            }
-                            success = G.TryParseIntoDouble(line.Substring(ii + i5 * width, width), out ss);
-                            if (!success)
-                            {
-                                string toParse = line.Substring(ii + i5 * width, width).Trim();
-                                if (G.Equal(toParse, "NaN") || G.Equal(toParse, "-NaN"))
-                                {
-                                    ss = 1e+15;  //signals missing value
-                                    NaNCounter++;
-                                }
-                                else
-                                {
-                                    G.Writeln2("*** ERROR: " + varName + ": could not parse '" + toParse + "' as a number");
-                                    //sr.Close();
-                                    throw new GekkoException();
-                                }
-                            }
+                            //read expression
+                            string expr = line.Substring(0, 32).Trim();
 
-                            if (ss == 1e+15)
-                            {
-                                ss = double.NaN;
-                            }
-                            else
-                            {
-                                if (Math.Abs(ss) < 1e-37 && ss != 0d)
-                                {
-                                    smallWarnings++;
-                                    ss = 0d;  //numbers smaller than this become imprecise when imported from AREMOS
-                                              //AREMOS sets all numbers > 1e+15 to 1e+15 when exporting, so no need to do this for large numbers
-                                }
-                            }
-                            tempArray[countdata] = ss;
-                            countdata++;
-                            obsLeft--;
-                        }
-
-                        if (obsLeft == 0)
-                        {
-                            GekkoTime gt1 = new GekkoTime(freq, d1, d1sub);
-                            GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
-
-                            int offset = 0;
-
-                            ////See similar code in px reader
-                            //if (dates != null)
+                            //read stamp
+                            string stamp = line.Substring(32, 8).Trim();
+                            //if (stamp.Length > 0)  //catcing is timeconsuming, and it does not work properly anyway
                             //{
-                            //    var tuple = GetFirstLastDates(dates, gt1, gt2);
-                            //    gt1 = tuple.Item1;
-                            //    gt2 = tuple.Item2;
-                            //    offset = tuple.Item3;
+                            //    try
+                            //    {
+                            //        // #80927435209843
+                            //        int i1 = int.Parse(stamp.Substring(0, 2)); //month
+                            //        int i2 = int.Parse(stamp.Substring(3, 2)); //day
+                            //        int i3 = int.Parse(stamp.Substring(6, 2)); //year
+                            //        if (i3 > 80) i3 = 1900 + i3;  //will work until 2080!
+                            //        else i3 = 2000 + i3;
+                            //        stamp = stamp.Substring(3, 2) + "-" + stamp.Substring(0, 2) + "-" + i3;
+                            //    }
+                            //    catch { };
+
                             //}
 
-                            int nob = GekkoTime.Observations(gt1, gt2);
-                            if (nob > 0)
+                            //read date
+                            int iiStart = 37;
+                            string date1 = line.Substring(iiStart + 7, 4);
+                            string date1sub = line.Substring(iiStart + 11, 2);
+                            string date2 = line.Substring(iiStart + 15, 4);
+                            string date2sub = line.Substring(iiStart + 19, 2);
+                            try
                             {
-                                ts.SetDataSequence(gt1, gt2, tempArray, offset);
-                                ts.Trim(); //to save ram                                                             
+                                d1 = int.Parse(date1);
                             }
-                            counter++;
-                            nextState = 1;
+                            catch
+                            {
+                                G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1 + "' as an int (start year)");
+                                throw new GekkoException();
+                            }
+                            try
+                            {
+                                d1sub = int.Parse(date1sub);
+                            }
+                            catch
+                            {
+                                G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
+                                throw new GekkoException();
+                            }
+                            try
+                            {
+                                d2 = int.Parse(date2);
+                            }
+                            catch
+                            {
+                                G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2 + "' as an int (end year)");
+                                throw new GekkoException();
+                            }
+                            try
+                            {
+                                d2sub = int.Parse(date2sub);
+                            }
+                            catch
+                            {
+                                G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
+                                throw new GekkoException();
+                            }
+                            frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
+
+                            d1min = G.GekkoMin(d1, d1min);  //finding min and max years
+                            d2max = G.GekkoMax(d2, d2max);
+
+                            //preparing nextState = 3
+                            {
+
+                                bool ok = G.IsSimpleToken(varName);
+                                string label = null;
+                                if (!ok)
+                                {
+                                    if (varName.Length >= 17)
+                                    {
+                                        //Of this type, where the first 16 chars is the name, and the rest is the label
+                                        //gdp2            GDP in version 2, mia. DKK
+                                        string v1 = varName.Substring(0, 16).Trim();
+                                        string v2 = varName.Substring(16, varName.Length - 16).Trim();
+
+                                        if (!G.IsSimpleToken(v1))
+                                        {
+                                            G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
+                                            G.Writeln("         : " + v1);
+                                            G.Writeln("         : The name should contain letters, digits or underscore only");
+                                            G.Writeln("         : (It seems there is a label starting in position 17, this is ok)");
+                                            throw new GekkoException();
+                                        }
+
+                                        varName = v1;
+                                        label = v2;
+                                    }
+                                    else
+                                    {
+
+                                        G.Writeln2("*** ERROR: tsd read: the following name is malformed:");
+                                        G.Writeln("         : " + varName);
+                                        G.Writeln("         : The name should contain letters, digits or underscore only");
+                                        throw new GekkoException();
+                                    }
+                                }
+
+                                countdata = 0;
+                                freq = G.GetFreq(frequency);
+                                obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub), new GekkoTime(freq, d2, d2sub));
+                                obsLeft = obs;
+                                ts = null;
+                                if (IsNonsenseVariableName(varName))
+                                {
+                                    emptyWarnings++;
+                                    ts = new Series(freq, varName);  //completely phoney, will not live after exit of this method: just so that we can continue
+                                }
+                                else
+                                {
+                                    ts = FindOrCreateTimeSeriesInDataBank(databank, varName, freq);
+                                }
+                                if (label != null && label != "") ts.meta.label = label;
+                                if (expr != null && expr != "") ts.meta.source = expr;
+                                if (stamp != null && stamp != "") ts.meta.stamp = stamp;
+                                //datalines = 0;
+                                nextState = 3;
+                            }
+
                         }
+                        else if (nextState == 3)
+                        {
+                            int n = Math.Min(5, obsLeft);
+                            for (int i5 = 0; i5 < n; i5++)
+                            {
+                                double ss = double.NaN;
+                                bool success = false;
+                                int width = 0;
+                                if (isTsdx)
+                                {
+                                    width = 21;
+                                }
+                                else
+                                {
+                                    width = 15;
+                                }
+                                success = G.TryParseIntoDouble(line.Substring(ii + i5 * width, width), out ss);
+                                if (!success)
+                                {
+                                    string toParse = line.Substring(ii + i5 * width, width).Trim();
+                                    if (G.Equal(toParse, "NaN") || G.Equal(toParse, "-NaN"))
+                                    {
+                                        ss = 1e+15;  //signals missing value
+                                        NaNCounter++;
+                                    }
+                                    else
+                                    {
+                                        G.Writeln2("*** ERROR: " + varName + ": could not parse '" + toParse + "' as a number");
+                                        //sr.Close();
+                                        throw new GekkoException();
+                                    }
+                                }
+
+                                if (ss == 1e+15)
+                                {
+                                    ss = double.NaN;
+                                }
+                                else
+                                {
+                                    if (Math.Abs(ss) < 1e-37 && ss != 0d)
+                                    {
+                                        smallWarnings++;
+                                        ss = 0d;  //numbers smaller than this become imprecise when imported from AREMOS
+                                                  //AREMOS sets all numbers > 1e+15 to 1e+15 when exporting, so no need to do this for large numbers
+                                    }
+                                }
+                                tempArray[countdata] = ss;
+                                countdata++;
+                                obsLeft--;
+                            }
+
+                            if (obsLeft == 0)
+                            {
+                                GekkoTime gt1 = new GekkoTime(freq, d1, d1sub);
+                                GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
+
+                                int offset = 0;
+
+                                ////See similar code in px reader
+                                //if (dates != null)
+                                //{
+                                //    var tuple = GetFirstLastDates(dates, gt1, gt2);
+                                //    gt1 = tuple.Item1;
+                                //    gt2 = tuple.Item2;
+                                //    offset = tuple.Item3;
+                                //}
+
+                                int nob = GekkoTime.Observations(gt1, gt2);
+                                if (nob > 0)
+                                {
+                                    ts.SetDataSequence(gt1, gt2, tempArray, offset);
+                                    ts.Trim(); //to save ram                                                             
+                                }
+                                counter++;
+                                nextState = 1;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        G.Writeln("*** ERROR: TSD import failed on line: " + lineCounter);
+                        throw;
                     }
                 }  //end of readline from file
                 readInfo.startPerInFile = d1min;

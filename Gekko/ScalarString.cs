@@ -395,28 +395,21 @@ namespace Gekko
             //Conversion not allowed in for instance VAL x = %s, where s is a STRING pointing to a timeseries.
             G.Writeln2("*** ERROR: You are trying to extract a numerical value from STRING '" + this.string2 + "'");
             G.Writeln("           A STRING s ('" + this.string2 + "') can refer to a timeseries name (" + this.string2 + "), but in");
-            G.Writeln("           that case you must use {s} or {%s} instead of %s.");
+            G.Writeln("           that case you must use {%s} instead of %s.");
             throw new GekkoException();
         }
 
         public double GetVal(GekkoTime smpl)
         {
-            G.Writeln2("*** ERROR: Cannot extract a scalar value from " + G.GetTypeString(this) + " type");
+            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
             throw new GekkoException();
         }
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
-            double d = double.NaN; bool b = double.TryParse(this.string2, out d);
-            if (this.isFromNakedList && b)
-            {
+            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type ('" + this.string2 + "')");
+            G.Writeln(Globals.stringConversionNote);
 
-                G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");
-                G.Writeln("           'naked' list without parentheses, like #m = 1, 2, 3;. In such naked lists,");
-                G.Writeln("           the items are always treated as strings. You should perhaps add enclosing");
-                G.Writeln("           parentheses, corresponding to #m = (1, 2, 3);");
-            }
             throw new GekkoException();
         }
 
@@ -464,6 +457,7 @@ namespace Gekko
                 case EVariableType.Series:
                     {
                         G.Writeln2("*** ERROR: You cannot add a string and a timeseries");
+                        G.Writeln(Globals.stringConversionNote);
                         throw new GekkoException();
                     }                    
                 case EVariableType.Val:
@@ -519,26 +513,30 @@ namespace Gekko
 
         public IVariable Subtract(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: %x -%y (minus) is not allowed if %x is a STRING scalar.");
+            G.Writeln2("*** ERROR: Subtracting from a string ('" + this.string2 + "') is not allowed");
+            G.Writeln(Globals.stringConversionNote);
             throw new GekkoException();
         }
 
         public IVariable Multiply(GekkoSmpl t, IVariable x)
-        {
-            G.Writeln2("*** ERROR: %x*%y (multiply) is not allowed if %x is a STRING scalar.");
-            throw new GekkoException();            
+        {            
+            G.Writeln2("*** ERROR: Multiplication involving a string ('" + this.string2 + "') is not allowed");
+            G.Writeln(Globals.stringConversionNote);
+            throw new GekkoException();
         }
 
         public IVariable Divide(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: %x/%y (divide) is not allowed if %x is a STRING scalar.");
-            throw new GekkoException();            
+            G.Writeln2("*** ERROR: Division involving a string ('" + this.string2 + "') is not allowed");
+            G.Writeln(Globals.stringConversionNote);
+            throw new GekkoException();
         }
 
         public IVariable Power(GekkoSmpl t, IVariable x)
         {
-            G.Writeln2("*** ERROR: %x^%y or %x**%y (power) is not allowed if %x is a STRING scalar.");
-            throw new GekkoException();            
+            G.Writeln2("*** ERROR: Exponentiation involving a string ('" + this.string2 + "') is not allowed");
+            G.Writeln(Globals.stringConversionNote);
+            throw new GekkoException();
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)

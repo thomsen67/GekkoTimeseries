@@ -2154,6 +2154,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: log(): type " + x1.Type().ToString() + " not supported");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return rv;            
@@ -2187,6 +2188,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: exp(): type " + x1.Type().ToString() + " not supported");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return rv;
@@ -2219,7 +2221,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: abs(): type " + x1.Type().ToString() + " not supported");
+                G.Writeln2("*** ERROR: sqrt(): type " + x1.Type().ToString() + " not supported");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return rv;
@@ -2261,6 +2264,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return null;
@@ -2313,7 +2317,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                G.Writeln2("*** ERROR: dlog() function only valid for time series arguments");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return null;
@@ -2337,7 +2342,8 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: pch() function only valid for time series arguments");
+                G.Writeln2("*** ERROR: dif() function only valid for time series arguments");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return null;
@@ -2395,6 +2401,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: movsum() only works for SERIES");
+                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
 
@@ -2414,6 +2421,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: pchy() function only valid for time series arguments");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return null;
@@ -2437,7 +2445,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: dif() function only valid for time series arguments");
+                G.Writeln2("*** ERROR: dify() function only valid for time series arguments");
                 throw new GekkoException();
             }
             return null;
@@ -2456,6 +2464,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: dlogy() function only valid for time series arguments");
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
             return null;
@@ -2551,6 +2560,7 @@ namespace Gekko
             else
             {
                 G.Writeln2("*** ERROR: round() does not support type " + x1.Type().ToString());
+                if (x1.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
                 throw new GekkoException();
             }
         }
