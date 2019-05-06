@@ -19080,7 +19080,7 @@ namespace Gekko
 
                         if (tok.Offset(i)?.s == "." && tok.Offset(i + 1)?.s == ".")
                         {
-                            //good
+                            //good, we are at the '..' part, now comes the LHS expression
                         }
                         else
                         {
@@ -19142,12 +19142,7 @@ namespace Gekko
 
                         TokenHelper lhsTokensGekko = e.lhsTokensGams.DeepClone(null);
                         TokenHelper rhsTokensGekko = e.rhsTokensGams.DeepClone(null);
-
-                        //if (lhsTokensGams.ToString().ToLower().Contains("qx('tot',t)"))
-                        //{
-
-                        //}
-
+                                                
                         WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
                         WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
                         WalkTokens(lhsTokensGekko);
@@ -19203,6 +19198,7 @@ namespace Gekko
 
                         string varname = null;
 
+                        //#098732423489734
                         string lineText = null;
                         for (int ii = 0; ii < lhsTokensGams.subnodes.Count(); ii++)
                         {
@@ -19220,21 +19216,7 @@ namespace Gekko
                                     lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
                                 }
                             }
-                        }
-
-                        //varname = lhsTokensGams.subnodes[0].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
-
-                        //if (lhsTokensGams.subnodes[1] != null && lhsTokensGams.subnodes[1].SubnodesType() == "(")
-                        //{
-                        //    if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
-                        //    {
-                        //        varname = lhsTokensGams.subnodes[1].subnodes[0].ToStringTrim();
-                        //    }
-                        //    else if (G.Equal(varname, "sum"))
-                        //    {
-                        //        varname = null; //ignore it
-                        //    }
-                        //}
+                        }                        
 
                         if (varname != null)
                         {
