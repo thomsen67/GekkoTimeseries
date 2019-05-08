@@ -18929,7 +18929,64 @@ namespace Gekko
             var tags4 = new List<string>() { "*" };
 
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
-            Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, List<ModelGamsEquation>> equations = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+
+            GekkoDictionary<string, string> dependents = null;
+            IVariable lhsList = O.GetIVariableFromString("#dependents", O.ECreatePossibilities.NoneReturnNull);
+            if (lhsList != null)
+            {
+                //A variable #dependents exists
+                dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+                List lhsList_list = lhsList as List;
+                if (lhsList_list == null)
+                {
+                    G.Writeln2("*** ERROR: Variable #dependents should be of list type");
+                    throw new GekkoException();
+                }
+                int c = 0;
+                foreach (IVariable x in lhsList_list.list)
+                {
+                    c++;
+                    if (x.Type() != EVariableType.List)
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": should be of list type");
+                        throw new GekkoException();
+                    }
+                    List x_list = x as List;
+                    try
+                    {
+                        List<string> ss = Program.GetListOfStringsFromList(x_list);
+                        if (ss.Count < 2)
+                        {
+                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
+                            throw new GekkoException();
+                        }
+                        string lhs = ss[0];
+                        for (int i = 1; i < ss.Count; i++)
+                        {
+                            //The ss list has this form for each line:
+                            //qG; E_qG; E_qG_tot    --> first the lhs name, then the equations where it is a lhs variable
+                            //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
+                            //the ss list.
+
+                            string temp = null; dependents.TryGetValue(ss[i], out temp);
+                            if (temp != null)
+                            {
+                                G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
+                                throw new GekkoException();
+                            }
+                            dependents.Add(ss[i], lhs);
+                        }
+                    }
+                    catch
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": all elements should be strings");
+                        throw;
+                    }
+                }
+                
+            }
 
             int counter = 0;
 
@@ -18948,308 +19005,16 @@ namespace Gekko
                     }
                     else
                     {
-                        
-                        int iEqStart = 0;
-                        //searches for '..' with no blank between (could be improved)
-                        //now we search backwards for start of line
-                        for (int i2 = -1; i2 > -int.MaxValue; i2--)
-                        {
-                            int iLineStart = -12345;
-                            if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
-                            {
-                                iEqStart = i2 + 1;
-                                break;
-                            }
-                        }
-
-                        int i = iEqStart;
-
-                        //-----------------------------------------------
-                        //now we are ready for the equation definition
-                        //-----------------------------------------------
-
-                        //The equation is of this form:
-
-                        //e_pi(i,ds,t) $ (tx0(t) and d1i(i,ds,t)) .. pI(i,ds,t)*qI(i,ds,t) =E= vI(i,ds,t);
-
-                        //Tokenized in tree structure it looks like this:
-
-                        //e_pi(...) $ (...) .. pI(...)*qI(...) =E= vI(...);
-
-                        //So the following:
-                        // varname
-                        // maybe a set parenthesis
-                        // maybe a dollar
-                        //     if so either a (...) or a variable with a (...)
-                        // a '..' always
-                        // a leftside until '=e='
-                        // a rightside after'=e=' until semicolon
-
-                        string nameGams = null;
-                        string dollarGams = null;
-                        string setsGams = null;
-                        string lhsGams = null;
-                        string rhsGams = null;
-                        TokenHelper lhsTokensGams = null;
-                        TokenHelper rhsTokensGams = null;
-
-                        string dollar = null;
-
-                        nameGams = tok.Offset(i)?.s;
-
-                        i++;
-
-                        //this may be parentheses
-                        TokenHelper tok2 = tok.Offset(i);
-                        if (tok2.SubnodesTypeParenthesisStart())
-                        {
-                            setsGams = tok2.subnodes.ToString();
-                            i++;
-
-                            if (tok.Offset(i).s == "$")
-                            {
-                                i++;
-
-                                //TODO: remove stray ANDs
-
-                                
-                                TokenHelper tok3 = tok.Offset(i);
-                                dollarGams = null;
-                                if (tok3.subnodes != null)
-                                {
-                                    dollarGams = tok3.subnodes.ToString();
-                                }
-
-                                if (tok3.SubnodesTypeParenthesisStart())
-                                {
-
-                                    TokenList list = new TokenList();
-                                    for (int ii = 0; ii < tok3.subnodes.storage.Count; ii++)
-                                    {
-                                        if (ii < tok3.subnodes.Count() - 1 && tok3.subnodes[ii].HasNoChildren() && tok3.subnodes[ii + 1] != null && tok3.subnodes[ii + 1].HasChildren())
-                                        {
-                                            //Remove anything that looks like time restriction
-                                            List<TokenHelperComma> temp = tok3.subnodes[ii + 1].SplitCommas(true);
-                                            if (temp.Count == 1 && G.Equal(temp[0].list.ToString().Trim(), "t"))
-                                            {
-                                                ii += 2;
-                                                if (G.Equal(tok3.subnodes[ii]?.s, "and"))
-                                                {
-                                                    ii++;  //also check before
-                                                }
-                                                ii--;  //will get 1 added at loop start
-                                                continue;
-                                            }
-                                        }
-                                        list.storage.Add(tok3.subnodes[ii]);                                        
-                                    }
-
-                                    WalkTokensHandleParentheses(list);
-                                    WalkTokens(list);
-
-                                    dollar = list.ToStringTrim();                                        
-
-                                    if (dollar.StartsWith("(") && dollar.EndsWith(")"))
-                                    {
-                                        dollar = dollar.Substring(1, dollar.Length - 2).Trim();
-                                        if (dollar.StartsWith("and ")) dollar = dollar.Substring("and ".Length).Trim();
-                                    }
-
-                                    i++;
-                                }
-                                else
-                                {
-                                    string s7 = tok.Offset(i).ToString();
-                                    if (!G.IsIdent(s7))
-                                    {
-                                        G.Writeln2("*** ERROR: Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
-                                        throw new GekkoException();
-                                    }
-                                    i++;
-
-                                    string s8 = tok.Offset(i).ToString();
-                                    if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
-                                    {
-                                        G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
-                                        throw new GekkoException();
-                                    }
-                                    i++;
-                                }
-                            }
-                        }
-
-                        if (tok.Offset(i)?.s == "." && tok.Offset(i + 1)?.s == ".")
-                        {
-                            //good, we are at the '..' part, now comes the LHS expression
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
-                            throw new GekkoException();
-                        }
-                        i++;
-                        i++;
-
-                        //now ready for the contents of the equation
-
-                        //find lhs of equation -----------------------------------------
-                        int i1Start = i;
-
-                        List<string> eqsign = new List<string>() { "=", "e", "=" };
-
-                        int iEqual = tok.Search(i1Start, eqsign);
-
-                        if (iEqual == -12345)
-                        {
-                            G.Writeln2("*** ERROR: Could not find '=e=' in eq definition, " + tok.Offset(i).LineAndPosText());
-                            throw new GekkoException();
-                        }
-
-                        int i1End = iEqual - 1;
-                        int i2Start = i1End + eqsign.Count + 1;
-                        int iSemi = tok.Search(i2Start, new List<string>() { ";" });
-
-                        int iEqEnd = iSemi;
-
-                        lhsGams = tok.OffsetInterval(i1Start, i1End).ToString().Trim();
-                        lhsTokensGams = tok.OffsetInterval(i1Start, i1End);
-
-                        rhsGams = tok.OffsetInterval(i2Start, iSemi - 1).ToString().Trim();
-                        rhsTokensGams = tok.OffsetInterval(i2Start, iSemi - 1);
-
-                        eqCounter++;
-                        
-                        if (false && eqCounter < 10)
-                        {
-                            G.Writeln2("Eqname:  " + nameGams);
-                            G.Writeln("Sets:    " + setsGams);
-                            G.Writeln("Dollar:  " + dollarGams);
-                            G.Writeln("LHS:     " + lhsGams);
-                            G.Writeln("RHS:     " + rhsGams);
-                        }
-
-                        ModelGamsEquation e = new ModelGamsEquation();
-                        if (true)
-                        {
-                            e.nameGams = nameGams;
-                            e.setsGams = setsGams;
-                            e.conditionalsGams = dollarGams;
-                            e.lhsGams = lhsGams;
-                            e.rhsGams = rhsGams;
-                            e.lhsTokensGams = lhsTokensGams;
-                            e.rhsTokensGams = rhsTokensGams;
-                        }
-
-                        TokenHelper lhsTokensGekko = e.lhsTokensGams.DeepClone(null);
-                        TokenHelper rhsTokensGekko = e.rhsTokensGams.DeepClone(null);
-                                                
-                        WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
-                        WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
-                        WalkTokens(lhsTokensGekko);
-                        WalkTokens(rhsTokensGekko);
-
-                        //sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
-
-                        string lhs = lhsTokensGekko.ToStringTrim();
-                        string rhs = rhsTokensGekko.ToStringTrim();
-                                                
-                        if (false && (eqCounter > 10 || lhs.Contains("*")))
-                        {
-                            //skip
-                        }
-                        else
-                        {
-                            int v = 3;
-                            if (v == 1)
-                            {
-                                sb.Append("PRT " + lhs + ";" + G.NL);
-                                sb.Append("PRT " + rhs + ";" + G.NL);
-                                sb.AppendLine();
-                            }
-                            else if (v == 2)
-                            {
-                                sb.Append("PRT<n> " + lhs + " - ( " + rhs + " );" + G.NL);
-                            }
-                            else
-                            {
-                                string dollar2 = null;
-                                if (dollar != null && dollar.Trim() != "" && dollar.Trim() != "()")
-                                {
-                                    dollar2 = dollar.Trim();
-                                }
-
-                                if (dollar2 != null)
-                                {
-                                    sb.Append(lhs + " $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
-                                }
-                                else
-                                {
-                                    sb.Append(lhs + " = " + rhs + ";" + G.NL);
-                                }
-                            }
-                        }
-
-                        if (true)
-                        {
-                            e.lhs = lhs;
-                            e.rhs = rhs;
-                            e.conditionals = dollar;                            
-                        }
-
-                        string varname = null;
-
-                        //#098732423489734
-                        string lineText = null;
-                        for (int ii = 0; ii < lhsTokensGams.subnodes.Count(); ii++)
-                        {
-                            if (lhsTokensGams.subnodes[ii].type == ETokenType.Word)
-                            {
-                                varname = lhsTokensGams.subnodes[ii].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
-                                lineText = lhsTokensGams.subnodes[ii].LineAndPosText();
-                                if (G.Equal(varname, "sum"))
-                                {
-                                    varname = null; //ignore it
-                                }
-                                else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
-                                {
-                                    varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
-                                    lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
-                                }
-                            }
-                        }                        
-
-                        if (varname != null)
-                        {
-                            if (!G.IsSimpleToken(varname))
-                            {
-                                G.Writeln2("+++ WARNING: Reading model: could not identify variable from this (" + lineText + "):");
-                                G.Writeln("             " + lhsTokensGams.ToString(), Color.Orange);
-                            }
-
-                            if (xx.ContainsKey(varname))
-                            {
-                                xx[varname].Add(e);  //can have more than one eq with same lhs variable
-                            }
-                            else
-                            {
-                                List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
-                                e2.Add(e);
-                                xx.Add(varname, e2);
-                            }
-                        }
-                        else
-                        {
-                            //an error could be issued?
-                        }
+                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equations, tok, dependents);
                     }
                 }
             }
             Program.modelGams = new ModelGams();
-            Program.modelGams.equations = xx;
+            Program.modelGams.equations = equations;
 
             G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
             G.Writeln("Read " + counter + " lines from " + fileName);
-            G.Writeln("Found " + xx.Count + " distinct equations (use DISP to display them)");
+            G.Writeln("Found " + equations.Count + " distinct equations (use DISP to display them)");
 
             if (Globals.runningOnTTComputer)
             {
@@ -19261,6 +19026,321 @@ namespace Gekko
             }
         }
 
+        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper tok, GekkoDictionary<string, string> dependents)
+        {
+
+
+            int iEqStart = 0;
+            //searches for '..' with no blank between (could be improved)
+            //now we search backwards for start of line
+            for (int i2 = -1; i2 > -int.MaxValue; i2--)
+            {
+                int iLineStart = -12345;
+                if (tok.Offset(i2) == null || tok.Offset(i2).type == ETokenType.EOL)
+                {
+                    iEqStart = i2 + 1;
+                    break;
+                }
+            }
+
+            int i = iEqStart;
+
+            //-----------------------------------------------
+            //now we are ready for the equation definition
+            //-----------------------------------------------
+
+            //The equation is of this form:
+
+            //e_pi(i,ds,t) $ (tx0(t) and d1i(i,ds,t)) .. pI(i,ds,t)*qI(i,ds,t) =E= vI(i,ds,t);
+
+            //Tokenized in tree structure it looks like this:
+
+            //e_pi(...) $ (...) .. pI(...)*qI(...) =E= vI(...);
+
+            //So the following:
+            // eqname
+            // maybe a set parenthesis
+            // maybe a dollar
+            //     if so either a (...) or a variable with a (...)
+            // a '..' always
+            // a leftside until '=e='
+            // a rightside after'=e=' until semicolon
+
+            string eqnameGams = null;
+            string dollarGams = null;
+            string setsGams = null;
+            string lhsGams = null;
+            string rhsGams = null;
+            TokenHelper lhsTokensGams = null;
+            TokenHelper rhsTokensGams = null;
+
+            string dollar = null;
+
+            eqnameGams = tok.Offset(i)?.s;
+
+            i++;
+
+            //this may be parentheses
+            TokenHelper tok2 = tok.Offset(i);
+            if (tok2.SubnodesTypeParenthesisStart())
+            {
+                setsGams = tok2.subnodes.ToString();
+                i++;
+
+                if (tok.Offset(i).s == "$")
+                {
+                    i++;
+
+                    //TODO: remove stray ANDs
+
+
+                    TokenHelper tok3 = tok.Offset(i);
+                    dollarGams = null;
+                    if (tok3.subnodes != null)
+                    {
+                        dollarGams = tok3.subnodes.ToString();
+                    }
+
+                    if (tok3.SubnodesTypeParenthesisStart())
+                    {
+
+                        TokenList list = new TokenList();
+                        for (int ii = 0; ii < tok3.subnodes.storage.Count; ii++)
+                        {
+                            if (ii < tok3.subnodes.Count() - 1 && tok3.subnodes[ii].HasNoChildren() && tok3.subnodes[ii + 1] != null && tok3.subnodes[ii + 1].HasChildren())
+                            {
+                                //Remove anything that looks like time restriction
+                                List<TokenHelperComma> temp = tok3.subnodes[ii + 1].SplitCommas(true);
+                                if (temp.Count == 1 && G.Equal(temp[0].list.ToString().Trim(), "t"))
+                                {
+                                    ii += 2;
+                                    if (G.Equal(tok3.subnodes[ii]?.s, "and"))
+                                    {
+                                        ii++;  //also check before
+                                    }
+                                    ii--;  //will get 1 added at loop start
+                                    continue;
+                                }
+                            }
+                            list.storage.Add(tok3.subnodes[ii]);
+                        }
+
+                        WalkTokensHandleParentheses(list);
+                        WalkTokens(list);
+
+                        dollar = list.ToStringTrim();
+
+                        if (dollar.StartsWith("(") && dollar.EndsWith(")"))
+                        {
+                            dollar = dollar.Substring(1, dollar.Length - 2).Trim();
+                            if (dollar.StartsWith("and ")) dollar = dollar.Substring("and ".Length).Trim();
+                        }
+
+                        i++;
+                    }
+                    else
+                    {
+                        string s7 = tok.Offset(i).ToString();
+                        if (!G.IsIdent(s7))
+                        {
+                            G.Writeln2("*** ERROR: Expected a name instead of '" + s7 + "' , " + tok.Offset(i).LineAndPosText());
+                            throw new GekkoException();
+                        }
+                        i++;
+
+                        string s8 = tok.Offset(i).ToString();
+                        if (!(tok.Offset(i).SubnodesTypeParenthesisStart()))
+                        {
+                            G.Writeln2("*** ERROR: Expected a (...) parenthesis instead of '" + s8 + "' , " + tok.Offset(i).LineAndPosText());
+                            throw new GekkoException();
+                        }
+                        i++;
+                    }
+                }
+            }
+
+            if (tok.Offset(i)?.s == "." && tok.Offset(i + 1)?.s == ".")
+            {
+                //good, we are at the '..' part, now comes the LHS expression
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Expected '..' in eq definition, " + tok.Offset(i).LineAndPosText());
+                throw new GekkoException();
+            }
+            i++;
+            i++;
+
+            //now ready for the contents of the equation
+
+            //find lhs of equation -----------------------------------------
+            int i1Start = i;
+
+            List<string> eqsign = new List<string>() { "=", "e", "=" };
+
+            int iEqual = tok.Search(i1Start, eqsign);
+
+            if (iEqual == -12345)
+            {
+                G.Writeln2("*** ERROR: Could not find '=e=' in eq definition, " + tok.Offset(i).LineAndPosText());
+                throw new GekkoException();
+            }
+
+            int i1End = iEqual - 1;
+            int i2Start = i1End + eqsign.Count + 1;
+            int iSemi = tok.Search(i2Start, new List<string>() { ";" });
+
+            int iEqEnd = iSemi;
+
+            lhsGams = tok.OffsetInterval(i1Start, i1End).ToString().Trim();
+            lhsTokensGams = tok.OffsetInterval(i1Start, i1End);
+
+            rhsGams = tok.OffsetInterval(i2Start, iSemi - 1).ToString().Trim();
+            rhsTokensGams = tok.OffsetInterval(i2Start, iSemi - 1);
+
+            eqCounter++;
+
+            if (false && eqCounter < 10)
+            {
+                G.Writeln2("Eqname:  " + eqnameGams);
+                G.Writeln("Sets:    " + setsGams);
+                G.Writeln("Dollar:  " + dollarGams);
+                G.Writeln("LHS:     " + lhsGams);
+                G.Writeln("RHS:     " + rhsGams);
+            }
+
+            ModelGamsEquation equation = new ModelGamsEquation();
+            if (true)
+            {
+                equation.nameGams = eqnameGams;
+                equation.setsGams = setsGams;
+                equation.conditionalsGams = dollarGams;
+                equation.lhsGams = lhsGams;
+                equation.rhsGams = rhsGams;
+                equation.lhsTokensGams = lhsTokensGams;
+                equation.rhsTokensGams = rhsTokensGams;
+            }
+
+            TokenHelper lhsTokensGekko = equation.lhsTokensGams.DeepClone(null);
+            TokenHelper rhsTokensGekko = equation.rhsTokensGams.DeepClone(null);
+
+            WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
+            WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
+            WalkTokens(lhsTokensGekko);
+            WalkTokens(rhsTokensGekko);
+
+            //sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
+
+            string lhs = lhsTokensGekko.ToStringTrim();
+            string rhs = rhsTokensGekko.ToStringTrim();
+
+            if (false && (eqCounter > 10 || lhs.Contains("*")))
+            {
+                //skip
+            }
+            else
+            {
+                int v = 3;
+                if (v == 1)
+                {
+                    sb.Append("PRT " + lhs + ";" + G.NL);
+                    sb.Append("PRT " + rhs + ";" + G.NL);
+                    sb.AppendLine();
+                }
+                else if (v == 2)
+                {
+                    sb.Append("PRT<n> " + lhs + " - ( " + rhs + " );" + G.NL);
+                }
+                else
+                {
+                    string dollar2 = null;
+                    if (dollar != null && dollar.Trim() != "" && dollar.Trim() != "()")
+                    {
+                        dollar2 = dollar.Trim();
+                    }
+
+                    if (dollar2 != null)
+                    {
+                        sb.Append(lhs + " $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                    }
+                    else
+                    {
+                        sb.Append(lhs + " = " + rhs + ";" + G.NL);
+                    }
+                }
+            }
+
+            if (true)
+            {
+                equation.lhs = lhs;
+                equation.rhs = rhs;
+                equation.conditionals = dollar;
+            }
+
+            ReadGamsModelGetLhsName(equations, lhsTokensGams, equation, eqnameGams, dependents);
+
+
+            return eqCounter;
+        }
+
+        private static void ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents)
+        {
+
+            string d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);
+
+            string varnameFound = null;
+            if (d == null)
+            {
+                //not found in #dependents                
+
+                //#098732423489734
+                string lineText = null;
+                for (int ii = 0; ii < lhsTokensGams.subnodes.Count(); ii++)
+                {
+                    string varname = null;
+                    if (lhsTokensGams.subnodes[ii].type == ETokenType.Word)
+                    {
+                        varname = lhsTokensGams.subnodes[ii].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
+                        lineText = lhsTokensGams.subnodes[ii].LineAndPosText();
+                        if (G.Equal(varname, "sum"))
+                        {
+                            varname = null; //ignore it
+                        }
+                        else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                        {
+                            varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
+                            lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
+                        }
+                    }
+                    if (G.IsSimpleToken(varname) && varnameFound == null) varnameFound = varname;
+
+                }
+
+                if (varnameFound == null)
+                {
+                    G.Writeln2("+++ WARNING: Reading model: could not identify variable from this (" + lineText + "):");
+                    G.Writeln("             " + lhsTokensGams.ToString(), Color.Orange);
+                }
+            }
+            else
+            {
+                //found in #dependents
+                varnameFound = d;
+            }
+
+
+            if (equations.ContainsKey(varnameFound))
+            {
+                equations[varnameFound].Add(e);  //can have more than one eq with same lhs variable
+            }
+            else
+            {
+                List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                e2.Add(e);
+                equations.Add(varnameFound, e2);
+            }
+
+        }
 
         private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
         {
