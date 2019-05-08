@@ -8136,6 +8136,75 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ModelGamsLhsDependent()
+        {
+            // ------------------------------------------------------------
+            // default model, the "right" vars are first on the lhs
+            // ------------------------------------------------------------
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("pC = series(1);");
+            I("pC[cCar] = 1;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("MODEL <gms> model.gmy;");
+            I("DISP pC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");                        
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+
+            // ------------------------------------------------------------
+            // Now pC is first in the qC equations, but pC is lagged,
+            // which is detected
+            // So we are finding the first non-lagged lhs variable (possibly
+            // inside an exp() or log())
+            // ------------------------------------------------------------
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model3.gmy;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+            // ------------------------------------------------------------
+            // Here, the two pC eqs need to know that pC is dependent, not qC
+            // ------------------------------------------------------------
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("pC = series(1);");
+            I("pC[cCar] = 1;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("#dependents = #(listfile dependents2);");
+            I("MODEL <gms> model2.gmy;");
+            
+            I("DISP pC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");            
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+
+
+
+
+        }
+
+        [TestMethod]
         public void _Test_FunctionLocalTime_AndSomeBlock()
         {
             // ============================================

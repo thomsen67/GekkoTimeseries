@@ -16489,6 +16489,18 @@ namespace Gekko
 
             List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
 
+            if (G.IsUnitTesting())
+            {
+                Globals.unitTestDependents = new List<string>();
+                if (eqs != null)
+                {
+                    foreach (ModelGamsEquation eq in eqs)
+                    {
+                        Globals.unitTestDependents.Add(eq.nameGams);
+                    }
+                }
+            }
+
             if (eqs != null && eqs.Count > 0)
             {
                 if (G.Chop_HasIndex(varnameWithoutFreq) && eqs.Count > 1)
@@ -19302,14 +19314,27 @@ namespace Gekko
                     {
                         varname = lhsTokensGams.subnodes[ii].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
                         lineText = lhsTokensGams.subnodes[ii].LineAndPosText();
-                        if (G.Equal(varname, "sum"))
+
+                        if (IsLaggedOrLeaded(lhsTokensGams.subnodes[ii]))
                         {
-                            varname = null; //ignore it
+                            varname = null;
                         }
-                        else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                        else
                         {
-                            varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
-                            lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
+
+                            if (G.Equal(varname, "sum"))
+                            {
+                                varname = null; //ignore it
+                            }
+                            else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
+                            {
+                                varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
+                                lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
+                                if (IsLaggedOrLeaded(lhsTokensGams.subnodes[ii].subnodes[0]))
+                                {
+                                    varname = null;
+                                }
+                            }
                         }
                     }
                     if (G.IsSimpleToken(varname) && varnameFound == null) varnameFound = varname;
@@ -19326,12 +19351,11 @@ namespace Gekko
             {
                 //found in #dependents
                 varnameFound = d;
-            }
-
+            }            
 
             if (equations.ContainsKey(varnameFound))
             {
-                equations[varnameFound].Add(e);  //can have more than one eq with same lhs variable
+                equations[varnameFound].Add(e);  //can have more than one eq with same lhs variable                
             }
             else
             {
@@ -19340,6 +19364,31 @@ namespace Gekko
                 equations.Add(varnameFound, e2);
             }
 
+        }
+
+        private static bool IsLaggedOrLeaded(TokenHelper x)
+        {
+            bool lagLead = false;
+            TokenHelper next = x.SiblingAfter();
+            if (next != null && next.SubnodesType() == "[")
+            {
+                List<TokenHelperComma> split = next.SplitCommas(true);
+                if (split.Count > 0)
+                {
+                    string last = split[split.Count - 1].list.ToString().Trim();
+                    if (last == "t-5") lagLead = true;
+                    if (last == "t-4") lagLead = true;
+                    if (last == "t-3") lagLead = true;
+                    if (last == "t-2") lagLead = true;
+                    if (last == "t-1") lagLead = true;
+                    if (last == "t+1") lagLead = true;
+                    if (last == "t+2") lagLead = true;
+                    if (last == "t+3") lagLead = true;
+                    if (last == "t+4") lagLead = true;
+                    if (last == "t+5") lagLead = true;
+                }
+            }
+            return lagLead;
         }
 
         private static void HandleVarlist(ModelCommentsHelper modelCommentsHelper)
