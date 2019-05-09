@@ -183,11 +183,16 @@ namespace Gekko
         /// Returns first item of subnodes which is also the type
         /// </summary>
         /// <returns></returns>
-        public string SubnodesType()
+        public string SubnodesType(bool checkArtificialTopNode)
         {
             if (!this.HasChildren()) return null;  //should not be called like this
-            if (this.artificialTopNode) return Globals.artificial;
+            if (checkArtificialTopNode && this.artificialTopNode) return Globals.artificial;
             return this.subnodes[0].s;  //the first item is also the subnode-type      
+        }
+
+        public string SubnodesType()
+        {
+            return SubnodesType(true);
         }
 
         /// <summary>

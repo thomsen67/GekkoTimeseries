@@ -16731,7 +16731,7 @@ namespace Gekko
                     G.Writeln();
                     
                     G.Write(lhs + " = ");
-                    int length = (rhs + " = ").Length;
+                    int length = (lhs + " = ").Length;
 
                     GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
                     TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
@@ -16746,23 +16746,31 @@ namespace Gekko
                         }
                         else
                         {
-                            if (token.s == "\\")  //tokens[i]
+                            //if (token.s == "\\")  //tokens[i]
+                            //{
+                            //    if (i < tokens.storage.Count - 2 && G.Equal(tokens[i + 1].s, "n"))
+                            //    {
+                            //        if (i > 1 && tokens[i - 2].s == "\\" && G.Equal(tokens[i - 1].s, "n"))
+                            //        {
+                            //            //do nothing                                                        
+                            //            tokens[i + 2].leftblanks = 0;
+                            //        }
+                            //        else
+                            //        {
+                            //            G.Writeln();
+                            //            tokens[i + 2].leftblanks = length;
+                            //        }
+                            //        i++;
+                            //        continue;
+                            //    }
+                            //}
+                            if (token.type == ETokenType.EOL)
                             {
-                                if (i < tokens.storage.Count - 2 && G.Equal(tokens[i + 1].s, "n"))
-                                {
-                                    if (i > 1 && tokens[i - 2].s == "\\" && G.Equal(tokens[i - 1].s, "n"))
-                                    {
-                                        //do nothing                                                        
-                                        tokens[i + 2].leftblanks = 0;
-                                    }
-                                    else
-                                    {
-                                        G.Writeln();
-                                        tokens[i + 2].leftblanks = length;
-                                    }
-                                    i++;
-                                    continue;
-                                }
+                                G.Writeln();
+                                TokenHelper next = tokens[i + 1];
+                                if (next != null && next.type == ETokenType.EOL) i++;  //skip it
+                                tokens[i + 1].leftblanks = 4;
+                                continue;
                             }
                             G.Write(token.s);
                         }
@@ -19336,12 +19344,21 @@ namespace Gekko
 
                     if (dollar2 != null)
                     {
-                        sb.Append(lhs + " $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                        sb.Append("(" + lhs + ") $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
                     }
                     else
                     {
                         sb.Append(lhs + " = " + rhs + ";" + G.NL);
                     }
+
+                    //if (dollar2 != null)
+                    //{
+                    //    sb.Append("(" + lhs + ") $ (" + dollar2 + ")" + G.NL);  //always add parentheses
+                    //}
+                    //else
+                    //{
+                    //    sb.Append(lhs + " = " + G.NL);
+                    //}
                 }
             }
 
@@ -19353,17 +19370,18 @@ namespace Gekko
             }
 
             string lhsVariable = ReadGamsModelGetLhsName(equations, lhsTokensGekko, equation, eqnameGams, dependents, problems);
-            sb.AppendLine("LHS DEPENDENT VAR = " + lhsVariable);
+            sb.AppendLine("LHS_DEPENDENT_VAR  =  " + lhsVariable);
+            sb.AppendLine();
 
             return eqCounter;
         }
 
-        public static void GetLhsVariable(TokenHelper ths, ref string lhs)
+        public static void GetLhsVariable(TokenHelper node, ref string lhs)
         {            
 
             if (lhs != null) return;  //found the lhs
-
-            if (ths.HasNoChildren())
+            
+            if (node.HasNoChildren())
             {
                 //not a sub-node, do nothing             
             }
@@ -19371,34 +19389,59 @@ namespace Gekko
             {
                 //an empty node with children
                 string lineText = null;
-                for (int ii = 0; ii < ths.subnodes.Count(); ii++)
+                for (int ii = 0; ii < node.subnodes.Count(); ii++)
                 {
                     string varname = null;
 
-                    if (ths.subnodes[ii].HasChildren())
-                    {                        
-                        GetLhsVariable(ths.subnodes[ii], ref lhs);                        
+                    bool dollar = false;
+                    TokenHelper previous = node.subnodes[ii].SiblingBefore();  //it seems dollars are only in the eq, not set on the lhs variable
+                    if (previous != null && previous.s == "$")
+                    {
+                        dollar = true;
                     }
-                    else
+
+                    if (!dollar)  //we skip looking at variables, if it is like x $ ... or x $ (...)
                     {
 
-                        if (ths.subnodes[ii].type == ETokenType.Word)
+                        if (node.subnodes[ii].HasChildren())
                         {
-                            varname = ths.subnodes[ii].ToStringTrim();
-                            lineText = ths.subnodes[ii].LineAndPosText();
-
-                            TokenHelper next = ths.subnodes[ii].SiblingAfter();
-                            if (IsLaggedOrLeaded(ths.subnodes[ii]))  //will detect x[#i][-1] + y = ... for instance
+                            if (node.subnodes[ii].SubnodesType(false) == "(")
                             {
-                                varname = null;
+                                //will not look deeper into [...], or later on {...}, only (...)
+                                GetLhsVariable(node.subnodes[ii], ref lhs);
                             }
-                            else if (next != null && next.HasChildren() && next.SubnodesType() == "(")  //will detect log(x) + y = ... , not thinking "log" is a variable
+                        }
+                        else
+                        {
+
+                            if (node.subnodes[ii].type == ETokenType.Word)
                             {
-                                varname = null;  //function name
+                                varname = node.subnodes[ii].ToStringTrim();
+                                lineText = node.subnodes[ii].LineAndPosText();
+
+                                TokenHelper next = node.subnodes[ii].SiblingAfter();
+                                if (IsLaggedOrLeaded(node.subnodes[ii]))  //will detect x[#i][-1] + y = ... for instance
+                                {
+                                    varname = null;
+                                }
+                                else if (next != null && next.HasChildren() && next.SubnodesType() == "(")  //will detect log(x) + y = ... , not thinking "log" is a variable
+                                {
+                                    varname = null;  //function name
+                                }
+                                else if (node.subnodes[ii].leftblanks == 0 && previous != null && (previous.s == "#" || previous.s == "%"))
+                                {
+                                    //name like #x or %x. This will probably not happen, since from gauss such a var will be a #i,
+                                    //and the #i will be inside [...] or $ (...)
+                                    varname = null;
+                                }
                             }
                         }
                     }
-                    if (lhs == null && G.IsSimpleToken(varname)) lhs = varname;  //only if lhs is not already found, and if the name is a token
+
+                    if (lhs == null && G.IsSimpleToken(varname))
+                    {                        
+                        lhs = varname;  //only if lhs is not already found, and if the name is a token
+                    }
                 }                
             }
 

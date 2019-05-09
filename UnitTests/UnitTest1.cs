@@ -8168,13 +8168,54 @@ namespace UnitTests
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
-            I("MODEL <gms> model3.gmy;");
+            I("MODEL <gms> model2.gmy;");
             I("qC = series(1);");
             I("qC[cCar] = 1;");
             I("DISP qC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
             Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+            // ------------------------------------------------------------            
+            // Stuff after $ is ignored
+            // ------------------------------------------------------------
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model2a.gmy;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model2b.gmy;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
+
+            // ------------------------------------------------------------            
+            // vars starting with % or # are ignored
+            // ------------------------------------------------------------
+            // only test '%', because using '#' in a GAMS file is treated like out-commenting
+            // actually '%' and '#' would not appear in GAMS files, but only in the 
+            // translated equations.
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("MODEL <gms> model2c.gmy;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("DISP qC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 1);
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");            
 
             // ------------------------------------------------------------
             // Here, the two pC eqs need to know that pC is dependent, not qC
@@ -8186,7 +8227,7 @@ namespace UnitTests
             I("pC[cCar] = 1;");
             I("qC = series(1);");
             I("qC[cCar] = 1;");            
-            I("MODEL <gms dep = #(listfile d2)> model2.gmy;");            
+            I("MODEL <gms dep = #(listfile d2)> model3.gmy;");            
             I("DISP pC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
