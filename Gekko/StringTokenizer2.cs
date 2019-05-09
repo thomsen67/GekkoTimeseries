@@ -128,6 +128,7 @@ namespace Gekko
             th.s = this.s;
             th.type = this.type;
             th.leftblanks = this.leftblanks;
+            th.line = this.line;
             th.column = this.column;
             th.parent = parent;
             th.id = this.id;
