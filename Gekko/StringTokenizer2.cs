@@ -176,7 +176,7 @@ namespace Gekko
             {
                 //this.subnodesType = type;
             }
-            OrganizeSubnodes(this);
+            this.OrganizeSubnodes();
         }
 
         /// <summary>
@@ -339,19 +339,19 @@ namespace Gekko
             return i1Start + j;
         }
 
-        private static void OrganizeSubnodes(TokenHelper temp)
+        public  void OrganizeSubnodes()
         {
             //temp is an empty node (.s == null) with subnodes
             int counter = -1;
-            for (int ii = 0; ii < temp.subnodes.Count(); ii++)
+            for (int ii = 0; ii < this.subnodes.Count(); ii++)
             {
-                TokenHelper subnode = temp.subnodes[ii];
+                TokenHelper subnode = this.subnodes[ii];
                 counter++;
                 subnode.id = counter;
-                subnode.parent = temp;
+                subnode.parent = this;
             }
-            temp.line = temp.subnodes[0].line;
-            temp.column = temp.subnodes[0].column;
+            this.line = this.subnodes[0].line;
+            this.column = this.subnodes[0].column;
         }
         
         /// <summary>
@@ -381,7 +381,7 @@ namespace Gekko
             TokenList rv2 = new TokenList();
             for (int i = start; i <= end; i++)
             {
-                rv2.storage.Add(this.parent.subnodes[this.id+i]);
+                rv2.storage.Add(this.parent.subnodes[this.id + i]);
             }
             TokenHelper rv = new TokenHelper(rv2, null);
             return rv;

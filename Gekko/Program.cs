@@ -18753,24 +18753,44 @@ namespace Gekko
                                                             helper.list[1].leftblanks = 0; //no blanks to the left of for instance '-1'
                                                         }
                                                         else
-                                                        {
-                                                            //x(t-1) --> x[-1]
-                                                            //x(i, t-1) --> x[#i][-1]
+                                                        {   
                                                             if (iSplit == 0)
                                                             {
+                                                                //x(t-1) --> x[-1]
                                                                 //helper.comma will be = null
                                                                 helper.list[0].Clear(); //kill the 't'completely including blanks
                                                                 helper.list[1].leftblanks = 0; //no blanks to the left of for instance '-1'
                                                             }
                                                             else
                                                             {
+                                                                //x(i, t-1) --> x[#i][-1]
                                                                 //we need to transform one []-subnode into two consequtive
-                                                                TokenHelper nextNode1 = new TokenHelper(); nextNode1.subnodes = new TokenList();
                                                                 TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();
+                                                                nextNode2.subnodes.storage.Add(new TokenHelper("["));
+                                                                for (int iii = 1; iii < helper.list.storage.Count; iii++)
+                                                                {
+                                                                    nextNode2.subnodes.storage.Add(helper.list[iii]);
+                                                                }
+                                                                nextNode2.subnodes.storage.Add(new TokenHelper("]"));                                                                
 
+                                                                TokenHelper nextNode1 = new TokenHelper(); nextNode1.subnodes = new TokenList();
                                                                 nextNode1.subnodes.storage.Add(new TokenHelper("["));
-
+                                                                for (int iii = 0; iii < split.Count - 1; iii++)
+                                                                {
+                                                                    if (split[iii].comma != null) nextNode1.subnodes.storage.Add(split[iii].comma);
+                                                                    nextNode1.subnodes.storage.AddRange(split[iii].list.storage);
+                                                                }
                                                                 nextNode1.subnodes.storage.Add(new TokenHelper("]"));
+
+                                                                int id = nextNode.id;
+                                                                TokenHelper parent = nextNode.parent;
+
+                                                                parent.subnodes.storage.RemoveAt(id);
+                                                                parent.subnodes.storage.Insert(id, nextNode2);
+                                                                parent.subnodes.storage.Insert(id, nextNode1);
+                                                                parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
+                                                                
+
 
                                                             }                                                            
                                                         }
@@ -18808,9 +18828,14 @@ namespace Gekko
             {
                 //an empty node with children
 
-                foreach (TokenHelper child in node.subnodes.storage)
+                //foreach (TokenHelper child in node.subnodes.storage)
+                //{
+                //    WalkTokens(child);
+                //}
+
+                for (int i = 0; i < node.subnodes.storage.Count; i++)  //the count may increase, because subnodes may be added dynamically (translating x[i, t-1] into x[#i][-1])
                 {
-                    WalkTokens(child);
+                    WalkTokens(node.subnodes.storage[i]);
                 }
             }
         }
