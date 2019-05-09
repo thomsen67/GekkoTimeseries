@@ -724,6 +724,12 @@ namespace Gekko.Parser.Gek
                 if (node.ChildrenCount() == 0) throw new GekkoException();
                 else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.GetList(" + node[0].Code + ");" + G.NL);
             }
+            else if (node.Text != null && node.Text.StartsWith("ASTOPT_VAR_"))
+            {
+                string s2 = node.Text.Substring(11);
+                if (node.ChildrenCount() == 0) throw new GekkoException();
+                else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = " + node[0].Code + ";" + G.NL);
+            }
             else
             {
                 //After sub-nodes                

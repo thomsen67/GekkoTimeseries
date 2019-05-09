@@ -8185,10 +8185,8 @@ namespace UnitTests
             I("pC = series(1);");
             I("pC[cCar] = 1;");
             I("qC = series(1);");
-            I("qC[cCar] = 1;");
-            I("#dependents = #(listfile dependents2);");
-            I("MODEL <gms> model2.gmy;");
-            
+            I("qC[cCar] = 1;");            
+            I("MODEL <gms dep = #(listfile d2)> model2.gmy;");            
             I("DISP pC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
@@ -8198,9 +8196,30 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
             Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
 
+            // ------------------------------------------------------------
+            // This will fail, because d2.lst is not loaded
+            // ------------------------------------------------------------
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("pC = series(1);");
+            I("pC[cCar] = 1;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("MODEL <gms> model2.gmy;");
+            I("DISP pC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 0);  //no eqs found
 
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
 
-
+            FAIL("MODEL < gms dep = 1 > model2.gmy;");
+            FAIL("MODEL < gms dep = ('a', 'b') > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), 'b') > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('a', 'b')) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('a',)) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), (1, 'x')) > model2.gmy;");
+            FAIL("MODEL < gms dep = (('a', 'b'), ('x', 1)) > model2.gmy;");
 
         }
 

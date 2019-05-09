@@ -2494,8 +2494,9 @@ namespace Gekko
             return IsIdent(s);
         }   
 
-        public static bool IsInteger(string s, bool canHaveMinus)
+        public static bool IsInteger(string s, bool canHaveMinus, bool canBeZero)
         {
+            //if canBeZero is false, the integer has to be <> 0 when evaluated
             bool first = true;
             foreach (char c in s)
             {
@@ -2516,12 +2517,17 @@ namespace Gekko
                 }
                 first = false;
             }
+            if (canBeZero == false)
+            {
+                int i = int.Parse(s);
+                if (i == 0) return false;  //will catch "0" and "-0"
+            }
             return true;
         }
 
         public static bool IsInteger(string s)
         {
-            return IsInteger(s, false);
+            return IsInteger(s, false, true);
         }
 
         public static bool IsIntegerTranslate(string s)

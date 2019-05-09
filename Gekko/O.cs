@@ -469,7 +469,7 @@ namespace Gekko
 
                         if (!ss.Contains("."))
                         {
-                            if (G.IsInteger(ss, true))
+                            if (G.IsInteger(ss, true, true))
                             {
                                 //good
                             }
@@ -9894,6 +9894,7 @@ namespace Gekko
             public string fileName = null;
             public string opt_info = null;
             public string opt_gms = null;
+            public IVariable opt_dep = null;
             public P p = null;
             public void Exe()
             {                

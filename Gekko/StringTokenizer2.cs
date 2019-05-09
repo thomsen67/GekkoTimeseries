@@ -386,6 +386,30 @@ namespace Gekko
             return rv;
         }
 
+        public void Flatten(TokenHelper rv)
+        {
+            //Note: the return value is actually the argument, where the tokens are put into!
+
+            if (rv.subnodes == null) rv.subnodes = new TokenList();
+            
+            //All subnodes of node are flattend
+            if (this.HasNoChildren())
+            {
+                //not a sub-node
+                rv.subnodes.storage.Add(this);
+            }
+            else
+            {
+                //an empty node with children
+                foreach (TokenHelper child in this.subnodes.storage)
+                {
+                    child.Flatten(rv);
+                }
+            }
+            
+        }
+
+
         /// <summary>
         /// Trimmed version of ToString()
         /// </summary>

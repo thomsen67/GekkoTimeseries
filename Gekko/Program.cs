@@ -18459,7 +18459,7 @@ namespace Gekko
 
             if (isGms)
             {
-                ReadGamsModel(textInputRaw, fileName);
+                ReadGamsModel(textInputRaw, fileName, o);
             }
             else
             {
@@ -18823,11 +18823,11 @@ namespace Gekko
         }
 
 
-        private static void ReadGamsModel(string textInputRaw, string fileName)
+        private static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
             if (!G.Equal(Path.GetExtension(fileName), ".csv"))
             {
-                ReadGamsModelNormal(textInputRaw, fileName);
+                ReadGamsModelNormal(textInputRaw, fileName, o);
             }
             else
             {
@@ -18925,7 +18925,7 @@ namespace Gekko
             G.Writeln("Found " + xx.Count + " distinct equations (use DISP to display them)");
         }
 
-        private static void ReadGamsModelNormal(string textInputRaw, string fileName)
+        private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -18944,7 +18944,7 @@ namespace Gekko
             Dictionary<string, List<ModelGamsEquation>> equations = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
             GekkoDictionary<string, string> dependents = null;
-            IVariable lhsList = O.GetIVariableFromString("#dependents", O.ECreatePossibilities.NoneReturnNull);
+            IVariable lhsList = o.opt_dep;
             if (lhsList != null)
             {
                 //A variable #dependents exists
@@ -18966,38 +18966,45 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     List x_list = x as List;
+
+                    List<string> ss = null;
+
                     try
                     {
-                        List<string> ss = Program.GetListOfStringsFromList(x_list);
-                        if (ss.Count < 2)
-                        {
-                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
-                            throw new GekkoException();
-                        }
-                        string lhs = ss[0];
-                        for (int i = 1; i < ss.Count; i++)
-                        {
-                            //The ss list has this form for each line:
-                            //qG; E_qG; E_qG_tot    --> first the lhs name, then the equations where it is a lhs variable
-                            //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
-                            //the ss list.
-
-                            string temp = null; dependents.TryGetValue(ss[i], out temp);
-                            if (temp != null)
-                            {
-                                G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
-                                throw new GekkoException();
-                            }
-                            dependents.Add(ss[i], lhs);
-                        }
+                        ss = Program.GetListOfStringsFromList(x_list);
                     }
                     catch
                     {
                         G.Writeln2("*** ERROR: #dependents sublist line " + c + ": all elements should be strings");
                         throw;
                     }
+
+                    if (ss.Count < 2)
+                    {
+                        G.Writeln2("*** ERROR: #dependents sublist line " + c + ": must have > 1 elements");
+                        throw new GekkoException();
+                    }
+                    string lhs = ss[0];
+                    for (int i = 1; i < ss.Count; i++)
+                    {
+                        //The ss list has this form for each line:
+                        //qG; E_qG; E_qG_tot    --> first the lhs name, then the equations where it is a lhs variable
+                        //Since each equation can only have 1 lhs, the eqnames (E_qG etc.) can at most appear 1 time in
+                        //the ss list.
+
+                        string temp = null; dependents.TryGetValue(ss[i], out temp);
+                        if (temp != null)
+                        {
+                            G.Writeln2("*** ERROR: #dependents sublist line " + c + ": The equation '" + ss[i] + "' already assigns '" + temp + "' as lhs");
+                            throw new GekkoException();
+                        }
+                        dependents.Add(ss[i], lhs);
+                    }
+
+
+
                 }
-                
+
             }
 
             int counter = 0;
@@ -19289,14 +19296,59 @@ namespace Gekko
                 equation.conditionals = dollar;
             }
 
-            ReadGamsModelGetLhsName(equations, lhsTokensGams, equation, eqnameGams, dependents);
+            ReadGamsModelGetLhsName(equations, lhsTokensGekko, equation, eqnameGams, dependents);
 
 
             return eqCounter;
         }
 
-        private static void ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents)
+        public static void GetLhsVariable(TokenHelper ths, ref string lhs)
         {
+            //All subnodes of node are flattend
+
+            if (lhs != null) return;  //found the lhs
+
+            if (ths.HasNoChildren())
+            {
+                //not a sub-node, do nothing             
+            }
+            else
+            {
+                //an empty node with children
+                string lineText = null;
+                for (int ii = 0; ii < ths.subnodes.Count(); ii++)
+                {
+                    string varname = null;
+                    if (ths.subnodes[ii].type == ETokenType.Word)
+                    {
+                        varname = ths.subnodes[ii].ToStringTrim();
+                        lineText = ths.subnodes[ii].LineAndPosText();
+
+                        TokenHelper next = ths.subnodes[ii].SiblingAfter();
+                        if (IsLaggedOrLeaded(ths.subnodes[ii]))  //will detect x[#i][-1] + y = ... for instance
+                        {
+                            varname = null;
+                        }
+                        else if (next != null && next.s == "(")  //will detect log(x) + y = ... , not thinking "log" is a variable
+                        {
+                            varname = null;  //function name
+                        }
+                    }
+                    if (G.IsSimpleToken(varname)) lhs = varname;
+                }
+
+                foreach (TokenHelper child in ths.subnodes.storage)
+                {
+                    GetLhsVariable(child, ref lhs);
+                }
+            }
+
+        }
+
+        private static void ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents)
+        {
+
+            string lhs = null; GetLhsVariable(lhsTokensGams2, ref lhs);
 
             string d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);
 
@@ -19306,45 +19358,12 @@ namespace Gekko
                 //not found in #dependents                
 
                 //#098732423489734
-                string lineText = null;
-                for (int ii = 0; ii < lhsTokensGams.subnodes.Count(); ii++)
-                {
-                    string varname = null;
-                    if (lhsTokensGams.subnodes[ii].type == ETokenType.Word)
-                    {
-                        varname = lhsTokensGams.subnodes[ii].ToStringTrim();  //will also work for p(t)*x(t) =e= ... type of eqsa
-                        lineText = lhsTokensGams.subnodes[ii].LineAndPosText();
 
-                        if (IsLaggedOrLeaded(lhsTokensGams.subnodes[ii]))
-                        {
-                            varname = null;
-                        }
-                        else
-                        {
-
-                            if (G.Equal(varname, "sum"))
-                            {
-                                varname = null; //ignore it
-                            }
-                            else if (G.Equal(varname, "log") || G.Equal(varname, "exp"))
-                            {
-                                varname = lhsTokensGams.subnodes[ii].subnodes[0].ToStringTrim();  //what if newline here....? Never mind
-                                lineText = lhsTokensGams.subnodes[ii].subnodes[0].LineAndPosText();
-                                if (IsLaggedOrLeaded(lhsTokensGams.subnodes[ii].subnodes[0]))
-                                {
-                                    varname = null;
-                                }
-                            }
-                        }
-                    }
-                    if (G.IsSimpleToken(varname) && varnameFound == null) varnameFound = varname;
-
-                }
 
                 if (varnameFound == null)
                 {
-                    G.Writeln2("+++ WARNING: Reading model: could not identify variable from this (" + lineText + "):");
-                    G.Writeln("             " + lhsTokensGams.ToString(), Color.Orange);
+                    G.Writeln2("+++ WARNING: Reading model: could not identify variable from this (line " + lhsTokensGams2.line + "):");
+                    G.Writeln("             " + lhsTokensGams2.ToString(), Color.Orange);
                 }
             }
             else
@@ -19372,20 +19391,33 @@ namespace Gekko
             TokenHelper next = x.SiblingAfter();
             if (next != null && next.SubnodesType() == "[")
             {
-                List<TokenHelperComma> split = next.SplitCommas(true);
-                if (split.Count > 0)
+                TokenHelper next2 = next.SiblingAfter();
+                if (next2 != null && next2.SubnodesType() == "[")
                 {
-                    string last = split[split.Count - 1].list.ToString().Trim();
-                    if (last == "t-5") lagLead = true;
-                    if (last == "t-4") lagLead = true;
-                    if (last == "t-3") lagLead = true;
-                    if (last == "t-2") lagLead = true;
-                    if (last == "t-1") lagLead = true;
-                    if (last == "t+1") lagLead = true;
-                    if (last == "t+2") lagLead = true;
-                    if (last == "t+3") lagLead = true;
-                    if (last == "t+4") lagLead = true;
-                    if (last == "t+5") lagLead = true;
+                    //Something like x[a, #i, b][-1]
+                    bool lagLead2 = IsLagOrLeadBracket(next2);
+                    if (lagLead2) lagLead = true;
+                }
+                else
+                {
+                    //Something like x[-1]
+                    bool lagLead2 = IsLagOrLeadBracket(next);
+                    if (lagLead2) lagLead = true;
+                }
+            }
+            return lagLead;
+        }
+
+        private static bool IsLagOrLeadBracket(TokenHelper next2)
+        {
+            bool lagLead = false;
+            List<TokenHelperComma> split = next2.SplitCommas(true);
+            if (split.Count == 1)
+            {
+                string ss = split[0].list.ToString();
+                if (G.IsInteger(ss, true, false))
+                {
+                    lagLead = true;
                 }
             }
             return lagLead;

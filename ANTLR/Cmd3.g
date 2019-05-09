@@ -103,6 +103,8 @@ tokens {
 	ASTOPT_STRING_DATECELL;
 	ASTOPT_STRING_METHOD;
 
+	ASTOPT_VAR_DEP;
+
 	ASTDOUBLE;
 	ASTDOLLARCONDITIONALVARIABLE;
 	ASTINDEXERELEMENTIDENT;
@@ -1058,6 +1060,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	DEP = 'DEP';
 	BROWSER      = 'BROWSER'     ;
     FIRST            = 'FIRST';
     FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
@@ -1667,6 +1670,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("dep"               , DEP  );
                                         d.Add("browser"         , BROWSER);
                                         d.Add("first"    , FIRST  );
                                         d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
@@ -2979,6 +2983,7 @@ model:                      MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL"
 modelOpt1:                  ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
 modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
+						  |	DEP EQUAL expression -> ^(ASTOPT_VAR_DEP expression)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4266,6 +4271,7 @@ ident2: 					Ident |
   FLAT|
   NAMECELL|
   DATECELL|
+  DEP|
   FOLDER|
   FONTSIZE|
   FONT|
@@ -4699,6 +4705,7 @@ ident3: 					Ident |
   FIX|
   FLAT|
   DATECELL|
+  DEP|
   NAMECELL|
   FOLDER|
   FONTSIZE|
