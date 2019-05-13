@@ -16729,55 +16729,14 @@ namespace Gekko
                     }
 
                     G.Writeln();
-                    
-                    G.Write(lhs + " = ");
-                    int length = (lhs + " = ").Length;
 
-                    GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
-                    TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
+                    PrintEquation(lhs); G.Write(" = ");
+                    //G.Write(lhs + " = ");
+                    //int length = (lhs + " = ").Length;
 
-                    for (int i = 0; i < tokens.storage.Count; i++)
-                    {
-                        TokenHelper token = tokens[i];
-                        if (token.leftblanks > 0) G.Write(G.Blanks(token.leftblanks));
-                        if (token.type == ETokenType.Word && knownVars.ContainsKey(token.s))
-                        {
-                            G.WriteLink(token.s, "disp:" + token.s);
-                        }
-                        else
-                        {
-                            //if (token.s == "\\")  //tokens[i]
-                            //{
-                            //    if (i < tokens.storage.Count - 2 && G.Equal(tokens[i + 1].s, "n"))
-                            //    {
-                            //        if (i > 1 && tokens[i - 2].s == "\\" && G.Equal(tokens[i - 1].s, "n"))
-                            //        {
-                            //            //do nothing                                                        
-                            //            tokens[i + 2].leftblanks = 0;
-                            //        }
-                            //        else
-                            //        {
-                            //            G.Writeln();
-                            //            tokens[i + 2].leftblanks = length;
-                            //        }
-                            //        i++;
-                            //        continue;
-                            //    }
-                            //}
-                            if (token.type == ETokenType.EOL)
-                            {
-                                G.Writeln();
-                                TokenHelper next = tokens[i + 1];
-                                if (next != null && next.type == ETokenType.EOL) i++;  //skip it
-                                tokens[i + 1].leftblanks = 4;
-                                continue;
-                            }
-                            G.Write(token.s);
-                        }
-                    }
-                    G.Writeln(";");
+                    PrintEquation(rhs); G.Writeln(";");
                     if (conditionals != null && conditionals.Trim() != "") G.Writeln("Conditionals: " + conditionals);
-                }                
+                }
             }
 
             finally
@@ -16787,6 +16746,34 @@ namespace Gekko
                 Program.options.print_filewidth = fileWidthRemember;
             }
             
+        }
+
+        private static void PrintEquation(string rhs)
+        {
+            GekkoDictionary<string, string> knownVars = GetKnownVars(rhs, true);
+            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);  //slack, tokenizing two times
+            for (int i = 0; i < tokens.storage.Count; i++)
+            {
+                TokenHelper token = tokens[i];
+                if (token.leftblanks > 0) G.Write(G.Blanks(token.leftblanks));
+                if (token.type == ETokenType.Word && knownVars.ContainsKey(token.s))
+                {
+                    G.WriteLink(token.s, "disp:" + token.s);
+                }
+                else
+                {
+                    if (token.type == ETokenType.EOL)
+                    {
+                        G.Writeln();
+                        TokenHelper next = tokens[i + 1];
+                        if (next != null && next.type == ETokenType.EOL) i++;  //skip it
+                        tokens[i + 1].leftblanks = 4;
+                        continue;
+                    }
+                    G.Write(token.s);
+                }
+            }
+            //G.Writeln(";");
         }
 
         private static GekkoDictionary<string, string> GetKnownVars(string input)
@@ -18985,6 +18972,7 @@ namespace Gekko
         private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
         {
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine();
 
             int eqCounter = 0;
 
@@ -19083,7 +19071,7 @@ namespace Gekko
                     }
                     else
                     {
-                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equations, tok, dependents, problems);
+                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equations, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
                     }
                 }
             }
@@ -19099,17 +19087,18 @@ namespace Gekko
                 foreach (string s in problems) G.Writeln("+++ " + s);
             }
 
-            if (Globals.runningOnTTComputer)
+            if (G.Equal(o.opt_dump, "yes"))
             {
-                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\model.gcm", Program.GekkoFileReadOrWrite.Write))
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gcm", Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
                     sw.Write(sb);
                 }
             }
+
         }
 
-        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems)
+        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
         {
 
 
@@ -19342,6 +19331,7 @@ namespace Gekko
                         dollar2 = dollar.Trim();
                     }
 
+                    sb.AppendLine("Equation: " + eqnameGams);
                     if (dollar2 != null)
                     {
                         sb.Append("(" + lhs + ") $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
@@ -19369,8 +19359,14 @@ namespace Gekko
                 equation.conditionals = dollar;
             }
 
-            string lhsVariable = ReadGamsModelGetLhsName(equations, lhsTokensGekko, equation, eqnameGams, dependents, problems);
-            sb.AppendLine("LHS_DEPENDENT_VAR  =  " + lhsVariable);
+            bool fromList = false;
+            string lhsVariable = ReadGamsModelGetLhsName(equations, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
+            string s = null;
+            if (fromList) s = ", designated from list";
+            if (lhsVariable == null) lhsVariable = "[not identified]";
+            sb.AppendLine("--> " + lhsVariable + " (dependent" + s + ")");
+            sb.AppendLine();
+            sb.AppendLine("----------------------------------------------------------------------------------------------------------------");
             sb.AppendLine();
 
             return eqCounter;
@@ -19447,7 +19443,7 @@ namespace Gekko
 
         }
 
-        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems)
+        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
         {
 
             string lhs = null; GetLhsVariable(lhsTokensGams2, ref lhs);
@@ -19459,6 +19455,7 @@ namespace Gekko
             {                
                 //found in #dependents
                 varnameFound = d;
+                fromList = true;
             }
 
             if (varnameFound == null && lhs != null) varnameFound = lhs;
@@ -19486,6 +19483,7 @@ namespace Gekko
         private static bool IsLaggedOrLeaded(TokenHelper x)
         {
             bool lagLead = false;
+            if (Program.options.model_gams_dep_current) return false;  //even if it is x[-1] or x[+1], a false will be returned.
             TokenHelper next = x.SiblingAfter();
             if (next != null && next.SubnodesType() == "[")
             {

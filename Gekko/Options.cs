@@ -114,9 +114,11 @@ Additionally, there are model, solve, equation options.
         public int interface_zoom = 100;
         public string menu_startfile = "menu.html";
         public bool model_cache = true;  //if using cache on file or not        
-        public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM        
-        public string model_infofile = "yes";  //yes/no/temp
+        public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
 
+        public bool model_gams_dep_current = true;
+        
+        public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //normal | gams
 
         public string plot_decimalseparator = "period";  //comma|period

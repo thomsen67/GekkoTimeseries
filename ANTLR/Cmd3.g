@@ -9,6 +9,7 @@
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
+
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 	naked
@@ -854,6 +855,7 @@ ASTOPT_STRING_Y2;
             AT2 = 'AT';
             BETWEEN = 'BETWEEN';
             NONANNUAL = 'NONANNUAL';
+			CURRENT = 'CURRENT';
             DIGITS = 'DIGITS';
 			GAMS = 'GAMS';
 			GDX = 'GDX';
@@ -1455,6 +1457,7 @@ d.Add("ALIAS", ALIAS);
             d.Add("AT", AT2);
             d.Add("BETWEEN", BETWEEN);
             d.Add("NONANNUAL", NONANNUAL);
+			d.Add("CURRENT", CURRENT);
             d.Add("DIGITS", DIGITS);            
 d.Add("X" ,X);
 d.Add("Y" ,Y);
@@ -2984,6 +2987,7 @@ modelOpt1:                  ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> mode
 modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 						  |	GMS (EQUAL yesNo)? -> ^(ASTOPT_STRING_GMS yesNo?)
 						  |	DEP EQUAL expression -> ^(ASTOPT_VAR_DEP expression)
+						  |	DUMP (EQUAL yesNo)? -> ^(ASTOPT_STRING_DUMP yesNo?)
 						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -3698,8 +3702,10 @@ optionType:
 			 | MODEL question -> MODEL question
              | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
+			 | MODEL GAMS DEP CURRENT '='? yesNoSimple -> MODEL GAMS DEP CURRENT ^(ASTBOOL yesNoSimple)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
 			 | MODEL TYPE '='? name -> MODEL TYPE ^(ASTSTRINGSIMPLE name)
+			 
 
 			 | PLOT question -> PLOT question	
 			 | PLOT ELEMENTS MAX '='? Integer -> PLOT ELEMENTS MAX ^(ASTINTEGER Integer)		 
@@ -4378,6 +4384,7 @@ ident2: 					Ident |
   NOLEV|
   NOMAX|
   NONANNUAL|
+  CURRENT|
   NONE|
   NONMODEL|
   NOPCH|
@@ -4809,6 +4816,7 @@ ident3: 					Ident |
   NOLEV|
   NOMAX|
   NONANNUAL|
+  CURRENT|
   NONE|
   NONMODEL|
   NOPCH|
