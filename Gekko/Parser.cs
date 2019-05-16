@@ -1473,12 +1473,16 @@ namespace Gekko
                     codeNewton.AppendLine("{");
                     foreach (int endoNumber in Program.model.m2.simulRecursive)
                     {
+                        StringBuilder sb = new StringBuilder();
                         EquationHelper eh = Program.model.equations[endoNumber];
-                        codeNewton.Append(eh.csCodeLhsGauss);
-                        codeNewton.Append(" = ");
-                        codeNewton.AppendLine(eh.csCodeRhs);
-                        codeNewton.AppendLine(";");
-                        codeNewton.AppendLine();
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" = ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(";");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
+
                     }
                     codeNewton.AppendLine("}");
 
@@ -1487,15 +1491,18 @@ namespace Gekko
 
                     for (int i = 0; i < Program.model.m2.simulFeedback.Count; i++)
                     {
+                        StringBuilder sb = new StringBuilder();
                         int endoNumber = (int)Program.model.m2.simulFeedback[i];
                         EquationHelper eh = Program.model.equations[endoNumber];
-                        codeNewton.Append("r[" + i + "] = ");
-                        codeNewton.Append(eh.csCodeLhsGauss);
-                        codeNewton.Append(" -( ");
-                        codeNewton.AppendLine(eh.csCodeRhs);
-                        codeNewton.AppendLine(")");
-                        codeNewton.AppendLine(";");
-                        codeNewton.AppendLine();
+                        sb.Append("r[" + i + "] = ");
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" -( ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(")");
+                        sb.AppendLine(";");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
                     }
                     codeNewton.AppendLine("}");
 
@@ -1507,16 +1514,19 @@ namespace Gekko
 
                     for (int i = 0; i < Program.model.m2.simulFeedback.Count; i++)
                     {
+                        StringBuilder sb = new StringBuilder();
                         int endoNumber = (int)Program.model.m2.simulFeedback[i];
                         EquationHelper eh = Program.model.equations[endoNumber];
-                        codeNewton.AppendLine("case " + i + ":");
-                        codeNewton.Append("r[" + i + "] = ");
-                        codeNewton.Append(eh.csCodeLhsGauss);
-                        codeNewton.Append(" -( ");
-                        codeNewton.AppendLine(eh.csCodeRhs);
-                        codeNewton.AppendLine(" ); ");
-                        codeNewton.Append("break;");
-                        codeNewton.AppendLine();
+                        sb.AppendLine("case " + i + ":");
+                        sb.Append("r[" + i + "] = ");
+                        sb.Append(eh.csCodeLhsGauss);
+                        sb.Append(" -( ");
+                        sb.AppendLine(eh.csCodeRhs);
+                        sb.AppendLine(" ); ");
+                        sb.Append("break;");
+                        sb.AppendLine();
+                        if (Program.options.solve_newton_robust) NewtonStartingValuesFixHelper2(sb);
+                        codeNewton.Append(sb);
                     }
                     codeNewton.AppendLine("}");  //case
                     codeNewton.AppendLine("}");  //method
@@ -1721,6 +1731,12 @@ namespace Gekko
                     G.Writeln("Compiling lasted " + duration);
                 }
             }
+        }
+
+        private static void NewtonStartingValuesFixHelper2(StringBuilder sb)
+        {
+            sb = sb.Replace("O.Log(", "O.Special_Log(");
+            sb = sb.Replace("O.Pow(", "O.Special_Pow(");
         }
 
         public static void ReferencedAssembliesGekko(CompilerParameters compilerParams)
@@ -1950,7 +1966,7 @@ namespace Gekko
                                 throw new GekkoException();
                             }
                             recognized = true;
-                            wh2.rightHandSideCsCode.Append("Math.Log(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append("O.Log(", EEmitType.computerReadable);
                             wh2.rightHandSideCsCode.Append("Log(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
@@ -1962,7 +1978,7 @@ namespace Gekko
                                 throw new GekkoException();
                             }
                             recognized = true;
-                            wh2.rightHandSideCsCode.Append("Math.Exp(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append("O.Exp(", EEmitType.computerReadable);
                             wh2.rightHandSideCsCode.Append("Exp(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
@@ -1974,7 +1990,7 @@ namespace Gekko
                                 throw new GekkoException();
                             }
                             recognized = true;
-                            wh2.rightHandSideCsCode.Append("Math.Abs(", EEmitType.computerReadable);
+                            wh2.rightHandSideCsCode.Append("O.Abs(", EEmitType.computerReadable);
                             wh2.rightHandSideCsCode.Append("Abs(", EEmitType.humanReadable);
                             numberOfRightParentheses++;
                         }
@@ -3087,7 +3103,7 @@ namespace Gekko
 
         private static void HandlePowFunction(EquationHelper eh, ASTNode equationNode, int depth, WalkerHelper2 wh2, Model model, int subTreeLag, bool isModel, bool function)
         {
-            wh2.rightHandSideCsCode.Append("Math.Pow(", EEmitType.computerReadable);
+            wh2.rightHandSideCsCode.Append("O.Pow(", EEmitType.computerReadable);
             wh2.rightHandSideCsCode.Append("Pow(", EEmitType.humanReadable);
             int start = 0;
             int end = 1;

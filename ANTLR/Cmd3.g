@@ -1121,6 +1121,7 @@ Y2                    = 'Y2'                       ;
     INTERFACE        = 'INTERFACE'       ;
     INTERNAL = 'INTERNAL';
     INVERT           = 'INVERT';
+	ROBUST           = 'ROBUST';
     ITER             = 'ITER'         ;
     ITERMAX          = 'ITERMAX'         ;
     ITERMIN          = 'ITERMIN'         ;
@@ -1737,6 +1738,7 @@ d.Add("Y" ,Y);
                                         d.Add("interface"               , INTERFACE );
                                         d.Add("INTERNAL", INTERNAL);
                                         d.Add("INVERT"    , INVERT      );
+										d.Add("ROBUST"    , ROBUST      );
                                         d.Add("iter"    , ITER   );
                                         d.Add("itermax" , ITERMAX   );
                                         d.Add("itermin" , ITERMIN   );
@@ -3826,6 +3828,7 @@ optionType:
 			 | SOLVE NEWTON BACKTRACK '='? yesNoSimple -> SOLVE NEWTON BACKTRACK ^(ASTBOOL yesNoSimple)
 			 | SOLVE NEWTON CONV ABS '='? numberIntegerOrDouble -> SOLVE NEWTON CONV ABS numberIntegerOrDouble
              | SOLVE NEWTON INVERT '='? optionSolveNewtonInvert -> SOLVE NEWTON INVERT ^(ASTSTRINGSIMPLE optionSolveNewtonInvert)
+			 | SOLVE NEWTON ROBUST '='? yesNoSimple -> SOLVE NEWTON ROBUST ^(ASTBOOL yesNoSimple)	
              | SOLVE NEWTON ITERMAX '='? Integer -> SOLVE NEWTON ITERMAX ^(ASTINTEGER Integer)
              | SOLVE NEWTON UPDATEFREQ '='? Integer -> SOLVE NEWTON UPDATEFREQ ^(ASTINTEGER Integer)
              | SOLVE PRINT '='? yesNoSimple -> SOLVE PRINT ^(ASTBOOL yesNoSimple)  //obsolete
@@ -4326,6 +4329,7 @@ ident2: 					Ident |
   INTERFACE|
   INTERNAL|
   INVERT|
+  ROBUST|
   ITALIC|
   ITERMAX|
   ITERMIN|
@@ -4759,6 +4763,7 @@ ident3: 					Ident |
   INTERFACE|
   INTERNAL|
   INVERT|
+  ROBUST|
   ITALIC|
   ITERMAX|
   ITERMIN|

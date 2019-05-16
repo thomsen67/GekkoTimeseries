@@ -215,6 +215,7 @@ Additionally, there are model, solve, equation options.
         public double solve_forward_fair_conv2_trel = 0.001d;
         public double solve_forward_fair_damp = 0.0; //redefined in 2.0
         public int solve_forward_fair_itermax = 200;
+        public bool solve_newton_robust = false;
         public int solve_forward_fair_itermin = 0;
         public string solve_forward_method = "fair";  //or "stacked" or "nfair" or "none"        
         public string solve_forward_nfair_conv = "conv1";

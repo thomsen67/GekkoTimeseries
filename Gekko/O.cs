@@ -112,6 +112,66 @@ namespace Gekko
             Lag
         }
 
+        public static double Exp(double x)
+        {
+            return Math.Exp(x);
+        }
+
+        public static double Abs(double x)
+        {
+            return Math.Abs(x);
+        }
+
+        public static double Log(double x)
+        {
+            return Math.Log(x);
+        }
+
+        public static double Special_Log(double x)
+        {
+            if (x < 0)
+            {
+                double d = NewtonStartingValuesFixHelper1(x);
+                return O.Log(d);
+            }
+            else return O.Log(x);
+        }
+
+        public static double Pow(double x1, double x2)
+        {
+            //special treatment of x^2
+            return x2 == 2d ? x1 * x1 : Math.Pow(x1, x2);
+        }
+
+        public static double Special_Pow(double x1, double x2)
+        {
+            if (x1 < 0)
+            {
+                double d = NewtonStartingValuesFixHelper1(x1);
+                return O.Pow(d, x2);
+            }
+            else return O.Pow(x1, x2);
+        }
+
+        private static double NewtonStartingValuesFixHelper1(double x)
+        {
+            //x is < 0 here
+            if (Globals.newtonRobustHelper1 == -12345) return x;
+            double distance = -x + Globals.newtonRobustHelper3;  //distance will be > 0
+            if (Globals.newtonRobustHelper1 < Globals.newtonRobustHelper2.Length)
+            {
+                Globals.newtonRobustHelper2[Globals.newtonRobustHelper1] = distance;
+                Globals.newtonRobustHelper1++;
+            }
+            else
+            {
+                //ignore recording of this distance
+            }
+            double d = Globals.newtonRobustHelper3;
+            return d;
+        }
+
+
         public static bool isTableCall = false;
 
         public static string ShowDatesAsString(GekkoTime t1, GekkoTime t2)

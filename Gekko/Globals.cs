@@ -46,6 +46,24 @@ namespace Gekko
 
         public static bool decompSubstitute = false;
 
+        // ----------------------------------------------------------------
+        // GRADIENT
+        // ----------------------------------------------------------------
+        public static bool gradientSolve = true;
+        // ----------------------------------------------------------------
+
+        // ----------------------------------------------------------------
+        // ROBUST 
+        // ----------------------------------------------------------------
+        //public static bool newtonStartingValuesFix = true;
+        public static int newtonRobustHelper1 = -12345;
+        public static double[] newtonRobustHelper2 = new double[1000];
+        public const double newtonRobustHelper3 = 0.000001d;
+        //public const double special_value2 = 1e6d;
+        //public static int disableStartingValuesFix = 0;
+        // ----------------------------------------------------------------
+
+
         //Using GekkoArg instead of IVariable as function parameters
         //with both false and true: below code is about 12.6 sec in debug mode --> 166.000 per second
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
@@ -465,8 +483,7 @@ namespace Gekko
         public static string decompText2a = "[Right hand side]";
         
         public static int solveJacobiSparse = 0;
-        public static int disableStartingValuesFix = 1;
-
+        
         public static int solveNewtonSimpleBacktrack = 1;
         public static bool solveNewtonOnlyFeedback = false;  //should always be false
 
