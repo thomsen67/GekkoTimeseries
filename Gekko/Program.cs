@@ -5139,7 +5139,8 @@ namespace Gekko
                     string varName = string.Empty;
                     int varType = 0;
                     int d;
-                    if (gamsDir == null) gamsDir = "";
+                    if (gamsDir == null) gamsDir = "";                    
+
                     Gdxcs gdx = new Gdxcs(gamsDir, ref msg);  //it seems ok if gamsSysDir = "", then it will autolocate it (but there may be a 64-bit problem...)
                     if (msg != string.Empty)
                     {
@@ -16943,68 +16944,42 @@ namespace Gekko
             return iv;
         }
 
+        public static void FMethod(double[] arg, ref double func, object obj)
+        {
+            double a = 1; double b = 100;
+            double x = arg[0]; double y = arg[1];
+            func = (a - x) * (a - x) + b * (y - x * x) * (y - x * x);
+        }
+
         public static void Tell(string text, bool nocr)
         {
             //IVariable iv = O.GetIVariableFromString("a!a[b]", O.ECreatePossibilities.Must);
             if (nocr) G.Write(text);
             else G.Writeln(text);
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
-                // FUNCTION f( name %x); PRT @{%x}; END; f(y);
-                // FUNCTION f( string %x); PRT @{%x}; END; f('y');
+                //double[] x = new double[] { 1.5, 2.5 };
+                double[] x = new double[] { -1, -1 };
+                double[] xnew = new double[] { double.NaN, double.NaN };
 
-                Func<GekkoSmpl, IVariable> Evalcode832 = (smpl5) =>
-               {
-                   //return O.Add(x1, x2);
-                   //x2 = O.Add(x3, x4);
-                   //return O.Add(x1, O.Add(x3, x4));
-                   return null;
-               };
+                double epsg = 0.000001;
+                double epsf = 0;
+                double epsx = 0;
+                double stpmax = 0.1;
+                int maxits = 0;
 
-                if (false)
-                {
-                    //used to test Func<> in function arguments, #980745824309
+                alglib.mincgstate state = new alglib.mincgstate();
+                alglib.mincgreport rep = new alglib.mincgreport();
 
-                    GekkoSmpl smpl = new GekkoSmpl(Globals.globalPeriodStart, Globals.globalPeriodEnd);
-
-                    DateTime dt = DateTime.Now;
-                    int n = 300000;
-                    for (int i = 0; i < n; i++)
-                    {
-                        IVariable ivTmpvar1 = ff1(smpl, O.Add(smpl, O.Lookup(smpl, null, null, "%x", null, null, new LookupSettings(), EVariableType.Var, null), Globals.scalarVal1));
-                        O.Lookup(smpl, null, null, "%x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, new O.Assignment());
-                    }
-                    G.Writeln((double)n / (DateTime.Now - dt).TotalMilliseconds * 1000d);  //110.000
-
-                    dt = DateTime.Now;
-                    for (int i = 0; i < n; i++)
-                    {
-                        IVariable ivTmpvar1 = ff3(smpl, new GekkoArg((smpl2) => O.Add(smpl2, O.Lookup(smpl2, null, null, "%x", null, null, new LookupSettings(), EVariableType.Var, null), Globals.scalarVal1), null));
-                        O.Lookup(smpl, null, null, "%x", null, ivTmpvar1, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, new O.Assignment());
-                    }
-                    G.Writeln((double)n / (DateTime.Now - dt).TotalMilliseconds * 1000d);  //110.000
-
-                }
-
-                //
-                // Here we demonstrate polynomial interpolation and differentiation
-                // of y=x^2-x sampled at [0,1,2]. Barycentric representation of polynomial is used.
-                //
-
-                double[] x = new double[] { 0, 1, 2 };
-                double[] y = new double[] { 0, 0, 2 };
-                double t = -1;
-                double v;                
-                alglib.barycentricinterpolant p;
-
-                // barycentric model is created
-                alglib.polynomialbuild(x, y, out p);
-
-                // barycentric interpolation is demonstrated
-                v = alglib.barycentriccalc(p, t);
-                G.Writeln2("v = " + v); // EXPECTED: 2.0
-            }     
+                alglib.mincgcreatef(2, x, 1e-8d, out state);  //if the "f" is removed
+                alglib.mincgsetcond(state, epsg, epsf, epsx, maxits);
+                alglib.mincgsetstpmax(state, stpmax);
+                alglib.mincgsetcgtype(state, 0);  //Dai + Yuan
+                alglib.mincgoptimize(state, FMethod, null, null);                               
+                alglib.mincgresults(state, out xnew, out rep);
+                G.Writeln2(xnew[0] + " "+xnew[1] + ", " + rep.iterationscount + ", " + rep.terminationtype);
+            }                  
         }
                
 
