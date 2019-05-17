@@ -11421,7 +11421,7 @@ public partial class alglib
              Copyright 20.04.2009 by Bochkanov Sergey
         *************************************************************************/
         public static bool mincgiteration(mincgstate state)
-        {
+        {            
             bool result = new bool();
             int n = 0;
             int i = 0;
@@ -11966,7 +11966,7 @@ public partial class alglib
             //
             if( state.mcinfo==1 && !state.innerresetneeded )
             {
-                
+                Console.WriteLine("Wolfe step " + state.repiterationscount + ", " + state.f); //qwerty
                 //
                 // Standard Wolfe conditions hold
                 // Calculate Y[K] and D[K]'*Y[K]
@@ -12004,6 +12004,7 @@ public partial class alglib
                 {
                     betak = Math.Max(0, Math.Min(state.betady, state.betahs));
                 }
+                Console.WriteLine("betak = " + betak);
             }
             else
             {
@@ -12039,9 +12040,10 @@ public partial class alglib
                 state.dn[i_] = -state.g[i_];
             }
             preconditionedmultiply(state, ref state.dn, ref state.work0, ref state.work1);
+            
             for(i_=0; i_<=n-1;i_++)
             {
-                state.dn[i_] = state.dn[i_] + betak*state.dk[i_];
+                state.dn[i_] = state.dn[i_] + betak * state.dk[i_];
             }
             state.lastscaledstep = 0.0;
             for(i=0; i<=n-1; i++)

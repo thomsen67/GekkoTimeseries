@@ -46,10 +46,14 @@ namespace Gekko
 
         public static bool decompSubstitute = false;
 
+        public static StreamWriter sw = null; 
+        
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------
         public static bool gradientSolve = true;
+        public static double[] gradientX0 = null;
+        public static double[] gradientX = null;
         // ----------------------------------------------------------------
 
         // ----------------------------------------------------------------
@@ -60,7 +64,7 @@ namespace Gekko
         public static double[] newtonRobustHelper2 = new double[1000];
         public const double newtonRobustHelper3 = 0.000001d;
         //public const double special_value2 = 1e6d;
-        //public static int disableStartingValuesFix = 0;
+        //public static int disableStartingValuesFix = 0;        
         // ----------------------------------------------------------------
 
 
