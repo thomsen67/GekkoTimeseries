@@ -90,6 +90,25 @@ namespace Gekko
         Special
     }
 
+    public class CGSolverOutput
+    {
+        public int iterations = -12345;
+        public double f = double.NaN;
+        public double[] x = null;
+        public int evals = 0;
+    }
+
+    public class CGSolverInput
+    {
+        public double deltaGradient = 1e-8;
+        public double deltaGolden = 1e-8;
+        public double krit = Program.options.solve_newton_conv_abs* Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
+        public bool limitBeta = true;  //does not have any effect on the unit tests (until now)
+        public int restartInterval = -12345; //if -12345 --> will use n, setting to 1 --> basic steepest gradient, setting to n is normal conjugate gradient
+        // -------------
+        public int evals = 0;  //!!!!!!! do not change
+    }
+
     public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1 = null;
@@ -22511,7 +22530,7 @@ namespace Gekko
 
             if (Globals.gradientSolve && Globals.runningOnTTComputer)
             {
-                Program.SolveGradientAlgorithm(Program.model.b, Program.model.m2.assemblyNewton, nah);
+                //Program.SolveGradientAlgorithm(Program.model.b, Program.model.m2.assemblyNewton, nah);
             }
             else
             {
@@ -35025,10 +35044,8 @@ namespace Gekko
             }  //ii
         }
 
-        public static void SolveGradientAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
-        {
-
-            
+        public static void SolveGradientAlgorithmUsingAlglib(double[] b, Type assembly, NewtonAlgorithmHelper nah)
+        {            
 
             double[] bTemp = new double[Program.model.b.Length];
             Array.Copy(Program.model.b, bTemp, Program.model.b.Length);
@@ -35058,7 +35075,7 @@ namespace Gekko
                 double epsg = 0.000001;
                 double epsf = 0;
                 double epsx = 0;
-                double stpmax = 0.1;
+                double stpmax = 0.0;  //0.0 is unlimited, 0.1 will make snail steps
                 int maxits = 0;
                 alglib.mincgstate state = new alglib.mincgstate();
                 alglib.mincgreport rep = new alglib.mincgreport();
@@ -35077,32 +35094,10 @@ namespace Gekko
                     func = RssNonScaled(residuals);
                     //G.Writeln2(arg[0] + " " + arg[1] + " RSS ---> " + func);
                 }
+                
                 alglib.mincgoptimize(state, FunctionToOptimize, null, null);
                 alglib.mincgresults(state, out Globals.gradientX, out rep);                
-            }
-
-            if (false)
-            {
-                //Rosenbrock example
-                double[] x = new double[] { -1, -1 };
-                double[] xnew = new double[] { double.NaN, double.NaN };
-                double epsg = 0.000001;
-                double epsf = 0;
-                double epsx = 0;
-                double stpmax = 0.1;
-                int maxits = 0;
-                alglib.mincgstate state = new alglib.mincgstate();
-                alglib.mincgreport rep = new alglib.mincgreport();
-                alglib.mincgcreatef(2, x, 1e-8d, out state);  //if the "f" is removed
-                alglib.mincgsetcond(state, epsg, epsf, epsx, maxits);
-                alglib.mincgsetstpmax(state, stpmax);
-                alglib.mincgsetcgtype(state, 0);  //Dai + Yuan
-                alglib.mincgoptimize(state, Function, null, null);
-                alglib.mincgresults(state, out xnew, out rep);
-                G.Writeln2(xnew[0] + " " + xnew[1] + ", " + rep.iterationscount + ", " + rep.terminationtype);
-            }
-
-
+            }            
 
             //converged
             Program.model.simulateResults[0] = iterations;
@@ -35111,15 +35106,242 @@ namespace Gekko
 
         }
 
-        //public static void FunctionToOptimize5(double[] arg, ref double func, object obj)
-        //{
-        //    IElementalAccessVector x0 = new DenseVector(arg.Length);
-        //    for (int i = 0; i < arg.Length; i++)
-        //    {
-        //        x0.SetValue(i, Program.model.b[model.m2.fromEqNumberToBNumber[i]]);
-        //    }            IElementalAccessVector residuals = new DenseVector(n);
-        //    RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)  
-        //}
+        public static CGSolverOutput SolveGradientAlgorithm(double[] x_input, Func<double[], CGSolverInput, double> func, CGSolverInput input)
+        {
+            //https://en.wikipedia.org/wiki/Nonlinear_conjugate_gradient_method
+
+            if (input.restartInterval == 0) throw new GekkoException();
+
+            int n = x_input.Length;
+
+            CGSolverOutput output = new CGSolverOutput();
+
+            double[] x = (double[])x_input.Clone();
+            double[] dx_old = null;
+            double[] s_old = null;            
+
+            int iterations = 0;
+            
+            double[] gradient = new double[n];
+            double[] dx = new double[n];
+            double beta = double.NaN;
+            double[] s = new double[n];
+
+
+            int jj = -1;  //iterations since resetting
+            for (int j = 0; j < int.MaxValue; j++)
+            {
+                jj++;                
+
+                if (j == 0)
+                {
+                    SolveGradientAlgorithHelper(gradient, func, x, input);
+                    for (int i = 0; i < n; i++)
+                    {
+                        dx[i] = -gradient[i];
+                    }
+                    double alpha = Golden(x, dx, func, input);
+                    for (int i = 0; i < n; i++)
+                    {
+                        x[i] += alpha * dx[i];
+                    }
+                    dx_old = (double[])dx.Clone();
+                    s_old = (double[])dx.Clone();
+                }
+                else
+                {
+                    SolveGradientAlgorithHelper(gradient, func, x, input);                    
+                    for (int i = 0; i < n; i++)
+                    {
+                        dx[i] = -gradient[i];
+                    }
+
+                    double fraction1 = 0d;
+                    double fraction2 = 0d;
+                    for (int i = 0; i < n; i++)
+                    {
+                        fraction1 += dx[i] * dx[i];
+                        fraction2 += s_old[i] * (dx[i] - dx_old[i]);
+                    }
+                    beta = -fraction1 / fraction2;
+
+                    if (input.limitBeta)
+                    {
+                        if (beta < 0d) beta = 0d;  //actually restarting
+                        else if (beta >= 1d) beta = 0.9999d;
+                    }
+
+                    int interval = n;
+                    if (input.restartInterval != -12345) interval = input.restartInterval;
+                    
+                    if (jj >= interval)
+                    {
+                        beta = 0d; //reset, because of rounding problems
+                        jj = 0;
+                    }                    
+                                        
+                    for (int i = 0; i < n; i++)
+                    {
+                        s[i] = dx[i] + beta * s_old[i];
+                    }                                                          
+
+                    if (false)
+                    {
+                        StreamWriter sw = new StreamWriter(@"c:\Thomas\Desktop\gekko\testing\golden.csv");
+                        double[] xx = new double[x.Length];
+                        for (double a = 0d; a <= 2000d; a += 0.01d)
+                        {
+                            goldenHelper1(xx, s, x, a);
+                            double f = func(xx, input);
+                            sw.WriteLine(a + "; " + f);
+                        }
+                        sw.Flush(); sw.Close();
+                    }
+
+                    double alpha = Golden(x, s, func, input);
+                    for (int i = 0; i < n; i++)
+                    {
+                        x[i] += alpha * s[i];
+                    }
+
+                    dx_old = (double[])dx.Clone();
+                    s_old = (double[])s.Clone();
+                }
+
+                double f2 = func(x, input);
+                if (f2 < input.krit)
+                {
+                    output.iterations = j + 1;
+                    output.f = f2;
+                    output.x = x;
+                    output.evals = input.evals; input.evals = 0;
+                    break;
+                }
+
+            }
+
+            //converged
+            //Program.model.simulateResults[0] = iterations;
+            //Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
+                       
+
+            return output;
+
+        }
+
+        public static double Golden(double[] x777, double[] direction, Func<double[], CGSolverInput, double> func, CGSolverInput input)
+        {
+            //https://en.wikipedia.org/wiki/Golden-section_search, see Python example
+
+            double[] x = (double[])x777.Clone();
+            double[] xOriginal = (double[])x777.Clone();
+
+            double invphi = (Math.Sqrt(5d) - 1d) / 2d; // 1/phi                                                                                                                     
+            double invphi2 = (3d - Math.Sqrt(5d)) / 2d;
+
+            double a = 0d;                      
+            
+            goldenHelper1(x, direction, xOriginal, a);
+            double fStart = func(x, input);
+
+            double b = 2000d;
+
+            if (true)
+            {
+                b = .00001d; //b = 1 means following direction directly
+                while (true)
+                {                    
+                    goldenHelper1(x, direction, xOriginal, b);
+                    double fEnd = func(x, input);
+                    if (fEnd > fStart)
+                    {
+                        break;
+                    }
+                    else
+                    {
+
+                    }
+                    b = 3 * b;
+                }
+            }
+
+            double h = b - a;
+
+            int n = (int)(Math.Ceiling(Math.Log(input.deltaGolden / h) / Math.Log(invphi)));
+
+            double c = a + invphi2 * h;
+            double d = a + invphi * h;
+
+            goldenHelper1(x, direction, xOriginal, c);
+            double yc = func(x, input);
+            goldenHelper1(x, direction, xOriginal, d);
+            double yd = func(x, input);
+
+            for (int k = 0; k < n; k++)
+            {
+
+                if (yc < yd)
+                {
+                    b = d;
+                    d = c;
+                    yd = yc;
+                    h = invphi * h;
+                    c = a + invphi2 * h;
+                    goldenHelper1(x, direction, xOriginal, c);
+                    yc = func(x, input);
+                }
+                else
+                {
+                    a = c;
+                    c = d;
+                    yc = yd;
+                    h = invphi * h;
+                    d = a + invphi * h;
+                    goldenHelper1(x, direction, xOriginal, d);
+                    yd = func(x, input);
+                }
+            }
+
+            if (yc < yd)
+            {
+                //a, d
+                return (a + d) / 2d;
+            }
+            else
+            {
+                //c, b
+                return (c + b) / 2d;
+            }
+
+            
+        }
+
+        private static void goldenHelper1(double[] x, double[] d, double[] xOriginal, double alpha)
+        {
+            for (int j = 0; j < x.Length; j++)
+            {
+                x[j] = xOriginal[j] + alpha * d[j];
+            }
+        }
+
+        private static void SolveGradientAlgorithHelper(double[] gradient, Func<double[], CGSolverInput, double> func, double[] x0, CGSolverInput input)
+        {
+            int n = x0.Length;
+            double y0 = func(x0, input);
+            double sum = 0d;
+            for (int i = 0; i < n; i++)
+            {
+                x0[i] += input.deltaGradient;
+                double y1 = func(x0, input);
+                gradient[i] = (y1 - y0) / input.deltaGradient;
+                //sum += gradient[i] * gradient[i];
+                x0[i] -= input.deltaGradient;
+            }
+            //for (int i = 0; i < n; i++)
+            //{
+            //    gradient[i] = gradient[i] / Math.Sqrt(sum);
+            //}
+        }
 
         public static void Function(double[] arg, ref double func, object obj)
         {

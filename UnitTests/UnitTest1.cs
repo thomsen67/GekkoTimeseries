@@ -8264,6 +8264,157 @@ namespace UnitTests
 
         }
 
+        
+        [TestMethod]
+        public void _Test_SolverConjugateGradientQuadraticFunction()
+        {            
+            double Function(double[] x_function, CGSolverInput input_function)
+            {
+                //will converge in n = 3 iterations
+
+                double a11 = .5d;
+                double a12 = -.1d;
+                double a13 = -.2d;
+                double a21 = -.3d;
+                double a22 = 1d;
+                double a23 = -.4d;
+                double a31 = -.5d;
+                double a32 = -.6d;
+                double a33 = 2d;
+                double x1 = x_function[0]; double x2 = x_function[1]; double x3 = x_function[2];
+                double func = (a11 * x1 + a12 * x2 + a13 * x3) * (a11 * x1 + a12 * x2 + a13 * x3) + (a21 * x1 + a22 * x2 + a23 * x3) * (a21 * x1 + a22 * x2 + a23 * x3) + (a31 * x1 + a32 * x2 + a33 * x3) * (a31 * x1 + a32 * x2 + a33 * x3);
+                input_function.evals++;
+                return func;
+            }
+                        
+            double[] xstart = new double[] { 2d, 1d, -3d };  //2 1 -3
+            CGSolverInput input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            Assert.AreEqual(3, output.iterations);
+            Assert.AreEqual(184, output.evals);
+            Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-10);
+
+            xstart = new double[] { -2d, 10d, 7d };  //2 1 -3
+            input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            Assert.AreEqual(3, output.iterations);
+            Assert.AreEqual(184, output.evals);
+            Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-9);
+
+            xstart = new double[] { -2d, 10d, 7d };  //2 1 -3
+            input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            input.restartInterval = 1;
+            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            Assert.AreEqual(266, output.iterations);
+            Assert.AreEqual(15162, output.evals);
+            Assert.IsTrue(output.x[0] * output.x[0] + output.x[1] * output.x[1] + output.x[2] * output.x[2] < 1e-6);
+
+
+        }
+
+        [TestMethod]
+        public void _Test_SolverConjugateGradientRosenbrock()
+        {
+            double Function(double[] x_function, CGSolverInput input_function)
+            {
+                //Rosenbrock function
+                double a = 1; double b = 100;
+                double x = x_function[0]; double y = x_function[1];
+                double func = (a - x) * (a - x) + b * (y - x * x) * (y - x * x);
+                input_function.evals++;
+                return func;
+            }
+
+            double[] xstart = new double[] { -1d, -1d };  //-1 -1
+            xstart = new double[] { 10d, 10d };
+            CGSolverInput input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            input.restartInterval = -12345;
+            //input.limitBeta = true; has no effect
+            CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            Assert.AreEqual(37, output.iterations);
+            Assert.AreEqual(1794, output.evals);
+            Assert.IsTrue((output.x[0] - 1d) * (output.x[0] - 1d) + (output.x[1] - 1d) * (output.x[1] - 1d) < 1e-7);
+
+        }
+
+        [TestMethod]
+        public void _Test_SolverConjugateGradientAlglib()
+        {
+            //Rosenbrock example
+
+            void Function(double[] arg, ref double func, object obj)
+            {
+                //Rosenbrock function
+                double a = 1; double b = 100;
+                double x = arg[0]; double y = arg[1];
+                func = (a - x) * (a - x) + b * (y - x * x) * (y - x * x);
+            }
+
+            // default, starting at (-1, -1), limit on step, #57
+                        
+            double[] xstart = new double[] { -1, -1 };  //-1, -1
+            double[] xnew = new double[] { double.NaN, double.NaN };
+            double epsg = 0.000001;
+            double epsf = 0;
+            double epsx = 0;
+            double stpmax = 0.0; //0.1
+            int maxits = 0;  //0
+            alglib.mincgstate state = null;
+            alglib.mincgreport rep = null;
+            
+            // -------------------- no limit on step, starting at (-1, -1) #24
+
+            xstart = new double[] { -1, -1 };  //-1, -1            
+            state = new alglib.mincgstate();
+            rep = new alglib.mincgreport();
+            alglib.mincgcreatef(2, xstart, 1e-8d, out state);  //if the "f" is removed
+            alglib.mincgsetcond(state, epsg, epsf, epsx, maxits);
+            alglib.mincgsetstpmax(state, stpmax);
+            alglib.mincgsetcgtype(state, 0);  //Dai + Yuan, the other one is 54 its                        
+            alglib.mincgoptimize(state, Function, null, null);
+            alglib.mincgresults(state, out xnew, out rep);
+            Assert.AreEqual(24, rep.iterationscount);
+            Assert.AreEqual(62, rep.nfev);
+            Assert.AreEqual(4, rep.terminationtype);
+            Assert.AreEqual(1.0000000001725846, xnew[0], 0.0000000000000001);
+            Assert.AreEqual(1.0000000003451626, xnew[1], 0.0000000000000001);
+
+            // -------------------- no limit on step, starting at (1000, 1000) #24
+
+            xstart = new double[] { 1000, 1000 };            
+            state = new alglib.mincgstate();
+            rep = new alglib.mincgreport();
+            //maxits = 20;
+            alglib.mincgcreatef(2, xstart, 1e-8d, out state);  //if the "f" is removed
+            alglib.mincgsetcond(state, epsg, epsf, epsx, maxits);
+            alglib.mincgsetstpmax(state, stpmax);
+            alglib.mincgsetcgtype(state, 0);  //Dai + Yuan, the other one is 54 its                        
+            alglib.mincgoptimize(state, Function, null, null);
+            alglib.mincgresults(state, out xnew, out rep);
+            Assert.AreEqual(262, rep.iterationscount);
+            Assert.AreEqual(862, rep.nfev);
+            Assert.AreEqual(4, rep.terminationtype);
+            Assert.AreEqual(0.99999994265358982, xnew[0], 0.0000000000000001);
+            Assert.AreEqual(0.99999988507761006, xnew[1], 0.0000000000000001);
+
+            // -----------------------
+
+        }
+
+
+
         [TestMethod]
         public void _Test_FunctionLocalTime_AndSomeBlock()
         {

@@ -11419,6 +11419,8 @@ public partial class alglib
             linminstate state,
             ref int stage)
         {
+            
+            
             double v = 0;
             double p5 = 0;
             double p66 = 0;
@@ -11726,6 +11728,8 @@ public partial class alglib
                 }
             }
         }
+
+        
 
 
         /*************************************************************************

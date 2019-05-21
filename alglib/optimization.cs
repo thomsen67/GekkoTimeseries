@@ -64,6 +64,7 @@ public partial class alglib
         public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
         public double[] g { get { return _innerobj.g; } }
         public double[] x { get { return _innerobj.x; } }
+        //public ndimensional_func func = null;  //TT qwerty 
 
         public mincgstate()
         {
@@ -548,7 +549,9 @@ public partial class alglib
     *************************************************************************/
     public static void mincgoptimize(mincgstate state, ndimensional_func func, ndimensional_rep rep, object obj)
     {
-        if( func==null )
+        //state.func = func;
+        
+        if ( func==null )
             throw new alglibexception("ALGLIB: error in 'mincgoptimize()' (func is null)");
         while( alglib.mincgiteration(state) )
         {
@@ -10830,6 +10833,7 @@ public partial class alglib
             public double betady;
             public double[] work0;
             public double[] work1;
+            
             public mincgstate()
             {
                 init();
@@ -10838,7 +10842,7 @@ public partial class alglib
             {
                 diagh = new double[0];
                 diaghl2 = new double[0];
-                vcorr = new double[0,0];
+                vcorr = new double[0, 0];
                 s = new double[0];
                 xk = new double[0];
                 dk = new double[0];
@@ -10853,6 +10857,7 @@ public partial class alglib
                 work0 = new double[0];
                 work1 = new double[0];
             }
+
             public override alglib.apobject make_copy()
             {
                 mincgstate _result = new mincgstate();
@@ -11685,9 +11690,9 @@ public partial class alglib
             state.algpowerup = false;
         lbl_30:
             optserv.trimprepare(state.f, ref state.trimthreshold);
-            for(i_=0; i_<=n-1;i_++)
+            for (i_ = 0; i_ <= n - 1; i_++)
             {
-                state.dk[i_] = -state.g[i_];
+                state.dk[i_] = -state.g[i_];  //TT: search direction dk is set to minus gradient
             }
             preconditionedmultiply(state, ref state.dk, ref state.work0, ref state.work1);
             if( !state.xrep )
@@ -11796,7 +11801,7 @@ public partial class alglib
             }
             state.mcstage = 0;
             state.stp = 1.0;
-            linmin.linminnormalized(ref state.d, ref state.stp, n);
+            linmin.linminnormalized(ref state.d, ref state.stp, n);  //TT: state.d (direction) now has length 1 (scaled)
             if( (double)(state.lastgoodstep)!=(double)(0) )
             {
                 state.stp = state.lastgoodstep;
@@ -11828,11 +11833,14 @@ public partial class alglib
                 result = false;
                 return result;
             }
-            
+
             //
             // Minimization along D
             //
+
+            
             linmin.mcsrch(n, ref state.x, ref state.f, ref state.g, state.d, ref state.stp, state.curstpmax, gtol, ref state.mcinfo, ref state.nfev, ref state.work0, state.lstate, ref state.mcstage);
+            
         lbl_38:
             if( state.mcstage==0 )
             {
@@ -11899,11 +11907,13 @@ public partial class alglib
             state.needf = false;
         lbl_41:
             optserv.trimfunction(ref state.f, ref state.g, n, state.trimthreshold);
-            
+
             //
             // Call MCSRCH again
             //
+            
             linmin.mcsrch(n, ref state.x, ref state.f, ref state.g, state.d, ref state.stp, state.curstpmax, gtol, ref state.mcinfo, ref state.nfev, ref state.work0, state.lstate, ref state.mcstage);
+            
             goto lbl_38;
         lbl_39:
             
@@ -11996,7 +12006,7 @@ public partial class alglib
                 //
                 // Choose BetaK
                 //
-                if( state.cgtype==0 )
+                if ( state.cgtype==0 )
                 {
                     betak = state.betady;
                 }
