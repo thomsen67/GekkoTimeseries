@@ -112,7 +112,7 @@ namespace UnitTests
         }
     }
 
-    
+
 
     /// <summary>
     /// Summary description for UnitTest1
@@ -168,7 +168,7 @@ namespace UnitTests
             Program.databanks.storage.Add(new Databank(Globals.Ref));
 
             Program.CreateTempFilesFolder();
-            
+
             string s = Globals.localTempFilesLocation;
             if (!(s.Contains("AppData") && s.Contains("tempfiles")))
             {
@@ -236,7 +236,7 @@ namespace UnitTests
         public void MyTestInitialize()
         {
             Globals.threadIsInProcessOfAborting = false;
-            Globals.applicationIsInProcessOfAborting = false; 
+            Globals.applicationIsInProcessOfAborting = false;
         }
 
         //
@@ -262,10 +262,10 @@ namespace UnitTests
                     double d2 = ss[i];
                     if (!G.Compare(d1, d2)) Assert.IsFalse(true);
                 }
-                else 
+                else
                 {
                     Assert.IsFalse(true);
-                }                
+                }
             }
         }
 
@@ -292,8 +292,8 @@ namespace UnitTests
                     if (ss[i].ss == null) Assert.IsFalse(true);
                     AssertListStringHelper(item as List, ss[i].ss);
                 }
-                else Assert.IsFalse(true);                
-            }            
+                else Assert.IsFalse(true);
+            }
         }
 
         [TestMethod]
@@ -335,26 +335,26 @@ namespace UnitTests
             I("#m1 = a, b, c;");
             I("#m2 = b, c, d;");
             I("#m = #m1.extend(#m2);");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "b", "c", "d"));
             _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
             _AssertListString(First(), "#m2", new StringOrList("b", "c", "d"));  //no sideeffects
             FAIL("#m = #m1.extend('f');");  //this is not allowed and #m1 + 'f' would append 'f' to list elements
             //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
             I("#m = extend(#m1, #m2);");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "b", "c", "d"));
             //I("#m = extend(#m1, 'f');");  //not allowed
             //_AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "f" ));
             I("#m = #m1 + #m2;");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d" ));
-            I("#m = #m1.suffix('f');");            
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "b", "c", "d"));
+            I("#m = #m1.suffix('f');");
             _AssertListString(First(), "#m", new StringOrList("af", "bf", "cf"));
             I("#m = #m1.extend(#m2).extend(#m2);");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "b", "c", "d", "b", "c", "d"));
             I("#m = #m1 + #m2 + #m2;");
-            _AssertListString(First(), "#m", new StringOrList( "a", "b", "c", "b", "c", "d", "b", "c", "d" ));
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "c", "b", "c", "d", "b", "c", "d"));
             I("#m = #m1.extend(3, #m2);");
             _AssertListString(First(), "#m", new StringOrList("a", "b", "b", "c", "d", "c"));
-            
+
             //-------------------------------------------------------------------------
             //-----------  append(), includes inserting
             //-------------------------------------------------------------------------
@@ -404,7 +404,7 @@ namespace UnitTests
             //-----------  count()
             //-------------------------------------------------------------------------
             I("reset;");
-            I("#m1 = a, b, c, b;");            
+            I("#m1 = a, b, c, b;");
             I("%v = #m1.count('b');");
             _AssertScalarVal(First(), "%v", 2d);
             I("%v = #m1.count('e');");
@@ -414,7 +414,7 @@ namespace UnitTests
             //-----------  remove()
             //-------------------------------------------------------------------------
             I("reset;");
-            I("#m1 = a, b, c;");            
+            I("#m1 = a, b, c;");
             I("#m = #m1.remove('b');");
             _AssertListString(First(), "#m", new StringOrList("a", "c"));
             _AssertListString(First(), "#m1", new StringOrList("a", "b", "c"));  //no sideeffects
@@ -430,7 +430,7 @@ namespace UnitTests
             I("#m = #m1.pop();");
             _AssertListString(First(), "#m", new StringOrList("a", "b"));
             I("#m = #m1.pop(3);");
-            _AssertListString(First(), "#m", new StringOrList("a", "b"));            
+            _AssertListString(First(), "#m", new StringOrList("a", "b"));
             FAIL("#m = #m1.pop(4);");
             FAIL("#m = #m1.pop(0);");
 
@@ -505,7 +505,7 @@ namespace UnitTests
             //-------------------------------------------------------------------------
             //-----------  sort()
             //-------------------------------------------------------------------------
-            
+
             I("reset;");
             I("#m1 = e, AB, c, B;");
             I("#m = #m1.sort();");
@@ -636,7 +636,7 @@ namespace UnitTests
             _AssertListSize(First(), "#dif", 2);
             _AssertListString(First(), "#dif", 1, "xx[b, y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
-            
+
             I("compare < dump sort = rel >;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
@@ -648,7 +648,7 @@ namespace UnitTests
             _AssertListSize(First(), "#dif", 2);
             _AssertListString(First(), "#dif", 1, "yy[i]");
             _AssertListString(First(), "#dif", 2, "xx[b, y]");
-            
+
             I("compare < dump abs = 1.01 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
@@ -657,12 +657,12 @@ namespace UnitTests
 
             I("compare < dump abs = 2.01 >;");  //xx[b, y] is filtered out
             I("p <n m q> {#dif};");
-            _AssertListSize(First(), "#dif", 1);            
+            _AssertListSize(First(), "#dif", 1);
             _AssertListString(First(), "#dif", 1, "yy[i]");
 
             I("compare < dump abs = 4.01 >;");  //all are filtered out
             I("p <n m q> {#dif};");
-            _AssertListSize(First(), "#dif", 0);            
+            _AssertListSize(First(), "#dif", 0);
 
             I("compare < dump rel = 0.0039 >;");  //no effect
             I("p <n m q> {#dif};");
@@ -693,7 +693,7 @@ namespace UnitTests
 
             I("compare < dump rel = 0.0051 >;");  //all are filtered out
             I("p <n m q> {#dif};");
-            _AssertListSize(First(), "#dif", 0);            
+            _AssertListSize(First(), "#dif", 0);
 
             I("compare < dump abs = 2.01 rel = 0.0041 >;"); //all are filtered out, abs catches xx[b, y] and rel catches yy[i]
             I("p #dif;");
@@ -730,7 +730,7 @@ namespace UnitTests
             _AssertListSize(First(), "#dif", 2);
             _AssertListString(First(), "#dif", 1, "xx[b, y]");
             _AssertListString(First(), "#dif", 2, "yy[i]");
-            
+
             I("compare <2001 2001 dump abs = 0.199 >;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 2);
@@ -783,7 +783,7 @@ namespace UnitTests
             // -------- restricted on xx -------------
             // ---------------------------------------
             // ---------------------------------------
-            
+
             I("compare<2001 2001>xx;");  //should work without params            
             I("%s = readfile('compare_databanks.txt');");
             ss = (First().GetIVariable("%s") as ScalarString).ConvertToString();
@@ -794,23 +794,23 @@ namespace UnitTests
             I("p #dif;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
 
             I("compare <2001 2001 dump sort = rel >xx;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
 
             I("compare <2001 2001 dump sort = abs >xx;");
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
 
             I("compare <2001 2001 dump abs = 0.199 >xx;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
             _AssertListString(First(), "#dif", 1, "xx[b, y]");
-            
+
             I("compare <2001 2001 dump abs = 0.201 >xx;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
@@ -823,13 +823,13 @@ namespace UnitTests
             I("compare <2001 2001 dump rel = 0.0001 >xx;");  //no effect
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
-            _AssertListString(First(), "#dif", 1, "xx[b, y]");            
+            _AssertListString(First(), "#dif", 1, "xx[b, y]");
 
             I("compare <2001 2001 dump rel = 0.0003 >xx;");  //yy[i] is filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 1);
             _AssertListString(First(), "#dif", 1, "xx[b, y]");
-            
+
             I("compare <2001 2001 dump rel = 0.0011 >xx;");  //all are filtered out
             I("p <n m q> {#dif};");
             _AssertListSize(First(), "#dif", 0);
@@ -934,8 +934,8 @@ namespace UnitTests
 
             I("reset;");
             I("option freq q;");
-            I("time 2001q1 2001q2;");            
-            I("yyi!q = (1000, 1000);");            
+            I("time 2001q1 2001q2;");
+            I("yyi!q = (1000, 1000);");
             I("xxax!q = (100, 100);");
             I("xxbx!q = (200, 200);");
             I("xxay!q = (300, 300);");
@@ -981,7 +981,7 @@ namespace UnitTests
             FAIL("OPEN a:b1!q;");
             FAIL("OPEN b1!q;");
             //------
-            I("OPEN b1; OPEN b2;");            
+            I("OPEN b1; OPEN b2;");
             I("CLOSE b1; CLOSE b2;");
             //------
             I("OPEN b1, b2;");
@@ -990,7 +990,7 @@ namespace UnitTests
             I("OPEN b1, b2 as c1, c2;");
             I("CLOSE c1, c2;");
             //------
-            FAIL("OPEN b1, b2 as c1, c2, c3;");            
+            FAIL("OPEN b1, b2 as c1, c2, c3;");
             //------
             I("OPEN " + Globals.ttPath2 + @"\regres\Databanks\temp\b1, " + Globals.ttPath2 + @"\regres\Databanks\temp\b2 as c1, c2;");
             I("CLOSE c1, c2;");
@@ -1016,7 +1016,7 @@ namespace UnitTests
             I("CLOSE {#m2};");
             //------
             I("#m1 = ('b1',);");
-            I("#m1a = (#m1, 'b2');");            
+            I("#m1a = (#m1, 'b2');");
             I("OPEN {#m1a};");
             I("CLOSE {#m1a};");
             //------
@@ -1131,8 +1131,8 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_ArraySeries1()
-        {                      
-            
+        {
+
             // ------------------------------------
 
             I("RESET; TIME 2001 2003;");
@@ -1219,14 +1219,14 @@ namespace UnitTests
 
 
         }
-        
+
 
         [TestMethod]
         public void _Test_SeriesLags()
         {
 
             I("reset; time 2000 2007;");
-            I("x1 = 1;");            
+            I("x1 = 1;");
             I("y1 = x1[-2];");
             I("z1 = (x1+x1)[-2];");
             I("w1 = pch(x1+x1)[-2];");
@@ -1239,7 +1239,7 @@ namespace UnitTests
             I("<2002 2005>k2 = dif(pch(x2+x2))[-2];");
 
             _AssertSeries(First(), "x1", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "x1", 2000, 2007, 1d, sharedDelta);            
+            _AssertSeries(First(), "x1", 2000, 2007, 1d, sharedDelta);
             _AssertSeries(First(), "x1", 2008, double.NaN, sharedDelta);
 
             _AssertSeries(First(), "y1", 2001, double.NaN, sharedDelta);
@@ -1307,7 +1307,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2003, 100d, sharedDelta);
             _AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
         }
-        
+
 
         [TestMethod]
         public void _Test_Timeless()
@@ -1325,7 +1325,7 @@ namespace UnitTests
             I("x5 = timeless(500);");  //note: LHS if found as a normal series, so no creation
 
             HelperTimeless();  //asserts
-            
+
             I("WRITE <gdx> temp;");
             I("RESET;");
             I("READ <gdx> temp;");
@@ -1354,7 +1354,7 @@ namespace UnitTests
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2001, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2002, 300d, sharedDelta);
             _AssertSeries(First(), "x3!a", new string[] { "a" }, 2003, 300d, sharedDelta);
-            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);            
+            _AssertSeries(First(), "x3!a", new string[] { "a" }, 2004, 300d, sharedDelta);
             IVariable temp3 = null; (First().GetIVariable("x3!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "a" }), out temp3);
             Assert.IsTrue((temp3 as Series).type == ESeriesType.Timeless);
 
@@ -1362,7 +1362,7 @@ namespace UnitTests
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2001, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2002, 400d, sharedDelta);
             _AssertSeries(First(), "x4!a", new string[] { "b" }, 2003, 400d, sharedDelta);
-            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);            
+            _AssertSeries(First(), "x4!a", new string[] { "b" }, 2004, double.NaN, sharedDelta);
             IVariable temp4 = null; (First().GetIVariable("x4!a") as Series).dimensionsStorage.TryGetValue(new MapMultidimItem(new string[] { "b" }), out temp4);
             Assert.IsTrue((temp4 as Series).type == ESeriesType.Normal);
 
@@ -1521,7 +1521,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2001, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
-            
+
             //series condition ---
 
             I("xx = 1; xx $ (b == 102) = 2;");
@@ -1542,14 +1542,14 @@ namespace UnitTests
             I("xx = 1; xx $ (b3) = 2;");
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
-            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);  
+            _AssertSeries(First(), "xx", 2001, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
-            
+
             //in map ---
 
             I("map #m = (xx = 1); #m.xx $ (b == 102) = 2;");
-            Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;            
+            Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(m, "xx", 2000, 2d, sharedDelta);
             _AssertSeries(m, "xx", 2001, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
@@ -1563,7 +1563,7 @@ namespace UnitTests
             _AssertSeries(m, "xx", 2001, 2d, sharedDelta);
             _AssertSeries(m, "xx", 2002, 0d, sharedDelta);  //maybe ought to be skipped --> = 1
             _AssertSeries(m, "xx", 2003, double.NaN, sharedDelta);
-            
+
             //if ------------------------------------------------------------
 
             I("if (1 == 1) xx = 0; xx = 2; else xx = 0; xx = 1; end;");
@@ -1587,7 +1587,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2002, 1d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
 
-            I("b2 = (102, 102, 102);"); 
+            I("b2 = (102, 102, 102);");
             I("if (b2 == 102); xx = 0; xx = 2; else xx = 0; xx = 1; end;");  //will be true
             _AssertSeries(First(), "xx", 1999, double.NaN, sharedDelta);
             _AssertSeries(First(), "xx", 2000, 2d, sharedDelta);
@@ -1609,7 +1609,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx", 2001, 100d, sharedDelta);
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
             _AssertSeries(First(), "xx", 2003, double.NaN, sharedDelta);
-            
+
             I("xx1 = (1, 2, 3);");
             I("xx2 = (101, 102, 103);");
             I("xx = xx2 $ (xx1 == 2);");
@@ -1677,7 +1677,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a2]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 1.1d, sharedDelta);
-            Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);            
+            Assert.AreEqual(table.Get(2, 3).number, 2.2d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 3.3d, sharedDelta);
             I("p<m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
@@ -1689,7 +1689,7 @@ namespace UnitTests
             Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
 
-            I("OPTION series array print missing = zero;");                        
+            I("OPTION series array print missing = zero;");
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1715,7 +1715,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 3).number, 0d - 2.2d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
 
-            I("OPTION series array print missing = skip;");                       
+            I("OPTION series array print missing = skip;");
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1744,7 +1744,7 @@ namespace UnitTests
             // <missing = ...>
 
             I("OPTION series array print missing = error;");
-                                  
+
             I("p<n missing = m> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1771,7 +1771,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 3).number, double.NaN);
             Assert.IsTrue(table.Get(2, 3).numberShouldShowAsN);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
-                        
+
             I("p<n missing = zero> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1796,7 +1796,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 0d - 2.2d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
-                        
+
             I("p<n missing = skip> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1835,7 +1835,7 @@ namespace UnitTests
             I("OPTION series array print missing = error;");
             FAIL("p<m> x[#i];");
 
-            I("OPTION series array print missing = m;");                                 
+            I("OPTION series array print missing = m;");
             I("p<n> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "x[a1]");
@@ -1992,7 +1992,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "x[a3]");
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 13d - 3.3d, sharedDelta);
-            
+
 
         }
 
@@ -2014,7 +2014,7 @@ namespace UnitTests
             Table table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.GetColMaxNumber(), 2 + 1);
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "abc");
-            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "acd");            
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "acd");
             I("PRT <n> {'*b*'};");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.GetColMaxNumber(), 1 + 1);
@@ -2041,7 +2041,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "Ref:abc");
             Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "Ref:abc!q");
             Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "Ref:acd");
-            
+
             if (Globals.UNITTESTFOLLOWUP)
             {
                 I("PRT <n> {'%a*'};");  //should unfold
@@ -2125,7 +2125,7 @@ namespace UnitTests
             // ======== with dyn option ===========
             // ========================================
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2136,7 +2136,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2147,7 +2147,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2160,7 +2160,7 @@ namespace UnitTests
 
             // with ^= instead of =
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2171,7 +2171,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 403d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2182,7 +2182,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 272d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2197,7 +2197,7 @@ namespace UnitTests
             // ======== with <dyn> ================
             // ========================================
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2208,7 +2208,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2219,7 +2219,7 @@ namespace UnitTests
             _AssertSeries(First(), "x!a", 2003, 81d, sharedDelta);
             _AssertSeries(First(), "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("x = (100, 90, 80);");
             I("time 2002 2003;");
@@ -2234,7 +2234,7 @@ namespace UnitTests
             // ======== testing val just in case... ===
             // ========================================
 
-            I("reset;");            
+            I("reset;");
             I("block series dyn = yes; %v = 100; %v = %v + 1; end;");  //if something wrong with option series dyn, this will run too many times
             _AssertScalarVal(First(), "%v", 101d);
 
@@ -2242,7 +2242,7 @@ namespace UnitTests
             // ======== testing map ===================
             // ========================================
 
-            I("reset;");            
+            I("reset;");
             I("block series dyn = yes; #m = (%v = 100); #m.%v = #m.%v + 1; end;");  //if something wrong with option series dyn, this will run too many times            
             Map m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertScalarVal(m, "%v", 101d);
@@ -2252,14 +2252,14 @@ namespace UnitTests
             I("#m = (x = 100);");
             I("time 2002 2003;");
             I("#m.x = #m.x[-1] + 1;");
-            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;            
+            m = Program.databanks.GetFirst().GetIVariable("#m") as Map;
             _AssertSeries(m, "x!a", 2000, double.NaN, sharedDelta);
             _AssertSeries(m, "x!a", 2001, 100d, sharedDelta);
             _AssertSeries(m, "x!a", 2002, 101d, sharedDelta);
             _AssertSeries(m, "x!a", 2003, 101d, sharedDelta);
             _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
@@ -2271,7 +2271,7 @@ namespace UnitTests
             _AssertSeries(m, "x!a", 2003, 102d, sharedDelta);
             _AssertSeries(m, "x!a", 2004, double.NaN, sharedDelta);
 
-            I("reset;");            
+            I("reset;");
             I("time 2001 2003;");
             I("#m = (x = 100);");
             I("time 2002 2003;");
@@ -2290,7 +2290,7 @@ namespace UnitTests
         public void _Test_AgeLag()
         {
             //Test that age lags like x[#a-1] or x{#a-1} work as intended
-            
+
             I("x = series(1);");
             I("x[20] = 100;");
             I("x[21] = 200;");
@@ -2324,7 +2324,7 @@ namespace UnitTests
             Table table = null;
 
 
-            
+
             // setting up the tests
             // setting up the tests ----------------------------------------------
             // setting up the tests
@@ -2411,7 +2411,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 3).number, 4.0000d, 0.0001);
             Assert.AreEqual(table.Get(3, 3).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 3).number, 6.0000d, 0.0001);
-            
+
 
             //Test that only one col of data is written
             //so we are sure #m1 is not "free" but is soaked
@@ -2428,7 +2428,7 @@ namespace UnitTests
             //Globals.lastPrtOrMulprtTable = null;
             I("p <n> sum(#m1, xx[#m1, x]);");
             table = Globals.lastPrtOrMulprtTable;
-            
+
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
@@ -2449,7 +2449,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
             Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
-                       
+
 
             /*             
                                   xx['a', 'x']    xx['a', 'y'] 
@@ -2728,7 +2728,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(5, 2).number, 8.0000d, 0.0001);
             Assert.AreEqual(table.Get(6, 2).number, 10.0000d, 0.0001);
             Assert.AreEqual(table.Get(7, 2).number, 12.0000d, 0.0001);
-            
+
             //Globals.lastPrtOrMulprtTable = null;
             I("p <n> sum((#m1, #m2), xx[#m1, #m2] $ (#m1 in #m4));");
             table = Globals.lastPrtOrMulprtTable;
@@ -2757,7 +2757,7 @@ namespace UnitTests
             I("#m1 = ('a', 'b');");
             I("#m2 = ('x', 'y');");
             FAIL("p <n> sum((#m1, #m2), xx[#m1, #m2]);");
-            
+
             //I("option series array ignoremissing yes;");                        
             I("option series array calc missing = zero;");
 
@@ -3045,7 +3045,7 @@ namespace UnitTests
             I("#a = a1, a2;");
             I("%s = 'a3';");
             I("a1 = 1;");
-            I("a2 = 2;");            
+            I("a2 = 2;");
             I("a3 = 3;");
             //Globals.lastPrtOrMulprtTable = null;
             I("p <n> {#a}, {%s};");
@@ -3285,7 +3285,7 @@ namespace UnitTests
                     FAIL("endo <2003 2005> x['a', 'k1']<2001 2002>, y;");
 
                     I("{%s2} = series(2);");
-                    I("{%s2}[%s1+'', 'k1'] = 1000;");                    
+                    I("{%s2}[%s1+'', 'k1'] = 1000;");
                     I("y = 2000;");
 
                     I("exo {%s2}[%s1+'', 'k1'] <2002 2004>, y<2004 2006>;");
@@ -3325,7 +3325,7 @@ namespace UnitTests
                 _AssertSeries(First(), "exo_y", 2006, 1d, sharedDelta);
                 _AssertSeries(First(), "exo_y", 2007, double.NaN, sharedDelta);
 
-                
+
                 _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2000, double.NaN, sharedDelta);
                 _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2001, 1d, sharedDelta);
                 _AssertSeries(First(), "endo_x", new string[] { "a", "k1" }, 2002, 1d, sharedDelta);
@@ -3400,7 +3400,7 @@ namespace UnitTests
             I("xx4 = xx4 + 1000;");
             I("option freq a;");
             //Globals.lastPrtOrMulprtTable = null;
-            I("p xx1, xx2, {#m};");            
+            I("p xx1, xx2, {#m};");
             Table table = Globals.lastPrtOrMulprtTable;
             double deltaHere = 0.0001d;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx1");
@@ -3500,7 +3500,7 @@ namespace UnitTests
 
 
 
-        
+
 
         [TestMethod]
         public void _Test_Assignment()
@@ -3539,7 +3539,7 @@ namespace UnitTests
             _AssertSeries(First(), "x", 2003, 3d, sharedDelta);
             _AssertSeries(First(), "x", 2004, 3d * 1.01d, sharedDelta);
             _AssertSeries(First(), "x", 2005, 3d * 1.01d * 1.03d, sharedDelta);
-            _AssertSeries(First(), "x", 2006, 3d * 1.01d * 1.03d * 1.05d, sharedDelta);            
+            _AssertSeries(First(), "x", 2006, 3d * 1.01d * 1.03d * 1.05d, sharedDelta);
             _AssertSeries(First(), "x", 2007, double.NaN, sharedDelta);
 
 
@@ -3953,7 +3953,7 @@ namespace UnitTests
             }
             Assert.AreEqual(count, 16);  //safety
 
-            
+
             // ----------------------------------------------------
             // OPERATOR m and += (then -= is probably ok too)
             // 16 combinations:
@@ -4628,7 +4628,7 @@ namespace UnitTests
             I("RENAME x1 to b10:x2;");
             Assert.IsFalse(Program.databanks.GetFirst().ContainsIVariable("x1!a"));
             Assert.IsTrue(Program.databanks.GetDatabank("b10").ContainsIVariable("x2!a"));
-                        
+
             I("RENAME ref:#x1 as *:#x20;");
             Assert.IsFalse(Program.databanks.GetRef().ContainsIVariable("#x1"));
             Assert.IsTrue(Program.databanks.GetRef().ContainsIVariable("#x20"));
@@ -4663,7 +4663,7 @@ namespace UnitTests
             _AssertSeries(First(), "x1", 2001, 11d, sharedDelta);
             _AssertSeries(First(), "x1", 2002, 11d, sharedDelta);
             _AssertSeries(First(), "x1", 2003, 11d, sharedDelta);
-            _AssertSeries(First(), "x1", 2004, double.NaN, sharedDelta);            
+            _AssertSeries(First(), "x1", 2004, double.NaN, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2001, 11d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2002, 11d, sharedDelta);
@@ -4679,7 +4679,7 @@ namespace UnitTests
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2003, 12d, sharedDelta);
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2004, double.NaN, sharedDelta);
 
-            I("SERIES<2000 2005> x5 = 13;");            
+            I("SERIES<2000 2005> x5 = 13;");
             I("TIME 2002 2002;");
             I("COPY <respect> x5 to b10:x2;");
             _AssertSeries(Program.databanks.GetDatabank("b10"), "x2", 2000, double.NaN, sharedDelta);
@@ -4744,7 +4744,7 @@ namespace UnitTests
             I("y2 <2002 2003> %= 2.27, 2.37;");
             I("BLOCK print fields ndec = 1, print fields pdec = 1; PRT y1; END; PRT y2;");
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.2 "));
-            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.3 "));            
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 1.3 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.2193 "));
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains(" 2.27 "));
 
@@ -4765,7 +4765,7 @@ namespace UnitTests
             //  #x1      #x1      #x3
             //  x2
             //
-            
+
 
             // copy <from:b1 to:b10> x3, work:x2 to ref:y1, y2;   b1:x3 -> ref:y1, work:x2 -> b10:y2
             // copy <from:b1 to:b10> * to *;
@@ -5448,8 +5448,8 @@ namespace UnitTests
             I("close b1; open b1; unlock b1;");
             //hmmm seems the only way to create a fresh bank not in first position
             I("open<edit>b10; x = 1; close b10; open b10; unlock b10; clear b10;"); //fresh destination bank
-            
-            
+
+
         }
 
 
@@ -5483,7 +5483,7 @@ namespace UnitTests
             _AssertScalarVal(First(), "%sum", 52d, sharedDelta);
 
             I("reset; for string %i = ('a', 'b'); tell '' + %i; end;");
-            
+
             I("reset; for val %i = (1, 2); tell '' + %i; end;");
             I("reset; for date %i = (2001q1, 2001q3) ; tell '' + %i; end;");
             I("reset; series a = 100; series b = 200; for series i = (a, b); prt i; end;");
@@ -5496,7 +5496,7 @@ namespace UnitTests
             I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 = #m3 + (%s,); end;");
             _AssertListString(First(), "#m3", 1, "ax");
             _AssertListString(First(), "#m3", 2, "by");
-            
+
             I("for string %i = #m1, string %j = #m2; %s = %i + %j; #m3 = #m3.append(%s); end;");
             _AssertListString(First(), "#m3", 1, "ax");
             _AssertListString(First(), "#m3", 2, "by");
@@ -5576,7 +5576,7 @@ namespace UnitTests
             _AssertSeries(m2, "ts", 2012, double.NaN, sharedDelta);
 
         }
-    
+
         // --------------------------------------------------------------------------------
         // --------------------------------------------------------------------------------
         // --------------------------------------------------------------------------------
@@ -5584,7 +5584,7 @@ namespace UnitTests
         // --------------------------------------------------------------------------------
         // --------------------------------------------------------------------------------
         // --------------------------------------------------------------------------------
-        
+
         [TestMethod]
         public void _Test_Gekko20()
         {
@@ -5612,7 +5612,7 @@ namespace UnitTests
             I("STRING %s1 = string(%v);");
             _AssertScalarString(First(), "%s1", "2010");
             I("STRING %s2 = string(%d);");
-            _AssertScalarString(First(), "%s2", "2010");            
+            _AssertScalarString(First(), "%s2", "2010");
             I("STRING %s3 = string(%s);");
             _AssertScalarString(First(), "%s3", "2010");
             I("STRING %s4 = string(#l);");
@@ -5624,12 +5624,12 @@ namespace UnitTests
             I("VAL %v2 = val(%d);");
             _AssertScalarVal(First(), "%v2", 2010);
             I("VAL %v3 = val(%s);");
-            _AssertScalarVal(First(), "%v3", 2010);            
+            _AssertScalarVal(First(), "%v3", 2010);
             FAIL("VAL %v4 = val(#l);");
             FAIL("VAL %v5 = val(ser);");
 
             I("DATE %d1 = date(%v);");
-            _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);            
+            _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);
             I("DATE %d2 = date(%d);");
             _AssertScalarDate(First(), "%d1", EFreq.A, 2010, 1);
             I("DATE %d3 = date(%s);");
@@ -5659,7 +5659,7 @@ namespace UnitTests
             I("CREATE xx; SERIES xx = x.1 - x[-1];");
             _AssertSeries(First(), "xx", 2002, 0d, sharedDelta);
 
-            I("CREATE yy; SERIES yy = 1*x.1 -1*x[-1];");            
+            I("CREATE yy; SERIES yy = 1*x.1 -1*x[-1];");
             _AssertSeries(First(), "yy", 2000, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy", 2001, double.NaN, sharedDelta);
             _AssertSeries(First(), "yy", 2002, 0d, sharedDelta);
@@ -5693,10 +5693,10 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Movavg()
-        {            
+        {
 
-            I("RESET; MODE data;");            
-            I("OPTION freq a;");                        
+            I("RESET; MODE data;");
+            I("OPTION freq a;");
             I("CREATE x; SER <2006 2013> x = (-.89, .33, -3.8, 4.32, 2, 3, 4, 5);");  //first 3 values are only used for some of the last tests in the following
             I("FOR val %i = 1 to 4; CREATE y{%i}; END;");
             I("TIME 2013 2013;");
@@ -5743,7 +5743,7 @@ namespace UnitTests
             I("DELETE y1, y2, y3, y4;");
             I("SERIES y1 = movsum(2*x-x,2);");
             I("SERIES y2 = movsum(movsum(2*x-x,2),2);");
-            I("SERIES y3 = movsum(movsum(movsum(2*x-x,2),2),2);");            
+            I("SERIES y3 = movsum(movsum(movsum(2*x-x,2),2),2);");
             _AssertSeries(First(), "y1", 2013, 9d, sharedDelta);
             _AssertSeries(First(), "y2", 2013, 16d, sharedDelta);
             _AssertSeries(First(), "y3", 2013, 28d, sharedDelta);
@@ -5756,7 +5756,7 @@ namespace UnitTests
             _AssertSeries(First(), "y2", 2013, 4d, sharedDelta);
             _AssertSeries(First(), "y3", 2013, 3.5d, sharedDelta);
 
-            I("DELETE y1;");            
+            I("DELETE y1;");
             I("SERIES y1 = dif(movavg(pch(2*x-x),2));");
             I("SERIES <2012 2013> y2 = movavg(movavg(movavg(2*x-x,4),3),2);");
             _AssertSeries(First(), "y1", 2013, -12.5d, sharedDelta);
@@ -5814,9 +5814,9 @@ namespace UnitTests
                 _AssertSeries(First(), "y9", EFreq.Q, 2011, 1, 0.5d * 3d + 1d, sharedDelta);
             }
 
-            I("RESET; MODE data;");            
-            I("OPTION freq q;");            
-            I("CREATE x; SER <2010q1 2011q1> x = (200, 1, 2, 3, 202);");            
+            I("RESET; MODE data;");
+            I("OPTION freq q;");
+            I("CREATE x; SER <2010q1 2011q1> x = (200, 1, 2, 3, 202);");
             I("SERIES <2011q1 2011q1> y1 = pchy(x);");
             I("SERIES <2011q1 2011q1> y2 = dify(x);");
             I("SERIES <2011q1 2011q1> y3 = diffy(x);");
@@ -5825,10 +5825,10 @@ namespace UnitTests
             I("SERIES <2011q1 2011q1> y6 = dif(x);");
             I("SERIES <2011q1 2011q1> y7 = diff(x);");
             I("SERIES <2011q1 2011q1> y8 = dlog(x);");
-            _AssertSeries(First(), "y1", EFreq.Q, 2011, 1,  (202d / 200d - 1d) * 100d, sharedDelta);
-            _AssertSeries(First(), "y2", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
-            _AssertSeries(First(), "y3", EFreq.Q, 2011, 1,  (202d - 200d), sharedDelta);
-            _AssertSeries(First(), "y4", EFreq.Q, 2011, 1,  Math.Log(202d / 200d), sharedDelta);
+            _AssertSeries(First(), "y1", EFreq.Q, 2011, 1, (202d / 200d - 1d) * 100d, sharedDelta);
+            _AssertSeries(First(), "y2", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y3", EFreq.Q, 2011, 1, (202d - 200d), sharedDelta);
+            _AssertSeries(First(), "y4", EFreq.Q, 2011, 1, Math.Log(202d / 200d), sharedDelta);
 
             //same with expression inside
             I("RESET; MODE data;");
@@ -6130,14 +6130,14 @@ namespace UnitTests
                 I("create ts1, ts2, ts0a, ts0b;");
                 I("SERIES <2002 2006> ts1 = (2, 3, 4, 5, 6);");
                 I("SERIES <2004 2010> ts2 = (41, 42, 43, 44, 45, 46, 46);");
-                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");                
+                I("splice ts0a = ts1 ts2;                                    //splicing two series by means of three common observations");
                 double delta = 0.0001d;
                 _AssertSeries(First(), "ts0a", 2006, 6d, delta);
                 _AssertSeries(First(), "ts0a", 2007, 5.2381d, delta);
                 _AssertSeries(First(), "ts0a", 2008, 5.3571d, delta);
                 _AssertSeries(First(), "ts0a", 2009, 5.4762d, delta);
                 _AssertSeries(First(), "ts0a", 2010, 5.5952d, delta);
-                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");                
+                I("splice ts0b = ts1 2006 ts2;                               //splicing on one observation instead, follows ts2 growth from 2007 and on.");
                 _AssertSeries(First(), "ts0b", 2006, 6d, delta);
                 _AssertSeries(First(), "ts0b", 2007, 6.1395d, delta);
                 _AssertSeries(First(), "ts0b", 2008, 6.2791d, delta);
@@ -6242,7 +6242,7 @@ namespace UnitTests
             _AssertMatrix(First(), "#corr", 3, 1, 0.31237800d, d);
             _AssertMatrix(First(), "#corr", 3, 2, 0.30733932d, d);
             _AssertMatrix(First(), "#corr", 3, 3, 1d, d);
-                        
+
             I("reset;");
             I("option freq q;");
             I("time 2001q1 2003q2;");
@@ -6250,7 +6250,7 @@ namespace UnitTests
             I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
             I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
             I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
-            I("analyze (x1, x2, x3);");            
+            I("analyze (x1, x2, x3);");
             _AssertMatrix(First(), "#corr", 1, 1, 1d, d);
             _AssertMatrix(First(), "#corr", 1, 2, 0.21295885d, d);
             _AssertMatrix(First(), "#corr", 1, 3, 0.31237800d, d);
@@ -6262,14 +6262,14 @@ namespace UnitTests
             _AssertMatrix(First(), "#corr", 3, 3, 1d, d);
         }
 
-           
+
 
         [TestMethod]
         public void _Test_Statistikbanken()
         {
             Databank work = First();
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("DOWNLOAD 'http://api.statbank.dk/v1/data' statbank.json;");
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
@@ -6277,7 +6277,7 @@ namespace UnitTests
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
 
             I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
             I("DOWNLOAD 'http://api.statbank.dk/v1/data' statbank.json;");
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
@@ -6305,7 +6305,7 @@ namespace UnitTests
             I("RESET;");
             I("create ts, ts1, ts2, ts3, ts4;");
             I("SERIES <2002 2004> ts = (2, 3, 4);");
-            I("SERIES <2008 2010> ts = (9, 8, 7);"); 
+            I("SERIES <2008 2010> ts = (9, 8, 7);");
             I("SERIES <2004 2008> tsb = (-1, -2, -3, -4, -5);");
             I("smooth ts1 = ts spline;                                  //fill holes with cubic spline");
             I("smooth work:ts2 = ts linear;                                  //fill holes with linear interpolation");
@@ -6343,8 +6343,8 @@ namespace UnitTests
             _AssertSeries(First(), "ts4", 2006, 3d, sharedDelta);
             _AssertSeries(First(), "ts4", 2007, 4d, sharedDelta);
             _AssertSeries(First(), "ts4", 2008, double.NaN, sharedDelta);
-            _AssertSeries(First(), "ts4", 2009, double.NaN, sharedDelta);                       
-            
+            _AssertSeries(First(), "ts4", 2009, double.NaN, sharedDelta);
+
             //quarters
             I("RESET;");
             I("option freq q;");
@@ -6373,7 +6373,7 @@ namespace UnitTests
             _AssertSeries(First(), "ts4", EFreq.M, 2000, 6, double.NaN, sharedDelta);
             _AssertSeries(First(), "ts4", EFreq.M, 2000, 7, double.NaN, sharedDelta);
 
-            
+
         }
 
 
@@ -6402,7 +6402,7 @@ namespace UnitTests
 
             I("WRITE arrayts;");
 
-           
+
             // ------ test of read and write
 
             I("RESET; MODE data; TIME 2000;");
@@ -6412,7 +6412,7 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "a", "b", "c" }, 2000, 3, sharedDelta);
             _AssertSeries(First(), "y", new string[] { "d", "e" }, 2000, 3, sharedDelta);
             _AssertSeries(First(), "z", 2000, 100, sharedDelta);
-                       
+
 
             // --------------------------------
             // looping with lists
@@ -6421,7 +6421,7 @@ namespace UnitTests
             I("RESET; MODE data; TIME 2000;");
             I("LIST #i = a, b;");
             I("LIST #j = x, y;");
-            I("y = series(2);");            
+            I("y = series(2);");
             I("y['a', 'x'] = 100;");
             I("y['a', 'y'] = 101;");
             I("y['b', 'x'] = 102;");
@@ -6437,7 +6437,7 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "b", "x" }, 2000, 1103, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1105, sharedDelta);
 
-            
+
 
             // --------------------------------
             // looping with lists and dollar
@@ -6474,7 +6474,7 @@ namespace UnitTests
             I("SER x2[#i0] = sum(#j, y[#i0, #j]) + sum(#j, y[#i0, #j]) + 10;");
             _AssertSeries(First(), "x2", new string[] { "a" }, 2000, 2 * 201d + 10d, sharedDelta);
             _AssertSeries(First(), "x2", new string[] { "b" }, 2000, 2 * 205d + 10d, sharedDelta);
-            
+
             I("LIST #i0 = list('a');");
             //I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i0[#i]) + z[#j];");
             I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i in #i0) + z[#j];");
@@ -6484,7 +6484,7 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
-                   
+
             I("LIST #i0 = list();");
             //I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i0[#i]) + z[#j];");
             I("SER x[#i, #j] = 1 + y[#i, #j] $ (#i in #i0) + z[#j];");
@@ -6494,7 +6494,7 @@ namespace UnitTests
             _AssertSeries(First(), "x", new string[] { "b", "y" }, 2000, 1002, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "c", "x" }, 2000, 1001, sharedDelta);
             _AssertSeries(First(), "x", new string[] { "c", "y" }, 2000, 1002, sharedDelta);
-            
+
             // ---------- ignore missing cells ------------------------
 
             I("RESET; MODE data; TIME 2000;");
@@ -6504,7 +6504,7 @@ namespace UnitTests
             I("y['b'] = 101;");
             I("y['c'] = 102;");
             FAIL("SER z = sum(#i, y[#i]);");
-            FAIL("SER z = y['d']);");            
+            FAIL("SER z = y['d']);");
             I("OPTION series array calc missing = zero; ");
             I("z = series(1);");
             I("SER z['1'] = sum(#i, y[#i]);");
@@ -6526,7 +6526,7 @@ namespace UnitTests
                 _AssertSeries(First(), "xx", new string[] { "b" }, 2000, 2, sharedDelta);
                 _AssertSeries(First(), "xx", new string[] { "c" }, 2000, 3, sharedDelta);
             }
-                       
+
 
             // -----------------------------------------
             // DOLLAR CONDITIONAL TESTING
@@ -6542,7 +6542,7 @@ namespace UnitTests
             _AssertSeries(First(), "y", 2003, 0d, sharedDelta);
             _AssertSeries(First(), "y", 2004, 0d, sharedDelta);
             _AssertSeries(First(), "y", 2005, 110d, sharedDelta);
-                       
+
 
             //Switch on timeseries, testing of different types (VAL vs. SERIES)
             I("RESET; MODE data;");
@@ -6574,7 +6574,7 @@ namespace UnitTests
             I("SERIES y3 = (x + 100) $ (x <> x2);");
             _AssertSeries(First(), "y3", 2000, 0d, sharedDelta);
 
-            
+
 
             //Switching between two values depending upon same criterion 
             I("RESET; MODE data;");
@@ -6594,7 +6594,7 @@ namespace UnitTests
             _AssertSeries(First(), "y2", 2004, 111d, sharedDelta);
             _AssertSeries(First(), "y2", 2005, 110d, sharedDelta);
 
-            
+
 
             I("RESET; MODE data;");
             I("TIME 2000 2000;");
@@ -6627,7 +6627,7 @@ namespace UnitTests
             I("SERIES y = 3 $ ('c' in #m or %v == 10);");
             _AssertSeries(First(), "y", 2000, 3d, sharedDelta);
 
-          
+
 
             //Without parenthesis (...) for lists
             I("SERIES y = 2;");
@@ -6678,7 +6678,7 @@ namespace UnitTests
             I("list #a = a, b;");
             I("list #i = i, j;");
             I("for string %ts = x, y; mulprt {%ts}[#a, #i]; end;");  //should be tested, yields 10 abs difference for each
-            
+
         }
 
 
@@ -6797,7 +6797,7 @@ namespace UnitTests
             I("COPY @{#m[1]} TO work:*;");
             I("COPY {['@f*'][1]};");     //           =====> NO GOOD, do not allow
             I("COPY {['@fa..@fc'][1]};"); //           =====> NO GOOD, do not allow
-            
+
             //----------------------------
             I("COPY ref:fa TO work:*;");
             I("COPY ref:{%s} TO work:*;");
@@ -6923,11 +6923,11 @@ namespace UnitTests
             _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
             _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
             _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 101d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES bank:series[...] = ...
             I("RESET;");
@@ -6941,11 +6941,11 @@ namespace UnitTests
             _AssertSeries(First(), "gdp", 2011, 101d, sharedDelta);
             _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
             _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2009, double.NaN, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2010, 100d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2011, 1000d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2012, 102d, sharedDelta);
-            _AssertSeries(Program.databanks.GetRef(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Program.databanks.GetRef(), "gdp", 2013, double.NaN, sharedDelta);
 
             //With SERIES #m[1] = ...
             I("RESET;");
@@ -6980,7 +6980,7 @@ namespace UnitTests
                 _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
                 _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
             }
-            
+
             //---------------- loop with lags ---------------
             I("RESET;");
             I("TIME 2010 2012;");
@@ -7004,7 +7004,7 @@ namespace UnitTests
             _AssertSeries(First(), "gdp2", 2012, 100d * 1.01d * 1.01d, sharedDelta);
             _AssertSeries(First(), "gdp2", 2013, double.NaN, sharedDelta);
 
-        }                
+        }
 
         [TestMethod]
         public void _Test_FunctionCondit()
@@ -7057,7 +7057,7 @@ namespace UnitTests
             _AssertSeries(First(), "xx3", 2003, 9d, 0d);
             _AssertSeries(First(), "xx3", 2004, double.NaN, 0d);
         }
-                
+
 
         [TestMethod]
         public void _Test_Series()
@@ -7066,7 +7066,7 @@ namespace UnitTests
 
             //Object x needs to be replaced, this is testing it.
             I("RESET; x = 100; x = series(2); x[a, b] = 100;");
-            
+
             I("RESET;");
             I("TIME 2010 2012;");
             I("CREATE gdp;");
@@ -7079,11 +7079,11 @@ namespace UnitTests
             _AssertSeries(First(), "gdp", 2011, 1000d, sharedDelta);
             _AssertSeries(First(), "gdp", 2012, 1000d, sharedDelta);
             _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2009, double.NaN, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2010, 100d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2011, 101d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2012, 102d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2010, 100d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2011, 101d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2012, 102d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2013, double.NaN, sharedDelta);
 
             //Testing SERIES bank:series = ...
             I("RESET;");
@@ -7097,18 +7097,18 @@ namespace UnitTests
             _AssertSeries(First(), "gdp", 2011, 101d, sharedDelta);
             _AssertSeries(First(), "gdp", 2012, 102d, sharedDelta);
             _AssertSeries(First(), "gdp", 2013, double.NaN, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2009, double.NaN, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2010, 1000d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2011, 1000d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2012, 1000d, sharedDelta);
-            _AssertSeries(Ref(),  "gdp", 2013, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2009, double.NaN, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2010, 1000d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2011, 1000d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2012, 1000d, sharedDelta);
+            _AssertSeries(Ref(), "gdp", 2013, double.NaN, sharedDelta);
         }
 
         [TestMethod]
         public void _Test_Cache()
         {
             //But cache not active anymore...?
-            
+
             //==================== TRUNCATE ===========================================
             Databank work = First();
 
@@ -7149,7 +7149,7 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Copy2()
-        {           
+        {
 
             //TODO: quarters and months
 
@@ -7162,7 +7162,7 @@ namespace UnitTests
             Databank bank2 = null;
             Databank work = null;
             Databank base2 = null;
-            
+
 
             Helper_copy_init(ref work, ref bank1, ref bank2, ref base2);
             if (true)
@@ -7171,9 +7171,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7198,9 +7198,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);  //from here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7221,9 +7221,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7246,9 +7246,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7271,9 +7271,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7296,9 +7296,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7321,9 +7321,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7370,9 +7370,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);  //from here
                 _AssertSeries(First(), "a2", 2010, -101, sharedDelta);  //to here
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7393,9 +7393,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7416,9 +7416,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7440,9 +7440,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7463,9 +7463,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 202, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7486,9 +7486,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 203, sharedDelta); //to here
@@ -7513,9 +7513,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -201, sharedDelta); //to here
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta); //from here
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -201, sharedDelta); //to here
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7536,9 +7536,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);  //from here
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);  //from here
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, -201, sharedDelta); //to here
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7558,9 +7558,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, 201, sharedDelta); //to here
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, 201, sharedDelta); //to here
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7581,9 +7581,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -101, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta); //from here
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta); //from here
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta); //from here
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta); //from here
                 _AssertSeries(bank1, "a1", 2010, -201, sharedDelta); //to here
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, -203, sharedDelta); //to here
@@ -7611,9 +7611,9 @@ namespace UnitTests
                 _AssertSeries(First(), "a1", 2010, -201, sharedDelta);
                 _AssertSeries(First(), "a2", 2010, -102, sharedDelta);
                 _AssertSeries(First(), "a3", 2010, -103, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a1", 2010, -201, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a2", 2010, -202, sharedDelta);
-                _AssertSeries(Program.databanks.GetRef(),  "a3", 2010, -203, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a1", 2010, -201, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a2", 2010, -202, sharedDelta);
+                _AssertSeries(Program.databanks.GetRef(), "a3", 2010, -203, sharedDelta);
                 _AssertSeries(bank1, "a1", 2010, 101, sharedDelta);
                 _AssertSeries(bank1, "a2", 2010, 102, sharedDelta);
                 _AssertSeries(bank1, "a3", 2010, 103, sharedDelta);
@@ -7906,7 +7906,7 @@ namespace UnitTests
 
             FAIL("COPY a,b,c TO d,e;");  //3 versus 2
 
-            
+
 
             //Test of COPY <error=no>
 
@@ -8041,7 +8041,7 @@ namespace UnitTests
             Assert.IsNotNull(work.GetIVariable("b2!a"));
             Assert.AreEqual(work.storage.Count, 2);
             I("PRT b1, b2;");
-        }        
+        }
 
         [TestMethod]
         public void _Test_Seasonal()
@@ -8152,7 +8152,7 @@ namespace UnitTests
             I("DISP pC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
-            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");                        
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");
             I("DISP qC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
@@ -8215,7 +8215,7 @@ namespace UnitTests
             I("qC[cCar] = 1;");
             I("DISP qC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 1);
-            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");            
+            Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
 
             // ------------------------------------------------------------
             // Here, the two pC eqs need to know that pC is dependent, not qC
@@ -8226,12 +8226,12 @@ namespace UnitTests
             I("pC = series(1);");
             I("pC[cCar] = 1;");
             I("qC = series(1);");
-            I("qC[cCar] = 1;");            
-            I("MODEL <gms dep = #(listfile d2)> model3.gmy;");            
+            I("qC[cCar] = 1;");
+            I("MODEL <gms dep = #(listfile d2)> model3.gmy;");
             I("DISP pC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_pC");
-            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");            
+            Assert.AreEqual(Globals.unitTestDependents[1], "E_pC_tot");
             I("DISP qC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 2);
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
@@ -8264,9 +8264,24 @@ namespace UnitTests
 
         }
 
-        
         [TestMethod]
-        public void _Test_SolverConjugateGradientQuadraticFunction()
+        public void _Test_SolverConjugateGradientJul05()
+        {            
+            I("RESET; MODE sim;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
+            I("MODEL jul05;");
+            I("READ<tsd>jul05;");
+            I("TIME 2006 2008;");                        
+            I("OPTION solve method = newton;");
+            if (!Globals.gradientSolve) Assert.IsTrue(false);
+            I("SIM;");
+            _AssertSeries(First(), "fy", 2006, 1407457d, 1d);  //1.11%
+            _AssertSeries(First(), "fy", 2007, 1437479d, 1d);  //2.13%
+            _AssertSeries(First(), "fy", 2008, 1456464d, 1d);  //1.32%            
+        }
+
+        [TestMethod]
+        public void _Test_SolverConjugateGradientQuadratic()
         {            
             double Function(double[] x_function, CGSolverInput input_function)
             {
@@ -8334,20 +8349,36 @@ namespace UnitTests
                 return func;
             }
 
+            //Cf. alglib: #897325342875
             double[] xstart = new double[] { -1d, -1d };  //-1 -1
-            xstart = new double[] { 10d, 10d };
+            //xstart = new double[] { 10d, 10d };
             CGSolverInput input = new CGSolverInput();
             input.deltaGradient = 1e-8;
             input.deltaGolden = 1e-8;
             input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
             input.restartInterval = -12345;
-            //input.limitBeta = true; has no effect
+            //input.limitBeta = true;  --> more its
             CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);
-            Assert.AreEqual(37, output.iterations);
-            Assert.AreEqual(1794, output.evals);
+            Assert.AreEqual(18, output.iterations);
+            Assert.AreEqual(902, output.evals);
+            Assert.IsTrue((output.x[0] - 1d) * (output.x[0] - 1d) + (output.x[1] - 1d) * (output.x[1] - 1d) < 1e-7);
+
+            //Cf. alglib: #897325342876            
+            xstart = new double[] { 1000d, 1000 };             
+            input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            input.restartInterval = -12345;
+            //input.limitBeta = true; --> more its
+            output = Program.SolveGradientAlgorithm(xstart, Function, input);
+            Assert.AreEqual(1054, output.iterations);
+            Assert.AreEqual(38148, output.evals);
             Assert.IsTrue((output.x[0] - 1d) * (output.x[0] - 1d) + (output.x[1] - 1d) * (output.x[1] - 1d) < 1e-7);
 
         }
+
+
 
         [TestMethod]
         public void _Test_SolverConjugateGradientAlglib()
@@ -8373,9 +8404,10 @@ namespace UnitTests
             int maxits = 0;  //0
             alglib.mincgstate state = null;
             alglib.mincgreport rep = null;
-            
+
             // -------------------- no limit on step, starting at (-1, -1) #24
 
+            //Cf. Gekko: #897325342875
             xstart = new double[] { -1, -1 };  //-1, -1            
             state = new alglib.mincgstate();
             rep = new alglib.mincgreport();
@@ -8393,6 +8425,7 @@ namespace UnitTests
 
             // -------------------- no limit on step, starting at (1000, 1000) #24
 
+            //Cf. Gekko: #897325342876
             xstart = new double[] { 1000, 1000 };            
             state = new alglib.mincgstate();
             rep = new alglib.mincgreport();
@@ -10199,6 +10232,50 @@ namespace UnitTests
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3047"));
             //Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("1.3788"));  //this is hidden for view
             Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("5.68"));
+
+            I("x = series(1);");
+            I("x[a] = 2.34;");
+            I("%s = 'a';");
+            I("%x = 'x';");
+
+            Globals.unitTestScreenOutput.Clear();
+            I("p x[a];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("p x['a'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("p x[%s+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("p x['{%s}'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+
+            //must be same as for gams type
+            I("disp x[a];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp {%x+''}[a];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x['a'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x[%s+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x['{%s}'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+
+            I("option model type = gams;");
+            
+            //must be same as for normal type
+            I("disp x[a];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp {%x+''}[a];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x['a'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x[%s+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+            I("disp x['{%s}'+''];");
+            Assert.IsTrue(Globals.unitTestScreenOutput.ToString().Contains("2.34")); Globals.unitTestScreenOutput.Clear();
+
+
+
         }
 
         [TestMethod]

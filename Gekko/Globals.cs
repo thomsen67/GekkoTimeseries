@@ -51,9 +51,14 @@ namespace Gekko
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------
+        
+        //public static bool gradientSolve = false;
+        //public static double naiveGradient = double.NaN; // 0.000002d;  //NaN to switch off
+        //public static double naiveMomentum = double.NaN; // 0.9d;  //NaN to switch off
+
         public static bool gradientSolve = true;
-        public static double[] gradientX0 = null;
-        public static double[] gradientX = null;
+        public static double naiveGradient = 0.000002d;  //NaN to switch off
+        public static double naiveMomentum = 0.9d;  //NaN to switch off
         // ----------------------------------------------------------------
 
         // ----------------------------------------------------------------

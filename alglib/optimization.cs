@@ -64,8 +64,7 @@ public partial class alglib
         public double f { get { return _innerobj.f; } set { _innerobj.f = value; } }
         public double[] g { get { return _innerobj.g; } }
         public double[] x { get { return _innerobj.x; } }
-        //public ndimensional_func func = null;  //TT qwerty 
-
+        
         public mincgstate()
         {
             _innerobj = new mincg.mincgstate();
@@ -11976,7 +11975,7 @@ public partial class alglib
             //
             if( state.mcinfo==1 && !state.innerresetneeded )
             {
-                Console.WriteLine("Wolfe step " + state.repiterationscount + ", " + state.f); //qwerty
+                //Console.WriteLine("Wolfe step " + state.repiterationscount + ", " + state.f);
                 //
                 // Standard Wolfe conditions hold
                 // Calculate Y[K] and D[K]'*Y[K]

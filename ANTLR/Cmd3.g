@@ -2216,18 +2216,28 @@ bank7:						  AT GLUE -> ASTAT
 							  ;
 
 freq7:						  GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;  
-indexer7:					  leftBracket (w7 (',' w7)*) RIGHTBRACKET -> ^(ASTL0 w7+);
+indexer7:					  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);  
 
-w7:							  wildcard7 -> ^(ASTL1 wildcard7);
+indexerHelper7:				  
+						      wildcardIndexer7 -> ^(ASTL1 wildcardIndexer7)	 //stuff like x[a], x[a*b]						 
+					//		| stringInQuotes -> ^(ASTL1 stringInQuotes)
+							| expression -> ^(ASTL1 expression)              //stuff like x['a'], x['a'+'b'], 
+							  ;
 
 name7:						  (identDigit | nameCurlyStart) (GLUE! identDigit | nameCurly)*;  //was: name, but name7 can be 117, 007, 1e10, 1a, etc.
+
+wildcardIndexer7:  		      name7 (wildSymbolMiddle name7)* wildSymbolEnd? //a?b a?b?, a?b?c a?b?c?, etc.
+						    | name7 wildSymbolEnd //a?						  	
+						    | wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd? //?a ?a? ?a?b ?a?b?, etc.
+						    | wildSymbolFree //?	
+							  ;
 
 wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 							| stars -> ASTSTARS		         //everything in a bank
 							| sigil? name7 (wildSymbolMiddle name7)* wildSymbolEnd? freq7? //a?b a?b?, a?b?c a?b?c?, etc.
 						    | sigil? name7 wildSymbolEnd freq7? //a?						  	
 						    | sigilNoGlue? wildSymbolStart name7 (wildSymbolMiddle name7)* wildSymbolEnd? freq7? //?a ?a? ?a?b ?a?b?, etc.
-						    | sigilNoGlue? wildSymbolFree freq7? //?
+						    | sigilNoGlue? wildSymbolFree freq7? //?							
 						      ;
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
@@ -2766,8 +2776,8 @@ deleteOpt1h:			    NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
 // DISP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-disp:						DISP StringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input.LT(1).Line)} StringInQuotes)
-						  | DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, input.LT(1).Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
+disp:						//DISP stringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input.LT(1).Line)} stringInQuotes)
+						    DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, input.LT(1).Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
 						    ;
 
 dispOpt1:					ISNOTQUAL
@@ -5028,6 +5038,10 @@ ident3: 					Ident |
 expression2:                expression;  //just an alias
 expression3:                expression;  //just an alias
 expression4:                expression | ;  //alias
+
+stringInQuotes:             StringInQuotes -> ^(ASTSTRINGINQUOTES StringInQuotes)
+						  | stringInQuotesWithCurlies
+						    ;
 
  //TODO: Clean up what is fragments and tokens. Stuff used inside lexer rules should be fragments for sure.
  //      Maybe special names for fragments like F_digit etc. And have for instance a F_glue for '¨' that the

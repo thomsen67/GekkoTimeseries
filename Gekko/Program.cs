@@ -103,7 +103,7 @@ namespace Gekko
         public double deltaGradient = 1e-8;
         public double deltaGolden = 1e-8;
         public double krit = Program.options.solve_newton_conv_abs* Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
-        public bool limitBeta = true;  //does not have any effect on the unit tests (until now)
+        public bool limitBeta = false;  //does not have any effect on the unit tests (until now)
         public int restartInterval = -12345; //if -12345 --> will use n, setting to 1 --> basic steepest gradient, setting to n is normal conjugate gradient
         // -------------
         public int evals = 0;  //!!!!!!! do not change
@@ -6712,7 +6712,7 @@ namespace Gekko
 
         public static EquationHelper FindEquationByMeansOfVariableName(string lhsName)
         {
-            if (model == null) return null;
+            if (modelGams == null) return null;
             int r = -12345;
             if (model.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
             {
@@ -12283,15 +12283,38 @@ namespace Gekko
                 decompOptions.variable = G.Chop_RemoveFreq(decompOptions.expressionOld);
                 decompOptions.expressionOld = null;
                 decompOptions.expression = null;
-                if (Program.model == null)
+
+
+
+
+                if (Program.modelGams != null)
                 {
-                    G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
-                    throw new GekkoException();
+                    if (Program.modelGams == null)
+                    {
+                        G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
+                        throw new GekkoException();
+                    }
+                    if (Program.modelGams.equations != null)
+                    {
+                        ModelGamsEquation found = DecompEvalGams(decompOptions.variable);
+                        decompOptions.expression = Globals.expression;
+                        decompOptions.expressionOld = found.lhs + " = " + found.rhs;
+                    }
+                }
+                else
+                {
+
+                    if (Program.model == null)
+                    {
+                        G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
+                        throw new GekkoException();
+                    }
+
+                    EquationHelper found = DecompEval(decompOptions.variable);
+                    decompOptions.expression = Globals.expression;
+                    decompOptions.expressionOld = found.equationText;
                 }
 
-                EquationHelper found = DecompEval(decompOptions.variable);
-                decompOptions.expression = Globals.expression;
-                decompOptions.expressionOld = found.equationText;
 
             }
 
@@ -12406,6 +12429,36 @@ namespace Gekko
             }
 
             //rhs = found.lhs + " = " + rhs + ";";
+            rhs = rhs + ";";
+
+            try
+            {
+                Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return found;
+        }
+
+        public static ModelGamsEquation DecompEvalGams(string variable)
+        {
+            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(variable, out eqs);
+            ModelGamsEquation found = eqs[0];  //pick the first one
+            if (eqs == null || eqs.Count == 0)
+            {
+                G.Writeln2("*** ERROR: Variable '" + variable + "' was not found");
+                throw new GekkoException();
+            }
+            if (eqs.Count > 1)
+            {
+                G.Writeln2("+++ WARNING: Variable '" + variable + "' appears in several equations, first one is picked");                
+            }
+
+            string rhs = found.rhs.Trim();
+            string lhs = found.lhs.Trim();            
             rhs = rhs + ";";
 
             try
@@ -16168,7 +16221,7 @@ namespace Gekko
 
             G.Writeln();
             G.Writeln("==========================================================================================");
-            G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + G.Chop_RemoveFreq(ts.name));
+            G.Writeln("SERIES " + bank + Globals.symbolBankColon + " " + ts.GetNameWithoutCurrentFreq(true));
             if (true)
             {
                 EEndoOrExo type1 = VariableTypeEndoExo(varnameWithoutFreq);
@@ -22528,9 +22581,9 @@ namespace Gekko
             args[0] = Program.model.b;
             Program.model.m2.assemblyPrologueEpilogue.InvokeMember("prologue", BindingFlags.InvokeMethod, null, null, args);
 
-            if (Globals.gradientSolve && Globals.runningOnTTComputer)
+            if (Globals.gradientSolve)
             {
-                //Program.SolveGradientAlgorithm(Program.model.b, Program.model.m2.assemblyNewton, nah);
+                SolveGradientAlgorithmUsingAlglib(Program.model.b, Program.model.m2.assemblyNewton, nah);
             }
             else
             {
@@ -34658,37 +34711,7 @@ namespace Gekko
                 }
             }
             return;
-        }
-
-        ////res is altered as a side-effect, and b array too. But x is unaltered.
-        //public static double rssFunction(out int numericalProblem, IElementalAccessVector res, IElementalAccessVector x, Type assembly)
-        //{
-        //    numericalProblem = runModel(res, x, assembly);  //res is residuals, implicitly also calculates b array
-        //    double rss = Blas.Default.Dot(res, res);
-        //    return rss;
-        //}
-
-        ////res is altered as a side-effect, and b array too. But x is unaltered.
-        //public static double rssFunction2(out int numericalProblem, double[] res, double[] x, Type assembly)
-        //{
-        //    int n = res.Length;
-        //    IElementalAccessVector x2 = new DenseVector(res.Length);
-        //    IElementalAccessVector res2 = new DenseVector(n);
-        //    for (int i1 = 0; i1 < n; i1++)
-        //    {
-        //        res2.SetValue(i1, res[i1]);
-        //        x2.SetValue(i1, x[i1]);
-        //    }
-        //    numericalProblem = runModel(res2, x2, assembly);  //res is residuals, implicitly also calculates b array
-        //    for (int i1 = 0; i1 < n; i1++)
-        //    {
-        //        res[i1] = res2.GetValue(i1);
-        //        //x[i1]=x2.GetValue(i1);  //unaltered
-        //    }
-        //    return double.NaN;
-        //}
-
-        
+        }                
 
         //TODO: Not strict regarding use of b[] -- actually puts result into Program.model.b[] via RSS(). These are typically the same, but what if not
         public static void SolveNewtonAlgorithm(double[] b, Type assembly, NewtonAlgorithmHelper nah)
@@ -35045,62 +35068,49 @@ namespace Gekko
         }
 
         public static void SolveGradientAlgorithmUsingAlglib(double[] b, Type assembly, NewtonAlgorithmHelper nah)
-        {            
+        {
 
             double[] bTemp = new double[Program.model.b.Length];
             Array.Copy(Program.model.b, bTemp, Program.model.b.Length);
 
-            int iterations = 0;
-
-            double krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2
-                                                                                                          //Ehm, RSS is divided by 2 now!
             int n = model.m2.fromEqNumberToBNumber.Length;
 
             IElementalAccessVector residuals = new DenseVector(n);
             IElementalAccessVector x0 = new DenseVector(n);
 
-            Globals.gradientX0 = new double[n];
-
+            double[] xstart = new double[n];
+            
             for (int i = 0; i < n; i++)
             {
                 x0.SetValue(i, b[model.m2.fromEqNumberToBNumber[i]]);
-                Globals.gradientX0[i] = b[model.m2.fromEqNumberToBNumber[i]];
+                //Globals.gradientX0[i] = b[model.m2.fromEqNumberToBNumber[i]];
+                xstart[i] = b[model.m2.fromEqNumberToBNumber[i]];
             }
 
             RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)      
+            
+            CGSolverInput input = new CGSolverInput();
+            input.deltaGradient = 1e-8;
+            input.deltaGolden = 1e-8;
+            input.krit = Program.options.solve_newton_conv_abs * Program.options.solve_newton_conv_abs;  //0.0001^2 <=> no residual can be > 0.0001, for in that case RSS would be > krit = 0.0001^2        
+            input.restartInterval = -12345;
+            //input.limitBeta = true;  --> more its
+            CGSolverOutput output = Program.SolveGradientAlgorithm(xstart, Function, input);                        
 
-            if (true)
+            double Function(double[] arg, CGSolverInput input2)
             {
-                //Calling conjugate gradient
-                double epsg = 0.000001;
-                double epsf = 0;
-                double epsx = 0;
-                double stpmax = 0.0;  //0.0 is unlimited, 0.1 will make snail steps
-                int maxits = 0;
-                alglib.mincgstate state = new alglib.mincgstate();
-                alglib.mincgreport rep = new alglib.mincgreport();
-                alglib.mincgcreatef(n, Globals.gradientX0, 1e-6d, out state);  //if the "f" is removed
-                alglib.mincgsetcond(state, epsg, epsf, epsx, maxits);
-                alglib.mincgsetstpmax(state, stpmax);
-                alglib.mincgsetcgtype(state, 0);  //0: Dai + Yuan
-                
-                void FunctionToOptimize(double[] arg, ref double func, object obj)
+                for (int i = 0; i < n; i++)
                 {
-                    for (int i = 0; i < n; i++)
-                    {
-                        x0.SetValue(i, arg[i]);                        
-                    }
-                    RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)  
-                    func = RssNonScaled(residuals);
-                    //G.Writeln2(arg[0] + " " + arg[1] + " RSS ---> " + func);
+                    x0.SetValue(i, arg[i]);
                 }
-                
-                alglib.mincgoptimize(state, FunctionToOptimize, null, null);
-                alglib.mincgresults(state, out Globals.gradientX, out rep);                
-            }            
+                RSS(residuals, x0, assembly);  //residuals are by-product (b[] also altered)  
+                double func = RssNonScaled(residuals);
+                //G.Writeln2(arg[0] + " " + arg[1] + " RSS ---> " + func);
+                return func;
+            }
 
             //converged
-            Program.model.simulateResults[0] = iterations;
+            Program.model.simulateResults[0] = output.iterations;
             Program.model.simulateResults[1] = Math.Sqrt(RssNonScaled(residuals));
             return;
 
@@ -35140,7 +35150,10 @@ namespace Gekko
                     {
                         dx[i] = -gradient[i];
                     }
-                    double alpha = Golden(x, dx, func, input);
+
+                    double alpha = Globals.naiveGradient;
+                    if (double.IsNaN(Globals.naiveGradient)) alpha = Golden(x, dx, func, input);
+
                     for (int i = 0; i < n; i++)
                     {
                         x[i] += alpha * dx[i];
@@ -35165,11 +35178,11 @@ namespace Gekko
                     }
                     beta = -fraction1 / fraction2;
 
+                    if (beta < 0d) beta = 0d;  //actually restarting, this is always done, also if .limitBeta == false
                     if (input.limitBeta)
-                    {
-                        if (beta < 0d) beta = 0d;  //actually restarting
-                        else if (beta >= 1d) beta = 0.9999d;
-                    }
+                    {                        
+                        if (beta >= 1d) beta = 0.9999d;  //maybe not always a good, even if it means that momentum is > 1...
+                    }                    
 
                     int interval = n;
                     if (input.restartInterval != -12345) interval = input.restartInterval;
@@ -35178,7 +35191,9 @@ namespace Gekko
                     {
                         beta = 0d; //reset, because of rounding problems
                         jj = 0;
-                    }                    
+                    }
+
+                    if (!double.IsNaN(Globals.naiveMomentum)) beta = Globals.naiveMomentum;
                                         
                     for (int i = 0; i < n; i++)
                     {
@@ -35198,7 +35213,9 @@ namespace Gekko
                         sw.Flush(); sw.Close();
                     }
 
-                    double alpha = Golden(x, s, func, input);
+                    double alpha = Globals.naiveGradient;
+                    if (double.IsNaN(Globals.naiveGradient)) alpha = Golden(x, s, func, input);
+
                     for (int i = 0; i < n; i++)
                     {
                         x[i] += alpha * s[i];
@@ -35249,6 +35266,7 @@ namespace Gekko
             if (true)
             {
                 b = .00001d; //b = 1 means following direction directly
+                if (Globals.gradientSolve) b = 1e-20d;
                 while (true)
                 {                    
                     goldenHelper1(x, direction, xOriginal, b);
@@ -35364,6 +35382,187 @@ namespace Gekko
 
         public static double RssNonScaled(IElementalAccessVector residuals)
         {
+            double[] rs = null;
+            if (Globals.gradientSolve)
+            {
+                rs = new double[residuals.Length];
+                rs[0] = 881076420.104297;
+                rs[1] = 528046105.358638;
+                rs[2] = 96878.2422177543;
+                rs[3] = 8883963.07545618;
+                rs[4] = 5580277.4200431;
+                rs[5] = 16275513.8271017;
+                rs[6] = 4967989.05735513;
+                rs[7] = 3287.82641639816;
+                rs[8] = 844243018.280563;
+                rs[9] = 1;
+                rs[10] = 25.9132374196197;
+                rs[11] = 1165600.9369;
+                rs[12] = 25.0916281321108;
+                rs[13] = 148.477695298437;
+                rs[14] = 468.753515613759;
+                rs[15] = 16329.503854833;
+                rs[16] = 154551.682046505;
+                rs[17] = 410555.650140476;
+                rs[18] = 325880.736147055;
+                rs[19] = 10717.6527658839;
+                rs[20] = 162585.170564617;
+                rs[21] = 17.2352843716;
+                rs[22] = 1;
+                rs[23] = 199.54485102418;
+                rs[24] = 1123.60205595221;
+                rs[25] = 563.434158519221;
+                rs[26] = 124853.099615233;
+                rs[27] = 169887.055919074;
+                rs[28] = 68134.837885043;
+                rs[29] = 10233.3655102884;
+                rs[30] = 1.96354762920963;
+                rs[31] = 3575.2982107094;
+                rs[32] = 1;
+                rs[33] = 196158.801770344;
+                rs[34] = 72.0452131091625;
+                rs[35] = 1;
+                rs[36] = 1;
+                rs[37] = 1;
+                rs[38] = 1;
+                rs[39] = 310633.231662062;
+                rs[40] = 135921.801427652;
+                rs[41] = 101823.431396324;
+                rs[42] = 152562.131469454;
+                rs[43] = 904.08737500063;
+                rs[44] = 471177.184440291;
+                rs[45] = 59433317.7636482;
+                rs[46] = 2345926.45366178;
+                rs[47] = 1934770.01492767;
+                rs[48] = 66718471.5298202;
+                rs[49] = 21647770.5160572;
+                rs[50] = 3282643.60766666;
+                rs[51] = 86130.7875103574;
+                rs[52] = 5890971.67115578;
+                rs[53] = 214412461.089019;
+                rs[54] = 2571.9156810042;
+                rs[55] = 26764.4525804713;
+                rs[56] = 813.857297442365;
+                rs[57] = 17.1969023482577;
+                rs[58] = 8035.56449178327;
+                rs[59] = 6610.15357111226;
+                rs[60] = 7.29186338753971;
+                rs[61] = 6515.62317725039;
+                rs[62] = 3679.40254151463;
+                rs[63] = 3441.10813404644;
+                rs[64] = 5932.74125570171;
+                rs[65] = 133312.819430566;
+                rs[66] = 16675.3142378461;
+                rs[67] = 1;
+                rs[68] = 58901.6910406279;
+                rs[69] = 32775431.3031213;
+                rs[70] = 8178873.91303376;
+                rs[71] = 6.31091386522723;
+                rs[72] = 15552085.9802367;
+                rs[73] = 6291.09430899397;
+                rs[74] = 3232892.69601735;
+                rs[75] = 39663912.9536616;
+                rs[76] = 77068786.6090455;
+                rs[77] = 59315672.9401214;
+                rs[78] = 5341105.45634241;
+                rs[79] = 52593263.8732157;
+                rs[80] = 79966806.7135784;
+                rs[81] = 111939600.716443;
+                rs[82] = 4.28031048659134;
+                rs[83] = 197222323.911892;
+                rs[84] = 63878103.7907757;
+                rs[85] = 1;
+                rs[86] = 1288296183.69595;
+                rs[87] = 1;
+                rs[88] = 68.9369958822177;
+                rs[89] = 392267.515694667;
+                rs[90] = 1;
+                rs[91] = 1;
+                rs[92] = 389847.840667553;
+                rs[93] = 2347.39161887546;
+                rs[94] = 1;
+                rs[95] = 1;
+                rs[96] = 473.187989453432;
+                rs[97] = 1;
+                rs[98] = 1;
+                rs[99] = 43926.6803056866;
+                rs[100] = 37569.2872332592;
+                rs[101] = 7741429.40970652;
+                rs[102] = 1719898.01393812;
+                rs[103] = 6452267.71504301;
+                rs[104] = 1714.9971709645;
+                rs[105] = 1302494.29445975;
+                rs[106] = 6533071.42870396;
+                rs[107] = 38091.2360923349;
+                rs[108] = 10991766.1698877;
+                rs[109] = 964972.696866395;
+                rs[110] = 26589686.6386658;
+                rs[111] = 3824106.25141885;
+                rs[112] = 9605603.8515495;
+                rs[113] = 5217791.66760478;
+                rs[114] = 7791961.47780735;
+                rs[115] = 178927712.208443;
+                rs[116] = 545.387521867339;
+                rs[117] = 414798.990798985;
+                rs[118] = 1;
+                rs[119] = 1;
+                rs[120] = 1;
+                rs[121] = 1;
+                rs[122] = 1.9778739272097;
+                rs[123] = 918246.587442251;
+                rs[124] = 33174232.7378947;
+                rs[125] = 386968361.294037;
+                rs[126] = 2528455.08297954;
+                rs[127] = 64224900.6196431;
+                rs[128] = 1078986.87676941;
+                rs[129] = 21866273.1523049;
+                rs[130] = 1;
+                rs[131] = 1;
+                rs[132] = 3460356.17040596;
+                rs[133] = 1299816.44326847;
+                rs[134] = 1438844.03200548;
+                rs[135] = 1;
+                rs[136] = 1;
+                rs[137] = 18827260.8215001;
+                rs[138] = 1;
+                rs[139] = 1;
+                rs[140] = 1;
+                rs[141] = 1;
+                rs[142] = 3697110.17673378;
+                rs[143] = 2111725.178482;
+                rs[144] = 3253406.14525164;
+                rs[145] = 1;
+                rs[146] = 2177974.68814944;
+                rs[147] = 117402574.567437;
+                rs[148] = 961832056.128285;
+                rs[149] = 680404974.221596;
+                rs[150] = 4268025.97337332;
+                rs[151] = 26988672.993993;
+                rs[152] = 6378454.4050829;
+                rs[153] = 80.8040872283524;
+                rs[154] = 2908473459.50373;
+                rs[155] = 1570363741.13058;
+                rs[156] = 74922.3324474215;
+                rs[157] = 7033168.7688151;
+                rs[158] = 2895.05577249148;
+                rs[159] = 86869.9498440973;
+                rs[160] = 3363873.77091985;
+                rs[161] = 5605570.268026;
+                rs[162] = 766185.324014204;
+                rs[163] = 77354.4571900019;
+                rs[164] = 10012147.277403;
+                rs[165] = 838883.305923875;
+                rs[166] = 108326807.907112;
+                rs[167] = 1;
+                rs[168] = 1540682319.34851;
+                rs[169] = 1;
+                rs[170] = 1;
+                rs[171] = 1;
+                rs[172] = 1;
+                rs[173] = 1;
+
+            }
+
             bool check = false;
             double rssNonScaled = 0d;
             double max = double.NegativeInfinity;
@@ -35376,6 +35575,7 @@ namespace Gekko
                     G.Writeln("NUM ERROR ---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[i]]);
                 }
                 double number2 = number * number;
+                if (Globals.gradientSolve) number2 = number2 / rs[i];
                 rssNonScaled += number2;
                 if (number2 > max)
                 {
@@ -35386,12 +35586,33 @@ namespace Gekko
 
             if (check)
             {
-
                 if (Globals.sw == null) Globals.sw = G.GekkoStreamWriter(Program.WaitForFileStream(@"c:\Thomas\Desktop\gekko\testing\cg.txt", Program.GekkoFileReadOrWrite.Write));
-                Globals.sw.WriteLine("i = " + maxI + " " + max + " " + rssNonScaled + " " + max / rssNonScaled);
-                Globals.sw.WriteLine("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
+
+                for (int i = 0; i < residuals.Length; i++)
+                {
+                    double number = residuals.GetValue(i);
+                    double number2 = number * number;
+                    if (number2 > 1d)
+                    {
+                        Globals.sw.WriteLine("rs[" + i + "] = " + number2 + ";");
+                    }
+                    else
+                    {
+                        Globals.sw.WriteLine("rs[" + i + "] = " + 1d + ";");
+                    }
+                }
+
+
+                if (false)
+                {
+                    
+                    Globals.sw.WriteLine("i = " + maxI + " " + max + " " + rssNonScaled + " " + max / rssNonScaled);
+                    Globals.sw.WriteLine("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
+                }
+
                 //G.Writeln2("i = " + maxI + " " + max + " " + rssNonScaled + " " + max / rssNonScaled);
                 //G.Writeln("---> " + model.varsBTypeInverted[Program.model.m2.fromEqNumberToBNumberFeedbackNEW[maxI]]);
+
                 Globals.sw.Flush();
             }
 
