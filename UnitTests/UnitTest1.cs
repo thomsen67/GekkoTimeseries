@@ -8378,6 +8378,62 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void _Test_SolverNewtonRobust()
+        {
+
+            for (int i = 0; i < 4; i++)
+            {                
+                I("reset;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
+                I("model sv;");
+                I("OPTION databank create auto = yes;");                
+                if (i >= 2) I("option solve newton robust = yes;");  //i == 2, 3
+                I("option solve method newton;");                
+                I("time 2000 2001;");
+                I("ser a1 = miss();");
+                I("ser aa1 = 1;");
+                I("ser a2 = 1;");
+                I("ser a3 = 1;");
+                I("%v = 20;");
+                I("ser c11 = %v + 0;");
+                I("ser c12 = %v + 0;");
+                I("ser c13 = %v + 0;");
+                I("ser c21 = %v + 0.1;");
+                I("ser c22 = %v - 0.1;");
+                I("ser c23 = %v + 0.1;");
+                I("ser c31 = %v - 0.2;");
+                I("ser c32 = %v + 0.2;");
+                I("ser c33 = %v + 0.2;");
+                I("ser x1 = 1 * 1000;");
+                I("ser x2 = -1 * 1000;");
+                I("ser x3 = 2 * 1000;");
+                if (i % 2 == 0)  //i == 0, 2
+                {
+                    I("ser x1 = 20.5;");
+                    I("ser x2 = 20.5;");
+                    I("ser x3 = 20.5;");
+                }
+                I("time 2001 2001;");
+                if (i == 1)
+                {
+                    FAIL("sim;");  //this combo will fail, but i = 3 will be ok (actual test of robustness)
+                }
+                else
+                {
+                    I("sim;");
+                    _AssertSeries(First(), "x1!a", 2001, 20.7031d, 0.0002d);
+                    _AssertSeries(First(), "x2!a", 2001, 20.4641d, 0.0002d);
+                    _AssertSeries(First(), "x3!a", 2001, 20.5389d, 0.0002d);
+                }
+            }
+
+            //I("prt < n > { '*'};");
+            //I("p <n> x1, (a1 ^ 2 - (x2 - c12) ^ 2.0001 - (x3 - c13) ^ 2.0001)^ 0.5 + c11;");
+            //I("p <n> x2, (a2 ^ 2 - (x1 - c21) ^ 2.0001 - (x2 - c22) ^ 2.0001)^ 0.5 + c22;");
+            //I("p <n> x3, (a3 ^ 2 - (x1 - c31) ^ 2.0001 - (x2 - c32) ^ 2.0001)^ 0.5 + c33;");
+
+        }
 
 
         [TestMethod]
