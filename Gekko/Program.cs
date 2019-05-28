@@ -6712,7 +6712,7 @@ namespace Gekko
 
         public static EquationHelper FindEquationByMeansOfVariableName(string lhsName)
         {
-            if (modelGams == null) return null;
+            //if (modelGams == null) return null;
             int r = -12345;
             if (model.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
             {
@@ -12274,10 +12274,15 @@ namespace Gekko
                 Globals.windowsDecomp.Add(w);
             }
 
-            if (decompOptions.expressionOld == null && decompOptions.variable != null)
-            {
-                decompOptions.expressionOld = decompOptions.variable;
-            }
+            //if (decompOptions.expressionOld == null && decompOptions.variable != null)
+            //{
+            //    decompOptions.expressionOld = decompOptions.variable;
+            //}
+
+            //if (decompOptions.name == null && decompOptions.variable != null)
+            //{
+            //    decompOptions.name = decompOptions.variable;
+            //}
 
             string name = null;
             if (decompOptions.name != null)
@@ -12290,6 +12295,10 @@ namespace Gekko
                     throw new GekkoException();
                 }
                 name = name_list2[0];
+            }
+            else
+            {
+                if (decompOptions.variable != null) name = decompOptions.variable;
             }
                         
             if (name != null)
