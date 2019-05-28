@@ -1031,14 +1031,13 @@ namespace Gekko
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
 
-                    if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                    if (this.decompOptions.modelHash != Program.model.modelHashTrue)
-                    {
-                        MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
-                        return;
-                    }
+                    //if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
+                    //if (this.decompOptions.modelHash != Program.model.modelHashTrue)
+                    //{
+                    //    MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
+                    //    return;
+                    //}
                 }
-
                                                           
                 //Setting defaults
                 radioButton21.IsEnabled = true;
@@ -1153,10 +1152,10 @@ namespace Gekko
 
                 bool useLocalData = false;
 
-                if (this.decompOptions.expression == null)
-                {
-                    this.decompOptions.modelHash = Program.model.modelHashTrue;  //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                }
+                //if (this.decompOptions.expression == null)
+                //{
+                //    this.decompOptions.modelHash = Program.model.modelHashTrue;  //To make sure that decomp is not clicked and results shown, after a new model has been loaded
+                //}
 
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);

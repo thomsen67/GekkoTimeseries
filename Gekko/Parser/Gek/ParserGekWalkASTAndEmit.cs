@@ -5300,6 +5300,14 @@ namespace Gekko.Parser.Gek
                             string methodName = "Evalcode" + ++Globals.counter;
                             StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
                             node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
+                            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+                            {
+                                node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);
+                                foreach (string s in node.freeIndexedLists.Keys)
+                                {
+                                    node.Code.A("Globals.freeIndexedListsDecomp.Add(@`" + s + "`);" + G.NL);
+                                }
+                            }                            
                         }
                         break;
                     case "ASTDECOMP":

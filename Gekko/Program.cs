@@ -12477,6 +12477,35 @@ namespace Gekko
             try
             {
                 Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
+
+                if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (string s in Globals.freeIndexedListsDecomp)
+                    {
+                        TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);
+                        for (int i = 1; i < tokens.storage.Count; i++)
+                        {
+                            if (tokens[i - 1].s == Globals.symbolCollection.ToString() && tokens[i].leftblanks == 0 && tokens[i].type == ETokenType.Word)
+                            {
+                                if (G.Equal(tokens[i].s, s))
+                                {
+                                    tokens[i - 1].s = "";
+                                    tokens[i].s = "1";
+                                }
+                            }
+                        }
+
+                        for (int i = 0; i < tokens.storage.Count; i++)
+                        {
+                            sb.Append(tokens[i].ToString());
+                        }
+
+                        Program.obeyCommandCalledFromGUI("EVAL " + sb.ToString(), new P()); //produces Func<> Globals.expression with the expression
+                    }
+
+                }
+
             }
             catch (Exception e)
             {
@@ -35896,7 +35925,7 @@ namespace Gekko
                     y0a = o.expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
                     O.AdjustSmplForDecomp(smpl, 1);
                     //Function call end   --------------
-
+                    
                     List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
                     if (true)
                     {
