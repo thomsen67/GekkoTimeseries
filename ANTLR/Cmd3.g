@@ -284,6 +284,7 @@ ASTCOMPARE2;
 	ASTEVAL;
     ASTDECOMP;
     ASTDECOMPITEMS;
+	ASTDECOMPITEMS2;
     ASTDECOMPTYPE;
     ASTDELETE;
     ASTDELETEALL;
@@ -2749,7 +2750,10 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 // DECOMP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-decomp:						DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement));
+decomp:						
+DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
+| DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement))
+;
 
 decompElement:              expression -> expression;
 

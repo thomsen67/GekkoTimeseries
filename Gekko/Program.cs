@@ -12109,7 +12109,8 @@ namespace Gekko
             decompOptions.expressionOld = o.label;            
             decompOptions.expression = o.expression;
             //decompOptions.smplForFunc = o.smplForFunc;
-            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();            
+            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
+            decompOptions.name = o.name;
             Decomp(decompOptions);
 
         }
@@ -12278,14 +12279,28 @@ namespace Gekko
                 decompOptions.expressionOld = decompOptions.variable;
             }
 
-            if (G.IsSimpleToken(decompOptions.expressionOld, true))
+            string name = null;
+            if (decompOptions.name != null)
             {
-                decompOptions.variable = G.Chop_RemoveFreq(decompOptions.expressionOld);
+                List name_list = decompOptions.name as List;
+                List<string> name_list2 = O.Restrict(name_list, false, false, false, true);
+                if (name_list2.Count != 1)
+                {
+                    G.Writeln2("*** ERROR: List of names not accepted in DECOMP");
+                    throw new GekkoException();
+                }
+                name = name_list2[0];
+            }
+                        
+            if (name != null)
+            {
+                string name2 = G.Chop_GetName(name);
+                List<string> name3 = G.Chop_GetIndex(name);
+
+                decompOptions.variable = name2;
+                decompOptions.variable_subelement = name3;
                 decompOptions.expressionOld = null;
                 decompOptions.expression = null;
-
-
-
 
                 if (Program.modelGams != null)
                 {
@@ -12314,11 +12329,9 @@ namespace Gekko
                     decompOptions.expression = Globals.expression;
                     decompOptions.expressionOld = found.equationText;
                 }
-
-
             }
 
-            if (decompOptions.expressionOld != null)
+            if (decompOptions.name == null)
             {
                 w.Title = "Decompose expression";
             }
@@ -35798,49 +35811,7 @@ namespace Gekko
             Blas.Default.Scale(-1d, dx);  //the direction is NEGATIVE!
             //dx is Newton direction
             return true;
-        }
-
-        //public static IVariable Test(GekkoSmpl smpl) 
-        //{
-        //    var smplCommandRemember20 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-        //    Series temp18 = new Series(ESeriesType.Normal, Program.options.freq, null); temp18.SetZero(smpl);
-
-        //    foreach
-        //     (IVariable listloop_a17 in new O.GekkoListIterator(O.Lookup(smpl, null,
-        //     ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(),
-        //     EVariableType.Var, null)))
-        //    {
-        //        temp18.InjectAdd(smpl, temp18, O.Indexer(O.Indexer2(smpl,
-        //         O.EIndexerType.None, listloop_a17), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "npop",
-        //         null, null, new LookupSettings(), EVariableType.Var, null),
-        //         listloop_a17));
-        //    }
-
-        //    return temp18;
-
-        //}
-
-        //public static IVariable Test2(GekkoSmpl smpl)
-        //{
-        //    var smplCommandRemember20 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-        //    Series temp18 = new Series(ESeriesType.Normal, Program.options.freq, null); temp18.SetZero(smpl);
-
-        //    IVariable x = O.Lookup(smpl, null, null, "npop",
-        //         null, null, new LookupSettings(), EVariableType.Var, null);
-
-        //    foreach
-        //     (IVariable listloop_a17 in new O.GekkoListIterator(O.Lookup(smpl, null,
-        //     ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(),
-        //     EVariableType.Var, null)))
-        //    {
-        //        temp18.InjectAdd(smpl, temp18, O.Indexer(O.Indexer2(smpl,
-        //         O.EIndexerType.None, listloop_a17), smpl, O.EIndexerType.None, x,
-        //         listloop_a17));
-        //    }
-
-        //    return temp18;
-
-        //}
+        }        
 
         public static Table Decompose(DecompOptions o)
         {

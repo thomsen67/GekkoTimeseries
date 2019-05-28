@@ -8579,6 +8579,7 @@ namespace Gekko
             public Func<GekkoSmpl, IVariable> expression = null;
             public string opt_prtcode = null;
             public string label = null;
+            public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
 
             public void Exe()
             {

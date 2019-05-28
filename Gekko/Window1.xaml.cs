@@ -1039,11 +1039,7 @@ namespace Gekko
                     }
                 }
 
-
-
-
-
-
+                                                          
                 //Setting defaults
                 radioButton21.IsEnabled = true;
                 radioButton21.Opacity = 1.0;
@@ -1834,6 +1830,7 @@ namespace Gekko
 
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
+        public List<string> variable_subelement = null;
         public bool isPercentageType = false;
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
@@ -1850,6 +1847,9 @@ namespace Gekko
         //public GekkoSmpl smplForFunc = null;
 
         public List<string> subst = new List<string>();
+
+        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
+        
 
         //-------- tranformation start --------------
         public string guiDecompTransformationCode = "n";
