@@ -5300,6 +5300,7 @@ namespace Gekko.Parser.Gek
                             string methodName = "Evalcode" + ++Globals.counter;
                             StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
                             node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
+                            node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
                             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
                             {
                                 node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);

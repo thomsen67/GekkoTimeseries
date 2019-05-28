@@ -1533,12 +1533,12 @@ namespace Gekko
                 if (Program.guiBrowseNumber < 2) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 2];
                 Program.guiBrowseNumber += -2;  //1 will be added later, when calling "disp". Net result: -1.
-                                
-                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var)))
+
+                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.HasGamsEquation(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);
-                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);                    
+                    Program.Disp(Globals.dispLastDispStart, Globals.dispLastDispEnd, temp, false, false, true, null);
                 }
                 else
                 {
@@ -1565,6 +1565,8 @@ namespace Gekko
             }
         }
 
+        
+
         public void toolStripButton2_Click(object sender, EventArgs e)
         {
             if (Gui.gui.tabControl1.SelectedIndex == 0)
@@ -1572,7 +1574,7 @@ namespace Gekko
                 if (Program.guiBrowseNumber >= Program.guiBrowseHistory.Count) return;
                 string var = Program.guiBrowseHistory[Program.guiBrowseNumber - 0];
                 Program.guiBrowseNumber += 0;  //1 will be added later, when calling "disp". Net result: 1.
-                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || (Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var)))
+                if ((Program.model?.varsAType != null && Program.model.varsAType.ContainsKey(var)) || ( Program.HasGamsEquation(var)))
                 {
                     List<string> temp = new List<string>();
                     temp.Add(var);

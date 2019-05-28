@@ -12467,8 +12467,7 @@ namespace Gekko
 
         public static ModelGamsEquation DecompEvalGams(string variable)
         {
-            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(variable, out eqs);
-            ModelGamsEquation found = eqs[0];  //pick the first one
+            List<ModelGamsEquation> eqs = GetGamsEquations(variable);
             if (eqs == null || eqs.Count == 0)
             {
                 G.Writeln2("*** ERROR: Variable '" + variable + "' was not found");
@@ -12476,11 +12475,12 @@ namespace Gekko
             }
             if (eqs.Count > 1)
             {
-                G.Writeln2("+++ WARNING: Variable '" + variable + "' appears in several equations, first one is picked");                
+                G.Writeln2("+++ WARNING: Variable '" + variable + "' appears in several equations, first one is picked");
             }
+            ModelGamsEquation found = eqs[0];  //pick the first one
 
             string rhs = found.rhs.Trim();
-            string lhs = found.lhs.Trim();            
+            string lhs = found.lhs.Trim();
             rhs = rhs + ";";
 
             try
@@ -12522,6 +12522,12 @@ namespace Gekko
             }
 
             return found;
+        }
+
+        private static List<ModelGamsEquation> GetGamsEquations(string variable)
+        {
+            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(variable, out eqs);
+            return eqs;
         }
 
         public static O.Prt PrtSnippet(string s, string s2)
@@ -16567,6 +16573,11 @@ namespace Gekko
             if (note != null) G.Writeln(note);
         }
 
+        public static bool HasGamsEquation(string var)
+        {
+            return Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var);
+        }
+
         private static bool DispHelperShowGamsEquations(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
         {
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
@@ -16603,7 +16614,9 @@ namespace Gekko
                 G.Writeln();
             }
 
-            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
+            //List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
+            List<ModelGamsEquation> eqs = GetGamsEquations(varnameWithoutFreqAndIndex);
+
 
             if (G.IsUnitTesting())
             {
@@ -16905,7 +16918,8 @@ namespace Gekko
             {
                 if (token.type == ETokenType.Word)
                 {
-                    List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
+                    //List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
+                    List<ModelGamsEquation> e3 = GetGamsEquations(token.s);
 
                     if (e3 != null)
                     {
@@ -25875,9 +25889,13 @@ namespace Gekko
             Program.guiBrowseNumber = 0;
             Globals.guiHomeMenuEnabled = false;
 
-            //Program.Cut(false);
+            Globals.expressionText = null;
+            Globals.expression = null;
+            Globals.freeIndexedListsDecomp = null;
 
-            RemoteInit();
+        //Program.Cut(false);
+
+        RemoteInit();
 
             StartPulse();
 

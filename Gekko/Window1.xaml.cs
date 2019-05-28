@@ -486,8 +486,21 @@ namespace Gekko
                 {
                     string ss = G.ExtractOnlyVariableIgnoreLag(s, Globals.leftParenthesisIndicator);
                     ss = G.PrettifyTimeseriesHash(ss, true, true);
-                    EEndoOrExo e = Program.VariableTypeEndoExo(ss);
-                    if (e == EEndoOrExo.Endo || s == Globals.decompText0)
+
+                    bool isEndogenous = false;
+
+                    if (G.Equal(Program.options.model_type, "gams"))
+                    {
+                        if (Program.HasGamsEquation(ss)) isEndogenous = true;
+                    }
+                    else
+                    {
+                        EEndoOrExo e = Program.VariableTypeEndoExo(ss);
+                        isEndogenous = e == EEndoOrExo.Endo;
+                    }
+                    
+
+                    if (isEndogenous || s == Globals.decompText0)
                     {
                         textBlock.MouseEnter += Mouse_Enter;
                         textBlock.MouseLeave += Mouse_Leave;
