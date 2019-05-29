@@ -8165,7 +8165,7 @@ namespace UnitTests
             // So we are finding the first non-lagged lhs variable (possibly
             // inside an exp() or log())
             // ------------------------------------------------------------
-            I("RESET;");
+            I("RESET;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
             I("MODEL <gms> model2.gmy;");
@@ -8179,7 +8179,7 @@ namespace UnitTests
             // ------------------------------------------------------------            
             // Stuff after $ is ignored
             // ------------------------------------------------------------
-            I("RESET;");
+            I("RESET;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
             I("MODEL <gms> model2a.gmy;");
@@ -8190,7 +8190,7 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestDependents[0], "E_qC");
             Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
 
-            I("RESET;");
+            I("RESET;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
             I("MODEL <gms> model2b.gmy;");
@@ -8220,7 +8220,7 @@ namespace UnitTests
             // ------------------------------------------------------------
             // Here, the two pC eqs need to know that pC is dependent, not qC
             // ------------------------------------------------------------
-            I("RESET;");
+            I("RESET;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
             I("pC = series(1);");
@@ -8240,7 +8240,7 @@ namespace UnitTests
             // ------------------------------------------------------------
             // This will fail, because d2.lst is not loaded
             // ------------------------------------------------------------
-            I("RESET;");
+            I("RESET;");            
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             I("OPTION model type = gams;");
             I("pC = series(1);");
@@ -8266,15 +8266,25 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_SolverConjugateGradientJul05()
-        {            
+        {
+            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
             I("RESET; MODE sim;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");
             I("MODEL jul05;");
             I("READ<tsd>jul05;");
             I("TIME 2006 2008;");                        
-            I("OPTION solve method = newton;");
-            if (!Globals.gradientSolve) Assert.IsTrue(false);
-            I("SIM;");
+            I("OPTION solve method = newton;");            
+            
+            try
+            {
+                Globals.gradientSolve = true;
+                I("SIM;");
+            }
+            finally
+            {
+                Globals.gradientSolve = false;
+            }
+
             _AssertSeries(First(), "fy", 2006, 1407457d, 1d);  //1.11%
             _AssertSeries(First(), "fy", 2007, 1437479d, 1d);  //2.13%
             _AssertSeries(First(), "fy", 2008, 1456464d, 1d);  //1.32%            

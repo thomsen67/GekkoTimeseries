@@ -1829,7 +1829,23 @@ namespace Gekko
     {
         public Window1.GekkoTableTypes type = Window1.GekkoTableTypes.Unknown;
         public Brush originalBackgroundColor = null;
-    }    
+    }
+
+    public class DecompTables
+    {        
+        public bool hasCalculatedQuo = false;
+        public bool hasCalculatedRef = false;
+        // -------------------------------------
+        public DecompDict cellsQuo = null;
+        public DecompDict cellsGradQuo = null;
+        public DecompDict cellsContribD = null;
+        // -------------------------------------
+        public DecompDict cellsRef = null;
+        public DecompDict cellsGradRef = null;
+        public DecompDict cellsContribDRef = null;
+        // -------------------------------------
+        public DecompDict cellsContribM = null;
+    }
 
     public class DecompOptions
     {
@@ -1887,16 +1903,7 @@ namespace Gekko
         public int decimalsPch = 2;
         public string dream = null;  //experimental
 
-        public bool hasCalculatedQuo = false;
-        public DecompDict cellsQuo = null;
-        public DecompDict cellsGradQuo = null;
-        public DecompDict cellsContribD = null;
-
-        public bool hasCalculatedRef = false;
-        public DecompDict cellsGradRef = null;        
-        public DecompDict cellsRef = null;        
-        public DecompDict cellsContribDRef = null;
-        public DecompDict cellsContribM = null;
+        public DecompTables decompTables = null;
 
         public List<string> vars2 = null;
 
@@ -1927,18 +1934,6 @@ namespace Gekko
                 d.subst.Add(s);
             }
 
-            if (false)
-            {
-                cellsGradQuo = null;
-                d.cellsGradRef = this.cellsGradRef;
-                d.cellsQuo = this.cellsQuo;
-                d.cellsRef = this.cellsRef;
-                d.cellsContribD = this.cellsContribD;
-                d.cellsContribDRef = this.cellsContribDRef;
-                d.cellsContribM = this.cellsContribM;
-                d.hasCalculatedQuo = this.hasCalculatedQuo;
-                d.hasCalculatedRef = this.hasCalculatedRef;
-            }
             return d;
         }
     }
