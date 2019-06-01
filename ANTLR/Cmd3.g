@@ -283,6 +283,7 @@ ASTCOMPARE2;
     ASTDATESTATEMENT;
 	ASTEVAL;
     ASTDECOMP;
+	ASTDECOMP2;
     ASTDECOMPITEMS;
 	ASTDECOMPITEMS2;
     ASTDECOMPTYPE;
@@ -1019,6 +1020,7 @@ Y2                    = 'Y2'                       ;
     DEC              = 'DEC';
     DECIMALSEPARATOR = 'DECIMALSEPARATOR';
     DECOMP           = 'DECOMP'          ;
+	DECOMP2           = 'DECOMP2'          ;
 	EVAL           = 'EVAL'          ;
     DELETE           = 'DELETE'          ;
     DETAILS          = 'DETAILS';
@@ -1256,6 +1258,7 @@ Y2                    = 'Y2'                       ;
     RING             = 'RING';
     RN= 'RN'       ;
     ROWS             = 'ROWS';
+	GROUP             = 'GROUP';
     RP= 'RP'       ;
     RUN              = 'RUN'             ;
 	LIBRARY = 'LIBRARY';
@@ -1633,6 +1636,7 @@ d.Add("Y" ,Y);
                                         d.Add("dec"     , DEC );
                                         d.Add("decimalseparator"       , DECIMALSEPARATOR    );
                                         d.Add("decomp"  , DECOMP    );
+										d.Add("decomp2"  , DECOMP2    );
 										d.Add("eval"  , EVAL    );
                                         d.Add("delete"  , DELETE    );
                                         d.Add("details"  , DETAILS   );
@@ -1873,6 +1877,7 @@ d.Add("Y" ,Y);
                                         d.Add("ring"    , RING    );
                                         d.Add("rn"               , RN );
                                         d.Add("rows"    , ROWS    );
+										d.Add("group"    , GROUP    );
                                         d.Add("rp"               , RP );
                                         d.Add("run"     , RUN       );
 										d.Add("library"     , LIBRARY       );
@@ -2243,6 +2248,7 @@ wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
+seqOfBankvarnamesOnly1:     seqItem -> ^(ASTBANKVARNAMELIST seqItem);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
 //distinguishing between a or 'a' is not interesting here, as it is for seqOfBankvarnames
@@ -2454,6 +2460,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | create               SEMICOLON!
 						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!
+						  | decomp2              SEMICOLON!
 						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -2755,7 +2762,15 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 | DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement))
 ;
 
-decomp2: DECOMP2 decompOpt1? seqOfBa
+decomp2:                //    DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompExtra -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1) decompExtra)
+						   DECOMP2 decompOpt1? decompElement decompExtra?          -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement)           decompExtra?)
+						    ;
+
+decompExtra:                (DOLLAR dollarConditional -> ^(ASTDOLLAR dollarConditional))?
+							(GROUP decompGroup* ->  decompGroup*)?
+							;
+
+decompGroup:                seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1;
 
 decompElement:              expression -> expression;
 
@@ -4086,6 +4101,7 @@ ident2: 					Ident |
   CUT|
   DATE|
   DECOMP|
+  DECOMP2|
   EVAL|
   DELETE|
   DISP|
@@ -4460,6 +4476,7 @@ ident2: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
+  GROUP|
   RP|
   R|
   SAVE|
@@ -4893,6 +4910,7 @@ ident3: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
+  GROUP|
   RP|
   R|
   SAVE|
