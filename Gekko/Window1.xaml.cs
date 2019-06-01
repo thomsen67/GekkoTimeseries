@@ -1180,7 +1180,7 @@ namespace Gekko
 
                 table = Program.Decompose(this.decompOptions);
 
-                if (Globals.runningOnTTComputer)
+                if (false && Globals.runningOnTTComputer)
                 {
                     DecompTables d = Program.DecomposeNEW(this.decompOptions.expression, EDecompBanks.Both, this.decompOptions.t1, this.decompOptions.t2);
                 }

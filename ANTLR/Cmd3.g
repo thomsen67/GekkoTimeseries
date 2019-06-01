@@ -1258,9 +1258,10 @@ Y2                    = 'Y2'                       ;
     RING             = 'RING';
     RN= 'RN'       ;
     ROWS             = 'ROWS';
-	GROUP             = 'GROUP';
+	AGG             = 'AGG';
 	LEVEL = 'LEVEL';
-	SUBST = 'SUBST';
+	LINK = 'LINK';
+	WHERE = 'WHERE';
     RP= 'RP'       ;
     RUN              = 'RUN'             ;
 	LIBRARY = 'LIBRARY';
@@ -1879,9 +1880,10 @@ d.Add("Y" ,Y);
                                         d.Add("ring"    , RING    );
                                         d.Add("rn"               , RN );
                                         d.Add("rows"    , ROWS    );
-										d.Add("group"    , GROUP    );
+										d.Add("agg"    , AGG    );
 										d.Add("level"    , LEVEL    );
-										d.Add("subst"    , SUBST    );
+										d.Add("link"    , LINK    );
+										d.Add("where"    , WHERE    );
                                         d.Add("rp"               , RP );
                                         d.Add("run"     , RUN       );
 										d.Add("library"     , LIBRARY       );
@@ -2766,7 +2768,8 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 | DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
 ;
 
-decomp2:               		DECOMP2 decompOpt1? decompHelper decompDollar decompGroup decompSubst         -> ^({token("ASTDECOMP¤"+($decompHelper.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) decompHelper  decompDollar decompGroup decompSubst )
+decomp2:               	  	DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompWhere decompAgg decompLink         -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1)  decompWhere decompAgg decompLink)
+                       	  |	DECOMP2 decompOpt1? decompExpression       decompWhere decompAgg decompLink         -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)}      ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression)          decompWhere decompAgg decompLink)
 						    ;
 
 decompExpression:           expression;
@@ -2775,9 +2778,9 @@ decompHelper:               seqOfBankvarnamesOnly1 -> ^(ASTDECOMPITEMS2 seqOfBan
 						  | decompExpression -> ^(ASTDECOMPITEMS decompExpression)
 						    ;
 
-decompDollar:               DOLLAR dollarConditional -> ^(ASTDOLLAR dollarConditional);
-decompGroup:                GROUP seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression;
-decompSubst:                SUBST seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
+decompWhere:                WHERE dollarConditional -> dollarConditional;
+decompAgg:                  AGG seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression;
+decompLink:                 LINK seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
 
 decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
@@ -4481,9 +4484,10 @@ ident2: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
-  GROUP|
+  AGG|
   LEVEL|
-  SUBST|
+  LINK|
+  WHERE|
   RP|
   R|
   SAVE|
@@ -4917,9 +4921,10 @@ ident3: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
-  GROUP|
+  AGG|
   LEVEL|
-  SUBST|
+  LINK|
+  WHERE|
   RP|
   R|
   SAVE|
