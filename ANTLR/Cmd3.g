@@ -2755,6 +2755,8 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 | DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement))
 ;
 
+decomp2: DECOMP2 decompOpt1? seqOfBa
+
 decompElement:              expression -> expression;
 
 decompOpt1:					ISNOTQUAL

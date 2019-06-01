@@ -8136,6 +8136,21 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ModelDecomp1()
+        {
+            I("RESET; time 2010 2010;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option model type = gams;");
+            I("model <gms> simple1;");
+            I("y = 5000;");
+            I("c = 4000;");
+            I("i =  900;");
+            I("g =  100;");
+            I("DECOMP2 yg =  100;");
+
+        }
+
+        [TestMethod]
         public void _Test_ModelGamsLhsDependent()
         {
             // ------------------------------------------------------------

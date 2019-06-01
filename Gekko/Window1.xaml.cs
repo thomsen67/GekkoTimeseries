@@ -50,6 +50,8 @@ namespace Gekko
         public enum GekkoTableTypes { 
             TableContent, Left, Top, UpperLeft, Unknown
         };
+
+        
         
         public int frozenRows=0;
         public int frozenCols=0;
@@ -1178,6 +1180,11 @@ namespace Gekko
 
                 table = Program.Decompose(this.decompOptions);
 
+                if (Globals.runningOnTTComputer)
+                {
+                    DecompTables d = Program.DecomposeNEW(this.decompOptions.expression, EDecompBanks.Both, this.decompOptions.t1, this.decompOptions.t2);
+                }
+
                 if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
                 {
                     foreach (string var in this.decompOptions.subst)
@@ -1832,10 +1839,7 @@ namespace Gekko
     }
 
     public class DecompTables
-    {        
-        public bool hasCalculatedQuo = false;
-        public bool hasCalculatedRef = false;
-        // -------------------------------------
+    {           
         public DecompDict cellsQuo = null;
         public DecompDict cellsGradQuo = null;
         public DecompDict cellsContribD = null;
@@ -1904,6 +1908,8 @@ namespace Gekko
         public string dream = null;  //experimental
 
         public DecompTables decompTables = null;
+        public bool hasCalculatedQuo = false;
+        public bool hasCalculatedRef = false;
 
         public List<string> vars2 = null;
 
