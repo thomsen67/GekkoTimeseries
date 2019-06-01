@@ -2763,24 +2763,21 @@ cut:					    CUT -> ^({token("ASTCUT", ASTCUT, input.LT(1).Line)});
 
 decomp:						
 DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarnames.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnames))
-| DECOMP decompOpt1? decompElement -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement))
+| DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
 ;
 
-decomp2:                //    DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompExtra -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1) decompExtra)
-						   DECOMP2 decompOpt1? decompElement decompExtra          -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement)           decompExtra)
+decomp2:               		DECOMP2 decompOpt1? decompHelper decompDollar decompGroup decompSubst         -> ^({token("ASTDECOMP¤"+($decompHelper.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) decompHelper  decompDollar decompGroup decompSubst )
 						    ;
 
-decompHelper:               seqOfBankvarnamesOnly1
+decompExpression:           expression;
 
-decompExtra:                (DOLLAR dollarConditional -> ^(ASTDOLLAR dollarConditional))?
-							(GROUP decompGroup* ->  decompGroup*)?
-							(SUBST decompSubst* ->  decompSubst*)?
-							;
+decompHelper:               seqOfBankvarnamesOnly1 -> ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1) 
+						  | decompExpression -> ^(ASTDECOMPITEMS decompExpression)
+						    ;
 
-decompGroup:                seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 (LEVEL expression)? (ZOOM expression)?;
-decompSubst:                seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
-
-decompElement:              expression -> expression;
+decompDollar:               DOLLAR dollarConditional -> ^(ASTDOLLAR dollarConditional);
+decompGroup:                GROUP seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression;
+decompSubst:                SUBST seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
 
 decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
