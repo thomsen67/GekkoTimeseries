@@ -1259,6 +1259,8 @@ Y2                    = 'Y2'                       ;
     RN= 'RN'       ;
     ROWS             = 'ROWS';
 	GROUP             = 'GROUP';
+	LEVEL = 'LEVEL';
+	SUBST = 'SUBST';
     RP= 'RP'       ;
     RUN              = 'RUN'             ;
 	LIBRARY = 'LIBRARY';
@@ -1878,6 +1880,8 @@ d.Add("Y" ,Y);
                                         d.Add("rn"               , RN );
                                         d.Add("rows"    , ROWS    );
 										d.Add("group"    , GROUP    );
+										d.Add("level"    , LEVEL    );
+										d.Add("subst"    , SUBST    );
                                         d.Add("rp"               , RP );
                                         d.Add("run"     , RUN       );
 										d.Add("library"     , LIBRARY       );
@@ -2763,14 +2767,18 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 ;
 
 decomp2:                //    DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompExtra -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1) decompExtra)
-						   DECOMP2 decompOpt1? decompElement decompExtra?          -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement)           decompExtra?)
+						   DECOMP2 decompOpt1? decompElement decompExtra          -> ^({token("ASTDECOMP¤"+($decompElement.text), ASTDECOMP, input.LT(1).Line)}          ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompElement)           decompExtra)
 						    ;
+
+decompHelper:               seqOfBankvarnamesOnly1
 
 decompExtra:                (DOLLAR dollarConditional -> ^(ASTDOLLAR dollarConditional))?
 							(GROUP decompGroup* ->  decompGroup*)?
+							(SUBST decompSubst* ->  decompSubst*)?
 							;
 
-decompGroup:                seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1;
+decompGroup:                seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 (LEVEL expression)? (ZOOM expression)?;
+decompSubst:                seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
 
 decompElement:              expression -> expression;
 
@@ -4477,6 +4485,8 @@ ident2: 					Ident |
   ROWNAMES|
   ROWS|
   GROUP|
+  LEVEL|
+  SUBST|
   RP|
   R|
   SAVE|
@@ -4911,6 +4921,8 @@ ident3: 					Ident |
   ROWNAMES|
   ROWS|
   GROUP|
+  LEVEL|
+  SUBST|
   RP|
   R|
   SAVE|
