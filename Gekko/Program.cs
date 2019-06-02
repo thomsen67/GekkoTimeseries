@@ -36078,7 +36078,13 @@ namespace Gekko
             //                 Ref[-1]             Work[-1]
             //
             //
-            // DECOMP   sum((#a, #s), pop[#a, #s, #o))   $   'se' in #o   group   #a as #a_agg level '10-year' zoom '27', #b as ...     subst   x1 from e2, x3 from e1, x2 from e7;
+            //DECOMP2 <2010 2012 q> sum((#a, #s), pop[#a, #s, #o])  
+            //  WHERE  'se' in #o, 'se' in #o  // ... , date = 2011    
+            //  AGG   #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   
+            //  LINK   x1 from e2, x3 from e1    
+            //  COLS  #a, #o;
+
+            // DECOMP a where a in b agg x as y level 1 zoom 2 link a from b;
             // y   $   'a' in #a and 'b' in #j --> y[a, b]
             // comma could be used in $
             // level 3 --> level '5-year'
@@ -36086,6 +36092,9 @@ namespace Gekko
             //    level '10-year' zoom '25..29'   or   level '10-year' zoom '27'
             // when zooming, sibling nodes for zoomed level are shown, same for parents up to the current aggregation level.
             // Like this, we can both have an aggregation level and a deeper zoom.
+            //
+            // Per default, we have time in cols. It should be possible to put other dimensions on the cols (for fixed time).
+            // even having time on rows should be possible
             //                        
             // #a_agg = nested list with this structure:            
             //

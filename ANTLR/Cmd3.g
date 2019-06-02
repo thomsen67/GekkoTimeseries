@@ -2768,19 +2768,18 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 | DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
 ;
 
-decomp2:               	  	DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompWhere decompAgg decompLink         -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1)  decompWhere decompAgg decompLink)
-                       	  |	DECOMP2 decompOpt1? decompExpression       decompWhere decompAgg decompLink         -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)}      ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression)          decompWhere decompAgg decompLink)
+decomp2:               	  	DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompWhere decompAgg decompLink decompCols         -> ^({token("ASTDECOMP¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1)  decompWhere decompAgg decompLink)
+                       	  |	DECOMP2 decompOpt1? decompExpression       decompWhere decompAgg decompLink decompCols         -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)}      ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression)          decompWhere decompAgg decompLink)
 						    ;
 
 decompExpression:           expression;
 
-decompHelper:               seqOfBankvarnamesOnly1 -> ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1) 
-						  | decompExpression -> ^(ASTDECOMPITEMS decompExpression)
-						    ;
+decompWhere:                WHERE decompWhere1 IN seqOfBankvarnamesOnly1 (COMMA2 decompWhere1 IN seqOfBankvarnamesOnly1)*;
+decompAgg:                  AGG seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression (COMMA2 seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression)*;
+decompLink:                 LINK seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1 (COMMA2 seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1)*;
+decompCols:                 COLS seqOfBankvarnames;
 
-decompWhere:                WHERE dollarConditional -> dollarConditional;
-decompAgg:                  AGG seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 LEVEL expression ZOOM expression;
-decompLink:                 LINK seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1;
+decompWhere1:               seqOfBankvarnamesOnly1 | expression;
 
 decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
