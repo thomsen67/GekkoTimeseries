@@ -5326,9 +5326,62 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".expression = " + methodName + ";" + G.NL);
                         }
                         break;
+                    case "ASTDECOMP2":
+                        {
+                            node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                            GetCodeFromAllChildren(node);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
                     case "ASTDECOMPITEMS2":
                         {                            
                             node.Code.A("o" + Num(node) + ".name = " + node[0].Code + ";" + G.NL);
+                        }
+                        break;
+                    case "ASTDECOMPWHERE":
+                        {
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".where.Add(" + node[i].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
+                    case "ASTDECOMPWHERE2":
+                        {
+                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + "}");                            
+                        }
+                        break;
+                    case "ASTDECOMPAGG":
+                        {
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".agg.Add(" + node[i].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
+                    case "ASTDECOMPAGG1c":
+                    case "ASTDECOMPAGG1d":
+                        {
+                            if (node.Code.ToString() == "") node.Code.A("null");
+                        }
+                        break;
+                    case "ASTDECOMPAGG1":
+                        {
+                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + ", " + node[2][0].Code + ", " + node[3][0].Code + "}");                        
+                        }
+                        break;
+                    case "ASTDECOMPLINK":
+                        {
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".link.Add(" + node[i].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
+                    case "ASTDECOMPLINK1":
+                        {
+                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + "}");
                         }
                         break;
                     case "ASTUNFIX":

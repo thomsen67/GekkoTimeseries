@@ -8590,8 +8590,30 @@ namespace Gekko
             }
         }
 
-        
-            
+
+        public class Decomp2
+        {
+            public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
+            public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set            
+            public string opt_prtcode = null;
+            public string variable = null;
+            public string expressionCs = null;
+            public Func<GekkoSmpl, IVariable> expression = null;            
+            public string label = null;
+            public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
+            public List<List<IVariable>> where = new List<List<IVariable>>();
+            public List<List<IVariable>> agg = new List<List<IVariable>>();
+            public List<List<IVariable>> link = new List<List<IVariable>>();
+
+            public void Exe()
+            {
+                G.CheckLegalPeriod(this.t1, this.t2);
+                if (G.NullOrEmpty(this.opt_prtcode)) this.opt_prtcode = "n";                
+                Program.Decomp2(this);
+            }
+        }
+
+
 
         //public class Info
         //{

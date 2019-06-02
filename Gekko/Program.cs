@@ -12122,6 +12122,59 @@ namespace Gekko
 
         }
 
+        public static void Decomp2(O.Decomp2 o)
+        {
+
+            //This is the starting point of a decomposition call
+            //Calls: Program.Decomp(decompOptions);
+            //       Program.DecompThreadFunction(Object o) --> doing stuff with EVal() function
+            //       Window1.RecalcCellsWithNewType();
+            //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
+            //
+            //CLICKING: Mouse_Down(), cf. #98732498724
+            //
+            //Actual calculation is in Decompose(DecompOptions o)
+
+            //We need to merge DecompHelper2() into Decompose()
+
+            DecompOptions decompOptions = new DecompOptions();
+            decompOptions.t1 = o.t1;
+            decompOptions.t2 = o.t2;
+            decompOptions.expressionOld = o.label;
+            decompOptions.expression = o.expression;            
+            decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
+            decompOptions.name = o.name;
+
+            foreach (List<IVariable> liv in o.where)
+            {
+                //'a' in #i
+                string x1 = O.ConvertToString(liv[0]);
+                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
+                decompOptions.where.Add(new List<string>() { x1, x2[0] });
+            }
+
+            foreach (List<IVariable> liv in o.agg)
+            {
+                //
+                List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
+                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
+                string x3 = O.ConvertToString(liv[2]);
+                string x4 = O.ConvertToString(liv[3]);
+                decompOptions.agg.Add(new List<string>() { x1[0], x2[0], x3, x4 });
+            }
+
+            foreach (List<IVariable> liv in o.link)
+            {
+                //
+                List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
+                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
+                decompOptions.link.Add(new List<string>() { x1[0], x2[0] });
+            }
+
+            Decomp(decompOptions);
+
+        }
+
         public static string[] GetListOfStringsFromListOfIvariables(IVariable[] indexes)
         {
             string[] keys = new string[indexes.Length];

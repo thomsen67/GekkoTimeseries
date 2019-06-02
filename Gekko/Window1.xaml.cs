@@ -1913,6 +1913,10 @@ namespace Gekko
 
         public List<string> vars2 = null;
 
+        public List<List<string>> where = new List<List<string>>();
+        public List<List<string>> agg = new List<List<string>>();
+        public List<List<string>> link = new List<List<string>>();
+
         public DecompOptions Clone()
         {
             //clones relevant parts for new window
@@ -1939,6 +1943,38 @@ namespace Gekko
             {
                 d.subst.Add(s);
             }
+
+            foreach (List<string> x1 in this.where)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x2 in x1)
+                {
+                    temp.Add(x2);
+                }
+                d.where.Add(temp);
+            }
+
+            foreach (List<string> x1 in this.agg)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x2 in x1)
+                {
+                    temp.Add(x2);
+                }
+                d.agg.Add(temp);
+            }
+
+            foreach (List<string> x1 in this.link)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x2 in x1)
+                {
+                    temp.Add(x2);
+                }
+                d.link.Add(temp);
+            }
+
+
 
             return d;
         }
