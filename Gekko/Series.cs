@@ -1253,7 +1253,7 @@ namespace Gekko
             {
                 rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
 
-                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;
@@ -1313,7 +1313,7 @@ namespace Gekko
 
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
             {                               
-                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0.Add(xx); //should return a seies corresponding to t0-t3                    
                     GekkoTime window2 = smpl.t3;
@@ -1431,7 +1431,7 @@ namespace Gekko
                 // x2 is a VAL or MATRIX 1x1
                 // ---------------------------
 
-                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
+                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     int ia1 = rv_series.ResizeDataArray(window1);
                     int ia2 = rv_series.ResizeDataArray(window2);
@@ -1507,7 +1507,7 @@ namespace Gekko
                 //So for practical purposes, Func<> here does not cost performance.
                 //If raw arrays were being used over large samples, perhaps the difference would manifest.
 
-                if (Program.options.bugfix_speedup && x1_series.type != ESeriesType.Timeless && x2_series.type != ESeriesType.Timeless)
+                if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless && x2_series.type != ESeriesType.Timeless)
                 {
                     int ia1 = rv_series.ResizeDataArray(window1);
                     int ia2 = rv_series.ResizeDataArray(window2);
@@ -2316,7 +2316,7 @@ namespace Gekko
             if (this.Type() == EVariableType.Series && y.Type() == EVariableType.Series)
             {
                 Series y_series = y as Series;
-                if (Program.options.bugfix_speedup && this.type != ESeriesType.Timeless && y_series.type != ESeriesType.Timeless)
+                if (Globals.bugfix_speedup && this.type != ESeriesType.Timeless && y_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0;
                     GekkoTime window2 = smpl.t3;

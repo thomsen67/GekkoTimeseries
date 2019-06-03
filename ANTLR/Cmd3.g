@@ -3682,7 +3682,7 @@ optionType:
 			 | BUGFIX IMPORT EXPORT '='? yesNoSimple -> BUGFIX IMPORT EXPORT ^(ASTBOOL yesNoSimple)
 			 | BUGFIX PX '='? yesNoSimple -> BUGFIX PX ^(ASTBOOL yesNoSimple)
 			 | BUGFIX DOWNLOAD '='? yesNoSimple -> BUGFIX DOWNLOAD ^(ASTBOOL yesNoSimple)
-			 | BUGFIX SPEEDUP '='? yesNoSimple -> BUGFIX SPEEDUP ^(ASTBOOL yesNoSimple)
+		//	 | BUGFIX SPEEDUP '='? yesNoSimple -> BUGFIX SPEEDUP ^(ASTBOOL yesNoSimple)
 			 | BUGFIX GBK '='? yesNoSimple -> BUGFIX GBK ^(ASTBOOL yesNoSimple)
 
              //| CALC question -> CALC question

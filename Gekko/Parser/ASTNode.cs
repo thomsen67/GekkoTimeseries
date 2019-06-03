@@ -66,7 +66,8 @@ namespace Gekko.Parser
         public GekkoDictionary<string, string> freeIndexedLists = null; //like x[#m], need to unfold for PRT/PLOT
         //public GekkoDictionary<string, string> freeIndexedListsLeftSide = null; //like series x[#m] = 1
         public List<Tuple<string, string>> forLoop = null;
-        
+        public string localInsideLoopVariablesCs = null;
+
         //public string listLoopNestCode = null; //code delivered from sub-tree
         public string ivTempVarName = null;
         public string mapTempVarName = null;

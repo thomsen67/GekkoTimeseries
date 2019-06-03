@@ -48,7 +48,7 @@ Additionally, there are model, solve, equation options.
         //public bool bugfix_px = true;
         public bool bugfix_import_export = false;
         public bool bugfix_download = true;
-        public bool bugfix_speedup = true;  //decomp <2020 2050> sum(#a, npop[#a]+npop[#a]+npop[#a]+npop[#a]+npop[#a]) --> speedup of factor 2.5. The more arithmetics and periods, the more speedup compared to GetData() and SetData()
+        
         public bool bugfix_gbk = false;  //set true to activate old 7zip writer
 
         public bool databank_create_auto = true;

@@ -2554,9 +2554,16 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 sb1.AppendLine("Func<" + iv + "> " + funcName + " = (" + parentListLoopVars1 + ") => {");
-                                
+
                                 //NOTE: local functions are in C#7, but to compile them .NET 4.6 is necessary. So use Func<> for now, small speed penalty.
                                 //sb1.AppendLine(iv + " " + funcName + "(" + parentListLoopVars1 + ")" + " {");
+
+                                //#ttqwerty
+
+                                if (node.localInsideLoopVariablesCs != null)
+                                {
+                                    sb1.AppendLine(node.localInsideLoopVariablesCs);
+                                }
 
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
@@ -4294,7 +4301,27 @@ namespace Gekko.Parser.Gek
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
 
-                                if (Program.options.bugfix_speedup)
+                                //if (Globals.bugfix_speedup)
+                                //{
+                                //    ASTNode highest = SearchUpwardsInTree7a(node);
+                                //    if (highest != null)
+                                //    {
+                                //        if (lookupCode.Contains(Globals.listLoopInternalName))
+                                //        {
+                                //            //that would not be good, for instance #i in a x{#i}y variable inside the name
+                                //        }
+                                //        else
+                                //        {
+                                            
+                                //            string name = Globals.listLoopMovedStuff + ++Globals.counter;
+                                //            w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
+                                //            lookupCode = name;                                            
+                                //            //highest.CodeSentFromSubTree+=
+                                //        }
+                                //    }
+                                //}
+
+                                if (Globals.bugfix_speedup2)
                                 {
                                     ASTNode highest = SearchUpwardsInTree7a(node);
                                     if (highest != null)
@@ -4305,11 +4332,21 @@ namespace Gekko.Parser.Gek
                                         }
                                         else
                                         {
-                                            
+
+                                            //#ttqwerty
                                             string name = Globals.listLoopMovedStuff + ++Globals.counter;
-                                            w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
-                                            lookupCode = name;                                            
-                                            //highest.CodeSentFromSubTree+=
+
+                                            if (Globals.bugfix_speedup3)
+                                            {
+                                                highest.localInsideLoopVariablesCs+= "IVariable " + name + " = " + lookupCode + ";" + G.NL;
+                                                lookupCode = name;
+                                            }
+                                            else
+                                            {                                                
+                                                w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
+                                                lookupCode = name;
+                                                //highest.CodeSentFromSubTree+=
+                                            }
                                         }
                                     }
                                 }
@@ -8041,7 +8078,7 @@ namespace Gekko.Parser.Gek
         //created for each new command (except IF, FOR, etc -- hmm is this true now?)
 
         public GekkoStringBuilder localFuncs = null;
-        public string localInsideLoopVariables = null;
+        public string localInsideLoopVariables = null;  //probably obsolete now
 
         public GekkoDictionary<string, string> localStatementCache = null;        
         public seriesType seriesHelper = seriesType.None;
