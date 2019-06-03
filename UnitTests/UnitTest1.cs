@@ -2318,12 +2318,52 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_PrintSumMultiplier()
+        {
+            Table table = null;
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("xx = series(2);");
+            I("xx[a, x] = (1,2,3);");
+            I("xx[a, y] = (7,8,9);");
+            I("CLONE;");
+            I("xx[a, x] = (1+7,2+8,3+6);");
+            I("xx[a, y] = (7+3,8+2,9+3);");
+
+            /*                     
+                                           sum
+                          2001          1.0000 
+                          2002          2.0000 
+                          2003          3.0000
+             */
+            
+            I("p <m> xx[a, x] + xx[a, y] 'sum';");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?            
+            Assert.AreEqual(table.Get(2, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 9.0000d, 0.0001);
+
+            I("#i = x, y;");
+            I("p <m> sum(#i, xx[a, #i]) 'sum';");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?            
+            Assert.AreEqual(table.Get(2, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 9.0000d, 0.0001);
+        }
+
+
+        [TestMethod]
         public void _Test_SumUnfoldDollarPrint()
         {
 
             Table table = null;
-
-
 
             // setting up the tests
             // setting up the tests ----------------------------------------------
@@ -2355,6 +2395,7 @@ namespace UnitTests
             I("xxby = (14,15,16);");
 
             I("CLONE;");
+
 
 
             /*                     

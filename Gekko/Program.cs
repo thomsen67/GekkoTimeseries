@@ -36131,9 +36131,11 @@ namespace Gekko
             //                 Ref[-1]             Work[-1]
             //
             //
-            //DECOMP2 <2010 2012 q> sum((#a, #s), pop[#a, #s, #o])  
+            //DECOMP2 <2010 2012 q> sum((#a, #s), pop[#a, #s, #o]) 
+            //  SELECT #a, #s
             //  WHERE  'se' in #o, 'se' in #o  // ... , date = 2011    
-            //  AGG   #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   
+            //  AGG   #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'  
+            //  SORT #s, #a
             //  LINK   x1 from e2, x3 from e1    
             //  COLS  #a, #o;
 
