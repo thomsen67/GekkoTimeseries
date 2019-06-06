@@ -738,27 +738,27 @@ namespace Gekko.Parser.Gek
                 {
                     case "+":
                         {
-                            node.Code.CA("O.Add(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;                    
                     case "-":
                         {
-                            node.Code.CA("O.Subtract(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Subtract(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "*":
                         {
-                            node.Code.CA("O.Multiply(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Multiply(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "/":
                         {
-                            node.Code.CA("O.Divide(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Divide(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTPOW":
                         {
-                            node.Code.CA("O.Power(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Power(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     //case "&+":
@@ -778,22 +778,22 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTLISTAND":
                         {
-                            node.Code.CA("O.Intersect(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Intersect(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTLISTOR":
                         {
-                            node.Code.CA("O.Union(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Union(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;                    
                     case "ASTPLUS":
                         {
-                            node.Code.CA("O.Add(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTMINUS":
                         {
-                            node.Code.CA("O.Subtract(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Subtract(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     //case "ASTPERCENT2":
@@ -813,7 +813,7 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTSTAR":
                         {
-                            node.Code.CA("O.Multiply(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Multiply(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTREPSTAR":
@@ -823,12 +823,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDIV":
                         {
-                            node.Code.CA("O.Divide(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Divide(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTPOWER":
                         {
-                            node.Code.CA("O.Power(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                            node.Code.CA("O.Power(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTXLINE":
@@ -1076,14 +1076,14 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Reset o" + Num(node) + " = new O.Reset();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".Exe(" + Globals.XXXXXXXX + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe(" + Globals.smpl + ");" + G.NL);
                         }
                         break;
                     case "ASTRESTART":
                         {
                             node.Code.A("O.Restart o" + Num(node) + " = new O.Restart();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".Exe(" + Globals.XXXXXXXX + ");" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe(" + Globals.smpl + ");" + G.NL);
                         }
                         break;
 
@@ -1477,11 +1477,11 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (child[0].Text == "ASTPLUS")
                                     {
-                                        s = "O.AddSpecial(" + Globals.XXXXXXXX + ", " + internalName + ", " + child[0][1].Code + ", false)";
+                                        s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", false)";
                                     }
                                     else
                                     {
-                                        s = "O.AddSpecial(" + Globals.XXXXXXXX + ", " + internalName + ", " + child[0][1].Code + ", true)";
+                                        s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", true)";
                                     }
                                 }
                                 else
@@ -1665,19 +1665,19 @@ namespace Gekko.Parser.Gek
                                 if (node?.Parent?.Parent?.Parent?.Text == "ASTASSIGNMENT")
                                 {
                                     //assignment is a bit special
-                                    node.Code.A("" + Globals.XXXXXXXX + ".t0 = ").A(s1).A(";").A(G.NL);
-                                    node.Code.A("" + Globals.XXXXXXXX + ".t1 = ").A(s1).A(";").A(G.NL);
-                                    node.Code.A("" + Globals.XXXXXXXX + ".t2 = ").A(s2).A(";").A(G.NL);
-                                    node.Code.A("" + Globals.XXXXXXXX + ".t3 = ").A(s2).A(";").A(G.NL);
+                                    node.Code.A("" + Globals.smpl + ".t0 = ").A(s1).A(";").A(G.NL);
+                                    node.Code.A("" + Globals.smpl + ".t1 = ").A(s1).A(";").A(G.NL);
+                                    node.Code.A("" + Globals.smpl + ".t2 = ").A(s2).A(";").A(G.NL);
+                                    node.Code.A("" + Globals.smpl + ".t3 = ").A(s2).A(";").A(G.NL);
                                 }
                                 else
                                 {
                                     if (node?.Parent?.Parent?.Text == "ASTOLS")  //so that the expressions get the right " + Globals.smpl + " period
                                     {
-                                        node.Code.A("" + Globals.XXXXXXXX + ".t0 = ").A(s1).A(";").A(G.NL);
-                                        node.Code.A("" + Globals.XXXXXXXX + ".t1 = ").A(s1).A(";").A(G.NL);
-                                        node.Code.A("" + Globals.XXXXXXXX + ".t2 = ").A(s2).A(";").A(G.NL);
-                                        node.Code.A("" + Globals.XXXXXXXX + ".t3 = ").A(s2).A(";").A(G.NL);
+                                        node.Code.A("" + Globals.smpl + ".t0 = ").A(s1).A(";").A(G.NL);
+                                        node.Code.A("" + Globals.smpl + ".t1 = ").A(s1).A(";").A(G.NL);
+                                        node.Code.A("" + Globals.smpl + ".t2 = ").A(s2).A(";").A(G.NL);
+                                        node.Code.A("" + Globals.smpl + ".t3 = ").A(s2).A(";").A(G.NL);
                                     }
 
                                     node.Code.A("o").A(Num(node)).A(".t1 = ").A(s1).A(";").A(G.NL);
@@ -1749,7 +1749,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(node[1].Code);
                             //node.Code.A("))");
 
-                            node.Code.A("O.LogicalOr(" + Globals.XXXXXXXX + ", ");
+                            node.Code.A("O.LogicalOr(" + Globals.smpl + ", ");
                             node.Code.A(node[0].Code);
                             node.Code.A(", ");
                             node.Code.A(node[1].Code);
@@ -1764,7 +1764,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(node[1].Code);
                             //node.Code.A("))");
 
-                            node.Code.A("O.LogicalAnd(" + Globals.XXXXXXXX + ", ");
+                            node.Code.A("O.LogicalAnd(" + Globals.smpl + ", ");
                             node.Code.A(node[0].Code);
                             node.Code.A(", ");
                             node.Code.A(node[1].Code);
@@ -1778,7 +1778,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(node[0].Code);                            
                             //node.Code.A(")");
 
-                            node.Code.A("O.LogicalNot(" + Globals.XXXXXXXX + ", ");
+                            node.Code.A("O.LogicalNot(" + Globals.smpl + ", ");
                             node.Code.A(node[0].Code);
                             node.Code.A(")");                            
                         }
@@ -1835,27 +1835,27 @@ namespace Gekko.Parser.Gek
                             string code2 = node[2].Code.ToString();
                             if (op == "ASTIFOPERATOR4")  //"<"
                             {                                
-                                node.Code.A("O.StrictlySmallerThan(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.StrictlySmallerThan(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR6")  //"<="
                             {
-                                node.Code.A("O.SmallerThanOrEqual(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.SmallerThanOrEqual(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR1") //"=="
                             {
-                                node.Code.A("O.Equals(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.Equals(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR5")  //">="
                             {
-                                node.Code.A("O.LargerThanOrEqual(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.LargerThanOrEqual(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR3") //">"
                             {
-                                node.Code.A("O.StrictlyLargerThan(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.StrictlyLargerThan(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR2") //"<>"
                             {
-                                node.Code.A("O.NonEquals(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.NonEquals(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
                             {
@@ -1883,7 +1883,7 @@ namespace Gekko.Parser.Gek
                                     code1 = internalName;
                                 }                                
 
-                                node.Code.A("O.In(" + Globals.XXXXXXXX + ", " + code1 + "," + code2 + ")");
+                                node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
 
                             }
                         }
@@ -1925,7 +1925,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 //right-hand side, much easier
-                                node.Code.A("O.Dollar(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ")");
+                                node.Code.A("O.Dollar(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                             }
                             break;
                         }
@@ -2236,7 +2236,7 @@ namespace Gekko.Parser.Gek
                     case "ASTIF":
                         {
                             node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
-                            node.Code.A("if(O.IsTrue(" + Globals.XXXXXXXX + ", " + node[0].Code + ")) {");
+                            node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");
                             //node.Code.A(Globals.splitSTART);
                             GetCodeFromAllChildren(node, node[1][0]);                            
                             //node.Code.A(Globals.splitSTOP);
@@ -2306,11 +2306,11 @@ namespace Gekko.Parser.Gek
                                         if (i < 2)
                                         {
                                             //special <%t1 %t2> arguments
-                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func, " + Globals.XXXXXXXX + ", " + (i + 1) + ");" + G.NL;
+                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func, " + Globals.smpl + ", " + (i + 1) + ");" + G.NL;
                                         }
                                         else
                                         {
-                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(" + Globals.XXXXXXXX + ")" + ", " + (i + 1) + ");" + G.NL;
+                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(" + Globals.smpl + ")" + ", " + (i + 1) + ");" + G.NL;
                                         }
                                     }
                                     else
@@ -2326,7 +2326,7 @@ namespace Gekko.Parser.Gek
                             string ss = null;
                             if (Globals.functionFuncArguments) ss = "New";
 
-                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.XXXXXXXX + ", P p" + vars + ") => " + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p" + vars + ") => " + G.NL);
                             w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);                            
                             w.headerCs.AppendLine("}" + G.NL);
                             
@@ -2421,7 +2421,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (child.IsFirstChild()) s = child.Code.ToString();
-                                else s += ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`/`)).Add(" + Globals.XXXXXXXX + ", " + child.Code + ")";
+                                else s += ".Add(" + Globals.smpl + ", new ScalarString(`/`)).Add(" + Globals.smpl + ", " + child.Code + ")";
                             }
                             node.Code.A(s);
                         }
@@ -2432,14 +2432,14 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (child.IsFirstChild()) s = child.Code.ToString();
-                                else s += ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`.`)).Add(" + Globals.XXXXXXXX + ", " + child.Code + ")";
+                                else s += ".Add(" + Globals.smpl + ", new ScalarString(`.`)).Add(" + Globals.smpl + ", " + child.Code + ")";
                             }
                             node.Code.A(s);
                         }
                         break;
                     case "ASTURLFIRST1":
                         {
-                            node.Code.CA(node[0].Code + ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`http://`)).Add(" + Globals.XXXXXXXX + ", " + node[1].Code + ")");
+                            node.Code.CA(node[0].Code + ".Add(" + Globals.smpl + ", new ScalarString(`http://`)).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                         }
                         break;
                     case "ASTURLFIRST3":                    
@@ -2454,7 +2454,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (child.IsFirstChild()) s = child.Code.ToString();
-                                else s += ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`\\\\`)).Add(" + Globals.XXXXXXXX + ", " + child.Code + ")";
+                                else s += ".Add(" + Globals.smpl + ", new ScalarString(`\\\\`)).Add(" + Globals.smpl + ", " + child.Code + ")";
                             }
                             node.Code.A(s);
                         }
@@ -2465,14 +2465,14 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (child.IsFirstChild()) s = child.Code.ToString();
-                                else s += ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`.`)).Add(" + Globals.XXXXXXXX + ", " + child.Code + ")";
+                                else s += ".Add(" + Globals.smpl + ", new ScalarString(`.`)).Add(" + Globals.smpl + ", " + child.Code + ")";
                             }
                             node.Code.A(s);
                         }
                         break;
                     case "ASTFILENAMEFIRST1":                    
                         {
-                            node.Code.CA(node[0].Code + ".Add(" + Globals.XXXXXXXX + ", new ScalarString(`:\\\\`)).Add(" + Globals.XXXXXXXX + ", " + node[1].Code + ")");
+                            node.Code.CA(node[0].Code + ".Add(" + Globals.smpl + ", new ScalarString(`:\\\\`)).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                         }
                         break;                    
                     case "ASTFILENAMEFIRST2":
@@ -2568,7 +2568,7 @@ namespace Gekko.Parser.Gek
                                 if (G.Equal(functionNameLower, "sum"))
                                 {
                                     sb1.AppendLine(GekkoSmplCommandHelper1(smplCommandNumber, "Sum"));
-                                    sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(" + Globals.XXXXXXXX + ");" + G.NL);
+                                    sb1.AppendLine("Series " + tempName + " = new Series(ESeriesType.Normal, Program.options.freq, null); " + tempName + ".SetZero(" + Globals.smpl + ");" + G.NL);
                                 }
                                 else
                                 {
@@ -2584,7 +2584,7 @@ namespace Gekko.Parser.Gek
 
                                     if (s == null) 
                                     {
-                                        s = "O.Lookup(" + Globals.XXXXXXXX + ", null, ((O.scalarStringHash).Add(" + Globals.XXXXXXXX + ", (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, new  LookupSettings(), EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
+                                        s = "O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, new  LookupSettings(), EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
                                     }
 
                                     sb1.AppendLine("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(" + s + ")) {");
@@ -2592,7 +2592,7 @@ namespace Gekko.Parser.Gek
 
                                 if (G.Equal(functionNameLower, "sum"))
                                 {                                    
-                                    sb1.AppendLine(tempName + ".InjectAdd(" + Globals.XXXXXXXX + ", " + node[3].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine(tempName + ".InjectAdd(" + Globals.smpl + ", " + node[3].Code.ToString() + ");" + G.NL);
                                     sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
                                 else
@@ -2649,7 +2649,7 @@ namespace Gekko.Parser.Gek
                                             if (G.IsInteger(meta))
                                             {
                                                 //simple: lag=2                                                
-                                                extra = "O.Smpl(" + Globals.XXXXXXXX + ", " + -int.Parse(meta) + "), ";
+                                                extra = "O.Smpl(" + Globals.smpl + ", " + -int.Parse(meta) + "), ";
                                             }
                                             else
                                             {
@@ -2712,11 +2712,11 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (lagIndexOffset == 0)
                                         {
-                                            extra = "O.Smpl(" + Globals.XXXXXXXX + ", " + node[lagIndex - 1].Code + "), ";
+                                            extra = "O.Smpl(" + Globals.smpl + ", " + node[lagIndex - 1].Code + "), ";
                                         }
                                         else
                                         {
-                                            extra = "O.Smpl(" + Globals.XXXXXXXX + ", O.Add(" + Globals.XXXXXXXX + ", " + node[lagIndex - 1].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
+                                            extra = "O.Smpl(" + Globals.smpl + ", O.Add(" + Globals.smpl + ", " + node[lagIndex - 1].Code + ", new ScalarVal(" + lagIndexOffset + "d))), ";
                                         }
                                     }
 
@@ -2891,7 +2891,7 @@ namespace Gekko.Parser.Gek
                             else
                             {                                
                                 //name:name
-                                node.Code.CA("O.Add(" + Globals.XXXXXXXX + ", " + node[0].Code + ", new ScalarString(`:`), " + node[1].Code + ")");                             
+                                node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", new ScalarString(`:`), " + node[1].Code + ")");                             
                             }
                         }
                         break;
@@ -2977,14 +2977,14 @@ namespace Gekko.Parser.Gek
                     //    break;
                     case "ASTGENRLISTINDEXER":
                         {
-                            node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), "O.GetTimeSeriesFromList(" + Globals.XXXXXXXX + ", " + node[1].Code + ", " + node[2].Code + ", 1)", node[3].Code.ToString(), w, null));
+                            node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), "O.GetTimeSeriesFromList(" + Globals.smpl + ", " + node[1].Code + ", " + node[2].Code + ", 1)", node[3].Code.ToString(), w, null));
                             //GENR #m[2] = ...
                         }
                         break;
                     case "ASTGENRLISTINDEXER2":
                         {
                             //GENR #m[2][2015] = ...
-                            node.Code.A("O.GetTimeSeriesFromList(" + Globals.XXXXXXXX + ", " + node[0].Code + ", " + node[1].Code + ", 1).ts.SetData(O.ConvertToDate(" + node[2].Code + ", O.GetDateChoices.Strict), O.ConvertToVal(" + node[3].Code + "));" + G.NL);
+                            node.Code.A("O.GetTimeSeriesFromList(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ", 1).ts.SetData(O.ConvertToDate(" + node[2].Code + ", O.GetDateChoices.Strict), O.ConvertToVal(" + node[3].Code + "));" + G.NL);
                         }
                         break;
                     case "ASTHASHPAREN":
@@ -3215,7 +3215,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (child[0].Text == "ASTPLUS")
                                         {
-                                            string s = "O.AddSpecial(" + Globals.XXXXXXXX + ", " + internalName + ", " + child[0][1].Code + ", false)";
+                                            string s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", false)";
                                             indexes += s;
                                             ix[i] = s;
                                             if (reportInterior && !xxx)
@@ -3227,7 +3227,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         else
                                         {
-                                            string s = "O.AddSpecial(" + Globals.XXXXXXXX + ", " + internalName + ", " + child[0][1].Code + ", true)";
+                                            string s = "O.AddSpecial(" + Globals.smpl + ", " + internalName + ", " + child[0][1].Code + ", true)";
                                             indexes += s;
                                             ix[i] = s;
                                             if (reportInterior && !xxx)
@@ -3381,11 +3381,11 @@ namespace Gekko.Parser.Gek
                                 {
                                     if (Globals.fixALag)
                                     {
-                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.XXXXXXXX + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.XXXXXXXX + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
+                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
                                     }
                                     else
                                     {
-                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.XXXXXXXX + ", " + indexerType + "," + indexes + "), " + Globals.XXXXXXXX + ", " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
+                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + indexes + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
                                     }
 
                                     //this alternative code is only done for x[a] type of variables, not x.f() etc.
@@ -3396,10 +3396,10 @@ namespace Gekko.Parser.Gek
                                         node.AlternativeCode.A("(").A(node[0].AlternativeCode).A(")");
                                         for (int i = 0; i < node[1].ChildrenCount(); i++)
                                         {
-                                            if (i == 0) node.AlternativeCode.A(".Add(" + Globals.XXXXXXXX + ", new ScalarString(\"[\"))");
-                                            node.AlternativeCode = node.AlternativeCode.A(".Add(" + Globals.XXXXXXXX + ", ").A(node[1][i].Code).A(")");
-                                            if (i < node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(" + Globals.XXXXXXXX + ", new ScalarString(\", \"))");
-                                            if (i == node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(" + Globals.XXXXXXXX + ", new ScalarString(\"]\"))");
+                                            if (i == 0) node.AlternativeCode.A(".Add(" + Globals.smpl + ", new ScalarString(\"[\"))");
+                                            node.AlternativeCode = node.AlternativeCode.A(".Add(" + Globals.smpl + ", ").A(node[1][i].Code).A(")");
+                                            if (i < node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(" + Globals.smpl + ", new ScalarString(\", \"))");
+                                            if (i == node[1].ChildrenCount() - 1) node.AlternativeCode.A(".Add(" + Globals.smpl + ", new ScalarString(\"]\"))");
                                         }
                                     }
 
@@ -3423,7 +3423,7 @@ namespace Gekko.Parser.Gek
                                 //---------------------------------------------
                                 //So a lookup on the first container, then index and index, and finally indexersetdata()
 
-                                node.Code.A("O.IndexerSetData(" + Globals.XXXXXXXX + ", ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(OperatorHelper(node, -12345) + ", ").A(indexes).A(")");
+                                node.Code.A("O.IndexerSetData(" + Globals.smpl + ", ").A(node[0].Code).A(",  ").A(ivTempVar).A(", ").A(OperatorHelper(node, -12345) + ", ").A(indexes).A(")");
 
                             }
 
@@ -3546,7 +3546,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 else
                                 {
-                                    node.Code.CA("(" + bankCs + ").Add(" + Globals.XXXXXXXX + ", new ScalarString(\":\")).Add(" + Globals.XXXXXXXX + ", " + node[1].Code + ")");
+                                    node.Code.CA("(" + bankCs + ").Add(" + Globals.smpl + ", new ScalarString(\":\")).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                                 }
 
                             }
@@ -3557,7 +3557,7 @@ namespace Gekko.Parser.Gek
                         {
                             if (true)
                             {
-                                node.Code.CA("(" + node[0].Code + ").Add(" + Globals.XXXXXXXX + ", new ScalarString(\"..\")).Add(" + Globals.XXXXXXXX + ", " + node[1].Code + ")");
+                                node.Code.CA("(" + node[0].Code + ").Add(" + Globals.smpl + ", new ScalarString(\"..\")).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                             }
                         }
                         break;
@@ -3831,7 +3831,7 @@ namespace Gekko.Parser.Gek
                             {
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.XXXXXXXX + ", null, ((O.scalarStringHash).Add(" + Globals.XXXXXXXX + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
                                 }
                             }
 
@@ -3854,9 +3854,9 @@ namespace Gekko.Parser.Gek
 
                                 //more complicated probing for sb2
                                 sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
-                                sb2.A("O.Dynamic1(" + Globals.XXXXXXXX + ");" + G.NL);
+                                sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
                                 sb2.A(node[0].Code).End();
-                                sb2.A("return O.Dynamic2(" + Globals.XXXXXXXX + ");" + G.NL);
+                                sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
                                 //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
                             }
 
@@ -3872,7 +3872,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(sb2);
                                 node.Code.A("};" + G.NL);  //end of action
 
-                                node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.XXXXXXXX + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                                node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
                             }
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
@@ -4261,7 +4261,7 @@ namespace Gekko.Parser.Gek
                                     //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also 
                                     //optionsString = "null";  //the above does not work
 
-                                    lookupCode = "O.Lookup(" + Globals.XXXXXXXX + ", " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
+                                    lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
                                     
                                     node.AlternativeCode = new GekkoSB();
                                     string ss = sigil + simpleName;
@@ -4288,14 +4288,14 @@ namespace Gekko.Parser.Gek
                                         bankNameCs = node[0][0].Code.ToString();
                                         if (Globals.fixConcat)
                                         {
-                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(" + Globals.XXXXXXXX + ", O.scalarStringColon)" + ".Concat(" + Globals.XXXXXXXX + ", " + node[1].Code + ")";
+                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(" + Globals.smpl + ", O.scalarStringColon)" + ".Concat(" + Globals.smpl + ", " + node[1].Code + ")";
                                         }
                                         else
                                         {
-                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Add(" + Globals.XXXXXXXX + ", O.scalarStringColon)" + ".Add(" + Globals.XXXXXXXX + ", " + node[1].Code + ")";
+                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Add(" + Globals.smpl + ", O.scalarStringColon)" + ".Add(" + Globals.smpl + ", " + node[1].Code + ")";
                                         }
                                     }
-                                    lookupCode = "O.Lookup(" + Globals.XXXXXXXX + ", " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
+                                    lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
                                                                         
                                     node.AlternativeCode = new GekkoSB();
                                     node.AlternativeCode.A("" + nameAndBankCode + "");     
@@ -4362,25 +4362,25 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = "m" + ++Globals.counter;  //for ultra-safety
                                 string code = "List " + listName + " = null; try { " + listName + " = new List();" + G.NL;
-                                code += "for (" + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " = 0; " + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; " + Globals.XXXXXXXX + "." + Globals.bankNumberiName + "++) {" + G.NL;
+                                code += "for (" + Globals.smpl + "." + Globals.bankNumberiName + " = 0; " + Globals.smpl + "." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; " + Globals.smpl + "." + Globals.bankNumberiName + "++) {" + G.NL;
                                 //code += node[0].Code + ";" + G.NL;
                                 code += listName + ".Add(" + node[0].Code + ");" + G.NL;
                                 code += "}" + G.NL;  //end of for
                                 code += "}" + G.NL;  //end of try
                                 code += "finally" + G.NL;  //end of try
                                 code += "{" + G.NL;
-                                code += "" + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " = 0;" + G.NL;
+                                code += "" + Globals.smpl + "." + Globals.bankNumberiName + " = 0;" + G.NL;
                                 code += "}" + G.NL;
                                 node.Code.A(code);
-                                if(false) node.Code.LoopSmplCode("O.Print(" + Globals.XXXXXXXX + ", " + listName + ")");
-                                node.Code.A("O.Print(" + Globals.XXXXXXXX + ", " + listName + ");");
+                                if(false) node.Code.LoopSmplCode("O.Print(" + Globals.smpl + ", " + listName + ")");
+                                node.Code.A("O.Print(" + Globals.smpl + ", " + listName + ");");
                             }
                             else { 
 
                                 string code = null;
                                 string funcName = "PrintHelper_" + ++Globals.counter;
                                 string listName = "m" + ++Globals.counter;  //for ultra-safety
-                                string methodCode = "public static List " + funcName + "(GekkoSmpl " + Globals.XXXXXXXX + ") { try { List " + listName + " = new List(); for (" + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " = 0; " + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; " + Globals.XXXXXXXX + "." + Globals.bankNumberiName + "++)";
+                                string methodCode = "public static List " + funcName + "(GekkoSmpl " + Globals.smpl + ") { try { List " + listName + " = new List(); for (" + Globals.smpl + "." + Globals.bankNumberiName + " = 0; " + Globals.smpl + "." + Globals.bankNumberiName + " < " + Globals.bankNumberiMax + "; " + Globals.smpl + "." + Globals.bankNumberiName + "++)";
                                 methodCode += "{" + G.NL;
                                 methodCode += "" + listName + ".Add(" + node[0].Code + ");" + G.NL;
                                 methodCode += "}" + G.NL;
@@ -4388,12 +4388,12 @@ namespace Gekko.Parser.Gek
                                 methodCode += "}" + G.NL;  //end of try
                                 methodCode += "finally" + G.NL;  //end of try
                                 methodCode += "{" + G.NL;
-                                methodCode += "" + Globals.XXXXXXXX + "." + Globals.bankNumberiName + " = 0;" + G.NL;
+                                methodCode += "" + Globals.smpl + "." + Globals.bankNumberiName + " = 0;" + G.NL;
                                 methodCode += "}" + G.NL;
                                 methodCode += "}" + G.NL;  //end of method
                                 w.headerCs.Append(methodCode);
-                                if(false) node.Code.LoopSmplCode("O.Print(" + Globals.XXXXXXXX + ", (" + funcName + "(" + Globals.XXXXXXXX + ")" + "))");
-                                node.Code.A("O.Print(" + Globals.XXXXXXXX + ", (" + funcName + "(" + Globals.XXXXXXXX + ")" + "));");
+                                if(false) node.Code.LoopSmplCode("O.Print(" + Globals.smpl + ", (" + funcName + "(" + Globals.smpl + ")" + "))");
+                                node.Code.A("O.Print(" + Globals.smpl + ", (" + funcName + "(" + Globals.smpl + ")" + "));");
                             }
                         }
                         break;
@@ -4409,11 +4409,11 @@ namespace Gekko.Parser.Gek
                                     //%a!q, does not make sense...
                                     if (Globals.fixConcat)
                                     {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.XXXXXXXX + ", " + node[1][0].Code + ")").A(".Concat(" + Globals.XXXXXXXX + ", O.scalarStringTilde)").A(".Concat(" + Globals.XXXXXXXX + ", " + node[2][0].Code + ")");
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
                                     else
                                     {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.XXXXXXXX + ", " + node[1][0].Code + ")").A(".Add(" + Globals.XXXXXXXX + ", O.scalarStringTilde)").A(".Add(" + Globals.XXXXXXXX + ", " + node[2][0].Code + ")");
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Add(" + Globals.smpl + ", O.scalarStringTilde)").A(".Add(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
                                 }
                                 else
@@ -4421,11 +4421,11 @@ namespace Gekko.Parser.Gek
                                     //%a
                                     if (Globals.fixConcat)
                                     {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.XXXXXXXX + ", " + node[1][0].Code + ")");
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")");
                                     }
                                     else
                                     {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.XXXXXXXX + ", " + node[1][0].Code + ")");
+                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.smpl + ", " + node[1][0].Code + ")");
                                     }
                                 }                         
                             }
@@ -4436,12 +4436,12 @@ namespace Gekko.Parser.Gek
                                     //a!q
                                     if (Globals.fixConcat)
                                     {
-                                        node.Code.A("(" + node[1][0].Code + ")").A(".Concat(" + Globals.XXXXXXXX + ", O.scalarStringTilde)").A(".Concat(" + Globals.XXXXXXXX + ", " + node[2][0].Code + ")");
+                                        node.Code.A("(" + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
 
                                     else
                                     {
-                                        node.Code.A("(" + node[1][0].Code + ")").A(".Add(" + Globals.XXXXXXXX + ", O.scalarStringTilde)").A(".Add(" + Globals.XXXXXXXX + ", " + node[2][0].Code + ")");
+                                        node.Code.A("(" + node[1][0].Code + ")").A(".Add(" + Globals.smpl + ", O.scalarStringTilde)").A(".Add(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
                                 }
                                 else
@@ -4468,11 +4468,11 @@ namespace Gekko.Parser.Gek
                                     {
                                         if (Globals.fixConcat)
                                         {
-                                            node.Code.A(".Concat(" + Globals.XXXXXXXX + ", " + child.Code + ")");
+                                            node.Code.A(".Concat(" + Globals.smpl + ", " + child.Code + ")");
                                         }
                                         else
                                         {                                            
-                                            node.Code.A(".Add(" + Globals.XXXXXXXX + ", " + child.Code + ")");
+                                            node.Code.A(".Add(" + Globals.smpl + ", " + child.Code + ")");
                                         }
                                     }
                                     counter++;
@@ -4520,7 +4520,7 @@ namespace Gekko.Parser.Gek
                                 ////NOT ACTIVE AT THE MOMENT
                                 //G.Writeln2("*** ERROR: name with versions (e.g. fY.s0) not allowed at this point");
                                 //throw new GekkoException();
-                                node.Code.A("O.Add(" + Globals.XXXXXXXX + ", O.Add(" + Globals.XXXXXXXX + ", " + node[0].Code + ", new ScalarString(`.`)), " + node[1].Code + ")");
+                                node.Code.A("O.Add(" + Globals.smpl + ", O.Add(" + Globals.smpl + ", " + node[0].Code + ", new ScalarString(`.`)), " + node[1].Code + ")");
                                 if (node[0].nameSimpleIdent != null && node[1].nameSimpleIdent != null)
                                 {
                                     node.nameSimpleIdent = node[0].nameSimpleIdent + "." + node[1].nameSimpleIdent;
@@ -4603,12 +4603,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTNEGATE":
                         {
-                            node.Code.A("O.Negate(" + Globals.XXXXXXXX + ", " + node.GetChildCode(0) + ")");
+                            node.Code.A("O.Negate(" + Globals.smpl + ", " + node.GetChildCode(0) + ")");
                         }
                         break;
                     case "ASTSEQITEMMINUS":
                         {                            
-                            node.Code.A("(").A("(new ScalarString(`-`)).Add(" + Globals.XXXXXXXX + ", " + node[0].Code.ToString() + ")").A(")");
+                            node.Code.A("(").A("(new ScalarString(`-`)).Add(" + Globals.smpl + ", " + node[0].Code.ToString() + ")").A(")");
                         }
                         break;
                     case "ASTOPEN":
@@ -5151,7 +5151,7 @@ namespace Gekko.Parser.Gek
                                                                                                //node.Code.A("ope" + Num(node) + ".label = `" + freelists + givenLabel + "`;" + G.NL);
 
                             //node.Code.A("smpl = new GekkoSmpl(o" + Num(node) + ".t1.Add(-2), o" + Num(node) + ".t2);" + G.NL);
-                            node.Code.A("" + Globals.XXXXXXXX + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); " + Globals.XXXXXXXX + ".t0 = " + Globals.XXXXXXXX + ".t0.Add(-2);" + G.NL);
+                            node.Code.A("" + Globals.smpl + " = new GekkoSmpl(o" + Num(node) + ".t1, o" + Num(node) + ".t2); " + Globals.smpl + ".t0 = " + Globals.smpl + ".t0.Add(-2);" + G.NL);
 
                             ASTNode child = node.GetChild("ASTPRTELEMENTOPTIONFIELD");
                             if (child != null) node.Code.A(child.Code);
@@ -5171,17 +5171,17 @@ namespace Gekko.Parser.Gek
                             //tt123
                             node.Code.A("for(int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++) {" + G.NL);
                             node.Code.A("int bankNumber = bankNumbers[bankNumberI];" + G.NL);
-                            node.Code.A("" + Globals.XXXXXXXX + ".bankNumber = bankNumber;" + G.NL);
+                            node.Code.A("" + Globals.smpl + ".bankNumber = bankNumber;" + G.NL);
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
 
                             //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
 
-                            node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(" + Globals.XXXXXXXX + ", ope" + Num(node) + ");" + G.NL);
+                            node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(" + Globals.smpl + ", ope" + Num(node) + ");" + G.NL);
                             //node.Code.A("O.PrtElementHandleLabel(smpl, ope" + Num(node) + ");" + G.NL);
 
                             node.Code.A("}" + G.NL);  //end of bankNumbers
-                            node.Code.A("" + Globals.XXXXXXXX + ".bankNumber = 0;" + G.NL);  //resetting, probably superfluous
+                            node.Code.A("" + Globals.smpl + ".bankNumber = 0;" + G.NL);  //resetting, probably superfluous
                             node.Code.A("o" + Num(node) + ".prtElements.Add(ope" + Num(node) + ");" + G.NL);
                             node.Code.A("}" + G.NL);  //avoid scope collisions
 
@@ -5660,9 +5660,9 @@ namespace Gekko.Parser.Gek
                                 string s1 = G.HandleQuoteInQuote(node[i].Text.Substring(1, node[i].Text.Length - 2));
                                 string s2 = null;
                                 string add = null;
-                                if (i + 1 < node.ChildrenCount()) add = ".Add(" + Globals.XXXXXXXX + ", O.CurlyMethod(" + Globals.XXXXXXXX + ", " + node[i + 1].Code.ToString() + "))";
+                                if (i + 1 < node.ChildrenCount()) add = ".Add(" + Globals.smpl + ", O.CurlyMethod(" + Globals.smpl + ", " + node[i + 1].Code.ToString() + "))";
 
-                                if (i >= 2) ss += ".Add(" + Globals.XXXXXXXX + ", O.HandleString(new ScalarString(@`" + s1 + "`)))" + add;
+                                if (i >= 2) ss += ".Add(" + Globals.smpl + ", O.HandleString(new ScalarString(@`" + s1 + "`)))" + add;
                                 else ss += "O.HandleString(new ScalarString(@`" + s1 + "`))" + add;
                             }                            
 
@@ -5996,7 +5996,7 @@ namespace Gekko.Parser.Gek
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (first) s = child.Code.ToString();
-                                else s += ".Add(" + Globals.XXXXXXXX + ", " + child.Code + ")";
+                                else s += ".Add(" + Globals.smpl + ", " + child.Code + ")";
                                 first = false;
                             }
                             //node.Code.CA("O.IndexerAlone(" + s + ")";
@@ -6227,7 +6227,7 @@ namespace Gekko.Parser.Gek
             {
                 if (a[i2].type == ETokenType.Word)
                 {
-                    if (a[i2].s == "" + Globals.XXXXXXXX + "") a[i2].s = "smpl5";
+                    if (a[i2].s == "" + Globals.smpl + "") a[i2].s = "smpl5";
                 }
                 ss += a[i2].ToString();
             }            
@@ -6281,8 +6281,8 @@ namespace Gekko.Parser.Gek
 
             string c = "spml" + ++Globals.counter;
 
-            if (node[i].AlternativeCode != null) alternative = node[i].AlternativeCode.ToString().Replace("" + Globals.XXXXXXXX + "", c);
-            string original = node[i].Code.ToString().Replace("" + Globals.XXXXXXXX + "", c);
+            if (node[i].AlternativeCode != null) alternative = node[i].AlternativeCode.ToString().Replace("" + Globals.smpl + "", c);
+            string original = node[i].Code.ToString().Replace("" + Globals.smpl + "", c);
             string result = "new GekkoArg((" + c + ") => " + original + ", " + "(" + c + ") => " + alternative + ")";
             return result;
         }
@@ -6291,7 +6291,7 @@ namespace Gekko.Parser.Gek
         {
             //This helper is just to mark the two places it is used
             if (node != null) return "o" + Num(node);                       
-            return "O.AdjustT0(" + Globals.XXXXXXXX + ", " + i + ")";
+            return "O.AdjustT0(" + Globals.smpl + ", " + i + ")";
             throw new GekkoException();
         }
 
@@ -6344,13 +6344,13 @@ namespace Gekko.Parser.Gek
 
         private static string GekkoSmplCommandHelper2(int smplCommandNumber)
         {
-            string s2 = "" + Globals.XXXXXXXX + ".command = smplCommandRemember" + smplCommandNumber + ";";
+            string s2 = "" + Globals.smpl + ".command = smplCommandRemember" + smplCommandNumber + ";";
             return s2;
         }
 
         private static string GekkoSmplCommandHelper1(int smplCommandNumber, string ss)
         {
-            string s = "var smplCommandRemember" + smplCommandNumber + " = " + Globals.XXXXXXXX + ".command; " + Globals.XXXXXXXX + ".command = GekkoSmplCommand." + ss + ";";
+            string s = "var smplCommandRemember" + smplCommandNumber + " = " + Globals.smpl + ".command; " + Globals.smpl + ".command = GekkoSmplCommand." + ss + ";";
             return s;
         }
 
@@ -7046,7 +7046,7 @@ namespace Gekko.Parser.Gek
                 {
                     //It is a simple ident code, such as VAL x = ...                                
                     string tempDoubleCs = "tempDouble" + ++Globals.counter;
-                    nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(" + Globals.XXXXXXXX + ");" + G.NL;
+                    nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(" + Globals.smpl + ");" + G.NL;
                     string notUsed = null;
                     string leftSideCs = CacheRefScalarCs(out notUsed, node0.nameSimpleIdent, GetScalarCache(w), GetHeaderCs(w), EScalarRefType.Val, tempDoubleCs, false, true, false);
                     nodeCodeTemp += leftSideCs + G.NL;
@@ -7054,7 +7054,7 @@ namespace Gekko.Parser.Gek
                 else
                 {
                     //fancy name like VAL x|%y = ... --> this will be slow!                                
-                    nodeCodeTemp += "O.SetValData(" + Globals.XXXXXXXX + ", " + node0.Code + ", " + childCode + ");" + G.NL;
+                    nodeCodeTemp += "O.SetValData(" + Globals.smpl + ", " + node0.Code + ", " + childCode + ");" + G.NL;
                 }
             }
             return nodeCodeTemp;

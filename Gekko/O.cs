@@ -5143,7 +5143,7 @@ namespace Gekko
                 G.Writeln("           in-built Gekko function. Please use another name.", Color.Red);
                 throw new GekkoException();
             }
-            foreach (string s in Globals.helpTopics)
+            foreach (string s in Globals.commandNames)
             {
                 if (G.Equal(s, name))
                 {

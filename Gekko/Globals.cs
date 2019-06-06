@@ -40,6 +40,8 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
+        public static string smpl = "smpl";  //this line must be at top
+
         public static string versionInternal = "";
 
         public static bool lagfix = true;
@@ -299,11 +301,11 @@ namespace Gekko
         //public static string functionT1Cs = "t";
         //public static string functionT2Cs = "GekkoTime t";
         
-        public static string functionTP1Cs = Globals.XXXXXXXX + ", p";
-        public static string functionTP2Cs = "GekkoTime " + Globals.XXXXXXXX + ", P p";
+        public static string functionTP1Cs = Globals.smpl + ", p";
+        public static string functionTP2Cs = "GekkoTime " + Globals.smpl + ", P p";
 
-        public static string functionT1Cs = Globals.XXXXXXXX;
-        public static string functionT2Cs = "GekkoTime " + Globals.XXXXXXXX;
+        public static string functionT1Cs = Globals.smpl;
+        public static string functionT2Cs = "GekkoTime " + Globals.smpl;
 
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
@@ -332,7 +334,7 @@ namespace Gekko
 
         public static string gekkoSmplIteratorName = "{__GekkoCounter__}";
         public static string startGekkoSmplIteratorCode = "for (int iSmpl" + gekkoSmplIteratorName + " = 0; iSmpl" + gekkoSmplIteratorName + " < int.MaxValue; iSmpl" + gekkoSmplIteratorName + "++) {" + G.NL;
-        public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.XXXXXXXX + ".HasError()) O.TryNewSmpl(" + Globals.XXXXXXXX + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
+        public static string endGekkoSmplIteratorCode = G.NL + "if (" + Globals.smpl + ".HasError()) O.TryNewSmpl(" + Globals.smpl + ", iSmpl" + gekkoSmplIteratorName + "); else break;" + G.NL + "}";
         
 
         //public static string startGekkoListIteratorCode = "{" + G.NL + " //HEJ1 " + G.NL;
@@ -431,11 +433,11 @@ namespace Gekko
         public static bool fixWildcardLabel = true;
         public static string wildcardText = "wildcard";
 
-        public static string reportInterior1 = "O.ReportInterior(" + Globals.XXXXXXXX + ", ";
+        public static string reportInterior1 = "O.ReportInterior(" + Globals.smpl + ", ";
         public const string reportInterior2 = ")";
         public const string labelCounter = "labelCounter";
 
-        public static string reportLabel1 = "O.ReportLabel(" + Globals.XXXXXXXX + ", ";
+        public static string reportLabel1 = "O.ReportLabel(" + Globals.smpl + ", ";
         public const string reportLabel2 = ")";        
 
         public static int guiTimerCounter = 0;
@@ -655,8 +657,8 @@ namespace Gekko
 
         public static bool revertSimpleJ = true;        
 
-        public static string[] helpTopics = {  //this list corresponds to items in "Gekko commands" in the help files
-            //done april 2019
+        public static List<string> helpTopics = new List<string>() {  //this list corresponds to items in "Gekko commands" in the help files
+            //done april 2019, see also Globals.extraNames and Globals.commandNames
 
                                                 "ACCEPT",
                                                 "ANALYZE",
@@ -749,7 +751,10 @@ namespace Gekko
 "WRITE",
 "X12A",
 "XEDIT"
-};
+        };
+
+        public static List<string> extraNames = new List<string>() { "P", "PRI", "PRINT", "SER" };
+        public static List<string> commandNames = Program.Add2Lists(Globals.helpTopics, Globals.extraNames);  //must be after the two lists
 
         public static bool showZero = true;
         
@@ -900,11 +905,10 @@ namespace Gekko
 
         //public static string gekkoTimeIniCs = "GekkoTime t = GekkoTime.tNull;";
         //public static string gekkoSmplInit = "GekkoSmpl smpl = O.Smpl();";
-        public static string gekkoSmplInit = "GekkoSmpl " + Globals.XXXXXXXX + " = new GekkoSmpl(); O.InitSmpl(" + Globals.XXXXXXXX + ", p);";
-        public static string gekkoSmplInitCommand = "O.InitSmpl(" + Globals.XXXXXXXX + ", p);";
-        public static string GekkoSmplNull = "" + Globals.XXXXXXXX + " = null;";
-        public static string XXXXXXXX = "smpl";
-
+        public static string gekkoSmplInit = "GekkoSmpl " + Globals.smpl + " = new GekkoSmpl(); O.InitSmpl(" + Globals.smpl + ", p);";
+        public static string gekkoSmplInitCommand = "O.InitSmpl(" + Globals.smpl + ", p);";
+        public static string GekkoSmplNull = "" + Globals.smpl + " = null;";
+        
         public static string iniFileSecretName = "[[RunGekkoIniFile]]";
 
         public static WindowIntellisense windowIntellisense = null;

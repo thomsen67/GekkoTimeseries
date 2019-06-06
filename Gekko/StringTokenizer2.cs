@@ -501,6 +501,77 @@ namespace Gekko
         public List<Tuple<string, string>> commentsClosedOnlyStartOfLine = new List<Tuple<string, string>>(); //only at start of line, for instance $ontext ... $offtext
         public List<string> commentsNonClosedOnlyStartOfLine = new List<string>();  //only at start of line, for instance * in GAMS
 
+
+        // =============================================================================
+        // ====================== helper functions =====================================
+        // =============================================================================
+
+        public static string GetS(List<TokenHelper> line, int i)
+        {
+            if (i < 0 || i >= line.Count) return null;
+            return line[i].s;
+        }
+
+        public static int FindS(List<TokenHelper> line, string s)
+        {
+            return FindS(line, 0, s);
+        }
+
+        public static int FindS(List<TokenHelper> line, int start, string s)
+        {
+            return FindS(line, start, new string[] { s });
+        }
+
+        public static int FindS(List<TokenHelper> line, int start, string[] ss)
+        {
+            int rv = -12345;
+            for (int i = start; i < line.Count; i++)
+            {
+                foreach (string s in ss)
+                {
+                    if (Equal(line, i, s))
+                    {
+                        rv = i;
+                        return i;  //break will not work
+                    }
+                }
+            }
+            return rv;
+        }
+
+
+
+        public static bool Equal(List<TokenHelper> line, int i, string s)
+        {
+            return G.Equal(GetS(line, i), s);
+        }
+
+        public static bool Equal(List<TokenHelper> line, int i, List<string> ss)
+        {
+            return G.Equal(GetS(line, i), ss) != null;
+        }
+
+        public static Tuple<int, int> FindOptionFieldInSeriesAssignment(List<TokenHelper> line)
+        {
+            //not completely bulletproof, for instance "COMMAND <...> .... file = xx;" will fail, where command is a user-defined procedure
+            if (Program.IsNonSeriesStatement(line))return new Tuple<int, int>(-12345, -12345);
+            int i1 = FindS(line, "<");
+            if (i1 == -12345) return new Tuple<int, int>(-12345, -12345);
+            int i2 = FindS(line, i1 + 1, ">");
+            if (i2 == -12345) return new Tuple<int, int>(-12345, -12345);
+            int i3 = FindS(line, i2 + 1, "=");
+            if (i3 == -12345) return new Tuple<int, int>(-12345, -12345);
+            int i4 = FindS(line, "="); //start from pos 0, not pos after '>'
+            if (i4 < i1) return new Tuple<int, int>(-12345, -12345);  //in that case, no option field has been found (example: y = x $ (i<1 and j>3))
+            //so now we are sure that there is a bracket <...>, with no '=' before.            
+            return new Tuple<int, int>(i1, i2);
+        }
+
+        // =============================================================================
+        // ====================== helper functions end =================================
+        // =============================================================================
+
+
         public StringTokenizer2(TextReader reader, bool specialLoopSignsAcceptedAsWords, bool treatQuotesAsUnknown)
         {
             this.specialLoopSignsAcceptedAsWords = specialLoopSignsAcceptedAsWords;

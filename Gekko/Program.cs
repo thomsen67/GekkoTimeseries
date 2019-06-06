@@ -8955,48 +8955,65 @@ namespace Gekko
             for (int j = 0; j < statements.Count; j++)
             {
                 List<TokenHelper> th = statements[j];
-                if (G.Equal(th[0].s, "ser") || G.Equal(th[0].s, "series"))
+
+                if (IsNonSeriesStatement(th))
                 {
-                    //Skip <...>
+                    continue;
+                }
 
-                    int startI = 1;
-                    if (th[1].s == "<")
+                Tuple<int, int> opt = StringTokenizer2.FindOptionFieldInSeriesAssignment(th);
+                int hasSeriesKeyword = 0;
+                if (G.Equal(th[0].s, "ser") || G.Equal(th[0].s, "series")) hasSeriesKeyword = 1;
+                string temp = null;
+                int nameStart = -12345;
+                int nameEnd = -12345;
+                if (opt.Item1 == -12345)
+                {
+                    //no option field, "x = 1" OR "ser x = 1"
+                    //if we start at hasSeriesKeyword, it is: "x = 1"
+                    nameStart = hasSeriesKeyword;
+                    nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "=");
+                    if (nameEnd != -12345) nameEnd--;
+                }
+                else
+                {
+                    //option field, "<...> x = 1" OR "x <...> = 1" OR "ser <...> x = 1" OR "ser x <...> = 1"
+                    //if we start at hasSeriesKeyword, it is: "<...> x = 1" OR "x <...> = 1"
+                    if (th[hasSeriesKeyword].s == "<")
                     {
-                        for (int i = 1; i < th.Count; i++)
-                        {
-                            if (th[i].s == ">")
-                            {
-                                startI = i + 1;
-                                break;
-                            }
-                        }
+                        //option field before variable, for instance <...> x =  OR series <...> x = 
+                        nameStart = opt.Item2 + 1;
+                        nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "=");
+                        if (nameEnd != -12345) nameEnd--;
                     }
+                    else
+                    {
+                        //option field after variable, for instance x <...> = OR series x <...> = 
+                        nameStart = hasSeriesKeyword;
+                        nameEnd = StringTokenizer2.FindS(th, nameStart + 1, "<");
+                        if (nameEnd != -12345) nameEnd--;
+                    }
+                }
 
+                if (nameStart != -12345 && nameEnd != -12345)
+                {
 
-                    if (th[startI].type == ETokenType.Word && th[startI + 1].s == "=")
+                    if (nameStart == nameEnd && th[nameStart].type == ETokenType.Word)
                     {
                         //simple name
-                        string name = th[startI].s;
+                        string name = th[nameStart].s;
                         string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                         BrowserAddItem(datagen, name.Trim(), s3.Trim());
                     }
                     else
                     {
                         //may be a composed name like x%i, x{%i}, x{i} or x[2000]
-                        int iEq = -12345;
-                        for (int i = startI; i < th.Count; i++)
-                        {
-                            if (th[i].s == "=")
-                            {
-                                iEq = i;
-                                break;
-                            }
-                        }
-                        if (iEq != -12345)
+
+                        if (true)
                         {
                             //finding scalar vars in lhs name
                             GekkoDictionary<string, List<string>> scalarsOnLhsInSerStatement = new GekkoDictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-                            for (int i = startI; i < iEq; i++)
+                            for (int i = nameStart; i <= nameEnd; i++)
                             {
                                 string mem = null;
                                 if (BrowserIsScalar(th, i))
@@ -9011,18 +9028,18 @@ namespace Gekko
                             for (int jj = j - 1; jj >= 0; jj--)
                             {
                                 List<TokenHelper> th2 = statements[jj];
-                                if (G.Equal(th2[0].s, "for") && th2[1].type == ETokenType.Word && th2[2].s == "=" && scalarsOnLhsInSerStatement.ContainsKey(th2[1].s))
+                                if (G.Equal(th2[0].s, "for") && th2[1].s == "%" && th2[2].type == ETokenType.Word && th2[3].s == "=" && scalarsOnLhsInSerStatement.ContainsKey(th2[2].s))
                                 {
                                     //We have found the definition of one of the scalars in the lhs SERIES name.
                                     List<string> rhsVars = new List<string>();
-                                    for (int i2 = 3; i2 < th2.Count; i2++)
+                                    for (int i2 = 4; i2 < th2.Count; i2++)
                                     {
                                         if ((th2[i2].type == ETokenType.Word || th2[i2].type == ETokenType.QuotedString) && (th2[i2 + 1].s == "," || th2[i2 + 1].s == ";"))
                                         {
                                             rhsVars.Add(G.StripQuotes(th2[i2].s));
                                         }
                                     }
-                                    scalarsOnLhsInSerStatement[th2[1].s] = rhsVars;
+                                    scalarsOnLhsInSerStatement[th2[2].s] = rhsVars;
                                 }
                             }
 
@@ -9032,7 +9049,7 @@ namespace Gekko
                             if (scalarsOnLhsInSerStatement.Count == 0)
                             {
                                 //probably nothing to add, complicated name but no scalars found, for instance fy[2000] = ...
-                                string name = th[startI].s;
+                                string name = th[nameStart].s;
                                 string s3 = GetTextFromLeftBlanksTokens(th, 0, th.Count - 1).Trim();
                                 BrowserAddItem(datagen, name.Trim(), s3.Trim());
                             }
@@ -9042,7 +9059,7 @@ namespace Gekko
                                 {
 
                                     string s7 = null;
-                                    for (int i = startI; i < iEq; i++)
+                                    for (int i = nameStart; i <= nameEnd; i++)
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == 0 && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
                                         {
@@ -9056,7 +9073,7 @@ namespace Gekko
                                     }
 
                                     string s8 = null;
-                                    for (int i = startI; i < th.Count; i++)
+                                    for (int i = nameStart; i < th.Count; i++)
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == 0 && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
                                         {
@@ -9080,16 +9097,13 @@ namespace Gekko
                         }
                     }
                 }
-            }
-
-            //string s2 = GetTextFromLeftBlanksTokens(a, 0, n - 1);
-
-            //using (FileStream fs = WaitForFileStream(Program.options.folder_working + "\\" + "x12345.gcm", GekkoFileReadOrWrite.Write))
-            //using (StreamWriter res = G.GekkoStreamWriter(fs))
-            //{
-            //    res.Write(s2);
-            //}
+            }            
             return datagen;
+        }
+
+        public static bool IsNonSeriesStatement(List<TokenHelper> th)
+        {
+            return !G.Equal(th[0].s, "ser") && !G.Equal(th[0].s, "series") && Globals.commandNames.Contains(th[0].s, StringComparer.OrdinalIgnoreCase);
         }
 
         private static void BrowserAddItem(GekkoDictionary<string, List<string>> datagen, string name, string s3)
@@ -25958,9 +25972,6 @@ namespace Gekko
         RemoteInit();
 
             StartPulse();
-
-
-
         }
 
         public static void InitUfunctionsAndArithmeticsAndMore()
@@ -25996,7 +26007,7 @@ namespace Gekko
             Globals.ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
             Globals.ufunctionsNew14 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            
+
             Globals.arithmentics[0] = (x1, x2) => x1 + x2;
             Globals.arithmentics[1] = (x1, x2) => x2 + x1;
             Globals.arithmentics[2] = (x1, x2) => x1 - x2;
@@ -26021,7 +26032,15 @@ namespace Gekko
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)
             {
                 Globals.timeStrings[i - Globals.timeStringsStart] = i.ToString();
-            }
+            }            
+        }
+
+        public static List<string> Add2Lists(List<string> x1, List<string> x2)
+        {
+            List<string> x = new List<string>();
+            x.AddRange(x1);
+            x.AddRange(x2);
+            return x;
         }
 
         public static void RemoteInit()
