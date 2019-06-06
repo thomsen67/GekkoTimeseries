@@ -14,79 +14,67 @@ namespace Gekko
         {
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
-            IVariable listloopMovedStuff_83 = O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null);
-            IVariable listloopMovedStuff_84 = O.Lookup(smpl, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null);
-            IVariable listloopMovedStuff_85 = O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null);
 
-            Func<IVariable> func87 = () =>
+            O.Assignment o0 = new O.Assignment();
+            o0.opt_source = @"<[code]>#m=(%x=2)";
+
+            o0.opt_source = @"<[code]>%x=2";
+
+            Func<GekkoSmpl, Map> MapDef_mapTmpvar42 = (smpl46) =>
             {
-                var smplCommandRemember88 = smpl.command; smpl.command = GekkoSmplCommand.Sum;
-                Series temp86 = new Series(ESeriesType.Normal, Program.options.freq, null); temp86.SetZero(smpl);
-
-                foreach (IVariable listloop_i82 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, null)))
+                Map mapTmpvar42 = new Map();
+                Action assign_45 = () =>
                 {
-                    temp86.InjectAdd(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, new ScalarString("a"), listloop_i82), smpl, O.EIndexerType.None, listloopMovedStuff_84, O.ReportLabel(smpl, new ScalarString("a"), "a|[@16,21:21='a',<815>,1:21]|[@16,21:21='a',<815>,1:21]"), listloop_i82));
+                    O.AdjustT0(smpl46, -2);
+                    IVariable ivTmpvar43 = i44;
+                    O.AdjustT0(smpl46, 2);
+                    O.Lookup(smpl46, mapTmpvar42, null, "%x", null, ivTmpvar43, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                };
+                Func<bool> check_45 = () =>
+                {
+                    O.AdjustT0(smpl46, -2);
+                    IVariable ivTmpvar43 = i44;
+                    O.AdjustT0(smpl46, 2);
+                    if (ivTmpvar43.Type() != EVariableType.Series) return false;
+                    O.Dynamic1(smpl46);
+                    O.Lookup(smpl46, mapTmpvar42, null, "%x", null, ivTmpvar43, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                    ;
+                    return O.Dynamic2(smpl46);
+                };
+                O.RunAssigmentMaybeDynamic(smpl46, assign_45, check_45, o0);
 
-                    labelCounter++;
-                }
-                labelCounter = 0;
-                smpl.command = smplCommandRemember88;
-                return temp86;
 
+                return mapTmpvar42;
             };
 
 
-            Func<GraphHelper, string> print0 = (gh) =>
+            Action assign_47 = () =>
             {
-                O.Prt o0 = new O.Prt();
-                labelCounter = 0; o0.guiGraphIsRefreshing = gh.isRefreshing;
-                o0.guiGraphOperator = gh.operator2;
-                o0.guiGraphIsLogTransform = gh.isLogTransform;
-                o0.prtType = "p";
-                o0.t1 = Globals.globalPeriodStart;
-                o0.t2 = Globals.globalPeriodEnd;
-
-                o0.operators.Add(new OptString("r", O.ConvertToString(new ScalarString("yes"))));
-
-
-
-                ESeriesMissing r1_0 = Program.options.series_array_print_missing; ESeriesMissing r2_0 = Program.options.series_normal_print_missing; try
-                {
-                    O.HandleOptionBankRef1(o0.opt_bank, o0.opt_ref); O.HandleMissing1(o0.opt_missing);
-                    {
-                        List<int> bankNumbers = null;
-                        O.Prt.Element ope0 = new O.Prt.Element();
-                        ope0.labelGiven = new List<string>() { "sum¨(#¨i, xx[_[a,#¨i])|[@6,6:8='sum',<1318>,1:6]|[@22,27:27=')',<1265>,1:27]" };
-                        smpl = new GekkoSmpl(o0.t1, o0.t2); smpl.t0 = smpl.t0.Add(-2);
-                        ope0.operatorsFinal = Program.GetElementOperators(o0, ope0); bankNumbers = O.Prt.GetBankNumbers(null, ope0.operatorsFinal);
-                        for (int bankNumberI = 0; bankNumberI < bankNumbers.Count; bankNumberI++)
-                        {
-                            int bankNumber = bankNumbers[bankNumberI];
-                            smpl.bankNumber = bankNumber;
-                            ope0.variable[bankNumber] = func87();
-                            if (bankNumberI == 0) O.PrtElementHandleLabel(smpl, ope0);
-                        }
-                        smpl.bankNumber = 0;
-                        o0.prtElements.Add(ope0);
-                    }
-
-                }
-                finally
-                {
-                    O.HandleOptionBankRef2(); O.HandleMissing2(r1_0, r2_0);
-                }
-                o0.counter = 2;
-                o0.printCsCounter = Globals.printCs.Count - 1;
-                o0.Exe();
-                return o0.emfName;
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar41 = MapDef_mapTmpvar42(smpl);
+                O.AdjustT0(smpl, 2);
+                O.Lookup(smpl, null, null, "#m", null, ivTmpvar41, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
             };
-            Globals.printCs.Add(Globals.printCs.Count, print0);
-            print0(new GraphHelper());
+            Func<bool> check_47 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar41 = MapDef_mapTmpvar42(smpl);
+                O.AdjustT0(smpl, 2);
+                if (ivTmpvar41.Type() != EVariableType.Series) return false;
+                O.Dynamic1(smpl);
+                O.Lookup(smpl, null, null, "#m", null, ivTmpvar41, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+                return O.Dynamic2(smpl);
+            };
+            O.RunAssigmentMaybeDynamic(smpl, assign_47, check_47, o0);
 
             //[[commandEnd]]0
         }
 
 
+        public static readonly ScalarVal i44 = new ScalarVal(2d);
 
         public static void CodeLines(P p)
         {

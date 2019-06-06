@@ -3937,8 +3937,9 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(funcName + "(smpl)");
 
                             if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-                            w.wh.localFuncs.AppendLine("Func<Map> " + funcName + " = () => {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "};" + G.NL);
-                            node.Code.A(funcName + "()");
+                            string smplLocal, s2_changes; ReplaceSmpl(s2, out smplLocal, out s2_changes);
+                            w.wh.localFuncs.AppendLine("Func<GekkoSmpl, Map> " + funcName + " = (" + smplLocal + ") => {" + G.NL + s2_changes + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "};" + G.NL);
+                            node.Code.A(funcName + "(" + Globals.smpl + ")");
 
                         }
                         break;
@@ -6218,25 +6219,15 @@ namespace Gekko.Parser.Gek
 
         private static void StashIntoLocalFuncs(W w, string c, string s0)
         {
-            //int fat = 5;
-            //var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-            //var tags2 = new List<string>() { "//" };
-            //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(s0, fat, tags1, tags2, null, null).storage;
-            //string ss = null;
-            //for (int i2 = 0; i2 < a.Count; i2++)
-            //{
-            //    if (a[i2].type == ETokenType.Word)
-            //    {
-            //        if (a[i2].s == "" + Globals.smpl + "") a[i2].s = "smpl5";
-            //    }
-            //    ss += a[i2].ToString();
-            //}
-
-            string smpl = "smpl" + ++Globals.counter;
-            string s0_changes = s0.Replace(Globals.smpl, smpl);
-
+            string smplLocal, s0_changes; ReplaceSmpl(s0, out smplLocal, out s0_changes);
             if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smpl + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
+            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
+        }
+
+        private static void ReplaceSmpl(string inputCs, out string smplLocal, out string outputCs)
+        {
+            smplLocal = "smpl" + ++Globals.counter;
+            outputCs = inputCs.Replace(Globals.smpl, smplLocal);
         }
 
         private static O.ELoopType LoopType(ASTNode node, int i)
