@@ -6218,21 +6218,25 @@ namespace Gekko.Parser.Gek
 
         private static void StashIntoLocalFuncs(W w, string c, string s0)
         {
-            int fat = 5;
-            var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
-            var tags2 = new List<string>() { "//" };
-            List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(s0, fat, tags1, tags2, null, null).storage;
-            string ss = null;
-            for (int i2 = 0; i2 < a.Count; i2++)
-            {
-                if (a[i2].type == ETokenType.Word)
-                {
-                    if (a[i2].s == "" + Globals.smpl + "") a[i2].s = "smpl5";
-                }
-                ss += a[i2].ToString();
-            }            
-            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();            
-            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (smpl5) => { return " + ss + ";" + G.NL + " };" + G.NL);
+            //int fat = 5;
+            //var tags1 = new List<Tuple<string, string>>() { new Tuple<string, string>("/*", "*/") };
+            //var tags2 = new List<string>() { "//" };
+            //List<TokenHelper> a = StringTokenizer2.GetTokensWithLeftBlanks(s0, fat, tags1, tags2, null, null).storage;
+            //string ss = null;
+            //for (int i2 = 0; i2 < a.Count; i2++)
+            //{
+            //    if (a[i2].type == ETokenType.Word)
+            //    {
+            //        if (a[i2].s == "" + Globals.smpl + "") a[i2].s = "smpl5";
+            //    }
+            //    ss += a[i2].ToString();
+            //}
+
+            string smpl = "smpl" + ++Globals.counter;
+            string s0_changes = s0.Replace(Globals.smpl, smpl);
+
+            if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
+            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smpl + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
         }
 
         private static O.ELoopType LoopType(ASTNode node, int i)

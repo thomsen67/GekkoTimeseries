@@ -225,7 +225,8 @@ namespace Gekko.Parser.Gek
             s2.AppendLine("}");  //class TranslatedCode
             s2.AppendLine("}");  //namespace Gekko            
 
-            ch2.code = s2.ToString().Replace("`", Globals.QT);
+            ch2.code = s2.ToString().Replace("`", Globals.QT).Replace(Globals.smpl, "smpl");
+
             ch2.errors = errors;  //not used?
 
             if (Globals.uFunctionStorageCs.Count > 0)

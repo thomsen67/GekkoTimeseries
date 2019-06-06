@@ -40,7 +40,7 @@ namespace Gekko
     /// </summary>
     public class Globals        
     {
-        public static string smpl = "smpl";  //this line must be at top
+        public static string smpl = "§¤£";  //this line must be at top
 
         public static string versionInternal = "";
 
