@@ -426,8 +426,8 @@ namespace Gekko
         public static bool printOnlyErrors = true;  //normally false
 
         public static bool bugfix_speedup = true; //decomp <2020 2050> sum(#a, npop[#a]+npop[#a]+npop[#a]+npop[#a]+npop[#a]) --> speedup of factor 2.5. The more arithmetics and periods, the more speedup compared to GetData() and SetData()
-        public static bool bugfix_speedup2 = true; //faster sum() for array-sreies
-        public static bool bugfix_speedup3 = false; //faster sum() for array-sreies
+        public static bool bugfix_speedup2 = false; //!! does not really offer speedup.... :-(   faster sum() for array-sreies
+        public static bool bugfix_speedup3 = false; //!! entails problem with PRT<r>, problematic...
 
         public const string freelists = "|||";
         public static bool fixWildcardLabel = true;

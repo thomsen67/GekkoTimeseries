@@ -154,14 +154,16 @@ namespace Gekko
                 throw new GekkoException();
             }
         }
-        
-        public string GetName()
+
+        public string GetNameAndFreqPretty(bool useQuotes)
         {
-            //if (this.name == null && Globals.runningOnTTComputer)
-            //{
-            //    G.Writeln2("*** ERROR: Name error");
-            //    throw new GekkoException();
-            //}
+            string s = this.GetName();
+            string ss = G.GetNameAndFreqPretty(s, useQuotes);
+            return ss;
+        }
+
+        public string GetName()
+        {            
             if (this.name == null || this.name.StartsWith(Globals.seriesArraySubName))
             {
                 if (this.mmi == null)
@@ -2432,6 +2434,11 @@ namespace Gekko
                             double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix
                             GekkoTime t = new GekkoTime(this.freq, i, 1);
                             this.SetData(t, d);
+                            if (Program.options.series_failsafe)
+                            {
+                                //only for debugging                        
+                                O.ReportSeriesMissingValue(this, t, t);
+                            }
                         }
                         else
                         {
@@ -2443,7 +2450,13 @@ namespace Gekko
                 else if (indexes.Length == 1 && indexes[0].Type() == EVariableType.Date)
                 {
                     double d = rhsExpression.ConvertToVal();  //will fail with an error unless VAL or 1x1 matrix                
-                    this.SetData(((ScalarDate)(indexes[0])).date, d);  //will fail with an error if freqs do not match
+                    GekkoTime t = ((ScalarDate)(indexes[0])).date;
+                    this.SetData(t, d);  //will fail with an error if freqs do not match
+                    if (Program.options.series_failsafe)
+                    {
+                        //only for debugging                        
+                        O.ReportSeriesMissingValue(this, t, t);
+                    }
                 }
                 else
                 {

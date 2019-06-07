@@ -3797,6 +3797,7 @@ optionType:
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
 
              | SERIES DYN '='? yesNoSimple -> SERIES DYN ^(ASTBOOL yesNoSimple)
+			 | SERIES FAILSAFE '='? yesNoSimple -> SERIES FAILSAFE ^(ASTBOOL yesNoSimple)
 
 			 | SERIES ARRAY IGNOREMISSING '='? yesNoSimple -> SERIES ARRAY IGNOREMISSING ^(ASTBOOL yesNoSimple)	
 			 | SERIES DATA IGNOREMISSING '='? yesNoSimple -> SERIES DATA IGNOREMISSING ^(ASTBOOL yesNoSimple)	

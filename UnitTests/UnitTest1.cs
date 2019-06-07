@@ -2328,7 +2328,7 @@ namespace UnitTests
             I("xx[a, x] = (1,2,3);");
             I("xx[a, y] = (7,8,9);");
             I("CLONE;");
-            I("xx[a, x] = (1+7,2+8,3+6);");
+            I("xx[a, x] = (1+7,2+18,3+6);");
             I("xx[a, y] = (7+3,8+2,9+3);");
 
             /*                     
@@ -2344,7 +2344,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?            
             Assert.AreEqual(table.Get(2, 2).number, 10.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 20.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 9.0000d, 0.0001);
 
             I("#i = x, y;");
@@ -2354,8 +2354,18 @@ namespace UnitTests
             Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
             Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?            
             Assert.AreEqual(table.Get(2, 2).number, 10.0000d, 0.0001);
-            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 20.0000d, 0.0001);
             Assert.AreEqual(table.Get(4, 2).number, 9.0000d, 0.0001);
+
+            I("#i = x, y;");
+            I("p <rn> sum(#i, xx[a, #i]) 'sum';");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2003"); //why is it not a date?            
+            Assert.AreEqual(table.Get(2, 2).number, 8.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 10.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 12.0000d, 0.0001);
         }
 
 

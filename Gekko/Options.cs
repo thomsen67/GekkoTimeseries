@@ -164,6 +164,8 @@ Additionally, there are model, solve, equation options.
 
         public bool series_dyn = false;
 
+        public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
+
         //public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
         
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
@@ -172,14 +174,8 @@ Additionally, there are model, solve, equation options.
 
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
-        //public string series_array_print_set1 = "";
-        //public string series_array_print_set2 = "";
+        
 
-        //public ESeriesMissing series_data_print_missing = ESeriesMissing.M;
-        //public ESeriesMissing series_data_calc_missing = ESeriesMissing.M;            //sumt(...), avgt(...)
-
-        //public string series_array_print_set1 = "#s:tot";
-        //public string series_array_print_set2 = "#s:";
 
         // -------- new options regarding missings end ---------------------
 

@@ -2505,8 +2505,8 @@ namespace Gekko.Parser.Gek
 
                                 //string funcName = "localFunc" + ++Globals.counter;
 
-                                string parentListLoopVars1 = null;
-                                string parentListLoopVars2 = null;
+                                string parentListLoopVars1 = "GekkoSmpl " + Globals.smpl + ", ";
+                                string parentListLoopVars2 = Globals.smpl + ", ";
 
                                 int parentListLoopCounter = 0;
                                 ASTNode node2 = node;
@@ -2538,7 +2538,7 @@ namespace Gekko.Parser.Gek
                                 }
                                 //method def:
 
-                                string iv = "IVariable";
+                                string iv = "GekkoSmpl, IVariable";
                                 for (int i = 0; i < parentListLoopCounter; i++)
                                 {
                                     iv = iv + ", IVariable";
@@ -2620,10 +2620,12 @@ namespace Gekko.Parser.Gek
                                 sb1.AppendLine("return " + tempName + ";" + G.NL);
                                 sb1.AppendLine("};");  //method def, must end with ;
 
+                                string smplLocal, s2_changes; ReplaceSmpl(sb1.ToString(), out smplLocal, out s2_changes);
+
                                 //node.Code.A(funcName + "()");
-                                                                
+
                                 if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-                                w.wh.localFuncs.AppendLine(sb1.ToString());
+                                w.wh.localFuncs.AppendLine(s2_changes.ToString());
 
                                 node.Code.A(funcName + "(" + parentListLoopVars2 + ")"); //functionname may be for instance temp27(smpl)
 
@@ -3077,6 +3079,8 @@ namespace Gekko.Parser.Gek
                             {
                                 //PRT
 
+                                //NOTE: This Func<> does not need to have a smpl argument, since it can not be used in 
+                                //      a recursive way.
                                 node.Code.A("Func<GraphHelper, string> print" + Num(node) + " = (gh) =>" + G.NL);
                                 node.Code.A("{" + G.NL);  //start Action
 

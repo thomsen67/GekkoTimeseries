@@ -3197,9 +3197,7 @@ namespace Gekko
                                                 //may enlarge the array with NaNs first and last
                                                 double[] data_beware_do_not_alter = rhs_series.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tt1, tt2);
                                                 //may enlarge the array with NaNs first and last
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);
-                                                //if (create) AddIvariableWithOverwrite(ib, varnameWithFreq, true, lhs_series);
-
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);                                                
                                             }
                                             else
                                             {
@@ -3449,7 +3447,7 @@ namespace Gekko
                     if (keep)
                     {
                         GekkoTime tLast = lhs_series.GetRealDataPeriodLast();
-                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))
+                        foreach (GekkoTime t in new GekkoTimeIterator(smpl.t3.Add(1), tLast))  //why t3 and not t2?
                         {
                             //runs after the <...> period or globals period until data ends
                             //so the updates outside of sample.
@@ -3457,11 +3455,40 @@ namespace Gekko
                             lhs_series.SetData(t, lhs_series.GetData(smpl, t.Add(-1)) * rel);
                         }
                     }
+
+                    if (Program.options.series_failsafe)
+                    {
+                        //only for debugging                        
+                        ReportSeriesMissingValue(lhs_series, smpl.t1, smpl.t2);
+                    }
                 }
             }
 
             return;
 
+        }
+
+        public static void ReportSeriesMissingValue(Series lhs_series, GekkoTime t1, GekkoTime t2)
+        {
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                if (G.isNumericalError(lhs_series.GetDataSimple(t)))
+                {
+                    G.Writeln2("*** ERROR: Missing value encountered in series " + lhs_series.GetNameAndFreqPretty(true) + ", period: " + t.ToString());
+                    if (!t1.IsSamePeriod(t2))
+                    {
+                        G.Writeln("Values:");
+                        foreach (GekkoTime tt in new GekkoTimeIterator(t1, t2))
+                        {
+                            G.Writeln(tt.ToString() + "    " + G.levelFormat(lhs_series.GetDataSimple(tt), 20));
+                        }
+                    }
+                    G.Writeln();
+                    G.Writeln("+++ NOTE: To ignore such errors: set OPTION series failsafe = no;");
+                    G.Writeln();
+                    throw new GekkoException();
+                }
+            }
         }
 
         public static void WriteListFile(string varnameWithFreq, IVariable rhs)
