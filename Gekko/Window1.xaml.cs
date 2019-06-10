@@ -1175,45 +1175,53 @@ namespace Gekko
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
-                this.decompOptions.prtOptionLower = transformationCodeAugmented;
+                this.decompOptions.prtOptionLower = transformationCodeAugmented;                                               
 
-
-                table = Program.Decompose(this.decompOptions);
-
-                if (false && Globals.runningOnTTComputer)
+                if (this.decompOptions.isNew)
                 {
                     DecompTables d = Program.DecomposeNEW(this.decompOptions.expression, EDecompBanks.Both, this.decompOptions.t1, this.decompOptions.t2);
+                    GekkoTime t = new GekkoTime(EFreq.A, 2002, 1);
+                    double quo_0 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
+                    double quo_m1 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[-1]"].GetDataSimple(t);
+                    double gradQuo_0 = d.cellsGradQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
+                    double contribD_0 = d.cellsContribD.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
+                    double b = (gradQuo_0 * (quo_0 - quo_m1));
+                    G.Writeln(quo_m1 + " " + quo_0 + " " + contribD_0 + " " + b);
+                    return;
                 }
-
-                if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
+                else
                 {
-                    foreach (string var in this.decompOptions.subst)
+                    table = Program.Decompose(this.decompOptions);
+                    if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
                     {
-                        table = DecompSubstitute(table, var);
+                        foreach (string var in this.decompOptions.subst)
+                        {
+                            table = DecompSubstitute(table, var);
+                        }
                     }
+
+                    if (this.decompOptions.isSort)
+                    {
+                        table = TableSort(table);
+                    }
+
+                    if (this.decompOptions.isPool)
+                    {
+                        table = TablePool(table);
+                    }
+
+                    string s = FindEquationText(this.decompOptions);
+                    equation.Text = s;
+
+                    //
+                    // NOTE:
+                    //
+                    flowText.Visibility = Visibility.Collapsed;
+
+                    this.decompOptions.guiDecompValues = table;
+                    ClearGrid();
+                    MakeTable(table, this.decompOptions);
                 }
-
-                if (this.decompOptions.isSort)
-                {                    
-                    table = TableSort(table);
-                }
-
-                if (this.decompOptions.isPool)
-                {
-                    table = TablePool(table);
-                }
-
-                string s = FindEquationText(this.decompOptions);
-                equation.Text = s;
-
-                //
-                // NOTE:
-                //
-                flowText.Visibility = Visibility.Collapsed;
-
-                this.decompOptions.guiDecompValues = table;
-                ClearGrid();
-                MakeTable(table, this.decompOptions);
 
 
             }
@@ -1853,6 +1861,8 @@ namespace Gekko
 
     public class DecompOptions
     {
+        public bool isNew = false;
+
         public bool isSubst = false;
         public bool isPool = false;
         public bool isSort = false;

@@ -12158,6 +12158,7 @@ namespace Gekko
             decompOptions.expression = o.expression;            
             decompOptions.prtOptionLower = o.opt_prtcode.ToLower();
             decompOptions.name = o.name;
+            decompOptions.isNew = true;
 
             foreach (List<IVariable> liv in o.where)
             {
@@ -12435,9 +12436,16 @@ namespace Gekko
                 if (Globals.windowsDecomp.Count > 0) Globals.windowsDecomp.RemoveAt(Globals.windowsDecomp.Count - 1); }
             else
             {
-                w.ShowDialog();
-                w.Close();  //probably superfluous
-                w = null;  //probably superfluous
+                if (decompOptions.isNew)
+                {
+                    //do not show it yet
+                }
+                else
+                {
+                    w.ShowDialog();
+                    w.Close();  //probably superfluous
+                    w = null;  //probably superfluous
+                }
             }
         }
 
@@ -36434,11 +36442,13 @@ namespace Gekko
                                             int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
                                             string name = G.Chop_FreqRemove(dp.s, tt1.freq);
 
-                                            if (lag != 0)
-                                            {
-                                                if (lag < 0) name += "¤[" + lag + "]";
-                                                else name += "¤[+" + lag + "]";
-                                            }
+                                            //if (lag != 0)
+                                            //{
+                                            //    if (lag < 0) name += "¤[" + lag + "]";
+                                            //    else name += "¤[+" + lag + "]";
+                                            //}
+
+                                            name += "¤[" + lag + "]";
 
                                             if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
                                             {
