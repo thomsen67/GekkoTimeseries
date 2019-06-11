@@ -34,7 +34,23 @@ using System.Collections.ObjectModel;
 namespace Gekko
 {
     public class CrossThreadStuff
-    {        
+    {
+
+        //weird delegate pattern, but it works!
+        delegate void Decomp2Callback(DecompOptions2 x);
+        public static void Decomp2(DecompOptions2 x)
+        {
+            if (Gui.gui.InvokeRequired)
+            {
+                // It's on a different thread, so use Invoke.
+                Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { x });
+            }
+            else
+            {
+                // It's on the same thread, no need for Invoke
+
+            }
+        }
 
         //weird delegate pattern, but it works!
         delegate void SetTextInputCallback(string text, string type2);
