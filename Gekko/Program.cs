@@ -12473,11 +12473,11 @@ namespace Gekko
             DecompOptions2 decompOptions = (DecompOptions2)o;
             //decompOptions.isCalledFromDecompWindow = false;
 
-            Window1 w = null;
+            WindowDecomp w = null;
             if (true)
             {
-                w = new Window1(decompOptions);
-                Globals.windowsDecomp.Add(w);
+                w = new WindowDecomp(decompOptions);
+                Globals.windowsDecomp2.Add(w);
             }
 
             //if (decompOptions.expressionOld == null && decompOptions.variable != null)
@@ -12564,7 +12564,7 @@ namespace Gekko
             {
                 //The line below removes the window from the global list of active windows.
                 //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                if (Globals.windowsDecomp.Count > 0) Globals.windowsDecomp.RemoveAt(Globals.windowsDecomp.Count - 1);
+                if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
             }
             else
             {

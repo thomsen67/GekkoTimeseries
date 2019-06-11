@@ -37,8 +37,7 @@ using System.Globalization;
 
 namespace Gekko
 {
-
-    public delegate void CloseDelegate2();
+       
     
     /// <summary>
     /// Interaction logic for Window1.xaml

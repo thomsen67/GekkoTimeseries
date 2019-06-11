@@ -2714,6 +2714,14 @@ namespace Gekko
                     CrossThreadStuff.CloseDecomp(windowsDecompTemp[i]);  //fails silently
                 }
 
+                List<WindowDecomp> windowsDecompTemp2 = new List<WindowDecomp>();
+                windowsDecompTemp2.AddRange(Globals.windowsDecomp2);
+                for (int i = 0; i < windowsDecompTemp2.Count; i++)
+                {
+                    if (windowsDecompTemp2[i] == null) continue;
+                    CrossThreadStuff.CloseDecomp2(windowsDecompTemp2[i]);  //fails silently
+                }
+
                 if (print && Globals.ch.windowsGraphCloseCounter + Globals.ch.windowsDecompCloseCounter > 0)
                 {
                     G.Writeln();
