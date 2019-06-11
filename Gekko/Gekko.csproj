@@ -344,8 +344,8 @@
       <DependentUpon>TspUtilitiesGui.cs</DependentUpon>
     </Compile>
     <Compile Include="UserSettings.cs" />
-    <Compile Include="Window1 - Copy.xaml.cs">
-      <DependentUpon>Window1 - Copy.xaml</DependentUpon>
+    <Compile Include="WindowDecomp.xaml.cs">
+      <DependentUpon>WindowDecomp.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window1.xaml.cs">
       <DependentUpon>Window1.xaml</DependentUpon>
@@ -479,7 +479,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Window1 - Copy.xaml">
+    <Page Include="WindowDecomp.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
