@@ -2782,8 +2782,10 @@ decomp2:               	  	DECOMP2 decompOpt1? decompVar1 decompWhere decompGrou
                        	  |	DECOMP2 decompOpt1? decompVar2 decompWhere decompGroup decompLink decompCols         -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  decompVar2 decompWhere decompGroup decompLink)
 						    ;
 
-decompVar1:                 (seqOfBankvarnamesOnly1 IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME seqOfBankvarnamesOnly1+);
-decompVar2:                 (seqOfBankvarnamesOnly1 IN)? decompExpression        -> ^(ASTDECOMPITEMSEXPR decompExpression seqOfBankvarnamesOnly1?);
+seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
+
+decompVar1:                 (seqOfBankvarnamesOnly1Alias IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1));
+decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression        -> ^(ASTDECOMPITEMSEXPR ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER decompExpression));
 
 decompExpression:           expression;
 

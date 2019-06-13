@@ -5376,27 +5376,17 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMPITEMSEXPR":
                         {
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());                            
-                            if (node.ChildrenCount() == 1)
-                            {
-                                node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", null, null))" + ";" + G.NL);
-                            }
-                            else
-                            {
-                                node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + node[1].Code + ", null))" + ";" + G.NL);
-                            }
+                            StashIntoLocalFuncs(w, methodName, node[1][0].Code.ToString());
+                            string n = "null";
+                            if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
+                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + n + ", null))" + ";" + G.NL);                            
                         }
                         break;
                     case "ASTDECOMPITEMSNAME":
-                        {                            
-                            if (node.ChildrenCount() == 1)
-                            {
-                                node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + node[0].Code + ", null))" + ";" + G.NL);
-                            }
-                            else
-                            {
-                                node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + node[0].Code + ", " + node[1].Code + "))" + ";" + G.NL);
-                            }
+                        {
+                            string n = "null";
+                            if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();                                                        
+                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + node[1][0].Code + "))" + ";" + G.NL);                            
                         }
                         break;
                     case "ASTDECOMP2":

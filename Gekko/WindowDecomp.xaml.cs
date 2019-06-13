@@ -2081,8 +2081,8 @@ namespace Gekko
             foreach (DecompItemsString x1 in this.link)
             {
                 DecompItemsString temp = new DecompItemsString();
-                temp.name1 = x1.name1;
-                temp.name2 = x1.name2;
+                temp.varname = x1.varname;
+                temp.eqname = x1.eqname;
                 temp.expression = (Func<GekkoSmpl, IVariable>)x1.expression.Clone();  //not sure if this cloning is necessary
                 d.link.Add(temp);
             }

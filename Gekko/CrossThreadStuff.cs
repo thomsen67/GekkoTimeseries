@@ -59,48 +59,106 @@ namespace Gekko
                     Globals.windowsDecomp2.Add(w);
                 }
 
-                string name = null;
-                if (decompOptions.name != null)
-                {
-                    List name_list = decompOptions.name as List;
-                    List<string> name_list2 = O.Restrict(name_list, false, false, false, true);
-                    if (name_list2.Count != 1)
-                    {
-                        G.Writeln2("*** ERROR: List of names not accepted in DECOMP");
-                        throw new GekkoException();
-                    }
-                    name = name_list2[0];
-                }
-                else
-                {
-                    if (decompOptions.variable != null) name = decompOptions.variable;
-                }
+                //string name = null;
+                //if (decompOptions.name != null)
+                //{
+                //    List name_list = decompOptions.name as List;
+                //    List<string> name_list2 = O.Restrict(name_list, false, false, false, true);
+                //    if (name_list2.Count != 1)
+                //    {
+                //        G.Writeln2("*** ERROR: List of names not accepted in DECOMP");
+                //        throw new GekkoException();
+                //    }
+                //    name = name_list2[0];
+                //}
+                //else
+                //{
+                //    if (decompOptions.variable != null) name = decompOptions.variable;
+                //}
 
-                if (name != null)
+                //if (name != null)
+                //{
+                //    string name2 = G.Chop_GetName(name);
+                //    List<string> name3 = G.Chop_GetIndex(name);
+
+                //    decompOptions.variable = name2;
+                //    decompOptions.variable_subelement = name3;
+                //    decompOptions.expressionOld = null;
+                //    decompOptions.expression = null;
+
+                //    foreach (DecompItemsString decompItem in decompOptions.link)
+                //    {
+                //        if (Program.modelGams != null)
+                //        {
+                //            if (Program.modelGams == null)
+                //            {
+                //                G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
+                //                throw new GekkoException();
+                //            }
+                //            if (Program.modelGams.equations != null)
+                //            {
+                //                ModelGamsEquation found = Program.DecompEvalGams(decompOptions.variable);
+                //                decompOptions.expression = Globals.expression;
+                //                decompOptions.expressionOld = found.lhs + " = " + found.rhs;
+                //            }
+                //        }
+                //        else
+                //        {
+
+                //            if (Program.model == null)
+                //            {
+                //                G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
+                //                throw new GekkoException();
+                //            }
+
+                //            EquationHelper found = Program.DecompEval(decompOptions.variable);
+                //            decompOptions.expression = Globals.expression;
+                //            decompOptions.expressionOld = found.equationText;
+                //        }
+                //    }
+                //}
+
+                if (true)
                 {
-                    string name2 = G.Chop_GetName(name);
-                    List<string> name3 = G.Chop_GetIndex(name);
-
-                    decompOptions.variable = name2;
-                    decompOptions.variable_subelement = name3;
-                    decompOptions.expressionOld = null;
-                    decompOptions.expression = null;
-
+                    int count = -1;
                     foreach (DecompItemsString decompItem in decompOptions.link)
                     {
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        count++;
+                        if (count > 0) continue;
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                         if (Program.modelGams != null)
-                        {
-                            if (Program.modelGams == null)
+                        {                            
+
+                            if (decompItem.expression == null)
                             {
-                                G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
-                                throw new GekkoException();
+                                if (Program.modelGams.equations != null)
+                                {
+                                    ModelGamsEquation found = Program.DecompEvalGams(decompItem.varname);
+                                    decompItem.expression = Globals.expression;
+                                    decompItem.expressionText = found.lhs + " = " + found.rhs;
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: No GAMS equations given");
+                                    throw new GekkoException();
+                                }
                             }
-                            if (Program.modelGams.equations != null)
+                            else
                             {
-                                ModelGamsEquation found = Program.DecompEvalGams(decompOptions.variable);
-                                decompOptions.expression = Globals.expression;
-                                decompOptions.expressionOld = found.lhs + " = " + found.rhs;
+                                //fix this...
                             }
+
+                            
                         }
                         else
                         {

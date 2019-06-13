@@ -12182,11 +12182,11 @@ namespace Gekko
             foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<string> x1 = O.Restrict(liv.name1 as List, false, true, false, false);
-                List<string> x2 = O.Restrict(liv.name2 as List, false, true, false, false);
+                List<string> x1 = O.Restrict(liv.varname as List, false, true, false, false);
+                List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
                 DecompItemsString temp = new DecompItemsString();
-                if (x1 != null) temp.name1 = x1[0];
-                if (x2 != null) temp.name2 = x2[0];
+                if (x1 != null) temp.varname = x1[0];
+                if (x2 != null) temp.eqname = x2[0];
                 temp.expression = liv.expression;
                 decompOptions2.link.Add(temp);
             }

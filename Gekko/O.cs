@@ -29,22 +29,23 @@ namespace Gekko
 
     public class DecompItemsString
     {
+        public string expressionText = null;
         public Func<GekkoSmpl, IVariable> expression = null;
-        public string name1 = null;
-        public string name2 = null;
+        public string varname = null;
+        public string eqname = null;
     }
 
     public class DecompItems
     {
         public Func<GekkoSmpl, IVariable> expression = null;
-        public IVariable name1 = null;
-        public IVariable name2 = null;
+        public IVariable varname = null;
+        public IVariable eqname = null;
 
         public DecompItems(Func<GekkoSmpl, IVariable> expression, IVariable name1, IVariable name2)
         {
             this.expression = expression;
-            this.name1 = name1;
-            this.name2 = name2;
+            this.varname = name1;
+            this.eqname = name2;
         }
     }
 
