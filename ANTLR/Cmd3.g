@@ -35,13 +35,13 @@ tokens {
 	ASTFORTYPE1;
 	ASTNUMBERMINUS;
 	ASTDECOMPWHERE;
-	ASTDECOMPAGG;
+	ASTDECOMPGROUP;
 	ASTDECOMPLINK;
 	ASTDECOMPLINK1;
 	ASTDECOMPWHERE2;
-	ASTDECOMPAGG1;
-	ASTDECOMPAGG1c;
-	ASTDECOMPAGG1d;
+	ASTDECOMPGROUP1;
+	ASTDECOMPGROUP1c;
+	ASTDECOMPGROUP1d;
 	ASTFORTYPE2;
 	ASTNAKEDLISTMISS;
 	ASTLOCAL;
@@ -294,6 +294,8 @@ ASTCOMPARE2;
 	ASTDECOMP2;
     ASTDECOMPITEMS;
 	ASTDECOMPITEMS2;
+	ASTDECOMPITEMSNAME;
+	ASTDECOMPITEMSEXPR;
     ASTDECOMPTYPE;
     ASTDELETE;
     ASTDELETEALL;
@@ -1266,7 +1268,7 @@ Y2                    = 'Y2'                       ;
     RING             = 'RING';
     RN= 'RN'       ;
     ROWS             = 'ROWS';
-	AGG             = 'AGG';
+	GROUP             = 'GROUP';
 	LEVEL = 'LEVEL';
 	LINK = 'LINK';
 	WHERE = 'WHERE';
@@ -1888,7 +1890,7 @@ d.Add("Y" ,Y);
                                         d.Add("ring"    , RING    );
                                         d.Add("rn"               , RN );
                                         d.Add("rows"    , ROWS    );
-										d.Add("agg"    , AGG    );
+										d.Add("group"    , GROUP    );
 										d.Add("level"    , LEVEL    );
 										d.Add("link"    , LINK    );
 										d.Add("where"    , WHERE    );
@@ -2776,23 +2778,29 @@ DECOMP decompOpt1? seqOfBankvarnames -> ^({token("ASTDECOMP¤"+($seqOfBankvarname
 | DECOMP decompOpt1? decompExpression -> ^({token("ASTDECOMP¤"+($decompExpression.text), ASTDECOMP, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression))
 ;
 
-decomp2:               	  	DECOMP2 decompOpt1? seqOfBankvarnamesOnly1 decompWhere decompAgg decompLink decompCols         -> ^({token("ASTDECOMP2¤"+($seqOfBankvarnamesOnly1.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS2 seqOfBankvarnamesOnly1)  decompWhere decompAgg decompLink)
-                       	  |	DECOMP2 decompOpt1? decompExpression       decompWhere decompAgg decompLink decompCols         -> ^({token("ASTDECOMP2¤"+($decompExpression.text), ASTDECOMP2, input.LT(1).Line)}       ^(ASTOPT_ decompOpt1?) ^(ASTDECOMPITEMS decompExpression)          decompWhere decompAgg decompLink)
+decomp2:               	  	DECOMP2 decompOpt1? decompVar1 decompWhere decompGroup decompLink decompCols         -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  decompVar1 decompWhere decompGroup decompLink)
+                       	  |	DECOMP2 decompOpt1? decompVar2 decompWhere decompGroup decompLink decompCols         -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  decompVar2 decompWhere decompGroup decompLink)
 						    ;
+
+decompVar1:                 (seqOfBankvarnamesOnly1 IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME seqOfBankvarnamesOnly1+);
+decompVar2:                 (seqOfBankvarnamesOnly1 IN)? decompExpression        -> ^(ASTDECOMPITEMSEXPR decompExpression seqOfBankvarnamesOnly1?);
 
 decompExpression:           expression;
 
 decompWhere:                WHERE decompWhere2 (COMMA2 decompWhere2)*-> ^(ASTDECOMPWHERE decompWhere2+);
-decompAgg:                  AGG decompAgg1 (COMMA2 decompAgg1)* -> ^(ASTDECOMPAGG decompAgg1+);
+decompGroup:                GROUP decompGroup1 (COMMA2 decompGroup1)* -> ^(ASTDECOMPGROUP decompGroup1+);
 decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> ^(ASTDECOMPLINK decompLink1+);
 decompCols:                 COLS seqOfBankvarnames;
 
 decompWhere2:               decompWhere1 IN seqOfBankvarnamesOnly1 -> ^(ASTDECOMPWHERE2 decompWhere1 seqOfBankvarnamesOnly1);
 decompWhere1:               seqOfBankvarnamesOnly1 | expression;
 
-decompAgg1:                 seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 (LEVEL expression)? (ZOOM expression2)? -> ^(ASTDECOMPAGG1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1 ^(ASTDECOMPAGG1c expression?) ^(ASTDECOMPAGG1d expression2?));
+decompGroup1:               seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 (LEVEL expression)? (ZOOM expression2)? -> ^(ASTDECOMPGROUP1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1 ^(ASTDECOMPGROUP1c expression?) ^(ASTDECOMPGROUP1d expression2?));
 
-decompLink1:                seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1 -> ^(ASTDECOMPLINK1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1);
+//decompLink1:              seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1 -> ^(ASTDECOMPLINK1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1);
+decompLink1:                decompVar1 -> ^(ASTDECOMPLINK1 decompVar1)
+                          | decompVar2 -> ^(ASTDECOMPLINK1 decompVar2)
+						    ;
 
 decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
@@ -4497,7 +4505,7 @@ ident2: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
-  AGG|
+  GROUP|
   LEVEL|
   LINK|
   WHERE|
@@ -4934,7 +4942,7 @@ ident3: 					Ident |
   RN|
   ROWNAMES|
   ROWS|
-  AGG|
+  GROUP|
   LEVEL|
   LINK|
   WHERE|

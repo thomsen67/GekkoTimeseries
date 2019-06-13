@@ -27,7 +27,28 @@ namespace Gekko
         }
     }
 
-        public class LookupSettings
+    public class DecompItemsString
+    {
+        public Func<GekkoSmpl, IVariable> expression = null;
+        public string name1 = null;
+        public string name2 = null;
+    }
+
+    public class DecompItems
+    {
+        public Func<GekkoSmpl, IVariable> expression = null;
+        public IVariable name1 = null;
+        public IVariable name2 = null;
+
+        public DecompItems(Func<GekkoSmpl, IVariable> expression, IVariable name1, IVariable name2)
+        {
+            this.expression = expression;
+            this.name1 = name1;
+            this.name2 = name2;
+        }
+    }
+
+    public class LookupSettings
     {
         public O.ECreatePossibilities create = O.ECreatePossibilities.NoneReportError;
         public O.ELookupType type = O.ELookupType.RightHandSide;
@@ -8608,6 +8629,7 @@ namespace Gekko
             public string label = null;
             public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
             
+            
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
@@ -8629,8 +8651,8 @@ namespace Gekko
             public string label = null;
             public IVariable name = null;  //name given from ASTDECOMPITEMS2, is only active if DECOMP x, DECOM x[a] and the like (a name, no expression)
             public List<List<IVariable>> where = new List<List<IVariable>>();
-            public List<List<IVariable>> agg = new List<List<IVariable>>();
-            public List<List<IVariable>> link = new List<List<IVariable>>();
+            public List<List<IVariable>> group = new List<List<IVariable>>();            
+            public List<DecompItems> decompItems = new List<DecompItems>();  //second, third etc. elements are links
 
             public void Exe()
             {

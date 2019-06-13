@@ -12,74 +12,72 @@ namespace Gekko
         public static int labelCounter;
         public static void C0(GekkoSmpl smpl, P p)
         {
-            //[[commandStart]]1
-            p.SetText(@"¤2"); O.InitSmpl(smpl, p);
+            //[[commandStart]]0
+            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            O.Assignment o1 = new O.Assignment();
-            o1.opt_source = @"<[code]>x = sum(#i, xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i]+xx[a, #i])";
-
-            Func<GekkoSmpl, IVariable> func77 = (GekkoSmpl smpl79) =>
+            Func<GekkoSmpl, IVariable> func60 = (GekkoSmpl smpl62) =>
             {
-                var smplCommandRemember78 = smpl79.command; smpl79.command = GekkoSmplCommand.Sum;
-                Series temp76 = new Series(ESeriesType.Normal, Program.options.freq, null); temp76.SetZero(smpl79);
+                var smplCommandRemember61 = smpl62.command; smpl62.command = GekkoSmplCommand.Sum;
+                Series temp59 = new Series(ESeriesType.Normal, Program.options.freq, null); temp59.SetZero(smpl62);
 
-                foreach (IVariable listloop_i75 in new O.GekkoListIterator(O.Lookup(smpl79, null, ((O.scalarStringHash).Add(smpl79, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, null)))
+                foreach (IVariable listloop_a56 in new O.GekkoListIterator(O.Lookup(smpl62, null, ((O.scalarStringHash).Add(smpl62, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, null)))
                 {
-                    temp76.InjectAdd(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Add(smpl79, O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)), O.Indexer(O.Indexer2(smpl79, O.EIndexerType.None, new ScalarString("a"), listloop_i75), smpl79, O.EIndexerType.None, O.Lookup(smpl79, null, null, "xx", null, null, new LookupSettings(), EVariableType.Var, null), new ScalarString("a"), listloop_i75)));
+                    foreach (IVariable listloop_s57 in new O.GekkoListIterator(O.Lookup(smpl62, null, ((O.scalarStringHash).Add(smpl62, (new ScalarString("s")))), null, new LookupSettings(), EVariableType.Var, null)))
+                    {
+                        foreach (IVariable listloop_o58 in new O.GekkoListIterator(O.Lookup(smpl62, null, ((O.scalarStringHash).Add(smpl62, (new ScalarString("o")))), null, new LookupSettings(), EVariableType.Var, null)))
+                        {
+                            temp59.InjectAdd(smpl62, O.Indexer(O.Indexer2(smpl62, O.EIndexerType.None, listloop_a56, listloop_s57, listloop_o58), smpl62, O.EIndexerType.None, O.Lookup(smpl62, null, null, "pop", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a56, listloop_s57, listloop_o58));
 
-                    labelCounter++;
+                            labelCounter++;
+                        }
+                    }
                 }
                 labelCounter = 0;
-                smpl79.command = smplCommandRemember78;
-                return temp76;
+                smpl62.command = smplCommandRemember61;
+                return temp59;
 
             };
 
 
-            Action assign_80 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar74 = func77(smpl);
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "x", null, ivTmpvar74, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
-                ;
-            };
-            Func<bool> check_80 = () =>
-            {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar74 = func77(smpl);
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar74.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "x", null, ivTmpvar74, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_80, check_80, o1);
+            O.Decomp2 o0 = new O.Decomp2();
+            o0.label = @"popsum in (-popsum + sum((#a, #s, #o), pop[#a, #s, #o]))";
+            o0.t1 = O.ConvertToDate(i54, O.GetDateChoices.FlexibleStart);
+            ;
+            o0.t2 = O.ConvertToDate(i55, O.GetDateChoices.FlexibleEnd);
+            ;
 
-            //[[commandEnd]]1
+            o0.opt_prtcode = O.ConvertToString((new ScalarString("xd")));
+
+
+
+
+            o0.where.Add(new List<IVariable>() { O.HandleString(new ScalarString(@"se")), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("o")) })) });
+            o0.where.Add(new List<IVariable>() { O.HandleString(new ScalarString(@"se")), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("o")) })) });
+
+            o0.group.Add(new List<IVariable>() { O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("a")) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("a_agg")) })), O.HandleString(new ScalarString(@"10-year")), O.HandleString(new ScalarString(@"27")) });
+            o0.group.Add(new List<IVariable>() { O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("a")) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { O.scalarStringHash.Concat(null, new ScalarString("a_agg")) })), O.HandleString(new ScalarString(@"10-year")), O.HandleString(new ScalarString(@"27")) });
+
+            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("x1") })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("e2") }))));
+
+
+            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("x3") })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("e1") }))));
+
+
+
+            o0.Exe();
+
+            //[[commandEnd]]0
         }
 
 
-        public static readonly ScalarVal i72 = new ScalarVal(1d);
-        public static readonly ScalarVal i73 = new ScalarVal(30000d);
+        public static readonly ScalarVal i54 = new ScalarVal(2002d);
+        public static readonly ScalarVal i55 = new ScalarVal(2003d);
 
         public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-            //[[commandSpecial]]0
-            IVariable forloop_xe7dke6cj_71 = null;
-            int counter81 = 0;
-            for (O.IterateStart(O.ELoopType.ForTo, ref forloop_xe7dke6cj_71, i72); O.IterateContinue(O.ELoopType.ForTo, forloop_xe7dke6cj_71, i72, i73, null, ref counter81); O.IterateStep(O.ELoopType.ForTo, ref forloop_xe7dke6cj_71, i72, null, counter81))
-            {
-                ;
-
-                C0(smpl, p);
-
-            };
-
-            //[[commandEnd]]0
+            C0(smpl, p);
 
 
 

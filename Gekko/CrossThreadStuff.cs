@@ -37,18 +37,113 @@ namespace Gekko
     {
 
         //weird delegate pattern, but it works!
-        delegate void Decomp2Callback(DecompOptions2 x);
-        public static void Decomp2(DecompOptions2 x)
+        delegate void Decomp2Callback(DecompOptions2 o);
+        public static void Decomp2(DecompOptions2 o)
         {
             if (Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
-                Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { x });
+                Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
             }
             else
             {
                 // It's on the same thread, no need for Invoke
 
+                DecompOptions2 decompOptions = (DecompOptions2)o;
+                //decompOptions.isCalledFromDecompWindow = false;
+
+                WindowDecomp w = null;
+                if (true)
+                {
+                    w = new WindowDecomp(decompOptions);
+                    Globals.windowsDecomp2.Add(w);
+                }
+
+                string name = null;
+                if (decompOptions.name != null)
+                {
+                    List name_list = decompOptions.name as List;
+                    List<string> name_list2 = O.Restrict(name_list, false, false, false, true);
+                    if (name_list2.Count != 1)
+                    {
+                        G.Writeln2("*** ERROR: List of names not accepted in DECOMP");
+                        throw new GekkoException();
+                    }
+                    name = name_list2[0];
+                }
+                else
+                {
+                    if (decompOptions.variable != null) name = decompOptions.variable;
+                }
+
+                if (name != null)
+                {
+                    string name2 = G.Chop_GetName(name);
+                    List<string> name3 = G.Chop_GetIndex(name);
+
+                    decompOptions.variable = name2;
+                    decompOptions.variable_subelement = name3;
+                    decompOptions.expressionOld = null;
+                    decompOptions.expression = null;
+
+                    foreach (DecompItemsString decompItem in decompOptions.link)
+                    {
+                        if (Program.modelGams != null)
+                        {
+                            if (Program.modelGams == null)
+                            {
+                                G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
+                                throw new GekkoException();
+                            }
+                            if (Program.modelGams.equations != null)
+                            {
+                                ModelGamsEquation found = Program.DecompEvalGams(decompOptions.variable);
+                                decompOptions.expression = Globals.expression;
+                                decompOptions.expressionOld = found.lhs + " = " + found.rhs;
+                            }
+                        }
+                        else
+                        {
+
+                            if (Program.model == null)
+                            {
+                                G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
+                                throw new GekkoException();
+                            }
+
+                            EquationHelper found = Program.DecompEval(decompOptions.variable);
+                            decompOptions.expression = Globals.expression;
+                            decompOptions.expressionOld = found.equationText;
+                        }
+                    }
+                }
+
+                if (decompOptions.name == null)
+                {
+                    w.Title = "Decompose expression";
+                }
+                else
+                {
+                    w.Title = "Decompose " + decompOptions.variable + "";
+                }
+                w.Tag = decompOptions;
+
+                w.SetRadioButtons();
+                w.RecalcCellsWithNewType();
+                decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
+
+                if (w.isClosing)  //if something goes wrong, .isClosing will be true
+                {
+                    //The line below removes the window from the global list of active windows.
+                    //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                    if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                }
+                else
+                {
+                    w.ShowDialog();
+                    w.Close();  //probably superfluous
+                    w = null;  //probably superfluous
+                }
             }
         }
 

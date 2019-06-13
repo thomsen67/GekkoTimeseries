@@ -97,6 +97,7 @@ namespace Gekko
         Special
     }
 
+    
     public class CGSolverOutput
     {
         public int iterations = -12345;
@@ -12116,7 +12117,7 @@ namespace Gekko
             //Calls: Program.Decomp(decompOptions);
             //       Program.DecompThreadFunction(Object o) --> doing stuff with EVal() function
             //       Window1.RecalcCellsWithNewType();
-            //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
+            //       Program.Decompose(DecompOptions o)
             //
             //CLICKING: Mouse_Down(), cf. #98732498724
             //
@@ -12139,9 +12140,9 @@ namespace Gekko
         public static void Decomp2(O.Decomp2 o)
         {
 
-            //This is the starting point of a decomposition call
+            //This is the starting point of a decomposition call, just after O.Decmop2 (main entry)
             //Calls: Program.Decomp2(decompOptions);
-            //       Program.DecompThreadFunction(Object o) --> doing stuff with EVal() function
+            //       CrossThreadStuff.Decomp2(decompOptions2) --> doing stuff with EVal() function
             //       Window1.RecalcCellsWithNewType();
             //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
             //
@@ -12168,7 +12169,7 @@ namespace Gekko
                 decompOptions2.where.Add(new List<string>() { x1, x2[0] });
             }
 
-            foreach (List<IVariable> liv in o.agg)
+            foreach (List<IVariable> liv in o.group)
             {
                 //
                 List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
@@ -12178,18 +12179,19 @@ namespace Gekko
                 decompOptions2.agg.Add(new List<string>() { x1[0], x2[0], x3, x4 });
             }
 
-            foreach (List<IVariable> liv in o.link)
+            foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<string> x1 = O.Restrict(liv[0] as List, false, true, false, false);
-                List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
-                decompOptions2.link.Add(new List<string>() { x1[0], x2[0] });
+                List<string> x1 = O.Restrict(liv.name1 as List, false, true, false, false);
+                List<string> x2 = O.Restrict(liv.name2 as List, false, true, false, false);
+                DecompItemsString temp = new DecompItemsString();
+                if (x1 != null) temp.name1 = x1[0];
+                if (x2 != null) temp.name2 = x2[0];
+                temp.expression = liv.expression;
+                decompOptions2.link.Add(temp);
             }
 
-            Thread thread = new Thread(new ParameterizedThreadStart(DecompThreadFunction2));
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.CurrentCulture = CultureInfo.InvariantCulture;            
-            thread.Start(decompOptions2);
+            CrossThreadStuff.Decomp2(decompOptions2);
 
             if (true)
             {
@@ -12466,121 +12468,7 @@ namespace Gekko
                 }
             }
         }
-
-        // Thread for decomp window
-        public static void DecompThreadFunction2(Object o)
-        {
-            DecompOptions2 decompOptions = (DecompOptions2)o;
-            //decompOptions.isCalledFromDecompWindow = false;
-
-            WindowDecomp w = null;
-            if (true)
-            {
-                w = new WindowDecomp(decompOptions);
-                Globals.windowsDecomp2.Add(w);
-            }
-
-            //if (decompOptions.expressionOld == null && decompOptions.variable != null)
-            //{
-            //    decompOptions.expressionOld = decompOptions.variable;
-            //}
-
-            //if (decompOptions.name == null && decompOptions.variable != null)
-            //{
-            //    decompOptions.name = decompOptions.variable;
-            //}
-
-            string name = null;
-            if (decompOptions.name != null)
-            {
-                List name_list = decompOptions.name as List;
-                List<string> name_list2 = O.Restrict(name_list, false, false, false, true);
-                if (name_list2.Count != 1)
-                {
-                    G.Writeln2("*** ERROR: List of names not accepted in DECOMP");
-                    throw new GekkoException();
-                }
-                name = name_list2[0];
-            }
-            else
-            {
-                if (decompOptions.variable != null) name = decompOptions.variable;
-            }
-
-            if (name != null)
-            {
-                string name2 = G.Chop_GetName(name);
-                List<string> name3 = G.Chop_GetIndex(name);
-
-                decompOptions.variable = name2;
-                decompOptions.variable_subelement = name3;
-                decompOptions.expressionOld = null;
-                decompOptions.expression = null;
-
-                if (Program.modelGams != null)
-                {
-                    if (Program.modelGams == null)
-                    {
-                        G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
-                        throw new GekkoException();
-                    }
-                    if (Program.modelGams.equations != null)
-                    {
-                        ModelGamsEquation found = DecompEvalGams(decompOptions.variable);
-                        decompOptions.expression = Globals.expression;
-                        decompOptions.expressionOld = found.lhs + " = " + found.rhs;
-                    }
-                }
-                else
-                {
-
-                    if (Program.model == null)
-                    {
-                        G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
-                        throw new GekkoException();
-                    }
-
-                    EquationHelper found = DecompEval(decompOptions.variable);
-                    decompOptions.expression = Globals.expression;
-                    decompOptions.expressionOld = found.equationText;
-                }
-            }
-
-            if (decompOptions.name == null)
-            {
-                w.Title = "Decompose expression";
-            }
-            else
-            {
-                w.Title = "Decompose " + decompOptions.variable + "";
-            }
-            w.Tag = decompOptions;
-
-            w.SetRadioButtons();
-            w.RecalcCellsWithNewType();
-            decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
-
-            if (w.isClosing)  //if something goes wrong, .isClosing will be true
-            {
-                //The line below removes the window from the global list of active windows.
-                //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
-            }
-            else
-            {
-                if (decompOptions.isNew)
-                {
-                    //do not show it yet
-                }
-                else
-                {
-                    w.ShowDialog();
-                    w.Close();  //probably superfluous
-                    w = null;  //probably superfluous
-                }
-            }
-        }
-
+        
         public static EquationHelper DecompEval(string variable)
         {
             EquationHelper found = Program.FindEquationByMeansOfVariableName(variable);
@@ -36275,7 +36163,7 @@ namespace Gekko
 
         }
 
-        public static DecompTables DecomposeNEW(Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, GekkoTime tt1, GekkoTime tt2)
+        public static DecompTables Decompose2(Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, GekkoTime tt1, GekkoTime tt2)
         {
             //
             //
@@ -36665,6 +36553,8 @@ namespace Gekko
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t2, dContribD);
 
+                            G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
+
                             if (mm.Contains(1))
                             {
                                 double vRef = d.cellsRef[s].GetData(smpl, t2);
@@ -36938,12 +36828,278 @@ namespace Gekko
             }
         }
 
+        public static void DecomposePutIntoTable2(DecompOptions2 o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
+        {
+            int iOffset = 0;
+            if (o.showErrors) iOffset = 1;
+
+            if (o.isPercentageType)
+            {
+                tab.Set(1, 1, "%");
+            }
+
+            int j = 0;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+            {
+                j++;
+                int i = 0;
+                double lhsSum = 0d;
+                double rhsSum = 0d;
+                foreach (string varname in vars2)
+                {
+                    i++;
+                    if (j == 1)
+                    {
+                        string varname2 = varname;
+                        string lag5 = null;
+                        string[] ss = varname.Split('¤');
+                        if (ss.Length == 2)
+                        {
+                            varname2 = ss[0];
+                            lag5 = ss[1];
+                        }
+                        else
+                        {
+                            //do nothing
+                        }
+                        tab.Set(i + 1, 1, G.Chop_RemoveBank(varname2, Program.databanks.GetFirst().name) + lag5);
+                    }
+
+                    if (i == 1)
+                    {
+                        Cell c = new Cell();
+                        c.date = t2.ToString();
+                        c.cellType = CellType.Date;
+                        tab.Set(new Coord(1, j + 1), c);
+                    }
+                    double d = double.NaN;
+                    if (code1 == "n" || code1 == "xn" || code1 == "x")
+                    {
+                        d = o.decompTables.cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                                                                                 //o.cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                    }
+                    else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
+                    {
+                        d = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        //o.decompTables.cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                    }
+                    else if (code1 == "d")
+                    {
+                        d = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "rd")
+                    {
+                        d = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "xd")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "xrd")
+                    {
+                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "m")
+                    {
+                        d = o.decompTables.cellsContribM[varname].GetData(smpl, t2);
+                    }
+                    else if (code1 == "xm")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        d = d1 - d0;
+                    }
+                    else if (code1 == "p")
+                    {
+                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "rp")
+                    {
+                        double dd = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "xp")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "xrp")
+                    {
+                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "q")
+                    {
+                        double dd = o.decompTables.cellsContribM[varname].GetData(smpl, t2);
+                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2);
+                        d = (dd / dLhsLag) * 100d;
+                    }
+                    else if (code1 == "xq")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        d = (d1 / d0 - 1d) * 100d;
+                    }
+                    else if (code1 == "dp")
+                    {
+                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dd_lag = o.decompTables.cellsContribD[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+                    }
+                    else if (code1 == "rdp")
+                    {
+                        double dd = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dd_lag = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+                    }
+                    else if (code1 == "xdp")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d1_lag = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                    }
+                    else if (code1 == "xrdp")
+                    {
+                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1_lag = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+                    }
+                    else if (code1 == "mp")  // <p> - <rp>
+                    {
+                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+
+                        double dd2 = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag2 = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
+
+
+                    }
+                    else if (code1 == "xmp")
+                    {
+                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1_ref = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0_ref = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
+                    }
+                    else
+                    {
+                        MessageBox.Show("*** ERROR: Wrong operator: " + o.prtOptionLower);
+                        throw new GekkoException();
+                    }
+
+                    if (i == 1)
+                    {
+                        lhsSum = d;
+                    }
+                    else
+                    {
+                        rhsSum += d;
+                    }
+
+                    DecomposeInsertValue(tab, code1, code2, j, i, d, o);
+
+                    if (i == 1 && o.showErrors)
+                    {
+                        i = i + iOffset;
+                        //skip a line, to make room for error showing (at i = 2, or row 3 in the table)
+                        if (j == 1 && DecomposePutIntoTableIsError(o, i))
+                        {
+                            tab.Set(i + 1, 1, Globals.decompText2);
+                            tab.Get(i + 1, 1).backgroundColor = "LightRed";
+                        }
+                    }
+
+                }
+                if (code1 == "d" || code1 == "rd" || code1 == "m" || code1 == "p" || code1 == "rp" || code1 == "q" || code1 == "dp" || code1 == "rdp" || code1 == "mp")
+                {
+                    double error = lhsSum - rhsSum;
+                    double factor = lhsSum / rhsSum;
+
+                    if (true)
+                    {
+                        error = 0d;
+                        factor = 1d;
+                    }
+
+                    int end = vars2.Count;
+                    if (o.showErrors)
+                    {
+                        factor = 1d;  //resetting
+                        end = end + iOffset;
+                    }
+                    for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                    {
+                        if (DecomposePutIntoTableIsError(o, i)) //real table row 3
+                        {
+                            DecomposeInsertValue(tab, code1, code2, j, i, error, o);
+                            tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
+                        }
+                        else
+                        {
+                            tab.Get(i + 1, j + 1).number *= factor;
+                        }
+                    }
+                    if (code2 == "s")
+                    {
+                        //just take raw cell numbers and make them sum to 100
+                        tab.Get(1 + 1, j + 1).number *= 100d / tab.Get(1 + 1, j + 1).number;  //variable 1, table row 2
+                        double sum = 0d;
+                        for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                        {
+                            sum += tab.Get(i + 1, j + 1).number;
+                        }
+                        for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
+                        {
+                            tab.Get(i + 1, j + 1).number *= 100d / sum;
+                        }
+                    }
+                }
+            }
+        }
+
         private static bool DecomposePutIntoTableIsError(DecompOptions o, int i)
         {
             return o.showErrors && i == 2;
         }
 
         private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions decompOptions)
+        {
+            Cell c = new Cell();
+            c.number = d;
+            c.cellType = CellType.Number;
+            int decimals = 0;
+            if (decompOptions.isPercentageType) decimals = decompOptions.decimalsPch;
+            else decimals = decompOptions.decimalsLevel;
+            string format = "f16." + decimals.ToString();
+            c.numberFormat = format;
+            tab.Set(new Coord(i + 1, j + 1), c);
+        }
+
+        private static bool DecomposePutIntoTableIsError(DecompOptions2 o, int i)
+        {
+            return o.showErrors && i == 2;
+        }
+
+        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions2 decompOptions)
         {
             Cell c = new Cell();
             c.number = d;

@@ -1107,11 +1107,7 @@ namespace Gekko
                 if (this.decompOptions.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
 
-                if (this.decompOptions.isSubst) subst.IsChecked = true;
-                if (this.decompOptions.isSort) sort.IsChecked = true;
-                if (this.decompOptions.isPool) pool.IsChecked = true;
-
-
+                
                 if (this.decompOptions.guiDecompIsBaseline)
                 {
                     radioButton22.IsEnabled = false;
@@ -1174,28 +1170,9 @@ namespace Gekko
                 Table table = null;
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
-                this.decompOptions.prtOptionLower = transformationCodeAugmented;                                               
+                this.decompOptions.prtOptionLower = transformationCodeAugmented;
 
-                if (this.decompOptions.isNew)
-                {
-                    DecompTables d = Program.DecomposeNEW(this.decompOptions.expression, EDecompBanks.Both, this.decompOptions.t1, this.decompOptions.t2);
-                    GekkoTime t = new GekkoTime(EFreq.A, 2002, 1);
-
-                    foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
-                    {
-                        double v = kvp.Value.GetDataSimple(t);
-                        G.Writeln(kvp.Key + ": " + v);
-                    }
-
-                    //double quo_0 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double quo_m1 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[-1]"].GetDataSimple(t);
-                    //double gradQuo_0 = d.cellsGradQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double contribD_0 = d.cellsContribD.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double b = (gradQuo_0 * (quo_0 - quo_m1));
-                    //G.Writeln(quo_m1 + " " + quo_0 + " " + contribD_0 + " " + b);
-                    return;
-                }
-                else
+                if (true)
                 {
                     table = Program.Decompose(this.decompOptions);
                     if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
@@ -1809,41 +1786,7 @@ namespace Gekko
             }
         }
 
-        private void Sort_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions.isSort = true;
-        }
-
-        private void Pool_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions.isPool = true;
-        }
-
-        private void Subst_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
-        }
-
-        private void Sort_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions.isSort = true;
-        }
-
-        private void Pool_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions.isPool = true;
-        }
-
-        private void Subst_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
-        }
+        
     }
 
     public class GekkoDockPanel : DockPanel
@@ -1996,133 +1939,5 @@ namespace Gekko
         }
     }
 
-    public class DecompOptions2
-    {
-        public bool isNew = false;
-
-        public bool isSubst = false;
-        public bool isPool = false;
-        public bool isSort = false;
-
-        //public bool onlyTable = false;
-        //public Table table = null;
-
-        public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
-        public string variable = null;
-        public List<string> variable_subelement = null;
-        public bool isPercentageType = false;
-        //public bool isExpression = false; //true for UDVALG fy+1 etc.
-        public string expressionOld = null;  //only != null for expressions
-        public Func<GekkoSmpl, IVariable> expression = null;
-        public List<Dictionary<string, string>> precedents;  //only != null for expressions
-        public string type;  //not used yet (UDVALG or DECOMP)
-        //public GekkoParserTimePeriod tp;
-        public GekkoTime t1 = GekkoTime.tNull;
-        public GekkoTime t2 = GekkoTime.tNull;
-        public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
-        //public List<string> vars;
-        public bool isSubWindow = false;  //when browsing/clicking, opening a new window
-        public bool showErrors = false;
-        //public GekkoSmpl smplForFunc = null;
-
-        public List<string> subst = new List<string>();
-
-        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
-
-        //-------- tranformation start --------------
-        public string guiDecompTransformationCode = "n";
-        public bool guiDecompIsShares = false;
-        public bool guiDecompIsRaw = true;
-        public bool guiDecompIsBaseline = false;
-        //-------- tranformation end ----------------
-        public int guiDecompLastClickedRow = 0;
-        public int guiDecompLastClickedCol = 0;
-        public int guiDecompSelectedColMin = 0;
-        public int guiDecompSelectedColMax = 0;
-        public int guiDecompSelectedRowMin = 0;
-        public int guiDecompSelectedRowMax = 0;
-        public bool guiDecompIsSelecting = false;
-        public bool guiDecompIsSelectingAll = false;
-        public Dictionary<string, int> guiDecompChangedCells = new Dictionary<string, int>();
-        public Table guiDecompValues = new Table();
-        //public bool isCalledFromDecompWindow = true;
-        public LocalBanks localBanks = null;
-        public string modelHash = null;
-        //public int decimals = 4;
-        public int decimalsLevel = 4;
-        public int decimalsPch = 2;
-        public string dream = null;  //experimental
-
-        public DecompTables decompTables = null;
-        public bool hasCalculatedQuo = false;
-        public bool hasCalculatedRef = false;
-
-        public List<string> vars2 = null;
-
-        public List<List<string>> where = new List<List<string>>();
-        public List<List<string>> agg = new List<List<string>>();
-        public List<List<string>> link = new List<List<string>>();
-
-        public DecompOptions Clone()
-        {
-            //clones relevant parts for new window
-            DecompOptions d = new DecompOptions();
-            //d.tp = this.tp;
-            d.variable = this.variable;
-            d.t1 = this.t1;
-            d.t2 = this.t2;
-            d.prtOptionLower = this.prtOptionLower;
-            d.guiDecompIsShares = this.guiDecompIsShares;
-            d.guiDecompIsRaw = this.guiDecompIsRaw;
-            d.guiDecompIsBaseline = this.guiDecompIsBaseline;
-            d.guiDecompTransformationCode = this.guiDecompTransformationCode;
-            d.modelHash = this.modelHash;
-            d.showErrors = this.showErrors;
-            //d.decimalsLevel = this.decimalsLevel;
-            d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
-            d.dream = this.dream;
-
-            d.isSort = this.isSort;
-            d.isSubst = this.isSubst;
-            d.isPool = this.isPool;
-            foreach (string s in this.subst)
-            {
-                d.subst.Add(s);
-            }
-
-            foreach (List<string> x1 in this.where)
-            {
-                List<string> temp = new List<string>();
-                foreach (string x2 in x1)
-                {
-                    temp.Add(x2);
-                }
-                d.where.Add(temp);
-            }
-
-            foreach (List<string> x1 in this.agg)
-            {
-                List<string> temp = new List<string>();
-                foreach (string x2 in x1)
-                {
-                    temp.Add(x2);
-                }
-                d.agg.Add(temp);
-            }
-
-            foreach (List<string> x1 in this.link)
-            {
-                List<string> temp = new List<string>();
-                foreach (string x2 in x1)
-                {
-                    temp.Add(x2);
-                }
-                d.link.Add(temp);
-            }
-
-
-
-            return d;
-        }
-    }
+    
 }

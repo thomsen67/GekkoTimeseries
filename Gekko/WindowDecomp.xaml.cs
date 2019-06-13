@@ -63,28 +63,28 @@ namespace Gekko
         public StatusBar _status = null;
         public TextBlock _statusText = null;
 
-        public DecompOptions2 decompOptions = null;
+        public DecompOptions2 decompOptions2 = null;
 
         public List<string> Customers = new List<string>();        
         
         public void SetRadioButtons() {
-            if (this.decompOptions.isSubWindow)
+            if (this.decompOptions2.isSubWindow)
             {
-                if (this.decompOptions.guiDecompIsRaw)
+                if (this.decompOptions2.guiDecompIsRaw)
                 {
-                    if (this.decompOptions.guiDecompTransformationCode == "n")
+                    if (this.decompOptions2.guiDecompTransformationCode == "n")
                     {
                         radioButton1.IsChecked = true;
                     }
-                    else if(this.decompOptions.guiDecompTransformationCode == "d")
+                    else if(this.decompOptions2.guiDecompTransformationCode == "d")
                     {
                         radioButton2.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "p")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "p")
                     {
                         radioButton4.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "dp")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "dp")
                     {
                         radioButton9.IsChecked = true;
                     }
@@ -92,33 +92,33 @@ namespace Gekko
                     //{
                     //    radioButton21.IsChecked = true;
                     //}
-                    else if (this.decompOptions.guiDecompTransformationCode == "m")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "m")
                     {
                         radioButton22.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "q")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "q")
                     {
                         radioButton24.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "mp")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "mp")
                     {
                         radioButton29.IsChecked = true;
                     }
                 }
                 else {
-                    if (this.decompOptions.guiDecompTransformationCode == "n")
+                    if (this.decompOptions2.guiDecompTransformationCode == "n")
                     {
                         radioButton5.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "d")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "d")
                     {
                         radioButton6.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "p")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "p")
                     {
                         radioButton8.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "dp")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "dp")
                     {
                         radioButton10.IsChecked = true;
                     }
@@ -128,31 +128,31 @@ namespace Gekko
                     //{
                     //    radioButton25.IsChecked = true;
                     //}
-                    else if (this.decompOptions.guiDecompTransformationCode == "m")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "m")
                     {
                         radioButton26.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "q")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "q")
                     {
                         radioButton28.IsChecked = true;
                     }
-                    else if (this.decompOptions.guiDecompTransformationCode == "mp")
+                    else if (this.decompOptions2.guiDecompTransformationCode == "mp")
                     {
                         radioButton30.IsChecked = true;
                     }
                 }
 
-                if (this.decompOptions.guiDecompIsShares)
+                if (this.decompOptions2.guiDecompIsShares)
                 {
                     checkBox1.IsChecked = true;
                 }
 
-                if (this.decompOptions.showErrors)
+                if (this.decompOptions2.showErrors)
                 {
                     checkBoxErrors.IsChecked = true;
                 }
                 
-                if (this.decompOptions.guiDecompIsBaseline)
+                if (this.decompOptions2.guiDecompIsBaseline)
                 {
                     checkBox2.IsChecked = true;
                 }
@@ -160,19 +160,19 @@ namespace Gekko
             else
             {
                 //All these buttons are in the "Decomp" columns, codes are from e.g. UDVALG<p> or UDVALG<q> calls from command lines/files.
-                if (G.Equal(decompOptions.prtOptionLower, "d"))
+                if (G.Equal(decompOptions2.prtOptionLower, "d"))
                 {
                     radioButton6.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOptionLower, "p"))
+                if (G.Equal(decompOptions2.prtOptionLower, "p"))
                 {
                     radioButton8.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOptionLower, "m"))
+                if (G.Equal(decompOptions2.prtOptionLower, "m"))
                 {
                     radioButton26.IsChecked = true;
                 }
-                if (G.Equal(decompOptions.prtOptionLower, "q"))
+                if (G.Equal(decompOptions2.prtOptionLower, "q"))
                 {
                     radioButton28.IsChecked = true;
                 }
@@ -182,7 +182,7 @@ namespace Gekko
         public WindowDecomp(DecompOptions2 decompOptions)
         {
             
-            this.decompOptions = decompOptions;
+            this.decompOptions2 = decompOptions;
             
             isInitializing = true;
             InitializeComponent();
@@ -204,9 +204,9 @@ namespace Gekko
 
             this.KeyDown += new KeyEventHandler(Window_KeyDown); //new System.Windows.Forms.KeyEventHandler(this.radioButton1_KeyDown);
 
-            this.decompOptions.guiDecompChangedCells.Clear();
-            this.decompOptions.guiDecompIsSelecting = false;
-            this.decompOptions.guiDecompIsSelectingAll = false;
+            this.decompOptions2.guiDecompChangedCells.Clear();
+            this.decompOptions2.guiDecompIsSelecting = false;
+            this.decompOptions2.guiDecompIsSelectingAll = false;
 
             if (true)
             {
@@ -380,6 +380,89 @@ namespace Gekko
             }
         }
 
+        private void PutTableIntoGrid2(Grid g, Table table, GekkoTableTypes type, DecompOptions2 decompOptions)
+        {
+            int offsetRow = 0;
+            int offsetCol = 0;
+            int startRow = 0;
+            int endRow = 0;
+            int startCol = 0;
+            int endCol = 0;
+
+            if (type == GekkoTableTypes.TableContent)
+            {
+                startRow = this.frozenRows + 1;
+                startCol = this.frozenCols + 1;
+                endRow = table.GetRowMaxNumber();
+                endCol = table.GetColMaxNumber();
+                offsetRow = this.frozenRows;
+                offsetCol = this.frozenCols;
+            }
+            else if (type == GekkoTableTypes.Top)
+            {
+                startRow = 1;
+                startCol = frozenCols + 1;
+                endRow = this.frozenRows;
+                endCol = table.GetColMaxNumber();
+                offsetRow = 0;
+                offsetCol = frozenCols;
+            }
+            else if (type == GekkoTableTypes.Left)
+            {
+                startRow = frozenRows + 1;
+                startCol = 1;
+                endRow = table.GetRowMaxNumber();
+                endCol = this.frozenCols;
+                offsetRow = frozenRows;
+                offsetCol = 0;
+            }
+            else if (type == GekkoTableTypes.UpperLeft)
+            {
+                startRow = 1;
+                endRow = 1;
+                startCol = 1;
+                endCol = 1;
+            }
+
+            if (true)
+            {
+                for (int i = startRow; i <= endRow; i++)
+                {
+                    for (int j = startCol; j <= endCol; j++)
+                    {
+                        Cell c = table.Get(i, j);
+                        if (c == null)
+                        {
+                            AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, "", false, type, null);  //transparent
+                            continue;
+                        }
+                        string s = "";
+                        bool leftAlign = false;
+
+                        string ss = c.numberFormat;
+                        string[] sss = ss.Split('.');
+                        string ssss = sss[sss.Length - 1];
+                        int xx = int.Parse(ssss);
+
+                        if (c.cellType == CellType.Text)
+                        {
+                            s = c.CellText.TextData[0];
+                            leftAlign = true;
+                        }
+                        else if (c.cellType == CellType.Number)
+                        {
+                            s = G.UpdprtFormat(c.number, xx, false);
+                        }
+                        else if (c.cellType == CellType.Date) s = c.date;
+
+                        if (type == GekkoTableTypes.TableContent && decompOptions.dream != null && (i == endRow || j == endCol)) c.backgroundColor = "Linen";
+
+                        AddCell(g, i - 1 - offsetRow, j - 1 - offsetCol, s, leftAlign, type, c.backgroundColor);
+                    }
+                }
+            }
+        }
+
         private void HandleKeyDownEvent(object sender, KeyEventArgs e)
         {            
             // Ctrl + C
@@ -395,7 +478,7 @@ namespace Gekko
                 DefaultGrid(this.grid1);
                 this.canvasBorder.BorderBrush = Brushes.Black;
                 this.canvasBorder.BorderThickness = new Thickness(3);
-                this.decompOptions.guiDecompIsSelectingAll = true;
+                this.decompOptions2.guiDecompIsSelectingAll = true;
              
                 //this.decompOptions.guiDecompLastClickedRow = 0;
                 //this.decompOptions.guiDecompLastClickedCol = 0;
@@ -416,17 +499,17 @@ namespace Gekko
             int c0 = -12345;
             int c1 = -12345;
 
-            if (this.decompOptions.guiDecompIsSelectingAll)
+            if (this.decompOptions2.guiDecompIsSelectingAll)
             {
                 r0 = 1;
-                r1 = this.decompOptions.guiDecompValues.GetRowMaxNumber();
+                r1 = this.decompOptions2.guiDecompValues.GetRowMaxNumber();
                 c0 = 1;
-                c1 = this.decompOptions.guiDecompValues.GetColMaxNumber();
+                c1 = this.decompOptions2.guiDecompValues.GetColMaxNumber();
             }
             else
             {
-                CoordConversion(out r0, out c0, type, this.decompOptions.guiDecompSelectedRowMin, this.decompOptions.guiDecompSelectedColMin);
-                CoordConversion(out r1, out c1, type, this.decompOptions.guiDecompSelectedRowMax, this.decompOptions.guiDecompSelectedColMax);
+                CoordConversion(out r0, out c0, type, this.decompOptions2.guiDecompSelectedRowMin, this.decompOptions2.guiDecompSelectedColMin);
+                CoordConversion(out r1, out c1, type, this.decompOptions2.guiDecompSelectedRowMax, this.decompOptions2.guiDecompSelectedColMax);
             }
 
             //Cannot just copy what is seen on the screen if it is a number -- in that case decimals would get lost in Excel.
@@ -437,7 +520,7 @@ namespace Gekko
                 {
                     int x = i; int y = j;                    
 
-                    Cell c = this.decompOptions.guiDecompValues.Get(x, y);
+                    Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
                     if (c == null)
                     {
                     }
@@ -590,13 +673,13 @@ namespace Gekko
             if (e.ChangedButton == MouseButton.Left) this.canvasBorder.BorderThickness = new Thickness(0);
             GekkoDockPanel2 dockPanel = (GekkoDockPanel2)sender;
             if (dockPanel.type != GekkoTableTypes.TableContent) return;
-            if (!this.decompOptions.guiDecompIsSelecting) return;            
+            if (!this.decompOptions2.guiDecompIsSelecting) return;            
             Grid g = (Grid)dockPanel.Parent;
             int col = (int)dockPanel.GetValue(Grid.ColumnProperty);
             int row = (int)dockPanel.GetValue(Grid.RowProperty);
             Select(g, col, row);
-            this.decompOptions.guiDecompIsSelecting = false;
-            this.decompOptions.guiDecompIsSelectingAll = false;
+            this.decompOptions2.guiDecompIsSelecting = false;
+            this.decompOptions2.guiDecompIsSelectingAll = false;
         }
 
         private void Cell_MouseDown(object sender, MouseButtonEventArgs e)
@@ -674,7 +757,7 @@ namespace Gekko
             }
             else  //normal click
             {
-                this.decompOptions.guiDecompIsSelecting = true;
+                this.decompOptions2.guiDecompIsSelecting = true;
                 DefaultGrid(g);
         
                 border.BorderThickness = new Thickness(3);
@@ -682,9 +765,9 @@ namespace Gekko
                 mySolidColorBrush.Color = Color.FromArgb(255, 0, 0, 0);
                 border.BorderBrush = mySolidColorBrush;
 
-                this.decompOptions.guiDecompLastClickedRow = row;  //normal click
-                this.decompOptions.guiDecompLastClickedCol = col;
-                this.decompOptions.guiDecompChangedCells.Add(row + "," + col, 0);
+                this.decompOptions2.guiDecompLastClickedRow = row;  //normal click
+                this.decompOptions2.guiDecompLastClickedCol = col;
+                this.decompOptions2.guiDecompChangedCells.Add(row + "," + col, 0);
 
                 TextBlock textBlock = (TextBlock)border.Child;
                 textBlock.Padding = new Thickness(0, 0, 1, 0);          
@@ -707,10 +790,10 @@ namespace Gekko
         private void Select(Grid g, int col, int row)
         {
             DefaultGrid(g);
-            this.decompOptions.guiDecompSelectedRowMin = Math.Min(this.decompOptions.guiDecompLastClickedRow, row);
-            this.decompOptions.guiDecompSelectedRowMax = Math.Max(this.decompOptions.guiDecompLastClickedRow, row);
-            this.decompOptions.guiDecompSelectedColMin = Math.Min(this.decompOptions.guiDecompLastClickedCol, col);
-            this.decompOptions.guiDecompSelectedColMax = Math.Max(this.decompOptions.guiDecompLastClickedCol, col);
+            this.decompOptions2.guiDecompSelectedRowMin = Math.Min(this.decompOptions2.guiDecompLastClickedRow, row);
+            this.decompOptions2.guiDecompSelectedRowMax = Math.Max(this.decompOptions2.guiDecompLastClickedRow, row);
+            this.decompOptions2.guiDecompSelectedColMin = Math.Min(this.decompOptions2.guiDecompLastClickedCol, col);
+            this.decompOptions2.guiDecompSelectedColMax = Math.Max(this.decompOptions2.guiDecompLastClickedCol, col);
             double sum = 0d;
             int count = 0;
             foreach (GekkoDockPanel2 d2 in g.Children)
@@ -719,14 +802,14 @@ namespace Gekko
                 //b2.BorderBrush = null;
                 int col2 = (int)d2.GetValue(Grid.ColumnProperty);
                 int row2 = (int)d2.GetValue(Grid.RowProperty);
-                if (this.decompOptions.guiDecompSelectedRowMin <= row2 && row2 <= this.decompOptions.guiDecompSelectedRowMax)
+                if (this.decompOptions2.guiDecompSelectedRowMin <= row2 && row2 <= this.decompOptions2.guiDecompSelectedRowMax)
                 {
-                    if (this.decompOptions.guiDecompSelectedColMin <= col2 && col2 <= this.decompOptions.guiDecompSelectedColMax)
+                    if (this.decompOptions2.guiDecompSelectedColMin <= col2 && col2 <= this.decompOptions2.guiDecompSelectedColMax)
                     {
 
-                        if (!this.decompOptions.guiDecompChangedCells.ContainsKey(row2 + "," + col2))
+                        if (!this.decompOptions2.guiDecompChangedCells.ContainsKey(row2 + "," + col2))
                         {
-                            this.decompOptions.guiDecompChangedCells.Add(row2 + "," + col2, 0);
+                            this.decompOptions2.guiDecompChangedCells.Add(row2 + "," + col2, 0);
                         }                        
                         
                         SetDefaultBorder(b2);                        
@@ -739,10 +822,10 @@ namespace Gekko
                         double right = 0;
                         double top = 0.15;
                         double bottom = 0;
-                        if (this.decompOptions.guiDecompSelectedRowMin == row2) top = 3;
-                        if (this.decompOptions.guiDecompSelectedRowMax == row2) bottom = 3;
-                        if (this.decompOptions.guiDecompSelectedColMin == col2) left = 3;
-                        if (this.decompOptions.guiDecompSelectedColMax == col2) right = 3;
+                        if (this.decompOptions2.guiDecompSelectedRowMin == row2) top = 3;
+                        if (this.decompOptions2.guiDecompSelectedRowMax == row2) bottom = 3;
+                        if (this.decompOptions2.guiDecompSelectedColMin == col2) left = 3;
+                        if (this.decompOptions2.guiDecompSelectedColMax == col2) right = 3;
 
                         b2.BorderBrush = Brushes.Black;
                         b2.BorderThickness = new Thickness(left, top, right, bottom);
@@ -752,7 +835,7 @@ namespace Gekko
                         //border.BorderBrush = mySolidColorBrush;
 
 
-                        if (row2 == this.decompOptions.guiDecompLastClickedRow && col2 == this.decompOptions.guiDecompLastClickedCol)
+                        if (row2 == this.decompOptions2.guiDecompLastClickedRow && col2 == this.decompOptions2.guiDecompLastClickedCol)
                         {
                         }
                         else
@@ -780,7 +863,7 @@ namespace Gekko
 
                         int x; int y;
                         CoordConversion(out x, out y, d2.type, row2, col2);
-                        Cell c = this.decompOptions.guiDecompValues.Get(x, y);
+                        Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
                         
                         if (c == null)
                         {
@@ -810,13 +893,13 @@ namespace Gekko
                 Border b2 = (Border)d2.Children[0];
                 int col2 = (int)d2.GetValue(Grid.ColumnProperty);
                 int row2 = (int)d2.GetValue(Grid.RowProperty);
-                if (!this.decompOptions.guiDecompChangedCells.ContainsKey(row2 + "," + col2)) continue;
+                if (!this.decompOptions2.guiDecompChangedCells.ContainsKey(row2 + "," + col2)) continue;
                 if (d2.originalBackgroundColor == null) d2.Background = Brushes.White;
                 else d2.Background = d2.originalBackgroundColor;                
                 SetDefaultBorder(b2);                   
                 SetBorderThickness(g, row2, col2, b2);                
             }
-            this.decompOptions.guiDecompChangedCells.Clear();
+            this.decompOptions2.guiDecompChangedCells.Clear();
         }
 
         private void Cell_Leave(object sender, MouseEventArgs e)
@@ -827,7 +910,7 @@ namespace Gekko
             int col = (int)dockPanel.GetValue(Grid.ColumnProperty);
             int row = (int)dockPanel.GetValue(Grid.RowProperty);
 
-            if (this.decompOptions.guiDecompIsSelecting)
+            if (this.decompOptions2.guiDecompIsSelecting)
             {            
             }
             else
@@ -838,8 +921,8 @@ namespace Gekko
 
                 int x; int y;
                 CoordConversion(out x, out y, dockPanel.type, row, col);
-                Cell c = this.decompOptions.guiDecompValues.Get(x, y);
-                string s = FindEquationText2(this.decompOptions);
+                Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
+                string s = FindEquationText2(this.decompOptions2);
                 if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                 equation.Text = s;
             }
@@ -872,7 +955,7 @@ namespace Gekko
             int y = -12345;
             CoordConversion(out x, out y, GekkoTableTypes.Left, row, col);
 
-            Cell c = this.decompOptions.guiDecompValues.Get(x, y);
+            Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
 
             if (c != null && c.cellType == CellType.Text)
             {
@@ -880,7 +963,7 @@ namespace Gekko
 
                 string var2 = G.PrettifyTimeseriesHash(G.ExtractOnlyVariableIgnoreLag(var, Globals.leftParenthesisIndicator), true, true);
                                 
-                DecompOptions d = this.decompOptions.Clone();                                
+                DecompOptions2 d = this.decompOptions2.Clone();                                
 
                 if (d.isSubst)
                 {
@@ -893,8 +976,8 @@ namespace Gekko
                     d.variable = var2;
                     d.isSubWindow = true;
                 }
-
-                Program.Decomp(d);
+                                
+                CrossThreadStuff.Decomp2(d);
             }
             else
             {
@@ -915,13 +998,13 @@ namespace Gekko
             int x; int y;
             CoordConversion(out x, out y, type, row, col);
 
-            if (type == GekkoTableTypes.TableContent && this.decompOptions.guiDecompIsSelecting)
+            if (type == GekkoTableTypes.TableContent && this.decompOptions2.guiDecompIsSelecting)
             {
                 Select(g, col, row);
             }
             else
             {
-                Cell c = this.decompOptions.guiDecompValues.Get(x, y);
+                Cell c = this.decompOptions2.guiDecompValues.Get(x, y);
 
                 if (dockPanel.type == GekkoTableTypes.Left)
                 {
@@ -937,7 +1020,7 @@ namespace Gekko
 
                             if (G.Equal(var2, Globals.decompText0))
                             {
-                                if (decompOptions.expressionOld != null)
+                                if (decompOptions2.expressionOld != null)
                                 {
                                     this.equation.Text = "This value corresponds to evaluating the expression.";
                                 }
@@ -948,7 +1031,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText1))
                             {
-                                if (decompOptions.expressionOld != null)
+                                if (decompOptions2.expressionOld != null)
                                 {
                                     this.equation.Text = "This difference is always 0 for expressions.";
                                 }
@@ -960,7 +1043,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText1a))  //raw
                             {
-                                if (decompOptions.expressionOld != null)
+                                if (decompOptions2.expressionOld != null)
                                 {
                                     this.equation.Text = "This difference between the two rows above is always 0 for expressions.";
                                 }
@@ -972,7 +1055,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText2))
                             {
-                                if (decompOptions.expressionOld != null)
+                                if (decompOptions2.expressionOld != null)
                                 {
                                     this.equation.Text = "This value is the result of evaluating the expression minus the sum of decomposed contributions." + G.NL + "If the equation is linear, this number is very small (in principle: zero).";
                                 }
@@ -983,7 +1066,7 @@ namespace Gekko
                             }
                             else if (G.Equal(var2, Globals.decompText2a))  //raw
                             {
-                                if (decompOptions.expressionOld != null)
+                                if (decompOptions2.expressionOld != null)
                                 {
                                     this.equation.Text = "These values correspond to evaluating the expression (always equal to the row above for expressions).";
                                 }
@@ -1001,7 +1084,7 @@ namespace Gekko
                 }
                 else
                 {
-                    string s = FindEquationText2(this.decompOptions);
+                    string s = FindEquationText2(this.decompOptions2);
                     if (s.Contains("___CHOU")) s = "frml _i M['CHOU'] = myFM['CHOU'] * F['CHOU'] * ((PM['CHOU'] / PFF['CHOU']) * (PM['CHOU'] / PFF['CHOU'])) ** (-EF['CHOU'] / 2)";
                     equation.Text = s;
                 }
@@ -1041,18 +1124,11 @@ namespace Gekko
         {
             try
             {
-                if (this.decompOptions.expression == null)
+                if (this.decompOptions2.expression == null)
                 {
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
-
-                    //if (this.decompOptions.modelHash == null) this.decompOptions.modelHash = Program.model.modelHashTrue; //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                    //if (this.decompOptions.modelHash != Program.model.modelHashTrue)
-                    //{
-                    //    MessageBox.Show("*** ERROR: A new model seems to have been loaded." + "\n" + "Please reload the old model, or close this window" + "\n" + "and open it again from the command prompt");
-                    //    return;
-                    //}
                 }
-                                                          
+
                 //Setting defaults
                 radioButton21.IsEnabled = true;
                 radioButton21.Opacity = 1.0;
@@ -1091,9 +1167,9 @@ namespace Gekko
                 flowText.Opacity = 0.5;
                 flowText.Visibility = Visibility.Visible;
 
-                string transformationCodeAugmented = this.decompOptions.guiDecompTransformationCode;
+                string transformationCodeAugmented = this.decompOptions2.guiDecompTransformationCode;
 
-                if (this.decompOptions.guiDecompIsRaw && this.decompOptions.guiDecompIsShares)
+                if (this.decompOptions2.guiDecompIsRaw && this.decompOptions2.guiDecompIsShares)
                 {
                     G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
                     throw new GekkoException();
@@ -1103,16 +1179,16 @@ namespace Gekko
 
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used
 
-                if (this.decompOptions.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
-                if (this.decompOptions.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
-                if (this.decompOptions.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
+                if (this.decompOptions2.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
+                if (this.decompOptions2.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
+                if (this.decompOptions2.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
 
-                if (this.decompOptions.isSubst) subst.IsChecked = true;
-                if (this.decompOptions.isSort) sort.IsChecked = true;
-                if (this.decompOptions.isPool) pool.IsChecked = true;
+                if (this.decompOptions2.isSubst) subst.IsChecked = true;
+                if (this.decompOptions2.isSort) sort.IsChecked = true;
+                if (this.decompOptions2.isPool) pool.IsChecked = true;
 
 
-                if (this.decompOptions.guiDecompIsBaseline)
+                if (this.decompOptions2.guiDecompIsBaseline)
                 {
                     radioButton22.IsEnabled = false;
                     radioButton22.Opacity = 0.5;
@@ -1128,7 +1204,7 @@ namespace Gekko
                     radioButton30.Opacity = 0.5;
                 }
 
-                if (this.decompOptions.guiDecompIsShares)
+                if (this.decompOptions2.guiDecompIsShares)
                 {
                     radioButton21.IsEnabled = false;
                     radioButton21.Opacity = 0.5;
@@ -1149,7 +1225,7 @@ namespace Gekko
                     radioButton9.Opacity = 0.5;
                 }
 
-                if (this.decompOptions.guiDecompIsRaw)
+                if (this.decompOptions2.guiDecompIsRaw)
                 {
                     checkBox1.IsEnabled = false;  //shares
                     checkBox1.Opacity = 0.5;
@@ -1166,62 +1242,96 @@ namespace Gekko
 
                 bool useLocalData = false;
 
-                //if (this.decompOptions.expression == null)
-                //{
-                //    this.decompOptions.modelHash = Program.model.modelHashTrue;  //To make sure that decomp is not clicked and results shown, after a new model has been loaded
-                //}
-
-                Table table = null;
+                Table table = new Table();
                 //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
-                this.decompOptions.prtOptionLower = transformationCodeAugmented;                                               
-
-                if (this.decompOptions.isNew)
+                this.decompOptions2.prtOptionLower = transformationCodeAugmented;
+                                
+                string code1 = this.decompOptions2.prtOptionLower;
+                string code2 = null;
+                if (code1.StartsWith("s"))
                 {
-                    DecompTables d = Program.DecomposeNEW(this.decompOptions.expression, EDecompBanks.Both, this.decompOptions.t1, this.decompOptions.t2);
-                    GekkoTime t = new GekkoTime(EFreq.A, 2002, 1);
+                    code1 = code1.Substring(1);
+                    code2 = "s";
+                }
 
-                    foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                this.decompOptions2.isPercentageType = false;
+                if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+                {
+                    this.decompOptions2.isPercentageType = true;
+                }
+                
+                GekkoTime per1 = this.decompOptions2.t1;
+                GekkoTime per2 = this.decompOptions2.t2;
+
+                bool isRaw = false;
+                if (this.decompOptions2.prtOptionLower.StartsWith("x")) isRaw = true;
+
+                GekkoSmpl smpl = new GekkoSmpl(per1, per2);
+                IVariable y0a = null;
+                IVariable y0aRef = null;
+
+                int perLag = -2;
+                string lhs = "Expression value";
+
+                bool usesRef = code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
+
+                //decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.expression, EDecompBanks.Both, this.decompOptions2.t1, this.decompOptions2.t2);
+                decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.link[0].expression, EDecompBanks.Both, this.decompOptions2.t1, this.decompOptions2.t2);
+                List<string> temp = new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys);
+                Program.DecomposePutIntoTable2(this.decompOptions2, code1, code2, table, per1, per2, smpl, lhs, temp);
+                                                
+                if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
+                {
+                    foreach (string var in this.decompOptions2.subst)
                     {
-                        double v = kvp.Value.GetDataSimple(t);
-                        G.Writeln(kvp.Key + ": " + v);
+                        table = DecompSubstitute(table, var);
                     }
-
-                    //double quo_0 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double quo_m1 = d.cellsQuo.storage["Work:pop[20, k, dk]¤[-1]"].GetDataSimple(t);
-                    //double gradQuo_0 = d.cellsGradQuo.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double contribD_0 = d.cellsContribD.storage["Work:pop[20, k, dk]¤[0]"].GetDataSimple(t);
-                    //double b = (gradQuo_0 * (quo_0 - quo_m1));
-                    //G.Writeln(quo_m1 + " " + quo_0 + " " + contribD_0 + " " + b);
-                    return;
                 }
-                else
+
+                if (this.decompOptions2.isSort)
                 {
-                    throw new GekkoException();
+                    table = TableSort(table);
                 }
 
+                if (this.decompOptions2.isPool)
+                {
+                    table = TablePool(table);
+                }
+
+                string s = FindEquationText2(this.decompOptions2);
+                equation.Text = s;
+
+                //
+                // NOTE:
+                //
+                flowText.Visibility = Visibility.Collapsed;
+
+                this.decompOptions2.guiDecompValues = table;
+                ClearGrid();
+                MakeTable2(table, this.decompOptions2);
+
+                return;
 
             }
             catch (Exception e)
             {
                 this.isClosing = true;
-
                 MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
-
-
             }
         }
 
         private Table DecompSubstitute(Table table, string var2)
         {
-            EquationHelper found = Program.DecompEval(var2);
-            DecompOptions d3 = this.decompOptions.Clone();
-            d3.variable = var2;
-            d3.expression = Globals.expression;
-            d3.expressionOld = found.equationText;
-            Table table2 = Program.Decompose(d3);
-            Table table3 = TableSubstitute(table, var2, table2, true);
-            return table3;
+            //EquationHelper found = Program.DecompEval(var2);
+            //DecompOptions2 d3 = this.decompOptions2.Clone();
+            //d3.variable = var2;
+            //d3.expression = Globals.expression;
+            //d3.expressionOld = found.equationText;
+            //Table table2 = Program.Decompose(d3);
+            //Table table3 = TableSubstitute(table, var2, table2, true);
+            //return table3;
+            return null;
         }
 
         private static Table TableSubstitute(Table table1, string var, Table table2, bool scale)
@@ -1512,6 +1622,23 @@ namespace Gekko
             PutTableIntoGrid(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);            
         }
 
+        private void MakeTable2(Table table, DecompOptions2 decompOptions)
+        {
+
+            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
+
+            //DateTime t0 = DateTime.Now;
+            PutTableIntoGrid2(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
+            //MessageBox.Show("Took " + (DateTime.Now - t0).TotalMilliseconds);
+
+            CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
+            PutTableIntoGrid2(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
+            CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
+            PutTableIntoGrid2(this.grid1Top, table, GekkoTableTypes.Top, decompOptions);
+            CreateGridRowsAndColumns(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft);
+            PutTableIntoGrid2(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);
+        }
+
         private string FindEquationText(DecompOptions decompOptions)
         {
             if (decompOptions.expressionOld != null)
@@ -1520,7 +1647,7 @@ namespace Gekko
             }
             else
             {
-                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompOptions.variable);
+                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompOptions2.variable);
                 if (eh == null) return ""; //probably only when model is changed while UDVALG window is open (this is illegal anyway, and a popup will appear)
                 else return ((EquationHelper)eh).equationText;
             }
@@ -1534,7 +1661,7 @@ namespace Gekko
             }
             else
             {
-                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompOptions.variable);
+                EquationHelper eh = Program.FindEquationByMeansOfVariableName(this.decompOptions2.variable);
                 if (eh == null) return ""; //probably only when model is changed while UDVALG window is open (this is illegal anyway, and a popup will appear)
                 else return ((EquationHelper)eh).equationText;
             }
@@ -1544,8 +1671,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "n";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "n";
                 RecalcCellsWithNewType();
             }
         }
@@ -1554,8 +1681,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "d";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "d";
                 RecalcCellsWithNewType();
             }
         }
@@ -1564,8 +1691,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "d";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "d";
                 RecalcCellsWithNewType();
             }
         }
@@ -1574,8 +1701,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "p";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "p";
                 RecalcCellsWithNewType();
             }
         }
@@ -1584,8 +1711,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "p";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "p";
                 RecalcCellsWithNewType();
             }
         }        
@@ -1594,8 +1721,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "n";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "n";
                 RecalcCellsWithNewType();
             }
         }
@@ -1604,8 +1731,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "m";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "m";
                 RecalcCellsWithNewType();
             }
         }
@@ -1614,8 +1741,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "m";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "m";
                 RecalcCellsWithNewType();
             }
         }        
@@ -1624,8 +1751,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "q";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "q";
                 RecalcCellsWithNewType();
             }
         }
@@ -1634,8 +1761,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "q";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "q";
                 RecalcCellsWithNewType();
             }
         }
@@ -1644,8 +1771,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "mp";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "mp";
                 RecalcCellsWithNewType();
             }
         }
@@ -1654,8 +1781,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "mp";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "mp";
                 RecalcCellsWithNewType();
             }
         }
@@ -1664,8 +1791,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = true;
-                this.decompOptions.guiDecompTransformationCode = "dp";
+                this.decompOptions2.guiDecompIsRaw = true;
+                this.decompOptions2.guiDecompTransformationCode = "dp";
                 RecalcCellsWithNewType();
             }
         }       
@@ -1674,8 +1801,8 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsRaw = false;
-                this.decompOptions.guiDecompTransformationCode = "dp";
+                this.decompOptions2.guiDecompIsRaw = false;
+                this.decompOptions2.guiDecompTransformationCode = "dp";
                 RecalcCellsWithNewType();
             }
         }
@@ -1684,7 +1811,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsShares = true;
+                this.decompOptions2.guiDecompIsShares = true;
                 RecalcCellsWithNewType();
             }
         }
@@ -1693,7 +1820,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsShares = false;
+                this.decompOptions2.guiDecompIsShares = false;
                 RecalcCellsWithNewType();
             }
         }
@@ -1702,7 +1829,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsBaseline = true;
+                this.decompOptions2.guiDecompIsBaseline = true;
                 RecalcCellsWithNewType();
             }
         }
@@ -1711,7 +1838,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.guiDecompIsBaseline = false;
+                this.decompOptions2.guiDecompIsBaseline = false;
                 RecalcCellsWithNewType();
             }
         }
@@ -1737,7 +1864,7 @@ namespace Gekko
         {
             if (!this.isInitializing)
             {
-                this.decompOptions.localBanks = null;  //clearing this, forcing window to use vales from Gekko databanks
+                this.decompOptions2.localBanks = null;  //clearing this, forcing window to use vales from Gekko databanks
                 this.RecalcCellsWithNewType();
             }
         }
@@ -1746,13 +1873,13 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions.isPercentageType)
+                if (this.decompOptions2.isPercentageType)
                 {
-                    this.decompOptions.decimalsPch++;
+                    this.decompOptions2.decimalsPch++;
                 }
                 else
                 {
-                    this.decompOptions.decimalsLevel++;
+                    this.decompOptions2.decimalsLevel++;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1762,15 +1889,15 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions.isPercentageType)
+                if (this.decompOptions2.isPercentageType)
                 {
-                    this.decompOptions.decimalsPch--;
-                    if (this.decompOptions.decimalsPch < 0) this.decompOptions.decimalsPch = 0;
+                    this.decompOptions2.decimalsPch--;
+                    if (this.decompOptions2.decimalsPch < 0) this.decompOptions2.decimalsPch = 0;
                 }
                 else
                 {
-                    this.decompOptions.decimalsLevel--;
-                    if (this.decompOptions.decimalsLevel < 0) this.decompOptions.decimalsLevel = 0;
+                    this.decompOptions2.decimalsLevel--;
+                    if (this.decompOptions2.decimalsLevel < 0) this.decompOptions2.decimalsLevel = 0;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1780,7 +1907,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.showErrors = true;
+                this.decompOptions2.showErrors = true;
                 RecalcCellsWithNewType();
             }
         }
@@ -1789,45 +1916,45 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.showErrors = false;
+                this.decompOptions2.showErrors = false;
                 RecalcCellsWithNewType();                
             }
         }
 
         private void Sort_Checked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions.isSort = true;
+            this.decompOptions2.isSort = false;
+            if (sort.IsChecked == true) this.decompOptions2.isSort = true;
         }
 
         private void Pool_Checked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions.isPool = true;
+            this.decompOptions2.isPool = false;
+            if (pool.IsChecked == true) this.decompOptions2.isPool = true;
         }
 
         private void Subst_Checked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
+            this.decompOptions2.isSubst = false;
+            if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
         }
 
         private void Sort_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions.isSort = true;
+            this.decompOptions2.isSort = false;
+            if (sort.IsChecked == true) this.decompOptions2.isSort = true;
         }
 
         private void Pool_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions.isPool = true;
+            this.decompOptions2.isPool = false;
+            if (pool.IsChecked == true) this.decompOptions2.isPool = true;
         }
 
         private void Subst_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.decompOptions.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions.isSubst = true;
+            this.decompOptions2.isSubst = false;
+            if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
         }
     }
 
@@ -1835,7 +1962,133 @@ namespace Gekko
     {
         public WindowDecomp.GekkoTableTypes type = WindowDecomp.GekkoTableTypes.Unknown;
         public Brush originalBackgroundColor = null;
-    }        
+    }
 
-    
+    public class DecompOptions2
+    {
+        public bool isNew = false;
+
+        public bool isSubst = false;
+        public bool isPool = false;
+        public bool isSort = false;
+
+        //public bool onlyTable = false;
+        //public Table table = null;
+
+        public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
+        public string variable = null;
+        public List<string> variable_subelement = null;
+        public bool isPercentageType = false;
+        //public bool isExpression = false; //true for UDVALG fy+1 etc.
+        public string expressionOld = null;  //only != null for expressions
+        public Func<GekkoSmpl, IVariable> expression = null;
+        public List<Dictionary<string, string>> precedents;  //only != null for expressions
+        public string type;  //not used yet (UDVALG or DECOMP)
+        //public GekkoParserTimePeriod tp;
+        public GekkoTime t1 = GekkoTime.tNull;
+        public GekkoTime t2 = GekkoTime.tNull;
+        public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
+        //public List<string> vars;
+        public bool isSubWindow = false;  //when browsing/clicking, opening a new window
+        public bool showErrors = false;
+        //public GekkoSmpl smplForFunc = null;
+
+        public List<string> subst = new List<string>();
+
+        public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
+
+        //-------- tranformation start --------------
+        public string guiDecompTransformationCode = "n";
+        public bool guiDecompIsShares = false;
+        public bool guiDecompIsRaw = true;
+        public bool guiDecompIsBaseline = false;
+        //-------- tranformation end ----------------
+        public int guiDecompLastClickedRow = 0;
+        public int guiDecompLastClickedCol = 0;
+        public int guiDecompSelectedColMin = 0;
+        public int guiDecompSelectedColMax = 0;
+        public int guiDecompSelectedRowMin = 0;
+        public int guiDecompSelectedRowMax = 0;
+        public bool guiDecompIsSelecting = false;
+        public bool guiDecompIsSelectingAll = false;
+        public Dictionary<string, int> guiDecompChangedCells = new Dictionary<string, int>();
+        public Table guiDecompValues = new Table();
+        //public bool isCalledFromDecompWindow = true;
+        public LocalBanks localBanks = null;
+        public string modelHash = null;
+        //public int decimals = 4;
+        public int decimalsLevel = 4;
+        public int decimalsPch = 2;
+        public string dream = null;  //experimental
+
+        public DecompTables decompTables = null;
+        public bool hasCalculatedQuo = false;
+        public bool hasCalculatedRef = false;
+
+        public List<string> vars2 = null;
+
+        public List<List<string>> where = new List<List<string>>();
+        public List<List<string>> agg = new List<List<string>>();
+        public List<DecompItemsString> link = new List<DecompItemsString>();
+
+        public DecompOptions2 Clone()
+        {
+            //clones relevant parts for new window
+            DecompOptions2 d = new DecompOptions2();
+            //d.tp = this.tp;
+            d.variable = this.variable;
+            d.t1 = this.t1;
+            d.t2 = this.t2;
+            d.prtOptionLower = this.prtOptionLower;
+            d.guiDecompIsShares = this.guiDecompIsShares;
+            d.guiDecompIsRaw = this.guiDecompIsRaw;
+            d.guiDecompIsBaseline = this.guiDecompIsBaseline;
+            d.guiDecompTransformationCode = this.guiDecompTransformationCode;
+            d.modelHash = this.modelHash;
+            d.showErrors = this.showErrors;
+            //d.decimalsLevel = this.decimalsLevel;
+            d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
+            d.dream = this.dream;
+
+            d.isSort = this.isSort;
+            d.isSubst = this.isSubst;
+            d.isPool = this.isPool;
+            foreach (string s in this.subst)
+            {
+                d.subst.Add(s);
+            }
+
+            foreach (List<string> x1 in this.where)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x2 in x1)
+                {
+                    temp.Add(x2);
+                }
+                d.where.Add(temp);
+            }
+
+            foreach (List<string> x1 in this.agg)
+            {
+                List<string> temp = new List<string>();
+                foreach (string x2 in x1)
+                {
+                    temp.Add(x2);
+                }
+                d.agg.Add(temp);
+            }
+
+            foreach (DecompItemsString x1 in this.link)
+            {
+                DecompItemsString temp = new DecompItemsString();
+                temp.name1 = x1.name1;
+                temp.name2 = x1.name2;
+                temp.expression = (Func<GekkoSmpl, IVariable>)x1.expression.Clone();  //not sure if this cloning is necessary
+                d.link.Add(temp);
+            }
+
+            return d;
+        }
+    }
+
 }
