@@ -147,7 +147,7 @@ namespace Gekko
                     checkBox1.IsChecked = true;
                 }
 
-                if (this.decompOptions.showErrors)
+                if (this.decompOptions.decompTablesFormat.showErrors)
                 {
                     checkBoxErrors.IsChecked = true;
                 }
@@ -1738,13 +1738,13 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions.isPercentageType)
+                if (this.decompOptions.decompTablesFormat.isPercentageType)
                 {
-                    this.decompOptions.decimalsPch++;
+                    this.decompOptions.decompTablesFormat.decimalsPch++;
                 }
                 else
                 {
-                    this.decompOptions.decimalsLevel++;
+                    this.decompOptions.decompTablesFormat.decimalsLevel++;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1754,15 +1754,15 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions.isPercentageType)
+                if (this.decompOptions.decompTablesFormat.isPercentageType)
                 {
-                    this.decompOptions.decimalsPch--;
-                    if (this.decompOptions.decimalsPch < 0) this.decompOptions.decimalsPch = 0;
+                    this.decompOptions.decompTablesFormat.decimalsPch--;
+                    if (this.decompOptions.decompTablesFormat.decimalsPch < 0) this.decompOptions.decompTablesFormat.decimalsPch = 0;
                 }
                 else
                 {
-                    this.decompOptions.decimalsLevel--;
-                    if (this.decompOptions.decimalsLevel < 0) this.decompOptions.decimalsLevel = 0;
+                    this.decompOptions.decompTablesFormat.decimalsLevel--;
+                    if (this.decompOptions.decompTablesFormat.decimalsLevel < 0) this.decompOptions.decompTablesFormat.decimalsLevel = 0;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1772,7 +1772,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.showErrors = true;
+                this.decompOptions.decompTablesFormat.showErrors = true;
                 RecalcCellsWithNewType();
             }
         }
@@ -1781,7 +1781,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions.showErrors = false;
+                this.decompOptions.decompTablesFormat.showErrors = false;
                 RecalcCellsWithNewType();                
             }
         }
@@ -1795,8 +1795,17 @@ namespace Gekko
         public Brush originalBackgroundColor = null;
     }
 
+    public class DecompTablesFormat
+    {
+        public int decimalsLevel = 4;
+        public int decimalsPch = 2;
+        public bool isPercentageType = false;
+        public bool showErrors = false;
+    }
+
     public class DecompTables
-    {           
+    {
+        
         public DecompDict cellsQuo = null;
         public DecompDict cellsGradQuo = null;
         public DecompDict cellsContribD = null;
@@ -1810,6 +1819,8 @@ namespace Gekko
 
     public class DecompOptions
     {
+        public DecompTablesFormat decompTablesFormat = new DecompTablesFormat();
+
         public bool isNew = false;
 
         public bool isSubst = false;
@@ -1822,7 +1833,9 @@ namespace Gekko
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
         public List<string> variable_subelement = null;
-        public bool isPercentageType = false;
+
+        
+        
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
         public Func<GekkoSmpl, IVariable> expression = null;
@@ -1834,7 +1847,7 @@ namespace Gekko
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
-        public bool showErrors = false;
+        
         //public GekkoSmpl smplForFunc = null;
 
         public List<string> subst = new List<string>();
@@ -1862,8 +1875,7 @@ namespace Gekko
         public LocalBanks localBanks = null;
         public string modelHash = null;
         //public int decimals = 4;
-        public int decimalsLevel = 4;
-        public int decimalsPch = 2;
+        
         public string dream = null;  //experimental
 
         public DecompTables decompTables = null;
@@ -1875,11 +1887,18 @@ namespace Gekko
         public List<List<string>> where = new List<List<string>>();
         public List<List<string>> agg = new List<List<string>>();
         public List<List<string>> link = new List<List<string>>();
-
+        
         public DecompOptions Clone()
         {
             //clones relevant parts for new window
             DecompOptions d = new DecompOptions();
+            
+            d.decompTablesFormat = new DecompTablesFormat();
+            d.decompTablesFormat.decimalsLevel = this.decompTablesFormat.decimalsLevel;
+            d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
+            d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
+            d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
+
             //d.tp = this.tp;
             d.variable = this.variable;
             d.t1 = this.t1;
@@ -1890,9 +1909,7 @@ namespace Gekko
             d.guiDecompIsBaseline = this.guiDecompIsBaseline;
             d.guiDecompTransformationCode = this.guiDecompTransformationCode;
             d.modelHash = this.modelHash;
-            d.showErrors = this.showErrors;
-            //d.decimalsLevel = this.decimalsLevel;
-            d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
+            
             d.dream = this.dream;
 
             d.isSort = this.isSort;

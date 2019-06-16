@@ -12681,10 +12681,10 @@ namespace Gekko
 
             Table table = new Table();  //!!BEWARE: this object is also used for flowcharts, so if the layout is changed, change it in flowcharts also
 
-            decompOptions.isPercentageType = false;
+            decompOptions.decompTablesFormat.isPercentageType = false;
             if (transformationCodeAugmented.StartsWith("s") || transformationCodeAugmented.EndsWith("p") || transformationCodeAugmented.EndsWith("dp") || transformationCodeAugmented.EndsWith("q") || transformationCodeAugmented.EndsWith("mp"))
             {
-                decompOptions.isPercentageType = true;
+                decompOptions.decompTablesFormat.isPercentageType = true;
                 table.Set(1, 1, "% ");
             }
 
@@ -12809,7 +12809,7 @@ namespace Gekko
                     }
                 }
 
-                if (decompOptions.showErrors)
+                if (decompOptions.decompTablesFormat.showErrors)
                 {
 
                     if (isRaw)
@@ -12829,7 +12829,7 @@ namespace Gekko
                 }
 
                 int o = 0;
-                if (decompOptions.showErrors) o = 2;
+                if (decompOptions.decompTablesFormat.showErrors) o = 2;
 
                 int j = -1;
                 foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
@@ -12867,8 +12867,8 @@ namespace Gekko
                     int offset_j = 2;
 
                     int decimals = 0;
-                    if (decompOptions.isPercentageType) decimals = decompOptions.decimalsPch;
-                    else decimals = decompOptions.decimalsLevel;
+                    if (decompOptions.decompTablesFormat.isPercentageType) decimals = decompOptions.decompTablesFormat.decimalsPch;
+                    else decimals = decompOptions.decompTablesFormat.decimalsLevel;
 
                     string format = "f16." + decimals.ToString();
 
@@ -12885,7 +12885,7 @@ namespace Gekko
                                 {
                                     line0 = data[0].z - data_base[0].z;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = data[0].y0 - data_base[0].y0;
                                     }
@@ -12899,7 +12899,7 @@ namespace Gekko
                                 {
                                     line0 = (data[0].z / data_base[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data[0].y0 / data_base[0].y0 - 1d) * 100d;
                                     }
@@ -12918,7 +12918,7 @@ namespace Gekko
                                 {
                                     line0 = data[0].z;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = data[0].y0;
                                     }
@@ -12933,7 +12933,7 @@ namespace Gekko
                                 {
                                     line0 = data_base[0].z;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = data_base[0].y0;
                                     }
@@ -12947,7 +12947,7 @@ namespace Gekko
                                 {
                                     line0 = data[0].z - data_lag[0].z;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = data[0].y0 - data_lag[0].y0;
                                     }
@@ -12961,7 +12961,7 @@ namespace Gekko
                                 {
                                     line0 = data_base[0].z - data_base_lag[0].z;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = data_base[0].y0 - data_base_lag[0].y0;
                                     }
@@ -12975,7 +12975,7 @@ namespace Gekko
                                 {
                                     line0 = (data[0].z / data_lag[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data[0].y0 / data_lag[0].y0 - 1d) * 100d;
                                     }
@@ -12989,7 +12989,7 @@ namespace Gekko
                                 {
                                     line0 = (data_base[0].z / data_base_lag[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data_base[0].y0 / data_base_lag[0].y0 - 1d) * 100d;
                                     }
@@ -13003,7 +13003,7 @@ namespace Gekko
                                 {
                                     line0 = (data[0].z / data_lag[0].z - 1d) * 100d - (data_lag[0].z / data_lag2[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data[0].y0 / data_lag[0].y0 - 1d) * 100d - (data_lag[0].y0 / data_lag2[0].y0 - 1d) * 100d;
                                     }
@@ -13017,7 +13017,7 @@ namespace Gekko
                                 {
                                     line0 = (data_base[0].z / data_base_lag[0].z - 1d) * 100d - (data_base_lag[0].z / data_base_lag2[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data_base[0].y0 / data_base_lag[0].y0 - 1d) * 100d - (data_base_lag[0].y0 / data_base_lag2[0].y0 - 1d) * 100d;
                                     }
@@ -13031,7 +13031,7 @@ namespace Gekko
                                 {
                                     line0 = (data[0].z / data_lag[0].z - 1d) * 100d - (data_base[0].z / data_base_lag[0].z - 1d) * 100d;
                                     table.SetNumber(0 + offset_i, j + offset_j, line0, format);  //What should format be?
-                                    if (decompOptions.showErrors)
+                                    if (decompOptions.decompTablesFormat.showErrors)
                                     {
                                         line2 = (data[0].y0 / data_lag[0].y0 - 1d) * 100d - (data_base[0].y0 / data_base_lag[0].y0 - 1d) * 100d;
                                     }
@@ -13050,7 +13050,7 @@ namespace Gekko
 
                         }  //end of switch
 
-                        if (decompOptions.showErrors)
+                        if (decompOptions.decompTablesFormat.showErrors)
                         {
                             line1 = line0 - line2;
                             table.SetNumber(2 + offset_i, j + offset_j, line1, format);
@@ -13159,7 +13159,7 @@ namespace Gekko
 
                         tableTemp[0] = truth;
 
-                        if (decompOptions.showErrors)
+                        if (decompOptions.decompTablesFormat.showErrors)
                         {
                             tableTemp[1] = nonlinError;
                             tableTemp[2] = dataError;
@@ -13186,7 +13186,7 @@ namespace Gekko
                             table.SetNumber(i + offset_i, j + offset_j, tableTemp[i], format);  //What should format be?
                         }
 
-                        if (decompOptions.showErrors)
+                        if (decompOptions.decompTablesFormat.showErrors)
                         {
                             table.Get(1 + offset_i, j + offset_j).backgroundColor = "LightRed";
                             table.Get(2 + offset_i, j + offset_j).backgroundColor = "LightRed";
@@ -35822,10 +35822,10 @@ namespace Gekko
                 code2 = "s";
             }
 
-            o.isPercentageType = false;
+            o.decompTablesFormat.isPercentageType = false;
             if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
             {
-                o.isPercentageType = true;
+                o.decompTablesFormat.isPercentageType = true;
             }
 
             Table tab = new Table();
@@ -36590,9 +36590,9 @@ namespace Gekko
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {
             int iOffset = 0;
-            if (o.showErrors) iOffset = 1;
+            if (o.decompTablesFormat.showErrors) iOffset = 1;
 
-            if (o.isPercentageType)
+            if (o.decompTablesFormat.isPercentageType)
             {
                 tab.Set(1, 1, "%");                
             }
@@ -36774,13 +36774,13 @@ namespace Gekko
                         rhsSum += d;
                     }
 
-                    DecomposeInsertValue(tab, code1, code2, j, i, d, o);
+                    DecomposeInsertValue(tab, code1, code2, j, i, d, o.decompTablesFormat);
 
-                    if (i == 1 && o.showErrors)
+                    if (i == 1 && o.decompTablesFormat.showErrors)
                     {
                         i = i + iOffset;
                         //skip a line, to make room for error showing (at i = 2, or row 3 in the table)
-                        if (j == 1 && DecomposePutIntoTableIsError(o, i))
+                        if (j == 1 && DecomposePutIntoTableIsError(o.decompTablesFormat.showErrors, i))
                         {
                             tab.Set(i + 1, 1, Globals.decompText2);
                             tab.Get(i + 1, 1).backgroundColor = "LightRed";
@@ -36793,16 +36793,16 @@ namespace Gekko
                     double error = lhsSum - rhsSum;
                     double factor = lhsSum / rhsSum;
                     int end = vars2.Count;
-                    if (o.showErrors)
+                    if (o.decompTablesFormat.showErrors)
                     {
                         factor = 1d;  //resetting
                         end = end + iOffset;
                     }
                     for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
                     {
-                        if (DecomposePutIntoTableIsError(o, i)) //real table row 3
+                        if (DecomposePutIntoTableIsError(o.decompTablesFormat.showErrors, i)) //real table row 3
                         {
-                            DecomposeInsertValue(tab, code1, code2, j, i, error, o);
+                            DecomposeInsertValue(tab, code1, code2, j, i, error, o.decompTablesFormat);
                             tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
                         }
                         else
@@ -36828,12 +36828,12 @@ namespace Gekko
             }
         }
 
-        public static void DecomposePutIntoTable2(DecompOptions2 o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
+        public static void DecomposePutIntoTable2(DecompTables decompTables, DecompTablesFormat format, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {
             int iOffset = 0;
-            if (o.showErrors) iOffset = 1;
+            if (format.showErrors) iOffset = 1;
 
-            if (o.isPercentageType)
+            if (format.isPercentageType)
             {
                 tab.Set(1, 1, "%");
             }
@@ -36875,134 +36875,134 @@ namespace Gekko
                     double d = double.NaN;
                     if (code1 == "n" || code1 == "xn" || code1 == "x")
                     {
-                        d = o.decompTables.cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                        d = decompTables.cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                                                                                  //o.cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                     }
                     else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
                     {
-                        d = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        d = decompTables.cellsRef[varname].GetData(smpl, t2);
                         //o.decompTables.cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                     }
                     else if (code1 == "d")
                     {
-                        d = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribD[varname].GetData(smpl, t2);
                     }
                     else if (code1 == "rd")
                     {
-                        d = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
                     }
                     else if (code1 == "xd")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
                         d = d1 - d0;
                     }
                     else if (code1 == "xrd")
                     {
-                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
                         d = d1 - d0;
                     }
                     else if (code1 == "m")
                     {
-                        d = o.decompTables.cellsContribM[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribM[varname].GetData(smpl, t2);
                     }
                     else if (code1 == "xm")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2);
                         d = d1 - d0;
                     }
                     else if (code1 == "p")
                     {
-                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
-                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "rp")
                     {
-                        double dd = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
-                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        double dd = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "xp")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "xrp")
                     {
-                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "q")
                     {
-                        double dd = o.decompTables.cellsContribM[varname].GetData(smpl, t2);
-                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2);
+                        double dd = decompTables.cellsContribM[varname].GetData(smpl, t2);
+                        double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2);
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "xq")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2);
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "dp")
                     {
-                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
-                        double dd_lag = o.decompTables.cellsContribD[varname].GetData(smpl, t2.Add(-1));
-                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
-                        double dLhsLag_lag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dd_lag = decompTables.cellsContribD[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                     }
                     else if (code1 == "rdp")
                     {
-                        double dd = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
-                        double dd_lag = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
-                        double dLhsLag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
-                        double dLhsLag_lag = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+                        double dd = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dd_lag = decompTables.cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
+                        double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        double dLhsLag_lag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                     }
                     else if (code1 == "xdp")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d1_lag = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d0_lag = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d1_lag = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                     }
                     else if (code1 == "xrdp")
                     {
-                        double d1 = o.decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d1_lag = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
-                        double d0 = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
-                        double d0_lag = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1_lag = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d0_lag = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                     }
                     else if (code1 == "mp")  // <p> - <rp>
                     {
-                        double dd = o.decompTables.cellsContribD[varname].GetData(smpl, t2);
-                        double dLhsLag = o.decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
 
-                        double dd2 = o.decompTables.cellsContribDRef[varname].GetData(smpl, t2);
-                        double dLhsLag2 = o.decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+                        double dd2 = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dLhsLag2 = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
 
 
                     }
                     else if (code1 == "xmp")
                     {
-                        double d1 = o.decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = o.decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d1_ref = o.decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0_ref = o.decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1_ref = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d0_ref = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
                     }
                     else
                     {
-                        MessageBox.Show("*** ERROR: Wrong operator: " + o.prtOptionLower);
+                        MessageBox.Show("*** ERROR: Wrong operator");
                         throw new GekkoException();
                     }
 
@@ -37015,13 +37015,13 @@ namespace Gekko
                         rhsSum += d;
                     }
 
-                    DecomposeInsertValue(tab, code1, code2, j, i, d, o);
+                    DecomposeInsertValue(tab, code1, code2, j, i, d, format);
 
-                    if (i == 1 && o.showErrors)
+                    if (i == 1 && format.showErrors)
                     {
                         i = i + iOffset;
                         //skip a line, to make room for error showing (at i = 2, or row 3 in the table)
-                        if (j == 1 && DecomposePutIntoTableIsError(o, i))
+                        if (j == 1 && DecomposePutIntoTableIsError(format.showErrors, i))
                         {
                             tab.Set(i + 1, 1, Globals.decompText2);
                             tab.Get(i + 1, 1).backgroundColor = "LightRed";
@@ -37041,16 +37041,16 @@ namespace Gekko
                     }
 
                     int end = vars2.Count;
-                    if (o.showErrors)
+                    if (format.showErrors)
                     {
                         factor = 1d;  //resetting
                         end = end + iOffset;
                     }
                     for (i = 2; i <= end; i++)  //note: the real rows of the table are i+1
                     {
-                        if (DecomposePutIntoTableIsError(o, i)) //real table row 3
+                        if (DecomposePutIntoTableIsError(format.showErrors, i)) //real table row 3
                         {
-                            DecomposeInsertValue(tab, code1, code2, j, i, error, o);
+                            DecomposeInsertValue(tab, code1, code2, j, i, error, format);
                             tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
                         }
                         else
@@ -37076,37 +37076,45 @@ namespace Gekko
             }
         }
 
-        private static bool DecomposePutIntoTableIsError(DecompOptions o, int i)
+        private static bool DecomposePutIntoTableIsError(bool showErrors, int i)
         {
-            return o.showErrors && i == 2;
+            return showErrors && i == 2;
         }
 
-        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions decompOptions)
+        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompTablesFormat o)
         {
             Cell c = new Cell();
             c.number = d;
             c.cellType = CellType.Number;
             int decimals = 0;
-            if (decompOptions.isPercentageType) decimals = decompOptions.decimalsPch;
-            else decimals = decompOptions.decimalsLevel;
-            string format = "f16." + decimals.ToString();
-            c.numberFormat = format;
+            if (o.isPercentageType) decimals = o.decimalsPch;
+            else decimals = o.decimalsLevel;
+            string format2 = "f16." + decimals.ToString();
+            c.numberFormat = format2;
             tab.Set(new Coord(i + 1, j + 1), c);
         }
 
-        private static bool DecomposePutIntoTableIsError(DecompOptions2 o, int i)
+        private static void DecomposeInsertValue2(Table tab, string code1, string code2, int j, int i, double d, DecompTablesFormat format)
         {
-            return o.showErrors && i == 2;
+            Cell c = new Cell();
+            c.number = d;
+            c.cellType = CellType.Number;
+            int decimals = 0;
+            if (format.isPercentageType) decimals = format.decimalsPch;
+            else decimals = format.decimalsLevel;
+            string format2 = "f16." + decimals.ToString();
+            c.numberFormat = format2;
+            tab.Set(new Coord(i + 1, j + 1), c);
         }
-
+        
         private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompOptions2 decompOptions)
         {
             Cell c = new Cell();
             c.number = d;
             c.cellType = CellType.Number;
             int decimals = 0;
-            if (decompOptions.isPercentageType) decimals = decompOptions.decimalsPch;
-            else decimals = decompOptions.decimalsLevel;
+            if (decompOptions.decompTablesFormat.isPercentageType) decimals = decompOptions.decompTablesFormat.decimalsPch;
+            else decimals = decompOptions.decompTablesFormat.decimalsLevel;
             string format = "f16." + decimals.ToString();
             c.numberFormat = format;
             tab.Set(new Coord(i + 1, j + 1), c);

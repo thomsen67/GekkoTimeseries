@@ -147,7 +147,7 @@ namespace Gekko
                     checkBox1.IsChecked = true;
                 }
 
-                if (this.decompOptions2.showErrors)
+                if (this.decompOptions2.decompTablesFormat.showErrors)
                 {
                     checkBoxErrors.IsChecked = true;
                 }
@@ -1250,10 +1250,10 @@ namespace Gekko
                     code2 = "s";
                 }
 
-                this.decompOptions2.isPercentageType = false;
+                this.decompOptions2.decompTablesFormat.isPercentageType = false;
                 if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
                 {
-                    this.decompOptions2.isPercentageType = true;
+                    this.decompOptions2.decompTablesFormat.isPercentageType = true;
                 }
 
                 GekkoTime per1 = this.decompOptions2.t1;
@@ -1326,7 +1326,7 @@ namespace Gekko
         {
             Table table = new Table();
             decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.link[0].expression, DecompBanks(code1), per1, per2);
-            Program.DecomposePutIntoTable2(this.decompOptions2, code1, code2, table, per1, per2, smpl, lhs, new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys));
+            Program.DecomposePutIntoTable2(this.decompOptions2.decompTables, this.decompOptions2.decompTablesFormat, code1, code2, table, per1, per2, smpl, lhs, new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys));
             return table;
         }
 
@@ -1890,13 +1890,13 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions2.isPercentageType)
+                if (this.decompOptions2.decompTablesFormat.isPercentageType)
                 {
-                    this.decompOptions2.decimalsPch++;
+                    this.decompOptions2.decompTablesFormat.decimalsPch++;
                 }
                 else
                 {
-                    this.decompOptions2.decimalsLevel++;
+                    this.decompOptions2.decompTablesFormat.decimalsLevel++;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1906,15 +1906,15 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                if (this.decompOptions2.isPercentageType)
+                if (this.decompOptions2.decompTablesFormat.isPercentageType)
                 {
-                    this.decompOptions2.decimalsPch--;
-                    if (this.decompOptions2.decimalsPch < 0) this.decompOptions2.decimalsPch = 0;
+                    this.decompOptions2.decompTablesFormat.decimalsPch--;
+                    if (this.decompOptions2.decompTablesFormat.decimalsPch < 0) this.decompOptions2.decompTablesFormat.decimalsPch = 0;
                 }
                 else
                 {
-                    this.decompOptions2.decimalsLevel--;
-                    if (this.decompOptions2.decimalsLevel < 0) this.decompOptions2.decimalsLevel = 0;
+                    this.decompOptions2.decompTablesFormat.decimalsLevel--;
+                    if (this.decompOptions2.decompTablesFormat.decimalsLevel < 0) this.decompOptions2.decompTablesFormat.decimalsLevel = 0;
                 }
                 RecalcCellsWithNewType();
             }
@@ -1924,7 +1924,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.showErrors = true;
+                this.decompOptions2.decompTablesFormat.showErrors = true;
                 RecalcCellsWithNewType();
             }
         }
@@ -1933,7 +1933,7 @@ namespace Gekko
         {
             if (!isInitializing)
             {
-                this.decompOptions2.showErrors = false;
+                this.decompOptions2.decompTablesFormat.showErrors = false;
                 RecalcCellsWithNewType();                
             }
         }
@@ -1983,6 +1983,8 @@ namespace Gekko
 
     public class DecompOptions2
     {
+        public DecompTablesFormat decompTablesFormat = new DecompTablesFormat();
+
         public bool isNew = false;
 
         public bool isSubst = false;
@@ -1995,7 +1997,7 @@ namespace Gekko
         public int numberOfRecalcs = 0;  //used to pause main thread until the DECOMP window has calculated.
         public string variable = null;
         public List<string> variable_subelement = null;
-        public bool isPercentageType = false;
+        
         //public bool isExpression = false; //true for UDVALG fy+1 etc.
         public string expressionOld = null;  //only != null for expressions
         public Func<GekkoSmpl, IVariable> expression = null;
@@ -2007,7 +2009,7 @@ namespace Gekko
         public string prtOptionLower;  //only used at first call of UDVALG (e.g. UDVALG<p>): when isSubWindow is false.
         //public List<string> vars;
         public bool isSubWindow = false;  //when browsing/clicking, opening a new window
-        public bool showErrors = false;
+        
         //public GekkoSmpl smplForFunc = null;
 
         public List<string> subst = new List<string>();
@@ -2034,8 +2036,7 @@ namespace Gekko
         public LocalBanks localBanks = null;
         public string modelHash = null;
         //public int decimals = 4;
-        public int decimalsLevel = 4;
-        public int decimalsPch = 2;
+        
         public string dream = null;  //experimental
 
         public DecompTables decompTables = null;
@@ -2052,6 +2053,13 @@ namespace Gekko
         {
             //clones relevant parts for new window
             DecompOptions2 d = new DecompOptions2();
+            d.decompTablesFormat = new DecompTablesFormat();
+            d.decompTablesFormat.decimalsLevel = this.decompTablesFormat.decimalsLevel;
+            d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
+            d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
+            d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
+
+
             //d.tp = this.tp;
             d.variable = this.variable;
             d.t1 = this.t1;
@@ -2062,9 +2070,9 @@ namespace Gekko
             d.guiDecompIsBaseline = this.guiDecompIsBaseline;
             d.guiDecompTransformationCode = this.guiDecompTransformationCode;
             d.modelHash = this.modelHash;
-            d.showErrors = this.showErrors;
+            
             //d.decimalsLevel = this.decimalsLevel;
-            d.decimalsPch = this.decimalsPch;  //these are inherited in sub-windows. But .decimalsLevel are not (some vars like prices really need 4 decimals).
+            
             d.dream = this.dream;
 
             d.isSort = this.isSort;
