@@ -1240,13 +1240,8 @@ namespace Gekko
 
                 _statusText.Text = "";
 
-                bool useLocalData = false;
-
-                Table table = new Table();
-                //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
-
                 this.decompOptions2.prtOptionLower = transformationCodeAugmented;
-                                
+
                 string code1 = this.decompOptions2.prtOptionLower;
                 string code2 = null;
                 if (code1.StartsWith("s"))
@@ -1260,7 +1255,7 @@ namespace Gekko
                 {
                     this.decompOptions2.isPercentageType = true;
                 }
-                
+
                 GekkoTime per1 = this.decompOptions2.t1;
                 GekkoTime per2 = this.decompOptions2.t2;
 
@@ -1274,13 +1269,8 @@ namespace Gekko
                 int perLag = -2;
                 string lhs = "Expression value";
 
-                bool usesRef = code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
+                Table table = DecompTable(code1, code2, per1, per2, smpl, lhs);
 
-                //decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.expression, EDecompBanks.Both, this.decompOptions2.t1, this.decompOptions2.t2);
-                decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.link[0].expression, EDecompBanks.Both, this.decompOptions2.t1, this.decompOptions2.t2);
-                List<string> temp = new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys);
-                Program.DecomposePutIntoTable2(this.decompOptions2, code1, code2, table, per1, per2, smpl, lhs, temp);
-                                                
                 if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
                 {
                     foreach (string var in this.decompOptions2.subst)
@@ -1308,17 +1298,44 @@ namespace Gekko
                 flowText.Visibility = Visibility.Collapsed;
 
                 this.decompOptions2.guiDecompValues = table;
-                ClearGrid();
-                MakeTable2(table, this.decompOptions2);
+
+                if (G.IsUnitTesting())
+                {
+                    Globals.lastDecompTable = table;
+                }
+                else
+                {
+                    ClearGrid();
+                    MakeTable2(table, this.decompOptions2);
+                }
 
                 return;
 
             }
             catch (Exception e)
             {
-                this.isClosing = true;
-                MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+                if (!G.IsUnitTesting())
+                {
+                    this.isClosing = true;
+                    MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+                }
             }
+        }
+
+        private Table DecompTable(string code1, string code2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs)
+        {
+            Table table = new Table();
+            decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.link[0].expression, DecompBanks(code1), per1, per2);
+            Program.DecomposePutIntoTable2(this.decompOptions2, code1, code2, table, per1, per2, smpl, lhs, new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys));
+            return table;
+        }
+
+        private static EDecompBanks DecompBanks(string code1)
+        {
+            EDecompBanks banks = EDecompBanks.Work;
+            if (code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "rp" || code1 == "xrp" || code1 == "rdp" || code1 == "xrdp") banks = EDecompBanks.Ref;
+            if (code1 == "m" || code1 == "xm" || code1 == "q" || code1 == "xq" || code1 == "mp" || code1 == "xmp") banks = EDecompBanks.Both;
+            return banks;
         }
 
         private Table DecompSubstitute(Table table, string var2)

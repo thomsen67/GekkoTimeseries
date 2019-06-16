@@ -8633,6 +8633,7 @@ namespace Gekko
             
             public void Exe()
             {
+                Globals.lastDecompTable = null;
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (G.NullOrEmpty(this.opt_prtcode)) this.opt_prtcode = "n";
                 //Gekko.Table tab = Program.Decompose(this);
@@ -8657,6 +8658,7 @@ namespace Gekko
 
             public void Exe()
             {
+                Globals.lastDecompTable = null;
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (G.NullOrEmpty(this.opt_prtcode)) this.opt_prtcode = "n";                
                 Program.Decomp2(this);

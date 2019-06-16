@@ -40,7 +40,7 @@ namespace Gekko
         delegate void Decomp2Callback(DecompOptions2 o);
         public static void Decomp2(DecompOptions2 o)
         {
-            if (Gui.gui.InvokeRequired)
+            if (Gui.gui != null && Gui.gui.InvokeRequired)
             {
                 // It's on a different thread, so use Invoke.
                 Gui.gui.Invoke(new Decomp2Callback(Decomp2), new object[] { o });
@@ -53,11 +53,9 @@ namespace Gekko
                 //decompOptions.isCalledFromDecompWindow = false;
 
                 WindowDecomp w = null;
-                if (true)
-                {
-                    w = new WindowDecomp(decompOptions);
-                    Globals.windowsDecomp2.Add(w);
-                }
+                
+                w = new WindowDecomp(decompOptions);
+                Globals.windowsDecomp2.Add(w);                
 
                 //string name = null;
                 //if (decompOptions.name != null)
@@ -190,17 +188,25 @@ namespace Gekko
                 w.RecalcCellsWithNewType();
                 decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
-                if (w.isClosing)  //if something goes wrong, .isClosing will be true
+                if (!G.IsUnitTesting())
                 {
-                    //The line below removes the window from the global list of active windows.
-                    //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                    if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                    if (w.isClosing)  //if something goes wrong, .isClosing will be true
+                    {
+                        //The line below removes the window from the global list of active windows.
+                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
+                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
+                    }
+                    else
+                    {
+                        w.ShowDialog();
+                        w.Close();  //probably superfluous
+                        w = null;  //probably superfluous
+                    }
                 }
                 else
                 {
-                    w.ShowDialog();
-                    w.Close();  //probably superfluous
-                    w = null;  //probably superfluous
+                    Globals.windowsDecomp2.Clear();
+                    w = null;
                 }
             }
         }
