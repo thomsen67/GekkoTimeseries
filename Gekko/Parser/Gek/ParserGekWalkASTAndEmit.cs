@@ -5376,7 +5376,21 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMPITEMSEXPR":
                         {
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalFuncs(w, methodName, node[1][0].Code.ToString());
+                            string code = null;
+                            if (node[1].ChildrenCount() == 1)
+                            {
+                                //DECOMP x1 + x2
+                                code = node[1][0].Code.ToString();
+                            }
+                            else
+                            {
+                                //DECOMP y = x1 + x2                                
+                                code = Program.EquationLhsRhs(node[1][0].Code.ToString(), node[1][1].Code.ToString(), false);
+                            }
+
+                            
+
+                            StashIntoLocalFuncs(w, methodName, code);
                             string n = "null";
                             if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
                             node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + n + ", null))" + ";" + G.NL);                            

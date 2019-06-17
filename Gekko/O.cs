@@ -8658,6 +8658,15 @@ namespace Gekko
 
             public void Exe()
             {
+                //This is the starting point
+                //Calls: Program.Decomp2(decompOptions);
+                //       CrossThreadStuff.Decomp2(decompOptions2) --> may use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
+                //       Window1.RecalcCellsWithNewType();
+                //       Program.Decompose(DecompOptions o)       --> actual calculation
+                //
+                //CLICKING: Mouse_Down(), cf. #98732498724
+                //                
+                
                 Globals.lastDecompTable = null;
                 G.CheckLegalPeriod(this.t1, this.t2);
                 if (G.NullOrEmpty(this.opt_prtcode)) this.opt_prtcode = "n";                

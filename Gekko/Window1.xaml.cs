@@ -1803,7 +1803,7 @@ namespace Gekko
         public bool showErrors = false;
     }
 
-    public class DecompTables
+    public class DecompData
     {
         
         public DecompDict cellsQuo = null;
@@ -1878,7 +1878,7 @@ namespace Gekko
         
         public string dream = null;  //experimental
 
-        public DecompTables decompTables = null;
+        public DecompData decompTables = null;
         public bool hasCalculatedQuo = false;
         public bool hasCalculatedRef = false;
 

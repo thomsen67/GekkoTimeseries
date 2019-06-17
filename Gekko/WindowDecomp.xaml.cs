@@ -1267,26 +1267,30 @@ namespace Gekko
                 IVariable y0aRef = null;
 
                 int perLag = -2;
-                string lhs = "Expression value";
+                string lhsString = "Expression value";
+                
+                //Keep these 2 together!
+                DecompData decompData = Program.Decompose2(per1, per2, this.decompOptions2.link[0].expression, DecompBanks(code1));
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, new List<string>(decompData.cellsContribD.storage.Keys));
 
-                Table table = DecompTable(code1, code2, per1, per2, smpl, lhs);
+                this.decompOptions2.decompData = decompData;
 
                 if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
                 {
-                    foreach (string var in this.decompOptions2.subst)
-                    {
-                        table = DecompSubstitute(table, var);
-                    }
+                    //foreach (string var in this.decompOptions2.subst)
+                    //{
+                    //    table = DecompSubstitute(table.Item2, var);
+                    //}
                 }
 
                 if (this.decompOptions2.isSort)
                 {
-                    table = TableSort(table);
+                    //table = TableSort(table);
                 }
 
                 if (this.decompOptions2.isPool)
                 {
-                    table = TablePool(table);
+                    //table = TablePool(table);
                 }
 
                 string s = FindEquationText2(this.decompOptions2);
@@ -1306,7 +1310,7 @@ namespace Gekko
                 else
                 {
                     ClearGrid();
-                    MakeTable2(table, this.decompOptions2);
+                    MakeGuiTable2(table, this.decompOptions2);
                 }
 
                 return;
@@ -1322,13 +1326,7 @@ namespace Gekko
             }
         }
 
-        private Table DecompTable(string code1, string code2, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs)
-        {
-            Table table = new Table();
-            decompOptions2.decompTables = Program.Decompose2(this.decompOptions2.link[0].expression, DecompBanks(code1), per1, per2);
-            Program.DecomposePutIntoTable2(this.decompOptions2.decompTables, this.decompOptions2.decompTablesFormat, code1, code2, table, per1, per2, smpl, lhs, new List<string>(this.decompOptions2.decompTables.cellsContribD.storage.Keys));
-            return table;
-        }
+     
 
         private static EDecompBanks DecompBanks(string code1)
         {
@@ -1639,7 +1637,7 @@ namespace Gekko
             PutTableIntoGrid(this.gridUpperLeft, table, GekkoTableTypes.UpperLeft, decompOptions);            
         }
 
-        private void MakeTable2(Table table, DecompOptions2 decompOptions)
+        private void MakeGuiTable2(Table table, DecompOptions2 decompOptions)
         {
 
             CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
@@ -2039,7 +2037,7 @@ namespace Gekko
         
         public string dream = null;  //experimental
 
-        public DecompTables decompTables = null;
+        public DecompData decompData = null;
         public bool hasCalculatedQuo = false;
         public bool hasCalculatedRef = false;
 

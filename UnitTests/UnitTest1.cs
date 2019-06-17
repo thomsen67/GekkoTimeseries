@@ -8201,7 +8201,8 @@ namespace UnitTests
                 I("g2 <2009 2011> =  10,  11,  13;");
                 //I("clone;");
                 string lhs = "e_y";
-                if (i == 1) lhs = "-y + c + i + 0.2*g1 + 0.8*g2[-1]";
+                //if (i == 1) lhs = "-y + c + i + 0.2*g1 + 0.8*g2[-1]";
+                if (i == 1) lhs = "y = c + i + 0.2*g1 + 0.8*g2[-1]";
 
                 // =========== levels =========================                
                 I("decomp2 <2011 2012 xn> y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");

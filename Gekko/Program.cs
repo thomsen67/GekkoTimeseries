@@ -12140,17 +12140,7 @@ namespace Gekko
         public static void Decomp2(O.Decomp2 o)
         {
 
-            //This is the starting point of a decomposition call, just after O.Decmop2 (main entry)
-            //Calls: Program.Decomp2(decompOptions);
-            //       CrossThreadStuff.Decomp2(decompOptions2) --> doing stuff with EVal() function
-            //       Window1.RecalcCellsWithNewType();
-            //       Program.Decompose(DecompOptions o)          WAS: //Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
-            //
-            //CLICKING: Mouse_Down(), cf. #98732498724
-            //
-            //Actual calculation is in Decompose(DecompOptions o)
-
-            //We need to merge DecompHelper2() into Decompose()
+            
 
             DecompOptions2 decompOptions2 = new DecompOptions2();
             decompOptions2.t1 = o.t1;
@@ -12587,7 +12577,7 @@ namespace Gekko
 
             try
             {
-                Program.obeyCommandCalledFromGUI("EVAL -(" + lhs + ") + " + rhs, new P()); //produces Func<> Globals.expression with the expression
+                Program.obeyCommandCalledFromGUI("EVAL " + EquationLhsRhs(lhs, rhs, true), new P()); //produces Func<> Globals.expression with the expression
 
                 if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
                 {
@@ -12624,6 +12614,15 @@ namespace Gekko
             }
 
             return found;
+        }
+
+        public static string EquationLhsRhs(string lhs, string rhs, bool simple)
+        {
+            //This method is just so that we keep the two ways of decomposing together,
+            //that is, calling an equation like DECOMP eq1, or DECOMP y = x1 + x2.
+            //The former has simple = true, the latter simple = false.
+            if (simple) return "-(" + lhs + ") + " + rhs;
+            else return "O.Add(" + Globals.smpl + ", O.Negate(" + Globals.smpl + ", " + lhs + "), " + rhs + ")";
         }
 
         private static List<ModelGamsEquation> GetGamsEquations(string variable)
@@ -35848,7 +35847,7 @@ namespace Gekko
             try
             {
 
-                if (o.decompTables == null) o.decompTables = new DecompTables();
+                if (o.decompTables == null) o.decompTables = new DecompData();
 
                 if ((!usesRef && !o.hasCalculatedQuo) || (usesRef && !o.hasCalculatedRef))
                 {
@@ -36163,7 +36162,7 @@ namespace Gekko
 
         }
 
-        public static DecompTables Decompose2(Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, GekkoTime tt1, GekkoTime tt2)
+        public static DecompData Decompose2(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth)
         {
             //
             //
@@ -36290,7 +36289,7 @@ namespace Gekko
                 mm.Add(1);
             }
 
-            DecompTables d = new DecompTables();
+            DecompData d = new DecompData();
 
             int funcCounter = 0;
 
@@ -36774,7 +36773,7 @@ namespace Gekko
                         rhsSum += d;
                     }
 
-                    DecomposeInsertValue(tab, code1, code2, j, i, d, o.decompTablesFormat);
+                    DecomposeInsertValue(tab, j, i, d, o.decompTablesFormat);
 
                     if (i == 1 && o.decompTablesFormat.showErrors)
                     {
@@ -36802,7 +36801,7 @@ namespace Gekko
                     {
                         if (DecomposePutIntoTableIsError(o.decompTablesFormat.showErrors, i)) //real table row 3
                         {
-                            DecomposeInsertValue(tab, code1, code2, j, i, error, o.decompTablesFormat);
+                            DecomposeInsertValue(tab, j, i, error, o.decompTablesFormat);
                             tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
                         }
                         else
@@ -36828,8 +36827,9 @@ namespace Gekko
             }
         }
 
-        public static void DecomposePutIntoTable2(DecompTables decompTables, DecompTablesFormat format, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
+        public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {
+            Table tab = new Table();
             int iOffset = 0;
             if (format.showErrors) iOffset = 1;
 
@@ -37015,7 +37015,7 @@ namespace Gekko
                         rhsSum += d;
                     }
 
-                    DecomposeInsertValue(tab, code1, code2, j, i, d, format);
+                    DecomposeInsertValue(tab, j, i, d, format);
 
                     if (i == 1 && format.showErrors)
                     {
@@ -37050,7 +37050,7 @@ namespace Gekko
                     {
                         if (DecomposePutIntoTableIsError(format.showErrors, i)) //real table row 3
                         {
-                            DecomposeInsertValue(tab, code1, code2, j, i, error, format);
+                            DecomposeInsertValue(tab, j, i, error, format);
                             tab.Get(i + 1, j + 1).backgroundColor = "LightRed";
                         }
                         else
@@ -37074,6 +37074,7 @@ namespace Gekko
                     }
                 }
             }
+            return tab;
         }
 
         private static bool DecomposePutIntoTableIsError(bool showErrors, int i)
@@ -37081,7 +37082,7 @@ namespace Gekko
             return showErrors && i == 2;
         }
 
-        private static void DecomposeInsertValue(Table tab, string code1, string code2, int j, int i, double d, DecompTablesFormat o)
+        private static void DecomposeInsertValue(Table tab, int j, int i, double d, DecompTablesFormat o)
         {
             Cell c = new Cell();
             c.number = d;
