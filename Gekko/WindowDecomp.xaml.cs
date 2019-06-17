@@ -1268,10 +1268,12 @@ namespace Gekko
 
                 int perLag = -2;
                 string lhsString = "Expression value";
-                
+
+                int eqNumber = 0;
+
                 //Keep these 2 together!
-                DecompData decompData = Program.Decompose2(per1, per2, this.decompOptions2.link[0].expression, DecompBanks(code1));
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, new List<string>(decompData.cellsContribD.storage.Keys));
+                DecompData decompData = Program.Decompose2(per1, per2, this.decompOptions2.link[eqNumber].expression, DecompBanks(code1));
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, DecompGetVars(decompData, eqNumber));
 
                 this.decompOptions2.decompData = decompData;
 
@@ -1303,7 +1305,7 @@ namespace Gekko
 
                 this.decompOptions2.guiDecompValues = table;
 
-                if (G.IsUnitTesting())
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
                 {
                     Globals.lastDecompTable = table;
                 }
@@ -1326,7 +1328,28 @@ namespace Gekko
             }
         }
 
-     
+        private List<string> DecompGetVars(DecompData decompData, int eqNumber)
+        {
+            List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys); vars.Sort(StringComparer.OrdinalIgnoreCase);
+            List<string> vars2 = new List<string>();
+            foreach (string var in vars)
+            {
+                if (G.Equal(this.decompOptions2.link[eqNumber].varname, var)) vars2.Add(var);
+            }
+            if (vars2.Count == 0)
+            {
+                G.Writeln2("*** ERROR: Did not find variable '' in the equation " + this.decompOptions2.link[eqNumber].expressionText);
+                throw new GekkoException();
+            }
+            foreach (string var in vars)
+            {
+                if (G.Equal(this.decompOptions2.link[eqNumber].varname, var)) continue;
+                vars2.Add(var);
+            }
+
+            return vars2;
+        }
+
 
         private static EDecompBanks DecompBanks(string code1)
         {

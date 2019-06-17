@@ -8186,8 +8186,10 @@ namespace UnitTests
 
         [TestMethod]
         public void _Test_Decomp1()
-        {            
-            for (int i = 0; i < 2; i++)  //either direct expression, or using an equation from file
+        {
+            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
+
+            for (int i = 0; i < 3; i++)  //either direct expression, or using an equation from file
             {
 
                 I("RESET; time 2010 2012;");
@@ -8200,12 +8202,12 @@ namespace UnitTests
                 I("g1 = 10,  11,  13;");
                 I("g2 <2009 2011> =  10,  11,  13;");
                 //I("clone;");
-                string lhs = "e_y";
-                //if (i == 1) lhs = "-y + c + i + 0.2*g1 + 0.8*g2[-1]";
+                string lhs = "e_y";                
                 if (i == 1) lhs = "y = c + i + 0.2*g1 + 0.8*g2[-1]";
-
+                else if (i == 2) lhs = "-y + c + i + 0.2*g1 + 0.8*g2[-1]";
+                
                 // =========== levels =========================                
-                I("decomp2 <2011 2012 xn> y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 xn> Work:y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 Table table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).date, "2011");
                 Assert.AreEqual(table.Get(1, 3).date, "2012");
@@ -8225,8 +8227,14 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(6, 2).number, 502.0000d, 0.0001);
                 Assert.AreEqual(table.Get(6, 3).number, 501.0000d, 0.0001);
 
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
                 // =========== differences, decomposed =========================                
-                I("decomp2 <2011 2012 d> y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 d> Work:y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).date, "2011");
                 Assert.AreEqual(table.Get(1, 3).date, "2012");

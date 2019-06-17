@@ -124,7 +124,12 @@ namespace Gekko
                 w.RecalcCellsWithNewType();
                 decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
-                if (!G.IsUnitTesting())
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                {
+                    Globals.windowsDecomp2.Clear();
+                    w = null;
+                }
+                else
                 {
                     if (w.isClosing)  //if something goes wrong, .isClosing will be true
                     {
@@ -137,12 +142,13 @@ namespace Gekko
                         w.ShowDialog();
                         w.Close();  //probably superfluous
                         w = null;  //probably superfluous
+                        if (Globals.showDecompTable)
+                        {
+                            Globals.showDecompTable = false;
+                            G.Writeln2("*** ERROR: Debug, tables aborted. Set Globals.showDecompTable = false.");
+                            throw new GekkoException();
+                        }
                     }
-                }
-                else
-                {
-                    Globals.windowsDecomp2.Clear();
-                    w = null;
                 }
             }
         }
