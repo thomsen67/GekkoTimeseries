@@ -36833,23 +36833,31 @@ namespace Gekko
         {
             List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys); vars.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> vars2 = new List<string>();
-            foreach (string var in vars)
+            if (varname == null)
             {
-                string[] ss = var.Split('¤');
-                string varnameWithoutFirstBank = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
-                if (ss[1] == "[0]" && G.Equal(varname, varnameWithoutFirstBank)) vars2.Add(var);
+                vars2 = new List<string>(vars);
+                vars2.Sort();
             }
-            if (vars2.Count == 0)
-            {
-                G.Writeln2("*** ERROR: Did not find variable '' in the equation " + expressionText);
-                throw new GekkoException();
+            else
+            {               
+                
+                foreach (string var in vars)
+                {
+                    string[] ss = var.Split('¤');
+                    string varnameWithoutFirstBank = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                    if (ss[1] == "[0]" && G.Equal(varname, varnameWithoutFirstBank)) vars2.Add(var);
+                }
+                if (vars2.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: Did not find variable '' in the equation " + expressionText);
+                    throw new GekkoException();
+                }
+                foreach (string var in vars)
+                {
+                    if (G.Equal(vars2[0], var)) continue;
+                    vars2.Add(var);
+                }
             }
-            foreach (string var in vars)
-            {
-                if (G.Equal(vars2[0], var)) continue;
-                vars2.Add(var);
-            }
-
             return vars2;
         }
 
