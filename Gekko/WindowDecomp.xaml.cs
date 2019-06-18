@@ -1271,9 +1271,12 @@ namespace Gekko
 
                 int eqNumber = 0;
 
+                DecompItemsString items = this.decompOptions2.link[eqNumber];
+
                 //Keep these 2 together!
-                DecompData decompData = Program.Decompose2(per1, per2, this.decompOptions2.link[eqNumber].expression, DecompBanks(code1));
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, DecompGetVars(decompData, eqNumber));
+                DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(code1));
+                List<string> vars2 = Program.DecompGetVars(decompData, items.varname, items.expressionText);
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, items.expressionText, vars2);
 
                 this.decompOptions2.decompData = decompData;
 
@@ -1328,27 +1331,7 @@ namespace Gekko
             }
         }
 
-        private List<string> DecompGetVars(DecompData decompData, int eqNumber)
-        {
-            List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys); vars.Sort(StringComparer.OrdinalIgnoreCase);
-            List<string> vars2 = new List<string>();
-            foreach (string var in vars)
-            {
-                if (G.Equal(this.decompOptions2.link[eqNumber].varname, var)) vars2.Add(var);
-            }
-            if (vars2.Count == 0)
-            {
-                G.Writeln2("*** ERROR: Did not find variable '' in the equation " + this.decompOptions2.link[eqNumber].expressionText);
-                throw new GekkoException();
-            }
-            foreach (string var in vars)
-            {
-                if (G.Equal(this.decompOptions2.link[eqNumber].varname, var)) continue;
-                vars2.Add(var);
-            }
-
-            return vars2;
-        }
+        
 
 
         private static EDecompBanks DecompBanks(string code1)

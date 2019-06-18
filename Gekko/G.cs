@@ -520,11 +520,11 @@ namespace Gekko
         }
 
         //See equivalent method in Functions.cs
-        public static string Chop_RemoveBank(string s1, string s2)
+        public static string Chop_RemoveBank(string s1, string bankname)
         {
             string bank, name, freq; string[] index;
             O.Chop(s1, out bank, out name, out freq, out index);
-            string bankRemove = s2;
+            string bankRemove = bankname;
             if (G.Equal(bankRemove, bank)) bank = null;
             return O.UnChop(bank, name, freq, index);
         }

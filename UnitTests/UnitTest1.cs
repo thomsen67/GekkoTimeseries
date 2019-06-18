@@ -8199,33 +8199,34 @@ namespace UnitTests
                 I("y = 500, 502, 501;");
                 I("c = 400, 402, 397;");
                 I("i =  90,  89,  91;");
-                I("g1 = 10,  11,  13;");
-                I("g2 <2009 2011> =  10,  11,  13;");
+                I("g1 <2011 2013> = 10,  11,  13;");
+                I("g2 <2009 2011> = 10,  11,  13;");
                 //I("clone;");
                 string lhs = "e_y";                
-                if (i == 1) lhs = "y = c + i + 0.2*g1 + 0.8*g2[-1]";
-                else if (i == 2) lhs = "-y + c + i + 0.2*g1 + 0.8*g2[-1]";
+                if (i == 1) lhs = "y = c + i + 0.2*g1[+1] + 0.8*g2[-1]";
+                else if (i == 2) lhs = "-y + c + i + 0.2*g1[+1] + 0.8*g2[-1]";
                 
                 // =========== levels =========================                
-                I("decomp2 <2011 2012 xn> Work:y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 xn> y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 Table table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).date, "2011");
                 Assert.AreEqual(table.Get(1, 3).date, "2012");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "c[0]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g1[0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g2[-1]");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "i[0]");
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "y[0]");
-                Assert.AreEqual(table.Get(2, 2).number, 402.0000d, 0.0001);
-                Assert.AreEqual(table.Get(2, 3).number, 397.0000d, 0.0001);
-                Assert.AreEqual(table.Get(3, 2).number, 11.0000d, 0.0001);
-                Assert.AreEqual(table.Get(3, 3).number, 13.0000d, 0.0001);
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g1[+1]");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g2[-1]");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "i");
+                Assert.AreEqual(table.Get(2, 2).number, 502.0000d, 0.0001);
+                Assert.AreEqual(table.Get(2, 3).number, 501.0000d, 0.0001);
+                Assert.AreEqual(table.Get(3, 2).number, 402.0000d, 0.0001);
+                Assert.AreEqual(table.Get(3, 3).number, 397.0000d, 0.0001);
                 Assert.AreEqual(table.Get(4, 2).number, 11.0000d, 0.0001);
                 Assert.AreEqual(table.Get(4, 3).number, 13.0000d, 0.0001);
-                Assert.AreEqual(table.Get(5, 2).number, 89.0000d, 0.0001);
-                Assert.AreEqual(table.Get(5, 3).number, 91.0000d, 0.0001);
-                Assert.AreEqual(table.Get(6, 2).number, 502.0000d, 0.0001);
-                Assert.AreEqual(table.Get(6, 3).number, 501.0000d, 0.0001);
+                Assert.AreEqual(table.Get(5, 2).number, 11.0000d, 0.0001);
+                Assert.AreEqual(table.Get(5, 3).number, 13.0000d, 0.0001);
+                Assert.AreEqual(table.Get(6, 2).number, 89.0000d, 0.0001);
+                Assert.AreEqual(table.Get(6, 3).number, 91.0000d, 0.0001);
+                
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -8234,25 +8235,26 @@ namespace UnitTests
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                 // =========== differences, decomposed =========================                
-                I("decomp2 <2011 2012 d> Work:y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 d> y in " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).date, "2011");
                 Assert.AreEqual(table.Get(1, 3).date, "2012");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "c[0]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g1[0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g2[-1]");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "i[0]");
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "y[0]");
-                Assert.AreEqual(table.Get(2, 2).number, 2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(2, 3).number, -5.0000d, 0.0001);
-                Assert.AreEqual(table.Get(3, 2).number, 0.2d * 1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(3, 3).number, 0.2d * 2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(4, 2).number, 0.8d * 1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(4, 3).number, 0.8d * 2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(5, 2).number, -1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(5, 3).number, 2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(6, 2).number, -2.0000d, 0.0001);  //opposite sign
-                Assert.AreEqual(table.Get(6, 3).number, 1.0000d, 0.0001);   //opposite sign
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "c");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g1[+1]");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g2[-1]");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "i");
+                Assert.AreEqual(table.Get(2, 2).number, -2.0000d, 0.0001);  //opposite sign
+                Assert.AreEqual(table.Get(2, 3).number, 1.0000d, 0.0001);   //opposite sign
+                Assert.AreEqual(table.Get(3, 2).number, 2.0000d, 0.0001);
+                Assert.AreEqual(table.Get(3, 3).number, -5.0000d, 0.0001);
+                Assert.AreEqual(table.Get(4, 2).number, 0.2d * 1.0000d, 0.0001);
+                Assert.AreEqual(table.Get(4, 3).number, 0.2d * 2.0000d, 0.0001);
+                Assert.AreEqual(table.Get(5, 2).number, 0.8d * 1.0000d, 0.0001);
+                Assert.AreEqual(table.Get(5, 3).number, 0.8d * 2.0000d, 0.0001);
+                Assert.AreEqual(table.Get(6, 2).number, -1.0000d, 0.0001);
+                Assert.AreEqual(table.Get(6, 3).number, 2.0000d, 0.0001);
+                
 
             }
         }

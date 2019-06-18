@@ -36467,7 +36467,9 @@ namespace Gekko
                                             //    else name += "¤[+" + lag + "]";
                                             //}
 
-                                            name += "¤[" + lag + "]";
+                                            string lag2 = lag.ToString();
+                                            if (lag >= 1) lag2 = "+" + lag;
+                                            name += "¤[" + lag2 + "]";
 
                                             if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
                                             {
@@ -36827,8 +36829,33 @@ namespace Gekko
             }
         }
 
-        public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, List<string> vars2)
+        public static List<string> DecompGetVars(DecompData decompData, string varname, string expressionText)
         {
+            List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys); vars.Sort(StringComparer.OrdinalIgnoreCase);
+            List<string> vars2 = new List<string>();
+            foreach (string var in vars)
+            {
+                string[] ss = var.Split('¤');
+                string varnameWithoutFirstBank = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                if (ss[1] == "[0]" && G.Equal(varname, varnameWithoutFirstBank)) vars2.Add(var);
+            }
+            if (vars2.Count == 0)
+            {
+                G.Writeln2("*** ERROR: Did not find variable '' in the equation " + expressionText);
+                throw new GekkoException();
+            }
+            foreach (string var in vars)
+            {
+                if (G.Equal(vars2[0], var)) continue;
+                vars2.Add(var);
+            }
+
+            return vars2;
+        }
+
+        public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2)
+        {
+            
             Table tab = new Table();
             int iOffset = 0;
             if (format.showErrors) iOffset = 1;
@@ -36850,19 +36877,10 @@ namespace Gekko
                     i++;
                     if (j == 1)
                     {
-                        string varname2 = varname;
-                        string lag5 = null;
+                        //See #876435924365                        
                         string[] ss = varname.Split('¤');
-                        if (ss.Length == 2)
-                        {
-                            varname2 = ss[0];
-                            lag5 = ss[1];
-                        }
-                        else
-                        {
-                            //do nothing
-                        }
-                        tab.Set(i + 1, 1, G.Chop_RemoveBank(varname2, Program.databanks.GetFirst().name) + lag5);
+                        if (ss[1] == "[0]") ss[1] = "";
+                        tab.Set(i + 1, 1, G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name) + ss[1]);
                     }
 
                     if (i == 1)
