@@ -36356,6 +36356,8 @@ namespace Gekko
                     y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
+                d.cellsQuo.storage.Add(Globals.decompExpressionName + "¤[0]", y0_series);
+
                 Series y0aRef_series = null;
                 Series y0Ref_series = null;
                 if (mm.Contains(1))
@@ -36379,6 +36381,7 @@ namespace Gekko
                     {
                         y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                     }
+                    d.cellsRef.storage.Add(Globals.decompExpressionName + "¤[0]", y0_series);
                 }
 
                 double eps = Globals.newtonSmallNumber;
@@ -36858,6 +36861,7 @@ namespace Gekko
                     vars2.Add(var);
                 }
             }
+            vars2.Add(Globals.decompExpressionName + "¤[0]");
             return vars2;
         }
 
