@@ -8192,94 +8192,151 @@ namespace UnitTests
             for (int j = 0; j < 3; j++)  //either direct expression, or using an equation from file
             {
 
+                //             2009             2010             2011             2012             2013
+                // -------+--------------------------------------------------------------------------------
+                //     y  |                      501     -2       499       5      504 
+                //    RES |                        1     -4        -3       6        3
+                //     c  |                      400      2       402      -5      397
+                // g1[+1] |                       10      1        11       2       13
+                // g2[-1] |                       10      1        11       2       13
+                //      i |                       90     -1        89       2       91
+                // -------+--------------------------------------------------------------------------------                  
+                //                       note: for i==2, RES = c + i + 0.2*g1[+1] + 0.8*g2[-1]
+                //
+                //                                         DECOMP <d>
+                // -------+--------------------------------------------------------------------------------
+                //     y  |                               2                -1          
+                //     c  |                              -2                 5           
+                // g1[+1] |                              -0.2              -0.4
+                // g2[-1] |                              -0.8              -1.6
+                //      i |                               1                -2
+                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                //    SUM |                               0                 0
+                // -------+--------------------------------------------------------------------------------
+                //
+
                 I("RESET; time 2010 2012;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("option model type = gams;");
                 I("model <gms> simple1;");
-                I("y = 500, 502, 501;");
+                //I("y = 500, 502, 501;");
+                I("y = 501, 499, 504;");
                 I("c = 400, 402, 397;");
                 I("i =  90,  89,  91;");
                 I("g1 <2011 2013> = 10,  11,  13;");
                 I("g2 <2009 2011> = 10,  11,  13;");
                 //I("clone;");
-                string lhs = "y in e_y";                
+                string lhs = "y in e_y";
                 if (j == 1) lhs = "y in y = c + i + 0.2*g1[+1] + 0.8*g2[-1]";
-                else if (j == 2) lhs = "y - (c + i + 0.2*g1[+1] + 0.8*g2[-1])";
+                else if (j == 2) lhs = "-(c + i + 0.2*g1[+1] + 0.8*g2[-1])";
                 int i = 0;
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // if(i==2) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // if(j==2) Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                
-
+                               
                 // =========== levels =========================                
                 I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 Table table = Globals.lastDecompTable;
+                double ylevel2011 = 499d; double ylevel2012 = 504d;
+                double ylevel2011b = 502d; double ylevel2012b = 501d;
 
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).date, "2011");
                 Assert.AreEqual(table.Get(i, 3).date, "2012");
-                i++;
+                // -------------------------------------------------------------                
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
-                    Assert.AreEqual(table.Get(i, 2).number, 502.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 501.0000d, 0.0001);
                     i++;
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(i, 2).number, ylevel2011, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, ylevel2012, 0.0001);                    
                 }
+                // -------------------------------------------------------------                
+                i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
-                Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);  //res
-                Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);  //res
+                if (j != 2)
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, -3.0000d, 0.0001);  //res
+                    Assert.AreEqual(table.Get(i, 3).number, 3.0000d, 0.0001);  //res
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, -ylevel2011b, 0.0001);  //res
+                    Assert.AreEqual(table.Get(i, 3).number, -ylevel2012b, 0.0001);  //res
+                }
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
                 Assert.AreEqual(table.Get(i, 2).number, 402.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 397.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
                 Assert.AreEqual(table.Get(i, 2).number, 11.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 13.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2[-1]");
                 Assert.AreEqual(table.Get(i, 2).number, 11.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 13.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
                 Assert.AreEqual(table.Get(i, 2).number, 89.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 91.0000d, 0.0001);                                              
+                Assert.AreEqual(table.Get(i, 3).number, 91.0000d, 0.0001);
 
                 // =========== differences, decomposed =========================                
                 I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
                 table = Globals.lastDecompTable;
 
+                //double ydif2011 = 2d;
+                //double ydif2012 = -1d;
+                double ydif2011 = -2d; double ydif2012 = 5d;
+                double ydif2011b = 2d; double ydif2012b = -1d;
+
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).date, "2011");
                 Assert.AreEqual(table.Get(i, 3).date, "2012");
-                i++;
+                // -------------------------------------------------------------                                
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
-                    Assert.AreEqual(table.Get(i, 2).number, 2.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, -1.0000d, 0.0001);
                     i++;
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(i, 2).number, ydif2011, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, ydif2012, 0.0001);                    
                 }
+                // -------------------------------------------------------------                
+                i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
-                Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+                if (j != 2)
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, 4.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -6.0000d, 0.0001);
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
+                }
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
                 Assert.AreEqual(table.Get(i, 2).number, -2.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
                 Assert.AreEqual(table.Get(i, 2).number, -0.2d * 1.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, -0.2d * 2.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2[-1]");
                 Assert.AreEqual(table.Get(i, 2).number, -0.8d * 1.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, -0.8d * 2.0000d, 0.0001);
+                // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
                 Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
