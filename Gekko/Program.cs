@@ -12572,12 +12572,11 @@ namespace Gekko
             ModelGamsEquation found = eqs[0];  //pick the first one
 
             string rhs = found.rhs.Trim();
-            string lhs = found.lhs.Trim();
-            rhs = rhs + ";";
+            string lhs = found.lhs.Trim();            
 
             try
             {
-                Program.obeyCommandCalledFromGUI("EVAL " + EquationLhsRhs(lhs, rhs, true), new P()); //produces Func<> Globals.expression with the expression
+                Program.obeyCommandCalledFromGUI("EVAL " + EquationLhsRhs(lhs, rhs, true) + ";", new P()); //produces Func<> Globals.expression with the expression
 
                 if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
                 {
@@ -12621,8 +12620,14 @@ namespace Gekko
             //This method is just so that we keep the two ways of decomposing together,
             //that is, calling an equation like DECOMP eq1, or DECOMP y = x1 + x2.
             //The former has simple = true, the latter simple = false.
-            if (simple) return "-(" + lhs + ") + " + rhs;
-            else return "O.Add(" + Globals.smpl + ", O.Negate(" + Globals.smpl + ", " + lhs + "), " + rhs + ")";
+            //if (simple) return "-(" + lhs + ") + " + rhs;
+            //else return "O.Add(" + Globals.smpl + ", O.Negate(" + Globals.smpl + ", " + lhs + "), " + rhs + ")";
+            if (simple)
+                //return lhs + " - (" + rhs + " + " + Globals.decompExpressionName + ")";
+                return lhs + " - (" + rhs + ")";
+            else
+                //return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", O.Add(" + Globals.smpl + ", " + rhs + ", " + Globals.decompExpressionName + ")))";
+                return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", (" + rhs + ")))";
         }
 
         private static List<ModelGamsEquation> GetGamsEquations(string variable)
@@ -36277,9 +36282,6 @@ namespace Gekko
             //   Work:x[c]¤[+1]     -12    
             //   Work:z¤[-1]          5
 
-
-
-
             List<int> mm = new List<int>();
             if (workOrRefOrBoth == EDecompBanks.Work) mm.Add(0);
             else if (workOrRefOrBoth == EDecompBanks.Ref) mm.Add(1);
@@ -36342,6 +36344,8 @@ namespace Gekko
                     }
                 }
 
+                //decompPrecedents.Add(new DecompPrecedent(Globals.decompExpressionName + "¤[0]", null));  //seems variable is not used anyway
+
                 Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary
 
                 Series y0a_series = y0a as Series;
@@ -36356,7 +36360,7 @@ namespace Gekko
                     y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
-                d.cellsQuo.storage.Add(Globals.decompExpressionName + "¤[0]", y0_series);
+                d.cellsQuo.storage.Add(GetDecompExpressionName(), y0_series);
 
                 Series y0aRef_series = null;
                 Series y0Ref_series = null;
@@ -36381,7 +36385,7 @@ namespace Gekko
                     {
                         y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                     }
-                    d.cellsRef.storage.Add(Globals.decompExpressionName + "¤[0]", y0_series);
+                    d.cellsRef.storage.Add(GetDecompExpressionName(), y0Ref_series);
                 }
 
                 double eps = Globals.newtonSmallNumber;
@@ -36557,6 +36561,8 @@ namespace Gekko
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t2, dContribD);
 
+
+
                             G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                             if (mm.Contains(1))
@@ -36571,6 +36577,9 @@ namespace Gekko
                                 d.cellsContribDRef[s].SetData(t2, dContribDRef);
                             }
                         }
+                        d.cellsContribD[GetDecompExpressionName()].SetData(t2, -(d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2.Add(-1))));
+                        d.cellsContribDRef[GetDecompExpressionName()].SetData(t2, -(d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2.Add(-1))));
+                        d.cellsContribM[GetDecompExpressionName()].SetData(t2, -(d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2)));
                     }
                 }
             }
@@ -36590,6 +36599,10 @@ namespace Gekko
 
         }
 
+        private static string GetDecompExpressionName()
+        {
+            return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "¤[0]";
+        }
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)
         {
@@ -36834,12 +36847,12 @@ namespace Gekko
 
         public static List<string> DecompGetVars(DecompData decompData, string varname, string expressionText)
         {
-            List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys); vars.Sort(StringComparer.OrdinalIgnoreCase);
+            List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys);
+            vars.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> vars2 = new List<string>();
             if (varname == null)
             {
-                vars2 = new List<string>(vars);
-                vars2.Sort();
+                vars2 = new List<string>(vars);                
             }
             else
             {               
@@ -36860,8 +36873,7 @@ namespace Gekko
                     if (G.Equal(vars2[0], var)) continue;
                     vars2.Add(var);
                 }
-            }
-            vars2.Add(Globals.decompExpressionName + "¤[0]");
+            }            
             return vars2;
         }
 
