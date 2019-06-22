@@ -1270,13 +1270,20 @@ namespace Gekko
                 string lhsString = "Expression value";
 
                 int eqNumber = 0;
-
                 DecompItemsString items = this.decompOptions2.link[eqNumber];
 
-                //Keep these 2 together!
+                //Keep these 3 together!
+                // --------------------------- start --------------------
                 DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(code1));
                 List<string> vars2 = Program.DecompGetVars(decompData, items.varname, items.expressionText);
                 Table table = Program.DecomposePutIntoTable2(per1, per2, decompData, this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, items.expressionText, vars2);
+                if (false)
+                {
+                    List<string> ss = table.Print();
+                    foreach (string s2 in ss) G.Writeln(s2);
+                }
+
+                // --------------------------- end -----------------------
 
                 this.decompOptions2.decompData = decompData;
 

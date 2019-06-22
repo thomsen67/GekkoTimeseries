@@ -8194,27 +8194,46 @@ namespace UnitTests
                 // j==0 and j==1
                 //             2009             2010             2011             2012             2013
                 // -------+--------------------------------------------------------------------------------
-                //     y  |                      501     -2       499       5      504       ...see ylevel[year]
+                //   v[y] |                      501     -2       499       5      504       ...see ylevel[year]
                 //    RES |                        1     -4        -3       6        3
-                //     c  |                      400      2       402      -5      397
+                //   v[c] |                      400      2       402      -5      397
                 // g1[+1] |                       10      1        11       2       13
                 // g2[-1] |                       10      1        11       2       13
                 //      i |                       90     -1        89       2       91
                 // -------+--------------------------------------------------------------------------------                                  
-                //                                         DECOMP <d>
+                //   v[c] |                      501     -2       499       5      504     
+                //    RES |                        1     -4        -3       6        3
+                //   v[y] |                      400      2       402      -5      397
+                //      w |                       10      1        11       2       13                
+                // -------+--------------------------------------------------------------------------------                                  
+                //                                         DECOMP <d>, summer til 0
                 // -------+--------------------------------------------------------------------------------
-                //     y  |                              -2                 5         
+                //   v[y] |                              -2                 5         
                 //    RES |                               4                -6
-                //     c  |                              -2                 5           
+                //   v[c] |                              -2                 5           
                 // g1[+1] |                              -0.2              -0.4
                 // g2[-1] |                              -0.8              -1.6
                 //      i |                               1                -2
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-                //    SUM |                               0                 0
+                // -------+--------------------------------------------------------------------------------
+                //   v[c] |                               2                -5         
+                //    RES |                              -3.66              9.1
+                //   v[y] |                               1.56             -3.9           
+                //      w |                               0.1              -0.2                
+                // -------+--------------------------------------------------------------------------------
+                //                                        COMBINED via v[c], multiply the second with -2/2 = -1
+                // -------+--------------------------------------------------------------------------------
+                //   v[y] |                              -2                 5         
+                //    RES |                               4                -6
+                //    RES |                               3.66             -9.1    *
+                //   v[y] |                              -1.56              3.9    * insertede      
+                //      w |                              -0.1               0.2    *
+                // g1[+1] |                              -0.2              -0.4
+                // g2[-1] |                              -0.8              -1.6
+                //      i |                               1                -2
                 // -------+--------------------------------------------------------------------------------
                 //
                 //                                DECOMP OF EXPRESSION
-                //                                here there are not residuals
+                //                                here there are no residuals
                 //                                since the eqution provides the 
                 //                                left-hand side value.
                 // j==2
@@ -8241,22 +8260,28 @@ namespace UnitTests
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("option model type = gams;");
                 I("model <gms> simple1;");
-                //I("y = 500, 502, 501;");
-                I("y = 501, 499, 504;");
-                I("c = 400, 402, 397;");
+                I("v = series(1);");
+                I("v[y] = 501, 499, 504;");
+                I("v[c] = 400, 402, 397;");
                 I("i =  90,  89,  91;");
+                I("w =  100,  99,  101;");
                 I("g1 <2011 2013> = 10,  11,  13;");
                 I("g2 <2009 2011> = 10,  11,  13;");
                 //I("clone;");
-                string lhs = "y in e_y";
-                if (j == 1) lhs = "y in y = c + i + 0.2*g1[+1] + 0.8*g2[-1]";
-                else if (j == 2) lhs = "-(c + i + 0.2*g1[+1] + 0.8*g2[-1])";
+                string lhs = "v[y] in e_y";
+                if (j == 1) lhs = "v[y] in v[y] = v[c] + i + 0.2*g1[+1] + 0.8*g2[-1]";
+                else if (j == 2) lhs = "-(v[c] + i + 0.2*g1[+1] + 0.8*g2[-1])";
                 int i = 0;
 
-                
-                               
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
                 // =========== levels =========================                
-                I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c, i in e_i     COLS #a, #o;");
                 Table table = Globals.lastDecompTable;
                 double ylevel2011 = 499d; double ylevel2012 = 504d;
                 double ylevel2011b = 502d; double ylevel2012b = 501d;
@@ -8268,7 +8293,7 @@ namespace UnitTests
                 if (j != 2)
                 {
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[y]");
                     Assert.AreEqual(table.Get(i, 2).number, ylevel2011, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, ylevel2012, 0.0001);                    
                 }
@@ -8284,12 +8309,7 @@ namespace UnitTests
                 {
                     Assert.AreEqual(table.Get(i, 2).number, -ylevel2011b, 0.0001);  //res
                     Assert.AreEqual(table.Get(i, 3).number, -ylevel2012b, 0.0001);  //res
-                }
-                // -------------------------------------------------------------                
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, 402.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 397.0000d, 0.0001);
+                }                
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
@@ -8305,15 +8325,15 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
                 Assert.AreEqual(table.Get(i, 2).number, 89.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 91.0000d, 0.0001);
-
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // if(j==2) Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // -------------------------------------------------------------                
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
+                Assert.AreEqual(table.Get(i, 2).number, 402.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, 397.0000d, 0.0001);
+                                
 
                 // =========== differences, decomposed =========================                
-                I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK x1 in e2, x3 in e1     COLS #a, #o;");
+                I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c, i in e_i     COLS #a, #o;");
                 table = Globals.lastDecompTable;
                                 
                 double ydif2011 = -2d; double ydif2012 = 5d;
@@ -8326,7 +8346,7 @@ namespace UnitTests
                 if (j != 2)
                 {
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[y]");
                     Assert.AreEqual(table.Get(i, 2).number, ydif2011, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, ydif2012, 0.0001);                    
                 }
@@ -8342,12 +8362,7 @@ namespace UnitTests
                 {
                     Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
-                }
-                // -------------------------------------------------------------                
-                i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "c");
-                Assert.AreEqual(table.Get(i, 2).number, -2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
+                }                
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
@@ -8363,6 +8378,11 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
                 Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, -2.0000d, 0.0001);
+                // -------------------------------------------------------------                
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
+                Assert.AreEqual(table.Get(i, 2).number, -2.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
             }
         }
 

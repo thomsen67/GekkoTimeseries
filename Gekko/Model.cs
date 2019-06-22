@@ -387,7 +387,8 @@ namespace Gekko
 
     public class ModelGams
     {
-        public Dictionary<string, List<ModelGamsEquation>> equations = null;
+        public Dictionary<string, List<ModelGamsEquation>> equationsByVarname = null;
+        public Dictionary<string, List<ModelGamsEquation>> equationsByEqname = null;
     }
 
     public class ModelGamsEquation

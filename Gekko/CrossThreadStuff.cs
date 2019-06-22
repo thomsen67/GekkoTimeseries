@@ -63,7 +63,7 @@ namespace Gekko
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     count++;
-                    if (count > 0) continue;
+                    //if (count > 0) continue;
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -75,17 +75,9 @@ namespace Gekko
 
                         if (decompItem.expression == null)
                         {
-                            if (Program.modelGams.equations != null)
-                            {
-                                ModelGamsEquation found = Program.DecompEvalGams(decompItem.varname);
-                                decompItem.expression = Globals.expression;
-                                decompItem.expressionText = found.lhs + " = " + found.rhs;
-                            }
-                            else
-                            {
-                                G.Writeln2("*** ERROR: No GAMS equations given");
-                                throw new GekkoException();
-                            }
+                            ModelGamsEquation found = Program.DecompEvalGams(decompItem.eqname, decompItem.varname);
+                            decompItem.expression = Globals.expression;
+                            decompItem.expressionText = found.lhs + " = " + found.rhs;
                         }
                         else
                         {

@@ -117,6 +117,12 @@ namespace Gekko
         public int evals = 0;  //!!!!!!! do not change
     }
 
+    //public class EquationsStorage
+    //{
+    //    Dictionary<string, List<ModelGamsEquation>> equationsByVarname = new Dictionary<string, List<ModelGamsEquation>>();
+    //    Dictionary<string, ModelGamsEquation> equationsByEqname = new Dictionary<string, ModelGamsEquation>();
+    //}
+
     public class GekkoArg
     {
         public Func<GekkoSmpl, IVariable> f1 = null;
@@ -12172,7 +12178,7 @@ namespace Gekko
             foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<string> x1 = O.Restrict(liv.varname as List, false, true, false, false);
+                List<string> x1 = O.Restrict(liv.varname as List, false, true, false, true);
                 List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
                 DecompItemsString temp = new DecompItemsString();
                 if (x1 != null) temp.varname = x1[0];
@@ -12403,9 +12409,9 @@ namespace Gekko
                         G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
                         throw new GekkoException();
                     }
-                    if (Program.modelGams.equations != null)
+                    if (Program.modelGams.equationsByVarname != null)
                     {
-                        ModelGamsEquation found = DecompEvalGams(decompOptions.variable);
+                        ModelGamsEquation found = DecompEvalGams(null, decompOptions.variable);
                         decompOptions.expression = Globals.expression;
                         decompOptions.expressionOld = found.lhs + " = " + found.rhs;
                     }
@@ -12557,19 +12563,38 @@ namespace Gekko
             return found;
         }
 
-        public static ModelGamsEquation DecompEvalGams(string variable)
+        public static ModelGamsEquation DecompEvalGams(string eqname, string varname)
         {
-            List<ModelGamsEquation> eqs = GetGamsEquations(variable);
-            if (eqs == null || eqs.Count == 0)
+            List<ModelGamsEquation> eqs = null;
+            ModelGamsEquation found = null;
+            if (eqname != null)
             {
-                G.Writeln2("*** ERROR: Variable '" + variable + "' was not found");
-                throw new GekkoException();
+                eqs = GetGamsEquationsByEqname(eqname);
+                if (eqs == null || eqs.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: Equation '" + varname + "' was not found");
+                    throw new GekkoException();
+                }
+                if (eqs.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: Internal error #809735208375");
+                }
+                found = eqs[0];  //pick the first one
             }
-            if (eqs.Count > 1)
+            else
             {
-                G.Writeln2("+++ WARNING: Variable '" + variable + "' appears in several equations, first one is picked");
-            }
-            ModelGamsEquation found = eqs[0];  //pick the first one
+                eqs = GetGamsEquationsByVarname(varname);
+                if (eqs == null || eqs.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: Variable '" + varname + "' was not found");
+                    throw new GekkoException();
+                }
+                if (eqs.Count > 1)
+                {
+                    G.Writeln2("+++ WARNING: Variable '" + varname + "' appears in several equations, first one is picked");
+                }
+                found = eqs[0];  //pick the first one
+            }           
 
             string rhs = found.rhs.Trim();
             string lhs = found.lhs.Trim();            
@@ -12630,9 +12655,25 @@ namespace Gekko
                 return "O.Add(" + Globals.smpl + ", " + lhs + ", O.Negate(" + Globals.smpl + ", (" + rhs + ")))";
         }
 
-        private static List<ModelGamsEquation> GetGamsEquations(string variable)
+        private static List<ModelGamsEquation> GetGamsEquationsByVarname(string variable)
         {
-            List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(variable, out eqs);
+            if (Program.modelGams.equationsByVarname == null || Program.modelGams.equationsByVarname.Count == 0)
+            {
+                G.Writeln2("*** ERROR: No GAMS equations found");
+                throw new GekkoException();
+            }
+            List<ModelGamsEquation> eqs = null; Program.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
+            return eqs;
+        }
+
+        private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable)
+        {
+            if (Program.modelGams.equationsByEqname == null || Program.modelGams.equationsByEqname.Count == 0)
+            {
+                G.Writeln2("*** ERROR: No GAMS equations found");
+                throw new GekkoException();
+            }
+            List<ModelGamsEquation> eqs = null; Program.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
         }
 
@@ -16473,7 +16514,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (Program.modelGams?.equations != null)
+                    if (Program.modelGams?.equationsByVarname != null)
                     {
                         note = "+++ NOTE: There is a GAMS model loaded, perhaps you should use 'OPTION model type = gams;'?";
                     }
@@ -16652,7 +16693,7 @@ namespace Gekko
 
             if (Program.modelGams != null)
             {
-                if (Program.modelGams.equations != null)
+                if (Program.modelGams.equationsByVarname != null)
                 {
                     eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, var, varnameWithoutFreq, eqsPrinted);
                 }
@@ -16681,7 +16722,7 @@ namespace Gekko
 
         public static bool HasGamsEquation(string var)
         {
-            return Program.modelGams?.equations != null && Program.modelGams.equations.ContainsKey(var);
+            return Program.modelGams?.equationsByVarname != null && Program.modelGams.equationsByVarname.ContainsKey(var);
         }
 
         private static bool DispHelperShowGamsEquations(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
@@ -16689,7 +16730,7 @@ namespace Gekko
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
 
             GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equations)
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equationsByVarname)
             {
                 foreach (ModelGamsEquation e5 in e4.Value)
                 {
@@ -16721,7 +16762,7 @@ namespace Gekko
             }
 
             //List<ModelGamsEquation> eqs = null; Program.modelGams.equations.TryGetValue(varnameWithoutFreqAndIndex, out eqs);
-            List<ModelGamsEquation> eqs = GetGamsEquations(varnameWithoutFreqAndIndex);
+            List<ModelGamsEquation> eqs = GetGamsEquationsByVarname(varnameWithoutFreqAndIndex);
 
 
             if (G.IsUnitTesting())
@@ -17025,7 +17066,7 @@ namespace Gekko
                 if (token.type == ETokenType.Word)
                 {
                     //List<ModelGamsEquation> e3 = null; Program.modelGams.equations.TryGetValue(token.s, out e3);
-                    List<ModelGamsEquation> e3 = GetGamsEquations(token.s);
+                    List<ModelGamsEquation> e3 = GetGamsEquationsByVarname(token.s);
 
                     if (e3 != null)
                     {
@@ -19141,7 +19182,7 @@ namespace Gekko
                     xx.Add(varName, e2);
                 }
             }
-            Program.modelGams.equations = xx;
+            Program.modelGams.equationsByVarname = xx;
             
             G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
             G.Writeln("Read " + eqLines.Count + " lines from " + fileName);
@@ -19165,7 +19206,8 @@ namespace Gekko
             var tags4 = new List<string>() { "*" };
 
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
-            Dictionary<string, List<ModelGamsEquation>> equations = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, List<ModelGamsEquation>> equationsByVarname = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, List<ModelGamsEquation>> equationsByEqname = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
             GekkoDictionary<string, string> dependents = null;
             IVariable lhsList = o.opt_dep;
@@ -19250,16 +19292,17 @@ namespace Gekko
                     }
                     else
                     {
-                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equations, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
+                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
                     }
                 }
             }
             Program.modelGams = new ModelGams();
-            Program.modelGams.equations = equations;
+            Program.modelGams.equationsByVarname = equationsByVarname;
+            Program.modelGams.equationsByEqname = equationsByEqname;
 
             G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
             G.Writeln("Read " + counter + " lines from " + fileName);
-            G.Writeln("Found " + equations.Count + " distinct equations (use DISP to display them)");
+            G.Writeln("Found " + equationsByVarname.Count + " distinct equations (use DISP to display them)");
             if (problems.Count > 0)
             {
                 G.Writeln("There were the following problems while reading the model:");
@@ -19277,7 +19320,7 @@ namespace Gekko
 
         }
 
-        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
+        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
         {
 
 
@@ -19539,7 +19582,7 @@ namespace Gekko
             }
 
             bool fromList = false;
-            string lhsVariable = ReadGamsModelGetLhsName(equations, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
+            string lhsVariable = ReadGamsModelGetLhsName(equations, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
             string s = null;
             if (fromList) s = ", designated from list";
             if (lhsVariable == null) lhsVariable = "[not identified]";
@@ -19622,7 +19665,7 @@ namespace Gekko
 
         }
 
-        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
+        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
         {
 
             string lhs = null; GetLhsVariable(lhsTokensGams2, ref lhs);
@@ -19654,6 +19697,18 @@ namespace Gekko
                     List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
                     e2.Add(e);
                     equations.Add(varnameFound, e2);
+                }
+
+                if (equationsByEqname.ContainsKey(eqnameGams))
+                {
+                    G.Writeln2("*** ERROR: The equation name '" + eqnameGams + "' appears multiple times");
+                    throw new GekkoException();
+                }
+                else
+                {
+                    List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
+                    e2.Add(e);
+                    equationsByEqname.Add(eqnameGams, e2);
                 }
             }
             return varnameFound;
