@@ -183,10 +183,10 @@ namespace Gekko
             }
         }
 
-        public Series Get(string s)
+        public bool Remove(string s)
         {
-            return storage[s];
-        }        
+            return storage.Remove(s);
+        }
     }
 
     public class MyCustomAttribute : Attribute

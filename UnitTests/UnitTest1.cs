@@ -8220,13 +8220,13 @@ namespace UnitTests
                 //   v[y] |                               1.56             -3.9           
                 //      w |                               0.1              -0.2                
                 // -------+--------------------------------------------------------------------------------
-                //                                        COMBINED via v[c], multiply the second with -2/2 = -1
+                //                                        COMBINED via v[c], multiply the second with -(-2/2) = 1
                 // -------+--------------------------------------------------------------------------------
                 //   v[y] |                              -2                 5         
                 //    RES |                               4                -6
-                //    RES |                               3.66             -9.1    *
-                //   v[y] |                              -1.56              3.9    * insertede      
-                //      w |                              -0.1               0.2    *
+                //    RES |                              -3.66              9.1    ]
+                //   v[y] |                               1.56             -3.9    ] inserted     
+                //      w |                               0.1              -0.2    ]
                 // g1[+1] |                              -0.2              -0.4
                 // g2[-1] |                              -0.8              -1.6
                 //      i |                               1                -2
@@ -8272,16 +8272,10 @@ namespace UnitTests
                 if (j == 1) lhs = "v[y] in v[y] = v[c] + i + 0.2*g1[+1] + 0.8*g2[-1]";
                 else if (j == 2) lhs = "-(v[c] + i + 0.2*g1[+1] + 0.8*g2[-1])";
                 int i = 0;
-
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+                                
 
                 // =========== levels =========================                
-                I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c, i in e_i     COLS #a, #o;");
+                I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c     COLS #a, #o;");  //, i in e_i
                 Table table = Globals.lastDecompTable;
                 double ylevel2011 = 499d; double ylevel2012 = 504d;
                 double ylevel2011b = 502d; double ylevel2012b = 501d;
@@ -8330,14 +8324,20 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
                 Assert.AreEqual(table.Get(i, 2).number, 402.0000d, 0.0001);
                 Assert.AreEqual(table.Get(i, 3).number, 397.0000d, 0.0001);
-                                
+
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                //if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
                 // =========== differences, decomposed =========================                
-                I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c, i in e_i     COLS #a, #o;");
+                I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c       COLS #a, #o;");   //, i in e_i
                 table = Globals.lastDecompTable;
                                 
-                double ydif2011 = -2d; double ydif2012 = 5d;
-                double ydif2011b = 2d; double ydif2012b = -1d;
+                double ydif2011 = -0.44d; double ydif2012 = 1.1d;
+                double ydif2011b = -1.66d; double ydif2012b   = 8.1d;
 
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).date, "2011");
@@ -8355,8 +8355,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 2).number, 4.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, -6.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 2).number, 0.34d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, 3.1d, 0.0001);
                 }
                 else
                 {
@@ -8381,8 +8381,8 @@ namespace UnitTests
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
-                Assert.AreEqual(table.Get(i, 2).number, -2.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 5.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
             }
         }
 
