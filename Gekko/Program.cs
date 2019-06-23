@@ -36222,7 +36222,7 @@ namespace Gekko
 
         }
 
-        public static DecompData Decompose2(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth)
+        public static DecompData Decompose2(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName)
         {
             //
             //
@@ -36415,7 +36415,7 @@ namespace Gekko
                     y0_series = y0a.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                 }
 
-                d.cellsQuo.storage.Add(GetDecompExpressionName(), y0_series);
+                d.cellsQuo.storage.Add(residualName, y0_series);
 
                 Series y0aRef_series = null;
                 Series y0Ref_series = null;
@@ -36440,7 +36440,7 @@ namespace Gekko
                     {
                         y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                     }
-                    d.cellsRef.storage.Add(GetDecompExpressionName(), y0Ref_series);
+                    d.cellsRef.storage.Add(residualName, y0Ref_series);
                 }
 
                 double eps = Globals.newtonSmallNumber;
@@ -36632,9 +36632,9 @@ namespace Gekko
                                 d.cellsContribDRef[s].SetData(t2, dContribDRef);
                             }
                         }
-                        d.cellsContribD[GetDecompExpressionName()].SetData(t2, -(d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2.Add(-1))));
-                        d.cellsContribDRef[GetDecompExpressionName()].SetData(t2, -(d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2.Add(-1))));
-                        d.cellsContribM[GetDecompExpressionName()].SetData(t2, -(d.cellsQuo[GetDecompExpressionName()].GetDataSimple(t2) - d.cellsRef[GetDecompExpressionName()].GetDataSimple(t2)));
+                        d.cellsContribD[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsQuo[residualName].GetDataSimple(t2.Add(-1))));
+                        d.cellsContribDRef[residualName].SetData(t2, -(d.cellsRef[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2.Add(-1))));
+                        d.cellsContribM[residualName].SetData(t2, -(d.cellsQuo[residualName].GetDataSimple(t2) - d.cellsRef[residualName].GetDataSimple(t2)));
                     }
                 }
             }
@@ -36654,9 +36654,10 @@ namespace Gekko
 
         }
 
-        private static string GetDecompExpressionName()
+        public static string GetDecompExpressionName(int counter)
         {
-            return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "¤[0]";
+            if (counter == 0) return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "¤[0]";
+            else return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "_link" + counter + "¤[0]";
         }
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)

@@ -8272,7 +8272,13 @@ namespace UnitTests
                 if (j == 1) lhs = "v[y] in v[y] = v[c] + i + 0.2*g1[+1] + 0.8*g2[-1]";
                 else if (j == 2) lhs = "-(v[c] + i + 0.2*g1[+1] + 0.8*g2[-1])";
                 int i = 0;
-                                
+
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                //if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 
                 // =========== levels =========================                
                 I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c     COLS #a, #o;");  //, i in e_i
@@ -8293,6 +8299,19 @@ namespace UnitTests
                 }
                 // -------------------------------------------------------------                
                 i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1");
+                if (j != 2)
+                {
+                    Assert.IsTrue(G.isNumericalError(table.Get(i, 2).number));
+                    Assert.IsTrue(G.isNumericalError(table.Get(i, 3).number));
+                }
+                else
+                {
+                    Assert.IsTrue(G.isNumericalError(table.Get(i, 2).number));  //res
+                    Assert.IsTrue(G.isNumericalError(table.Get(i, 3).number));  //res
+                }
+                // -------------------------------------------------------------                
+                i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
                 if (j != 2)
                 {
@@ -8304,7 +8323,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(i, 2).number, -ylevel2011b, 0.0001);  //res
                     Assert.AreEqual(table.Get(i, 3).number, -ylevel2012b, 0.0001);  //res
                 }                
-                // -------------------------------------------------------------                
+                // -------------------------------------------------------------   
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
                 Assert.AreEqual(table.Get(i, 2).number, 11.0000d, 0.0001);
@@ -8337,7 +8356,7 @@ namespace UnitTests
                 table = Globals.lastDecompTable;
                                 
                 double ydif2011 = -0.44d; double ydif2012 = 1.1d;
-                double ydif2011b = -1.66d; double ydif2012b   = 8.1d;
+                double ydif2011b = -3.66d; double ydif2012b   = 9.1d;
 
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).date, "2011");
@@ -8352,16 +8371,29 @@ namespace UnitTests
                 }
                 // -------------------------------------------------------------                
                 i++;
-                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1");
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 2).number, 0.34d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 3.1d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 2).number, -3.66d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, 9.1d, 0.0001);
                 }
                 else
                 {
                     Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
                     Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
+                }
+                // -------------------------------------------------------------                
+                i++;
+                Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
+                if (j != 2)
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, 4d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -6d, 0.0001);
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, 2d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -1d, 0.0001);
                 }                
                 // -------------------------------------------------------------                
                 i++;

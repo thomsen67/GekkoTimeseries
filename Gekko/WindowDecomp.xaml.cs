@@ -1272,9 +1272,12 @@ namespace Gekko
                 List<DecompData> decompDatas = new List<DecompData>();
                 //List<List<string>> varsForTables = new List<List<string>>();
                 List<string> expressionTexts = new List<string>();
+                int counter2 = -1;
                 foreach (DecompItemsString items in this.decompOptions2.link)
                 {
-                    DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(code1));
+                    counter2++;
+                    string residualName = Program.GetDecompExpressionName(counter2);
+                    DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(code1), residualName);
                     decompDatas.Add(decompData);                    
                     //varsForTables.Add(Program.DecompGetVars(decompData, items.varname, items.expressionText));
                 }
