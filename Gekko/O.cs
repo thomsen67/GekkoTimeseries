@@ -8333,6 +8333,7 @@ namespace Gekko
             public string opt_units = null;
             public string opt_stamp = null;
             public string opt_dyn = null;
+            public string opt_lsfunc = null;  //left-side function
         }
 
         public class Accept

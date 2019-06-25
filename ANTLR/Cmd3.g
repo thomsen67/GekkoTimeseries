@@ -2100,7 +2100,7 @@ wildRange:                  expression doubleDot2 expression -> ^(ASTRANGEGENERA
 
 leftSide:                   leftSideDollarExpression -> leftSideDollarExpression;
 
-leftSideDollarExpression:   listFile
+leftSideDollarExpression:   listFile 
                           | (bankvarnameIndexer -> bankvarnameIndexer) (DOLLAR lbla=dollarConditional -> ^(ASTDOLLAR $leftSideDollarExpression $lbla))*								
 						    ; 						
 
@@ -2573,7 +2573,7 @@ assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTL
 						  | assignmentType seriesOpt1? leftSide hashEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2  
 						  | assignmentType seriesOpt1? leftSide hashEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTHASH2
 
-
+						  
 						  | assignmentType leftSide seriesOpt1 EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
 						  | assignmentType leftSide seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER
 						  | assignmentType leftSide seriesOpt1 PLUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLUS2
@@ -2591,17 +2591,19 @@ assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTL
 						  | assignmentType leftSide seriesOpt1 hashEqual nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2  
 						  | assignmentType leftSide seriesOpt1 hashEqual expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTHASH2
 						  
-						  //handle y<2001 2005>=100, where '>=' is a token
+						    //handle y<2001 2005>=100, where '>=' is a token, also with pch(y) etc. on left-hand side (naked list not allowed in that case)
 						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER 
-						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER
-						  						  
+						  | assignmentType leftSide seriesOpt1a ISLARGEROREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER						  
+						  | assignmentType ident leftParenGlue leftSide RIGHTPAREN seriesOpt1a ISLARGEROREQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1a) assignmentType ASTPLACEHOLDER
+                            
+							//handle dlog(x) = ... etc. Nakedlist not allowed here, only expression.
+						  | assignmentType seriesOpt1? ident leftParenGlue leftSide RIGHTPAREN EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER						  
+						  | assignmentType ident leftParenGlue leftSide RIGHTPAREN seriesOpt1 EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide? ident) expression ^(ASTPLACEHOLDER seriesOpt1) assignmentType ASTPLACEHOLDER						  						  						  
 						    ;
 
-							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 just fine which is enough.
-assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType				 
+							//using += etc. will not be good in map def, too confusing. You can use #m.ts += 1 or dlog(#m.ts) = ... just fine which is enough.
+assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType				                         
 						    ;
-
-
 
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;

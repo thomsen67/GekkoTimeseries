@@ -3783,7 +3783,7 @@ namespace Gekko.Parser.Gek
                     case "ASTASSIGNMENT":
                         {
                             string number = "_" + ++Globals.counter;
-
+                            
                             string operatorType = "ASTPLACEHOLDER";
                             if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
 
@@ -3829,7 +3829,12 @@ namespace Gekko.Parser.Gek
                             else if (operatorType == "ASTHASH2")
                             {
                                 sb.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
-                            }                            
+                            }
+
+                            if (node[0].ChildrenCount() > 1)  //left-side function like pch(x) = 5
+                            {
+                                node.Code.A("o" + Num(node) + ".opt_lsfunc = `" + node[0][1][0].Text + "`;" + G.NL);
+                            }
 
                             if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
                             {
@@ -4625,36 +4630,19 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTLEFTSIDE":
-                        {
-                            //if (node[1] != null)
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".label = " + node[1].Code + ";" + G.NL);
-                            //}
-                            node.Code.A(node[0].Code + G.NL);
-                            
+                        {                            
+                            node.Code.A(node[0].Code + G.NL);                            
                         }
                         break;
                     case "ASTOPENHELPER":
                         {
-                            //string as2 = null;
-                            //if (node[1].ChildrenCount() == 1)
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".openFileNames.Add(new List<string>() {O.ConvertToString(" + node[0].Code + "), O.ConvertToString(" + node[1][0].Code + ")});" + G.NL);
-                            //}
-                            //else
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".openFileNames.Add(new List<string>() {O.ConvertToString(" + node[0].Code + "), null});" + G.NL);
-                            //}
-
                             node.Code.A("o" + Num(node) + ".openFileNames = "+ node[0].Code + ";" + G.NL);
-
                             string as2 = "null";
                             if (node[1][0] != null)
                             {
                                 as2 = node[1][0].Code.ToString();
                             }                            
-                            node.Code.A("o" + Num(node) + ".openFileNamesAs = " + as2 + ";" + G.NL);
-                            
+                            node.Code.A("o" + Num(node) + ".openFileNamesAs = " + as2 + ";" + G.NL);                            
                         }
                         break;
                     case "ASTOPT_":
