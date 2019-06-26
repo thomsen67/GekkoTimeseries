@@ -287,6 +287,10 @@ namespace Gekko
         public const string operator_m = "m";
         public const string operator_q = "q";
         public const string operator_mp = "mp";
+        public const string operator_l = "l";
+        public const string operator_dl = "dl";
+        public const string operator_rl = "rl";
+        public const string operator_rdl = "rdl";
 
         public const string fixedTimelessText = "all periods (timeless)";
         public const string fixedParameterText = "everything fixed (parameter)";

@@ -459,6 +459,8 @@ namespace Gekko
         m,
         q,
         mp,
+        dl,  //dlog()
+        l,   //log()
         n
     }
 
@@ -28954,6 +28956,7 @@ namespace Gekko
                             isPchType = true;
                             width = options.print_fields_pwidth;
                             dec = options.print_fields_pdec;
+                            if (operator2 == Globals.operator_dl || operator2 == Globals.operator_rdl) dec = dec + 2;
                         }
 
                         // ---------------------------------------------
@@ -31738,6 +31741,7 @@ namespace Gekko
                     isPchType = true;
                     width = options.print_fields_pwidth;
                     dec = options.print_fields_pdec;
+                    if (operator2 == Globals.operator_dl || operator2 == Globals.operator_rdl) dec = dec + 2;
                 }
 
                 // ---------------------------------------------
@@ -31805,7 +31809,7 @@ namespace Gekko
 
         private static bool IsLevelOperator(string operator2)
         {
-            return operator2 == "" || operator2 == "n" || operator2 == "d" || operator2 == Globals.operator_r || operator2 == Globals.operator_rn || operator2 == Globals.operator_rd || operator2 == "m";
+            return operator2 == "" || operator2 == "n" || operator2 == "d" || operator2 == Globals.operator_r || operator2 == Globals.operator_rn || operator2 == Globals.operator_rd || operator2 == "m" || operator2 == Globals.operator_l || operator2 == Globals.operator_rl;
         }
 
         private static string GetOperatorLabel(string operator2, bool isVerbose, bool useExoEndoIndicator, bool identicalCodes)
@@ -31841,6 +31845,9 @@ namespace Gekko
                 if (isVerbose) operatorLabel = "%";
             }
             else if (operator2 == "mp") operatorLabel = "mdif%";  //MULPRT<gdif>
+            else if (operator2 == Globals.operator_dl) operatorLabel = "dlog";
+            else if (operator2 == Globals.operator_rdl) operatorLabel = "@dlog";
+
             if (!isVerbose) operatorLabel = "[" + operatorLabel + "]";
             if (identicalCodes && operatorLabel == "[lev]") operatorLabel = "";  //no need for a [lev] on a PRT<nopch>.
             return operatorLabel;
@@ -31951,7 +31958,7 @@ namespace Gekko
                 else
                 {
                     G.Writeln();
-                    G.Writeln("*** ERROR: Sorry, internal Gekko error related to display codes");
+                    G.Writeln("*** ERROR: Sorry, internal Gekko error related to operator");
                     throw new GekkoException();
                 }
             }
@@ -31971,7 +31978,7 @@ namespace Gekko
 
         public static bool IsOperatorShort(string operator2)
         {
-            return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp");
+            return G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, "m") || G.Equal(operator2, "q") || G.Equal(operator2, "mp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl);
         }
 
         public static bool IsOperatorShortMultiplier(string operator2)
@@ -31981,12 +31988,12 @@ namespace Gekko
 
         public static bool IsOperatorShortBase(string operator2)
         {
-            return G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp);
+            return G.Equal(operator2, Globals.operator_r) || G.Equal(operator2, Globals.operator_rn) || G.Equal(operator2, Globals.operator_rd) || G.Equal(operator2, Globals.operator_rp) || G.Equal(operator2, Globals.operator_rdp) || G.Equal(operator2, Globals.operator_rl) || G.Equal(operator2, Globals.operator_rdl);
         }
 
         public static bool IsOperatorShortWork(string operator2)
         {
-            return operator2 == null || G.Equal(operator2, "") || G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp");
+            return operator2 == null || G.Equal(operator2, "") || G.Equal(operator2, "n") || G.Equal(operator2, "d") || G.Equal(operator2, "p") || G.Equal(operator2, "dp") || G.Equal(operator2, Globals.operator_l) || G.Equal(operator2, Globals.operator_dl);
         }
 
         private static bool IsOperatorLongNo(string operator2)
@@ -32504,114 +32511,7 @@ namespace Gekko
             }
             return EMissingType.Ok;
         }
-
-        public static PrtOptionsHelper ExtractPrintOptions(string printOptions)
-        {
-            PrtOptionsHelper po = new PrtOptionsHelper();
-            if (true)
-            {
-                string firstChar = "";
-                switch (printOptions.ToLower())
-                {
-                    case "":
-                    case "n":
-                        po.isMultiplier = false;
-                        po.isBaseline = false;
-                        po.isLog = false;
-                        po.isPch = false;
-                        po.isDlog = false;
-                        po.isDiff = false;
-                        po.isLevel = true;
-                        break;
-                    case "m":
-                        po.isMultiplier = true;
-                        po.isBaseline = false;
-                        po.isLog = false;
-                        po.isPch = false;
-                        po.isDlog = false;
-                        po.isDiff = true;
-                        po.isLevel = false;
-                        break;
-                    case "q":
-                        po.isMultiplier = true;
-                        po.isBaseline = false;
-                        po.isLog = false;
-                        po.isPch = true;
-                        po.isDlog = false;
-                        po.isDiff = false;
-                        po.isLevel = false;
-                        break;
-                    case "d":
-                        po.isMultiplier = false;
-                        po.isBaseline = false;
-                        po.isLog = false;
-                        po.isPch = false;
-                        po.isDlog = false;
-                        po.isDiff = true;
-                        po.isLevel = false;
-                        break;
-                    case "p":
-                        po.isMultiplier = false;
-                        po.isBaseline = false;
-                        po.isLog = false;
-                        po.isPch = true;
-                        po.isDlog = false;
-                        po.isDiff = false;
-                        po.isLevel = false;
-                        break;
-                    case Globals.operator_r:
-                    case Globals.operator_rn:
-                        po.isMultiplier = false;
-                        po.isBaseline = true;
-                        po.isLog = false;
-                        po.isPch = false;
-                        po.isDlog = false;
-                        po.isDiff = false;
-                        po.isLevel = true;
-                        break;
-                    case Globals.operator_rd:
-                        po.isMultiplier = false;
-                        po.isBaseline = true;
-                        po.isLog = false;
-                        po.isPch = false;
-                        po.isDlog = false;
-                        po.isDiff = true;
-                        po.isLevel = false;
-                        break;
-                    case Globals.operator_rp:
-                        po.isMultiplier = false;
-                        po.isBaseline = true;
-                        po.isLog = false;
-                        po.isPch = true;
-                        po.isDlog = false;
-                        po.isDiff = false;
-                        po.isLevel = false;
-                        break;
-                    case "dp":
-                        po.isDp = true;
-                        break;
-                    case "mp":  //"bmp" is not meaningful
-                        po.isMp = true;
-                        break;
-                    case Globals.operator_rdp:
-                        po.isDp = true;
-                        po.isBaseline = true;
-                        break;
-                    default:
-                        G.Writeln2("*** ERROR: print-code " + printOptions + " is not legal");
-                        throw new GekkoException();
-                        break;
-                }
-                if (!(po.isLog || po.isPch || po.isDlog || po.isDiff))
-                {
-                    po.isLevel = true;
-                }
-            }
-            return po;
-        }
-
-
-
+        
 
         private static void PrintFirstLineLabels(List<string> rememberWriteStatements, List<string> graphVarsLabels, PrintHelper ph, int numberOfLabelsRows, string[,] labelsArray, List<string> endoExoIndicators)
         {
@@ -34831,6 +34731,26 @@ namespace Gekko
             else if (operator3 == "mp")
             {
                 var1 = PchFunction(x, xLag) - PchFunction(y, yLag);
+                varPch = double.PositiveInfinity;
+            }
+            else if (operator3 == Globals.operator_l)
+            {
+                var1 = Math.Log(x);
+                varPch = double.PositiveInfinity;
+            }
+            else if (operator3 == Globals.operator_dl)
+            {
+                var1 = Math.Log(x) - Math.Log(xLag);
+                varPch = double.PositiveInfinity;
+            }
+            else if (operator3 == Globals.operator_rl)
+            {
+                var1 = Math.Log(y);
+                varPch = double.PositiveInfinity;
+            }
+            else if (operator3 == Globals.operator_rdl)
+            {
+                var1 = Math.Log(y) - Math.Log(yLag);
                 varPch = double.PositiveInfinity;
             }
             else

@@ -3812,6 +3812,15 @@ namespace Gekko
                 {
                     lhsData[i] = lhsData[i - 1] * (lhsDataOriginal[i] / lhsDataOriginal[i - 1] + rhsData[i] / 100d);
                 }
+                else if (operatorType == ESeriesUpdTypes.dl)  //dlog(x) = ...
+                {
+                    //dlog(y) = x --> log(y) = log(y.1) + x --> y = y.1 * exp(x)
+                    lhsData[i] = lhsData[i - 1] * Math.Exp(rhsData[i]);
+                }
+                else if (operatorType == ESeriesUpdTypes.l)  //log(x) = ...
+                {                    
+                    lhsData[i] = Math.Exp(rhsData[i]);
+                }
                 i++;
             }
 
@@ -3820,7 +3829,7 @@ namespace Gekko
 
         private static ESeriesUpdTypes GetOperatorType(Assignment options)
         {
-            if (options == null) return ESeriesUpdTypes.none;
+            if (options == null) return ESeriesUpdTypes.none;  //will this ever happen?
             ESeriesUpdTypes operatorType = ESeriesUpdTypes.none;
             if (G.Equal(options.opt_d, "yes")) operatorType = ESeriesUpdTypes.d;            
             else if (G.Equal(options.opt_p, "yes")) operatorType = ESeriesUpdTypes.p;
@@ -3828,6 +3837,35 @@ namespace Gekko
             else if (G.Equal(options.opt_q, "yes")) operatorType = ESeriesUpdTypes.q;
             else if (G.Equal(options.opt_mp, "yes")) operatorType = ESeriesUpdTypes.mp;
             else if (G.Equal(options.opt_n, "yes")) operatorType = ESeriesUpdTypes.n;
+            if (options.opt_lsfunc != null)
+            {
+                if (operatorType != ESeriesUpdTypes.none)
+                {
+                    G.Writeln2("*** ERROR: You cannot use a left-side function ('" + options.opt_lsfunc + "') together with operators");
+                    throw new GekkoException();
+                }
+                if (G.Equal(options.opt_lsfunc, "dif") || G.Equal(options.opt_lsfunc, "diff"))
+                {
+                    operatorType = ESeriesUpdTypes.d;
+                }
+                else if (G.Equal(options.opt_lsfunc, "pch"))
+                {
+                    operatorType = ESeriesUpdTypes.p;
+                }
+                else if (G.Equal(options.opt_lsfunc, "log"))
+                {
+                    operatorType = ESeriesUpdTypes.l;
+                }
+                else if (G.Equal(options.opt_lsfunc, "dlog"))
+                {
+                    operatorType = ESeriesUpdTypes.dl;
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Left-side function ('" + options.opt_lsfunc + "') is not implemented");
+                    throw new GekkoException();
+                }
+            }
             return operatorType;
         }
 
@@ -9822,7 +9860,23 @@ namespace Gekko
                 else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_mp))
                 {
                     rv = new List<int>(); rv.Add(0); rv.Add(1);
-                }                
+                }
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_l))
+                {
+                    rv = new List<int>(); rv.Add(0);
+                }
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_dl))
+                {
+                    rv = new List<int>(); rv.Add(0);
+                }
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rl))
+                {
+                    rv = new List<int>(); rv.Add(1);
+                }
+                else if (G.Equal(tableOrGraphGlobalOperator, Globals.operator_rdl))
+                {
+                    rv = new List<int>(); rv.Add(1);
+                }
                 else
                 {
                     bool usesBase = false;

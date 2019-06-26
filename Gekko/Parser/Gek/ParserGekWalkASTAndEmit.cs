@@ -4788,6 +4788,33 @@ namespace Gekko.Parser.Gek
                             node.Code.A(AddOperator("p", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
+
+
+
+
+                    case "ASTL":
+                        {
+                            node.Code.A(AddOperator(Globals.operator_l, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                        }
+                        break;
+                    case "ASTDL":
+                        {
+                            node.Code.A(AddOperator(Globals.operator_dl, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                        }
+                        break;
+                    case "ASTSL":
+                        {
+                            node.Code.A(AddOperator(Globals.operator_rl, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                        }
+                        break;
+                    case "ASTSDL":
+                        {
+                            node.Code.A(AddOperator(Globals.operator_rdl, node[0].Code.ToString(), node.Parent.Parent.Text, node));
+                        }
+                        break;
+
+
+
                     case "ASTPCH":
                         {
                             node.Code.A(AddOperator("pch", node[0].Code.ToString(), node.Parent.Parent.Text, node));

@@ -476,6 +476,10 @@ ASTCOMPARE2;
     ASTMODELFILE;
     ASTMODEQUESTION;
     ASTMP;
+	ASTL;
+	ASTDL;
+	ASTSL;
+	ASTSDL;
     ASTMULBK;
     ASTN;
     ASTNAME2;
@@ -607,6 +611,8 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_M;
     ASTOPT_STRING_MERGE;
     ASTOPT_STRING_MP;
+	ASTOPT_STRING_L;
+	ASTOPT_STRING_DL;
     ASTOPT_STRING_MUTE ;
 	ASTNONCURLY;
     ASTOPT_STRING_MUTE;
@@ -838,6 +844,7 @@ ASTOPT_STRING_Y2;
     ASTWRITEWITHOPTIONS;
     ASTX12A;
     ASTYES;
+	ASTYES2;
     ASTYMAX;
     ASTYMIN;
     ASTZERO;
@@ -1177,6 +1184,10 @@ Y2                    = 'Y2'                       ;
     MODEL            = 'MODEL'           ;
     MODERNLOOK       = 'MODERNLOOK'      ;
     MP               = 'MP'               ;
+	DL               = 'DL'               ;
+	L               = 'L'               ;	
+	RDL               = 'RDL'               ;
+	RL               = 'RL'               ;
     MULBK            = 'MULBK'           ;
     MULPCT           = 'MULPCT'          ;
     MULPRT           = 'MULPRT'          ;
@@ -1799,6 +1810,10 @@ d.Add("Y" ,Y);
                                         d.Add("model"   , MODEL     );
                                         d.Add("modernlook"              , MODERNLOOK);
                                         d.Add("mp" , MP);
+										d.Add("dl" , DL);
+										d.Add("l" , L);
+										d.Add("rdl" , RDL);
+										d.Add("rl" , RL);
                                         d.Add("mulbk"   , MULBK     );
                                         d.Add("mulpct"  , MULPCT    );
                                         d.Add("mulprt"  , MULPRT    );
@@ -2621,22 +2636,24 @@ assignmentType:             SER
 						  | -> ASTPLACEHOLDER  //may be empty
 						    ;
 
-seriesOpt1a               :  //so that we can handle y <2001 2005>=100; where '>=' is parsed as a token
+seriesOpt1a:                //so that we can handle y <2001 2005>=100; where '>=' is parsed as a token
 						  | leftAngle2          seriesOpt1h* -> ^(ASTOPT1 seriesOpt1h*)
 						  | leftAngleNo2 dates? seriesOpt1h* -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
                           ;
 
-seriesOpt1                : ISNOTQUAL
+seriesOpt1:                 ISNOTQUAL
 						  | leftAngle2          seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 seriesOpt1h*)
 						  | leftAngleNo2 dates? seriesOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) seriesOpt1h*)
                           ;
 
-seriesOpt1h               : D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
+seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | P (EQUAL yesNo)? -> ^(ASTOPT_STRING_P yesNo?)
 						  | M (EQUAL yesNo)? -> ^(ASTOPT_STRING_M yesNo?)
 						  | Q (EQUAL yesNo)? -> ^(ASTOPT_STRING_Q yesNo?)
 						  | MP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MP yesNo?)						
 						  | N (EQUAL yesNo)? -> ^(ASTOPT_STRING_N yesNo?)						
+						  | DL (EQUAL yesNo)? -> ^(ASTOPT_STRING_DL yesNo?)	
+						  | L (EQUAL yesNo)? -> ^(ASTOPT_STRING_L yesNo?)	
 						  | KEEP EQUAL exportType -> ^(ASTOPT_STRING_KEEP exportType)						  
                           | ROWNAMES EQUAL expression -> ^(ASTOPT_LIST_ROWNAMES expression)
                           | COLNAMES EQUAL expression -> ^(ASTOPT_LIST_COLNAMES expression)
@@ -3178,6 +3195,7 @@ prtOptionField4Helper:      width
 						  | ndec
 						  | pdec
 						  | opt2 -> ^(ASTPRTOPTION opt2)
+						  | opt2a -> ^(ASTPRTOPTION opt2a)
 						  | TYPE '=' linetypeHelper -> ^(ASTPRTELEMENTLINETYPE linetypeHelper)
 						  | DASHTYPE '=' expression -> ^(ASTPRTELEMENTDASHTYPE expression)
 						  | LINEWIDTH '=' expression -> ^(ASTPRTELEMENTLINEWIDTH expression)
@@ -3189,6 +3207,7 @@ prtOptionField4Helper:      width
 						    ;
 prtOpt1Helper:              filter						
 						  | opt2 -> ^(ASTPRTOPTION opt2)
+						  | opt2a -> ^(ASTPRTOPTION opt2a)
 						  | WIDTH EQUAL expression -> ^(ASTOPT_VAL_WIDTH expression)
 						  | DEC EQUAL expression -> ^(ASTOPT_VAL_DEC expression)
 						  | NWIDTH EQUAL expression -> ^(ASTOPT_VAL_NWIDTH expression)
@@ -3284,18 +3303,32 @@ prtOptCollapseHelper:       AVG -> ASTAVG
 						    ;
 opt2:                       optNew | optOld;							
 optOld:                     N    ('=' yesNo -> ^(ASTN yesNo) | -> ^(ASTN ASTYES))
+                   
 						  | D    ('=' yesNo -> ^(ASTD yesNo) | -> ^(ASTD  ASTYES))
 						  | P    ('=' yesNo -> ^(ASTP yesNo) | -> ^(ASTP  ASTYES))
+					
 						  | DP    ('=' yesNo -> ^(ASTDP yesNo) | -> ^(ASTDP  ASTYES))
 						  | R    ('=' yesNo -> ^(ASTS yesNo) | -> ^(ASTS  ASTYES))
 						  | RN    ('=' yesNo -> ^(ASTSN yesNo) | -> ^(ASTSN  ASTYES))
+					
 						  | RD    ('=' yesNo -> ^(ASTSD yesNo) | -> ^(ASTSD  ASTYES))
 						  | RP    ('=' yesNo -> ^(ASTSP yesNo) | -> ^(ASTSP  ASTYES))
+					
 						  | RDP    ('=' yesNo -> ^(ASTSDP yesNo) | -> ^(ASTSDP  ASTYES))
 						  | M    ('=' yesNo -> ^(ASTM yesNo) | -> ^(ASTM  ASTYES))
 						  | Q    ('=' yesNo -> ^(ASTQ yesNo) | -> ^(ASTQ  ASTYES))
 						  | MP    ('=' yesNo -> ^(ASTMP yesNo) | -> ^(ASTMP  ASTYES))
+						  ;
+
+
+
+opt2a:                        L    ('=' yesNo -> ^(ASTL yesNo) | -> ^(ASTL ASTYES))
+	                       | DL    ('=' yesNo -> ^(ASTDL yesNo) | -> ^(ASTDL  ASTYES))
+                     	  | RL    ('=' yesNo -> ^(ASTSL yesNo) | -> ^(ASTSL  ASTYES))	
+	                      | RDL    ('=' yesNo -> ^(ASTSDL yesNo) | -> ^(ASTSDL  ASTYES))
 						    ;
+
+
 optNew:                     lev
 						  | abs
 						  | dif
@@ -4433,6 +4466,10 @@ ident2: 					Ident |
   MIXED|
   MODERNLOOK|
   MP|
+  DL|
+  L|
+  RDL|
+  RL|
   MULBK|
   MULPCT|
   MUTE|
@@ -4870,6 +4907,10 @@ ident3: 					Ident |
   MIXED|
   MODERNLOOK|
   MP|
+  DL|
+  L|
+  RDL|
+  RL|
   MULBK|
   MULPCT|
   MUTE|
@@ -5251,7 +5292,7 @@ fragment H_:('h'|'H');
 fragment I_:('i'|'I');
 fragment J_:('j'|'J');
 fragment K_:('k'|'K');
-fragment L_:('l'|'L');
+//fragment L_:('l'|'L');
 fragment M_:('m'|'M');
 fragment N_:('n'|'N');
 fragment O_:('o'|'O');

@@ -3592,14 +3592,16 @@ namespace UnitTests
             _AssertSeries(First(), "x", 2005, 3d * 1.01d * 1.03d, sharedDelta);
             _AssertSeries(First(), "x", 2006, 3d * 1.01d * 1.03d * 1.05d, sharedDelta);
             _AssertSeries(First(), "x", 2007, double.NaN, sharedDelta);
-
-            //First a simple check of <p> x[a] = 3, and <p> x[#i] = 3....
-            //After this, we can be pretty sure that operators work for array-series as for normal series.
+                        
             //Then a check of left-hand functions dif(), diff(), pch(), dlog(), log()
-            //These are converted into codes <d>, <d>, <p>, <dl>, <l>, and these codes are tested too.
+            //These are converted into codes <d>, <d>, <p>, <dl>, <l>, and these codes are tested too.            
             FAIL("<2002 2004 d> dif(x[a]) = v + 0;");  //cannot combine operators
             for (int i = 0; i < 2; i++)
-            {            
+            {
+
+                //
+                // dif(x) = ...
+                //
                 I("RESET; TIME 2001 2004;");
                 I("x = series(1);");
                 I("v = 3;");
@@ -3632,6 +3634,56 @@ namespace UnitTests
                 _AssertSeries(First(), "x", new string[] { "b" }, 2003, 16d, sharedDelta);
                 _AssertSeries(First(), "x", new string[] { "b" }, 2004, 19d, sharedDelta);
                 _AssertSeries(First(), "x", new string[] { "b" }, 2005, double.NaN, sharedDelta);
+
+                //for array-series with list inside, the test is only done for diff() and <d>, the rest only test normal series
+
+                //
+                // pch(x) = ...
+                //
+                I("RESET; TIME 2001 2004;");
+                I("x = series(1);");
+                I("v = 3;");
+                I("x[a] = 5;");
+                if (i == 0) I("<2002 2004> pch(x[a]) = v + 0;");
+                else I("<2002 2004 p> x[a] = v + 0;");
+                _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2002, 5d * 1.03d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2003, 5d * 1.03d * 1.03d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2004, 5d * 1.03d * 1.03d * 1.03d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
+
+                //
+                // dlog(x) = ...
+                //
+                I("RESET; TIME 2001 2004;");
+                I("x = series(1);");
+                I("v = 0.03;");
+                I("x[a] = 5;");
+                if (i == 0) I("<2002 2004> dlog(x[a]) = v + 0;");
+                else I("<2002 2004 dl> x[a] = v + 0;");
+                _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2002, 5d * Math.Exp(0.03d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2003, 5d * Math.Exp(0.03d) * Math.Exp(0.03d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2004, 5d * Math.Exp(0.03d) * Math.Exp(0.03d) * Math.Exp(0.03d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
+
+                //
+                // pch(x) = ...
+                //
+                I("RESET; TIME 2001 2004;");
+                I("x = series(1);");
+                I("v = 3;");
+                I("x[a] = 5;");
+                if (i == 0) I("<2002 2004> log(x[a]) = v + 0;");
+                else I("<2002 2004 l> x[a] = v + 0;");
+                _AssertSeries(First(), "x", new string[] { "a" }, 2000, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2001, 5d, sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2002, Math.Exp(3d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2003, Math.Exp(3d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2004, Math.Exp(3d), sharedDelta);
+                _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
             }
 
 
