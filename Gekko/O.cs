@@ -3831,12 +3831,15 @@ namespace Gekko
         {
             if (options == null) return ESeriesUpdTypes.none;  //will this ever happen?
             ESeriesUpdTypes operatorType = ESeriesUpdTypes.none;
-            if (G.Equal(options.opt_d, "yes")) operatorType = ESeriesUpdTypes.d;            
+            if (G.Equal(options.opt_d, "yes")) operatorType = ESeriesUpdTypes.d;
             else if (G.Equal(options.opt_p, "yes")) operatorType = ESeriesUpdTypes.p;
             else if (G.Equal(options.opt_m, "yes")) operatorType = ESeriesUpdTypes.m;
             else if (G.Equal(options.opt_q, "yes")) operatorType = ESeriesUpdTypes.q;
             else if (G.Equal(options.opt_mp, "yes")) operatorType = ESeriesUpdTypes.mp;
             else if (G.Equal(options.opt_n, "yes")) operatorType = ESeriesUpdTypes.n;
+            else if (G.Equal(options.opt_l, "yes")) operatorType = ESeriesUpdTypes.l;
+            else if (G.Equal(options.opt_dl, "yes")) operatorType = ESeriesUpdTypes.dl;
+
             if (options.opt_lsfunc != null)
             {
                 if (operatorType != ESeriesUpdTypes.none)
@@ -8361,7 +8364,11 @@ namespace Gekko
             public string opt_p = null;
             public string opt_m = null;
             public string opt_q = null;
-            public string opt_mp = null;            
+            public string opt_mp = null;
+            public string opt_dl = null;
+            public string opt_l = null;
+
+
             public string opt_keep = null;
             public IVariable opt_rownames = null;
             public IVariable opt_colnames = null;

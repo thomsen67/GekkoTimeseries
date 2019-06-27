@@ -3412,18 +3412,33 @@ namespace UnitTests
             I("open <edit> b2;");
             I("x = 1.8;");
             I("close b2;");
-            I("reset; time 2001 2001;");
+            I("reset; time 2001 2002;");
             I("open b1, b2;");
-            I("x = 200;");
-            I("ref:x = 100;");
-            //Globals.lastPrtOrMulprtTable = null;
+            I("x = 200, 205;");
+            I("ref:x = 100, 102;");            
             I("prt <m> x;");
             Table table = Globals.lastPrtOrMulprtTable;
-            Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);
-            //Globals.lastPrtOrMulprtTable = null;
+            Assert.AreEqual(table.Get(2, 2).number, 100d, sharedDelta);            
             I("prt <bank=b1 ref=b2 m> x;");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(2, 2).number, 0.4d, sharedDelta);
+            //
+            // Testing the new <l>, <dl>, <rl>, <rdl> operators
+            //
+            I("prt <l> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, Math.Log(200d), sharedDelta);
+            I("prt <rl> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(2, 2).number, Math.Log(100d), sharedDelta);
+            I("prt <dl> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 2).number, Math.Log(205d/200d), sharedDelta);
+            I("prt <rdl> x;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 2).number, Math.Log(102d / 100d), sharedDelta);
+
+
         }
 
         [TestMethod]
@@ -3670,7 +3685,7 @@ namespace UnitTests
                 _AssertSeries(First(), "x", new string[] { "a" }, 2005, double.NaN, sharedDelta);
 
                 //
-                // pch(x) = ...
+                // log(x) = ...
                 //
                 I("RESET; TIME 2001 2004;");
                 I("x = series(1);");
@@ -6381,7 +6396,7 @@ namespace UnitTests
             Databank work = First();
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("DOWNLOAD 'http://api.statbank.dk/v1/data' statbank.json;");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank.json;");
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
@@ -6389,7 +6404,7 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("DOWNLOAD 'http://api.statbank.dk/v1/data' statbank.json;");
+            I("DOWNLOAD 'https://api.statbank.dk/v1/data' statbank.json;");
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
             _AssertSeries(First(), "pris6_VAREGR_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
