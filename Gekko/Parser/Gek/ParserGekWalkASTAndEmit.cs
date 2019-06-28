@@ -7874,6 +7874,10 @@ namespace Gekko.Parser.Gek
                         {
                             s7 = "G.GetMissing(" + s7 + ")";
                         }
+                        if (G.Equal(node[0].Text, "series") && G.Equal(node[1].Text, "data") && G.Equal(node[2].Text, "missing"))  //OPTION series data missing = ...
+                        {
+                            s7 = "G.GetMissing(" + s7 + ")";
+                        }
                         if (resolvePath)
                         {
                             s7 = "O.ResolvePath(" + s7 + ")";

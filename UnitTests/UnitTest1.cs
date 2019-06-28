@@ -7228,6 +7228,64 @@ namespace UnitTests
             _AssertSeries(Ref(), "gdp", 2011, 1000d, sharedDelta);
             _AssertSeries(Ref(), "gdp", 2012, 1000d, sharedDelta);
             _AssertSeries(Ref(), "gdp", 2013, double.NaN, sharedDelta);
+
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!  not 1!
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+            //!!!!!!!!!!!!
+
+            for (int i = 1; i < 2; i++)
+            {
+                I("RESET;");
+                if (i == 1) I("OPTION series data missing = zero;");
+                I("TIME 2010 2012;");
+                I("SERIES x = 100, m(), 102;");
+                I("SERIES y = x + x;");
+                I("SERIES xx = series(1);");
+                I("SERIES yy = series(1);");
+                I("SERIES zz = series(1);");
+                I("#m = a, b;");
+                I("SERIES xx[a] = 100, m(), 102;");
+                I("SERIES xx[b] = 100, 101, m();");
+                I("SERIES yy[a] = xx[a] + xx[a];");
+                I("SERIES z = sum(#m, xx[#m]);");
+                I("OPTION series data missing = m;");  //important to switch it off, else the following asserts will be misleading about the real contents of the series
+
+                _AssertSeries(First(), "y!a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(First(), "y!a", 2010, 200d, sharedDelta);
+                if (i == 0)
+                    _AssertSeries(First(), "y!a", 2011, double.NaN, sharedDelta);
+                else
+                    _AssertSeries(First(), "y!a", 2011, 0d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2012, 204d, sharedDelta);
+                _AssertSeries(First(), "y!a", 2013, double.NaN, sharedDelta);
+
+
+                _AssertSeries(First(), "yy", new string[] { "a" }, 2009, double.NaN, sharedDelta);
+                _AssertSeries(First(), "yy", new string[] { "a" }, 2010, 200d, sharedDelta);
+                if (i == 0)
+                    _AssertSeries(First(), "yy", new string[] { "a" }, 2011, double.NaN, sharedDelta);
+                else
+                    _AssertSeries(First(), "yy", new string[] { "a" }, 2011, 0d, sharedDelta);
+                _AssertSeries(First(), "yy", new string[] { "a" }, 2012, 204d, sharedDelta);
+                _AssertSeries(First(), "yy", new string[] { "a" }, 2013, double.NaN, sharedDelta);
+
+
+                _AssertSeries(First(), "z!a", 2009, double.NaN, sharedDelta);
+                _AssertSeries(First(), "z!a", 2010, 200d, sharedDelta);
+                if (i == 0)
+                    _AssertSeries(First(), "z!a", 2011, double.NaN, sharedDelta);
+                else
+                    _AssertSeries(First(), "z!a", 2011, 101d, sharedDelta);
+                if (i == 0)
+                    _AssertSeries(First(), "z!a", 2012, double.NaN, sharedDelta);
+                else
+                    _AssertSeries(First(), "z!a", 2012, 102d, sharedDelta);
+                _AssertSeries(First(), "z!a", 2013, double.NaN, sharedDelta);
+            }
         }
 
         [TestMethod]

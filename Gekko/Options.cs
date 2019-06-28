@@ -26,26 +26,9 @@ namespace Gekko
 {
     public class Options
     {
-        /* AREMOS options
-Set General Options	    Set the most commonly used AREMOS settings from a single screen.
-Set Calculation Options	Set the number of missing observations allowed in a period.
-Set Calendar Options	Set options defining which days of the week are used, when a week ends, and other specifics that determine how AREMOS handles days, months, etc.
-Set Conversion Options	Set options related to collapsing and interpolating series.
-Set Databank Options	Set options related to creating, modifying and overwriting series.
-Set File Options	    Set the search path and current directory.
-Set Frequency Options	Set the frequency for the current AREMOS session, as well as some calendar-related options for certain frequencies.
-Set Period Options	    Set the frequency and period for the current AREMOS session.
-Set Report Options	    Set options related to the layout and appearance of AREMOS reports.
-Set Savefile Options	Set options related to capturing AREMOS output to a file.
-Set Syntax Options	    Set the language used, prompting level and handling of missing arguments.
-Set Screen Options	    Set options related to the behavior of the AREMOS Graph screen and
-Additionally, there are model, solve, equation options.
-*/
-
-
+        
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
-
-        //public bool bugfix_px = true;
+                
         public bool bugfix_import_export = false;
         public bool bugfix_download = true;
         
@@ -58,8 +41,7 @@ Additionally, there are model, solve, equation options.
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
-        public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2
-        //public string databank_logic = "default";  //default | aremos
+        public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
 
         public int decomp_maxlag = 10;
@@ -174,8 +156,8 @@ Additionally, there are model, solve, equation options.
 
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
-        
 
+        public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero
 
         // -------- new options regarding missings end ---------------------
 

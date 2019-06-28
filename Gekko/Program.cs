@@ -9006,6 +9006,16 @@ namespace Gekko
 
                 if (nameStart != -12345 && nameEnd != -12345)
                 {
+                    bool lhsFunction = false;
+                    if (nameEnd > nameStart + 1 && G.Equal(th[nameStart + 1].s, "(") && th[nameStart + 1].leftblanks == 0 && G.Equal(th[nameEnd].s, ")"))
+                    {
+                        if (G.Equal(th[nameStart].s, "log") || G.Equal(th[nameStart].s, "dlog") || G.Equal(th[nameStart].s, "dif") || G.Equal(th[nameStart].s, "diff"))
+                        {
+                            lhsFunction = true;
+                            nameStart += 2;
+                            nameEnd--;
+                        }
+                    }
 
                     if (nameStart == nameEnd && th[nameStart].type == ETokenType.Word)
                     {
@@ -9037,18 +9047,18 @@ namespace Gekko
                             for (int jj = j - 1; jj >= 0; jj--)
                             {
                                 List<TokenHelper> th2 = statements[jj];
-                                if (G.Equal(th2[0].s, "for") && th2[1].s == "%" && th2[2].type == ETokenType.Word && th2[3].s == "=" && scalarsOnLhsInSerStatement.ContainsKey(th2[2].s))
+                                if (G.Equal(th2[0].s, "for") && G.Equal(th2[1].s, "string") && th2[2].s == "%" && th2[3].type == ETokenType.Word && th2[4].s == "=" && scalarsOnLhsInSerStatement.ContainsKey(th2[3].s))
                                 {
                                     //We have found the definition of one of the scalars in the lhs SERIES name.
                                     List<string> rhsVars = new List<string>();
-                                    for (int i2 = 4; i2 < th2.Count; i2++)
+                                    for (int i2 = 5; i2 < th2.Count; i2++)
                                     {
                                         if ((th2[i2].type == ETokenType.Word || th2[i2].type == ETokenType.QuotedString) && (th2[i2 + 1].s == "," || th2[i2 + 1].s == ";"))
                                         {
                                             rhsVars.Add(G.StripQuotes(th2[i2].s));
                                         }
                                     }
-                                    scalarsOnLhsInSerStatement[th2[2].s] = rhsVars;
+                                    scalarsOnLhsInSerStatement[th2[3].s] = rhsVars;
                                 }
                             }
 
@@ -9082,7 +9092,7 @@ namespace Gekko
                                     }
 
                                     string s8 = null;
-                                    for (int i = nameStart; i < th.Count; i++)
+                                    for (int i = 0; i < th.Count; i++)
                                     {
                                         if (th[i].s == "{" && th[i + 1].s == Globals.symbolScalar.ToString() && th[i + 2].type == ETokenType.Word && th[i + 2].leftblanks == 0 && th[i + 3].s == "}" && G.Equal(th[i + 2].s, xx[0].Key))
                                         {
@@ -9117,10 +9127,9 @@ namespace Gekko
 
         private static void BrowserAddItem(GekkoDictionary<string, List<string>> datagen, string name, string s3)
         {
-            if (s3.Contains("rep"))
-            {
+            string[] ss = name.Split('[');
+            if (ss.Length > 1) name = ss[0];
 
-            }
             if (datagen.ContainsKey(name))
             {
                 datagen[name].Add(s3);

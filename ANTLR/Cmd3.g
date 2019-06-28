@@ -3856,10 +3856,13 @@ optionType:
              | SERIES ARRAY CALC MISSING '=' optionSeriesMissing -> SERIES ARRAY CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
 			 | SERIES ARRAY TABLE MISSING '=' optionSeriesMissing -> SERIES ARRAY TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
 
+			 | SERIES DATA MISSING '=' optionSeriesMissing -> SERIES DATA MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)	
+
+			 //These are not used
 			 | SERIES DATA PRINT MISSING '=' optionSeriesMissing -> SERIES DATA PRINT MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
 			 | SERIES DATA CALC MISSING '=' optionSeriesMissing -> SERIES DATA CALC MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)     //sumt(...)
 			 | SERIES DATA TABLE MISSING '=' optionSeriesMissing -> SERIES DATA TABLE MISSING ^(ASTSTRINGSIMPLE optionSeriesMissing)
-			 			 
+			 
 			 | SHEET question -> SHEET question
 			 | SHEET COLLAPSE '='? optionPrintCollapse ->  SHEET COLLAPSE ^(ASTSTRINGSIMPLE optionPrintCollapse)			 
 			 | SHEET FREQ '='? optionPrintFreq ->  SHEET FREQ ^(ASTSTRINGSIMPLE optionPrintFreq)             
