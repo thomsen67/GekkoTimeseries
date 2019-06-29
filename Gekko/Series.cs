@@ -595,7 +595,7 @@ namespace Gekko
                 }
             }
         End:
-            if (Program.options.series_data_missing == ESeriesMissing.Zero)
+            if (Program.options.series_data_missing_NOT_USED == ESeriesMissing.Zero)
             {
                 if (G.isNumericalError(rv)) rv = 0d;
             }
@@ -729,7 +729,7 @@ namespace Gekko
                 int n = GekkoTime.Observations(gt1, gt2);
                 double[] numbers = new double[n];
                 double d = this.data.dataArray[0];
-                if (Program.options.series_data_missing == ESeriesMissing.Zero)
+                if (Program.options.series_data_missing_NOT_USED == ESeriesMissing.Zero)
                 {
                     if (G.isNumericalError(d)) d = 0d;
                 }
@@ -790,7 +790,7 @@ namespace Gekko
                 Array.Copy(this.data.dataArray, index1, temp, 0, size);
                 index1 = 0;
                 index2 = temp.Length - 1;  //TT changed 24-9-2018
-                if (Program.options.series_data_missing == ESeriesMissing.Zero)
+                if (Program.options.series_data_missing_NOT_USED == ESeriesMissing.Zero)
                 {
                     for (int i = 0; i < temp.Length; i++)
                     {
