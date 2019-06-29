@@ -156,9 +156,8 @@ namespace Gekko
 
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
-
-        public ESeriesMissing series_data_sum_missing = ESeriesMissing.M;  //M or Zero
-        public ESeriesMissing series_data_missing_NOT_USED = ESeriesMissing.M;  //M or Zero
+                
+        public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero
 
         // -------- new options regarding missings end ---------------------
 
