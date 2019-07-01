@@ -1377,8 +1377,10 @@ namespace Gekko
                     double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
-                    {                        
-                        arraya[i + ia1] = a(arrayb[i + ib1]);
+                    {
+                        double d = arrayb[i + ib1];
+                        if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d)) d = 0d;
+                        arraya[i + ia1] = a(d);
                     }
                 }
                 else
@@ -1394,7 +1396,9 @@ namespace Gekko
                 //safe to alter the object itself, since it is temporary
                 for (int i = 0; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                 {
-                    x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i]);
+                    double d = x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i];
+                    if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d)) d = 0d;
+                    x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(d);
                 }
                 rv_series = x1_series;
             }
@@ -1424,7 +1428,7 @@ namespace Gekko
             rv_series = new Series(ESeriesType.Light, smpl.t0.Add(xx), smpl.t3); //should return a seies corresponding to t0-t3
 
             if (x1_series.type == ESeriesType.Normal || x1_series.type == ESeriesType.Timeless)
-            {                               
+            {
                 if (Globals.bugfix_speedup && x1_series.type != ESeriesType.Timeless)
                 {
                     GekkoTime window1 = smpl.t0.Add(xx); //should return a seies corresponding to t0-t3                    
@@ -1436,22 +1440,20 @@ namespace Gekko
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ib1, array is enlarged not moved around
                     double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
-                    //for (int i = 0; i < lag; i++)
-                    //{
-                    //    arraya[i] = double.NaN;  //arraya[0] = M
-                    //}
-                    //for (int i = lag; i < GekkoTime.Observations(window1, window2); i++)
-                    //{
-                    //    //i starts in 1, that is, t0
-                    //    arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
-                    //}                    
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
-                        arraya[i + ia1] = a(arrayb[i + ib1], arrayb[i + ib1 - lag]);
+                        double d1 = arrayb[i + ib1];
+                        double d2 = arrayb[i + ib1 - lag];
+                        if (Program.options.series_data_missing == ESeriesMissing.Zero)
+                        {
+                            if (G.isNumericalError(d1)) d1 = 0d;
+                            if (G.isNumericalError(d2)) d2 = 0d;                            
+                        }
+                        arraya[i + ia1] = a(d1, d2);
                     }
                 }
                 else
-                {                    
+                {
                     foreach (GekkoTime t in smpl.Iterate03())
                     {
                         //timeless will just be 0 for dif()?
@@ -1461,55 +1463,26 @@ namespace Gekko
             }
             else if (x1_series.type == ESeriesType.Light)
             {
-                if (false)
+                //safe to alter the object itself, since it is temporary                
+                double[] temp = new double[x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length];
+                for (int i = 0; i < lag; i++)
                 {
-                    //this seems to be wrong
-
-                    int offset = GekkoTime.Observations(x1_series.data.anchorPeriod, rv_series.data.anchorPeriod) - 1;
-
-                    if (Globals.runningOnTTComputer && offset < 0)
-                    {
-                        if (Globals.runningOnTTComputer)
-                        {
-                            G.Writeln2("*** ERROR: TT note: lag problem");
-                            throw new GekkoException();
-                        }
-                    }
-
-                    for (int i = 0; i < rv_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
-                    {
-                        if (i - lag + offset < 0)
-                        {
-                            rv_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
-                            if (Globals.runningOnTTComputer)
-                            {
-                                G.Writeln2("*** ERROR: TT note: lag problem");
-                                throw new GekkoException();
-                            }
-                        }
-                        else
-                        {
-                            rv_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i + offset], x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag + offset]);
-                        }
-                    }
-
+                    temp[i] = double.NaN;
                 }
-                else
+                for (int i = 0 + lag; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                 {
-                    //safe to alter the object itself, since it is temporary                
-                    double[] temp = new double[x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length];
-                    for (int i = 0; i < lag; i++)
+
+                    double d1 = x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i];
+                    double d2 = x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag];
+                    if (Program.options.series_data_missing == ESeriesMissing.Zero)
                     {
-                        temp[i] = double.NaN;
+                        if (G.isNumericalError(d1)) d1 = 0d;
+                        if (G.isNumericalError(d2)) d2 = 0d;                        
                     }
-                    for (int i = 0 + lag; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
-                    {
-                        temp[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i], x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag]);
-                    }
-                    x1_series.data.SetDataarray_ONLY_INTERNAL_USE(temp);  //has same size and same anchors            
-                    rv_series = x1_series;
-                    //rv_series.SetDirty(true);
+                    temp[i] = a(d1, d2);
                 }
+                x1_series.data.SetDataarray_ONLY_INTERNAL_USE(temp);  //has same size and same anchors            
+                rv_series = x1_series;
             }
             else
             {
@@ -1556,7 +1529,9 @@ namespace Gekko
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
-                        arraya[i + ia1] = a(arrayb[i + ib1], x2_val);
+                        double d = arrayb[i + ib1];
+                        if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d)) d = 0d;
+                        arraya[i + ia1] = a(d, x2_val);
                     }
                 }
                 else
@@ -1636,7 +1611,14 @@ namespace Gekko
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
-                        arraya[i + ia1] = a(arrayb[i + ib1], arrayc[i + ic1]);
+                        double d1 = arrayb[i + ib1];
+                        double d2 = arrayc[i + ic1];
+                        if (Program.options.series_data_missing == ESeriesMissing.Zero)
+                        {
+                            if (G.isNumericalError(d1)) d1 = 0d;
+                            if (G.isNumericalError(d2)) d2 = 0d;
+                        }
+                        arraya[i + ia1] = a(d1, d2);
                     }
                 }
                 else
@@ -2444,7 +2426,9 @@ namespace Gekko
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
-                        arrayb[i + ib1] += arrayc[i + ic1];
+                        double d = arrayc[i + ic1];
+                        if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d)) d = 0d;
+                        arrayb[i + ib1] += d;  //what if lhs is NaN?
                     }
                 }
                 else
