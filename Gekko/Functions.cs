@@ -1886,7 +1886,7 @@ namespace Gekko
 
             int index1 = -12345;
             int index2 = -12345;
-            double[] data = ts.GetDataSequence(out index1, out index2, t1, t2);
+            double[] data = ts.GetDataSequenceBEWARE(out index1, out index2, t1, t2);
 
             //double[] data2 = new double[index2 - index1 + 1];  //we copy the array, to avoid mishaps if it is altered in the median method (= a little bit slack)
             //for (int i = index1; i <= index2; i++)

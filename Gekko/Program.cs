@@ -3404,7 +3404,7 @@ namespace Gekko
                                 int index2;
                                 try
                                 {
-                                    double[] data_beware_do_not_alter = tsSource.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, firstTruncated, lastTruncated);
+                                    double[] data_beware_do_not_alter = tsSource.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, firstTruncated, lastTruncated);  //should not optionally replace NaN with 0
                                     tsExisting.SetDataSequence(firstTruncated, lastTruncated, data_beware_do_not_alter, index1);
                                 }
                                 catch (Exception e)
@@ -3423,7 +3423,7 @@ namespace Gekko
                             //firstExisting is guaranteed to be != tNull, so lastExisting is so too
                             int index1;
                             int index2;
-                            double[] data_beware_do_not_change = tsSource.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, firstSource, lastSource);
+                            double[] data_beware_do_not_change = tsSource.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, firstSource, lastSource);  //should not optionally replace NaN with 0
                             tsExisting.SetDataSequence(firstSource, lastSource, data_beware_do_not_change, index1);
                         }
                     }
@@ -6406,17 +6406,14 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.data.dataArray;
-
-
-
+                dataArray = ts.GetDataSequenceUnsafePointerAlterBEWARE();
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
             else
             {
                 //also sets index1 and index2.
-                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
+                dataArray = ts.GetDataSequenceBEWARE(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
             }
 
             int count2 = 0;
@@ -6575,14 +6572,14 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.data.dataArray;
+                dataArray = ts.GetDataSequenceUnsafePointerAlterBEWARE();
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
             else
             {
                 //also sets index1 and index2.
-                dataArray = ts.GetDataSequence(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
+                dataArray = ts.GetDataSequenceBEWARE(out index1, out index2, per1, per2);  //a little bit slack not to use a pointer
             }
 
             int count2 = 0;
@@ -11321,7 +11318,7 @@ namespace Gekko
                 else
                 {
                     //Hmmm, Annual?? What about quarters/months??
-                    x = ts.GetDataSequence(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
+                    x = ts.GetDataSequenceBEWARE(out index1, out index2, tStart0, tEnd);  //implicit ", false" ending this method, no setting of start/end period of timeseries
                     length = index2 - index1 + 1;
                     if (negative)
                     {
@@ -22526,7 +22523,7 @@ namespace Gekko
                 }
                 else
                 {                    
-                    x_beware_do_not_change = ts.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tStart0, tEnd);  //no setting of start/end period of timeseries
+                    x_beware_do_not_change = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tStart0, tEnd);  //no setting of start/end period of timeseries. Does not optionally change NaN to 0, there is a solve option for that
                     length = index2 - index1 + 1;
                 }
                 //BEWARE: Do not alter x here
@@ -22571,7 +22568,7 @@ namespace Gekko
                 //??? what if above is null??? << create it if djz?
                 int index1 = -12345;
                 int index2 = -12345;
-                double[] x_beware_if_changed = ts.GetDataSequenceUnsafePointerAlter(out index1, out index2, tStart, tEnd);
+                double[] x_beware_if_changed = ts.GetDataSequenceUnsafePointerAlterBEWARE(out index1, out index2, tStart, tEnd);  //do not optionally change NaN to 0 here
                 
                 //#98726527
                 

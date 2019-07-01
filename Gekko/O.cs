@@ -2895,27 +2895,25 @@ namespace Gekko
 
                                                 //method will only work if smpl freq is same as series freq
                                                 int n = smpl.Observations12();
-                                                int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
-                                                int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);
+                                                //int i1 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t1);
+                                                //int i2 = rhs_series.FromGekkoTimeToArrayIndex(smpl.t2);                                                
+                                                //double[] source = rhs_series.GetDataArray();
+
+                                                int i1; int i2;
+                                                double[] source = rhs_series.GetDataSequenceUnsafePointerReadOnlyBEWARE(out i1, out i2, smpl.t1, smpl.t2);
+
                                                 Matrix m = new Matrix(1, n);
                                                 double[,] destination = m.data;
-                                                double[] source = rhs_series.data.dataArray;
 
                                                 int destinationStart = 0;
-                                                int ii1 = Math.Max(0, i1);
-                                                int ii2 = Math.Min(source.Length - 1, i2);
-                                                for (int j = i1; j < 0; j++)
-                                                {
-                                                    destination[1, j - i1 + destinationStart] = double.NaN;
-                                                }
-                                                for (int j = i2; j >= source.Length; j--)
-                                                {
-                                                    destination[1, j - i1 + destinationStart] = double.NaN;
-                                                }
-                                                //see also #0985324985237
-                                                Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
+                                                
+                                                Buffer.BlockCopy(source, 8 * i1, destination, 8 * destinationStart, 8 * (i2 - i1 + 1));
                                                 IVariable lhsNew = m;
+
+                                                if (Program.options.series_data_missing == ESeriesMissing.Zero) G.ReplaceNaNWith0(m.data);
+
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
+
                                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                             }
                                             else
@@ -2933,7 +2931,7 @@ namespace Gekko
 
                                             //if (lhsType == EVariableType.Matrix || lhsType == EVariableType.Var)
                                             if (lhsType == EVariableType.Matrix)
-                                                {
+                                            {
 
                                                 //method will only work if smpl freq is same as series freq
                                                 int n = smpl.Observations12();
@@ -2951,10 +2949,11 @@ namespace Gekko
 
                                                 int destinationStart = 0;
                                                 double[,] destination = m.data;
-                                                double[] source = rhs_series.data.dataArray;
+                                                double[] source = rhs_series.GetDataSequenceUnsafePointerReadOnlyBEWARE();
                                                 //see #0985324985237
                                                 Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                                 IVariable lhsNew = m;
+                                                if (Program.options.series_data_missing == ESeriesMissing.Zero) G.ReplaceNaNWith0(m.data);
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                             }
@@ -2974,7 +2973,8 @@ namespace Gekko
                                             if (lhsType == EVariableType.Matrix)
                                                 {
                                                 int n = smpl.Observations12();
-                                                double d = rhs_series.data.dataArray[0];
+                                                double d = rhs_series.GetDataSequenceUnsafePointerAlterBEWARE()[0];
+                                                if (G.isNumericalError(d) && Program.options.series_data_missing == ESeriesMissing.Zero) d = 0d;
                                                 Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
@@ -3168,8 +3168,8 @@ namespace Gekko
                     {
                         case EVariableType.Series:
                             {
-                                Series rhs_series = rhs as Series;
-                                string freq_rhs = G.GetFreq(rhs_series.freq);
+                                Series rhs_series_beware = rhs as Series;
+                                string freq_rhs = G.GetFreq(rhs_series_beware.freq);
                                 if (varnameWithFreq != null && !varnameWithFreq.ToLower().EndsWith(Globals.freqIndicator + freq_rhs))  //null if it is a subseries under an array-superseries
                                 {
                                     G.Writeln2("*** ERROR: Frequency: illegal series name '" + varnameWithFreq + "', should end with '" + Globals.freqIndicator + freq_rhs + "'");
@@ -3178,7 +3178,7 @@ namespace Gekko
 
 
 
-                                switch (rhs_series.type)
+                                switch (rhs_series_beware.type)
                                 {
 
                                     case ESeriesType.Normal:
@@ -3198,16 +3198,16 @@ namespace Gekko
                                                                                                                                     //bool create = CreateSeriesIfNotExisting(varnameWithFreq, freq, ref lhs_series);
                                                                                                                                     //Now the smpl window runs from tt1 to tt2
                                                                                                                                     //We copy in from that window
-                                                if (lhs_series.freq != rhs_series.freq)
+                                                if (lhs_series.freq != rhs_series_beware.freq)
                                                 {
                                                     G.Writeln2("*** ERROR: Frequency mismatch");
                                                     throw new GekkoException();
                                                 }
 
-                                                if (rhs_series.type == ESeriesType.Light)
+                                                if (rhs_series_beware.type == ESeriesType.Light)
                                                 {
                                                     int tooSmall = 0; int tooLarge = 0;
-                                                    rhs_series.TooSmallOrTooLarge(rhs_series.GetArrayIndex(tt1), rhs_series.GetArrayIndex(tt2), out tooSmall, out tooLarge);
+                                                    rhs_series_beware.TooSmallOrTooLarge(rhs_series_beware.GetArrayIndex(tt1), rhs_series_beware.GetArrayIndex(tt2), out tooSmall, out tooLarge);
                                                     if (tooSmall > 0 || tooLarge > 0)
                                                     {
                                                         if (smpl.gekkoError == null) smpl.gekkoError = new GekkoError(tooSmall, tooLarge);
@@ -3217,15 +3217,23 @@ namespace Gekko
 
                                                 int index1, index2;
                                                 //may enlarge the array with NaNs first and last
-                                                double[] data_beware_do_not_alter = rhs_series.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, tt1, tt2);
+                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
                                                 //may enlarge the array with NaNs first and last
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1);                                                
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, true);
+                                                if (Program.options.series_data_missing == ESeriesMissing.Zero)
+                                                {
+                                                    lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, true);
+                                                }
+                                                else
+                                                {
+                                                    lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, false);
+                                                }
                                             }
                                             else
                                             {
                                                 //not so fast running, could be improved                                            
 
-                                                OperatorHelperSeries(smpl, lhs_series, rhs_series, operatorType);
+                                                OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
 
                                             }
                                             G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
@@ -3237,16 +3245,25 @@ namespace Gekko
                                             // x = Series Timeless
                                             //---------------------------------------------------------
                                             // stuff below also handles array-timeseries just fine  
-
-                                            double d = double.NaN;
-                                            if (rhs_series.data.dataArray != null) d = rhs_series.data.dataArray[0];
-
+                                            
                                             if (create)
                                             {
-                                                lhs_series = rhs_series.DeepClone(null) as Series;  //so that it becomes timeless, too
+                                                lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too
+                                                double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
+                                                if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(temp[0]))
+                                                {
+                                                    temp[0] = 0d;
+                                                }
                                             }
                                             else
                                             {
+                                                double d = double.NaN;
+                                                if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) d = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0];
+                                                if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d))
+                                                {
+                                                    d = 0d;
+                                                }
+
                                                 if (operatorType == ESeriesUpdTypes.none || operatorType == ESeriesUpdTypes.n)
                                                 {
                                                     foreach (GekkoTime t in smpl.Iterate12())
@@ -5839,9 +5856,10 @@ namespace Gekko
                 throw new GekkoException();
             }
             Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-            for (int i = 0; i < tsl.data.dataArray.Length; i++)
+            double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
+            for (int i = 0; i < temp.Length; i++)  //we will not convert NaN in the matrix to 0 in the series
             {
-                tsl.data.dataArray[i] = m.data[i, 0];
+                temp[i] = m.data[i, 0];
             }
             return tsl;
         }
@@ -5989,9 +6007,12 @@ namespace Gekko
             {
                 //try to see if x can be a constant value
                 Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
-                for (int i = 0; i < tsl.data.dataArray.Length; i++)
+                double x_val = O.ConvertToVal(x);
+                if (G.isNumericalError(x_val) && Program.options.series_data_missing == ESeriesMissing.Zero) x_val = 0d;
+                double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
+                for (int i = 0; i < temp.Length; i++)
                 {
-                    tsl.data.dataArray[i] = O.ConvertToVal(x); //constant, will issue error if not a value
+                    temp[i] = x_val; //constant, will issue error if not a value
                 }
                 return tsl;
             }
@@ -9223,7 +9244,7 @@ namespace Gekko
                     }
                     else tsNew = ts;
 
-                    double[] data = tsNew.data.dataArray;
+                    double[] data = tsNew.GetDataSequenceUnsafePointerAlterBEWARE();  //do not optionally change NaN to 0
                     for (int ii = 0; ii < data.Length; ii++)
                     {
                         //could use ts.firstPeriodPositionInArray etc., but better to do it for all since ts.ts.firstPeriodPositionInArray is not always correct

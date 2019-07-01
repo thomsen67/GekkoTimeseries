@@ -89,6 +89,25 @@ namespace Gekko
         //            }
         //        }
 
+        public static void ReplaceNaNWith0(double[] temp)
+        {
+            for (int i = 0; i < temp.Length; i++)
+            {
+                if (G.isNumericalError(temp[i])) temp[i] = 0d;
+            }
+        }
+
+        public static void ReplaceNaNWith0(double[,] temp)
+        {            
+            for (int i = 0; i < temp.GetLength(0); i++)
+            {
+                for (int j = 0; j < temp.GetLength(1); j++)
+                {
+                    if (G.isNumericalError(temp[i, j])) temp[i, j] = 0d;
+                }
+            }            
+        }
+
         public static bool IsDebugSession
         {
             //Cannot get this to work...

@@ -244,8 +244,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Attempt to create SERIES with " + n + " observation");
                     throw new GekkoException();
                 }
-                this.data.dataArray = new double[n];  //we make the array as compact as possible --> faster
-                InitializeDataArray(this.data.dataArray);
+                this.data.SetDataarray_ONLY_INTERNAL_USE(new double[n]);  //we make the array as compact as possible --> faster
+                InitializeDataArray(this.data.GetDataArray_ONLY_INTERNAL_USE());
                 this.data.anchorPeriod = t1;
                 this.data.anchorPeriodPositionInArray = 0;
 
@@ -292,8 +292,8 @@ namespace Gekko
                 this.freq = freq;
                 this.name = variableName;
                 this.meta = new SeriesMetaInformation();
-                this.data.dataArray = new double[1];
-                this.data.dataArray[0] = val;
+                this.data.SetDataarray_ONLY_INTERNAL_USE(new double[1]);
+                this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = val;
             }
             else
             {
@@ -406,7 +406,7 @@ namespace Gekko
             int newFirst = Math.Max(this.meta.firstPeriodPositionInArray, indexStart);
             int newLast = Math.Min(this.meta.lastPeriodPositionInArray, indexEnd);
 
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 //do nothing, could be a series defined like x = m(); 
                 //in that case, this.meta.firstPeriodPositionInArray and this.meta.lastPeriodPositionInArray will be strange too
@@ -417,15 +417,10 @@ namespace Gekko
                 {
                     //the truncate window is completely before or after the data window
                     //wipe all the data, and set the sample to 1 length
-
-                    if (this.data == null || this.data.dataArray == null)
+                    
+                    for (int i = 0; i < this.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
-
-                    }
-
-                    for (int i = 0; i < this.data.dataArray.Length; i++)
-                    {
-                        this.data.dataArray[i] = double.NaN;
+                        this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
                     }
 
                     SetNullPeriod();
@@ -447,11 +442,11 @@ namespace Gekko
 
                     for (int i = 0; i < this.meta.firstPeriodPositionInArray; i++)
                     {
-                        this.data.dataArray[i] = double.NaN;
+                        this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
                     }
-                    for (int i = this.meta.lastPeriodPositionInArray + 1; i < this.data.dataArray.Length; i++)
+                    for (int i = this.meta.lastPeriodPositionInArray + 1; i < this.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
-                        this.data.dataArray[i] = double.NaN;
+                        this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
                     }
                 }
                 this.SetDirty(true);
@@ -499,19 +494,19 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             
             //DimensionCheck();
-            if (this.data.dataArray == null) return;
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null) return;
             if (this.IsNullPeriod()) return;  //could actually trim this, but oh well
-            if (!(this.meta.firstPeriodPositionInArray == 0 && this.meta.lastPeriodPositionInArray == this.data.dataArray.Length - 1))  //already trimmed                
+            if (!(this.meta.firstPeriodPositionInArray == 0 && this.meta.lastPeriodPositionInArray == this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1))  //already trimmed                
             {
                 int size = this.meta.lastPeriodPositionInArray - this.meta.firstPeriodPositionInArray + 1;
                 double[] temp = new double[size];
-                Array.Copy(this.data.dataArray, this.meta.firstPeriodPositionInArray, temp, 0, size);
+                Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), this.meta.firstPeriodPositionInArray, temp, 0, size);
                 int first = this.meta.firstPeriodPositionInArray;
                 //Correct these pointers accordingly
                 this.data.anchorPeriodPositionInArray += -first;
                 this.meta.firstPeriodPositionInArray += -first; // --> 0
                 this.meta.lastPeriodPositionInArray += -first;  // --> size-1
-                this.data.dataArray = temp;  //point to this array
+                this.data.SetDataarray_ONLY_INTERNAL_USE(temp);  //point to this array
             }
         }
 
@@ -543,7 +538,7 @@ namespace Gekko
             {
                 FreqError(t);
             }
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 //If no data has been added to the timeseries, NaN will always be returned.
                 if (this.type == ESeriesType.ArraySuper)
@@ -560,7 +555,7 @@ namespace Gekko
             }
             if (this.type == ESeriesType.Timeless)
             {
-                rv = this.data.dataArray[0];
+                rv = this.data.GetDataArray_ONLY_INTERNAL_USE()[0];
                 goto End;
             }
             else
@@ -590,7 +585,7 @@ namespace Gekko
                 }
                 else
                 {
-                    rv = this.data.dataArray[index];
+                    rv = this.data.GetDataArray_ONLY_INTERNAL_USE()[index];
                     goto End;
                 }
             }
@@ -623,11 +618,11 @@ namespace Gekko
             }
             if (this.type != ESeriesType.Light && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
 
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
-                this.data.dataArray = new double[1];
+                this.data.SetDataarray_ONLY_INTERNAL_USE(new double[1]);
             }
-            this.data.dataArray[0] = value;
+            this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = value;
         }
 
         public double GetTimelessData()
@@ -637,11 +632,11 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Timeless variable error #1009");
                 throw new GekkoException();
             }
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 return double.NaN;
             }
-            return this.data.dataArray[0];
+            return this.data.GetDataArray_ONLY_INTERNAL_USE()[0];
         }
 
         /// <summary>
@@ -661,7 +656,7 @@ namespace Gekko
                 //Should not normally be used.
                 //But this may be called from for instance DECOMP, calling it with a time period
                 //Normally timeless variables should be called via the SetData(double value) method
-                this.data.dataArray[0] = value;
+                this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = value;
             }
            
             if (this.type != ESeriesType.Light && this.meta != null && this.meta.parentDatabank != null && !this.meta.parentDatabank.editable) Program.ProtectError("You cannot change an observation in a timeseries residing in a non-editable databank, see OPEN<edit> or UNLOCK");
@@ -671,14 +666,14 @@ namespace Gekko
                 //See comment to GetData()
                 FreqError(t);
             }
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 InitDataArray(t);
             }
 
             if (this.type == ESeriesType.Timeless)
             {
-                this.data.dataArray[0] = value;
+                this.data.GetDataArray_ONLY_INTERNAL_USE()[0] = value;
             }
             else
             {
@@ -686,7 +681,7 @@ namespace Gekko
                 //be resized (1.5 times larger).
                 int index = ResizeDataArray(t, true);
                 //the index is offset safe
-                this.data.dataArray[index] = value;
+                this.data.GetDataArray_ONLY_INTERNAL_USE()[index] = value;
                 //Start and end date for observations are adjusted.
                 //for the first obs put into a new timeseries, both the if's should trigger.
                 if (this.type != ESeriesType.Light && this.meta != null)
@@ -721,14 +716,38 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
             // ----------------------------------------------------------------------------
 
-            //All GetDataSequence... go through here
+            // -------------------------------------------------------------------------------------------------------------------------------
+            // ----------------------------- OVERVIEW ofer GetDataSequence... methods            //
+            //  + GetDataSequenceAbstract(out int index1, out int index2, GekkoTime gt1, GekkoTime gt2, bool setStartEndPeriods, bool clone)
+            // => Not for outside use.
+            //
+            //  + GetDataSequenceBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+            // => Safe method that returns a *copy* of the dataArray, optionally with NaN changed to 0. May resize, safe to change dataArray if convenient. Will not set dirty. Use it for reading if you want to be safe regarding side-effects. Else if sure about side-effects, GetDataSequenceUnsafePointerReadOnlyBEWARE() can be used
+            //
+            //  + GetDataSequenceUnsafePointerAlterBEWARE()
+            // => Used in rare cases if no period is given, and something needs to be done on the dataArray. Will set dirty.
+            //
+            //  + GetDataSequenceUnsafePointerAlterBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+            // => Used to alter the dataArray directly. Will set dirty.Similar to below.Similar to above, but with periods and may resize.
+            //            
+            //  + GetDataSequenceUnsafePointerReadOnlyBEWARE()
+            // => Used when no period is given, but something should be read. Will not set dirty.
+            //
+            //  + GetDataSequenceUnsafePointerReadOnlyBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+            // => Used to access the dataArray directly. May resize, should not change data, will not set dirty. Similar to above.
+            //--------------------------------------------------------------------------------   //
+            // -------------------------------------------------------------------------------------------------------------------------------
+
+            //
+
+            //All GetDataSequence... except one go through here
             //generic method, not for outside use
 
             if (this.type == ESeriesType.Timeless)
             {
                 int n = GekkoTime.Observations(gt1, gt2);
                 double[] numbers = new double[n];
-                double d = this.data.dataArray[0];
+                double d = this.data.GetDataArray_ONLY_INTERNAL_USE()[0];
                 if (Program.options.series_data_missing == ESeriesMissing.Zero)
                 {
                     if (G.isNumericalError(d)) d = 0d;
@@ -752,9 +771,9 @@ namespace Gekko
                 throw new GekkoException();  //should be rare...
             }
 
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
-                InitDataArray(gt1);  //fills a new dataArray with NaN's so no risk regarding offset etc.
+                this.InitDataArray(gt1);  //fills a new dataArray with NaN's so no risk regarding offset etc.
             };
 
             index1 = GetArrayIndex(gt1);
@@ -787,34 +806,74 @@ namespace Gekko
             {
                 int size = index2 - index1 + 1;
                 double[] temp = new double[size];
-                Array.Copy(this.data.dataArray, index1, temp, 0, size);
+                Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), index1, temp, 0, size);
                 index1 = 0;
                 index2 = temp.Length - 1;  //TT changed 24-9-2018
-                if (Program.options.series_data_missing == ESeriesMissing.Zero)
-                {
-                    for (int i = 0; i < temp.Length; i++)
-                    {
-                        if (G.isNumericalError(temp[i])) temp[i] = 0d;
-                    }
-                }
+                if (Program.options.series_data_missing == ESeriesMissing.Zero) G.ReplaceNaNWith0(temp);
                 return temp;
             }
             else
             {
-                return this.data.dataArray;
+                return this.data.GetDataArray_ONLY_INTERNAL_USE();
             }
+        }
+
+       
+
+        public double[] GetDataSequenceUnsafePointerAlterBEWARE()
+        {
+            //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
+
+            //Will set dirty
+
+            //When using this to alter data, or to copy or transform it,
+            //beware that this is the actual data array, not a copy of it.
+            //Also, if using this, beware of OPTION series data missing.
+            //You may have to transform NaN to 0 if this option is set.
+            //See also #87943523987543
+
+            if (this.type == ESeriesType.Timeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #2");
+                throw new GekkoException();
+            }
+            this.SetDirty(true); //we have to mark dirty manually
+
+            return this.data.GetDataArray_ONLY_INTERNAL_USE();
+        }
+
+        public double[] GetDataSequenceUnsafePointerReadOnlyBEWARE()
+        {
+            //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
+
+            //Will not set dirty
+
+            //When using this to alter data, or to copy or transform it,
+            //beware that this is the actual data array, not a copy of it.
+            //Also, if using this, beware of OPTION series data missing.
+            //You may have to transform NaN to 0 if this option is set.
+            //See also #87943523987543
+
+            if (this.type == ESeriesType.Timeless)
+            {
+                G.Writeln2("*** ERROR: Timeless variable error #2");
+                throw new GekkoException();
+            }
+            this.SetDirty(true); //we have to mark dirty manually
+
+            return this.data.GetDataArray_ONLY_INTERNAL_USE();
         }
 
         public void TooSmallOrTooLarge(int index1, int index2, out int tooSmall, out int tooLarge)
         {
             tooSmall = -index1;
-            tooLarge = index2 - (this.data.dataArray.Length - 1);
+            tooLarge = index2 - (this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
         }
 
         public void TooSmallOrTooLarge(int index, out int tooSmall, out int tooLarge)
         {
             tooSmall = -index;
-            tooLarge = index - (this.data.dataArray.Length - 1);
+            tooLarge = index - (this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
         }
 
         /// <summary>
@@ -825,13 +884,27 @@ namespace Gekko
         /// <param name="per1">The start of the period.</param>
         /// <param name="per2">The end of the period.</param>
         /// <returns></returns>
-        public double[] GetDataSequence(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
-        {            
+        public double[] GetDataSequenceBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+        {
+            //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
+
+            //BEWARE: If using this, beware of OPTION series data missing.
+            //You may have to transform NaN to 0 if this option is set.
+            //See also #87943523987543
+
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, false, true);
         }
 
-        public double[] GetDataSequenceUnsafePointerReadOnly(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+        public double[] GetDataSequenceUnsafePointerReadOnlyBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
+            //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
+
+            //BEWARE: When using this to alter data, or to copy or transform it,
+            //beware that this is the actual data array, not a copy of it.
+            //Also, if using this, beware of OPTION series data missing.
+            //You may have to transform NaN to 0 if this option is set.
+            //See also #87943523987543
+
             //will also set metadata regarding max-min periods       
             if (this.type == ESeriesType.Timeless)
             {
@@ -841,8 +914,18 @@ namespace Gekko
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
         }
 
-        public double[] GetDataSequenceUnsafePointerAlter(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
+        public double[] GetDataSequenceUnsafePointerAlterBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
         {
+            //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
+
+            //Just like GetDataSequenceUnsafePointerReadOnlyBEWARE, but setting dirty
+
+            //BEWARE: When using this to alter data, or to copy or transform it,
+            //beware that this is the actual data array, not a copy of it.
+            //Also, if using this, beware of OPTION series data missing.
+            //You may have to transform NaN to 0 if this option is set.
+            //See also #87943523987543
+
             //will also set metadata regarding max-min periods
             if (this.type == ESeriesType.Timeless)
             {
@@ -853,6 +936,11 @@ namespace Gekko
             return GetDataSequenceAbstract(out index1, out index2, per1, per2, true, false);
         }
 
+        public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
+        {
+            this.SetDataSequence(gt1, gt2, input, inputOffset, false);
+        }
+
         /// <summary>
         /// For the given timeseries, this sets the data of the given period to array to the values given in the input array. An offset may be used.
         /// </summary>
@@ -861,7 +949,7 @@ namespace Gekko
         /// <param name="input">The input.</param>
         /// <param name="inputOffset">The input offset.</param>
         /// <exception cref="GekkoException">Exception if frequency of timeseries and periods differ.</exception>
-        public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset)
+        public void SetDataSequence(GekkoTime gt1, GekkoTime gt2, double[] input, int inputOffset, bool replaceNaNWith0)
         {
             // ------------------------------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() and ResizeDataArray() which are safe
@@ -887,7 +975,7 @@ namespace Gekko
                 throw new GekkoException();  //should be rare...
             }
 
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
                 //slack: init could be more precise regarding size, for non-annual frequencies.
                 GekkoTime gtTemp = new GekkoTime(gt1.freq, (gt1.super + gt2.super) / 2, 1);
@@ -897,12 +985,21 @@ namespace Gekko
             int index2 = -12345;
             index1 = GetArrayIndex(gt1);
             index2 = GetArrayIndex(gt2);
-            if (index1 < 0 || index1 >= this.data.dataArray.Length || index2 < 0 || index2 >= this.data.dataArray.Length)
+            if (index1 < 0 || index1 >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length || index2 < 0 || index2 >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
                 index1 = ResizeDataArray(gt1);
                 index2 = ResizeDataArray(gt2); //this would never change index1, since slots are added at the end                            
             }
-            System.Array.Copy(input, inputOffset, this.data.dataArray, index1, index2 - index1 + 1);
+            System.Array.Copy(input, inputOffset, this.data.GetDataArray_ONLY_INTERNAL_USE(), index1, index2 - index1 + 1);
+
+            if (replaceNaNWith0)
+            {
+                for (int i = index1; i <= index2; i++)  //=3, i<4, 
+                {
+                    if (G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i])) this.data.GetDataArray_ONLY_INTERNAL_USE()[i] = 0d;
+                }
+            }
+
             //Adjust start and end data positions.
             if (index2 > this.meta.lastPeriodPositionInArray)
             {
@@ -992,11 +1089,11 @@ namespace Gekko
             }
             else
             {
-                if (this.data.dataArray != null)
+                if (this.data.GetDataArray_ONLY_INTERNAL_USE() != null)
                 {
-                    for (int i = 0; i < this.data.dataArray.Length; i++)
+                    for (int i = 0; i < this.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
-                        if (!G.isNumericalError(this.data.dataArray[i]))
+                        if (!G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
                         {
                             rv = GetPeriod(i);
                             break;
@@ -1018,11 +1115,11 @@ namespace Gekko
             }
             else
             {
-                if (this.data.dataArray != null)
+                if (this.data.GetDataArray_ONLY_INTERNAL_USE() != null)
                 {
-                    for (int i = this.data.dataArray.Length - 1; i >= 0; i--)
+                    for (int i = this.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1; i >= 0; i--)
                     {
-                        if (!G.isNumericalError(this.data.dataArray[i]))
+                        if (!G.isNumericalError(this.data.GetDataArray_ONLY_INTERNAL_USE()[i]))
                         {
                             rv = GetPeriod(i);
                             break;
@@ -1167,23 +1264,23 @@ namespace Gekko
             // ----------------------------------------------------------------------------
             
             int index = GetArrayIndex(gt);
-            while (index < 0 || index >= this.data.dataArray.Length)
+            while (index < 0 || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
                 //Resize data array
                 //Keeps on going until the array is large enough.
-                double n = Math.Max(this.data.dataArray.Length, 4);  //the length could be 1 (or maybe even 0), so we translate 0, 1, 2, 3 into 4 which will become 6 with 1.5 times expandRate.
+                double n = Math.Max(this.data.GetDataArray_ONLY_INTERNAL_USE().Length, 4);  //the length could be 1 (or maybe even 0), so we translate 0, 1, 2, 3 into 4 which will become 6 with 1.5 times expandRate.
                 double[] newDataArray = new double[(int)(n * Globals.defaultExpandRateForDataArrays)];
                 InitializeDataArray(newDataArray);
-                if (index >= this.data.dataArray.Length)
+                if (index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
                 {
                     //new periods after end
-                    System.Array.Copy(this.data.dataArray, newDataArray, this.data.dataArray.Length);
+                    System.Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), newDataArray, this.data.GetDataArray_ONLY_INTERNAL_USE().Length);
                 }
                 else
                 {
                     //new periods added before start
-                    int diffSize = newDataArray.Length - this.data.dataArray.Length;
-                    System.Array.Copy(this.data.dataArray, 0, newDataArray, diffSize, this.data.dataArray.Length);
+                    int diffSize = newDataArray.Length - this.data.GetDataArray_ONLY_INTERNAL_USE().Length;
+                    System.Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), 0, newDataArray, diffSize, this.data.GetDataArray_ONLY_INTERNAL_USE().Length);
                     this.data.anchorPeriodPositionInArray += diffSize;
                     if (adjustStartEndDates)  //only for setting data
                     {
@@ -1204,7 +1301,7 @@ namespace Gekko
                 //this.data.GetDataArray_ONLY_FOR_INTERNAL_USE() = newDataArray;
                 //this.data.SetDataArray_ONLY_FOR_INTERNAL_USE(newDataArray);
 
-                this.data.dataArray = newDataArray;
+                this.data.SetDataarray_ONLY_INTERNAL_USE(newDataArray);
                 index = GetArrayIndex(gt);
             }
             return index;
@@ -1220,9 +1317,9 @@ namespace Gekko
             else
             {
                 //The anchor is set in the middle of the array, and the anchor date is set to gt.
-                this.data.dataArray = new double[Globals.defaultPeriodsWhenCreatingTimeSeries];
+                this.data.SetDataarray_ONLY_INTERNAL_USE(new double[Globals.defaultPeriodsWhenCreatingTimeSeries]);
                 this.data.anchorPeriodPositionInArray = Globals.defaultPeriodsWhenCreatingTimeSeries / 2;  //possible to simulate 100 years forwards, and have data 100 years back.
-                InitializeDataArray(this.data.dataArray);  //may fill it with NaN's
+                InitializeDataArray(this.data.GetDataArray_ONLY_INTERNAL_USE());  //may fill it with NaN's
                                                            //the following two will always be fixed to what they
                                                            //were for the very first observation entering the double[] array (unless the array is resized).
                 this.data.anchorPeriod = t;
@@ -1277,8 +1374,8 @@ namespace Gekko
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3
                     int ib1 = x1_series.ResizeDataArray(window1);  //t0
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3
-                    double[] arraya = rv_series.data.dataArray;
-                    double[] arrayb = x1_series.data.dataArray;
+                    double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {                        
                         arraya[i + ia1] = a(arrayb[i + ib1]);
@@ -1295,9 +1392,9 @@ namespace Gekko
             else if (x1_series.type == ESeriesType.Light)
             {
                 //safe to alter the object itself, since it is temporary
-                for (int i = 0; i < x1_series.data.dataArray.Length; i++)
+                for (int i = 0; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                 {
-                    x1_series.data.dataArray[i] = a(x1_series.data.dataArray[i]);
+                    x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i]);
                 }
                 rv_series = x1_series;
             }
@@ -1337,8 +1434,8 @@ namespace Gekko
                     int ia2 = rv_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ia1, array is enlarged not moved around
                     int ib1 = x1_series.ResizeDataArray(window1);  //t0
                     int ib2 = x1_series.ResizeDataArray(window2);  //t3 -----------> note: this cannot change ib1, array is enlarged not moved around
-                    double[] arraya = rv_series.data.dataArray;
-                    double[] arrayb = x1_series.data.dataArray;
+                    double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
                     //for (int i = 0; i < lag; i++)
                     //{
                     //    arraya[i] = double.NaN;  //arraya[0] = M
@@ -1379,11 +1476,11 @@ namespace Gekko
                         }
                     }
 
-                    for (int i = 0; i < rv_series.data.dataArray.Length; i++)
+                    for (int i = 0; i < rv_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
                         if (i - lag + offset < 0)
                         {
-                            rv_series.data.dataArray[i] = double.NaN;
+                            rv_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = double.NaN;
                             if (Globals.runningOnTTComputer)
                             {
                                 G.Writeln2("*** ERROR: TT note: lag problem");
@@ -1392,7 +1489,7 @@ namespace Gekko
                         }
                         else
                         {
-                            rv_series.data.dataArray[i] = a(x1_series.data.dataArray[i + offset], x1_series.data.dataArray[i - lag + offset]);
+                            rv_series.data.GetDataArray_ONLY_INTERNAL_USE()[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i + offset], x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag + offset]);
                         }
                     }
 
@@ -1400,16 +1497,16 @@ namespace Gekko
                 else
                 {
                     //safe to alter the object itself, since it is temporary                
-                    double[] temp = new double[x1_series.data.dataArray.Length];
+                    double[] temp = new double[x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length];
                     for (int i = 0; i < lag; i++)
                     {
                         temp[i] = double.NaN;
                     }
-                    for (int i = 0 + lag; i < x1_series.data.dataArray.Length; i++)
+                    for (int i = 0 + lag; i < x1_series.data.GetDataArray_ONLY_INTERNAL_USE().Length; i++)
                     {
-                        temp[i] = a(x1_series.data.dataArray[i], x1_series.data.dataArray[i - lag]);
+                        temp[i] = a(x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i], x1_series.data.GetDataArray_ONLY_INTERNAL_USE()[i - lag]);
                     }
-                    x1_series.data.dataArray = temp;  //has same size and same anchors            
+                    x1_series.data.SetDataarray_ONLY_INTERNAL_USE(temp);  //has same size and same anchors            
                     rv_series = x1_series;
                     //rv_series.SetDirty(true);
                 }
@@ -1454,8 +1551,8 @@ namespace Gekko
                     int ib1 = x1_series.ResizeDataArray(window1);
                     int ib2 = x1_series.ResizeDataArray(window2);
 
-                    double[] arraya = rv_series.data.dataArray;
-                    double[] arrayb = x1_series.data.dataArray;
+                    double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
@@ -1533,9 +1630,9 @@ namespace Gekko
                     int ic1 = x2_series.ResizeDataArray(window1);
                     int ic2 = x2_series.ResizeDataArray(window2);
 
-                    double[] arraya = rv_series.data.dataArray;
-                    double[] arrayb = x1_series.data.dataArray;
-                    double[] arrayc = x2_series.data.dataArray;
+                    double[] arraya = rv_series.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayb = x1_series.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayc = x2_series.data.GetDataArray_ONLY_INTERNAL_USE();
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
@@ -1833,7 +1930,7 @@ namespace Gekko
             if (x1.type == ESeriesType.Light)
             {
                 window1 = x1.data.anchorPeriod.Add(-x1.GetAnchorPeriodPositionInArray());
-                window2 = window1.Add(x1.data.dataArray.Length - 1);
+                window2 = window1.Add(x1.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
 
                 if (Globals.runningOnTTComputer)
                 {
@@ -2342,8 +2439,8 @@ namespace Gekko
                     int ic1 = y_series.ResizeDataArray(window1);
                     int ic2 = y_series.ResizeDataArray(window2);
                                         
-                    double[] arrayb = this.data.dataArray;
-                    double[] arrayc = y_series.data.dataArray;
+                    double[] arrayb = this.data.GetDataArray_ONLY_INTERNAL_USE();
+                    double[] arrayc = y_series.data.GetDataArray_ONLY_INTERNAL_USE();
 
                     for (int i = 0; i < GekkoTime.Observations(window1, window2); i++)
                     {
@@ -2539,14 +2636,14 @@ namespace Gekko
             tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases
 
             //.data field is always there
-            if (this.data.dataArray == null)
+            if (this.data.GetDataArray_ONLY_INTERNAL_USE() == null)
             {
-                tsCopy.data.dataArray = null;
+                tsCopy.data.SetDataarray_ONLY_INTERNAL_USE(null);
             }
             else
             {
-                tsCopy.data.dataArray = new double[this.data.dataArray.Length];
-                System.Array.Copy(this.data.dataArray, tsCopy.data.dataArray, this.data.dataArray.Length);
+                tsCopy.data.SetDataarray_ONLY_INTERNAL_USE(new double[this.data.GetDataArray_ONLY_INTERNAL_USE().Length]);
+                System.Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), tsCopy.data.GetDataArray_ONLY_INTERNAL_USE(), this.data.GetDataArray_ONLY_INTERNAL_USE().Length);
             }
             tsCopy.data.anchorPeriod = this.data.anchorPeriod;
             tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
@@ -2641,9 +2738,24 @@ namespace Gekko
         [ProtoContract]
     public class SeriesDataInformation
     {
+        public double[] GetDataArray_ONLY_INTERNAL_USE()
+        {
+            return this.dataArray;
+        }        
+
+        public void SetDataarray_ONLY_INTERNAL_USE(double[] x)
+        {
+            this.dataArray = x;
+        }
+
+        //public double[] GetDataarray()
+        //{
+        //    return this.dataArray;
+        //}
+
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
         //BEWARE: Be careful about .dataOffsetLag when using the array! #772439872435
-        public double[] dataArray = null;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
+        private double[] dataArray = null;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
 
         [ProtoMember(2)]
         public GekkoTime anchorPeriod = GekkoTime.tNull;

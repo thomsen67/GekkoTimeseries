@@ -14531,7 +14531,7 @@ namespace UnitTests
                 {
                     int index1 = 0;
                     int index2 = 0;
-                    double[] data = tsA2.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.A, i, 1), new GekkoTime(EFreq.A, i, 1));
+                    double[] data = tsA2.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.A, i, 1), new GekkoTime(EFreq.A, i, 1));
                     Assert.AreEqual(index1, index2);
                     data[index1] = (double)i;
                 }
@@ -14542,7 +14542,7 @@ namespace UnitTests
                     {
                         int index1 = 0;
                         int index2 = 0;
-                        double[] data = tsQ2.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.Q, i, j), new GekkoTime(EFreq.Q, i, j));
+                        double[] data = tsQ2.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.Q, i, j), new GekkoTime(EFreq.Q, i, j));
                         Assert.AreEqual(index1, index2);
                         data[index1] = (double)i + (double)j / 100d;
                     }
@@ -14552,7 +14552,7 @@ namespace UnitTests
                     tsM1.SetData(new GekkoTime(EFreq.M, i, j), (double)i + (double)j / 100d);
                     int index1 = 0;
                     int index2 = 0;
-                    double[] data = tsM2.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.M, i, j), new GekkoTime(EFreq.M, i, j));
+                    double[] data = tsM2.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.M, i, j), new GekkoTime(EFreq.M, i, j));
                     Assert.AreEqual(index1, index2);
                     data[index1] = (double)i + (double)j / 100d;
                 }
@@ -14564,7 +14564,7 @@ namespace UnitTests
                 {
                     int index1 = 0;
                     int index2 = 0;
-                    double[] data = tsA2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.A, i, 1), new GekkoTime(EFreq.A, i, 1));
+                    double[] data = tsA2.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, new GekkoTime(EFreq.A, i, 1), new GekkoTime(EFreq.A, i, 1));
                     Assert.AreEqual(index1, index2);
                     data[index1] = (double)i;
                 }
@@ -14575,7 +14575,7 @@ namespace UnitTests
                     {
                         int index1 = 0;
                         int index2 = 0;
-                        double[] data = tsQ2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.Q, i, j), new GekkoTime(EFreq.Q, i, j));
+                        double[] data = tsQ2.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, new GekkoTime(EFreq.Q, i, j), new GekkoTime(EFreq.Q, i, j));
                         Assert.AreEqual(index1, index2);
                         data[index1] = (double)i + (double)j / 100d;
                     }
@@ -14585,7 +14585,7 @@ namespace UnitTests
                     tsM1.SetData(new GekkoTime(EFreq.M, i, j), (double)i + (double)j / 100d);
                     int index1 = 0;
                     int index2 = 0;
-                    double[] data = tsM2.GetDataSequenceUnsafePointerReadOnly(out index1, out index2, new GekkoTime(EFreq.M, i, j), new GekkoTime(EFreq.M, i, j));
+                    double[] data = tsM2.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, new GekkoTime(EFreq.M, i, j), new GekkoTime(EFreq.M, i, j));
                     Assert.AreEqual(index1, index2);
                     data[index1] = (double)i + (double)j / 100d;
                 }
@@ -14637,7 +14637,7 @@ namespace UnitTests
             {
                 int index1 = 0;
                 int index2 = 0;
-                double[] data = tsA.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.A, start - 1, 1), new GekkoTime(EFreq.A, end + 1, 1));
+                double[] data = tsA.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.A, start - 1, 1), new GekkoTime(EFreq.A, end + 1, 1));
                 int counter = 0;
                 for (int i = index1; i <= index2; i++)
                 {
@@ -14658,7 +14658,7 @@ namespace UnitTests
             {
                 int index1 = 0;
                 int index2 = 0;
-                double[] data = tsQ.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.Q, start, 1).Add(-1), new GekkoTime(EFreq.Q, end, 4).Add(1));
+                double[] data = tsQ.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.Q, start, 1).Add(-1), new GekkoTime(EFreq.Q, end, 4).Add(1));
                 int counter = 0;
                 for (int i = index1; i <= index2; i++)
                 {
@@ -14679,7 +14679,7 @@ namespace UnitTests
             {
                 int index1 = 0;
                 int index2 = 0;
-                double[] data = tsM.GetDataSequence(out index1, out index2, new GekkoTime(EFreq.M, start, 1).Add(-1), new GekkoTime(EFreq.M, end, 12).Add(1));
+                double[] data = tsM.GetDataSequenceBEWARE(out index1, out index2, new GekkoTime(EFreq.M, start, 1).Add(-1), new GekkoTime(EFreq.M, end, 12).Add(1));
                 int counter = 0;
                 for (int i = index1; i <= index2; i++)
                 {

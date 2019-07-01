@@ -157,7 +157,7 @@ namespace Gekko
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
                 
-        public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero
+        public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero, last one only when accessing a series from an open databank, not in other cases. Not implemented for SIM (has its own solve option for that)
 
         // -------- new options regarding missings end ---------------------
 
