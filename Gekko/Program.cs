@@ -6406,7 +6406,7 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.GetDataSequenceUnsafePointerAlterBEWARE();
+                dataArray = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE();
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
@@ -6572,7 +6572,7 @@ namespace Gekko
             {
                 index1 = ts.meta.firstPeriodPositionInArray;
                 index2 = ts.meta.lastPeriodPositionInArray;
-                dataArray = ts.GetDataSequenceUnsafePointerAlterBEWARE();
+                dataArray = ts.GetDataSequenceUnsafePointerReadOnlyBEWARE();
                 per1 = ts.GetPeriodFirst();
                 per2 = ts.GetPeriodLast();
             }
@@ -25941,7 +25941,7 @@ namespace Gekko
                 }
                 else if (!removed.editable)
                 {
-                    G.Writeln2("*** ERROR: Internal error #872543: a non-editable bank should not be possible to alter.");
+                    G.Writeln2("*** ERROR: Internal error #872543: a non-editable bank '" + removed.name + "' should not be possible to alter.");
                     throw new GekkoException();
                 }                
                 else

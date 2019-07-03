@@ -15,32 +15,43 @@ namespace Gekko
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            O.Assignment o0 = new O.Assignment();
-            o0.opt_source = @"<[code]>y = log(x) + x";
+
+            Program.options.series_data_missing = G.GetMissing("zero");
+            G.Writeln();
+            G.Writeln("option series data missing = " + (G.GetMissing("zero")).ToString().ToLower() + "");
+
+            //[[commandEnd]]0
 
 
-            Action assign_60 = () =>
+            //[[commandStart]]1
+            p.SetText(@"¤2"); O.InitSmpl(smpl, p);
+
+            O.Assignment o1 = new O.Assignment();
+            o1.opt_source = @"<[code]>y=x";
+
+
+            Action assign_56 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar59 = O.Add(smpl, Functions.log(smpl, null, null, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null)), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null));
+                IVariable ivTmpvar55 = O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
                 O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar59, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                O.Lookup(smpl, null, null, "y", null, ivTmpvar55, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
                 ;
             };
-            Func<bool> check_60 = () =>
+            Func<bool> check_56 = () =>
             {
                 O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar59 = O.Add(smpl, Functions.log(smpl, null, null, O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null)), O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null));
+                IVariable ivTmpvar55 = O.Lookup(smpl, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null);
                 O.AdjustT0(smpl, 2);
-                if (ivTmpvar59.Type() != EVariableType.Series) return false;
+                if (ivTmpvar55.Type() != EVariableType.Series) return false;
                 O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "y", null, ivTmpvar59, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                O.Lookup(smpl, null, null, "y", null, ivTmpvar55, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o1)
                 ;
                 return O.Dynamic2(smpl);
             };
-            O.RunAssigmentMaybeDynamic(smpl, assign_60, check_60, o0);
+            O.RunAssigmentMaybeDynamic(smpl, assign_56, check_56, o1);
 
-            //[[commandEnd]]0
+            //[[commandEnd]]1
         }
 
 

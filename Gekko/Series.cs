@@ -725,13 +725,13 @@ namespace Gekko
             // => Safe method that returns a *copy* of the dataArray, optionally with NaN changed to 0. May resize, safe to change dataArray if convenient. Will not set dirty. Use it for reading if you want to be safe regarding side-effects. Else if sure about side-effects, GetDataSequenceUnsafePointerReadOnlyBEWARE() can be used
             //
             //  + GetDataSequenceUnsafePointerAlterBEWARE()
-            // => Used in rare cases if no period is given, and something needs to be done on the dataArray. Will set dirty.
+            // => Used if no period is given, and something needs to be done on the dataArray. Will set dirty, do not use for light timeseries.
             //
             //  + GetDataSequenceUnsafePointerAlterBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
             // => Used to alter the dataArray directly. Will set dirty.Similar to below.Similar to above, but with periods and may resize.
             //            
             //  + GetDataSequenceUnsafePointerReadOnlyBEWARE()
-            // => Used when no period is given, but something should be read. Will not set dirty.
+            // => Used when no period is given, but something should be read. Will not set dirty, can be used for light timeseries.
             //
             //  + GetDataSequenceUnsafePointerReadOnlyBEWARE(out int index1, out int index2, GekkoTime per1, GekkoTime per2)
             // => Used to access the dataArray directly. May resize, should not change data, will not set dirty. Similar to above.
@@ -824,7 +824,7 @@ namespace Gekko
         {
             //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
 
-            //Will set dirty
+            //Will set dirty, cannot be used for light timeseries for that reason
 
             //When using this to alter data, or to copy or transform it,
             //beware that this is the actual data array, not a copy of it.
@@ -832,11 +832,7 @@ namespace Gekko
             //You may have to transform NaN to 0 if this option is set.
             //See also #87943523987543
 
-            if (this.type == ESeriesType.Timeless)
-            {
-                G.Writeln2("*** ERROR: Timeless variable error #2");
-                throw new GekkoException();
-            }
+          
             this.SetDirty(true); //we have to mark dirty manually
 
             return this.data.GetDataArray_ONLY_INTERNAL_USE();
@@ -846,20 +842,14 @@ namespace Gekko
         {
             //Regarding the GetDataSequence... methods, see the overview in GetDataSequenceAbstract()
 
-            //Will not set dirty
+            //Will not set dirty, can be used for light timeseries
 
             //When using this to alter data, or to copy or transform it,
             //beware that this is the actual data array, not a copy of it.
             //Also, if using this, beware of OPTION series data missing.
             //You may have to transform NaN to 0 if this option is set.
             //See also #87943523987543
-
-            if (this.type == ESeriesType.Timeless)
-            {
-                G.Writeln2("*** ERROR: Timeless variable error #2");
-                throw new GekkoException();
-            }
-            this.SetDirty(true); //we have to mark dirty manually
+                                 
 
             return this.data.GetDataArray_ONLY_INTERNAL_USE();
         }

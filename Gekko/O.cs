@@ -939,6 +939,7 @@ namespace Gekko
                 ESeriesMissing missing = G.GetMissing(s);
                 Program.options.series_array_print_missing = missing;
                 Program.options.series_normal_print_missing = missing;
+                Program.options.series_data_missing = missing;
             }
         }
 
@@ -948,12 +949,12 @@ namespace Gekko
             Program.databanks.optionRef = null;
         }
 
-        public static void HandleMissing2(ESeriesMissing r1, ESeriesMissing r2)
+        public static void HandleMissing2(ESeriesMissing r1, ESeriesMissing r2, ESeriesMissing r3)
         {
             Program.options.series_array_print_missing = r1;
             Program.options.series_normal_print_missing = r2;
+            Program.options.series_data_missing = r3;
         }
-
         
         public static void IterateStep(ELoopType loopType, ref IVariable x, IVariable start, IVariable step, int counter)
         {
@@ -3217,17 +3218,9 @@ namespace Gekko
 
                                                 int index1, index2;
                                                 //may enlarge the array with NaNs first and last
-                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);
-                                                //may enlarge the array with NaNs first and last
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, true);
-                                                if (Program.options.series_data_missing == ESeriesMissing.Zero)
-                                                {
-                                                    lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, true);
-                                                }
-                                                else
-                                                {
-                                                    lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, false);
-                                                }
+                                                double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);                                                                                                                                                
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Program.options.series_data_missing == ESeriesMissing.Zero);
+
                                             }
                                             else
                                             {
@@ -5856,7 +5849,7 @@ namespace Gekko
                 throw new GekkoException();
             }
             Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
-            double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
+            double[] temp = tsl.GetDataSequenceUnsafePointerReadOnlyBEWARE(); //do not set it to 'Alter', because it then tries to set the series dirty, and it is a light series that cannot be dirty.
             for (int i = 0; i < temp.Length; i++)  //we will not convert NaN in the matrix to 0 in the series
             {
                 temp[i] = m.data[i, 0];
