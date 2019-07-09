@@ -20500,34 +20500,57 @@ namespace Gekko
                 string ss =  kvp.Key;                
                 if (G.GetFreqFromName(ss) != Program.options.freq) continue;  //we filter out other freqs
                 string s = G.Chop_RemoveFreq(ss);
+
                 if (hasFilter)
                 {
                     if (!filter.ContainsKey(s)) continue;  //ignore this
                 }
                 Series ts = kvp.Value as Series;
                 //Series ts = work.GetVariable(s);  //can this not be moved before loop??  //#getvar
-                if (ts.type == ESeriesType.ArraySuper) continue;  //ignore it, but should not be possible
-                foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
-                {                    
-                    double value = ts.GetDataSimple(t);
-                    if (G.isNumericalError(value))
+
+                List<Series> l = new List<Series>();
+                List<string> n = new List<string>();
+
+                if (ts.type == ESeriesType.ArraySuper)
+                {
+                    foreach (KeyValuePair<MapMultidimItem, IVariable> kvpsub in ts.dimensionsStorage.storage)
                     {
-                        if (replace)
+                        Series sub = kvpsub.Value as Series;
+                        l.Add(sub);
+                        n.Add(sub.GetNameWithoutCurrentFreq(true));
+                    }
+                }
+                else
+                {
+                    l.Add(ts);
+                    n.Add(s);
+                }
+
+                for (int i = 0; i < l.Count; i++)
+                {
+
+                    foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
+                    {
+                        double value = l[i].GetDataSimple(t);
+                        if (G.isNumericalError(value))
                         {
-                            ts.SetData(t, o.opt_replace);
-                        }
-                        else
-                        {
-                            missing_.Add(s);  //always put it in this list
-                            if (exod.ContainsKey(s)) missing_exod.Add(s);
-                            if (exoj.ContainsKey(s)) missing_exoj.Add(s);
-                            if (exoz.ContainsKey(s)) missing_exoz.Add(s);
-                            if (exodjz.ContainsKey(s)) missing_exodjz.Add(s);
-                            if (exo.ContainsKey(s)) missing_exo.Add(s);
-                            if (exotrue.ContainsKey(s)) missing_exotrue.Add(s);
-                            if (endo.ContainsKey(s)) missing_endo.Add(s);
-                            if (all.ContainsKey(s)) missing_all.Add(s);
-                            break;  //one is enough
+                            if (replace)
+                            {
+                                l[i].SetData(t, o.opt_replace);
+                            }
+                            else
+                            {
+                                missing_.Add(n[i]);  //always put it in this list
+                                if (exod.ContainsKey(n[i])) missing_exod.Add(s);
+                                if (exoj.ContainsKey(n[i])) missing_exoj.Add(s);
+                                if (exoz.ContainsKey(n[i])) missing_exoz.Add(s);
+                                if (exodjz.ContainsKey(n[i])) missing_exodjz.Add(s);
+                                if (exo.ContainsKey(n[i])) missing_exo.Add(s);
+                                if (exotrue.ContainsKey(n[i])) missing_exotrue.Add(s);
+                                if (endo.ContainsKey(n[i])) missing_endo.Add(s);
+                                if (all.ContainsKey(n[i])) missing_all.Add(s);
+                                break;  //one is enough
+                            }
                         }
                     }
                 }
@@ -34661,7 +34684,7 @@ namespace Gekko
             double yLag2 = double.NaN;
             if (tsWork != null)
             {
-                x = tsWork.GetDataSimple(gt);
+                x = tsWork.GetDataSimple(gt);  //actually quite good that GetData is used here, because for instance "PRT x;" will have the real series x here, where NaN have not optionally been replace with 0 (cf. option series data missing). But the GetData method takes care of that.
                 xLag = tsWork.GetDataSimple(gt.Add(-1));
                 xLag2 = tsWork.GetDataSimple(gt.Add(-2));
                 if (isLogTransform)

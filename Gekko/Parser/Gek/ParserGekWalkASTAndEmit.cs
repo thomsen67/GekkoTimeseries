@@ -6364,7 +6364,7 @@ namespace Gekko.Parser.Gek
 
         private static string LocalCode3(string num)
         {
-            return "ESeriesMissing r1_" + num + " = Program.options.series_array_print_missing; ESeriesMissing r2_" + num + " = Program.options.series_normal_print_missing; ESeriesMissing r3_" + num + " = Program.options.series_data_missing; try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref); O.HandleMissing1(o" + num + ".opt_missing);" + G.NL;
+            return "ESeriesMissing r1_" + num + " = Program.options.series_array_print_missing; ESeriesMissing r2_" + num + " = Program.options.series_array_calc_missing; ESeriesMissing r3_" + num + " = Program.options.series_data_missing; try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref); O.HandleMissing1(o" + num + ".opt_missing);" + G.NL;
         }        
 
         private static string LocalCode4(string num)

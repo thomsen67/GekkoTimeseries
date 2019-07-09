@@ -694,9 +694,10 @@ namespace Gekko
             else if (G.Equal(s, "m")) return ESeriesMissing.M;
             else if (G.Equal(s, "zero")) return ESeriesMissing.Zero;
             else if (G.Equal(s, "skip")) return ESeriesMissing.Skip;
+            else if (G.Equal(s, "ignore")) return ESeriesMissing.Ignore;
             else
             {
-                G.Writeln2("*** ERROR: Expected missing = error, m, zero or skip");
+                G.Writeln2("*** ERROR: Expected missing = error, m, zero, skip or ignore");
                 throw new GekkoException();
             }
 

@@ -27,6 +27,13 @@ namespace Gekko
         }
     }
 
+    public class MissingMemory
+    {
+        public ESeriesMissing print;
+        public ESeriesMissing calc;
+        public ESeriesMissing data;
+    }
+
     public class DecompItemsString
     {
         public string expressionText = null;
@@ -937,9 +944,20 @@ namespace Gekko
             if (s != null)
             {
                 ESeriesMissing missing = G.GetMissing(s);
-                Program.options.series_array_print_missing = missing;
-                Program.options.series_normal_print_missing = missing;
-                Program.options.series_data_missing = missing;
+                if (missing == ESeriesMissing.Ignore)
+                {
+                    Program.options.series_array_print_missing = ESeriesMissing.Skip;
+                    Program.options.series_array_calc_missing = ESeriesMissing.Zero;
+                    Program.options.series_data_missing = ESeriesMissing.Zero;
+                }
+                else
+                {
+                    //These options are not good, need to be reworked
+                    //but kept for legacy in 3.0
+                    Program.options.series_array_print_missing = missing;
+                    Program.options.series_array_calc_missing = missing;
+                    Program.options.series_data_missing = missing;
+                }
             }
         }
 
@@ -952,7 +970,7 @@ namespace Gekko
         public static void HandleMissing2(ESeriesMissing r1, ESeriesMissing r2, ESeriesMissing r3)
         {
             Program.options.series_array_print_missing = r1;
-            Program.options.series_normal_print_missing = r2;
+            Program.options.series_array_calc_missing = r2;
             Program.options.series_data_missing = r3;
         }
         
@@ -2911,7 +2929,7 @@ namespace Gekko
                                                 Buffer.BlockCopy(source, 8 * i1, destination, 8 * destinationStart, 8 * (i2 - i1 + 1));
                                                 IVariable lhsNew = m;
 
-                                                if (Program.options.series_data_missing == ESeriesMissing.Zero) G.ReplaceNaNWith0(m.data);
+                                                if (Series.MissingZero(rhs_series)) G.ReplaceNaNWith0(m.data);
 
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
 
@@ -2954,7 +2972,7 @@ namespace Gekko
                                                 //see #0985324985237
                                                 Buffer.BlockCopy(source, 8 * ii1, destination, 8 * destinationStart, 8 * (ii2 - ii1 + 1));
                                                 IVariable lhsNew = m;
-                                                if (Program.options.series_data_missing == ESeriesMissing.Zero) G.ReplaceNaNWith0(m.data);
+                                                //if (Series.MissingZero()) G.ReplaceNaNWith0(m.data); --> NO! Series light do not get replacement
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, lhsNew);
                                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
                                             }
@@ -2975,7 +2993,7 @@ namespace Gekko
                                                 {
                                                 int n = smpl.Observations12();
                                                 double d = rhs_series.GetDataSequenceUnsafePointerAlterBEWARE()[0];
-                                                if (G.isNumericalError(d) && Program.options.series_data_missing == ESeriesMissing.Zero) d = 0d;
+                                                if (Series.MissingZero(rhs_series) && G.isNumericalError(d)) d = 0d;
                                                 Matrix m = new Matrix(1, n, d);  //expanded as if it was a real timeseries                                       
                                                 AddIvariableWithOverwrite(ib, varnameWithFreq, lhs != null, m);
                                                 G.ServiceMessage("MATRIX " + varnameWithFreq + " updated ", smpl.p);
@@ -3219,8 +3237,7 @@ namespace Gekko
                                                 int index1, index2;
                                                 //may enlarge the array with NaNs first and last
                                                 double[] data_beware_do_not_alter = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE(out index1, out index2, tt1, tt2);                                                                                                                                                
-                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Program.options.series_data_missing == ESeriesMissing.Zero);
-
+                                                lhs_series.SetDataSequence(tt1, tt2, data_beware_do_not_alter, index1, Series.MissingZero(rhs_series_beware));
                                             }
                                             else
                                             {
@@ -3243,7 +3260,7 @@ namespace Gekko
                                             {
                                                 lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too
                                                 double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
-                                                if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(temp[0]))
+                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
                                                 {
                                                     temp[0] = 0d;
                                                 }
@@ -3252,7 +3269,7 @@ namespace Gekko
                                             {
                                                 double d = double.NaN;
                                                 if (rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE() != null) d = rhs_series_beware.GetDataSequenceUnsafePointerReadOnlyBEWARE()[0];
-                                                if (Program.options.series_data_missing == ESeriesMissing.Zero && G.isNumericalError(d))
+                                                if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(d))
                                                 {
                                                     d = 0d;
                                                 }
@@ -3641,22 +3658,46 @@ namespace Gekko
 
         public static void RunAssigmentMaybeDynamic(GekkoSmpl smpl, Action assign_20, Func<bool> check_20, O.Assignment o)
         {
-            if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
+
+            MissingMemory missing = null;
+            if (o.opt_missing != null)
             {
-                GekkoTime tt1_20 = smpl.t1;
-                GekkoTime tt2_20 = smpl.t2;
-                foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                missing = new MissingMemory();
+                missing.print = Program.options.series_array_print_missing;
+                missing.calc = Program.options.series_array_calc_missing;
+                missing.data = Program.options.series_data_missing;
+                HandleMissing1(o.opt_missing);
+            }
+
+            try
+            {
+                if ((Program.options.series_dyn || G.Equal(o.opt_dyn, "yes")) && check_20())
                 {
-                    smpl.t1 = t_20;
-                    smpl.t2 = t_20;
+                    GekkoTime tt1_20 = smpl.t1;
+                    GekkoTime tt2_20 = smpl.t2;
+                    foreach (GekkoTime t_20 in new GekkoTimeIterator(smpl.t1, smpl.t2))
+                    {
+                        smpl.t1 = t_20;
+                        smpl.t2 = t_20;
+                        assign_20();
+                    }
+                    smpl.t1 = tt1_20;
+                    smpl.t2 = tt2_20;
+                }
+                else
+                {
                     assign_20();
                 }
-                smpl.t1 = tt1_20;
-                smpl.t2 = tt2_20;
             }
-            else
+            finally
             {
-                assign_20();
+                if (o.opt_missing != null)
+                {
+                    missing.print = Program.options.series_array_print_missing;
+                    missing.calc = Program.options.series_array_calc_missing;
+                    missing.data = Program.options.series_data_missing;
+                    HandleMissing2(missing.print, missing.calc, missing.data);
+                }
             }
         }
 
@@ -6001,7 +6042,7 @@ namespace Gekko
                 //try to see if x can be a constant value
                 Series tsl = new Series(ESeriesType.Light, smpl.t0, smpl.t3); //will have small dataarray            
                 double x_val = O.ConvertToVal(x);
-                if (G.isNumericalError(x_val) && Program.options.series_data_missing == ESeriesMissing.Zero) x_val = 0d;
+                if (Series.MissingZero() && G.isNumericalError(x_val)) x_val = 0d;
                 double[] temp = tsl.GetDataSequenceUnsafePointerAlterBEWARE();
                 for (int i = 0; i < temp.Length; i++)
                 {
@@ -8393,6 +8434,7 @@ namespace Gekko
             public string opt_stamp = null;
             public string opt_dyn = null;
             public string opt_lsfunc = null;  //left-side function
+            public string opt_missing = null;
         }
 
         public class Accept
@@ -9489,7 +9531,7 @@ namespace Gekko
             public long counter = -12345;
 
             public string opt_split = "no";       //split "PRT x, y;" into "PRT x, PRT y;"
-            public string opt_missing = null;  //set to "skip" to skip non-existing, and "nan" to show them.
+            public string opt_missing = null;
 
             public void Exe()
             {

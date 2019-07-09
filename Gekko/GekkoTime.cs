@@ -20,7 +20,8 @@ namespace Gekko
         Error,
         M,
         Zero,
-        Skip
+        Skip,
+        Ignore
     }
     
     public class GekkoTimeStuff

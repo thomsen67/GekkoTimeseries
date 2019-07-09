@@ -1642,6 +1642,7 @@ namespace UnitTests
             //also p <missing = ...> and also OPTION series data missing = ...
 
             Table table = null;
+                                    
 
             // =============== missing in First
             // for each of these, 4 options are tried combined with <n>, <rn>, <m>
@@ -2059,14 +2060,69 @@ namespace UnitTests
                 _AssertSeries(First(), "z!a", 2013, double.NaN, sharedDelta);
             }
 
-            I("reset;");
+            //test of data missing
+            I("reset; time 2001 2003;");
             I("#m = a, b, c;");
+            I("xx = series(1);");
             I("SERIES xx[a] = 100, m(), 102;");
             I("SERIES xx[b] = 100, 101, m();");
-            I("PRT sum(#m, xx[#m]);");
-            I("PRT <missing = zero> sum(#m, xx[#m]);");
+            I("option series array calc missing = zero;");
+            I("option series data missing = zero;");
+            I("PRT <n> sum(#m, xx[#m]);");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "su");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], "m(#m, xx[#m])");
+            Assert.AreEqual(table.Get(3, 2).number, 200d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 101d, sharedDelta);
+            Assert.AreEqual(table.Get(5, 2).number, 102d, sharedDelta);
+                        
+            //test that data missing --> 0, but only when accessing series from banks,
+            //not because something like log(-1) produces a missing value.
+            I("reset; time 2001 2003;");            
+            I("xx = series(1);");
+            I("SERIES xx[a] = 1, -1, 2;");            
+            I("SERIES xx[b] = log(xx[a]);");            
+            I("SERIES xx[c] = log(xx[a]) + 0;");
+            I("option series data missing = zero;");
+            I("PRT <n> log(xx[a]), log(xx[a])+0, xx[b], xx[c];");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(2, 2).number, Math.Log(1d), sharedDelta);
+            Assert.IsTrue(double.IsNaN(table.Get(3, 2).number));
+            Assert.AreEqual(table.Get(4, 2).number, Math.Log(2d), sharedDelta);
+            Assert.AreEqual(table.Get(2, 3).number, Math.Log(1d), sharedDelta);            
+            Assert.IsTrue(double.IsNaN(table.Get(3, 3).number));
+            Assert.AreEqual(table.Get(4, 3).number, Math.Log(2d), sharedDelta);
+            Assert.AreEqual(table.Get(2, 4).number, Math.Log(1d), sharedDelta);
+            Assert.AreEqual(table.Get(3, 4).number, 0d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 4).number, Math.Log(2d), sharedDelta);
+            Assert.AreEqual(table.Get(2, 5).number, Math.Log(1d), sharedDelta);
+            Assert.AreEqual(table.Get(3, 5).number, 0d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 5).number, Math.Log(2d), sharedDelta);
 
+            //tests from the "missings" page in appendix (Gekko doc)
 
+            I("time 2011 2012;");
+            I("#e = k, s;");
+            I("#a = ('4', '5');");
+            I("x = series(2);");  //2 dimensions
+            I("x[k, 4] = 63, 65;");
+            I("x[k, 5] = 35, 37;");
+            I("x[s, 5] = 26, m();"); //m() = missing
+            FAIL("PRT <n> sum((#e, #a), x[#e, #a]), x[#e, #a];");
+            I("PRT <n missing = ignore> sum((#e, #a), x[#e, #a]), x[#e, #a];");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(3, 2).number, 124d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 2).number, 102d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 3).number, 63d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 3).number, 65d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 4).number, 35d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 4).number, 37d, sharedDelta);
+            Assert.AreEqual(table.Get(3, 5).number, 26d, sharedDelta);
+            Assert.AreEqual(table.Get(4, 5).number, 0d, sharedDelta);
+            FAIL("y = sum((#e, #a), x[#e, #a]);");
+            I("y <missing = ignore> = sum((#e, #a), x[#e, #a]);");
+            _AssertSeries(First(), "y!a", 2011, 124d, sharedDelta);
+            _AssertSeries(First(), "y!a", 2012, 102d, sharedDelta);
         }
 
         [TestMethod]
@@ -11438,6 +11494,8 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Findmisingdata()
         {
+            Databank w = First();
+
             //Does not test the result, only the command
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models';");  //needs "'" since it contains a "-"
@@ -11448,7 +11506,7 @@ namespace UnitTests
 
             //Tests replacement of M with a value (here 0)
             I("RESET;");
-            Databank w = First();
+            
             I("CREATE a, b;");
             I("TIME 2000 2003;");
             I("SERIES a = (1, m(), 2, m());");
@@ -11491,6 +11549,7 @@ namespace UnitTests
             _AssertSeries(w, "b", 2001, 1, sharedDelta);
             _AssertSeries(w, "b", 2002, 0, sharedDelta);
             _AssertSeries(w, "b", 2003, 2, sharedDelta);
+
             I("RESET;");
             I("CREATE a, b;");
             I("TIME 2000 2003;");
@@ -11505,6 +11564,27 @@ namespace UnitTests
             _AssertSeries(w, "b", 2001, 1, sharedDelta);
             _AssertSeries(w, "b", 2002, 0, sharedDelta);
             _AssertSeries(w, "b", 2003, 2, sharedDelta);
+
+
+            I("RESET;");
+            I("CREATE a, b;");
+            I("TIME 2000 2003;");
+            I("x = series(1);");
+            I("SERIES x[a] = (1, m(), 2, m());");
+            //I("SERIES x[b] = (m(), 1, m(), 2);");
+            I("SERIES x[b] = timeless(m());");
+            I("FINDMISSINGDATA <2001 2002 replace = 0> x*;");
+            _AssertSeries(w, "x", new string[] { "a" }, 2000, 1, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "a" }, 2001, 0, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "a" }, 2002, 2, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "a" }, 2003, double.NaN, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "b" }, 2000, 0d, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "b" }, 2001, 0d, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "b" }, 2002, 0d, sharedDelta);
+            _AssertSeries(w, "x", new string[] { "b" }, 2003, 0d, sharedDelta);
+
+
+
         }
 
         [TestMethod]
