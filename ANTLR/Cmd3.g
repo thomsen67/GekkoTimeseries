@@ -2812,7 +2812,7 @@ decompExpression2:          (expression EQUAL)? expression -> expression+;
 
 decompWhere:                WHERE decompWhere2 (COMMA2 decompWhere2)*-> ^(ASTDECOMPWHERE decompWhere2+);
 decompGroup:                GROUP decompGroup1 (COMMA2 decompGroup1)* -> ^(ASTDECOMPGROUP decompGroup1+);
-decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> ^(ASTDECOMPLINK decompLink1+);
+decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> ^(ASTDECOMPLINK decompLink1+) | -> ASTDECOMPLINK;
 decompCols:                 COLS seqOfBankvarnames;
 
 decompWhere2:               decompWhere1 IN seqOfBankvarnamesOnly1 -> ^(ASTDECOMPWHERE2 decompWhere1 seqOfBankvarnamesOnly1);

@@ -358,21 +358,7 @@ namespace Gekko
             bool isDiff = radioButton5.Checked;
             bool isDlog = radioButton8.Checked;
             bool isMultiplier = checkBox1.Checked;
-
-            long counter = this.graphOptions.counter;
-            string code1 = Globals.prtCsSnippets[counter];
-            string code2 = Globals.prtCsSnippetsHeaders[counter];
-
-
-            string cs = code1;
-            if (isMultiplier)
-            {
-                cs = cs.Replace("O.Prt.GetBankNumbers(null,", "O.Prt.GetBankNumbers(`m`,");
-            }
-            //this.graphOptions.o = Program.PrtSnippet(cs, code2);
-            //if (this.graphOptions.o == null) return;  //If so, an error box has been shown.    
-            //this.graphOptions.o.printCodes = new List<OptString>();
-
+            
             string s = null;
             if (isLevel) s = "n";
             else if (isLog) s = "n";

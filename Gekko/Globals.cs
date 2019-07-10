@@ -903,13 +903,7 @@ namespace Gekko
 
         public static CodeDomProvider csCompiler = CodeDomProvider.CreateProvider("CSharp");
         public static ICodeCompiler iCodeCompiler = Globals.csCompiler.CreateCompiler();
-
-        public static Dictionary<long, string> prtCsSnippets = new Dictionary<long, string>();
-        public static Dictionary<long, string> prtCsSnippetsHeaders = new Dictionary<long, string>();
-        public static long prtCsSnippetsCounter = 0;
-
-        //public static string gekkoTimeIniCs = "GekkoTime t = GekkoTime.tNull;";
-        //public static string gekkoSmplInit = "GekkoSmpl smpl = O.Smpl();";
+                
         public static string gekkoSmplInit = "GekkoSmpl " + Globals.smpl + " = new GekkoSmpl(); O.InitSmpl(" + Globals.smpl + ", p);";
         public static string gekkoSmplInitCommand = "O.InitSmpl(" + Globals.smpl + ", p);";
         public static string GekkoSmplNull = "" + Globals.smpl + " = null;";

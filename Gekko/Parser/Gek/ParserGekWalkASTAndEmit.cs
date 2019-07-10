@@ -3100,22 +3100,13 @@ namespace Gekko.Parser.Gek
 
                                 node.Code.A(node[3].Code);
 
-                                node.Code.A(LocalCode4(Num(node)));
-
-                                if (node.Text == "ASTPRT")
-                                {
-                                    //Globals.lastPrtCsSnippet = node.Code.ToString();  //without the o117.Exe()
-                                    //Globals.lastPrtCsSnippet += "return o" + Num(node) + ";" + G.NL;
-                                    //Globals.lastPrtCsSnippetHeader = w.headerCs.ToString();  //may contain a lot of unnecessary IVariables, but never mind (not a problem when used interactively)
-
-                                    Globals.prtCsSnippetsCounter++;
-                                    node.Code.A("o" + Num(node) + ".counter = " + Globals.prtCsSnippetsCounter + ";" + G.NL);
-                                    Globals.prtCsSnippets.Add(Globals.prtCsSnippetsCounter, node.Code.ToString() + "return o" + Num(node) + ";" + G.NL);
-                                    Globals.prtCsSnippetsHeaders.Add(Globals.prtCsSnippetsCounter, w.headerCs.ToString());
-                                }
+                                //node.Code.A(LocalCode4(Num(node)));
+                                                                
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
                                                                 
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+
+                                node.Code.A(LocalCode4(Num(node)));
 
                                 node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
 

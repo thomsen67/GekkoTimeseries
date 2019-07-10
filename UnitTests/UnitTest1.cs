@@ -1971,7 +1971,6 @@ namespace UnitTests
             Assert.AreEqual(table.Get(2, 2).number, 11d - 1.1d, sharedDelta);
             Assert.AreEqual(table.Get(2, 3).number, 12d - 0d, sharedDelta);
             Assert.AreEqual(table.Get(2, 4).number, 13d - 3.3d, sharedDelta);
-
             //I("OPTION series array print missing = skip;");
             I("p<n missing = skip> x[#i];");
             table = Globals.lastPrtOrMulprtTable;
@@ -2101,6 +2100,7 @@ namespace UnitTests
 
             //tests from the "missings" page in appendix (Gekko doc)
 
+            I("reset;");
             I("time 2011 2012;");
             I("#e = k, s;");
             I("#a = ('4', '5');");
@@ -2119,6 +2119,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 4).number, 37d, sharedDelta);
             Assert.AreEqual(table.Get(3, 5).number, 26d, sharedDelta);
             Assert.AreEqual(table.Get(4, 5).number, 0d, sharedDelta);
+            //Assert.IsTrue(double.IsNaN(table.Get(4, 5).number));
             FAIL("y = sum((#e, #a), x[#e, #a]);");
             I("y <missing = ignore> = sum((#e, #a), x[#e, #a]);");
             _AssertSeries(First(), "y!a", 2011, 124d, sharedDelta);
@@ -8469,14 +8470,15 @@ namespace UnitTests
                 I("v = series(1);");
                 I("v[y] = 501, 499, 504;");
                 I("v[c] = 400, 402, 397;");
+                I("v[c] *= 2;");
                 I("i =  90,  89,  91;");
                 I("w =  100,  99,  101;");
                 I("g1 <2011 2013> = 10,  11,  13;");
                 I("g2 <2009 2011> = 10,  11,  13;");
                 //I("clone;");
                 string lhs = "v[y] in e_y";
-                if (j == 1) lhs = "v[y] in v[y] = v[c] + i + 0.2*g1[+1] + 0.8*g2[-1]";
-                else if (j == 2) lhs = "-(v[c] + i + 0.2*g1[+1] + 0.8*g2[-1])";
+                if (j == 1) lhs = "v[y] in v[y] = 0.5*v[c] + i + 0.2*g1[+1] + 0.8*g2[-1]";
+                else if (j == 2) lhs = "-(0.5*v[c] + i + 0.2*g1[+1] + 0.8*g2[-1])";
                 int i = 0;
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -8547,8 +8549,8 @@ namespace UnitTests
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
-                Assert.AreEqual(table.Get(i, 2).number, 402.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, 397.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 2).number, 2 * 402.0000d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, 2 * 397.0000d, 0.0001);
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
