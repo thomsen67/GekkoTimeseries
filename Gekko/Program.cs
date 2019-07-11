@@ -12561,6 +12561,12 @@ namespace Gekko
 
             try
             {
+                if (Globals.printAST)
+                {
+                    G.Writeln2("-------------- EVAL ---------------");
+                    G.Writeln2("EVAL " + G.ReplaceGlueNew(rhs));
+                    G.Writeln2("-----------------------------------");
+                }               
                 Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
             }
             catch (Exception e)
@@ -12580,7 +12586,7 @@ namespace Gekko
                 eqs = GetGamsEquationsByEqname(eqname);
                 if (eqs == null || eqs.Count == 0)
                 {
-                    G.Writeln2("*** ERROR: Equation '" + varname + "' was not found");
+                    G.Writeln2("*** ERROR: Equation '" + eqname + "' was not found");
                     throw new GekkoException();
                 }
                 if (eqs.Count > 1)
@@ -12609,7 +12615,9 @@ namespace Gekko
 
             try
             {
-                Program.obeyCommandCalledFromGUI("EVAL " + EquationLhsRhs(lhs, rhs, true) + ";", new P()); //produces Func<> Globals.expression with the expression
+                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);                
+                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
 
                 if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
                 {
@@ -12634,7 +12642,9 @@ namespace Gekko
                             sb.Append(tokens[i].ToString());
                         }
 
-                        Program.obeyCommandCalledFromGUI("EVAL " + sb.ToString(), new P()); //produces Func<> Globals.expression with the expression
+                        string s2 = "EVAL " + sb.ToString() + ";";
+                        if (Globals.printAST) G.Writeln2("AST: ---> " + s2);
+                        Program.obeyCommandCalledFromGUI(s2, new P()); //produces Func<> Globals.expression with the expression
                     }
 
                 }
@@ -19753,7 +19763,7 @@ namespace Gekko
             if (split.Count == 1)
             {
                 string ss = split[0].list.ToString();
-                if (G.IsInteger(ss, true, false))
+                if ((ss.StartsWith("-") || ss.StartsWith("+")) && G.IsInteger(ss, true, false))  //x[-1] or x[+1]
                 {
                     lagLead = true;
                 }
@@ -36565,9 +36575,7 @@ namespace Gekko
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t2, dContribD);
 
-
-
-                            G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
+                            if(false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                             if (mm.Contains(1))
                             {
@@ -36870,7 +36878,7 @@ namespace Gekko
                 }
                 if (vars2.Count == 0)
                 {
-                    G.Writeln2("*** ERROR: Did not find variable '' in the equation " + expressionText);
+                    G.Writeln2("*** ERROR: Did not find variable '" + varname + "' in the equation " + expressionText);
                     throw new GekkoException();
                 }
                 foreach (string var in vars)

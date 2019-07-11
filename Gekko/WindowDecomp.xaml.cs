@@ -1284,6 +1284,15 @@ namespace Gekko
 
                 int parentI = 0;
 
+                //The series below is the lhs series of the whole decomposition. If the rhs or a link contains the lhs variable,
+                //it will be altered, therefore the clone. For instance, in y = c + g and c = 0.8*y, a naive decomp for data where
+                //y changes with 1 each period will only show 0.2. This is corrected below, corresponding to y = 0.8*y + g --> 0.2 y = g --> y = 5*g.
+                Series lhsClone = null;
+                if (decompOptions2.link[0].varname != null)
+                {
+                    lhsClone = decompDatas[parentI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"].DeepClone(null) as Series;
+                }
+
                 for (int i = 1; i < this.decompOptions2.link.Count; i++)
                 {
                     //adjust the table according to link variable, so it fits with the destination table
@@ -1325,7 +1334,22 @@ namespace Gekko
                         }                        
                     }
                 }
-                                
+
+                if (lhsClone != null)
+                {
+                    //now we correct if the lhs variable is on the rhs or in a link equation.
+                    Series lhs = decompDatas[parentI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"] as Series;
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        double factor = lhsClone.GetDataSimple(t) / lhs.GetDataSimple(t);
+                        foreach (KeyValuePair<string, Series> kvp in decompDatas[parentI].cellsContribD.storage)
+                        {
+                            Series x = decompDatas[parentI].cellsContribD[kvp.Key];
+                            x.SetData(t, factor * x.GetDataSimple(t));
+                        }
+                    }
+                }
+
                 Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 

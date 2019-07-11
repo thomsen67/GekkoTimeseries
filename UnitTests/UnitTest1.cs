@@ -8438,6 +8438,8 @@ namespace UnitTests
                 // g2[-1] |                              -0.8              -1.6
                 //      i |                               1                -2
                 // -------+--------------------------------------------------------------------------------
+                // In the above table, v[y] gets consolidated into -0.44, so the whole table must be multiplied
+                // with 2/0.44 in 2011 to make v[y] = -2.
                 //
                 //                                DECOMP OF EXPRESSION
                 //                                here there are no residuals
@@ -8557,14 +8559,14 @@ namespace UnitTests
                 //if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
+                
                 // =========== differences, decomposed =========================                
                 I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c       COLS #a, #o;");   //, i in e_i
                 table = Globals.lastDecompTable;
                                 
                 double ydif2011 = -0.44d; double ydif2012 = 1.1d;
                 double ydif2011b = -3.66d; double ydif2012b   = 9.1d;
+                double reduce = 2d / 0.44d;
 
                 i = 1;
                 Assert.AreEqual(table.Get(i, 2).date, "2011");
@@ -8574,16 +8576,16 @@ namespace UnitTests
                 {
                     i++;
                     Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[y]");
-                    Assert.AreEqual(table.Get(i, 2).number, ydif2011, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, ydif2012, 0.0001);                    
+                    Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);                    
                 }
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1");
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 2).number, -3.66d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 9.1d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 2).number, -reduce * 3.66d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, reduce * 9.1d, 0.0001);
                 }
                 else
                 {
@@ -8595,8 +8597,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
                 if (j != 2)
                 {
-                    Assert.AreEqual(table.Get(i, 2).number, 4d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, -6d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 2).number, reduce * 4d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -reduce * 6d, 0.0001);
                 }
                 else
                 {
@@ -8606,18 +8608,43 @@ namespace UnitTests
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
-                Assert.AreEqual(table.Get(i, 2).number, -0.2d * 1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, -0.2d * 2.0000d, 0.0001);
+                if (j != 2)
+                {                    
+                    Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.2d * 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -reduce * 0.2d * 2.0000d, 0.0001);
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, -0.2d * 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -0.2d * 2.0000d, 0.0001);
+                }
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2[-1]");
-                Assert.AreEqual(table.Get(i, 2).number, -0.8d * 1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, -0.8d * 2.0000d, 0.0001);
+                if (j != 2)
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.8d * 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -reduce * 0.8d * 2.0000d, 0.0001);
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, -0.8d * 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -0.8d * 2.0000d, 0.0001);
+                }
+
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
-                Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
-                Assert.AreEqual(table.Get(i, 3).number, -2.0000d, 0.0001);
+                if (j != 2)
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, reduce * 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -reduce * 2.0000d, 0.0001);
+                }
+                else
+                {
+                    Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(i, 3).number, -2.0000d, 0.0001);
+                }
                 // -------------------------------------------------------------                
                 i++;
                 Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");

@@ -39,6 +39,7 @@ tokens {
 	ASTDECOMPLINK;
 	ASTDECOMPLINK1;
 	ASTDECOMPWHERE2;
+	ASTDECOMPCOLS;
 	ASTDECOMPGROUP1;
 	ASTDECOMPGROUP1c;
 	ASTDECOMPGROUP1d;
@@ -2810,17 +2811,24 @@ decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression2 
 
 decompExpression2:          (expression EQUAL)? expression -> expression+;
 
-decompWhere:                WHERE decompWhere2 (COMMA2 decompWhere2)*-> ^(ASTDECOMPWHERE decompWhere2+);
-decompGroup:                GROUP decompGroup1 (COMMA2 decompGroup1)* -> ^(ASTDECOMPGROUP decompGroup1+);
-decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> ^(ASTDECOMPLINK decompLink1+) | -> ASTDECOMPLINK;
-decompCols:                 COLS seqOfBankvarnames;
+decompWhere:                WHERE decompWhere2 (COMMA2 decompWhere2)*-> ^(ASTDECOMPWHERE decompWhere2+)
+						  | -> ASTDECOMPWHERE
+							;
+decompGroup:                GROUP decompGroup1 (COMMA2 decompGroup1)* -> ^(ASTDECOMPGROUP decompGroup1+)
+					      | -> ASTDECOMPGROUP
+							;
+decompLink:                 LINK decompLink1 (COMMA2 decompLink1)* -> ^(ASTDECOMPLINK decompLink1+) 
+						  | -> ASTDECOMPLINK
+						    ;
+decompCols:                 COLS seqOfBankvarnames -> ^(ASTDECOMPCOLS seqOfBankvarnames)
+                          | -> ASTDECOMPCOLS
+							;
 
 decompWhere2:               decompWhere1 IN seqOfBankvarnamesOnly1 -> ^(ASTDECOMPWHERE2 decompWhere1 seqOfBankvarnamesOnly1);
 decompWhere1:               seqOfBankvarnamesOnly1 | expression;
 
 decompGroup1:               seqOfBankvarnamesOnly1 AS seqOfBankvarnamesOnly1 (LEVEL expression)? (ZOOM expression2)? -> ^(ASTDECOMPGROUP1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1 ^(ASTDECOMPGROUP1c expression?) ^(ASTDECOMPGROUP1d expression2?));
 
-//decompLink1:              seqOfBankvarnamesOnly1 FROM seqOfBankvarnamesOnly1 -> ^(ASTDECOMPLINK1 seqOfBankvarnamesOnly1 seqOfBankvarnamesOnly1);
 decompLink1:                decompVar1 -> ^(ASTDECOMPLINK1 decompVar1)
                           | decompVar2 -> ^(ASTDECOMPLINK1 decompVar2)
 						    ;
@@ -2829,7 +2837,7 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngle2          decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 decompOpt1h*)							
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
-decompOpt1h:				    name -> ^(ASTOPT_STRING_PRTCODE name);
+decompOpt1h:				name -> ^(ASTOPT_STRING_PRTCODE name);
 
 eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, input.LT(1).Line)} expression);
 
