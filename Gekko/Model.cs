@@ -408,6 +408,9 @@ namespace Gekko
         public TokenHelper lhsTokensGams = null;
         public TokenHelper rhsTokensGams = null;
 
+        public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
+        public List<string> expressionsNames = new List<string>();
+
 
     }
 }

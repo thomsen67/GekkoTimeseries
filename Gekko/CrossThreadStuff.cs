@@ -76,7 +76,7 @@ namespace Gekko
                         if (decompItem.expression == null)
                         {
                             ModelGamsEquation found = Program.DecompEvalGams(decompItem.eqname, decompItem.varname);
-                            decompItem.expression = Globals.expression;
+                            decompItem.expression = found.expressions[0];
                             decompItem.expressionText = found.lhs + " = " + found.rhs;
                         }
                         else

@@ -12420,7 +12420,7 @@ namespace Gekko
                     if (Program.modelGams.equationsByVarname != null)
                     {
                         ModelGamsEquation found = DecompEvalGams(null, decompOptions.variable);
-                        decompOptions.expression = Globals.expression;
+                        decompOptions.expression = found.expressions[0];
                         decompOptions.expressionOld = found.lhs + " = " + found.rhs;
                     }
                 }
@@ -12615,10 +12615,7 @@ namespace Gekko
 
             try
             {
-                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);                
-                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-
+                
                 if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
                 {
                     StringBuilder sb = new StringBuilder();
@@ -12645,15 +12642,22 @@ namespace Gekko
                         string s2 = "EVAL " + sb.ToString() + ";";
                         if (Globals.printAST) G.Writeln2("AST: ---> " + s2);
                         Program.obeyCommandCalledFromGUI(s2, new P()); //produces Func<> Globals.expression with the expression
+                        found.expressions.Add(Globals.expression);
                     }
-
+                }
+                else
+                {
+                    string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+                    if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
+                    Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
+                    found.expressions.Add(Globals.expression);
                 }
 
             }
             catch (Exception e)
             {
 
-            }
+            }            
 
             return found;
         }
