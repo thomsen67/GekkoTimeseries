@@ -251,8 +251,8 @@ namespace Gekko.Parser.Gek
 
             if (node.Text == "ASTBANKVARNAME2")
             {
-
-                //if (node?[1]?[0]?[0].Text != "ASTHASH") throw new GekkoException();  //must be a list
+                //listfile
+                
                 ASTNode name = node[1][1][0];
                 ASTNode placeholder = node[1][1];
 
@@ -320,8 +320,7 @@ namespace Gekko.Parser.Gek
                 }
                 node.Text = "ASTBANKVARNAME";
             }
-
-            if (node.Text == "ASTBANKVARNAME")
+            else if (node.Text == "ASTBANKVARNAME")  //p24234oi33
             {
                 string s = GetSimpleName(node);
 
@@ -381,17 +380,14 @@ namespace Gekko.Parser.Gek
                                 if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                                 if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
                             }
-                            //else if (node2.Text == "ASTLEFTSIDE")
-                            //{
-                            //    if (node2.freeIndexedListsLeftSide == null) node2.freeIndexedListsLeftSide = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                            //    if (!node2.freeIndexedListsLeftSide.ContainsKey(listnameWithoutSigil)) node2.freeIndexedListsLeftSide.Add(listnameWithoutSigil, null);
-                            //}
+                            
                             node2 = node2.Parent;
                         }
                         Label: node2 = node2;
                     }
                 }
             }
+
             foreach (ASTNode child in node.ChildrenIterator())
             {
                 WalkASTAndEmitUnfold(child);
@@ -401,7 +397,7 @@ namespace Gekko.Parser.Gek
             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
             {
 
-                if (node.Text == "ASTASSIGNMENT")
+                if (node.Text == "ASTASSIGNMENT" || node.Text == "ASTEVAL")  //#p24234oi34
                 {
                     //augment SearchUpwardsInTree2() in normal Walker so that it also checks
                     //if it is a left-side looper
@@ -5344,13 +5340,32 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTEVAL":
                         {
+                            StringBuilder before = new StringBuilder();
+                            StringBuilder after = new StringBuilder();
+                            if (Globals.fix && node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)  //#p24234oi35
+                            {
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
+                                {
+                                    before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    after.Append("}");
+                                }
+                            }
+
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
+                                                        
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
+                            string code = before.ToString() + node[0].Code.ToString() + after.ToString();
+                            StashIntoLocalFuncs(w, methodName, code);
                             node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
                             node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
                             if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
                             {
+                                //HMMMMMMMM what does this do?? compare to above
+                                //HMMMMMMMM what does this do?? compare to above
+                                //HMMMMMMMM what does this do?? compare to above --> what does freeIndexedListsDecomp do???
+                                //HMMMMMMMM what does this do?? compare to above
+                                //HMMMMMMMM what does this do?? compare to above
+
                                 node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);
                                 foreach (string s in node.freeIndexedLists.Keys)
                                 {

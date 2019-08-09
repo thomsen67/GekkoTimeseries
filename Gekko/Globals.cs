@@ -42,6 +42,8 @@ namespace Gekko
     {
         public static string smpl = "§¤£";  //this line must be at top
 
+        public static bool fix = true;
+
         public static string versionInternal = "";
 
         public static bool lagfix = true;

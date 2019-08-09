@@ -8764,7 +8764,7 @@ namespace Gekko
                 //Calls: Program.Decomp2();
                 //       CrossThreadStuff.Decomp2(decompOptions2) --> may use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
                 //       WindowDecomp.RecalcCellsWithNewType();
-                //       Program.Decompose2()                     --> actual calculation of data
+                //       Program.Decompose2()                     --> actual calculation of data, expression is argument
                 //       Program.DecomposePutIntoTable2()         --> putting the data into a table
                 //       WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
                 //

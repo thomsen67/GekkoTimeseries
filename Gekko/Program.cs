@@ -36336,6 +36336,10 @@ namespace Gekko
 
                 //Function call start --------------
                 O.AdjustSmplForDecomp(smpl, 0);
+
+                //TODO: can be deleted, #p24234oi32
+                string s5 = Globals.expressionText;
+
                 y0a = expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
                 O.AdjustSmplForDecomp(smpl, 1);
                 //Function call end   --------------
