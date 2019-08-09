@@ -6278,6 +6278,21 @@ namespace Gekko.Parser.Gek
             string smplLocal, s0_changes; ReplaceSmpl(s0, out smplLocal, out s0_changes);
             if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
             w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
+
+            //{
+            //    Func<GekkoSmpl, IVariable> Evalcode555 = (smpl556) => {
+            //        IVariable tmp = null;
+            //        foreach (IVariable listloop_a553 in new O.GekkoListIterator(O.Lookup(smpl556, null, ((O.scalarStringHash).Add(smpl556, (new ScalarString(`a`)))), null, new LookupSettings(), EVariableType.Var, o0)))
+            //        {
+            //            tmp = O.Subtract(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Add(smpl556, O.Multiply(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "k", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.IndexerLag, O.Negate(smpl556, i554)
+            //            ), smpl556, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Negate(smpl556, i554)
+            //            )), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553)));
+
+            //        }
+            //        return tmp;
+            //    };
+            //}
+
         }
 
         private static void ReplaceSmpl(string inputCs, out string smplLocal, out string outputCs)

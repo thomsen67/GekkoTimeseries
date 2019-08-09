@@ -4613,6 +4613,7 @@ namespace Gekko
                     state = 1;
                     firstLine = true;
                     line = line.Substring("DATA=".Length);
+                    line = line.Trim();  //may have blank after =
                 }
                 else if (line.StartsWith(codeTimeString))
                 {
@@ -4688,6 +4689,10 @@ namespace Gekko
                     int counter = 0;
                     for (int i5 = 0; i5 < s.Length; i5++)
                     {
+                        if(i5 == s.Length - 1)
+                        {
+
+                        }
                         char c = s[i5];
                         if ((c == ' ' || i5 == s.Length - 1) && sstate == 1)
                         {

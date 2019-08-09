@@ -8763,6 +8763,8 @@ namespace Gekko
                 //This is the starting point
                 //Calls: Program.Decomp2();
                 //       CrossThreadStuff.Decomp2(decompOptions2) --> may use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
+                //                                                    DecompEvalGams() finds the equation, translates to Gekko, and returns a 
+                //                                                    ModelGamsEquation object with element .expressions containing the expression
                 //       WindowDecomp.RecalcCellsWithNewType();
                 //       Program.Decompose2()                     --> actual calculation of data, expression is argument
                 //       Program.DecomposePutIntoTable2()         --> putting the data into a table

@@ -1242,16 +1242,16 @@ namespace Gekko
 
                 this.decompOptions2.prtOptionLower = transformationCodeAugmented;
 
-                string code1 = this.decompOptions2.prtOptionLower;
+                string operator1 = this.decompOptions2.prtOptionLower;
                 string code2 = null;
-                if (code1.StartsWith("s"))
+                if (operator1.StartsWith("s"))
                 {
-                    code1 = code1.Substring(1);
+                    operator1 = operator1.Substring(1);
                     code2 = "s";
                 }
 
                 this.decompOptions2.decompTablesFormat.isPercentageType = false;
-                if (code1.Contains("p") || code1.Contains("q") || code2 == "s")
+                if (operator1.Contains("p") || operator1.Contains("q") || code2 == "s")
                 {
                     this.decompOptions2.decompTablesFormat.isPercentageType = true;
                 }
@@ -1277,9 +1277,8 @@ namespace Gekko
                 {
                     counter2++;
                     string residualName = Program.GetDecompExpressionName(counter2);
-                    DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(code1), residualName);
-                    decompDatas.Add(decompData);                    
-                    //varsForTables.Add(Program.DecompGetVars(decompData, items.varname, items.expressionText));
+                    DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(operator1), residualName);
+                    decompDatas.Add(decompData);                                        
                 }
 
                 int parentI = 0;
@@ -1350,7 +1349,7 @@ namespace Gekko
                     }
                 }
 
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, code1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 
                 this.decompOptions2.decompData = decompDatas[parentI];
@@ -1409,11 +1408,11 @@ namespace Gekko
         
 
 
-        private static EDecompBanks DecompBanks(string code1)
+        private static EDecompBanks DecompBanks(string operator1)
         {
             EDecompBanks banks = EDecompBanks.Work;
-            if (code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "rp" || code1 == "xrp" || code1 == "rdp" || code1 == "xrdp") banks = EDecompBanks.Ref;
-            if (code1 == "m" || code1 == "xm" || code1 == "q" || code1 == "xq" || code1 == "mp" || code1 == "xmp") banks = EDecompBanks.Both;
+            if (operator1 == "r" || operator1 == "xr" || operator1 == "xrn" || operator1 == "rd" || operator1 == "xrd" || operator1 == "rp" || operator1 == "xrp" || operator1 == "rdp" || operator1 == "xrdp") banks = EDecompBanks.Ref;
+            if (operator1 == "m" || operator1 == "xm" || operator1 == "q" || operator1 == "xq" || operator1 == "mp" || operator1 == "xmp") banks = EDecompBanks.Both;
             return banks;
         }
 
