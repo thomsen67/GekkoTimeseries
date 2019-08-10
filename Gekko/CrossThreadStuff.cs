@@ -55,17 +55,17 @@ namespace Gekko
                 Globals.windowsDecomp2.Add(w);
 
                 int count = -1;
-                foreach (DecompItemsString decompItem in decompOptions.link)
+                foreach (Link link in decompOptions.link)
                 {                    
                     count++;
                     if (Program.modelGams != null)
                     {
 
-                        if (decompItem.expression == null)
+                        if (link.expressions.Count == 1 && link.expressions[0] == null)
                         {
-                            ModelGamsEquation found = Program.DecompEvalGams(decompItem.eqname, decompItem.varname);
-                            decompItem.expression = found.expressions[0];
-                            decompItem.expressionText = found.lhs + " = " + found.rhs;
+                            ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varname);
+                            link.expressions = found.expressions;
+                            link.expressionText = found.lhs + " = " + found.rhs;
                         }
                         else
                         {

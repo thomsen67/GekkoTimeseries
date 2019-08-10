@@ -1269,16 +1269,15 @@ namespace Gekko
                 int perLag = -2;
                 string lhsString = "Expression value";
                 
-                List<DecompData> decompDatas = new List<DecompData>();
-                //List<List<string>> varsForTables = new List<List<string>>();
+                List<DecompData> decompDatas = new List<DecompData>();                
                 List<string> expressionTexts = new List<string>();
                 int counter2 = -1;
-                foreach (DecompItemsString items in this.decompOptions2.link)
+                foreach (Link link in this.decompOptions2.link)
                 {
                     counter2++;
                     string residualName = Program.GetDecompExpressionName(counter2);
-                    DecompData decompData = Program.Decompose2(per1, per2, items.expression, DecompBanks(operator1), residualName);
-                    decompDatas.Add(decompData);                                        
+                    DecompData decompData = Program.Decompose2(per1, per2, link.expressions[0], DecompBanks(operator1), residualName);
+                    decompDatas.Add(decompData);
                 }
 
                 int parentI = 0;
@@ -2125,7 +2124,7 @@ namespace Gekko
 
         public List<List<string>> where = new List<List<string>>();
         public List<List<string>> agg = new List<List<string>>();
-        public List<DecompItemsString> link = new List<DecompItemsString>();
+        public List<Link> link = new List<Link>();
 
         public DecompOptions2 Clone()
         {
@@ -2181,12 +2180,12 @@ namespace Gekko
                 d.agg.Add(temp);
             }
 
-            foreach (DecompItemsString x1 in this.link)
+            foreach (Link x1 in this.link)
             {
-                DecompItemsString temp = new DecompItemsString();
+                Link temp = new Link();
                 temp.varname = x1.varname;
                 temp.eqname = x1.eqname;
-                temp.expression = (Func<GekkoSmpl, IVariable>)x1.expression.Clone();  //not sure if this cloning is necessary
+                temp.expressions = x1.expressions; //probably ok not to clone
                 d.link.Add(temp);
             }
 

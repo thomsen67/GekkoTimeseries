@@ -34,10 +34,10 @@ namespace Gekko
         public ESeriesMissing data;
     }
 
-    public class DecompItemsString
+    public class Link
     {
         public string expressionText = null;
-        public Func<GekkoSmpl, IVariable> expression = null;
+        public List<Func<GekkoSmpl, IVariable>> expressions = null;
         public string varname = null;
         public string eqname = null;
     }
