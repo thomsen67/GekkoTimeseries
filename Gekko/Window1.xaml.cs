@@ -1052,7 +1052,7 @@ namespace Gekko
                     //    return;
                     //}
                 }
-                                                          
+
                 //Setting defaults
                 radioButton21.IsEnabled = true;
                 radioButton21.Opacity = 1.0;
@@ -1107,7 +1107,7 @@ namespace Gekko
                 if (this.decompOptions.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
                 if (this.decompOptions.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
 
-                
+
                 if (this.decompOptions.guiDecompIsBaseline)
                 {
                     radioButton22.IsEnabled = false;
@@ -1172,49 +1172,56 @@ namespace Gekko
 
                 this.decompOptions.prtOptionLower = transformationCodeAugmented;
 
-                if (true)
+
+                table = Program.Decompose(this.decompOptions);
+                if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
                 {
-                    table = Program.Decompose(this.decompOptions);
-                    if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
+                    foreach (string var in this.decompOptions.subst)
                     {
-                        foreach (string var in this.decompOptions.subst)
-                        {
-                            table = DecompSubstitute(table, var);
-                        }
+                        table = DecompSubstitute(table, var);
                     }
+                }
 
-                    if (this.decompOptions.isSort)
-                    {
-                        table = TableSort(table);
-                    }
+                if (this.decompOptions.isSort)
+                {
+                    table = TableSort(table);
+                }
 
-                    if (this.decompOptions.isPool)
-                    {
-                        table = TablePool(table);
-                    }
+                if (this.decompOptions.isPool)
+                {
+                    table = TablePool(table);
+                }
 
-                    string s = FindEquationText(this.decompOptions);
-                    equation.Text = s;
+                string s = FindEquationText(this.decompOptions);
+                equation.Text = s;
 
-                    //
-                    // NOTE:
-                    //
-                    flowText.Visibility = Visibility.Collapsed;
+                //
+                // NOTE:
+                //
+                flowText.Visibility = Visibility.Collapsed;
 
-                    this.decompOptions.guiDecompValues = table;
+                this.decompOptions.guiDecompValues = table;
+
+                if (G.IsUnitTesting() && Globals.showDecompTable == false)
+                {
+                    Globals.lastDecompTable = table;
+                }
+                else
+                {
                     ClearGrid();
                     MakeTable(table, this.decompOptions);
                 }
 
+                return;
 
             }
             catch (Exception e)
             {
-                this.isClosing = true;
-
-                MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
-
-
+                if (!G.IsUnitTesting())
+                {
+                    this.isClosing = true;
+                    MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+                }
             }
         }
 

@@ -8394,6 +8394,20 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp1()
         {
+            Table table = null;
+
+            //Old style ADAM
+            I("RESET; TIME 2006 2006;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("READ <tsd> jul05;");
+            I("MODEL jul05;");            
+            I("DECOMP <d> fy;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).date, "2006");            
+            Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
+            Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
+            Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
+
             //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 
             for (int j = 0; j < 3; j++)  //either direct expression, or using an equation from file
@@ -8492,7 +8506,7 @@ namespace UnitTests
 
                 // =========== levels =========================                
                 I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c     COLS #a, #o;");  //, i in e_i
-                Table table = Globals.lastDecompTable;
+                table = Globals.lastDecompTable;
                 double ylevel2011 = 499d; double ylevel2012 = 504d;
                 double ylevel2011b = 502d; double ylevel2012b = 501d;
 
@@ -8656,6 +8670,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ModelGamsLhsDependent()
         {
+            
             // ------------------------------------------------------------
             // default model, the "right" vars are first on the lhs
             // ------------------------------------------------------------

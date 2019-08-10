@@ -12472,9 +12472,12 @@ namespace Gekko
                 }
                 else
                 {
-                    w.ShowDialog();
-                    w.Close();  //probably superfluous
-                    w = null;  //probably superfluous
+                    if (!G.IsUnitTesting())
+                    {
+                        w.ShowDialog();
+                        w.Close();  //probably superfluous
+                        w = null;  //probably superfluous
+                    }
                 }
             }
         }
