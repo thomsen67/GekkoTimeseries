@@ -5339,39 +5339,90 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTEVAL":
-                        {
-                            StringBuilder before = new StringBuilder();
-                            StringBuilder after = new StringBuilder();
-                            if (Globals.fix && node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)  //#p24234oi35
-                            {
-                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                {
-                                    before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
-                                    after.Append("}");
-                                }
-                            }
+                        {                            
+
+                            bool isLoop = Globals.fix && node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
+                            isLoop = Globals.fix;
+
+                            //List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();
+                            //foreach (IVariable listloop_a553 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, null)))
+                            //{
+                            //    Evalcode555.Add((smpl556) =>
+                            //    {                            
+                            //        return O.Subtract(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Add(smpl556, O.Multiply(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "k", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.IndexerLag, O.Negate(smpl556, i554)
+                            //        ), smpl556, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Negate(smpl556, i554)
+                            //        )), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553)));                            
+                            //    });
+                            //    //Evalcode555[0](null);
+                            //}
+
 
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                                                         
                             string methodName = "Evalcode" + ++Globals.counter;
-                            string code = before.ToString() + node[0].Code.ToString() + after.ToString();
-                            StashIntoLocalFuncs(w, methodName, code);
-                            node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
-                            node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
-                            if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
-                            {
-                                //HMMMMMMMM what does this do?? compare to above
-                                //HMMMMMMMM what does this do?? compare to above
-                                //HMMMMMMMM what does this do?? compare to above --> what does freeIndexedListsDecomp do???
-                                //HMMMMMMMM what does this do?? compare to above
-                                //HMMMMMMMM what does this do?? compare to above
 
-                                node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);
-                                foreach (string s in node.freeIndexedLists.Keys)
+                            StringBuilder code = new StringBuilder();
+                            string codeNew = null;
+                            if (isLoop)  //#p24234oi35
+                            {
+                                StringBuilder before = new StringBuilder();
+                                StringBuilder after = new StringBuilder();
+                                if (node.listLoopAnchor != null)
                                 {
-                                    node.Code.A("Globals.freeIndexedListsDecomp.Add(@`" + s + "`);" + G.NL);
+                                    foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
+                                    {
+                                        before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                        after.Append("}");
+                                    }
                                 }
-                            }                            
+
+                                ////List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();                                
+                                code.Append("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
+                                code.Append(before);
+
+                                code.Append("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
+                                code.Append("return " + node[0].Code.ToString() + " ;");
+                                code.Append("  });");
+                                code.Append(after);
+                                string smplLocal; ReplaceSmpl(code.ToString(), out smplLocal, out codeNew);
+
+                            }
+                            else
+                            {
+                                code.Append(node[0].Code.ToString());
+                                codeNew = code.ToString();
+                            }
+                            
+                            StashIntoLocalFuncs(w, methodName, codeNew, isLoop);
+
+                            if(isLoop)
+                            {
+                                node.Code.A("Globals.expressions = " + methodName + ";" + G.NL);
+                            }
+                            else
+                            {
+                                node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
+                            }
+                            
+                            node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
+
+                            if (false)
+                            {
+                                if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
+                                {
+                                    //HMMMMMMMM what does this do?? compare to above
+                                    //HMMMMMMMM what does this do?? compare to above
+                                    //HMMMMMMMM what does this do?? compare to above --> what does freeIndexedListsDecomp do???
+                                    //HMMMMMMMM what does this do?? compare to above
+                                    //HMMMMMMMM what does this do?? compare to above
+
+                                    node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);
+                                    foreach (string s in node.freeIndexedLists.Keys)
+                                    {
+                                        node.Code.A("Globals.freeIndexedListsDecomp.Add(@`" + s + "`);" + G.NL);
+                                    }
+                                }
+                            }
                         }
                         break;
                     case "ASTDECOMP":
@@ -5385,7 +5436,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMPITEMS":
                         {
                             string methodName = "Evalcode" + ++Globals.counter;
-                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString());
+                            StashIntoLocalFuncs(w, methodName, node[0].Code.ToString(), false);
                             node.Code.A("o" + Num(node) + ".expression = " + methodName + ";" + G.NL);                            
                         }
                         break;
@@ -5407,11 +5458,9 @@ namespace Gekko.Parser.Gek
                             {
                                 //DECOMP y = x1 + x2                                
                                 code = Program.EquationLhsRhs(node[1][0].Code.ToString(), node[1][1].Code.ToString(), false);
-                            }
+                            }                            
 
-                            
-
-                            StashIntoLocalFuncs(w, methodName, code);
+                            StashIntoLocalFuncs(w, methodName, code, false);
                             string n = "null";
                             if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
                             node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + n + ", null))" + ";" + G.NL);                            
@@ -6273,25 +6322,18 @@ namespace Gekko.Parser.Gek
             node.functionDef.Add(new Tuple<string, string>(type.ToLower(), Globals.functionArgName + Globals.counter));
         }
 
-        private static void StashIntoLocalFuncs(W w, string c, string s0)
+        private static void StashIntoLocalFuncs(W w, string c, string s0, bool isLoop)
         {
             string smplLocal, s0_changes; ReplaceSmpl(s0, out smplLocal, out s0_changes);
             if (w.wh.localFuncs == null) w.wh.localFuncs = new GekkoStringBuilder();
-            w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
-
-            //{
-            //    Func<GekkoSmpl, IVariable> Evalcode555 = (smpl556) => {
-            //        IVariable tmp = null;
-            //        foreach (IVariable listloop_a553 in new O.GekkoListIterator(O.Lookup(smpl556, null, ((O.scalarStringHash).Add(smpl556, (new ScalarString(`a`)))), null, new LookupSettings(), EVariableType.Var, o0)))
-            //        {
-            //            tmp = O.Subtract(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Add(smpl556, O.Multiply(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "k", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.IndexerLag, O.Negate(smpl556, i554)
-            //            ), smpl556, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Negate(smpl556, i554)
-            //            )), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553)));
-
-            //        }
-            //        return tmp;
-            //    };
-            //}
+            if (!isLoop)
+            {
+                w.wh.localFuncs.Append("Func<GekkoSmpl, IVariable> " + c + " = (" + smplLocal + ") => { return " + s0_changes + ";" + G.NL + " };" + G.NL);
+            }
+            else
+            {
+                w.wh.localFuncs.Append(s0);
+            }
 
         }
 

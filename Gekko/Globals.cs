@@ -621,7 +621,8 @@ namespace Gekko
         public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
 
         public static string expressionText = null;
-        public static Func<GekkoSmpl, IVariable> expression = null;        
+        public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
+        public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
         public static List<string> freeIndexedListsDecomp = null;
 
         public static bool fixALag = true;

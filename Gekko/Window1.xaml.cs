@@ -1223,7 +1223,8 @@ namespace Gekko
             EquationHelper found = Program.DecompEval(var2);
             DecompOptions d3 = this.decompOptions.Clone();
             d3.variable = var2;
-            d3.expression = Globals.expression;
+            if (Globals.fix) d3.expression = Globals.expressions[0];
+            else d3.expression = Globals.expression;
             d3.expressionOld = found.equationText;
             Table table2 = Program.Decompose(d3);
             Table table3 = TableSubstitute(table, var2, table2, true);

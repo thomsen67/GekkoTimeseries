@@ -12439,7 +12439,8 @@ namespace Gekko
                     }
 
                     EquationHelper found = DecompEval(decompOptions.variable);
-                    decompOptions.expression = Globals.expression;
+                    if(Globals.fix) decompOptions.expression = Globals.expressions[0];
+                    else decompOptions.expression = Globals.expression;
                     decompOptions.expressionOld = found.equationText;
                 }
             }
@@ -12647,7 +12648,8 @@ namespace Gekko
                         string s2 = "EVAL " + sb.ToString() + ";";
                         if (Globals.printAST) G.Writeln2("AST: ---> " + s2);
                         Program.obeyCommandCalledFromGUI(s2, new P()); //produces Func<> Globals.expression with the expression
-                        found.expressions.Add(Globals.expression);
+                        if (Globals.fix) found.expressions.Add(Globals.expressions[0]);
+                        else found.expressions.Add(Globals.expression);
                     }
                 }
                 else
@@ -12655,7 +12657,8 @@ namespace Gekko
                     string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
                     if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
                     Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-                    found.expressions.Add(Globals.expression);
+                    if(Globals.fix) found.expressions.Add(Globals.expressions[0]);
+                    else found.expressions.Add(Globals.expression);
                 }
 
             }
@@ -26102,6 +26105,7 @@ namespace Gekko
 
             Globals.expressionText = null;
             Globals.expression = null;
+            Globals.expressions = null;
             Globals.freeIndexedListsDecomp = null;
 
         //Program.Cut(false);

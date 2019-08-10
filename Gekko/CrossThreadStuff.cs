@@ -96,7 +96,8 @@ namespace Gekko
                         }
 
                         EquationHelper found = Program.DecompEval(decompOptions.variable);
-                        decompOptions.expression = Globals.expression;
+                        if(Globals.fix) decompOptions.expression = Globals.expressions[0];
+                        else decompOptions.expression = Globals.expression;
                         decompOptions.expressionOld = found.equationText;
                     }
                 }
