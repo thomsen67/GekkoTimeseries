@@ -1269,15 +1269,19 @@ namespace Gekko
                 int perLag = -2;
                 string lhsString = "Expression value";
                 
-                List<DecompData> decompDatas = new List<DecompData>();                
+                List<List<DecompData>> decompDatas = new List<List<DecompData>>();
                 List<string> expressionTexts = new List<string>();
                 int counter2 = -1;
                 foreach (Link link in this.decompOptions2.link)
                 {
                     counter2++;
                     string residualName = Program.GetDecompExpressionName(counter2);
-                    DecompData decompData = Program.Decompose2(per1, per2, link.expressions[0], DecompBanks(operator1), residualName);
-                    decompDatas.Add(decompData);
+                    List<DecompData> temp = new List<DecompData>();
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)
+                    {
+                        temp.Add(Program.Decompose2(per1, per2, expression, DecompBanks(operator1), residualName));
+                    }
+                    decompDatas.Add(temp);
                 }
 
                 int parentI = 0;
@@ -1288,15 +1292,15 @@ namespace Gekko
                 Series lhsClone = null;
                 if (decompOptions2.link[0].varname != null)
                 {
-                    lhsClone = decompDatas[parentI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"].DeepClone(null) as Series;
+                    lhsClone = decompDatas[parentI][0].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"].DeepClone(null) as Series;
                 }
 
                 for (int i = 1; i < this.decompOptions2.link.Count; i++)
                 {
                     //adjust the table according to link variable, so it fits with the destination table
                     string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varname + "¤[0]";
-                    Series linkParent = decompDatas[parentI].cellsContribD[linkVariable];
-                    Series linkChild = decompDatas[i].cellsContribD[linkVariable];
+                    Series linkParent = decompDatas[parentI][0].cellsContribD[linkVariable];
+                    Series linkChild = decompDatas[i][0].cellsContribD[linkVariable];
 
                     List<double> factors = new List<double>();
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
@@ -1310,10 +1314,10 @@ namespace Gekko
                     //for each period, find the variable value in the original equation, and compute
                     //  a correction factor for the sub-equation.                    
                     
-                    foreach (KeyValuePair<string, Series> kvp in decompDatas[i].cellsContribD.storage)
+                    foreach (KeyValuePair<string, Series> kvp in decompDatas[i][0].cellsContribD.storage)
                     {
 
-                        Series varParent = decompDatas[parentI].cellsContribD[kvp.Key];  //will be created
+                        Series varParent = decompDatas[parentI][0].cellsContribD[kvp.Key];  //will be created
                         Series varChild = kvp.Value;
 
                         int counter = -1;
@@ -1328,7 +1332,7 @@ namespace Gekko
                             double dVarChild = varChild.GetDataSimple(t);
                             double x = dVarParent + factors[counter] * dVarChild;
 
-                            decompDatas[parentI].cellsContribD[kvp.Key].SetData(t, x);                            
+                            decompDatas[parentI][0].cellsContribD[kvp.Key].SetData(t, x);                            
                         }                        
                     }
                 }
@@ -1336,22 +1340,22 @@ namespace Gekko
                 if (lhsClone != null)
                 {
                     //now we correct if the lhs variable is on the rhs or in a link equation.
-                    Series lhs = decompDatas[parentI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"] as Series;
+                    Series lhs = decompDatas[parentI][0].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"] as Series;
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
                         double factor = lhsClone.GetDataSimple(t) / lhs.GetDataSimple(t);
-                        foreach (KeyValuePair<string, Series> kvp in decompDatas[parentI].cellsContribD.storage)
+                        foreach (KeyValuePair<string, Series> kvp in decompDatas[parentI][0].cellsContribD.storage)
                         {
-                            Series x = decompDatas[parentI].cellsContribD[kvp.Key];
+                            Series x = decompDatas[parentI][0].cellsContribD[kvp.Key];
                             x.SetData(t, factor * x.GetDataSimple(t));
                         }
                     }
                 }
 
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][0], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][0], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 
-                this.decompOptions2.decompData = decompDatas[parentI];
+                this.decompOptions2.decompData = decompDatas[parentI][0];
 
                 if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
                 {
