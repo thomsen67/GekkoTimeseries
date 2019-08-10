@@ -56,20 +56,8 @@ namespace Gekko
 
                 int count = -1;
                 foreach (DecompItemsString decompItem in decompOptions.link)
-                {
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                {                    
                     count++;
-                    //if (count > 0) continue;
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
                     if (Program.modelGams != null)
                     {
 
@@ -83,8 +71,6 @@ namespace Gekko
                         {
                             //fix this...
                         }
-
-
                     }
                     else
                     {
@@ -101,7 +87,6 @@ namespace Gekko
                         decompOptions.expressionOld = found.equationText;
                     }
                 }
-
 
                 if (decompOptions.name == null)
                 {

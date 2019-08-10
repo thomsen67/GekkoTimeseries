@@ -2107,6 +2107,8 @@ namespace Gekko
 
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type, bool canSearch)
         {
+            //canSearch = true will only have effect if also "OPTION databank search = yes".
+            
             //if noSearch = true, type .Can and .Must can be used, 
             //else there will be a crash (too dangerous to create a series when the exact bank is not known)
 

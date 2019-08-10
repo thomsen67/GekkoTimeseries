@@ -5370,8 +5370,8 @@ namespace Gekko.Parser.Gek
                                 if (node.listLoopAnchor != null)
                                 {
                                     foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                    {
-                                        before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    {                                        
+                                        before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.GetIVariableFromString(`" + Globals.symbolCollection + kvp.Key + "`, O.ECreatePossibilities.NoneReportError, true))) {" + G.NL);
                                         after.Append("}");
                                     }
                                 }
@@ -5404,25 +5404,8 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
                             }
                             
-                            node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
-
-                            if (false)
-                            {
-                                if (node.freeIndexedLists != null && node.freeIndexedLists.Count > 0)
-                                {
-                                    //HMMMMMMMM what does this do?? compare to above
-                                    //HMMMMMMMM what does this do?? compare to above
-                                    //HMMMMMMMM what does this do?? compare to above --> what does freeIndexedListsDecomp do???
-                                    //HMMMMMMMM what does this do?? compare to above
-                                    //HMMMMMMMM what does this do?? compare to above
-
-                                    node.Code.A("Globals.freeIndexedListsDecomp = new List<string>();" + G.NL);
-                                    foreach (string s in node.freeIndexedLists.Keys)
-                                    {
-                                        node.Code.A("Globals.freeIndexedListsDecomp.Add(@`" + s + "`);" + G.NL);
-                                    }
-                                }
-                            }
+                            //node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
+                                                        
                         }
                         break;
                     case "ASTDECOMP":
@@ -6620,14 +6603,7 @@ namespace Gekko.Parser.Gek
                 node.Code.A(child[0].Code + ", " + xx);
                 if (i < node.ChildrenCount() - 1) node.Code.A(", ");                
             }
-        }
-
-        //private static string EmitListLoopingCode(ASTNode node, KeyValuePair<string, string> kvp)
-        //{
-        //    string nameCs = GetLoopNameCs(node, kvp.Key);
-        //    string nodeCode = "foreach (ScalarString " + nameCs + " in new O.GekkoListIterator(" + kvp.Value + ")) {" + G.NL;
-        //    return nodeCode;
-        //}
+        }        
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName)
         {

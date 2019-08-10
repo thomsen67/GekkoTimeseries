@@ -12620,50 +12620,15 @@ namespace Gekko
             }           
 
             string rhs = found.rhs.Trim();
-            string lhs = found.lhs.Trim();            
+            string lhs = found.lhs.Trim();
 
             try
             {
-                
-                if (Globals.freeIndexedListsDecomp != null && Globals.freeIndexedListsDecomp.Count > 0)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (string s in Globals.freeIndexedListsDecomp)
-                    {
-                        TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(rhs);
-                        for (int i = 1; i < tokens.storage.Count; i++)
-                        {
-                            if (tokens[i - 1].s == Globals.symbolCollection.ToString() && tokens[i].leftblanks == 0 && tokens[i].type == ETokenType.Word)
-                            {
-                                if (G.Equal(tokens[i].s, s))
-                                {
-                                    tokens[i - 1].s = "";
-                                    tokens[i].s = "1";
-                                }
-                            }
-                        }
-
-                        for (int i = 0; i < tokens.storage.Count; i++)
-                        {
-                            sb.Append(tokens[i].ToString());
-                        }
-
-                        string s2 = "EVAL " + sb.ToString() + ";";
-                        if (Globals.printAST) G.Writeln2("AST: ---> " + s2);
-                        Program.obeyCommandCalledFromGUI(s2, new P()); //produces Func<> Globals.expression with the expression
-                        if (Globals.fix) found.expressions.Add(Globals.expressions[0]);
-                        else found.expressions.Add(Globals.expression);
-                    }
-                }
-                else
-                {
-                    string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-                    if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
-                    Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-                    if(Globals.fix) found.expressions.Add(Globals.expressions[0]);
-                    else found.expressions.Add(Globals.expression);
-                }
-
+                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
+                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
+                if (Globals.fix) found.expressions.AddRange(Globals.expressions);
+                else found.expressions.Add(Globals.expression);
             }
             catch (Exception e)
             {
@@ -26109,7 +26074,7 @@ namespace Gekko
             Globals.expressionText = null;
             Globals.expression = null;
             Globals.expressions = null;
-            Globals.freeIndexedListsDecomp = null;
+            //Globals.freeIndexedListsDecomp = null;
 
         //Program.Cut(false);
 
