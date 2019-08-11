@@ -7781,7 +7781,7 @@ namespace Gekko.Parser.Gek
 
         private static string AddOperator(string type, string s, string parentType, ASTNode node)
         {
-            string o = "o" + Num(node) + ".operators";
+            string o = "o" + Num(node) + ".operators"; 
             if (parentType == "ASTPRTELEMENTOPTIONFIELD") o = "ope" + Num(node) + ".operators";
             return o + ".Add(new OptString(`" + type + "`, O.ConvertToString(" + s + ")));" + G.NL;
         }        
