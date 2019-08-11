@@ -15,27 +15,47 @@ namespace Gekko
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            var Evalcode573 = new List<Func<GekkoSmpl, IVariable>>();
-            //IVariable xx = O.Lookup(smpl574, null, ((O.scalarStringHash).Add(smpl574, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, o0);
-            IVariable xx = O.GetIVariableFromString("#a", O.ECreatePossibilities.NoneReportError, true);
-            foreach (IVariable listloop_a571 in new O.GekkoListIterator(xx))
+            O.Assignment o0 = new O.Assignment();
+            o0.opt_source = @"<[code]>#i = a, b";
+
+
+            Action assign_48 = () =>
             {
-                Evalcode573.Add((smpl574) =>
-                {
-                    return O.Subtract(smpl574, O.Indexer(O.Indexer2(smpl574, O.EIndexerType.None, listloop_a571), smpl574, O.EIndexerType.None, O.Lookup(smpl574, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a571), O.Add(smpl574, O.Multiply(smpl574, O.Indexer(O.Indexer2(smpl574, O.EIndexerType.None, listloop_a571), smpl574, O.EIndexerType.None, O.Lookup(smpl574, null, null, "k", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a571), O.Indexer(O.Indexer2(smpl574, O.EIndexerType.IndexerLag, O.Negate(smpl574, i572)
-                    ), smpl574, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl574, O.EIndexerType.None, listloop_a571), smpl574, O.EIndexerType.None, O.Lookup(smpl574, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a571), O.Negate(smpl574, i572)
-                    )), O.Indexer(O.Indexer2(smpl574, O.EIndexerType.None, listloop_a571), smpl574, O.EIndexerType.None, O.Lookup(smpl574, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a571)));
-                });
-            }
-            Globals.expressionText = @"x[#a] - (k[#a] * y[#a][-2] + z[#a])";
-            Globals.expressions = Evalcode573;
-            //Globals.freeIndexedListsDecomp = null;
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar47 = O.ExplodeIvariablesSeq(true, new List(new List<IVariable> { new ScalarString("a"), null, new ScalarString("b"), null }));
+                O.AdjustT0(smpl, 2);
+                O.Lookup(smpl, null, null, "#i", null, ivTmpvar47, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+            };
+            Func<bool> check_48 = () =>
+            {
+                O.AdjustT0(smpl, -2);
+                IVariable ivTmpvar47 = O.ExplodeIvariablesSeq(true, new List(new List<IVariable> { new ScalarString("a"), null, new ScalarString("b"), null }));
+                O.AdjustT0(smpl, 2);
+                if (ivTmpvar47.Type() != EVariableType.Series) return false;
+                O.Dynamic1(smpl);
+                O.Lookup(smpl, null, null, "#i", null, ivTmpvar47, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+                ;
+                return O.Dynamic2(smpl);
+            };
+            O.RunAssigmentMaybeDynamic(smpl, assign_48, check_48, o0);
 
             //[[commandEnd]]0
+
+
+            //[[commandStart]]1
+            p.SetText(@"¤2"); O.InitSmpl(smpl, p);
+
+
+            O.Copy o1 = new O.Copy();
+            o1.type = @"ASTPLACEHOLDER";
+            o1.names1 = O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("x").Concat(null, new ScalarString("[").Add(null, O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null)).Add(null, new ScalarString("]"))), new ScalarString("c") }));
+            o1.Exe();
+
+            //[[commandEnd]]1
         }
 
 
-        public static readonly ScalarVal i572 = new ScalarVal(2d);
 
         public static void CodeLines(P p)
         {

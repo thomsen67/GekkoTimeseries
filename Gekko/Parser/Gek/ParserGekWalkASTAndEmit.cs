@@ -908,15 +908,31 @@ namespace Gekko.Parser.Gek
                         {                            
 
                             node.Code.CA("new ScalarString(`[`)");
-                            for (int i = 0; i < node.ChildrenCount(); i++)
+
+                            if (Globals.fixConcat)
                             {
-                                for (int j = 0; j < node[i].ChildrenCount(); j++)
+                                for (int i = 0; i < node.ChildrenCount(); i++)
                                 {
-                                    node.Code.A(".Add(null, ").A(node[i][j].Code).A(")");
-                                }                                    
-                                if (i < node.ChildrenCount() - 1) node.Code.A(".Add(null, new ScalarString(`,`))");
+                                    for (int j = 0; j < node[i].ChildrenCount(); j++)
+                                    {
+                                        node.Code.A(".Concat(null, ").A(node[i][j].Code).A(")");
+                                    }
+                                    if (i < node.ChildrenCount() - 1) node.Code.A(".Concat(null, new ScalarString(`,`))");
+                                }
+                                node.Code.A(".Concat(null, new ScalarString(`]`))");
                             }
-                            node.Code.A(".Add(null, new ScalarString(`]`))");
+                            else
+                            {
+                                for (int i = 0; i < node.ChildrenCount(); i++)
+                                {
+                                    for (int j = 0; j < node[i].ChildrenCount(); j++)
+                                    {
+                                        node.Code.A(".Add(null, ").A(node[i][j].Code).A(")");
+                                    }
+                                    if (i < node.ChildrenCount() - 1) node.Code.A(".Add(null, new ScalarString(`,`))");
+                                }
+                                node.Code.A(".Add(null, new ScalarString(`]`))");
+                            }
                         }
                         break;
                     //case "ASTL1":

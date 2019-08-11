@@ -1273,6 +1273,20 @@ namespace Gekko
                 //corresponds to uncontrolled lists like x[#i] or x[#i, #j]
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>();
 
+                //!!!!
+                //!!!!
+                //!!!!
+                //!!!!
+                //!!!!
+                //!!!!
+                //!!!!
+                //IVariable zz = new ScalarString("x").Concat(null, new ScalarString("[").Concat(null, O.Lookup(smpl, null, null, "#a", null, null, new LookupSettings(), EVariableType.Var, null)).Concat(null, new ScalarString(",")).Concat(null, O.Lookup(smpl, null, null, "#a", null, null, new LookupSettings(), EVariableType.Var, null)).Concat(null, new ScalarString("]")));
+                //IVariable xx = O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { zz }));
+                //!!!!
+                //!!!!
+                //!!!!
+
+
                 List<string> expressionTexts = new List<string>();
                 int counter2 = -1;
                 foreach (Link link in this.decompOptions2.link)
