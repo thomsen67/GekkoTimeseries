@@ -1268,7 +1268,7 @@ namespace Gekko
 
                 int perLag = -2;
                 string lhsString = "Expression value";
-                
+
                 //decompDatas, first dimension corresponds to a link, whereas the next dimension
                 //corresponds to uncontrolled lists like x[#i] or x[#i, #j]
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>();
@@ -1287,8 +1287,8 @@ namespace Gekko
                     decompDatas.Add(temp);
                 }
 
-                int parentI = 0;
-                int parentListNumberI = 0;
+                int parentI = 0;                
+                int parentJ = FindLinkJ(decompDatas, parentI);
 
                 //The series below is the lhs series of the whole decomposition. If the rhs or a link contains the lhs variable,
                 //it will be altered, therefore the clone. For instance, in y = c + g and c = 0.8*y, a naive decomp for data where
@@ -1296,7 +1296,7 @@ namespace Gekko
                 Series lhsClone = null;
                 if (decompOptions2.link[0].varname != null)
                 {
-                    lhsClone = decompDatas[parentI][parentListNumberI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"].DeepClone(null) as Series;
+                    lhsClone = decompDatas[parentI][parentJ].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"].DeepClone(null) as Series;
                 }
 
                 //linking
@@ -1306,23 +1306,9 @@ namespace Gekko
                 {
                     //adjust the table according to link variable, so it fits with the destination table
                     string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varname + "¤[0]";
-                    Series linkParent = decompDatas[parentI][parentListNumberI].cellsContribD[linkVariable];
+                    Series linkParent = decompDatas[parentI][parentJ].cellsContribD[linkVariable];
 
-                    int j = -12345;
-                    for (int j2 = 0; j2 < decompDatas[i].Count; j2++)
-                    {
-                        if(decompDatas[i][j2].cellsContribD.ContainsKey(linkVariable))
-                        {
-                            j = j2;
-                            break;
-                        }
-                    }
-
-                    if (j == -12345)
-                    {
-                        G.Writeln2("*** ERROR: Could not find link variable " + decompOptions2.link[i].varname);
-                        throw new GekkoException();
-                    }
+                    int j = FindLinkJ(decompDatas, i);
 
                     Series linkChild = decompDatas[i][j].cellsContribD[linkVariable];
 
@@ -1334,13 +1320,13 @@ namespace Gekko
                         double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much
                         factors.Add(factor);
                     }
-                    
+
                     //for each period, find the variable value in the original equation, and compute
                     //  a correction factor for the sub-equation.                    
-                    
+
                     foreach (KeyValuePair<string, Series> kvp in decompDatas[i][j].cellsContribD.storage)
                     {
-                        Series varParent = decompDatas[parentI][parentListNumberI].cellsContribD[kvp.Key];  //will be created
+                        Series varParent = decompDatas[parentI][parentJ].cellsContribD[kvp.Key];  //will be created
                         Series varChild = kvp.Value;
 
                         int counter = -1;
@@ -1349,36 +1335,36 @@ namespace Gekko
                         {
                             counter++;
                             //if (G.Equal(kvp.Key, linkVariable)) continue;
-                            
+
                             double dVarParent = varParent.GetDataSimple(t);
                             if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
                             double dVarChild = varChild.GetDataSimple(t);
                             double x = dVarParent + factors[counter] * dVarChild;
 
-                            decompDatas[parentI][parentListNumberI].cellsContribD[kvp.Key].SetData(t, x);                            
-                        }                        
+                            decompDatas[parentI][parentJ].cellsContribD[kvp.Key].SetData(t, x);
+                        }
                     }
                 }
 
                 if (lhsClone != null)
                 {
                     //now we correct if the lhs variable is on the rhs or in a link equation.
-                    Series lhs = decompDatas[parentI][parentListNumberI].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"] as Series;
+                    Series lhs = decompDatas[parentI][parentJ].cellsContribD[Program.databanks.GetFirst().name + ":" + decompOptions2.link[0].varname + "¤[0]"] as Series;
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
                         double factor = lhsClone.GetDataSimple(t) / lhs.GetDataSimple(t);
-                        foreach (KeyValuePair<string, Series> kvp in decompDatas[parentI][parentListNumberI].cellsContribD.storage)
+                        foreach (KeyValuePair<string, Series> kvp in decompDatas[parentI][parentJ].cellsContribD.storage)
                         {
-                            Series x = decompDatas[parentI][parentListNumberI].cellsContribD[kvp.Key];
+                            Series x = decompDatas[parentI][parentJ].cellsContribD[kvp.Key];
                             x.SetData(t, factor * x.GetDataSimple(t));
                         }
                     }
                 }
 
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentListNumberI], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentListNumberI], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));                
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], decompOptions2.link[parentI].varname, decompOptions2.link[parentI].expressionText));
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 
-                this.decompOptions2.decompData = decompDatas[parentI][parentListNumberI];
+                this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
                 if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
                 {
@@ -1431,7 +1417,30 @@ namespace Gekko
             }
         }
 
-        
+        private int FindLinkJ(List<List<DecompData>> decompDatas, int parentI)
+        {
+            if (decompOptions2.link[parentI].varname == null) return 0;  //for instance decomp of an expression
+            string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[parentI].varname + "¤[0]";
+            int parentJ = -12345;            
+            for (int j2 = 0; j2 < decompDatas[parentI].Count; j2++)
+            {
+                
+                if (decompDatas[parentI][j2].cellsContribD.ContainsKey(linkVariable))
+                {
+                    parentJ = j2;
+                    break;
+                }
+            }
+
+            if (parentJ == -12345)
+            {
+                G.Writeln2("*** ERROR: Could not find link variable " + decompOptions2.link[parentI].varname);
+                throw new GekkoException();
+            }
+
+            return parentJ;
+        }
+
 
 
         private static EDecompBanks DecompBanks(string operator1)
