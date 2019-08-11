@@ -187,6 +187,11 @@ namespace Gekko
         {
             return storage.Remove(s);
         }
+
+        public bool ContainsKey(string s)
+        {
+            return storage.ContainsKey(s);
+        }
     }
 
     public class MyCustomAttribute : Attribute
