@@ -2208,15 +2208,14 @@ expressionOrNothing:        expression -> expression
 						    ;
 
 // ------------------------------------------------------------------------------------------------------------------
-// ------------------- naked list ------------------------------------------------------------------------------
+// ------------------- naked list, used in assignment and FOR -------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
 
 nakedList:					  seqItemNaked (COMMA2 seqItemNaked)+ ->  ^(ASTNAKEDLIST seqItemNaked+)
-| seqItemNaked COMMA2 -> ^(ASTNAKEDLIST seqItemNaked)
-							
-							   ;
+                            | seqItemNaked COMMA2 -> ^(ASTNAKEDLIST seqItemNaked)							
+							  ;
 
-seqItemNaked:                  MINUS seqItem7Naked 	(REP repN)?	-> ^(ASTNAKEDLISTITEM ^(ASTSEQITEMMINUS seqItem7Naked) repN?)
+seqItemNaked:                 MINUS seqItem7Naked 	(REP repN)?	-> ^(ASTNAKEDLISTITEM ^(ASTSEQITEMMINUS seqItem7Naked) repN?)
 							| seqItem7Naked	(REP repN)?	-> ^(ASTNAKEDLISTITEM seqItem7Naked repN?)
 							| seqNumber (REP repN)? -> ^(ASTNAKEDLISTITEM seqNumber repN?)
 							| ident leftParenGlue RIGHTPAREN -> ^(ASTNAKEDLISTMISS ident) //must catch m() or miss()
@@ -2227,8 +2226,9 @@ bank7Naked:					  AT GLUE -> ASTAT
 							| name7 COLON -> name7 ASTCOLON
 							  ;
 
-freq7Naked:				  GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;  
-indexer7Naked:			  leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name7+);
+freq7Naked:				      GLUE EXCLAMATION GLUE name7 -> ASTEXCLAMATION name7;  
+//indexer7Naked:			      leftBracket (name7 (',' name7)*) RIGHTBRACKET -> ^(ASTL0 name7+);
+indexer7Naked:				  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- flexible list --------------------------------------------------------------------------------
@@ -2238,7 +2238,6 @@ minus:                        MINUS -> ASTNUMBERMINUS;
 seqNumber:                    minus? double2 -> ^(ASTNUMBER double2 minus?)
 						    | minus? Integer -> ^(ASTNUMBER Integer minus?)
 							  ;
-//seqOfNumbers:                 seqNumber (COMMA2 seqNumber)* ->  ^(ASTNUMBERLIST seqNumber+);
 
 // ----------------------------------------------------------------------------------
 
@@ -2249,6 +2248,7 @@ seqItem:                      MINUS seqItem7 -> ^(ASTSEQITEMMINUS seqItem7)
 
 seqItem7:                     listFile
 							| bank7? wildcard7 indexer7? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7?) ^(ASTPLACEHOLDER wildcard7) ^(ASTPLACEHOLDER indexer7?));
+
 bank7:						  AT GLUE -> ASTAT
 							| wildcard7 COLON -> wildcard7 ASTCOLON
 							  ;
@@ -2257,8 +2257,7 @@ freq7:						  GLUE EXCLAMATION GLUE wildcard7 -> ASTEXCLAMATION wildcard7;
 indexer7:					  leftBracket (indexerHelper7 (',' indexerHelper7)*) RIGHTBRACKET -> ^(ASTL0 indexerHelper7+);  
 
 indexerHelper7:				  
-						      wildcardIndexer7 -> ^(ASTL1 wildcardIndexer7)	 //stuff like x[a], x[a*b]						 
-					//		| stringInQuotes -> ^(ASTL1 stringInQuotes)
+						      wildcardIndexer7 -> ^(ASTL1 wildcardIndexer7)	 //stuff like x[a], x[a*b]						 					
 							| expression -> ^(ASTL1 expression)              //stuff like x['a'], x['a'+'b'], 
 							  ;
 
@@ -2290,15 +2289,9 @@ seqOfFileNamesStar:         star -> ^(ASTFILENAMELIST ASTFILENAMESTAR)
 						  | fileName (COMMA2 fileName)* ->  ^(ASTFILENAMELIST fileName+)
 						    ;
 
-//seqOfBankvarnamesWild:      seqItemWild (COMMA2 seqItemWild)* ->  ^(ASTBANKVARNAMELISTWILD seqItemWild+);
-
-//seqItemWild:                expression;    
-
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- wildcards, ranges --------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------------
-
-
 
 listItemsWildRange:         listItemWildRange (COMMA2 listItemWildRange)* -> ^(ASTLISTITEMS (^(ASTLISTITEM listItemWildRange))+);   //puts in o.listItems
 
@@ -2315,8 +2308,7 @@ wildcardWithBank:           AT GLUE varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^
 						  | varnameOrWildcard -> ^(ASTWILDCARDWITHBANK ^(ASTPLACEHOLDER) varnameOrWildcard)
 						  ;
 
-rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)
-						  ;
+rangeWithBank             : range -> ^(ASTRANGEWITHBANK range)						  ;
 
 range:                      wildcardWithBank doubleDot2 wildcardWithBank -> wildcardWithBank wildcardWithBank;
 
@@ -2348,9 +2340,7 @@ wildSymbolEnd             : starGlueLeft -> ASTWILDSTAR
 wildSymbolMiddle          : starGlueBoth -> ASTWILDSTAR
                           | questionGlueBoth -> ASTWILDQUESTION
 						  ;
-
-
-
+						  						   
 
 // ------------------------------------------------------------------------------------------------------------------
 // ------------------- name START -------------------------------------------------------------------------------
@@ -2361,15 +2351,6 @@ name:                       name2 -> ^(ASTNAME name2);
 						    //name is without sigil, name is in principle just like characters, excluding sigils. Kind of like an advanced ident.
 name2:                      (ident | nameCurlyStart) (GLUE! identDigit | nameCurly)* ;
 
-//nameCurlyStart:             leftCurlyNoGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-//					      | leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
-//						    ;
-//
-//nameCurly:                  leftCurlyGlue ident RIGHTCURLY -> ^(ASTCURLYSIMPLE ident)
-//					      | leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
-//						    ;
-
-
 nameCurlyStart:             
 					        leftCurlyNoGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
@@ -2378,19 +2359,10 @@ nameCurly:
 					        leftCurlyGlue expression RIGHTCURLY -> ^({token("ASTCURLY¤"+($expression.text)+"¤"+($expression.start)+"¤"+($expression.stop), ASTCURLY, 0)} expression)
 						    ;
 
-
-
-//cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
-//cnameHelper:                GLUE sigilOrVertical name -> sigilOrVertical name;
-
 cname:                      name cnameHelper+ -> ^(ASTCNAME name cnameHelper+);
 cnameHelper:                GLUE sigil name -> ^(ASTCURLY ^(ASTBANKVARNAME ASTPLACEHOLDER  ^(ASTVARNAME ^(ASTPLACEHOLDER sigil) ^(ASTPLACEHOLDER  name )  ASTPLACEHOLDER   )     )  )                       
 						  | GLUE VERTICALBAR name -> name //does not have glue after
 						    ;
-
-//hashOrPercent:              PERCENT -> ASTPERCENT
-//						  | HASH -> ASTHASH
-//						    ; 
 
 nameOrCname:                cname | name;  //cname must be before name
 
@@ -2474,8 +2446,7 @@ start:                      statements EOF;  //EOF is necessary in order to forc
 
 statements:                 statements2*;
 
-statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written
-                     //     | series               SEMICOLON!  //before assignemt: must catch SERIES x = 1 -2 -3; etc.
+statements2:                SEMICOLON -> //stray semicolon is ok, nothing is written                     
 						  | assignment2          SEMICOLON!
 						  | accept               SEMICOLON!
 						  | analyze              SEMICOLON!		
