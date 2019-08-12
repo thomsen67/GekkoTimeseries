@@ -4294,17 +4294,12 @@ namespace Gekko
             //do this by first reading into a Gekko databank, and then merge that with the merge facilities from gbk read
 
             DateTime dt1 = DateTime.Now;
-
-            //if (!merge)
-            //{
-            //    databank.Clear();
-            //}
-
+                        
             string pxLinesText = Program.GetTextFromFileWithWait(fileLocal);  //also removes some kinds of funny characters
 
             int vars = -12345;
             GekkoTime startYear;
-            GekkoTime endYear;
+            GekkoTime endYear;            
             ReadPx(databank, oRead.array, false, null, null, null, pxLinesText, out vars, out startYear, out endYear);
 
             readInfo.startPerInFile = startYear.super;
@@ -4547,8 +4542,7 @@ namespace Gekko
 
 
         public static void ReadPx(Databank databank, string array, bool isDownload, string source, string tableName, List<string> codesHeaderJson, string pxLinesText, out int vars, out GekkoTime perStart, out GekkoTime perEnd)
-        {
-
+        {            
             bool isArray = false; if (G.Equal(array, "yes")) isArray = true;
 
             bool hyphenFound = false;
@@ -4567,11 +4561,10 @@ namespace Gekko
 
             //int counter = 0;
             string codeTimeString = "CODES(\"tid\")=";
-            string codeString = "CODES(";
-            //string valueTimeString = "VALUES(\"tid\")=";
+            string codeTimeString2 = "CODES(\"time\")=";
+            string codeString = "CODES(";            
             string valueString = "VALUES(";
             string matrixString = "MATRIX=";
-
 
             List<string> codesCombi = null;
             List<string> valuesCombi = null;
@@ -4596,7 +4589,8 @@ namespace Gekko
             GekkoTime gt0 = GekkoTime.tNull;
             GekkoTime gt1 = GekkoTime.tNull;
 
-            long allCcounter = 0;
+            long allCounter = 0;
+            long allCounter2 = 0;
 
             foreach (string line2 in lines2)
             {
@@ -4616,7 +4610,7 @@ namespace Gekko
                 bool semi = false;
                 bool firstLine = false;
 
-                if (line.StartsWith("DATA="))
+                if (line.StartsWith("DATA=", StringComparison.OrdinalIgnoreCase))
                 {
                     lineHelper = null; //not used 
                     state = 1;
@@ -4624,25 +4618,25 @@ namespace Gekko
                     line = line.Substring("DATA=".Length);
                     line = line.Trim();  //may have blank after =
                 }
-                else if (line.StartsWith(codeTimeString))
+                else if (line.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase) || line.StartsWith(codeTimeString2, StringComparison.OrdinalIgnoreCase))
                 {
                     lineHelper = new StringBuilder();
                     firstLine = true;
                     state = 2;
                 }
-                else if (line.StartsWith(codeString))
+                else if (line.StartsWith(codeString, StringComparison.OrdinalIgnoreCase))
                 {
                     lineHelper = new StringBuilder();
                     firstLine = true;
                     state = 3;
                 }
-                else if (line.StartsWith(valueString))
+                else if (line.StartsWith(valueString, StringComparison.OrdinalIgnoreCase))
                 {
                     lineHelper = new StringBuilder();
                     firstLine = true;
                     state = 4;
                 }
-                else if (line.StartsWith(matrixString))
+                else if (line.StartsWith(matrixString, StringComparison.OrdinalIgnoreCase))
                 {
                     if (tableName == null)
                     {
@@ -4695,13 +4689,10 @@ namespace Gekko
 
                     int sstate = 1;
                     int lastStart = 0;
-                    int counter = 0;
+                    //int counter = 0;
                     for (int i5 = 0; i5 < s.Length; i5++)
                     {
-                        if(i5 == s.Length - 1)
-                        {
-
-                        }
+                        
                         char c = s[i5];
                         if ((c == ' ' || i5 == s.Length - 1) && sstate == 1)
                         {
@@ -4710,10 +4701,16 @@ namespace Gekko
                             {
                                 add = 1;
                             }
-                            string temp2 = s.Substring(lastStart, i5 - lastStart + add);
-                            counter++;
-                            //G.Writeln2("oasfas " + counter);
+                            string temp2 = s.Substring(lastStart, i5 - lastStart + add).Trim();
+                            //counter++;
+                            allCounter2++;
+                            
                             double value = double.NaN;
+
+                            if (temp2 == "")
+                            {
+                                continue;  //if there are more than 1 blank
+                            }
 
                             if (temp2 == "\".\"" || temp2 == "\"..\"" || temp2 == "\"...\"" || temp2 == "\"....\"" || temp2 == "\":\"")
                             {
@@ -4732,6 +4729,11 @@ namespace Gekko
                                     G.Writeln2("*** ERROR: Could not convert '" + temp2 + "' into a number");
                                     throw new GekkoException();
                                 }
+                            }
+                            if (ii + jj * dates.Count >= data.Length)
+                            {
+                                G.Writeln2("*** ERROR: More than " + data.Length + " numbers found in data section");
+                                throw new GekkoException();
                             }
                             data[ii + jj * dates.Count] = value;  //i is date, j is variable
                             ii++;
@@ -4761,7 +4763,9 @@ namespace Gekko
                 else if (state == 2)
                 {
                     string s = lineHelper.ToString();
-                    s = s.Substring(codeTimeString.Length);
+                    if (s.StartsWith(codeTimeString, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString.Length);
+                    else if (s.StartsWith(codeTimeString2, StringComparison.OrdinalIgnoreCase)) s = s.Substring(codeTimeString2.Length);
+
                     string[] ss = s.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string s2 in ss)
                     {
@@ -4896,21 +4900,11 @@ namespace Gekko
 
                     int offset = 0;
 
-                    ////See similar code in the tsd reader
-                    //int offset = 0;
-                    //if (datesRestrict != null)
-                    //{
-                    //    var tuple = GetFirstLastDates(datesRestrict, gt_start, gt_end);
-                    //    gt_start = tuple.Item1;
-                    //    gt_end = tuple.Item2;
-                    //    offset = tuple.Item3;
-                    //}
-
                     int obs = GekkoTime.Observations(gt_start, gt_end);
 
                     ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                     ts.Trim();  //to save ram
-                    allCcounter += obs;
+                    allCounter += obs;
                     if (gt0.IsNull()) gt0 = gt_start;
                     if (gt1.IsNull()) gt1 = gt_end;
                     if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
@@ -4967,22 +4961,14 @@ namespace Gekko
                             G.Writeln2("*** ERROR: Expected " + dates.Count + " obs between " + dates[0] + " and " + dates[dates.Count - 1]);
                             throw new GekkoException();
                         }
-
-                        //See similar code in the tsd reader
+                        
                         int offset = 0;
-                        //if (datesRestrict != null)
-                        //{
-                        //    var tuple = GetFirstLastDates(datesRestrict, gt_start, gt_end);
-                        //    gt_start = tuple.Item1;
-                        //    gt_end = tuple.Item2;
-                        //    offset = tuple.Item3;
-                        //}
-
+                        
                         int obs = GekkoTime.Observations(gt_start, gt_end);
 
                         ts.SetDataSequence(gt_start, gt_end, data, j * dates.Count + offset);  //the last is the offset
                         ts.Trim();  //to save ram
-                        allCcounter += obs;
+                        allCounter += obs;
                         if (gt0.IsNull()) gt0 = gt_start;
                         if (gt1.IsNull()) gt1 = gt_end;
                         if (gt_start.StrictlySmallerThan(gt0)) gt0 = gt_start;
@@ -5019,11 +5005,13 @@ namespace Gekko
             perStart = gt0;
             perEnd = gt1;
 
-            if (data.LongLength != allCcounter)
+            if (data.LongLength != allCounter2)
             {
                 //See not in constrution of data array
-                G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCcounter + " data points in all, expected " + data.LongLength);
-            }
+                G.Writeln2("+++ WARNING: " + downloadOrImport + " " + allCounter2 + " numbers, expected " + data.LongLength);
+                G.Writeln("+++ WARNING: Please review the resulting timeseries carefully!");
+                if (Globals.runningOnTTComputer || G.IsUnitTesting()) throw new GekkoException();
+            }            
 
             if (hyphenFound)
             {
@@ -5037,7 +5025,7 @@ namespace Gekko
                 G.Writeln2("+++ WARNING: Underscores ('_') in names have been removed");
             }
             
-        }
+        }        
 
         private static string GetArrayName(string tableName, string codesCombi)
         {

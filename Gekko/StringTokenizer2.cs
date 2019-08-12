@@ -485,7 +485,7 @@ namespace Gekko
         int pos;    // position within data
 
         string data;
-
+                
         bool ignoreWhiteSpace;
         char[] symbolChars;
 
@@ -613,7 +613,7 @@ namespace Gekko
 
         private void Reset()
         {
-            this.ignoreWhiteSpace = false;
+            this.ignoreWhiteSpace = false;            
             this.symbolChars = new char[] { '=', '+', '-', '/', ',', '.', '*', '~', '!', '@', '#', '$', '%', '^', '&', '(', ')', '{', '}', '[', ']', ':', ';', '<', '>', '?', '|', '\\' };
             line = 1;
             column = 1;
@@ -631,8 +631,10 @@ namespace Gekko
         protected char Consume()
         {
             char ret = data[pos];
+            
             pos++;
             column++;
+            
             return ret;
         }
 
@@ -738,8 +740,8 @@ namespace Gekko
                         if (LA(0) == '\n')
                             Consume();  // on DOS/Windows we have \r\n for new line
                         line++;
-                        column = 1;
-                        return CreateToken(ETokenType.EOL);
+                        column = 1;                        
+                        return CreateToken(ETokenType.EOL);                                                
                     }
                 case '\n':
                     {
@@ -747,7 +749,7 @@ namespace Gekko
                         Consume();
                         line++;
                         column = 1;
-                        return CreateToken(ETokenType.EOL);
+                        return CreateToken(ETokenType.EOL);                                                
                     }
 
                 case '"':
