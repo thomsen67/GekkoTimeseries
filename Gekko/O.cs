@@ -38,20 +38,20 @@ namespace Gekko
     {
         public string expressionText = null;
         public List<Func<GekkoSmpl, IVariable>> expressions = null;
-        public string varname = null;
+        public List<string> varnames = null;
         public string eqname = null;
     }
 
     public class DecompItems
     {
         public Func<GekkoSmpl, IVariable> expression = null;
-        public IVariable varname = null;
+        public IVariable varnames = null;
         public IVariable eqname = null;
 
         public DecompItems(Func<GekkoSmpl, IVariable> expression, IVariable name1, IVariable name2)
         {
             this.expression = expression;
-            this.varname = name1;
+            this.varnames = name1;
             this.eqname = name2;
         }
     }

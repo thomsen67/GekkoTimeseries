@@ -172,6 +172,10 @@ namespace Gekko
         {
             get
             {
+                if(s.Contains("ollecti"))
+                {
+
+                }
                 Series ts = null; storage.TryGetValue(s, out ts);
                 if (ts == null)
                 {
@@ -12196,10 +12200,14 @@ namespace Gekko
             foreach (DecompItems liv in o.decompItems)
             {
                 //
-                List<string> x1 = O.Restrict(liv.varname as List, false, true, false, true);
+                List<string> x1 = O.Restrict(liv.varnames as List, false, true, false, true);
                 List<string> x2 = O.Restrict(liv.eqname as List, false, true, false, false);
                 Link temp = new Link();
-                if (x1 != null) temp.varname = x1[0];
+                if (x1 != null)
+                {
+                    temp.varnames = new List<string>();
+                    temp.varnames.AddRange(x1);
+                }
                 if (x2 != null) temp.eqname = x2[0];
                 temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
                 decompOptions2.link.Add(temp);
