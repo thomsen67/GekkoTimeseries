@@ -4640,7 +4640,7 @@ namespace Gekko
                 {
                     if (tableName == null)
                     {
-                        tableName = G.HandleQuoteInQuote(line.Substring(matrixString.Length)).Replace(";", "").Trim();
+                        tableName = line.Substring(matrixString.Length).Replace("\"", "").Replace(";", "").Trim();
                     }
                 }
                 else

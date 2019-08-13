@@ -8416,7 +8416,7 @@ namespace UnitTests
             //2001      2597.3163      0.10      2597.3163      0.10
             //2002      2599.9354      0.10      2599.9354      0.10
             //2003      2602.5572      0.10      2602.5572      0.10
-            _AssertSeries(First(), "xtot", 2001, 92597.3163d, 0.001d);
+            _AssertSeries(First(), "xtot", 2001, 2597.3163d, 0.001d);
             _AssertSeries(First(), "xtot_a", 2001, 2597.3163d, 0.001d);
             _AssertSeries(First(), "xtot", 2002, 2599.9354d, 0.001d);
             _AssertSeries(First(), "xtot_a", 2002, 2599.9354d, 0.001d);
