@@ -36323,26 +36323,26 @@ namespace Gekko
                 //Function call end   --------------
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
-                if (true)
-                {
-                    List<string> ss = Globals.precedents.Keys.ToList<string>();
-                    ss.Sort(StringComparer.OrdinalIgnoreCase);
-                    foreach (string s in ss)
-                    {
-                        IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
 
-                        if (x.Type() == EVariableType.Series)
-                        {
-                            Series ivTemp_series = x as Series;
-                            if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series
-                            decompPrecedents.Add(new DecompPrecedent(s, x));
-                        }
-                        else if (x.Type() == EVariableType.Val)
-                        {
-                            decompPrecedents.Add(new DecompPrecedent(s, x));
-                        }
+
+                List<string> ss = Globals.precedents.Keys.ToList<string>();
+                ss.Sort(StringComparer.OrdinalIgnoreCase);
+                foreach (string s in ss)
+                {
+                    IVariable x = O.GetIVariableFromString(s, O.ECreatePossibilities.NoneReportError);
+
+                    if (x.Type() == EVariableType.Series)
+                    {
+                        Series ivTemp_series = x as Series;
+                        if (ivTemp_series.type == ESeriesType.ArraySuper) continue;  //skipped: we are only looking at sub-series
+                        decompPrecedents.Add(new DecompPrecedent(s, x));
+                    }
+                    else if (x.Type() == EVariableType.Val)
+                    {
+                        decompPrecedents.Add(new DecompPrecedent(s, x));
                     }
                 }
+
 
                 //decompPrecedents.Add(new DecompPrecedent(Globals.decompExpressionName + "¤[0]", null));  //seems variable is not used anyway
 
@@ -36398,9 +36398,8 @@ namespace Gekko
 
                     foreach (DecompPrecedent dp in decompPrecedents)
                     {
+                                                
                         iVar++;
-
-                        //G.Writeln("Progress: " + G.pchFormat(100 * (double)iVar / (double)decompPrecedents.Count, 15));
 
                         Series xRef_series = null;
                         IVariable dpx = O.GetIVariableFromString(dp.s, O.ECreatePossibilities.NoneReportError);
@@ -36459,20 +36458,13 @@ namespace Gekko
 
                                         Series y1_series = y1 as Series;
 
-                                        foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(perLag), tt2.Add(0)))
-                                        //foreach (GekkoTime t2 in new GekkoTimeIterator(t1, t1))
+                                        foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(perLag), tt2.Add(0)))                                        
                                         {
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
                                             double grad = (y1_double - y0_double) / eps;
                                             int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
                                             string name = G.Chop_FreqRemove(dp.s, tt1.freq);
-
-                                            //if (lag != 0)
-                                            //{
-                                            //    if (lag < 0) name += "¤[" + lag + "]";
-                                            //    else name += "¤[+" + lag + "]";
-                                            //}
 
                                             string lag2 = lag.ToString();
                                             if (lag >= 1) lag2 = "+" + lag;
@@ -36561,7 +36553,7 @@ namespace Gekko
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t2, dContribD);
 
-                            if(false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
+                            if (false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                             if (mm.Contains(1))
                             {

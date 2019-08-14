@@ -8408,6 +8408,20 @@ namespace UnitTests
             //  and with a subsidy z[#a] added.
             //xtot = sum(#a, x[#a] * n[#a]);
             //x[#a] = k[#a] * y[#a] + z[#a];
+            //
+            // Aggregates:
+            // The idea is that we have this sum: xtot = x1 * n1 + x2 * n2            
+            // We have x1 = k1 * y1 + z1
+            //
+            // So: xtot = (k1 * y1 + z1) * n1 + (k2 * y2 + z2) * n2
+            //          = (ktot * yavg + zavg) * n
+            //     zavg = (z1 * n1 + z2 * n2) / n
+            //     yavg = (y1 * n1 + y2 * n2) / n
+            //     ktot = (k1 * y1 * n1 + k2 * y2 * n2) / (y1 * n1 + y2 * n2)
+            //
+            //    (k y n / y n * y n / n + z n / n ) * n
+
+            //
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
             I("OPTION model type = gams;");
@@ -8422,6 +8436,17 @@ namespace UnitTests
             _AssertSeries(First(), "xtot_a", 2002, 2599.9354d, 0.001d);
             _AssertSeries(First(), "xtot", 2003, 2602.5572d, 0.001d);
             _AssertSeries(First(), "xtot_a", 2003, 2602.5572d, 0.001d);
+                        
+            I("option model type = gams;");
+            I("model <gms> link;");
+
+            //Globals.showDecompTable = true;
+
+            I("decomp2 <d> xtot_a in e_xtot_a;");
+            I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot;");
+
+            //this one and the superlink above yield the exact same effects.
+            I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
 
 
             // ===============================================
