@@ -10,11 +10,39 @@ namespace Gekko
 
     [ProtoContract]
     [ProtoInclude(1, typeof(Series_1_2))]
+    [ProtoInclude(2, typeof(ScalarVal_1_2))]    
+    [ProtoInclude(3, typeof(ScalarDate_1_2))]
+    [ProtoInclude(4, typeof(ScalarString_1_2))]
+    [ProtoInclude(5, typeof(Map_1_2))]
+    [ProtoInclude(6, typeof(Matrix_1_2))]
+    [ProtoInclude(7, typeof(List_1_2))]
+    [ProtoInclude(8, typeof(Range_1_2))]
     public interface IVariable_1_2
     {
 
     }
 
+    [ProtoContract]
+    public class ScalarVal_1_2 : IVariable_1_2 { private ScalarVal_1_2() { } }
+
+    [ProtoContract]
+    public class ScalarDate_1_2 : IVariable_1_2 { private ScalarDate_1_2() { } }
+
+    [ProtoContract]
+    public class ScalarString_1_2 : IVariable_1_2 { private ScalarString_1_2() { } }
+
+    [ProtoContract]
+    public class Map_1_2 : IVariable_1_2 { private Map_1_2() { } }
+
+    [ProtoContract]
+    public class Matrix_1_2 : IVariable_1_2 { private Matrix_1_2() { } }
+
+    [ProtoContract]
+    public class List_1_2 : IVariable_1_2 { private List_1_2() { } }
+
+    [ProtoContract]
+    public class Range_1_2 : IVariable_1_2 { private Range_1_2() { } }
+    
     public enum EFixedType
     {
         None, //no fixing or parameter (that is: endogenous)
