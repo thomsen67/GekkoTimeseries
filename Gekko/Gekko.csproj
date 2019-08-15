@@ -181,6 +181,7 @@
     <Compile Include="CompareUtilityEquations.Designer.cs">
       <DependentUpon>CompareUtilityEquations.cs</DependentUpon>
     </Compile>
+    <Compile Include="Databank_1_2.cs" />
     <Compile Include="DragAdorner.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Gdxcs.cs" />
