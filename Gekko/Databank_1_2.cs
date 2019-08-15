@@ -7,6 +7,14 @@ using System.Drawing;
 
 namespace Gekko
 {
+
+    [ProtoContract]
+    [ProtoInclude(1, typeof(Series_1_2))]
+    public interface IVariable_1_2
+    {
+
+    }
+
     public enum EFixedType
     {
         None, //no fixing or parameter (that is: endogenous)
@@ -151,7 +159,7 @@ namespace Gekko
     }
 
     [ProtoContract]
-    public class Series_1_2
+    public class Series_1_2: IVariable_1_2
     {
         public enum ESeriesType
         {
@@ -601,8 +609,8 @@ namespace Gekko
 
         [ProtoMember(8)]
         public EFixedType fix = EFixedType.None;
-        [ProtoMember(9)]
-        public GekkoTimeSpans fixedNormal = null;  //only for EFixedType.Normal, setting the periods
+        //[ProtoMember(9)]
+        //public GekkoTimeSpans fixedNormal = null;  //only use for fixing in 3.0
 
         private bool isDirty = false;  //do not keep this in protobuf
         public Databank parentDatabank = null;  //do not keep this in protobuf        
@@ -629,7 +637,33 @@ namespace Gekko
         //}
     }
 
-    class Databank_1_2
-    {
+    [ProtoContract]
+    public class Databank_1_2
+    {             
+        [ProtoMember(1)]
+        public GekkoDictionary<string, IVariable_1_2> storage;
+        //public GekkoDictionary<string, Series_1_2> storage;  //cf. #db12
+        public string name = null;
+        private string fileNameWithPath = null;  //will be constructed when reading: do not protobuf it        
+        
+        public bool save = true;  //Don't use protobuffer on this field.
+        public int yearStart = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
+        public int yearEnd = -12345;  //only set when reading a bank, not afterwards if timeseries change. Not meant for making loops etc. or critical, only static information about the bank        
+        public string info1 = null; //must be taken from DatabankInfo.xml, don't use protobuffer        
+        public string date = null; //must be taken from DatabankInfo.xml, don't use protobuffer
+        public bool isDirty = false;  //used to see if en OPEN databank must be re-written. Don't use protobuffer on this field.
+        public bool editable = true;  //used to set an OPEN databank as editable. Don't use protobuffer on this field.        
+        public Program.ReadInfo readInfo = null; //contains info from reading the file, among other things info from the XML file. NOTE: do not store it in protobuf!
+        public string fileHash = null; //do not store this in protobuf
+
+        private Databank_1_2()
+        {
+            //This is ONLY because protobuf-net needs it
+            //without line below, protobuf probably crashes
+            this.storage = new GekkoDictionary<string, IVariable_1_2>(StringComparer.OrdinalIgnoreCase);
+            //this.storage = new GekkoDictionary<string, Series_1_2>(StringComparer.OrdinalIgnoreCase);  //cf. #db12
+        }
+
+        
     }
 }

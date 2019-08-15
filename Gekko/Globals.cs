@@ -406,7 +406,7 @@ namespace Gekko
         public static Databank undoBank = null;
         public static int hasBeenEndoExoStatementsSinceLastSim = 0;
         
-        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1" };
+        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
