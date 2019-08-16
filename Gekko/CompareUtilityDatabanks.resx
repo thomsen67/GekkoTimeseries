@@ -118,11 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="textBox1.Text" xml:space="preserve">
-    <value>This utility compares two databanks, and prints the comparison in the file 'compare_databanks.txt'. The databanks must be read into the primary and reference databanks beforehand, and the time period must be set.
+    <value>This utility compares two databanks, and prints the comparison in the file 'compare_databanks.txt'. The databanks must be read into the first-position and reference databanks beforehand, and the time period must be set.
 Example:
 
 RESTART;                  [clears the workspace]
-READ&lt;prim&gt; data08;        [read into primary bank]
+READ&lt;first&gt; data08;       [read into first-position bank]
 READ&lt;ref&gt; data07;         [read into reference bank]
 TIME 1990 2008;           [set the period]
 
