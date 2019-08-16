@@ -415,15 +415,16 @@ namespace Gekko
 
             Program.StartPulse();  //regarding remote.gcm
         }
-
+        
         private void StartupExeAndIniStuff()
         {
+            if (Globals.noini == false) RunGekkoIniFile();
             if (Globals.gekkoExeParameters != null)
             {
-                //works as if it was an inputted command line from the GUI                
+                //works as if it was an inputted command line from the GUI  
+                //must be after run of possible ini files (bug fixed 16.8 2019)
                 this.StartThread(Globals.gekkoExeParameters, true);
             }
-            if (Globals.noini == false) RunGekkoIniFile();
         }
 
         private void RunGekkoTabToTextStuff(string folder)
