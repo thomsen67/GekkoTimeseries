@@ -2767,6 +2767,40 @@ namespace Gekko
 
             if (databankVersion == "1.2")
             {
+
+                /*
+                 * This 3.0 code produces a 3.0 bank that can be read correctly by the code below with READ datatest
+                 * 
+                 * reset;
+time 2001 2003;
+x <LABEL='lbl' SOURCE='src' UNITS='u' STAMP='stmp'> = 1, 2, 3;
+option freq a;
+%x1 = 4;
+%x2 = 2001q2;
+%x3 = 'hej';
+#x4 = a, b, c;
+#x5 = (%x = 1, %y = 2);
+#x6 = [1, 2; 3, 4];
+x2 = timeless();
+x2 = 100;
+x3 = series(1);
+x3[a] = 4, 3, 2;
+x3[b] = timeless(200);
+
+option freq q;
+time 2001q1 2001q3;
+x = 1, 2, 3;
+x2 = timeless();
+x2 = 100;
+x3 = series(2);
+x3[a, x] = 4, 3, 2;
+x3[b, x] = timeless(200);
+
+write datatest;
+                 
+                 * * 
+                 */
+
                 string name = null;
                 if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName)) name = tempTsdxPath + "\\" + Globals.protobufFileName;  //legacy
                 else if (File.Exists(tempTsdxPath + "\\" + Globals.protobufFileName2)) name = tempTsdxPath + "\\" + Globals.protobufFileName2;  //usual name
@@ -2807,79 +2841,123 @@ namespace Gekko
                     int nMap = 0;
                     int nMatrix = 0;
 
+                    int minYearInProtobufFile = int.MaxValue;
+                    int maxYearInProtobufFile = int.MinValue;
+
+                    List<string> lines = new List<string>();
+
                     foreach (KeyValuePair<string, IVariable_1_2> kvp in databank2.storage)
                     {
                         if (kvp.Value is Series_1_2)
                         {
                                                                                     
-                            Series_1_2 x = kvp.Value as Series_1_2;
-
+                            Series_1_2 xGekko3 = kvp.Value as Series_1_2;
+                            
                             EFreq freq2 = EFreq.Annual;
-                            if (x.freq == EFreq_1_2.Q) freq2 = EFreq.Quarterly;
-                            else if (x.freq == EFreq_1_2.M) freq2 = EFreq.Monthly;
-                            else if (x.freq == EFreq_1_2.U) freq2 = EFreq.Undated;
-                            string[] ss = x.name.Split('!');
-                            TimeSeries x2 = new TimeSeries(freq2, ss[0]);
-                            x2.stamp = x.meta.stamp;
-                            x2.source = x.meta.source;
-                            x2.label = x.meta.label;
-                            x2.units = x.meta.units;
+                            if (xGekko3.freq == EFreq_1_2.Q) freq2 = EFreq.Quarterly;
+                            else if (xGekko3.freq == EFreq_1_2.M) freq2 = EFreq.Monthly;
+                            else if (xGekko3.freq == EFreq_1_2.U) freq2 = EFreq.Undated;
+                            string[] ss = kvp.Key.Split('!');
+                            TimeSeries xGekko2 = new TimeSeries(freq2, ss[0]);
+                            xGekko2.stamp = xGekko3.meta.stamp;
+                            xGekko2.source = xGekko3.meta.source;
+                            xGekko2.label = xGekko3.meta.label;
+                            xGekko2.units = xGekko3.meta.units;
+                            xGekko2.variableName = ss[0];
 
-                            if (x.type == Series_1_2.ESeriesType.ArraySuper)
+                            if (xGekko3.type == Series_1_2.ESeriesType.ArraySuper)
                             {
+                                // ARRAY-SERIES
                                 nArrayseries++;
 
-                                                                                                                                                                                                                 
-                                
-                                
+                                //make ghost
+                                                                                                
+                                xGekko2.SetGhost(true);  //only a placeholder, should not be counted etc.                                                                
+
+                                foreach (KeyValuePair<MapMultidimItem, IVariable_1_2> kvpSub in xGekko3.dimensionsStorage.storage)
+                                {
+
+                                    MapMultidimItem mmd = kvpSub.Key;
+                                    string s5 = mmd.ToString().Replace(" ", "").Replace(",", Globals.symbolTurtle);
+                                    IVariable_1_2 iv2 = kvpSub.Value;
+
+                                    Series_1_2 subGekko3 = iv2 as Series_1_2;
+                                    if (subGekko3 == null) continue;
+
+                                    string subname = xGekko2.variableName + Globals.symbolTurtle + s5;
+
+                                    TimeSeries subGekko2 = new TimeSeries(freq2, subname);
+
+                                    if (subGekko3.type == Series_1_2.ESeriesType.Timeless)
+                                    {
+                                        // TIMELESS INSIDE ARRAY-SERIES
+
+                                        double v = subGekko3.data.GetDataArray_ONLY_INTERNAL_USE()[0];
+                                        GekkoTime gt1 = new GekkoTime(freq2, 1950, 1);
+                                        GekkoTime gt2 = new GekkoTime(freq2, 2100, 1);
+                                        foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                                        {
+                                            subGekko2.SetData(gt, v);
+                                        }
+                                    }
+                                    else if (subGekko3.type == Series_1_2.ESeriesType.Normal)
+                                    {
+                                        // NORMAL INSIDE ARRAY-SERIES
+
+                                        GekkoTime_1_2 t1 = subGekko3.GetPeriod(0);
+                                        GekkoTime_1_2 t2 = subGekko3.GetPeriod(subGekko3.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
+                                        GekkoTime gt1 = new GekkoTime(freq2, t1.super, t1.sub);
+                                        GekkoTime gt2 = new GekkoTime(freq2, t2.super, t2.sub);
+                                        foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                                        {
+                                            GekkoTime_1_2 t = new GekkoTime_1_2(xGekko3.freq, gt.super, gt.sub);
+                                            double v = subGekko3.GetDataSimple(t);
+                                            subGekko2.SetData(gt, v);
+                                        }
+                                        subGekko2.Trim();
+                                        minYearInProtobufFile = Math.Min(minYearInProtobufFile, gt1.super);
+                                        maxYearInProtobufFile = Math.Max(maxYearInProtobufFile, gt2.super);
+                                    }
                                     
-                                    //foreach (IVariable iv2 in x.dimensionsStorage.storage.Values)
-                                    //{
-                                    //    if ((iv2 as Series).type == ESeriesType.Timeless) ntimeless++;
-                                    //    else nnontimeless++;
-                                    //}
-                                    
-                                
+                                    subGekko2.stamp = subGekko3.meta.stamp;
+                                    subGekko2.source = subGekko3.meta.source;
+                                    subGekko2.label = subGekko3.meta.label;
+                                    subGekko2.units = subGekko3.meta.units;
 
-                                
-
-
-
-
-
-
-
-
-
+                                    databank.AddVariableWithOverwrite(false, subGekko2.freqEnum, subGekko2, false);
+                                    nSeries++;
+                                }
                             }
-                            else if (x.type == Series_1_2.ESeriesType.Timeless)
+                            else if (xGekko3.type == Series_1_2.ESeriesType.Timeless)
                             {
                                 nTimelessseries++;
-                                double v = x.data.GetDataArray_ONLY_INTERNAL_USE()[0];
-                                GekkoTime gt1 = new GekkoTime(x2.freqEnum, 1950, 1);
-                                GekkoTime gt2 = new GekkoTime(x2.freqEnum, 2100, 1);
+                                double v = xGekko3.data.GetDataArray_ONLY_INTERNAL_USE()[0];
+                                GekkoTime gt1 = new GekkoTime(xGekko2.freqEnum, 1950, 1);
+                                GekkoTime gt2 = new GekkoTime(xGekko2.freqEnum, 2100, 1);
                                 foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
-                                {                                    
-                                    x2.SetData(gt, v);
+                                {
+                                    xGekko2.SetData(gt, v);
                                 }
                             }
                             else
                             {
-                                //must be normal then, cannot be light                                
-                                nSeries++;
-                                GekkoTime_1_2 t1 = x.GetPeriod(0);
-                                GekkoTime_1_2 t2 = x.GetPeriod(x.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
+                                //must be normal then, cannot be light                                                                
+                                GekkoTime_1_2 t1 = xGekko3.GetPeriod(0);
+                                GekkoTime_1_2 t2 = xGekko3.GetPeriod(xGekko3.data.GetDataArray_ONLY_INTERNAL_USE().Length - 1);
                                 GekkoTime gt1 = new GekkoTime(freq2, t1.super, t1.sub);
                                 GekkoTime gt2 = new GekkoTime(freq2, t2.super, t2.sub);
-                                foreach(GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
+                                foreach (GekkoTime gt in new GekkoTimeIterator(gt1, gt2))
                                 {
-                                    GekkoTime_1_2 t = new GekkoTime_1_2(x.freq, gt.super, gt.sub);
-                                    double v = x.GetDataSimple(t);
-                                    x2.SetData(gt, v);
+                                    GekkoTime_1_2 t = new GekkoTime_1_2(xGekko3.freq, gt.super, gt.sub);
+                                    double v = xGekko3.GetDataSimple(t);
+                                    xGekko2.SetData(gt, v);
                                 }
-                                x2.Trim();                                
-                                databank.AddVariable(x2.frequency, x2);
+                                xGekko2.Trim();
+                                minYearInProtobufFile = Math.Min(minYearInProtobufFile, gt1.super);
+                                maxYearInProtobufFile = Math.Max(maxYearInProtobufFile, gt2.super);
                             }
+                            databank.AddVariableWithOverwrite(false, xGekko2.freqEnum, xGekko2, false);
+                            nSeries++;
                         }
                         else if (kvp.Value is ScalarVal_1_2) nVal++;
                         else if (kvp.Value is ScalarDate_1_2) nDate++;
@@ -2889,27 +2967,24 @@ namespace Gekko
                         else if (kvp.Value is Matrix_1_2) nMatrix++;
                     }
                     
-                    if (nVal > 0) G.Writeln(nVal + " VALs were skipped");
-                    if (nDate > 0) G.Writeln(nDate + " DATEs were skipped");
-                    if (nString > 0) G.Writeln(nString + " STRINGs were skipped");
-                    if (nList > 0) G.Writeln(nList + " LISTs were skipped");
-                    if (nMap > 0) G.Writeln(nMap + " MAPs were skipped");
-                    if (nMatrix > 0) G.Writeln(nMatrix + " MATRIXs were skipped");
+                    if (nVal > 0) lines.Add(nVal + " VALs were skipped");
+                    if (nDate > 0) lines.Add(nDate + " DATEs were skipped");
+                    if (nString > 0) lines.Add(nString + " STRINGs were skipped");
+                    if (nList > 0) lines.Add(nList + " LISTs were skipped");
+                    if (nMap > 0) lines.Add(nMap + " MAPs were skipped");
+                    if (nMatrix > 0) lines.Add(nMatrix + " MATRIXs were skipped");
                     
                     if (nVal + nDate + nString + nList + nMatrix > 0)
                     {
-                        G.Writeln("+++ NOTE: Such variables could be extracted to Gekko 2.3.x.");
-                        G.Writeln("          If this is needed, contact the Gekko editor.");
-                        G.Writeln();
+                        lines.Add("+++ NOTE: Such variables could be extracted to the current Gekko version.");
+                        lines.Add("          If this is needed, contact the Gekko editor.");
+                        lines.Add("");
                     }
 
-                    if (nArrayseries > 0) G.Writeln(nArrayseries + " array-SERIES were read");
-                    if (nTimelessseries > 0) G.Writeln(nTimelessseries + " timeless SERIES were read (dates set to 1950-2100)");
+                    if (nArrayseries > 0) lines.Add(nArrayseries + " array-SERIES were read");
+                    if (nTimelessseries > 0) lines.Add(nTimelessseries + " timeless SERIES were read (dates set to 1950-2100)");
 
-                    readInfo.variables = nSeries;
-
-                    int minYearInProtobufFile = -12345; //FIXME
-                    int maxYearInProtobufFile = -12345; //FIXME
+                    readInfo.variables = nSeries;                                       
 
                     if (mergeOrTimeLimit)
                     {
@@ -2925,6 +3000,14 @@ namespace Gekko
                         readInfo.startPerResultingBank = readInfo.startPerInFile;
                         readInfo.endPerResultingBank = readInfo.endPerInFile;
                     }
+
+                    if (dates != null)
+                    {
+                        lines.Add("");
+                        lines.Add("+++ NOTE: date truncation (" + dates.t1Annual + "-" + dates.t2Annual + ") is ignored for Gekko 3.0 databanks");
+                    }
+
+                    readInfo.lines = lines;
                 }
             }
             else
@@ -34964,6 +35047,7 @@ namespace Gekko
         [ProtoContract]
         public class ReadInfo
         {
+            public List<string> lines = new List<string>();
             public static GekkoTime tStart = Globals.tNull;
             public static GekkoTime tEnd = Globals.tNull;
             public EReadInfoTypes type = EReadInfoTypes.Normal;
@@ -35082,6 +35166,23 @@ namespace Gekko
                         LinkContainer lc = new LinkContainer(sb.ToString());
                         Globals.linkContainer.Add(lc.counter, lc);
                         G.Write("+++ NOTE: The databank contains MODEL/SIM info ("); G.WriteLink("more", "outputtab:" + lc.counter); G.Writeln(")");
+                    }
+
+                    if (this.lines.Count > 0)
+                    {
+                        G.Writeln();
+                        bool first = true;
+                        foreach (string s in lines)
+                        {
+                            if (first && s == "")
+                            {
+                            }
+                            else
+                            {
+                                G.Writeln(s);
+                            }
+                            first = false;
+                        }                        
                     }
                 }
                 finally

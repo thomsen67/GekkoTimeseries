@@ -248,6 +248,23 @@ namespace Gekko
             this.isDirty = true;
         }
 
+        public void AddVariableWithOverwrite(bool freqAddToName, EFreq frequency, TimeSeries ts, bool variableNameCheck)
+        {
+            if (this.protect) Program.ProtectError("You cannot add a timeseries to a non-editable databank, see OPEN<edit> or UNLOCK");
+            string variable = ts.variableName;
+            if (variableNameCheck && !G.IsSimpleToken(variable))  //also checks for null and "" and '¤'
+            {
+                G.Writeln2("*** ERROR in databank: the name '" + variable + "' is not a simple variable name");
+                throw new GekkoException();
+            }
+            if (freqAddToName) variable = Program.AddFreqAtEndOfVariableName(variable);
+            else variable = Program.AddFreqAtEndOfVariableName(variable, frequency);
+            if (this.storage.ContainsKey(variable)) this.storage.Remove(variable);
+            this.storage.Add(variable, ts);
+            ts.parentDatabank = this;
+            this.isDirty = true;
+        }
+
         public TimeSeries GetVariable(string variable)
         {            
             return GetVariable(true, variable);

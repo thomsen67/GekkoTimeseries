@@ -128,14 +128,14 @@ namespace Gekko
     public class MapMultidim
     {
         [ProtoMember(1)]
-        public Dictionary<MapMultidimItem, IVariable> storage = new Dictionary<MapMultidimItem, IVariable>();
+        public Dictionary<MapMultidimItem, IVariable_1_2> storage = new Dictionary<MapMultidimItem, IVariable_1_2>();
         
         public MapMultidim()
         {
             //only for protobuf use
         }
 
-        public bool TryGetValue(MapMultidimItem gmi, out IVariable iv)
+        public bool TryGetValue(MapMultidimItem gmi, out IVariable_1_2 iv)
         {
             return this.storage.TryGetValue(gmi, out iv);
         }
@@ -216,9 +216,9 @@ namespace Gekko
         /// </summary>
         [ProtoMember(5)]
         public SeriesDataInformation data = new SeriesDataInformation();  //Must be born with this, unless ArraySuper       
-        //[ProtoMember(7)]
-        //private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
-        //[ProtoMember(8)]
+        [ProtoMember(7)]
+        private bool isTimeless = false; //a timeless variable is like a ScalarVal (VAL). A timeless variable puts the value in dataArray[0]        
+        [ProtoMember(8)]
         public MapMultidim dimensionsStorage = null;  //only active if it is an array-timeseries
 
         [ProtoMember(9)]
