@@ -920,6 +920,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	IMPORTEXPORT = 'IMPORTEXPORT';
     FIRST            = 'FIRST';
     FIRSTCOLWIDTH = 'FIRSTCOLWIDTH';
     FIX = 'FIX';
@@ -1482,6 +1483,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
                                         d.Add("findmissingdata"         , FINDMISSINGDATA);
+										d.Add("IMPORTEXPORT", IMPORTEXPORT);
                                         d.Add("first"    , FIRST  );
                                         d.Add("FIRSTCOLWIDTH" ,FIRSTCOLWIDTH);
                                         d.Add("FIX", FIX);
@@ -3270,6 +3272,8 @@ optionType :
 			 | INTERFACE TABLE PRINTCODES '='? yesNoSimple ->  INTERFACE TABLE PRINTCODES  ^(ASTBOOL yesNoSimple)
 			 | INTERFACE ZOOM '='? Integer -> INTERFACE ZOOM ^(ASTINTEGER Integer)
 
+			 | IMPORTEXPORT '='? yesNoSimple -> IMPORTEXPORT ^(ASTBOOL yesNoSimple)
+
 			 | MENU question -> MENU question
 			 | MENU STARTFILE '='? fileName ->  MENU STARTFILE ^(ASTSTRINGSIMPLE fileName)
 
@@ -3989,6 +3993,7 @@ END|
 EXIT|
 EXO|
 FINDMISSINGDATA|
+IMPORTEXPORT|
 FOR|
 FUNCTION|
 GOTO|

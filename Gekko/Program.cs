@@ -20610,6 +20610,7 @@ write datatest;
 
         public static int Write(O.Write o)
         {
+
             if (G.equal(o.opt_tsdx, "yes"))
             {
                 G.Writeln2("*** ERROR: You cannot use <tsdx>. The extension name has changed to to ." + Globals.extensionDatabank + ".");

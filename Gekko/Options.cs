@@ -100,6 +100,9 @@ Additionally, there are model, solve, equation options.
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_printcodes = true;
         public int interface_zoom = 100;
+
+        public bool importexport = false;  //is "true" in Gekko 3.0 per default
+
         public string library_file = "";
         public string menu_startfile = "menu.html";
         public bool model_cache = true;  //if using cache on file or not        

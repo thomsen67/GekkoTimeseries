@@ -1946,6 +1946,13 @@ namespace Gekko
             public P p = null;
             public void Exe()
             {
+
+                if (Program.options.importexport && G.equal(this.type, "import") && this.t1.IsNull() && this.t2.IsNull())
+                {
+                    this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
+                    this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                }             
+
                 if (opt_collapse != null)
                 {
                     Program.CollapsePoints(this);
@@ -5088,7 +5095,13 @@ namespace Gekko
             public string opt_cols = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
             public void Exe()
-            {                
+            {
+                if (Program.options.importexport && G.equal(this.type, "export") && this.t1.IsNull() && this.t2.IsNull())
+                {
+                    this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
+                    this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                }
+
                 Program.Write(this);
             }
         }
