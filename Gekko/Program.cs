@@ -34569,7 +34569,7 @@ write datatest;
                 }
                 samFile.Flush();
             }
-            if (variables == null) G.Writeln("Databank compare on " + both.Count + " common variables, result put in file '" + samFileName + "'");
+            if (variables == null) G.Writeln2("Databank compare on " + both.Count + " common variables, result put in file '" + samFileName + "'");
             else
             {
                 G.Writeln("Residual check on " + both.Count + " equations of type " + variablesType + ", result put in file '" + samFileName + "'");
