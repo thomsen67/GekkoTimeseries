@@ -1939,6 +1939,7 @@ namespace Gekko
             public string opt_cell = null;
             public string opt_namecell = null;
             public string opt_datecell = null;
+            public string opt_all = null;
 
             public string type = null;  //read or import
             
@@ -1949,8 +1950,15 @@ namespace Gekko
 
                 if (Program.options.importexport && G.equal(this.type, "import") && this.t1.IsNull() && this.t2.IsNull())
                 {
-                    this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
-                    this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                    if (this.opt_all != null && G.equal(this.opt_all, "yes"))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
+                        this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                    }
                 }             
 
                 if (opt_collapse != null)
@@ -5094,12 +5102,21 @@ namespace Gekko
             public string opt_series = null;
             public string opt_cols = null;
             public string type = null;  //THIS IS NOT WORKING PROPERLY!!
+            public string opt_all = null;
             public void Exe()
             {
+
                 if (Program.options.importexport && G.equal(this.type, "export") && this.t1.IsNull() && this.t2.IsNull())
                 {
-                    this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
-                    this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                    if (this.opt_all != null && G.equal(this.opt_all, "yes"))
+                    {
+                        //do nothing
+                    }
+                    else
+                    {
+                        this.t1 = O.GetDate(Functions.currentperstart(Globals.tNull), O.GetDateChoices.FlexibleStart);
+                        this.t2 = O.GetDate(Functions.currentperend(Globals.tNull), O.GetDateChoices.FlexibleEnd);
+                    }
                 }
 
                 Program.Write(this);

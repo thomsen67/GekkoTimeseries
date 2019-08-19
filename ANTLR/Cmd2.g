@@ -58,6 +58,7 @@ tokens {
 ASTOPT_STRING_DATECELL;
 ASTOPT_STRING_METHOD;
 ASTOPT_STRING_METHOD;
+ASTOPT_STRING_ALL;
 	ASTCOMPARE2;
 	ASTSERIESOPERATOR;
 	ASTSERIESDOLLARCONDITION;
@@ -2394,6 +2395,7 @@ readOpt1h                 : MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | DATECELL '=' expression -> ^(ASTOPT_STRING_DATECELL expression)
 						  | METHOD '=' name -> ^(ASTOPT_STRING_METHOD name)
 						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)
+						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)
 						  ;
 
 identOrStar               : ident -> ident
@@ -2582,6 +2584,7 @@ writeOpt1h                : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | SERIES EQUAL exportType -> ^(ASTOPT_STRING_SERIES exportType)												
 						  | SERIES -> ^(ASTOPT_STRING_SERIES ASTOPN)	
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)											  				
+						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
 						  ;
 
 //writeOpt2                 : leftAngle R (EQUAL yesNo)? RIGHTANGLE -> ^(ASTOPT_STRING_R yesNo?);
