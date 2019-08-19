@@ -35172,6 +35172,7 @@ write datatest;
                     if (this.lines.Count > 0)
                     {
                         G.Writeln();
+                        G.Writeln("========== Status: extracting from Gekko 3.0 databank ==========");
                         bool first = true;
                         foreach (string s in lines)
                         {
@@ -35183,7 +35184,9 @@ write datatest;
                                 G.Writeln(s);
                             }
                             first = false;
-                        }                        
+                        }
+                        G.Writeln("================================================================");
+                        G.Writeln();
                     }
                 }
                 finally

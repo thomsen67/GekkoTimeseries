@@ -2205,12 +2205,12 @@ namespace Gekko
                     //See #8904327598432
                     if (onlyDatabankNotModel.Count > 0)
                     {                        
-                        G.Write("+++ WARNING: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")", Globals.warningColor);
+                        G.Write("+++ WARNING: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("show", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")", Globals.warningColor);
                         G.Writeln("             You may use 'DELETE<nonmodel>' to remove those superfluous timeseries.");         
                     }
                     if (onlyModelNotDatabank.Count > 0)
                     {
-                        G.Write("+++ WARNING: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
+                        G.Write("+++ WARNING: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("show", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
                         G.Writeln("             You may use 'CREATE #all;' to create these timeseries.");
                     }
                 }
@@ -2220,13 +2220,13 @@ namespace Gekko
                     if (onlyDatabankNotModel.Count > 0)
                     {                                                
 
-                        G.Write("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")");
+                        G.Write("+++ NOTE: There are " + onlyDatabankNotModel.Count + " non-model timeseries in the databank ("); G.WriteLink("show", "outputtab:" + ListContainer(onlyDatabankNotModel).counter); G.Writeln(")");
                         G.Writeln("          You may use 'DELETE<nonmodel>' to remove those superfluous timeseries.");
                     }
                     if (onlyModelNotDatabank.Count > 0)
                     {
                         
-                        G.Write("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("here", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
+                        G.Write("+++ NOTE: There are " + onlyModelNotDatabank.Count + " non-databank timeseries in the model ("); G.WriteLink("show", "outputtab:" + ListContainer(onlyModelNotDatabank).counter); G.Writeln(")", Globals.warningColor);
                         G.Writeln("          You may use 'CREATE #all;' to create these timeseries.");
                     }
                 }
