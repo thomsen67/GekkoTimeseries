@@ -9634,6 +9634,8 @@ namespace Gekko
                 //      c[i2]
                 //      c[i3]
 
+                bool fixProblem = true;
+
                 bool allSeries = AllSeries();
 
                 if (allSeries) Explode(); //unfolds any lists in the prtElements
@@ -9644,7 +9646,14 @@ namespace Gekko
                 // ----- Unfolding of array-series start -------------------------------------------------------             
                 // ---------------------------------------------------------------------------------------------
 
-                //bool allSeries = true;
+                // PRT a, {#a}, s, {#s}, where #a = list including array-series and #s = list of series
+                // We need to unfold the items inside the commas.
+                // PRT accept an item to be a list of series, so it is a question of (a) exploding raw array-series
+                // and those list elements that are array-series. All other stuff is not touched.
+                // PRT a,        {#a},                               s,   {#s}
+                // PRT a1, a2,   (a[x], a[y], b[x], b[y], c1, c2),   s,   (s1, s2)
+
+                //for each comma:
                 foreach (O.Prt.Element element in this.prtElements)
                 {
                     labelOriginal.Add(element.labelGiven[0]);
@@ -9653,7 +9662,7 @@ namespace Gekko
                     check.Add(new List<MapMultidimItem>());
 
                     int firstVariableFoundInFirstOrRef = 0; //for each comma in PRT, counter is 1 when the first non-null variable is found (often in first, but could be in ref)
-                    //int jj = -1;
+                    
                     for (int bankNumber = 0; bankNumber < 2; bankNumber++)
                     {
 
@@ -9697,8 +9706,11 @@ namespace Gekko
                                     }
                                     catch { labelsUnfolded = new List<string>(); }
                                 }
+
+                                bool arraySeriesExploded = false;
                                 for (int k = 0; k < n; k++)
                                 {
+                                    bool handled = false;
                                     IVariable subElement = (((List)element.variable[bankNumber]).list[k]);
                                     if (subElement.Type() == EVariableType.Series)
                                     {
@@ -9716,15 +9728,31 @@ namespace Gekko
                                                 if (tempLabels == null) tempLabels = new List<string>();
                                                 tempLabels.AddRange(labels);
                                             }
+                                            handled = true;
+                                            arraySeriesExploded = true;
                                         }
                                     }
+                                    if (!handled)
+                                    {
+                                        //other types like normal series, scalars, etc.
+                                        if (tempVariables == null) tempVariables = new List();
+                                        tempVariables.list.Add(subElement);
+                                        if (firstVariableFoundInFirstOrRef == 1)
+                                        {
+                                            if (tempLabels == null) tempLabels = new List<string>();
+                                            if (labelsUnfolded != null && k < labelsUnfolded.Count) tempLabels.Add(labelsUnfolded[k]);
+                                        }
+
+                                    }
+                                }
+                                if (!arraySeriesExploded)
+                                {
+                                    //resetting these so we do not use these
+                                    tempVariables = null;
+                                    tempLabels = null;
                                 }
                             }
-                            else
-                            {
-                                //if (firstVariableFoundInFirstOrRef == 1) jj++;
-                                //allSeries = false;
-                            }
+                    
                         }
                         if (tempVariables != null) element.variable[bankNumber] = tempVariables;
                         if (tempLabels != null) element.labelGiven = tempLabels;

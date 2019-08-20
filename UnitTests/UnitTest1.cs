@@ -2537,6 +2537,58 @@ namespace UnitTests
             I("CLONE;");
 
 
+            // --------- simple stupid test regarding unfolding, also if {#m} list containing array-series
+
+            I("#deleteme = zz, xx;");
+
+            I("p <n> zz, xx;");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "zz");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
+                        
+            I("p <n> {#deleteme};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "zz");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
+
+            I("p <n> xx, zz;");
+            table = Globals.lastPrtOrMulprtTable;            
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "zz");
+
+            I("#deleteme = xx, zz;");
+            I("p <n> {#deleteme};");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, y]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "zz");
+
+            I("p <n> zz, {#deleteme}, xx;");
+            table = Globals.lastPrtOrMulprtTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "zz");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
+            Assert.AreEqual(table.Get(1, 7).CellText.TextData[0], "zz");
+            Assert.AreEqual(table.Get(1, 8).CellText.TextData[0], "xx[a, x]");
+            Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "xx[a, y]");
+            Assert.AreEqual(table.Get(1, 10).CellText.TextData[0], "xx[b, x]");
+            Assert.AreEqual(table.Get(1, 11).CellText.TextData[0], "xx[b, y]");
+                                 
+            // ---------- simple stupid test end
+
 
             /*                     
                                   xx['a', 'x'] 
