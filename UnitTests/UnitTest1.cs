@@ -5712,12 +5712,41 @@ namespace UnitTests
         [TestMethod]
         public void _Test_For()
         {
-            //IVariable forloop_xe7dke6cj_14 = null;
-            //int counter15 = 0;
-            //IVariable xxx = O.ExplodeIvariablesSeqFor(new List(new List<IVariable> { new ScalarString("a"), new ScalarString("b"), new ScalarString("c"), new ScalarString("d") }));
-            //for (O.IterateStart(ref forloop_xe7dke6cj_14, xxx); O.IterateContinue(forloop_xe7dke6cj_14, xxx, null, null, ref counter15); O.IterateStep(forloop_xe7dke6cj_14, xxx, null, counter15))
-            //{
-            //}
+
+            // ------------------------------------------------------------------
+            // Testing types and autoconversion from integers to annual dates
+            // ------------------------------------------------------------------
+
+            I("RESET; TIME 2001 2003; x = 1;");
+            I("FOR date %t = 2001 to 2003; x[%t] = 2; END;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 2d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x = 1; ");
+            I("FOR date %t = 2001a1 to 2003; x[%t] = 2; END;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 2d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x = 1;");
+            I("FOR date %t = 2001 to 2003a1; x[%t] = 2; END;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 2d, sharedDelta);
+
+            I("RESET; TIME 2001 2003; x = 1;");
+            I("FOR date %t = 2001a1 to 2003a1; x[%t] = 2; END;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2002, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2003, 2d, sharedDelta);
+
+            I("RESET; FOR val %t = 2001 to 2003; END;");
+            FAIL("RESET; FOR val %t = 2001a1 to 2003; END;");
+            FAIL("RESET; FOR val %t = 2001 to 2003a1; END;");
+            FAIL("RESET; FOR val %t = 2001a1 to 2003a1; END;");
+
+            // General tests of FOR
 
             //syntax fail: test of types and sigils
             FAIL("FOR(series %x = (1, 2)); END;");
@@ -5769,6 +5798,170 @@ namespace UnitTests
             I("%sum = 0;");
             I("for val %i = 1 to 1e2; %sum = add1(%sum); end;");
             _AssertScalarVal(First(), "%sum", 100d);
+
+
+            //----------------------------------------------------------------------
+            //Test of FOR
+            //  - string loops
+            //  - val loops
+            //  - date loops
+            //----------------------------------------------------------------------
+            //------------------------------------
+            // string loops
+            //------------------------------------
+            I("RESET;");
+            I("LIST #l = list();");
+            I("FOR string %i = a, b1; FOR string %j = ('1', '2a'); LIST #l = #l.append('{%i}{%j}'); END; END;");
+            List<string> l = _GetListOfStrings("l");
+            Assert.AreEqual(l.Count, 4);
+            Assert.AreEqual(l[0], "a1");
+            Assert.AreEqual(l[1], "a2a");
+            Assert.AreEqual(l[2], "b11");
+            Assert.AreEqual(l[3], "b12a");
+            //------------------------------------
+            I("LIST #l1 = list();");
+            I("LIST #l2 = a, b1;");
+            I("LIST #l3 = ('1', '2a');");
+            I("FOR string %i = #l2; FOR string %j = #l3; #l1 = #l1.append('{%i}{%j}'); END; END;");
+            List<string> l1 = _GetListOfStrings("l1");
+            Assert.AreEqual(l1.Count, 4);
+            Assert.AreEqual(l1[0], "a1");
+            Assert.AreEqual(l1[1], "a2a");
+            Assert.AreEqual(l1[2], "b11");
+            Assert.AreEqual(l1[3], "b12a");
+            //------------------------------------
+            I("RESET;");
+            I("LIST #l1 = list();");
+            I("STRING %s1 = 'u';");
+            I("LIST #l2 = a, b1;");
+            I("FOR string %i = (%s1,) + #l2; #l1 = #l1.append(%i); END;");
+            l1 = _GetListOfStrings("l1");
+            Assert.AreEqual(l1.Count, 3);
+            Assert.AreEqual(l1[0], "u");
+            Assert.AreEqual(l1[1], "a");
+            Assert.AreEqual(l1[2], "b1");
+            //------------------------------------
+            I("RESET;");
+            I("VAL %s1 = 1.1;");
+            FAIL("FOR string %i = %s1; TELL ''; END;");
+            //------------------------------------
+            I("RESET;");
+            I("DATE %d1 = 2000;");
+            FAIL("FOR string %i = %d1; TELL ''; END;");
+
+            //------------------------------------
+            // Parallel STRING loops
+            //------------------------------------
+
+            I("RESET;");
+            I("LIST #m1 = a1, b1;");
+            I("LIST #m2 = a2, b2;");
+            I("LIST #m3 = a3, b3;");
+            I("STRING %s = '';");
+            I("FOR string %i=#m1 string %j=#m2; STRING %s = %s + '[{%i},{%j}]'; END;");
+            _AssertScalarString(First(), "%s", "[a1,a2][b1,b2]");
+            I("STRING %s = '';");
+            I("FOR string %i=#m1 string %j=#m2 string %k=#m3; STRING %s = %s + '[{%i},{%j},{%k}]'; END;");
+            _AssertScalarString(First(), "%s", "[a1,a2,a3][b1,b2,b3]");
+
+            I("STRING %s = '';");
+            I("FOR string %i=#m1 string %j=#m2; FOR string %ii=#m1 string %jj=#m2; STRING %s = %s + '[{%i},{%j},{%ii},{%jj}]'; END; END;");
+            _AssertScalarString(First(), "%s", "[a1,a2,a1,a2][a1,a2,b1,b2][b1,b2,a1,a2][b1,b2,b1,b2]");
+
+            FAIL("FOR string %i=#m1 string %i=#m2; END;");
+            FAIL("FOR string %i=#m1 string %j=#m2 string %i=#m3; END;");
+            I("LIST #m3 = a3, b3, c3;");
+            FAIL("FOR string %i=#m1 string %j=#m2 string %k=#m3; END;");
+
+            //------------------------------------
+            // VAL loops
+            //------------------------------------
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("SERIES xx1 = 0;");
+            I("FOR val %i = 1 to 9; SERIES xx1 = xx1 + %i; END;");
+            _AssertSeries(First(), "xx1", 2000, 45d, sharedDelta);
+            //------------- just testing the doubledot (..) here:
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("RESET;");
+                I("TIME 2000 2000;");
+                I("SERIES xx1 = 0;");
+                I("FOR val %i = 1..9; SERIES xx1 = xx1 + %i; END;");
+                _AssertSeries(First(), "xx1", 2000, 45d, sharedDelta);
+            }
+            //------------------------------------
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("SERIES xx1 = 0;");
+            I("FOR val %i = 1 to 9 by 2; SERIES xx1 = xx1 + %i; END;");
+            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
+            //------------------------------------
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("SERIES xx1 = 0;");
+            I("FOR val %i = 9 to 1 by -2; SERIES xx1 = xx1 + %i; END;");
+            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
+            //------------------------------------
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("SERIES xx1 = 0;");
+            I("VAL %x1 = 1;");
+            I("VAL %x2 = 9;");
+            I("VAL %x3 = 2;");
+            I("FOR val %i = %x1+%x1-%x1 to %x2+%x1-%x1 by %x3+%x1-%x1; SERIES xx1 = xx1 + %i; END;");
+            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
+            //------------------------------------
+            // val is converted into date here (only works for annual)
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("SERIES xx1 = 0;");
+            // one must explicitly convert #i to #d. Maybe at a later point "SERIES <date(#i) date(#i)>" could be made legal.
+            I("FOR val %i = 2000 to 2003; DATE %d = %i; SERIES <%d %d> xx1 = %i; END;");
+            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, 2001d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
+
+            //------------------------------------
+            // DATE loops
+            //------------------------------------
+            // val is converted into date here (only works for annual), #873502938
+            // maybe a good idea with val(%d), else error-prone. The other way (fY[%v]) not so error-prone.
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("DATE %d1 = 2000;");
+            I("DATE %d2 = 2005;");
+            I("VAL %v = 2;");
+            I("SERIES xx1 = 0;");
+            I("FOR date %d = %d1 to %d2 by %v; SERIES <%d %d> xx1 = val(%d); END;");
+            _AssertSeries(First(), "xx1", 1998, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2004, 2004d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
+
+            //--------------------------------------------------------------------------
+            I("RESET;");
+            I("TIME 2000 2000;");
+            I("DATE %d1 = 2004;");
+            I("DATE %d2 = 2000;");
+            I("VAL %v = 2;");
+            I("SERIES xx1 = 0;");
+            I("FOR date %d = %d1 to %d2 by -%v; SERIES <%d %d> xx1 = val(%d); END;");
+
+            _AssertSeries(First(), "xx1", 1998, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 1999, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2001, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2004, 2004d, sharedDelta);
+            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
+            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
 
         }
 
@@ -13600,172 +13793,6 @@ namespace UnitTests
 
         }
 
-        [TestMethod]
-        public void _Test_For2()
-        {
-            //----------------------------------------------------------------------
-            //Test of FOR
-            //  - string loops
-            //  - val loops
-            //  - date loops
-            //----------------------------------------------------------------------
-            //------------------------------------
-            // string loops
-            //------------------------------------
-            I("RESET;");
-            I("LIST #l = list();");
-            I("FOR string %i = a, b1; FOR string %j = ('1', '2a'); LIST #l = #l.append('{%i}{%j}'); END; END;");
-            List<string> l = _GetListOfStrings("l");
-            Assert.AreEqual(l.Count, 4);
-            Assert.AreEqual(l[0], "a1");
-            Assert.AreEqual(l[1], "a2a");
-            Assert.AreEqual(l[2], "b11");
-            Assert.AreEqual(l[3], "b12a");
-            //------------------------------------
-            I("LIST #l1 = list();");
-            I("LIST #l2 = a, b1;");
-            I("LIST #l3 = ('1', '2a');");
-            I("FOR string %i = #l2; FOR string %j = #l3; #l1 = #l1.append('{%i}{%j}'); END; END;");
-            List<string> l1 = _GetListOfStrings("l1");
-            Assert.AreEqual(l1.Count, 4);
-            Assert.AreEqual(l1[0], "a1");
-            Assert.AreEqual(l1[1], "a2a");
-            Assert.AreEqual(l1[2], "b11");
-            Assert.AreEqual(l1[3], "b12a");
-            //------------------------------------
-            I("RESET;");
-            I("LIST #l1 = list();");
-            I("STRING %s1 = 'u';");
-            I("LIST #l2 = a, b1;");
-            I("FOR string %i = (%s1,) + #l2; #l1 = #l1.append(%i); END;");
-            l1 = _GetListOfStrings("l1");
-            Assert.AreEqual(l1.Count, 3);
-            Assert.AreEqual(l1[0], "u");
-            Assert.AreEqual(l1[1], "a");
-            Assert.AreEqual(l1[2], "b1");
-            //------------------------------------
-            I("RESET;");
-            I("VAL %s1 = 1.1;");
-            FAIL("FOR string %i = %s1; TELL ''; END;");
-            //------------------------------------
-            I("RESET;");
-            I("DATE %d1 = 2000;");
-            FAIL("FOR string %i = %d1; TELL ''; END;");
-
-            //------------------------------------
-            // Parallel STRING loops
-            //------------------------------------
-
-            I("RESET;");
-            I("LIST #m1 = a1, b1;");
-            I("LIST #m2 = a2, b2;");
-            I("LIST #m3 = a3, b3;");
-            I("STRING %s = '';");
-            I("FOR string %i=#m1 string %j=#m2; STRING %s = %s + '[{%i},{%j}]'; END;");
-            _AssertScalarString(First(), "%s", "[a1,a2][b1,b2]");
-            I("STRING %s = '';");
-            I("FOR string %i=#m1 string %j=#m2 string %k=#m3; STRING %s = %s + '[{%i},{%j},{%k}]'; END;");
-            _AssertScalarString(First(), "%s", "[a1,a2,a3][b1,b2,b3]");
-
-            I("STRING %s = '';");
-            I("FOR string %i=#m1 string %j=#m2; FOR string %ii=#m1 string %jj=#m2; STRING %s = %s + '[{%i},{%j},{%ii},{%jj}]'; END; END;");
-            _AssertScalarString(First(), "%s", "[a1,a2,a1,a2][a1,a2,b1,b2][b1,b2,a1,a2][b1,b2,b1,b2]");
-
-            FAIL("FOR string %i=#m1 string %i=#m2; END;");
-            FAIL("FOR string %i=#m1 string %j=#m2 string %i=#m3; END;");
-            I("LIST #m3 = a3, b3, c3;");
-            FAIL("FOR string %i=#m1 string %j=#m2 string %k=#m3; END;");
-
-            //------------------------------------
-            // VAL loops
-            //------------------------------------
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("SERIES xx1 = 0;");
-            I("FOR val %i = 1 to 9; SERIES xx1 = xx1 + %i; END;");
-            _AssertSeries(First(), "xx1", 2000, 45d, sharedDelta);
-            //------------- just testing the doubledot (..) here:
-            if (Globals.UNITTESTFOLLOWUP)
-            {
-                I("RESET;");
-                I("TIME 2000 2000;");
-                I("SERIES xx1 = 0;");
-                I("FOR val %i = 1..9; SERIES xx1 = xx1 + %i; END;");
-                _AssertSeries(First(), "xx1", 2000, 45d, sharedDelta);
-            }
-            //------------------------------------
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("SERIES xx1 = 0;");
-            I("FOR val %i = 1 to 9 by 2; SERIES xx1 = xx1 + %i; END;");
-            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
-            //------------------------------------
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("SERIES xx1 = 0;");
-            I("FOR val %i = 9 to 1 by -2; SERIES xx1 = xx1 + %i; END;");
-            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
-            //------------------------------------
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("SERIES xx1 = 0;");
-            I("VAL %x1 = 1;");
-            I("VAL %x2 = 9;");
-            I("VAL %x3 = 2;");
-            I("FOR val %i = %x1+%x1-%x1 to %x2+%x1-%x1 by %x3+%x1-%x1; SERIES xx1 = xx1 + %i; END;");
-            _AssertSeries(First(), "xx1", 2000, 25d, sharedDelta);
-            //------------------------------------
-            // val is converted into date here (only works for annual)
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("SERIES xx1 = 0;");
-            // one must explicitly convert #i to #d. Maybe at a later point "SERIES <date(#i) date(#i)>" could be made legal.
-            I("FOR val %i = 2000 to 2003; DATE %d = %i; SERIES <%d %d> xx1 = %i; END;");
-            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2001, 2001d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
-
-            //------------------------------------
-            // DATE loops
-            //------------------------------------
-            // val is converted into date here (only works for annual), #873502938
-            // maybe a good idea with val(%d), else error-prone. The other way (fY[%v]) not so error-prone.
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("DATE %d1 = 2000;");
-            I("DATE %d2 = 2005;");
-            I("VAL %v = 2;");
-            I("SERIES xx1 = 0;");
-            I("FOR date %d = %d1 to %d2 by %v; SERIES <%d %d> xx1 = val(%d); END;");
-            _AssertSeries(First(), "xx1", 1998, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2001, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2004, 2004d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
-
-            //--------------------------------------------------------------------------
-            I("RESET;");
-            I("TIME 2000 2000;");
-            I("DATE %d1 = 2004;");
-            I("DATE %d2 = 2000;");
-            I("VAL %v = 2;");
-            I("SERIES xx1 = 0;");
-            I("FOR date %d = %d1 to %d2 by -%v; SERIES <%d %d> xx1 = val(%d); END;");
-
-            _AssertSeries(First(), "xx1", 1998, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 1999, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2000, 2000d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2001, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2002, 2002d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2003, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2004, 2004d, sharedDelta);
-            _AssertSeries(First(), "xx1", 2005, double.NaN, sharedDelta);
-            _AssertSeries(First(), "xx1", 2006, double.NaN, sharedDelta);
-        }
 
         [TestMethod]
         public void _Test_If()

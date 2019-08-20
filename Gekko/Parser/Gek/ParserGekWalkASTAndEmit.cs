@@ -2144,8 +2144,10 @@ namespace Gekko.Parser.Gek
                                 node.Code.A(node.forLoop[i].Item1 + " " + node.forLoop[i].Item2 + " = null").End();
                                 node.Code.A("int " + temp + " = 0").End();
                                 string loopType2 = "O.ELoopType." + loopType.ToString();
-                                node.Code.A("for (O.IterateStart(" + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + loopType2 + ", " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
+                                string y = "years" + ++Globals.counter;
+                                node.Code.A("bool " + y + " = O.LoopYears(`" + type + "`, " + loopType2 + ", " + codeStart + ", " + codeEnd2 + "); " + "for (O.IterateStart(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + "); O.IterateContinue(" + y + ", " + loopType2 + ", " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeEnd2 + ", " + codeStep + ", ref " + temp + "); O.IterateStep(" + y + ", " + loopType2 + ", ref " + node.forLoop[i].Item2 + ", " + codeStart + ", " + codeStep + ", " + temp + "))" + G.NL);
                                 node.Code.A("{").End();
+                                node.Code.A("O.TypeCheck_" + type.ToLower() + "(" + node.forLoop[i].Item2 + ", 0);" + G.NL);
                                 node.Code.A(node[1].Code);
                                 node.Code.A("}").End();
                             }

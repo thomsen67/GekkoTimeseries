@@ -974,7 +974,7 @@ namespace Gekko
             Program.options.series_data_missing = r3;
         }
         
-        public static void IterateStep(ELoopType loopType, ref IVariable x, IVariable start, IVariable step, int counter)
+        public static void IterateStep(bool isYear, ELoopType loopType, ref IVariable x, IVariable start, IVariable step, int counter)
         {
             if (loopType == O.ELoopType.ForTo)
             {
@@ -1027,15 +1027,23 @@ namespace Gekko
             }         
         }
 
-        public static void IterateStart(ELoopType loopType, ref IVariable x, IVariable start)
+        public static void IterateStart(bool isYear, ELoopType loopType, ref IVariable x, IVariable start)
         {
             if (x == null)
             {
-                if(loopType==ELoopType.ForTo) {
+                if (loopType == ELoopType.ForTo)
+                {
 
                     if (start.Type() == EVariableType.Val)
                     {
-                        x = new ScalarVal(((ScalarVal)start).val);
+                        if (isYear)
+                        {
+                            x = new ScalarDate(new GekkoTime(EFreq.A, O.ConvertToInt(start), 1));
+                        }
+                        else
+                        {
+                            x = new ScalarVal(((ScalarVal)start).val);
+                        }
                     }
                     else if (start.Type() == EVariableType.Date)
                     {
@@ -1045,7 +1053,7 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR: FOR ... = ... TO ... loop must begin with val or date, not " + start.Type().ToString().ToLower());
                         throw new GekkoException();
-                    }                    
+                    }
                 }
                 else
                 {
@@ -1067,16 +1075,44 @@ namespace Gekko
                         G.Writeln2("*** ERROR: FOR ... = ... loop must have a list to iterate over, not a " + start.Type().ToString().ToLower());
                         throw new GekkoException();
                     }
-                }                
+                }
             }
         }
 
-        public static bool IterateContinue(ELoopType loopType, IVariable x, IVariable start, IVariable max, IVariable step, ref int counter)
+        public static bool LoopYears(string type, ELoopType isForToOrListType, IVariable start, IVariable end)
+        {
+            if (isForToOrListType == ELoopType.List) return false;  //do not do this for FOR val %i = (1, 2, 3)...
+            if (!G.Equal(type, "date")) return false;  //only FOR date ...
+            bool rv = false;
+            //Now we know that it is of this kind: FOR date ... = ... TO ...
+            EVariableType type1 = start.Type();
+            EVariableType type2 = end.Type();
+            if (type1 == EVariableType.Val && type2 == EVariableType.Val)
+            {
+                //FOR date %d = 1990 to 2000;
+                int i1 = O.ConvertToInt(start, false);
+                int i2 = O.ConvertToInt(end, false);
+                if (i1 >= 0 && i2 >= 0) rv = true; //will be -12345 if not integer
+            }
+            else if (type1 == EVariableType.Val && type2 == EVariableType.Date)
+            {
+                int i1 = O.ConvertToInt(start, false);
+                if (i1 >= 0) rv = true; //will be -12345 if not integer
+            }
+            else if (type1 == EVariableType.Date && type2 == EVariableType.Val)
+            {
+                int i2 = O.ConvertToInt(end, false);
+                if (i2 >= 0) rv = true; //will be -12345 if not integer
+            }
+            return rv;
+        }
+
+        public static bool IterateContinue(bool isYear, ELoopType isForToOrListType, IVariable x, IVariable start, IVariable max, IVariable step, ref int counter)
         {
             counter++;
             bool rv = false;
 
-            if (loopType == ELoopType.List)
+            if (isForToOrListType == ELoopType.List)
             {
                 //looping over a list like FOR <type> %i = (<item1>, item2, ...)
 
@@ -1125,10 +1161,23 @@ namespace Gekko
                 {
                     ScalarDate x_date = x as ScalarDate;
                     ScalarDate max_date = max as ScalarDate;
+                    GekkoTime gt_max = GekkoTime.tNull;
                     if (max_date == null)
                     {
-                        G.Writeln2("*** ERROR: Expected max value to be DATE type, you may try the date() function");
-                        throw new GekkoException();
+                        if (isYear)
+                        {
+                            int dd = O.ConvertToInt(max);
+                            gt_max = new GekkoTime(EFreq.A, dd, 1);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Expected max value to be DATE type, you may try the date() function");
+                            throw new GekkoException();
+                        }
+                    }
+                    else
+                    {
+                        gt_max = max_date.date;
                     }
                     ScalarVal step_val = null;
                     if (step == null) step_val = Globals.scalarVal1;
@@ -1144,15 +1193,14 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Step value cannot be 0");
                         throw new GekkoException();
                     }
-
-                    //GekkoTime gt = x_date.date.Add(step_int);
+                                        
                     if (step_val.val > 0)
                     {
-                        return x_date.date.SmallerThanOrEqual(max_date.date);
+                        return x_date.date.SmallerThanOrEqual(gt_max);
                     }
                     else
                     {
-                        return x_date.date.LargerThanOrEqual(max_date.date);
+                        return x_date.date.LargerThanOrEqual(gt_max);
                     }
                 }
                 else
@@ -6873,7 +6921,7 @@ namespace Gekko
             if (!reportError && problem) intValue = int.MaxValue;  //signals a problem with the conversion
             return intValue;
         }
-
+        
         //Common methods end
         //Common methods end
         //Common methods end
