@@ -76,6 +76,12 @@ namespace Gekko
     //    }
     //}
 
+    public enum EVariablesForWrite
+    {
+        Normal,  //series
+        OneNonSeries
+    }
+
     public enum EDecompBanks
     {
         Work,
@@ -23993,6 +23999,8 @@ namespace Gekko
 
             bool aliasRemember = Program.options.interface_alias;
 
+            EVariablesForWrite variablesType = EVariablesForWrite.Normal;
+
             try
             {
                 
@@ -24005,10 +24013,7 @@ namespace Gekko
                     return o.list1.Count();
                 }
                 else if (writeAllVariables)  //writing the whole first databank
-                {
-                    //list = GetAllVariablesFromBank(Program.databanks.GetFirst());
-
-                    //List<BankNameVersion> list = new List<BankNameVersion>();
+                {                    
                     list = new List<ToFrom>();
                     foreach (string s in Program.databanks.GetFirst().storage.Keys)
                     {
@@ -24016,15 +24021,9 @@ namespace Gekko
                         {
                             continue;  //probably some artefact creeping in from PCIM?
                         }
-                        list.Add(new ToFrom("First:" + s, "First:" + s, true));
-                        //BankNameVersion bnv = new Gekko.BankNameVersion();
-                        //bnv.name = s;
-                        //list.Add(bnv);
-                    }
-                    //list.Sort(StringComparer.InvariantCulture);
-                    //list = list.OrderBy(o => o.s1).ToList();                
+                        list.Add(new ToFrom("First:" + s, "First:" + s, true));                        
+                    }                    
                 }
-
 
                 bool isRecordsFormat = isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes") || G.Equal(o.opt_flat, "yes");
 
@@ -24037,7 +24036,7 @@ namespace Gekko
                 List<ToFrom> listFilteredForCurrentFreq = null;
                 if (isRecordsFormat)
                 {
-                    //can handle multiple frequencies
+                    //can handle multiple frequencies etc.
                     listFilteredForCurrentFreq = list;
                 }
                 else
@@ -24047,11 +24046,22 @@ namespace Gekko
 
                     foreach (ToFrom two in list)
                     {
-                        if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))
+                        if (G.Equal(G.GetFreq(Program.options.freq), G.Chop_GetFreq(two.s1)))  //.s2 is probably not used here
                         {
                             //good
                             if (listFilteredForCurrentFreq == null) listFilteredForCurrentFreq = new List<ToFrom>();
                             listFilteredForCurrentFreq.Add(two);
+                        }
+                    }
+
+                    if (listFilteredForCurrentFreq == null)
+                    {
+                        if (list.Count == 1 && G.Chop_HasSigil(list[0].s1))
+                        {
+                            variablesType = EVariablesForWrite.OneNonSeries;  //will only be active for 2D format
+                            //a %- or #-variable, not a series
+                            listFilteredForCurrentFreq = new List<ToFrom>();
+                            listFilteredForCurrentFreq.Add(list[0]);                            
                         }
                     }
                 }
@@ -24076,6 +24086,7 @@ namespace Gekko
                 if (G.Equal(o.opt_csv, "yes") || G.Equal(o.opt_prn, "yes"))
                 {
                     //2D format
+                    ErrorIfMatrix(variablesType);
                     EdataFormat format = EdataFormat.Csv;
                     if (G.Equal(o.opt_csv, "yes")) format = EdataFormat.Csv;
                     else if (G.Equal(o.opt_prn, "yes")) format = EdataFormat.Prn;
@@ -24085,12 +24096,14 @@ namespace Gekko
                 else if (G.Equal(o.opt_gnuplot, "yes"))
                 {
                     //2D format
+                    ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     return GnuplotWrite(listFilteredForCurrentFreq, fileName, tStart, tEnd);
                 }
                 else if (G.Equal(o.opt_tsp, "yes"))
                 {
                     //RECORDS
+                    ErrorIfMatrix(variablesType);
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
                     return Tspwrite(listFilteredForCurrentFreq, fileName, tStart, tEnd, isCaps);
                 }
@@ -24098,12 +24111,13 @@ namespace Gekko
                 {
                     //2D format
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"));
+                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), variablesType);
                     return 0;
                 }
                 else if (o.opt_gcm != null)
                 {
                     //RECORDS
+                    ErrorIfMatrix(variablesType);
                     if (fileName == null || fileName.Trim() == "")
                     {
                         G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<series>");
@@ -24116,6 +24130,7 @@ namespace Gekko
                 else if (o.opt_gdx != null)
                 {
                     //RECORDS
+                    ErrorIfMatrix(variablesType);
                     if (fileName == null || fileName.Trim() == "")
                     {
                         G.Writeln2("*** ERROR: Please indicate a file name for EXPORT<gdx>");
@@ -24167,6 +24182,15 @@ namespace Gekko
             finally
             {
                 Program.options.interface_alias = aliasRemember;
+            }
+        }
+
+        private static void ErrorIfMatrix(EVariablesForWrite variablesType)
+        {
+            if (variablesType == EVariablesForWrite.OneNonSeries)
+            {
+                G.Writeln2("*** ERROR: The format can not be used to EXPORT matrices");
+                throw new GekkoException();
             }
         }
 
@@ -24252,56 +24276,85 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> newList, bool isCols)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, EVariablesForWrite variablesType)
         {
-            G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
-            //TODO: variables and time                
-
-            int counter = 0;
-            int numberOfCols = GekkoTime.Observations(tStart, tEnd);
-            int numberOfRows = newList.Count;
             ExcelOptions eo = new ExcelOptions();
-            eo.excelData = new double[numberOfRows, numberOfCols];
-            eo.excelRowLabels = new string[numberOfRows, 1];
-            eo.excelColumnLabels = new string[1, numberOfCols];
-            eo.transpose = "no"; if (isCols) eo.transpose = "yes"; //kind of a workaround
 
-            for (int i = 0; i < newList.Count; i++)
+            if (variablesType == EVariablesForWrite.Normal)
             {
-                // db = GetBankFromBankNameVersion(newList[i].bank);
-                //string var = (string)newList[i].name;
-                //string varLabel = (string)newList[i].name;                
 
-                //Series ts = db.GetIVariableWithAddedFreq(var) as Series;
+                G.Writeln2("Writing Excel file for the period " + G.FromDateToString(tStart) + "-" + G.FromDateToString(tEnd));
+                //TODO: variables and time                
 
-                IVariable iv = O.GetIVariableFromString(newList[i].s1, O.ECreatePossibilities.NoneReportError, true);
-                Series ts = iv as Series;
-                string varLabel = G.Chop_GetName(newList[i].s2);
-                eo.excelRowLabels[i, 0] = varLabel;
+                int counter = 0;
+                int numberOfCols = GekkoTime.Observations(tStart, tEnd);
+                int numberOfRows = list.Count;
 
-                //Series tsGrund = base2.GetVariable(var);
-                if (ts == null)
+                eo.excelData = new double[numberOfRows, numberOfCols];
+                eo.excelRowLabels = new string[numberOfRows, 1];
+                eo.excelColumnLabels = new string[1, numberOfCols];
+                eo.transpose = "no"; if (isCols) eo.transpose = "yes"; //kind of a workaround
+
+                for (int i = 0; i < list.Count; i++)
                 {
-                    //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
-                    //G.Writeln("+++ WARNING: variable '" + newList[i] + "' is of wrong type, skipped");
-                    continue;
+                    IVariable iv = O.GetIVariableFromString(list[i].s1, O.ECreatePossibilities.NoneReportError, true);
+                    Series ts = iv as Series;
+                    string varLabel = G.Chop_GetName(list[i].s2);
+                    eo.excelRowLabels[i, 0] = varLabel;
+
+                    if (ts == null)
+                    {
+                        //TODO: check this beforehand, and do a msgbox with all missing vars (a la when doing sim)
+                        //G.Writeln("+++ WARNING: variable '" + newList[i] + "' is of wrong type, skipped");
+                        continue;
+                    }
+                    counter++;
+                    int periodCounter = 0;
+
+                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+                    {
+                        eo.excelColumnLabels[0, periodCounter] = gt.ToString();
+                        double var1 = ts.GetDataSimple(gt);
+                        if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                        eo.excelData[i, periodCounter] = var1;
+                        periodCounter++;
+                    }
                 }
-                counter++;
-                int periodCounter = 0;
-                //file.Write(varLabel);
-                foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+            }
+            else
+            {
+                int iHere = 0;
+                IVariable iv = O.GetIVariableFromString(list[iHere].s1, O.ECreatePossibilities.NoneReportError, true);
+                Matrix m = iv as Matrix;
+                if (m == null)
                 {
-                    eo.excelColumnLabels[0, periodCounter] = gt.ToString();
-                    double var1 = ts.GetDataSimple(gt);
-                    if (G.isNumericalError(var1)) var1 = 9.99999e+99;
-                    eo.excelData[i, periodCounter] = var1;
-                    periodCounter++;
+                    G.Writeln2("The variable '" + list[iHere].s1 + "' is not a matrix");
+                    throw new GekkoException();
                 }
+                double[,] data = m.data;
+                int ni = data.GetLength(0);
+                int nj = data.GetLength(1);
+
+                G.Writeln2("Writing Excel file containing matrix");
+
+                eo.excelData = new double[ni, nj];
+                eo.colors = "no";  
+                
+                for (int i = 0; i < ni; i++)
+                {
+                    for (int j = 0; j < nj; j++)
+                    {                        
+                        double var1 = data[i, j];
+                        if (G.isNumericalError(var1)) var1 = 9.99999e+99;
+                        eo.excelData[i, j] = var1;
+                    }
+                }
+                
             }
 
             eo.fileName = fileName;
 
-            Program.CreateExcelWorkbook2(eo, null, false);
+            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries);
         }
 
         public static void ArrayTimeseriesTip(string name)
@@ -30167,7 +30220,7 @@ namespace Gekko
                         }
                     }
 
-                    CreateExcelWorkbook2(eo, o, IsMulprt(o));
+                    CreateExcelWorkbook2(eo, o, IsMulprt(o), false);
                     return;
                 
 
@@ -38821,19 +38874,24 @@ namespace Gekko
         //    return CreateExcelWorkbookPIA(eo, oPrt, isMulprt);
         //}
 
-        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix)
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt);
+                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix);
             }
             else
             {
+                if (isMatrix)
+                {
+                    G.Writeln2("*** ERROR: Matrix export only supported for OPTION sheet engine = internal");
+                    throw new GekkoException();
+                }
                 return CreateExcelWorkbookPIA(eo, oPrt, isMulprt);
             }
         }
 
-        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
+        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix)
         {
 
             //1. append-     filename-     sheet-            show fakefilename sheet='Data'
@@ -38897,6 +38955,14 @@ namespace Gekko
                     bool isDates = true; if (oPrt != null && G.Equal(oPrt.opt_dates, "no")) isDates = false;
                     bool isNames = true; if (oPrt != null && G.Equal(oPrt.opt_names, "no")) isNames = false;
                     bool isColors = true; if (oPrt != null && G.Equal(oPrt.opt_colors, "no")) isColors = false;
+
+                    if (isMatrix)
+                    {
+                        isStamp = false;
+                        isDates = false;
+                        isNames = false;
+                        isColors = false;
+                    }
 
                     string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
                     
@@ -39013,7 +39079,8 @@ namespace Gekko
                     int dataCols = eo.excelData.GetLength(1);
 
                     int[,] excelColumnLabelsAnnual = new int[1, dataCols];
-                    if (options.freq == EFreq.A)
+
+                    if (eo.excelColumnLabels != null && options.freq == EFreq.A)
                     {
                         for (int i = 0; i < eo.excelColumnLabels.Length; i++)
                         {

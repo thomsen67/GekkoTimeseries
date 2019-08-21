@@ -655,7 +655,7 @@ namespace Gekko
             int dimI = i2 - i1 + 1;
             int dimJ = j2 - j1 + 1;
             Matrix m = new Matrix(dimI, dimJ);
-            double[,] data = m.data;
+            double[,] data = m.data; 
 
             try
             {

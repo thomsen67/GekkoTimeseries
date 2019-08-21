@@ -17724,15 +17724,25 @@ namespace UnitTests
                         ReadFormatsHelper("a", bank);
 
                         //
-                        // test matrix import
+                        // test matrix import/export
                         //
                         if (bank == null)
                         {
-                            I("SHEET <2001 2002 IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
+                            I("SHEET <IMPORT MATRIX SHEET='test' CELL='C5'> work:#m file=temp;");  //imports 2x2 matrix #m
                             _AssertMatrix(First(), "#m", 1, 1, 1001, sharedDelta);
                             _AssertMatrix(First(), "#m", 1, 2, 3001, sharedDelta);
                             _AssertMatrix(First(), "#m", 2, 1, 1002, sharedDelta);
                             _AssertMatrix(First(), "#m", 2, 2, 3002, sharedDelta);
+
+                            I("#m1 = [1, 2, 3; 4, 5, 6];");
+                            I("export <xlsx> #m1 file = matrixfile.xlsx;");
+                            I("SHEET <IMPORT MATRIX> work:#m2 file=matrixfile.xlsx;");  //imports 2x2 matrix #
+                            _AssertMatrix(First(), "#m2", 1, 1, 1d, sharedDelta);
+                            _AssertMatrix(First(), "#m2", 1, 2, 2d, sharedDelta);
+                            _AssertMatrix(First(), "#m2", 1, 3, 3d, sharedDelta);
+                            _AssertMatrix(First(), "#m2", 2, 1, 4d, sharedDelta);
+                            _AssertMatrix(First(), "#m2", 2, 2, 5d, sharedDelta);
+                            _AssertMatrix(First(), "#m2", 2, 3, 6d, sharedDelta);
                         }
                     }
                 }
