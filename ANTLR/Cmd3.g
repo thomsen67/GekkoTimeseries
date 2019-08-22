@@ -3782,6 +3782,7 @@ optionType:
              | MODEL CACHE MAX '='? Integer -> MODEL CACHE MAX  ^(ASTINTEGER Integer)
              | MODEL CACHE '='? yesNoSimple -> MODEL CACHE ^(ASTBOOL yesNoSimple)
 			 | MODEL GAMS DEP CURRENT '='? yesNoSimple -> MODEL GAMS DEP CURRENT ^(ASTBOOL yesNoSimple)
+			 | MODEL GAMS DEP METHOD '='? name -> MODEL GAMS DEP METHOD ^(ASTSTRINGSIMPLE name)
 			 | MODEL INFOFILE '='? optionModelInfoFile -> MODEL INFOFILE ^(ASTSTRINGSIMPLE optionModelInfoFile)
 			 | MODEL TYPE '='? name -> MODEL TYPE ^(ASTSTRINGSIMPLE name)
 			 

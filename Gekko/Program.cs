@@ -19673,10 +19673,44 @@ namespace Gekko
         private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
         {
 
-            string lhs = null; GetLhsVariable(lhsTokensGams2, ref lhs);
+            string lhs = null;
+
+            if (G.Equal(Program.options.model_gams_dep_method, "lhs"))
+            {
+                GetLhsVariable(lhsTokensGams2, ref lhs);
+            }
+            else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
+            {
+                if (eqnameGams.Contains("__"))
+                {
+                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': did not expect '__' substring in name");
+                    throw new GekkoException();
+                }
+                string[] ss = eqnameGams.Split('_');
+                if (ss.Length <= 1)
+                {
+                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': did not find any '_' separators");
+                    throw new GekkoException();
+                }
+                if (!G.Equal(ss[0], "e"))
+                {
+                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': expected it to start with 'e_'");
+                    throw new GekkoException();
+                }
+                if (!G.IsIdent(ss[1]))  //we use the e_{here}_..._..._... part
+                {
+                    G.Writeln2("*** ERROR: Eqname '" + eqnameGams + "': could not resolve variable name");
+                    throw new GekkoException();
+                }
+                lhs = ss[1];
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: option model gams dep method = lhs|eqname.");
+                throw new GekkoException();
+            }            
 
             string d = null; if (dependents != null) dependents.TryGetValue(eqnameGams, out d);
-
             string varnameFound = null;
             if (d != null)
             {                

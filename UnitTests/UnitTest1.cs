@@ -9081,7 +9081,7 @@ namespace UnitTests
             Assert.AreEqual(Globals.unitTestDependents[1], "E_qC_tot");
 
             // ------------------------------------------------------------
-            // This will fail, because d2.lst is not loaded
+            // This will fail, because d2.lst is not used
             // ------------------------------------------------------------
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
@@ -9094,9 +9094,38 @@ namespace UnitTests
             I("DISP pC;");
             Assert.IsTrue(Globals.unitTestDependents.Count == 0);  //no eqs found
 
+            // ------------------------------------------------------------
+            // Using equation names instead
+            // ------------------------------------------------------------
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("OPTION model gams dep method = eqname;");
+            I("pC = series(1);");
+            I("pC[cCar] = 1;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("MODEL <gms> model4.gmy;");
+            I("DISP pC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 2);
 
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
+            I("OPTION model type = gams;");
+            I("OPTION model gams dep method = eqname;");
+            I("pC = series(1);");
+            I("pC[cCar] = 1;");
+            I("qC = series(1);");
+            I("qC[cCar] = 1;");
+            I("MODEL <gms> model5.gmy;");
+            I("DISP pC;");
+            Assert.IsTrue(Globals.unitTestDependents.Count == 1);  //now only 1 hit, because only one e_pc... equation
+
+
+            // ----------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\GAMS';");
             FAIL("MODEL < gms dep = 1 > model2.gmy;");
             FAIL("MODEL < gms dep = ('a', 'b') > model2.gmy;");
             FAIL("MODEL < gms dep = (('a', 'b'), 'b') > model2.gmy;");

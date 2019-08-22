@@ -99,7 +99,8 @@ namespace Gekko
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
 
         public bool model_gams_dep_current = false;
-        
+        public string model_gams_dep_method = "lhs";  //lhs|eqname
+
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //normal | gams
 
