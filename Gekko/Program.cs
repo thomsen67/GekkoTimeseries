@@ -15100,26 +15100,46 @@ write datatest;
                 throw new GekkoException();
             }
             AddAbstract(fileName, true, true, p);
-        }
+        }        
 
         public static void Ini(P p)
         {
             string s = "gekko.ini";
+
             List<string> folders = new List<string>();
+            folders.Add(G.GetProgramDir());
+            string fileName2 = SearchForFile(s, folders, false);  //also calls CreateFullPathAndFileName()
+            if (fileName2 == null)
+            {
+                G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in program folder");
+            }
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
+            }
+
+            folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
             folders.Add(Program.options.folder_command2);
-            string fileName2 = SearchForFile(s, folders);  //also calls CreateFullPathAndFileName()
+            fileName2 = SearchForFile(s, folders, true);  //also calls CreateFullPathAndFileName()
             if (fileName2 == null)
             {
                 G.Writeln2("No INI file '" + Globals.autoExecCmdFileName + "' found in working folder");
                 return;  //used for gekko.ini file
             }
-            Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-            Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-            Program.EmitCodeFromANTLR("", fileName2, false, p);            
-            G.Writeln();
-            G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");            
+            else
+            {
+                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
+                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
+                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                G.Writeln();
+                G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
+            }
         }
 
         public static void AddAbstract(string s, bool run, bool isLibrary, P p)
