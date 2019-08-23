@@ -691,7 +691,7 @@ namespace Gekko
             {
                 //Get the array index corresponding to the period. If this index is out of array bounds, the array will
                 //be resized (1.5 times larger).
-                int index = ResizeDataArray(t, true);
+                int index = ResizeDataArray(t);
                 //the index is offset safe
                 this.data.GetDataArray_ONLY_INTERNAL_USE()[index] = value;
                 //Start and end date for observations are adjusted.
@@ -1251,15 +1251,9 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
             return FromGekkoTimeToArrayIndexAbstract(gt, this.data.anchorPeriod, this.GetAnchorPeriodPositionInArray());
-        }
+        }        
 
-        
         private int ResizeDataArray(GekkoTime gt)
-        {
-            return ResizeDataArray(gt, true);
-        }
-
-        private int ResizeDataArray(GekkoTime gt, bool adjustStartEndDates)
         {
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetArrayIndex() which is safe
@@ -1268,6 +1262,7 @@ namespace Gekko
             int index = GetArrayIndex(gt);
             while (index < 0 || index >= this.data.GetDataArray_ONLY_INTERNAL_USE().Length)
             {
+
                 //Resize data array
                 //Keeps on going until the array is large enough.
                 double n = Math.Max(this.data.GetDataArray_ONLY_INTERNAL_USE().Length, 4);  //the length could be 1 (or maybe even 0), so we translate 0, 1, 2, 3 into 4 which will become 6 with 1.5 times expandRate.
@@ -1281,23 +1276,42 @@ namespace Gekko
                 else
                 {
                     //new periods added before start
+
+                    if (IsOffsettedNormalSeries())
+                    {
+                        //There was the following problem (see unit test here: #79873242834)
+                        //a series x was defined, bank was written and read
+                        //so now the series array is exactly over 66-2018
+                        //Then x was used with a lag which triggerede a resize.
+                        //Problem is that the x[-1] variable is a special lagged variable,
+                        //using .dataOffsetLag. In a sense this x[-1] object is an empty shell, using 
+                        //the same dataarray as x. So when the array is resized and the .anchorPeriodPositionInArray
+                        //is changed (because data is added before what the original array spans), this should be
+                        //transmitted back to the original x object.
+                        //To do this, we would have to keep a pointer back to the x object, but what if we have x[-1] lagged later
+                        //on? To avoid such confusion, if the .anchorPeriodPositionInArray is altered in such an "empty shell" object,
+                        //we clone the dataarray for it. This will happen rarely anyway.   
+
+                        this.data = this.data.DeepClone();                        
+
+                    }
+
                     int diffSize = newDataArray.Length - this.data.GetDataArray_ONLY_INTERNAL_USE().Length;
                     System.Array.Copy(this.data.GetDataArray_ONLY_INTERNAL_USE(), 0, newDataArray, diffSize, this.data.GetDataArray_ONLY_INTERNAL_USE().Length);
                     this.data.anchorPeriodPositionInArray += diffSize;
-                    if (adjustStartEndDates)  //only for setting data
+
+                    if (this.meta != null)  //should never happen after the #79873242834 fix
                     {
-                        if (this.meta != null)
+                        if (this.meta.firstPeriodPositionInArray != Globals.firstPeriodPositionInArrayNull)
                         {
-                            if (this.meta.firstPeriodPositionInArray != Globals.firstPeriodPositionInArrayNull)
-                            {
-                                this.meta.firstPeriodPositionInArray += diffSize;
-                            }
-                            if (this.meta.lastPeriodPositionInArray != Globals.lastPeriodPositionInArrayNull)
-                            {
-                                this.meta.lastPeriodPositionInArray += diffSize;
-                            }
+                            this.meta.firstPeriodPositionInArray += diffSize;
+                        }
+                        if (this.meta.lastPeriodPositionInArray != Globals.lastPeriodPositionInArrayNull)
+                        {
+                            this.meta.lastPeriodPositionInArray += diffSize;
                         }
                     }
+
                 }
 
                 //this.data.GetDataArray_ONLY_FOR_INTERNAL_USE() = newDataArray;
@@ -1307,6 +1321,11 @@ namespace Gekko
                 index = GetArrayIndex(gt);
             }
             return index;
+        }
+
+        private bool IsOffsettedNormalSeries()
+        {
+            return this.name == null && this.meta == null;
         }
 
         private void InitDataArray(GekkoTime t)
@@ -2736,21 +2755,6 @@ namespace Gekko
         [ProtoContract]
     public class SeriesDataInformation
     {
-        public double[] GetDataArray_ONLY_INTERNAL_USE()
-        {
-            return this.dataArray;
-        }        
-
-        public void SetDataarray_ONLY_INTERNAL_USE(double[] x)
-        {
-            this.dataArray = x;
-        }
-
-        //public double[] GetDataarray()
-        //{
-        //    return this.dataArray;
-        //}
-
         [ProtoMember(1, IsPacked = true)]  //a bit faster, and a bit smaller file (also when zipped) 
         //BEWARE: Be careful about .dataOffsetLag when using the array! #772439872435
         private double[] dataArray = null;  //BEWARE: if altering directly, make sure that .protect in the databank is not set!!
@@ -2761,6 +2765,25 @@ namespace Gekko
         [ProtoMember(3)]
         //Do not access directly, use GetAnchorPeriodPositionInArray(), so the .lagOffset is included
         public int anchorPeriodPositionInArray = -123454321;
+
+        public double[] GetDataArray_ONLY_INTERNAL_USE()
+        {
+            return this.dataArray;
+        }
+
+        public void SetDataarray_ONLY_INTERNAL_USE(double[] x)
+        {
+            this.dataArray = x;
+        }
+
+        public SeriesDataInformation DeepClone()
+        {
+            SeriesDataInformation rv = new SeriesDataInformation();
+            rv.dataArray = this.dataArray.Clone() as double[];
+            rv.anchorPeriodPositionInArray = this.anchorPeriodPositionInArray;
+            rv.anchorPeriod = this.anchorPeriod;  //immutable, so safe to point to
+            return rv;
+        }
 
     }    
 

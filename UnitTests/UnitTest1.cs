@@ -8978,6 +8978,24 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_SeriesResize()
+        {
+            I("reset;");
+            I("time 1966 2018;");
+            I("x = seq(66, 118);");
+            I("write temp;");
+            I("read temp;");
+            I("y = x[-1];");  //triggers a dataarray resize where the anchor changes position, #79873242834    
+            _AssertSeries(First(), "x!a", 1966, 66d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2018, 118d, sharedDelta);
+            I("write data;");  //before fix, this would trim the dataarray in a wrong way
+            I("read data;");
+            _AssertSeries(First(), "x!a", 1966, 66d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2018, 118d, sharedDelta);
+
+        }
+
+        [TestMethod]
         public void _Test_ModelGamsLhsDependent()
         {
 
