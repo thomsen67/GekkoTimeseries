@@ -2421,8 +2421,6 @@ logicalNot:				    NOT logicalAtom     -> ^(ASTNOT logicalAtom)
 
 logicalAtom:				expression ifOperator expression -> ^(ASTCOMPARE ifOperator expression expression)
 						  | leftParen! logicalOr rightParen!           // omit both '(' and ')'
-//						  | bankvarnameindex			
-//						  | expression IN expression -> ^(ASTIN expression expression)
 						  | expression -> expression
 						  ;
 

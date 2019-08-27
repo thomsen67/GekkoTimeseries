@@ -1279,6 +1279,11 @@ namespace Gekko
 
                     if (IsOffsettedNormalSeries())
                     {
+                        //TODO:
+                        //
+                        // Another and faster way of doing this is that the "shell" object of x[-1] has a
+                        // pointer pointing back to the "real" series.
+                        
                         //There was the following problem (see unit test here: #79873242834)
                         //a series x was defined, bank was written and read
                         //so now the series array is exactly over 66-2018
