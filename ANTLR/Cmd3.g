@@ -397,6 +397,7 @@ ASTCOMPARE2;
     ASTHPFILTERLAMBDA;
     ASTHPFILTERLOG;
     ASTHTTP;
+	ASTASSIGNMENTQUESTION;
     ASTIDENT;
     ASTIDENTADVANCEDDOT;
     ASTIDENTDIGIT;
@@ -2535,7 +2536,10 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment2:               assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment);
+assignment2:               assignmentQuestion
+						 | assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment)
+						   ;
+
 assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignmentMap.text), ASTASSIGNMENT, input.LT(1).Line)} assignmentMap);
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
@@ -2634,6 +2638,8 @@ seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | DYN (EQUAL yesNo)? -> ^(ASTOPT_STRING_DYN yesNo?)	
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 						  ;						  
+
+assignmentQuestion:         assignmentType QUESTION -> ASTASSIGNMENTQUESTION assignmentType;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT

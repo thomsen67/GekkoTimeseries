@@ -122,7 +122,7 @@
 Example:
 
 RESTART;                  [clears the workspace]
-READ&lt;prim&gt; data08;        [read into primary bank]
+READ&lt;first&gt; data08;        [read into primary bank]
 READ&lt;ref&gt; data07;         [read into reference bank]
 TIME 1990 2008;           [set the period]
 
