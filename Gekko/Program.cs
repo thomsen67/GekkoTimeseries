@@ -16168,8 +16168,7 @@ namespace Gekko
         public static void DispSearch(string s)
         {
             Databank db = Program.databanks.GetFirst();
-
-            G.Writeln();
+                        
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
@@ -16180,78 +16179,74 @@ namespace Gekko
 
                 List<string> vars = new List<string>();
                 List<string> expl = new List<string>();
-                List<string> both = new List<string>();
-                List<string> both2 = new List<string>();
+                //List<string> both = new List<string>();
+                GekkoDictionary<string, string> both2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                bool differentFreq = false;
-                if (Program.unfoldedVariableList == null || Program.unfoldedVariableList.Count == 0)
-                {
-                    //try variable labels
-                    foreach (IVariable iv in db.storage.Values)
-                    {
-                        Series ts = iv as Series;
-                        if (ts == null) continue;
-                        string label = ts?.meta.label;
-                        if (label == null) continue;
-                        if (G.Contains(label, s))
-                        {
-                            vars.Add(ts.name);
-                            expl.Add(label);
-                            both.Add(ts.name + "¤" + label); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
-                            both2.Add(G.Chop_RemoveFreq(ts.name) + "¤" + label);
-                            if (Program.options.freq != ts.freq)
-                                differentFreq = true;                            
-                        }
-                    }
-                }
-                else
+                //bool differentFreq = false;
+
+                if (Program.unfoldedVariableList != null && Program.unfoldedVariableList.Count > 0)
                 {
                     List<string> explanation = new List<string>();
                     if (Program.unfoldedVariableList == null) return;
-                    
+
                     foreach (Program.Item item in Program.unfoldedVariableList)
                     {
                         string ss = "";
                         if (item.explanation.Count > 0) ss = item.explanation[0];
                         if (G.Contains(ss, s))
                         {
-                            vars.Add(item.variable);
-                            expl.Add(ss);
-                            both.Add(item.variable + "¤" + ss); //A bit hacky, but an easy way to get the variables sorted without using LINQ or Dictionary
+                            if (!both2.ContainsKey(item.variable)) both2.Add(item.variable, ss);
                         }
                     }
                 }
 
-                if (!differentFreq)
+                if (true)
                 {
-                    both2.Sort();
-                    both = both2;
-                }
-                else
-                {
-                    both.Sort();
+                    //try variable labels
+                    foreach (IVariable iv in db.storage.Values)
+                    {
+                        Series ts = iv as Series;
+                        if (ts == null) continue;                        
+                        if (Program.options.freq != ts.freq) continue;
+                        string label = ts?.meta.label;
+                        if (label == null) continue;
+                        if (G.Contains(label, s))
+                        {                            
+                            string s3 = G.Chop_RemoveFreq(ts.name);                            
+                            if (!both2.ContainsKey(s3)) both2.Add(s3, label);
+                        }
+                    }
                 }
 
                 int max = 0;
-                for (int i = 0; i < vars.Count; i++)
+                foreach (string k in both2.Keys)
                 {
-                    if (vars[i].Length > max) max = vars[i].Length;
+                    max = Math.Max(max, k.Length);
                 }
                 max = Math.Max(max, "Variable".Length);
+
                 int max2 = 0;
-                for (int i = 0; i < expl.Count; i++)
+                foreach (string k in both2.Values)
                 {
-                    if (expl[i].Length > max2) max2 = expl[i].Length;
+                    max2 = Math.Max(max2, k.Length);
                 }
 
-                if (vars.Count > 0)
+                List<string> lines = new List<string>();
+                foreach (KeyValuePair<string, string> kvp in both2)
+                {
+                    lines.Add(kvp.Key + "¤" + kvp.Value);
+                }
+                lines.Sort(StringComparer.OrdinalIgnoreCase);
+
+                if (lines.Count > 0)
                 {
                     string w = "Variable" + G.Blanks(max - "Variable".Length + 2) + "Label";
                     string w2 = new string('-', max + max2 + 2);
+                    G.Writeln();
                     G.Writeln(w);
                     G.Writeln(w2);
 
-                    foreach (string xx in both)
+                    foreach (string xx in lines)
                     {
                         if (Globals.threadIsInProcessOfAborting) throw new GekkoException();
                         string[] xxx = xx.Split('¤');
@@ -16264,7 +16259,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln("The string '" + s + "' did not match any variable labels");
+                    G.Writeln2("The string '" + s + "' did not match any variable labels");
                 }
             }
             finally

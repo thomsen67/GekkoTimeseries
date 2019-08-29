@@ -5874,7 +5874,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDISPSEARCH":
                         {
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".searchName = `" + G.StripQuotes(node[0].Text) + "`;" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".searchName = `" + G.StripQuotes(node[0][0].Text) + "`;" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

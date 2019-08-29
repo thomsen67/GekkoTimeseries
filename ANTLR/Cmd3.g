@@ -2825,8 +2825,8 @@ deleteOpt1h:			    NONMODEL (EQUAL yesNo)? -> ^(ASTOPT_STRING_NONMODEL yesNo?);
 // DISP
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-disp:						//DISP stringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input.LT(1).Line)} stringInQuotes)
-						    DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, input.LT(1).Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
+disp:						DISP stringInQuotes -> ^({token("ASTDISPSEARCH", ASTDISPSEARCH, input.LT(1).Line)} stringInQuotes)
+						  | DISP dispOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTDISP", ASTDISP, input.LT(1).Line)} ^(ASTOPT_ dispOpt1?) ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames) //varnameslist				
 						    ;
 
 dispOpt1:					ISNOTQUAL

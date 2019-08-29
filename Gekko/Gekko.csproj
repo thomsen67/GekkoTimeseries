@@ -424,10 +424,6 @@
       <Project>{8D2A69DC-7A76-44B3-B976-C078AF604763}</Project>
       <Name>Numerics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WA\WA.csproj">
-      <Project>{97DF83D0-2418-44F0-950B-B4BE29717AF2}</Project>
-      <Name>WA</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="CompareUtility3Way.resx">
