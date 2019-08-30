@@ -41322,14 +41322,14 @@ namespace Gekko
                         {
                             varPch = 0d;
                             varDelta = var1 - var2;
-                        }                        
-                        else if (double.IsNaN(var1) && double.IsNaN(var2))
+                        }
+                        else if (G.IsBothNumericalError(var1, var2)) //see also #87342543534
                         {
                             //this is considered okay
                             varPch = 0d;
                             varDelta = 0d;
                         }
-                        else if ((double.IsNaN(var1) && !double.IsNaN(var2)) || (!double.IsNaN(var1) && double.IsNaN(var2)))
+                        else if ((G.isNumericalError(var1) && !G.isNumericalError(var2)) || (!G.isNumericalError(var1) && G.isNumericalError(var2)))
                         {
                             //this is considered a problem
                             varPch = 1e+100d;

@@ -5030,7 +5030,7 @@ namespace Gekko
             {
                 //must return a VAL, not a SERIES
                 double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
-                if (G.isNumericalError(d1) && G.isNumericalError(d2))
+                if (G.IsBothNumericalError(d1, d2))  // see also #87342543534
                 {
                     rv = Globals.scalarVal1;
                 }
@@ -5067,6 +5067,8 @@ namespace Gekko
             }
             return rv;
         }
+
+        
 
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
         {

@@ -1463,11 +1463,16 @@ namespace Gekko
             else return false;
         }
 
-        public static bool Compare(double d1, double d2)
+        public static bool Compare(double d1, double d2)  
         {
-            if (G.isNumericalError(d1) && G.isNumericalError(d2)) return true;
+            if (G.IsBothNumericalError(d1, d2)) return true;  //see also #87342543534
             if (d1 == d2) return true;
             return false;
+        }
+
+        public static bool IsBothNumericalError(double d1, double d2)
+        {
+            return G.isNumericalError(d1) && G.isNumericalError(d2);
         }
 
         public static bool IsLetterOrDigitOrUnderscoreOrTilde(char c)
