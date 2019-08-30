@@ -725,6 +725,10 @@ namespace Gekko.Parser.Gek
                     {
                         flag = true;
                     }
+                    else if (ast.Text.StartsWith("ASTANALYZEEXPRESSION" + Globals.parserExpressionSeparator))
+                    {
+                        flag = true;
+                    }
                     else if (ast.Text.StartsWith("ASTASSIGNMENT" + Globals.parserExpressionSeparator))
                     {
                         flag = true;

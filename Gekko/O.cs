@@ -8570,8 +8570,8 @@ namespace Gekko
             public GekkoTime t1 = Globals.globalPeriodStart;  //default, if not explicitely set
             public GekkoTime t2 = Globals.globalPeriodEnd;    //default, if not explicitely set      
             public double lag = double.NaN;
-            public IVariable x = null;
-            public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
+            public List<IVariable> x = null;
+            public List<string> expressionsText = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
@@ -9662,7 +9662,7 @@ namespace Gekko
                     check.Add(new List<MapMultidimItem>());
 
                     int firstVariableFoundInFirstOrRef = 0; //for each comma in PRT, counter is 1 when the first non-null variable is found (often in first, but could be in ref)
-                    
+
                     for (int bankNumber = 0; bankNumber < 2; bankNumber++)
                     {
 
@@ -9752,7 +9752,7 @@ namespace Gekko
                                     tempLabels = null;
                                 }
                             }
-                    
+
                         }
                         if (tempVariables != null) element.variable[bankNumber] = tempVariables;
                         if (tempLabels != null) element.labelGiven = tempLabels;
@@ -9810,6 +9810,11 @@ namespace Gekko
                     {
                         G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                     }
+                }
+
+                if (G.Equal(prtType, "clip"))
+                {
+                    G.Writeln2("+++ NOTE: CLIP does not work in Gekko 3.0 yet, but you may use copy-button in the interface now");
                 }
             }
 

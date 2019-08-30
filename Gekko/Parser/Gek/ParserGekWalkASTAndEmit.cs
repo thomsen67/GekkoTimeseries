@@ -1148,8 +1148,23 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTANALYZE":
                         {
+                            
                             node.Code.A("O.Analyze o" + Num(node) + " = new O.Analyze();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".x = " + node[0].Code).End();
+
+                            GetCodeFromAllChildren(node, node[0]);
+
+                            node.Code.A("o" + Num(node) + ".x = new List<IVariable>();" + G.NL);
+                            for (int i = 1; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".x.Add(" + node[i][0].Code + ");" + G.NL);
+                            }
+
+                            node.Code.A("o" + Num(node) + ".expressionsText = new List<string>();" + G.NL);
+                            for (int i = 1; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".expressionsText.Add(@`" + node[i].specialExpressionAndLabelInfo[1] + "`);" + G.NL);
+                            }
+
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

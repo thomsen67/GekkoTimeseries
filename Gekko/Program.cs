@@ -28662,7 +28662,7 @@ namespace Gekko
             List<string> labels = new List<string>();
             for (int i = 0; i < input.Count; i++)
             {
-                labels.Add("Variable " + (i + 1));
+                labels.Add(G.ReplaceGlueNew(o.expressionsText[i]));
             }
             
             int n = GekkoTime.Observations(t1, t2);
@@ -28708,6 +28708,15 @@ namespace Gekko
 
             if (k > 1)
             {
+
+                foreach (double d in tsData)
+                {
+                    if (G.isNumericalError(d))
+                    {
+                        G.Writeln2("*** ERROR: Correlation cannot be computed due to missing values");
+                        throw new GekkoException();
+                    }
+                }
 
                 double[,] y = null;
                 alglib.pearsoncorrm(tsData, out y);

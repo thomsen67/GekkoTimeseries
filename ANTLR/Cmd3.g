@@ -502,6 +502,7 @@ ASTCOMPARE2;
     ASTOLSELEMENT;
     ASTOLSELEMENTS;
 	ASTOLSEXPRESSION;
+	ASTANALYZEEXPRESSION;
     ASTOPD;
     ASTOPEN;
     ASTOPENHELPER;
@@ -2536,9 +2537,11 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-assignment2:               assignmentQuestion
-						 | assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment)
-						   ;
+//assignment2:               assignmentQuestion
+					//	 | assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment)
+//						   ;
+
+assignment2:               assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment) ;
 
 assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignmentMap.text), ASTASSIGNMENT, input.LT(1).Line)} assignmentMap);
 
@@ -2639,7 +2642,7 @@ seriesOpt1h:                D (EQUAL yesNo)? -> ^(ASTOPT_STRING_D yesNo?)
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 						  ;						  
 
-assignmentQuestion:         assignmentType QUESTION -> ASTASSIGNMENTQUESTION assignmentType;
+assignmentQuestion:         VAL QUESTION -> ASTASSIGNMENTQUESTION ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // ACCEPT
@@ -2652,7 +2655,8 @@ acceptType:                 VAL | STRING2 | DATE;
 // ANALYZE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-analyze:                    ANALYZE analyzeOpt1? expression -> ^({token("ASTANALYZE", ASTANALYZE, input.LT(1).Line)} analyzeOpt1? expression);
+analyze:                    ANALYZE analyzeOpt1? analyzeExpression (',' analyzeExpression)* -> ^({token("ASTANALYZE", ASTANALYZE, input.LT(1).Line)} ^(ASTOPT_ analyzeOpt1?) analyzeExpression+);
+analyzeExpression:		    expression -> ^({token("ASTANALYZEEXPRESSION¤"+($expression.text), ASTANALYZEEXPRESSION, 0)} expression);
 analyzeOpt1:                ISNOTQUAL
 						  | leftAngle2          analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 analyzeOpt1h*)							
 						  | leftAngleNo2 dates? analyzeOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) analyzeOpt1h*)
