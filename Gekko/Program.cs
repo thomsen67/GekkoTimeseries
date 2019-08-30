@@ -23498,9 +23498,9 @@ namespace Gekko
                     StringBuilder sb = new StringBuilder();
                     if (type == 1)
                     {
-                        sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + "> " + var + " " + op + " (");
+                        sb.Append(var + " <" + tStart.ToString() + " " + tEnd.ToString() + "> " + op + " ");
                     }
-                    else sb.Append("SERIES <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> " + var + " = (");
+                    else sb.Append(var + " <" + tStart.ToString() + " " + tEnd.ToString() + " " + op + "> = ");
 
                     foreach (GekkoTime t in new GekkoTimeIterator(tStart, tEnd))
                     {
@@ -23550,7 +23550,7 @@ namespace Gekko
                         sb.Append(valstring);
                         if (GekkoTime.Observations(t, tEnd) > 1) sb.Append(", ");
                     }
-                    sb.Append(");");
+                    sb.Append(";");
                     sw.WriteLine(sb);
                 }
             }

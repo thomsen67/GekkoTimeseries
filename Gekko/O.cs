@@ -1784,7 +1784,7 @@ namespace Gekko
                 
                 List<string> names = Program.Search(new List(new List<string>() { varnameWithFreq }), frombank, EVariableType.Var);
 
-                if (Globals.fixWildcardLabel)
+                if (Globals.fixWildcardLabel && smpl != null)
                 {
                     smpl.labelRecordedPieces = new List<RecordedPieces>();
                     for (int i = 0; i < names.Count; i++)
@@ -8463,7 +8463,7 @@ namespace Gekko
                         Series iv_series = iv as Series;
                         if (iv_series == null)
                         {
-                            G.Writeln2("*** ERROR: Only series are allowed");
+                            G.Writeln2("*** ERROR: Only series are allowed as input varname");
                             throw new GekkoException();
                         }
                         if (opt_label != null) iv_series.meta.label = opt_label;
