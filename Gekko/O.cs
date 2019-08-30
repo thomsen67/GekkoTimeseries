@@ -3177,7 +3177,7 @@ namespace Gekko
                         if (!Program.options.databank_create_auto)
                         {
                             //#07549843254
-                            G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ".");
+                            G.Writeln2("*** ERROR: Cannot auto-create series " + varnameWithFreq + ". See the CREATE command.");
                             G.Writeln("           You may change the settings with the following option:", Color.Red);
                             G.Writeln("           OPTION databank create auto = yes;", Color.Red);
                             G.Writeln("           Alternatively, use 'MODE data;' or 'MODE mixed;'.", Color.Red);

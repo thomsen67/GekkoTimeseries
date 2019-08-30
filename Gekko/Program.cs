@@ -20383,24 +20383,28 @@ namespace Gekko
             foreach (Databank bank in banks)
             {
                 List<string> onlyDatabankNotModel = new List<string>();
-                foreach (string s in bank.storage.Keys)
+                foreach (KeyValuePair<string, IVariable> s in bank.storage)
                 {
-                    if (G.GetFreqFromName(s) != Program.options.freq) continue;  //filter out other freqs
-                    string s2 = G.Chop_RemoveFreq(s);
+                    if (s.Value.Type() != EVariableType.Series) continue;
+                    if (G.GetFreqFromName(s.Key) != Program.options.freq) continue;  //filter out other freqs
+                    string s2 = G.Chop_RemoveFreq(s.Key);                    
                     if (!Program.model.varsAType.ContainsKey(s2))
                     {
                         onlyDatabankNotModel.Add(s2);
                     }
                 }
 
+                int c = 0;
                 foreach (string s in onlyDatabankNotModel)
                 {
-                    if (bank.ContainsIVariable(s + Globals.freqIndicator + G.GetFreq(Program.options.freq)))
+                    string ss = s + Globals.freqIndicator + G.GetFreq(Program.options.freq);
+                    if (bank.ContainsIVariable(ss))
                     {
-                        bank.RemoveIVariable(s);
+                        bank.RemoveIVariable(ss);
+                        c++;
                     }
                 }
-                G.Writeln2("Removed " + onlyDatabankNotModel.Count + " variable(s) in '" + bank.name + "' databank");
+                G.Writeln2("Removed " + c + " variable(s) in '" + bank.name + "' databank");
             }
         }
 
