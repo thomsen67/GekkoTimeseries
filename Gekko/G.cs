@@ -1465,7 +1465,7 @@ namespace Gekko
 
         public static bool Compare(double d1, double d2)
         {
-            if (double.IsNaN(d1) && double.IsNaN(d2)) return true;
+            if (G.isNumericalError(d1) && G.isNumericalError(d2)) return true;
             if (d1 == d2) return true;
             return false;
         }
