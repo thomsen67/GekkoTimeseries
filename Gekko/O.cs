@@ -282,29 +282,83 @@ namespace Gekko
             }
         }
 
-        //public static void AssignVal(IVariable lhs, IVariable rhs)
-        //{
-        //    string s = O.ConvertToString(lhs);
-        //    double d = O.ConvertToVal(null, rhs);
-        //    IVariable iv = null; Program.scalars.TryGetValue(s, out iv);
-        //    if (iv != null)
-        //    {
-        //        if (iv.Type() == EVariableType.Val)
-        //        {
-        //            ((ScalarVal)iv).val = d;
-        //        }
-        //        else
-        //        {
-        //            Program.scalars.Remove(s);
-        //            Program.scalars.Add(s, new ScalarVal(d));
-        //        }
+        public static void ListQuestion(string type)
+        {
 
-        //    }
-        //    else
-        //    {
-        //        Program.scalars.Add(s, new ScalarVal(d));
-        //    }
-        //}
+            bool hasLargeModel = Program.IsLargeModel();
+            List<string> a4 = new List<string>();
+            foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
+            {
+                if (kvp.Value.Type() == EVariableType.List)
+                {
+                    string s = kvp.Key.Substring(1);
+                    a4.Add(s);
+                }
+            }
+
+            a4.Sort(StringComparer.InvariantCultureIgnoreCase);  //invariant is better for sorting than ordinal
+
+            List<string> user = new List<string>();
+            List<string> system = new List<string>();
+            foreach (string m in a4)
+            {
+                if (
+                G.Equal(m, "exod") ||
+                G.Equal(m, "exoj") ||
+                G.Equal(m, "exoz") ||
+                G.Equal(m, "exodjz") ||
+                G.Equal(m, "exo") ||
+                G.Equal(m, "exotrue") ||
+                G.Equal(m, "endo") ||
+                G.Equal(m, "all"))
+                {
+                    system.Add(m);
+                }
+                else
+                {
+                    user.Add(m);
+                }
+            }
+
+            int count = a4.Count;
+
+            if (type == "?")
+            {
+                G.Writeln();
+                G.Write("There are " + user.Count + " user lists and " + system.Count + " model lists.");
+                if (system.Count > 0)
+                {
+                    G.Write(" Click ");
+                    G.WriteLink("here", "list:?_show_all_lists");
+                    G.Write(" to see model lists.");
+                }
+                G.Writeln();
+                if (user.Count > 0)
+                {
+                    foreach (string m in user)
+                    {
+                        Program.WriteListItems(m);
+                    }
+                }
+            }
+            else //must be ?_show_all_lists
+            {
+                if (hasLargeModel) G.Writeln();
+                foreach (string m in system)
+                {
+                    if (hasLargeModel)
+                    {
+                        List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
+                        G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
+                        G.Writeln();
+                    }
+                    else
+                    {
+                        Program.WriteListItems(m);
+                    }
+                }
+            }
+        }
 
         public static IVariable Add(GekkoSmpl smpl, IVariable x, IVariable y)
         {
@@ -8637,20 +8691,20 @@ namespace Gekko
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);
-                List<string> listItems = Restrict(names, true, false, true, true);
+                List<string> listItems = Program.Search(this.names, null, EVariableType.Series);
                 int counter = 0;
                 foreach (string s in listItems)
                 {
                     IVariable iv = O.GetIVariableFromString(s, ECreatePossibilities.NoneReportError); //no searching!
-                    Series ts = O.ConvertToSeries(iv) as Series;
-                    //List<Series> tss = Program.GetTimeSeriesFromStringWildcard(s);
-                    //Now we are sure all the series are from Work
-                    //foreach (Series ts in tss)
-                    //{
+                    Series ts = iv as Series;
                     ts.Truncate(this.t1, this.t2);
                     counter++;
                     ts.Stamp();
-                    //}                    
+                }
+                if (counter == 0)
+                {
+                    G.Writeln2("Did not match any variables to truncate");
+                    throw new GekkoException();
                 }
                 G.Writeln2("Truncated " + counter + " series to " + t1 + "-" + t2 + "");
             }
@@ -9765,7 +9819,7 @@ namespace Gekko
                 // ----- Unfolding of array-series end ---------------------------------------------------------
                 // ---------------------------------------------------------------------------------------------
 
-                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries)
+                if (G.Equal(this.opt_split, "yes") || Program.options.print_split || !allSeries || Program.IsGmulprt(this, Program.GetPrintType(this)))
                 {
                     //Some of the vars are not series or val, so not possible to print them 
                     //meaningfully in one table. One or more of the vars may be array-series (non-indexed)
@@ -9813,11 +9867,7 @@ namespace Gekko
                         G.Writeln2("+++ WARNING: MULPRT is not intended for data mode, please use PRT (cf. the MODE command).");
                     }
                 }
-
-                if (G.Equal(prtType, "clip"))
-                {
-                    G.Writeln2("+++ NOTE: CLIP does not work in Gekko 3.0 yet, but you may use copy-button in the interface now");
-                }
+                                
             }
 
             private bool AllSeries()

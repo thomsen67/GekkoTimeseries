@@ -409,7 +409,8 @@ namespace Gekko
     {
         Print,
         Plot,
-        Sheet       
+        Sheet,
+        Clip
     }
 
     public enum EWildcardSearchType
@@ -11934,174 +11935,215 @@ namespace Gekko
 
         public static void Mem(string tpe)
         {
-            if (false && Globals.runningOnTTComputer)
-            {
-
-                bool intern = false;
-
-                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
-                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
-                //REMEMber TO STORE KEYS AS TOLOWER()!!!!!!!!
-
-                //#098q709q87543
-
-                var list = new List<string>();
-
-                for (int i = 0; i < 5 * 1000 * 1000; i++)
-                {
-                    var s = ReadFromDb();
-                    if (intern) list.Add(string.Intern(s));
-                    else list.Add(s);
-                }
-
-                G.Writeln(Process.GetCurrentProcess().PrivateMemorySize64 / 1024 / 1024 + " MB");
-
-
-
-                string a = null;
-                string b = null;
-                if (intern)
-                {
-                    a = string.Intern(ReadFromDb());
-                    b = string.Intern(ReadFromDb());
-                }
-                else
-                {
-                    a = ReadFromDb();
-                    b = ReadFromDb();
-                }
-
-                int equals = 0;
-                var stopwatch = Stopwatch.StartNew();
-                for (int i = 0; i < 250 * 1000 * 1000; i++)
-                {
-                    if (a == b) equals++;
-                }
-                stopwatch.Stop();
-
-                G.Writeln(stopwatch.Elapsed + ", equals: " + equals);
-
-            }
-
-            /*
-            
-            
-            /*
-            
-            //y = 1 + sum(#i, 2 + b[#i] + sum(#j, 3 + a[#i, #j]))
-
-            //når der mødes en #i i en sum(#i, ...) (*) registreres den
-            //  den må ikke allerede findes som loop-variabel eller en anden sum()
-            //  følgende #i'er kobles navnemæssigt til denne.
-            //  måske ved at adde og remover til en dictionary, når den går ind og ud af sum()
-
-            //test at $-conditions virker
-            //test lags
-            //test movsum()
-            //test bank:
-            //test x{i}a[#i]
-
-            //(*) logik mht. sum-funktion: kan kun være array hvis 2 argumenter, og det første skal være #i eller (#i, #j, ...)
-            //og det andet skal indeholde mindst én indexer
-
-            //result 2001 509605.4
-            //result 2002 518934.1
-
-            List<string> ii = new List<string>(new string[] { "m", "b" });
-            List<string> jj = new List<string>(new string[] { "nm", "nk" });
-
-            Series ts2 = Program.databanks.GetFirst().GetVariable("fk");
-            Series ts1 = Program.databanks.GetFirst().GetVariable("fim");
-
-            for (int t = 2001; t <= 2002; t++)
-            {
-                GekkoTime gt = new GekkoTime(EFreq.A, t, 1);
-                double d1 = 0;  //SUM FUNCTION1 +++++++++++++++++++++++++++
-                foreach (string i in ii)  //SUM FUNCTION1 ARG 1 ++++++++++++++++++++++++++++
-                {
-                    double d2 = 0;  //SUM FUNCTION2
-                    foreach (string j in jj)  //SUM FUNCTION ARG1
-                    {
-                        d2 += 3 + ((MetaTimeSeries)O.Indexer(gt, new MetaTimeSeries(ts2), false, new ScalarString(i), new ScalarString(j))).ts.GetData(null, gt); //SUM FUNCTION ARG2
-                    }
-                    d1 += 2 + ((MetaTimeSeries)O.Indexer(gt, new MetaTimeSeries(ts1), false, new ScalarString(i))).ts.GetData(null, gt);  //SUM FUNCTION1 ARG 2 +++++++++++++++++++
-                }
-                double d = 1 + d1;  //PARENT
-                G.Writeln2("result " + t + " " + d);
-            }
-        
-            */
-
-            //call with null, string, name, date, val
+            //call with null, string, date, val --> will be lower-case when called
 
             bool foundSomething = false;
 
-            foreach (Databank db in Program.databanks.storage)
-            {
+            List<Databank> banks = new List<Databank>();
+            banks.Add(Program.databanks.GetLocal());
+            banks.AddRange(Program.databanks.storage);
+            banks.Add(Program.databanks.GetGlobal());
 
-                int counter = 0;
+            if (tpe == null || tpe == "val" || tpe == "date" || tpe == "string")
+            {   //scalars
 
-                List<string> keys = new List<string>();
-
-                foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                foreach (Databank db in banks)
                 {
-                    if (kvp.Key.StartsWith(Globals.symbolScalar.ToString())) keys.Add(kvp.Key);
+                    int counter = 0;
+
+                    List<string> keys = new List<string>();
+
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                    {
+                        if (kvp.Value.Type() == EVariableType.Val || kvp.Value.Type() == EVariableType.Date || kvp.Value.Type() == EVariableType.String)
+                        {
+                            if (tpe == null)
+                            {
+                                keys.Add(kvp.Key);
+                            }
+                            else
+                            {
+                                if (tpe == "val" && kvp.Value.Type() == EVariableType.Val) keys.Add(kvp.Key);
+                                else if (tpe == "date" && kvp.Value.Type() == EVariableType.Date) keys.Add(kvp.Key);
+                                else if (tpe == "string" && kvp.Value.Type() == EVariableType.String) keys.Add(kvp.Key);
+                            }
+                        }
+                    }
+
+                    if (keys.Count() == 0) continue;
+
+                    foundSomething = true;
+
+                    keys.Sort(StringComparer.OrdinalIgnoreCase);
+
+                    Table tab = new Table();
+                    int row = 1;
+                    tab.SetBorder(row, 1, row, 3, BorderType.Top);
+                    tab.Set(row, 1, "type      ");
+                    tab.Set(row, 2, "name    ");  //blanks to get some spacing
+                    tab.Set(row, 3, "value    ");
+                    tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
+                    row++;
+                    foreach (string s in keys)
+                    {
+                        IVariable a = db.storage[s];
+                        string value = "";
+                        if (a.Type() == EVariableType.Date)
+                        {
+                            if (tpe != null && tpe != "date") continue;
+                            value = G.FromDateToString(a.ConvertToDate(O.GetDateChoices.Strict));
+                        }
+                        else if (a.Type() == EVariableType.String)
+                        {
+                            if (tpe != null && tpe != "string") continue;
+                            value = "'" + a.ConvertToString() + "'";
+                        }
+                        else if (a.Type() == EVariableType.Val)
+                        {
+                            if (tpe != null && tpe != "val") continue;
+                            value = a.ConvertToVal().ToString();
+                            if (value == "NaN") value = "M";
+                        }
+
+                        string type = a.Type().ToString().ToUpper();
+
+                        tab.Set(row, 1, type);
+                        tab.Set(row, 2, s);
+                        tab.Set(row, 3, value);
+                        row++;
+                        counter++;
+                    }
+                    tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
+
+                    string tpe2 = "";
+                    if (tpe != null) tpe2 = " " + tpe.ToUpper();
+                    G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
+                    foreach (string s in tab.Print()) G.Writeln(s);
                 }
-
-                if (keys.Count() == 0) continue;
-                foundSomething = true;
-
-                keys.Sort(StringComparer.OrdinalIgnoreCase);
-
+                if (!foundSomething)
+                {
+                    if (tpe == null) G.Writeln2("No scalars found in any open databank");
+                    else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
+                }
+            }
+            else if (tpe == "ser" || tpe == "series")
+            {
                 Table tab = new Table();
                 int row = 1;
+                tab.SetBorder(row, 1, row, 2, BorderType.Top);
 
-                tab.SetBorder(row, 1, row, 3, BorderType.Top);
-                tab.Set(row, 1, "type      ");
-                tab.Set(row, 2, "name    ");  //blanks to get some spacing
-                tab.Set(row, 3, "value    ");
-                tab.SetBorder(row, 1, row, 3, BorderType.Bottom);
-                row++;
-                foreach (string s in keys)
+                bool hit = false;
+
+                foreach (Databank db in banks)
                 {
-                    IVariable a = db.storage[s];
-                    string value = "";
-                    if (a.Type() == EVariableType.Date)
+                    string s = null;
+                    Dictionary<EFreq, long> count = new Dictionary<EFreq, long>();
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
                     {
-                        if (tpe != null && tpe != "date") continue;
-                        value = G.FromDateToString(a.ConvertToDate(O.GetDateChoices.Strict));
+                        if (kvp.Value.Type() != EVariableType.Series) continue;
+                        Series ts = kvp.Value as Series;
+                        if (!count.ContainsKey(ts.freq)) count.Add(ts.freq, 0);
+                        count[ts.freq]++; hit = true;
                     }
-                    else if (a.Type() == EVariableType.String)
+                    foreach (KeyValuePair<EFreq, long> kvp in count)
                     {
-                        if (tpe != null && tpe != "string") continue;
-                        value = "'" + a.ConvertToString() + "'";
+                        s += kvp.Value + " (" + G.GetFreqString(kvp.Key) + "), ";
                     }
-                    else if (a.Type() == EVariableType.Val)
+                    if (s != null)
                     {
-                        if (tpe != null && tpe != "val") continue;
-                        value = a.ConvertToVal().ToString();
-                        if (value == "NaN") value = "M";
+                        s = s.Substring(0, s.Length - 2);
+                        tab.Set(row, 1, db.name);
+                        tab.Set(row, 2, s);
+                        row++;
                     }
-
-                    string type = a.Type().ToString().ToUpper();
-
-                    tab.Set(row, 1, type);
-                    tab.Set(row, 2, s);
-                    tab.Set(row, 3, value);
-                    row++;
-                    counter++;
                 }
-                tab.SetBorder(row - 1, 1, row - 1, 3, BorderType.Bottom);
+                tab.SetBorder(row - 1, 1, row - 1, 2, BorderType.Bottom);
 
-                string tpe2 = "";
-                if (tpe != null) tpe2 = " " + tpe.ToUpper();
-                G.Writeln2(db.name + " databank: " + counter + tpe2 + " scalar(s) found");
-                foreach (string s in tab.Print()) G.Writeln(s);
+                if (hit)
+                {
+                    G.Writeln();
+                    foreach (string s in tab.Print()) G.Writeln(s);
+                }
+                else
+                {
+                    G.Writeln2("No series found in any open databank");
+                }
             }
-            if (!foundSomething)
+            else  //list, map, matrix
             {
-                if (tpe == null) G.Writeln2("No scalars found in any open databank");
-                else G.Writeln2("No " + tpe.ToUpper() + " scalar(s) found in any open databank");
+                foreach (Databank db in banks)
+                {
+                    int counter = 0;
+
+                    List<string> keys = new List<string>();
+
+                    foreach (KeyValuePair<string, IVariable> kvp in db.storage)
+                    {
+                        if (tpe == "list" && kvp.Value.Type() == EVariableType.List) keys.Add(kvp.Key);
+                        else if (tpe == "map" && kvp.Value.Type() == EVariableType.Map) keys.Add(kvp.Key);
+                        else if (tpe == "matrix" && kvp.Value.Type() == EVariableType.Matrix) keys.Add(kvp.Key);
+                    }
+
+                    if (keys.Count() == 0) continue;
+
+                    foundSomething = true;
+
+                    keys.Sort(StringComparer.OrdinalIgnoreCase);
+
+                    Table tab = new Table();
+                    int row = 1;
+                    tab.SetBorder(row, 1, row, 4, BorderType.Top);
+                    tab.Set(row, 1, "type    ");
+                    tab.Set(row, 2, "name    ");
+                    tab.Set(row, 3, "size    ");  //blanks to get some spacing                    
+                    tab.SetBorder(row, 1, row, 4, BorderType.Bottom);
+                    row++;
+                    foreach (string s in keys)
+                    {
+                        IVariable a = db.storage[s];
+                        string value = "";
+                        string modelList = "";
+                        if (a.Type() == EVariableType.List)
+                        {
+                            List list = a as List;
+                            value = list.list.Count().ToString();
+                            if (G.Equal(db.name, "Global"))
+                            {
+                                if (G.Equal(s, "#all") || G.Equal(s, "#endo") || G.Equal(s, "#exo") || G.Equal(s, "#exod") || G.Equal(s, "#exodjz") || G.Equal(s, "#exoj") || G.Equal(s, "#exotrue") || G.Equal(s, "#exoz"))
+                                {
+                                    modelList = "(model list)";
+                                }
+                            }
+                        }
+                        else if (a.Type() == EVariableType.Map)
+                        {
+                            Map map = a as Map;
+                            value = map.storage.Count().ToString();
+                        }
+                        else if (a.Type() == EVariableType.Matrix)
+                        {
+                            Matrix matrix = a as Matrix;
+                            value = matrix.DimensionsAsString();
+                        }
+
+                        string type = a.Type().ToString().ToUpper();
+
+                        tab.Set(row, 1, type);
+                        tab.Set(row, 2, s);
+                        tab.Set(row, 3, value);
+                        tab.Set(row, 4, modelList);
+                        row++;
+                        counter++;
+                    }
+                    tab.SetBorder(row - 1, 1, row - 1, 4, BorderType.Bottom);
+                                        
+                    G.Writeln2(db.name + " databank: " + counter + " " + tpe.ToUpper() + "s found");
+                    foreach (string s in tab.Print()) G.Writeln(s);
+                }
+                if (!foundSomething)
+                {   
+                    G.Writeln2("No " + tpe.ToUpper() + " variables found in any open databank");
+                }
             }
         }
 
@@ -18393,7 +18435,6 @@ namespace Gekko
         }
 
 
-
         public static void List(string type, string leftSide, List<string> rightSide)
         {
             List(type, leftSide, rightSide, true);
@@ -18438,139 +18479,19 @@ namespace Gekko
                 }
                 else
                 {
-                    bool hasLargeModel = IsLargeModel();
-                    List<string> a4 = new List<string>();
-                    foreach (KeyValuePair<string, IVariable> kvp in Program.databanks.GetFirst().storage)
-                    {
-                        if (kvp.Value.Type() == EVariableType.List)
-                        {
-                            string s = kvp.Key.Substring(1);
-                            a4.Add(s);
-                        }
-                    }
-
-                    a4.Sort(StringComparer.InvariantCultureIgnoreCase);  //invariant is better for sorting than ordinal
-
-                    List<string> user = new List<string>();
-                    List<string> system = new List<string>();
-                    foreach (string m in a4)
-                    {
-                        if (
-                        G.Equal(m, "exod") ||
-                        G.Equal(m, "exoj") ||
-                        G.Equal(m, "exoz") ||
-                        G.Equal(m, "exodjz") ||
-                        G.Equal(m, "exo") ||
-                        G.Equal(m, "exotrue") ||
-                        G.Equal(m, "endo") ||
-                        G.Equal(m, "all"))
-                        {
-                            system.Add(m);
-                        }
-                        else
-                        {
-                            user.Add(m);
-                        }
-                    }
-
-                    int count = a4.Count;
-
-                    if (type == "?")
-                    {
-                        G.Writeln();
-                        G.Write("There are " + user.Count + " user lists and " + system.Count + " model lists.");                        
-                        if (system.Count > 0)
-                        {
-                            G.Write(" Click ");
-                            G.WriteLink("here", "list:?_show_all_lists");
-                            G.Write(" to see model lists.");
-                        }
-                        G.Writeln();
-                        if (user.Count > 0)
-                        {
-                            foreach (string m in user)
-                            {
-                                WriteListItems(m);
-                            }
-                        }
-                    }
-                    else //must be ?_show_all_lists, because ?_mylist returns above.
-                    {
-                        if (hasLargeModel) G.Writeln();
-                        foreach (string m in system)
-                        {
-                            if (hasLargeModel)
-                            {
-                                List<string> a1 = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + m));
-                                G.Write("list #" + m + " = ["); G.WriteLink("show", "list:?_" + m); G.Writeln("]  (" + a1.Count + " elements from '" + a1[0] + "' to '" + a1[a1.Count - 1] + "')");
-                                G.Writeln();
-                            }
-                            else
-                            {
-                                WriteListItems(m);
-                            }
-                        }
-                    }
+                    
                 }
 
             }  //end of if startswith("?")
             else
             {
-                string leftSide = leftSideInput;
-                if (!hasHashSign) leftSide = "#" + leftSide;  //bit of a hack, at some point "LIST + #xx nm nk" will die anyway
-                if (leftSide != "null" && !leftSide.StartsWith("#"))
-                {
-                    G.Writeln2("*** ERROR regarding list (left side)");
-                    throw new GekkoException();
-                }
-                else leftSide = leftSide.Substring(1);  //removing the first '#'
-
-                if (type == "+")
-                {
-                    List<string> unfoldedRightSide = rightSide;
-
-                    if (unfoldedRightSide.Count == 1 && G.Equal(unfoldedRightSide[0], "null"))
-                    {
-                        //LIST mylist = null; ---> empty list
-                        unfoldedRightSide = new List<string>();
-                    }
-
-                    if (leftSideInput == null)
-                    {
-                        G.Writeln2("*** ERROR: List command failed internally");
-                        throw new GekkoException();
-                    }
-                    else
-                    {
-
-                        Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
-
-                        //if (Program.scalars.ContainsKey(Globals.symbolCollection + leftSide))
-                        //{
-                        //    Program.scalars.Remove(Globals.symbolCollection + leftSide);
-                        //}
-                        //Program.scalars.Add(Globals.symbolCollection + leftSide, new List(unfoldedRightSide));
-                    }
-                }
-                else if (type == "-")
-                {
-                    if (Program.databanks.GetFirst().ContainsIVariable(Globals.symbolCollection + leftSide))
-                    {
-                        Program.databanks.GetFirst().RemoveIVariable(Globals.symbolCollection + leftSide);
-                        //Program.scalars.Remove(Globals.symbolCollection + leftSide);
-                        G.Writeln("List #" + leftSide + " removed");
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: list #" + leftSide + " does not exist");
-                        throw new GekkoException();
-                    }                    
-                }
+                G.Writeln2("*** ERROR: Internal error #8794372264");
+                throw new GekkoException();                
             }
             return;
         }
 
-        private static bool IsLargeModel()
+        public static bool IsLargeModel()
         {
             bool hasLargeModel = false;
             IVariable all = Program.databanks.GetFirst().GetIVariable(Globals.symbolCollection + "all");
@@ -28981,7 +28902,7 @@ namespace Gekko
         public static void OPrint(O.Prt o, List<string> labelsHandmade, List<string> labelOriginal)
         {
             //Note: it is ok for a prtElement in o to be a List containg Series
-            
+
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
@@ -28997,11 +28918,9 @@ namespace Gekko
             //    G.Writeln();
             //}
 
-            EPrintTypes type = EPrintTypes.Print;
-            if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
-            else if (G.Equal(o.prtType, "sheet")) type = EPrintTypes.Sheet;
+            EPrintTypes type = GetPrintType(o);
 
-            if (type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.operators.Count == 1 && G.Equal(o.operators[0].s1, "v") && G.Equal(o.operators[0].s2, "yes"))))
+            if (IsGmulprt(o, type))
             {
 
                 for (int i = 0; i < o.prtElements.Count; i++)
@@ -29010,7 +28929,7 @@ namespace Gekko
                 }
             }
 
-            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;                       
+            bool rows = false; if (G.Equal(o.opt_rows, "yes")) rows = true;
 
             List<O.Prt.Element> containerExplode = new List<O.Prt.Element>();
 
@@ -29024,7 +28943,7 @@ namespace Gekko
 
             int labelMaxLine = 1;
             bool[] freqs = new bool[4];
-                        
+
             int numberOfGekkoNullVariables = 0;
             int numberOfOtherVariables = 0;
 
@@ -29045,7 +28964,7 @@ namespace Gekko
                     }
                 }
                 if (xx0 != null) n = xx0.list.Count;
-                else if (xx1 != null) n = xx1.list.Count;                
+                else if (xx1 != null) n = xx1.list.Count;
 
                 for (int i = 0; i < n; i++)  //this element may be a #-list with 2 timeseries, x1 and x2
                 {
@@ -29167,8 +29086,8 @@ namespace Gekko
                         {
                             numberOfGekkoNullVariables++;
                             continue;
-                        }                        
-                                                
+                        }
+
                         numberOfOtherVariables++;
 
                         Series temp0 = explodeElement.variable[0] as Series;
@@ -29205,7 +29124,7 @@ namespace Gekko
 
                         try
                         {
-                            lbl = OPrintLabels(element.labelGiven,element.labelRecordedPieces, n, i);
+                            lbl = OPrintLabels(element.labelGiven, element.labelRecordedPieces, n, i);
                         }
                         catch { lbl = new List<string>(); }
 
@@ -29244,18 +29163,33 @@ namespace Gekko
 
                         //FIXME
                         //FIXME
-                        if (G.Equal(element.operatorsFinal[0], "n") && iOperator > 0 && G.Equal(operator2, "p"))
+
+                        string ee = null;
+                        IVariable iv = element.variable[0];
+                        if (iv != null && iv as Series != null)
                         {
-                            explodeElement.labelOLD = new List<string> { "%" };
+                            Series ts = iv as Series;
+                            if (ts.type == ESeriesType.Normal)
+                            {
+                                string name = ts.GetName();
+                                EEndoOrExo endoExo = VariableTypeEndoExo(G.Chop_RemoveFreq(name));                                
+                                if (endoExo == EEndoOrExo.Endo) ee = "(E)";
+                                else if (endoExo == EEndoOrExo.Exo) ee = "(X)";
+                            }
+                        }
+
+                        if (G.Equal(element.operatorsFinal[0], "n") && iOperator > 0 && G.Equal(operator2, "p"))
+                        {                            
+                            explodeElement.labelOLD = new List<string> { ee + "%" };
                         }
                         else if (G.Equal(element.operatorsFinal[0], "m") && iOperator > 0 && G.Equal(operator2, "q"))
                         {
-                            explodeElement.labelOLD = new List<string> { "%" };
+                            explodeElement.labelOLD = new List<string> { ee + "%" };
                         }
                         else
                         {
                             if (iOperator == 0) ; //c.label = c.label + "  (" + printCode.ToLower() + ")";
-                            else if (iOperator > 0) explodeElement.labelOLD = new List<string> { "(" + operator2.ToLower() + ")" };
+                            else if (iOperator > 0) explodeElement.labelOLD = new List<string> { "<" + operator2.ToLower() + ">" };
                         }
 
                         containerExplode.Add(explodeElement);
@@ -29292,7 +29226,7 @@ namespace Gekko
 
             Table table = new Table();
             table.writeOnce = true;
-            
+
             int y1 = smpl.t1.super;
             int y2 = smpl.t2.super;
 
@@ -29305,10 +29239,6 @@ namespace Gekko
             //TIMEFILTER!!!!!!! with avg
 
             //timefilter removes items hitted. If avg/sum timefilter, track the omitted and print them instead of non-hitted
-
-            
-            //double[] dataMin = new double[containerExplode.Count];
-            //double[] dataMax = new double[containerExplode.Count];
 
             int[] colCounter = new int[containerExplode.Count];
 
@@ -29430,7 +29360,7 @@ namespace Gekko
                 bool pretty = false;
                 if (type == EPrintTypes.Sheet && G.Equal(Program.options.sheet_freq, "pretty")) pretty = true;
                 if (type == EPrintTypes.Print && G.Equal(Program.options.print_freq, "pretty")) pretty = true;
-                
+
 
                 // 1. 2003 (label)       
                 // 2. 2003q1            Q         
@@ -29466,14 +29396,14 @@ namespace Gekko
                 for (int year = y1; year <= y2; year++)
                 {
 
-                    string uglyYear = null; if (!pretty) uglyYear = year.ToString();                    
+                    string uglyYear = null; if (!pretty) uglyYear = year.ToString();
 
                     if (type != EPrintTypes.Plot) // ------------------------------------------------------------- (1)
                     {
                         //if (pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A)) i++;
 
                         //if (!pretty && year != y1 && !(sameFreq == EFreq.U || sameFreq == EFreq.A))
-                        
+
                         if (pretty || year == y1 || (sameFreq == EFreq.U || sameFreq == EFreq.A))
                         {
                             i++;
@@ -30204,70 +30134,81 @@ namespace Gekko
             {
                 CallGnuplotNew2(table, o, containerExplode, freqs);
             }
-            else if(type == EPrintTypes.Sheet)
-            {   
+            else if (type == EPrintTypes.Sheet)
+            {
+
+                if (sameFreq == EFreq.None)
+                {
+                    G.Writeln2("*** ERROR: SHEET is only for same frequency series, else use CLIP");
+                    throw new GekkoException();
+                }
+
                 //tab2 = tab.Transpose();
-                    //TODO: we need a counter regarding the first rows/cols of the table, how many??
+                //TODO: we need a counter regarding the first rows/cols of the table, how many??
 
-                    //TODO: fill with NaN!!!
-                    //TODO: fill with NaN!!!
-                    //TODO: fill with NaN!!!
+                //TODO: fill with NaN!!!
+                //TODO: fill with NaN!!!
+                //TODO: fill with NaN!!!
 
-                    //remember append
-                    //always start in A1, no blank line
-                    //labels.. what if they break -- should be infinitely long
+                //remember append
+                //always start in A1, no blank line
+                //labels.. what if they break -- should be infinitely long
 
-                    Table tab2 = table.Transpose();
-                    int startRows = 1;
-                    int startCols = 1;
-                    ExcelOptions eo = new ExcelOptions();
-                    eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
-                    eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
-                    eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
+                Table tab2 = table.Transpose();
+                int startRows = 1;
+                int startCols = 1;
+                ExcelOptions eo = new ExcelOptions();
+                eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
+                eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
+                eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
 
-                    for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
+                for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
+                {
+                    for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
                     {
-                        for (int j = 1; j <= tab2.GetColMaxNumber(); j++)
+                        Cell cell2 = tab2.Get(i, j);
+                        string s2 = "";
+                        if (cell2 == null)
                         {
-                            Cell cell2 = tab2.Get(i, j);
-                            string s2 = "";
-                            if (cell2 == null)
+                        }
+                        else
+                        {
+                            if (i == 1 && j == 1)
                             {
+                                //do nothing
+                            }
+                            else if (j == 1)
+                            {
+                                //first row
+                                string s = cell2.CellText.TextData[0];
+                                if (s == null) s = "";
+                                eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
+                            }
+                            else if (i == 1)
+                            {
+                                string s = cell2.CellText.TextData[0];
+                                if (s == null) s = "";
+                                eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
                             }
                             else
                             {
-                                if (i == 1 && j == 1)
-                                {
-                                    //do nothing
-                                }
-                                else if (j == 1)
-                                {
-                                    //first row
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelRowLabels[i - 1 - startRows, j - 1] = s;
-                                }
-                                else if (i == 1)
-                                {
-                                    string s = cell2.CellText.TextData[0];
-                                    if (s == null) s = "";
-                                    eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-                                }
-                                else
-                                {
-                                    eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
-                                    s2 = cell2.date;
-                                }
+                                eo.excelData[i - startRows - 1, j - startCols - 1] = cell2.number;
+                                s2 = cell2.date;
                             }
                         }
                     }
+                }
 
-                    CreateExcelWorkbook2(eo, o, IsMulprt(o), false);
-                    return;
-                
-
+                CreateExcelWorkbook2(eo, o, IsMulprt(o), false);
+                return;
             }
-            else
+            else if (type == EPrintTypes.Clip)
+            {
+                //do not print anything, but put it on clipboard             
+                Table tab2 = table.Transpose();
+                Program.PrtClipboard(tab2, false);
+            }
+            else  //is .Print type
             {
                 if (rows) table = table.Transpose();
 
@@ -30288,10 +30229,24 @@ namespace Gekko
                     Program.options.print_filewidth = fileWidthRemember;
                 }
 
-                Globals.lastPrtOrMulprtTable = table;
+                Globals.lastPrtOrMulprtTable = table;  //if CLIP x, y, z, this Globals.lastPrtOrMulprtTable is used later on
                 CrossThreadStuff.CopyButtonEnabled(true);
-                //PrtClipboard(table, false);
+
             }
+        }
+
+        public static EPrintTypes GetPrintType(O.Prt o)
+        {
+            EPrintTypes type = EPrintTypes.Print;
+            if (G.Equal(o.prtType, "plot")) type = EPrintTypes.Plot;
+            else if (G.Equal(o.prtType, "sheet")) type = EPrintTypes.Sheet;
+            else if (G.Equal(o.prtType, "clip")) type = EPrintTypes.Clip;
+            return type;
+        }
+
+        public static bool IsGmulprt(O.Prt o, EPrintTypes type)
+        {
+            return type == EPrintTypes.Print && (G.Equal(o.prtType, "gmulprt") || (o.operators.Count == 1 && G.Equal(o.operators[0].s1, "v") && G.Equal(o.operators[0].s2, "yes")));
         }
 
         private static void Mismatch()
@@ -31287,22 +31242,7 @@ namespace Gekko
             if (temp.Count == 1) identicalCodes = true;
             return identicalCodes;
         }
-
-        //private static string GetLabelInPrt(O.Prt.Element pe, int subElementCounter)
-        //{
-        //    string label = null;
-        //    if (pe.subElements[subElementCounter].label == null)
-        //    {
-        //        label = pe.label;
-        //    }
-        //    else
-        //    {
-        //        label = pe.subElements[subElementCounter].label;
-        //    }
-        //    label = G.ReplaceGlueNew(label);
-        //    label = ScalarString.SubstituteScalarsInString(label, false, true);
-        //    return label;
-        //}
+                
 
         private static double CalculateAveragesForPrint(string operator2, List<double> filterMemoryValues, EPrtCollapseTypes collapse, int n)
         {
@@ -31926,48 +31866,7 @@ namespace Gekko
         private static bool IsLevelOperator(string operator2)
         {
             return operator2 == "" || operator2 == "n" || operator2 == "d" || operator2 == Globals.operator_r || operator2 == Globals.operator_rn || operator2 == Globals.operator_rd || operator2 == "m" || operator2 == Globals.operator_l || operator2 == Globals.operator_rl;
-        }
-
-        private static string GetOperatorLabel(string operator2, bool isVerbose, bool useExoEndoIndicator, bool identicalCodes)
-        {
-            string operatorLabel = "";
-            if (operator2 == "n")
-            {
-                operatorLabel = "lev";  //MULPRT<lev>
-            }
-            else if (operator2 == Globals.operator_r || operator2 == Globals.operator_rn)
-            {
-                operatorLabel = "@lev";
-                if (isVerbose) operatorLabel = Globals.Ref + " bank";
-            }
-            else if (operator2 == "d") operatorLabel = "dif";  //PRT<dif>
-            else if (operator2 == Globals.operator_rd) operatorLabel = "@dif";
-            else if (operator2 == "p") operatorLabel = "%";  //PRT<pch>
-            else if (operator2 == Globals.operator_rp)
-            {
-                operatorLabel = "@%";
-                if (isVerbose) operatorLabel = "%";
-            }
-            else if (operator2 == "dp") operatorLabel = "dif%";  //PRT<gdif>
-            else if (operator2 == Globals.operator_rdp) operatorLabel = "@dif%";
-            else if (operator2 == "m")
-            {
-                operatorLabel = "mdif";  //MULPRT<abs>
-                if (isVerbose) operatorLabel = "Difference";
-            }
-            else if (operator2 == "q")
-            {
-                operatorLabel = "m%";  //MULPRT<pch>
-                if (isVerbose) operatorLabel = "%";
-            }
-            else if (operator2 == "mp") operatorLabel = "mdif%";  //MULPRT<gdif>
-            else if (operator2 == Globals.operator_dl) operatorLabel = "dlog";
-            else if (operator2 == Globals.operator_rdl) operatorLabel = "@dlog";
-
-            if (!isVerbose) operatorLabel = "[" + operatorLabel + "]";
-            if (identicalCodes && operatorLabel == "[lev]") operatorLabel = "";  //no need for a [lev] on a PRT<nopch>.
-            return operatorLabel;
-        }
+        }        
 
         private static bool HasIdenticalCodes(List<string> graphVars, PrtHelper ph)
         {

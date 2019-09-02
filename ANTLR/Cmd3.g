@@ -76,6 +76,7 @@ tokens {
 	ASTPLUS2;
 	ASTMINUS2;
 	ASTSTAR2;
+	ASTASSIGNMENTQUESTION;
 	ASTDIV2;
 	ASTVERTICALBAR;
     ASTINDEXERELEMENT;
@@ -2537,18 +2538,16 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 // ASSIGNMENT, VAL, STRING, DATE, SERIES, LIST, MATRIX, MAP, VAR
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-//assignment2:               assignmentQuestion
-					//	 | assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment)
-//						   ;
-
-assignment2:               assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment) ;
+assignment2:               assignment -> ^({token("ASTASSIGNMENT¤"+($assignment.text), ASTASSIGNMENT, input.LT(1).Line)} assignment);
 
 assignmentMap2:            assignmentMap -> ^({token("ASTASSIGNMENT¤"+($assignmentMap.text), ASTASSIGNMENT, input.LT(1).Line)} assignmentMap);
 
 //NOTE: ASTLEFTSIDE must always have ASTASSIGNMENT as parent, cf. #324683532
 //NOTE: instead of expression, we could use prtElement, and get stuff in-substituted the same way. For now we do it more simple.
 
-assignment:				    assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER 
+assignment:                 assignmentTypeNotEmpty question -> ASTASSIGNMENTQUESTION assignmentTypeNotEmpty
+
+				          | assignmentType seriesOpt1? leftSide EQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) nakedList ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER 
 						  | assignmentType seriesOpt1? leftSide EQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) expression ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLACEHOLDER
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL nakedList -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide nakedList) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
 						  | assignmentType seriesOpt1? leftSide PLUSEQUAL expression repStar? -> ^(ASTLEFTSIDE leftSide?) ^(ASTPLUS leftSide expression) ^(ASTPLACEHOLDER seriesOpt1?) assignmentType ASTPLUS2
@@ -2600,8 +2599,7 @@ assignmentMap:				assignmentType seriesOpt1? leftSide EQUAL expression repStar? 
 percentEqual : GLUE? PERCENTEQUAL;
 hashEqual: GLUE? HASHEQUAL;
 
-
-assignmentType:             SER 
+assignmentTypeNotEmpty:     SER 
 					 	  | SERIES 
 						  | STRING2 
 						  | VAL 
@@ -2610,6 +2608,10 @@ assignmentType:             SER
 						  | MAP 
 						  | MATRIX 
 						  | VAR 
+						  | -> ASTPLACEHOLDER  //may be empty
+						    ;
+
+assignmentType:             assignmentTypeNotEmpty       
 						  | -> ASTPLACEHOLDER  //may be empty
 						    ;
 

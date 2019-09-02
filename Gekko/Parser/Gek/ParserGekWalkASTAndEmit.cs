@@ -3802,135 +3802,144 @@ namespace Gekko.Parser.Gek
                     
                     case "ASTASSIGNMENT":
                         {
-                            string number = "_" + ++Globals.counter;
-                            
-                            string operatorType = "ASTPLACEHOLDER";
-                            if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
-
-                            GekkoSB sb = new GekkoSB();
-
-                            string ass = "O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL; //note: using a hack later on
-
-                            if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE" || node.Parent.Text == "ASTMAPITEM")  //the last convers function/procedure, but also IF and FOR indentation
+                            if (node[0].Text == "ASTASSIGNMENTQUESTION")
                             {
-                                //only for the top-most node, that is, only 1 time
-                                //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
-                                sb.A(ass); //note: using a hack later on
-                            }
-
-                            if (node.specialExpressionAndLabelInfo != null)
-                            {
-                                //may be overwritten with explicit source
-                                //maybe later on introduce a #calc list with such meta information
-                                sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
-                            }
-
-                            string type = HandleVar(node[3].Text);  //2 is options   
-                            GetCodeFromAllChildren(sb, node[2]);
-                            if (G.Equal(type, "STRING2")) type = "string";
-                            string ivTempVar = SearchUpwardsInTree4(node[0]);
-                            if (ivTempVar == null)
-                            {
-                                G.Writeln2("*** ERROR: Internal error #7698248427");
-                                throw new GekkoException();
-                            }
-                            string convertTo = null;
-
-                            string temp = node[1].Code.ToString();
-
-                            if (operatorType == "ASTHAT2")
-                            {
-                                sb.A("o" + Num(node) + ".opt_d = `yes`;" + G.NL);
-                            }
-                            else if (operatorType == "ASTPERCENT2")
-                            {
-                                sb.A("o" + Num(node) + ".opt_p = `yes`;" + G.NL);
-                            }
-                            else if (operatorType == "ASTHASH2")
-                            {
-                                sb.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
-                            }
-
-                            if (node[0].ChildrenCount() > 1)  //left-side function like pch(x) = 5
-                            {
-                                node.Code.A("o" + Num(node) + ".opt_lsfunc = `" + node[0][1][0].Text + "`;" + G.NL);
-                            }
-
-                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
-                            {
-                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                {
-                                    node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
-                                }
-                            }
-
-                            GekkoSB sb1 = new GekkoSB();
-                            GekkoSB sb2 = new GekkoSB();
-                                                       
-                            if (true)
-                            {
-
-                                sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
-                                sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                                sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
-
-                                sb2.A(sb1); //cloning
-
-                                //sb1.A(sb);
-                                //sb2.A(sb);
-
-                                sb1.A(node[0].Code).End();  //simple Lookup() for sb1
-
-                                //more complicated probing for sb2
-                                sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
-                                sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
-                                sb2.A(node[0].Code).End();
-                                sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
-                                //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
-                            }
-
-                            if (Globals.series_dynamic)
-                            {
-                                //node.Code.A(sb);
-
-                                node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
-                                node.Code.A(sb1);
-                                node.Code.A("};" + G.NL);  //end of action
-
-                                node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
-                                node.Code.A(sb2);
-                                node.Code.A("};" + G.NL);  //end of action
-
-                                node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
-                            }
-
-                            if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
-                            {
-                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                {
-                                    node.Code.A("}" + G.NL);
-                                }
-                            }
-
-                            string localFuncCode = "";                            
-                            if (w.wh.localFuncs != null) localFuncCode = w.wh.localFuncs.ToString();
-
-                            // HACK HACK HACK
-                            // HACK HACK HACK
-                            // HACK HACK HACK
-                            //#6473443634
-                            //A hack: check that the assignment of the same object is not already there. The hack should be relatively safe.
-                            if (sb.ToString().Contains(ass))  //can probably only contain one of these
-                            {
-                                localFuncCode = sb.ToString() + G.NL + localFuncCode.Replace(ass, "");
+                                //val?, series?, etc.
+                                string type = node[1].Text.ToLower();                                
+                                node.Code.A("Program.Mem(`" + type + "`);" + G.NL);                                
                             }
                             else
                             {
-                                localFuncCode = sb.ToString() + G.NL + localFuncCode;
-                            }                            
-                            
-                            w.wh.localFuncs = new GekkoStringBuilder();
-                            w.wh.localFuncs.Append(localFuncCode);
+                                string number = "_" + ++Globals.counter;
+
+                                string operatorType = "ASTPLACEHOLDER";
+                                if (node[4] != null) operatorType = node[4].Text; //ASTHAT2, ASTPERCENT2, ASTPLUS, etc. (ASTPLACEHOLDER if none)
+
+                                GekkoSB sb = new GekkoSB();
+
+                                string ass = "O.Assignment o" + Num(node) + " = new O.Assignment();" + G.NL; //note: using a hack later on
+
+                                if (node.Parent.Text == null || node.Parent.Text == "ASTFUNCTIONDEFCODE" || node.Parent.Text == "ASTPROCEDUREDEFCODE" || node.Parent.Text == "ASTMAPITEM")  //the last convers function/procedure, but also IF and FOR indentation
+                                {
+                                    //only for the top-most node, that is, only 1 time
+                                    //not for assignments in maps, #m = (x = 5), where x = 5 is assigned.
+                                    sb.A(ass); //note: using a hack later on
+                                }
+
+                                if (node.specialExpressionAndLabelInfo != null)
+                                {
+                                    //may be overwritten with explicit source
+                                    //maybe later on introduce a #calc list with such meta information
+                                    sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
+                                }
+
+                                string type = HandleVar(node[3].Text);  //2 is options   
+                                GetCodeFromAllChildren(sb, node[2]);
+                                if (G.Equal(type, "STRING2")) type = "string";
+                                string ivTempVar = SearchUpwardsInTree4(node[0]);
+                                if (ivTempVar == null)
+                                {
+                                    G.Writeln2("*** ERROR: Internal error #7698248427");
+                                    throw new GekkoException();
+                                }
+                                string convertTo = null;
+
+                                string temp = node[1].Code.ToString();
+
+                                if (operatorType == "ASTHAT2")
+                                {
+                                    sb.A("o" + Num(node) + ".opt_d = `yes`;" + G.NL);
+                                }
+                                else if (operatorType == "ASTPERCENT2")
+                                {
+                                    sb.A("o" + Num(node) + ".opt_p = `yes`;" + G.NL);
+                                }
+                                else if (operatorType == "ASTHASH2")
+                                {
+                                    sb.A("o" + Num(node) + ".opt_mp = `yes`;" + G.NL);
+                                }
+
+                                if (node[0].ChildrenCount() > 1)  //left-side function like pch(x) = 5
+                                {
+                                    node.Code.A("o" + Num(node) + ".opt_lsfunc = `" + node[0][1][0].Text + "`;" + G.NL);
+                                }
+
+                                if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
+                                {
+                                    foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
+                                    {
+                                        node.Code.A("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(`" + kvp.Key + "`)))), null, new  LookupSettings(), EVariableType.Var,     o" + Num(node) + "))) {" + G.NL);
+                                    }
+                                }
+
+                                GekkoSB sb1 = new GekkoSB();
+                                GekkoSB sb2 = new GekkoSB();
+
+                                if (true)
+                                {
+
+                                    sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                    sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                    sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+
+                                    sb2.A(sb1); //cloning
+
+                                    //sb1.A(sb);
+                                    //sb2.A(sb);
+
+                                    sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+
+                                    //more complicated probing for sb2
+                                    sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
+                                    sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
+                                    sb2.A(node[0].Code).End();
+                                    sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
+                                    //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+                                }
+
+                                if (Globals.series_dynamic)
+                                {
+                                    //node.Code.A(sb);
+
+                                    node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
+                                    node.Code.A(sb1);
+                                    node.Code.A("};" + G.NL);  //end of action
+
+                                    node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
+                                    node.Code.A(sb2);
+                                    node.Code.A("};" + G.NL);  //end of action
+
+                                    node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                                }
+
+                                if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
+                                {
+                                    foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
+                                    {
+                                        node.Code.A("}" + G.NL);
+                                    }
+                                }
+
+                                string localFuncCode = "";
+                                if (w.wh.localFuncs != null) localFuncCode = w.wh.localFuncs.ToString();
+
+                                // HACK HACK HACK
+                                // HACK HACK HACK
+                                // HACK HACK HACK
+                                //#6473443634
+                                //A hack: check that the assignment of the same object is not already there. The hack should be relatively safe.
+                                if (sb.ToString().Contains(ass))  //can probably only contain one of these
+                                {
+                                    localFuncCode = sb.ToString() + G.NL + localFuncCode.Replace(ass, "");
+                                }
+                                else
+                                {
+                                    localFuncCode = sb.ToString() + G.NL + localFuncCode;
+                                }
+
+                                w.wh.localFuncs = new GekkoStringBuilder();
+                                w.wh.localFuncs.Append(localFuncCode);
+                            }
 
                         }
                         break;

@@ -6729,10 +6729,10 @@ namespace UnitTests
             I("reset;");
             I("time 2001 2010;");
             I("create x1,x2,x3;");
-            I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
-            I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
+            I("ser x1 = 1,2,4,5,6,5,6,7,8,6;");
+            I("ser x2 = 5,4,4,5,6,3,6,1,8,6;");
             I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
-            I("analyze (x1, x2, x3);");
+            I("analyze x1, x2, x3;");
             double d = 0.00000001;  //very precise!
             _AssertMatrix(First(), "#corr", 1, 1, 1d, d);
             _AssertMatrix(First(), "#corr", 1, 2, 0.21295885d, d);
@@ -6748,10 +6748,10 @@ namespace UnitTests
             I("option freq q;");
             I("time 2001q1 2003q2;");
             I("create x1,x2,x3;");
-            I("ser x1 = (1,2,4,5,6,5,6,7,8,6);");
-            I("ser x2 = (5,4,4,5,6,3,6,1,8,6);");
-            I("ser x3 = (7,5,4,1,6,5,9,7,8,9);");
-            I("analyze (x1, x2, x3);");
+            I("ser x1 = 1,2,4,5,6,5,6,7,8,6;");
+            I("ser x2 = 5,4,4,5,6,3,6,1,8,6;");
+            I("ser x3 = 7,5,4,1,6,5,9,7,8,9;");
+            I("analyze x1, x2, x3;");
             _AssertMatrix(First(), "#corr", 1, 1, 1d, d);
             _AssertMatrix(First(), "#corr", 1, 2, 0.21295885d, d);
             _AssertMatrix(First(), "#corr", 1, 3, 0.31237800d, d);
