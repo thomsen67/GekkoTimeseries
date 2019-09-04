@@ -4665,13 +4665,13 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTOPENHELPER":
                         {
-                            node.Code.A("o" + Num(node) + ".openFileNames = "+ node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".openFileNames2 = "+ node[0].Code + ";" + G.NL);
                             string as2 = "null";
                             if (node[1][0] != null)
                             {
                                 as2 = node[1][0].Code.ToString();
                             }                            
-                            node.Code.A("o" + Num(node) + ".openFileNamesAs = " + as2 + ";" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".openFileNamesAs2 = " + as2 + ";" + G.NL);                            
                         }
                         break;
                     case "ASTOPT_":

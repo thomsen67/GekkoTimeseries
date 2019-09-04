@@ -472,15 +472,32 @@ namespace Gekko
             return Functions.intersect(smpl, null, null, x, y);
         }
 
-        public static IVariable ReplaceSlash(IVariable x)
+        public static IVariable ReplaceSlashHelper(IVariable x)
         {
             if (x.Type() != EVariableType.String) return x;
             ScalarString ss = x as ScalarString;
             if (ss.string2.Contains("/"))
             {
-                ss.string2 = ss.string2.Replace("/", "\\");  //doing it inline, why create new object?
+                x = new ScalarString(ss.string2.Replace("/", "\\"));
             }
             return x;
+        }
+
+        public static IVariable ReplaceSlash(IVariable x)
+        {
+            if (x.Type() == EVariableType.List)
+            {
+                List temp = new List();
+                foreach (IVariable iv in (x as List).list)
+                {
+                    temp.Add(ReplaceSlashHelper(iv));
+                }
+                return temp;
+            }
+            else
+            {
+                return ReplaceSlashHelper(x);
+            }
         }
 
         public static string ResolvePath(string fileName2)
@@ -8318,8 +8335,8 @@ namespace Gekko
             //public List<List<string>> openFileNames = new List<List<string>>();
             //public string fileName = null;
 
-            public List openFileNames = null;
-            public List openFileNamesAs = null;
+            public IVariable openFileNames2 = null;
+            public IVariable openFileNamesAs2 = null;
 
             public string opt_tsd = null;
             public string opt_gbk = null;
@@ -8347,6 +8364,11 @@ namespace Gekko
 
             public void Exe()
             {
+                List openFileNames = null;
+                List openFileNamesAs = null;
+                if (this.openFileNames2 != null) openFileNames = this.openFileNames2 as List;
+                if (this.openFileNamesAs2 != null) openFileNamesAs = this.openFileNamesAs2 as List;
+
                 if (G.Equal(opt_prot, "yes"))
                 {
                     G.Writeln2("+++ NOTE: The OPEN<prot> option is obsolete and can be omitted here.");
