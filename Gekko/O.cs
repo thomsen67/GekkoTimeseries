@@ -472,6 +472,17 @@ namespace Gekko
             return Functions.intersect(smpl, null, null, x, y);
         }
 
+        public static IVariable ReplaceSlash(IVariable x)
+        {
+            if (x.Type() != EVariableType.String) return x;
+            ScalarString ss = x as ScalarString;
+            if (ss.string2.Contains("/"))
+            {
+                ss.string2 = ss.string2.Replace("/", "\\");  //doing it inline, why create new object?
+            }
+            return x;
+        }
+
         public static string ResolvePath(string fileName2)
         {
             string rv = null;

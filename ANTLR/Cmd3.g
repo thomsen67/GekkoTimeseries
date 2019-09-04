@@ -49,6 +49,7 @@ tokens {
 	ASTARGS;
 	ASTCOLON;
 	ASTL0;
+	ASTFILENAMESTRING;
 	ASTBLOCKOPTION;
 	ASTNAKEDLISTITEM;
 	ASTNAKEDLIST;
@@ -4019,28 +4020,21 @@ q:                          Q;
 m:                          M;
 u:                          U;
 
-						    //If זרוֶ״ֵ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
-fileName:                   fileNameFirstPart (GLUEBACKSLASH fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)
-						  | expression
+						    
+fileName:                   fileNameFirstPart (slashHelper1 fileNamePart)* -> ^(ASTFILENAME fileNameFirstPart fileNamePart*)     //If זרוֶ״ֵ then you need to put inside ''. Also with blanks. And parts beginning with a digit will not work either (5file.7z)
+						  | expression -> ^(ASTFILENAME expression)
 						    ;
-fileNameFirstPart:          fileNameFirstPart1  //   c:\xx
-						  | fileNameFirstPart2  //   \xx
-						  | fileNameFirstPart3  //   xx
-						    ;
-						    //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d
-						    //ok to use name before colon, drive indicator should start with a letter.
-fileNameFirstPart1:         name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);
-                            //For instance READ \a.b\c.d, cannot be READ\a.b\c.d
-fileNameFirstPart2:         slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);
-                            //For instance READ a.b
-fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);
-							//stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
-fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);
-
+fileNameFirstPart:          fileNameFirstPart1                                                                                   //   c:\xx
+						  | fileNameFirstPart2                                                                                   //   \xx
+						  | fileNameFirstPart3                                                                                   //   xx
+						    ;						    
+fileNameFirstPart1:         name ':' slashHelper1 fileNamePart -> ^(ASTFILENAMEFIRST1 name fileNamePart);                        //For instance READ c:\a.b\c.d, cannot be c:a.b\c.d, ok to use name before colon, drive indicator should start with a letter.                            
+fileNameFirstPart2:         slashHelper2 fileNamePart -> ^(ASTFILENAMEFIRST2 fileNamePart);                                      //For instance READ \a.b\c.d, cannot be READ\a.b\c.d                            
+fileNameFirstPart3:         fileNamePart -> ^(ASTFILENAMEFIRST3 fileNamePart);                                                   //For instance READ a.b							
+fileNamePart:               fileNamePartHelper (GLUEDOT DOT fileNamePartHelper)* -> ^(ASTFILENAMEPART fileNamePartHelper+);      //stuff like 'a.7z' or 'a b.doc' or 'זרו.doc' must be in quotes.
 fileNamePartHelper:         name
 						  | identDigit  //cathes stuff like \05banker\bank etc.
 						    ;
-
 slashHelper1:               GLUEBACKSLASH | DIV;
 slashHelper2:               BACKSLASH | DIV;
 

@@ -2475,7 +2475,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA(node[0].Code);
                         }
-                        break;
+                        break;                    
                     case "ASTFILENAME":
                         {
                             //node.Code.CA(node[0].Code;
@@ -2485,7 +2485,7 @@ namespace Gekko.Parser.Gek
                                 if (child.IsFirstChild()) s = child.Code.ToString();
                                 else s += ".Add(" + Globals.smpl + ", new ScalarString(`\\\\`)).Add(" + Globals.smpl + ", " + child.Code + ")";
                             }
-                            node.Code.A(s);
+                            node.Code.A("O.ReplaceSlash(" + s + ")");
                         }
                         break;
                     case "ASTFILENAMEPART":

@@ -2448,6 +2448,31 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DataDateFormatCsvExcel()
+        {
+            I("reset;");
+            I("time 2001 2003;");
+            I("x = 2, 3, 4;");
+            I("export <csv dateformat='yyyy-mm-dd a'> temp;");
+            I("reset;");
+            I("import <csv dateformat='yyyy-mm-dd'> temp;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 4d, sharedDelta);
+
+            I("reset;");            
+            I("option freq q;");
+            I("time 2001q1 2001q3;");
+            I("x = 2, 3, 4;");
+            I("export <csv dateformat='yyyy-mm-dd '> temp;");
+            I("reset;");
+            I("import <csv dateformat='yyyy-mm-dd'> temp;");
+            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 3d, sharedDelta);
+            _AssertSeries(First(), "x!a", 2001, 4d, sharedDelta);
+        }
+
+        [TestMethod]
         public void _Test_PrintSumMultiplier()
         {
             Table table = null;

@@ -29172,9 +29172,16 @@ namespace Gekko
                             if (ts.type == ESeriesType.Normal)
                             {
                                 string name = ts.GetName();
-                                EEndoOrExo endoExo = VariableTypeEndoExo(G.Chop_RemoveFreq(name));                                
-                                if (endoExo == EEndoOrExo.Endo) ee = "(E)";
-                                else if (endoExo == EEndoOrExo.Exo) ee = "(X)";
+                                if (name != null)
+                                {
+                                    string n2 = G.Chop_RemoveFreq(name);
+                                    if (G.IsSimpleToken(n2))
+                                    {
+                                        EEndoOrExo endoExo = VariableTypeEndoExo(n2);
+                                        if (endoExo == EEndoOrExo.Endo) ee = "(E)";
+                                        else if (endoExo == EEndoOrExo.Exo) ee = "(X)";
+                                    }
+                                }
                             }
                         }
 
