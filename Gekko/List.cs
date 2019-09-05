@@ -10,12 +10,8 @@ namespace Gekko
     [ProtoContract]
     public class List : IVariable
     {
-        //Abstract class containing a List
-        //Used for pointing to Lists without having to create/clone them.      
-
-        public bool isNameList = true;  //no protobuf
-        //public bool isFromNakedList = false;  //no protobuf
-
+        public bool isNameList = true; //no protobuf. See #76328234 for similar functionality for ScalarVal
+        
         [ProtoMember(1)]
         public List<IVariable> list = null;  
 

@@ -11,7 +11,9 @@ namespace Gekko
     {
         [ProtoMember(1)]
         public double val;
-        public bool hasRepStar = false;  //to indicate for instance x = 1, 2 rep 2, 3 rep *; ---> 1, 2, 2, 3, where 3 has this flag set.
+
+        public bool hasRepStar = false;  //no protobuf. To indicate for instance x = 1, 2 rep 2, 3 rep *; ---> 1, 2, 2, 3, where 3 has this flag set. See #76328234 for similar functionality
+        public byte numberOfLeadingZeroes = 0; //no protobuf. See #76328234 for similar functionality. See definition in #8952042732435
 
         private ScalarVal()
         {
@@ -20,7 +22,13 @@ namespace Gekko
 
         public ScalarVal(double d)
         {
-            val = d;
+            this.val = d;
+        }
+
+        public ScalarVal(double d, byte b)
+        {
+            this.val = d;
+            this.numberOfLeadingZeroes = b;
         }
 
         public IVariable append(bool isLhs, GekkoSmpl smpl, IVariable x)

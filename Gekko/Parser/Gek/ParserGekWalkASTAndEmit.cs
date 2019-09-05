@@ -3492,16 +3492,36 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTINTEGER":
                         {
-                            //TODO 
-                            //TODO 
-                            //TODO use cache to avoid dublets
-                            //TODO Maybe not: this simplifies user defined functions
-                            //TODO 
                             string minus = HandleNegate(node);
+                            byte b = 0;
+
+                            if (minus == "" && node[0].Text.StartsWith("0"))
+                            {
+                                //#8952042732435
+                                //x[-01] will not become x['-01']
+                                //but x[01] will become x['01'], if x is an array-series. They way this is done is that
+                                //the ScalarVal contains info on trailing zeroes, which can be used later on. This info
+                                //is not stored in databanks or anything, and they will not survive addition, multiplication,
+                                //etc.  
+                                for (byte i = 0; i < node[0].Text.Length; i++)
+                                {
+                                    if (node[0].Text[i] != '0')
+                                    {
+                                        b = i;
+                                    }
+                                    if (i > 250)
+                                    {
+                                        G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
+                                        throw new GekkoException();
+                                    }
+                                }
+                            }
+
                             string intWithNumber = "i" + ++Globals.counter;
-                            string s = "new ScalarVal(" + minus + node[0].Text + "d)";
+                            string s = "new ScalarVal(" + minus + node[0].Text + "d, " + b + ")";
                             GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
                             node.Code.CA(intWithNumber);  //no need for checking if it exists
+
                         }
                         break;
                     case "ASTINTEGERNEGATIVE":

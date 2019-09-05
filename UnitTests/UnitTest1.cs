@@ -8666,6 +8666,24 @@ namespace UnitTests
         {
             Table table = null;
 
+            // ===============================================
+            // ===============================================
+            // Test with UADAM, linking etc.
+            // ===============================================
+            // ===============================================
+
+            I("RESET;");
+            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM';");
+            I("OPTION model type = gams;");
+            I("model <gms> uadam18;");
+            I("read ua1118;");
+            //I("decomp2 <d> ub0099 in ub0099 link x[#a] in e_x;");            
+            I("Ub = series(1);");
+            I("Ub['0014'] = Ub0014;");
+            I("Ub[1570] = Ub1570;");
+            I("Ub[7199] = Ub7199;");            
+            I("decomp2 <d> ub0099 in ub0099;");
 
             // ===============================================
             // ===============================================
@@ -8709,12 +8727,8 @@ namespace UnitTests
                         
             I("option model type = gams;");
             I("model <gms> link;");
-
-            //Globals.showDecompTable = true;
-
             I("decomp2 <d> xtot_a in e_xtot_a;");
             I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot;");
-
             //this one and the superlink above yield the exact same effects.
             I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
 
@@ -8911,7 +8925,7 @@ namespace UnitTests
                 // =========== differences, decomposed =========================                
                 I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c       COLS #a, #o;");   //, i in e_i
                 table = Globals.lastDecompTable;
-
+                               
                 double ydif2011 = -0.44d; double ydif2012 = 1.1d;
                 double ydif2011b = -3.66d; double ydif2012b = 9.1d;
                 double reduce = 2d / 0.44d;

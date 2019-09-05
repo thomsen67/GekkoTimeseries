@@ -12282,14 +12282,15 @@ namespace Gekko
                     ScalarString ss = iv as ScalarString;
                     keys[i] = ss.string2;
                 }
-                else if (iv.Type() == EVariableType.Val)  //will not handle 007 in x[a, 007], must be x[a, '007']
+                else if (iv.Type() == EVariableType.Val)  //will handle 007 in x[a, 007], will become x['a', '007']
                 {
                     //note: see same kind of code just below, //#98073245243875
                     int ii = O.ConvertToInt(iv, false);
                     if (ii != int.MaxValue)
                     {
                         stringCount++;
-                        keys[i] = ii.ToString();
+                        byte b = (iv as ScalarVal).numberOfLeadingZeroes;
+                        HandleLeadingZeroes(keys, i, b, ii);
                     }
                 }
                 else if (iv.Type() == EVariableType.List)
@@ -12314,6 +12315,9 @@ namespace Gekko
                             {
                                 stringCount++;
                                 keys[i] = ii.ToString();
+                                byte b = (singleton as ScalarVal).numberOfLeadingZeroes;
+                                HandleLeadingZeroes(keys, i, b, ii);
+
                             }
                         }
                     }
@@ -12325,6 +12329,28 @@ namespace Gekko
             }
 
             return keys;
+        }
+
+        private static void HandleLeadingZeroes(string[] keys, int i, byte b, int ii)
+        {
+            string z = null;            
+            if (b > 0)
+            {
+                z = new string('0', b);
+            }
+            if (ii < 0)
+            {
+                //This should never happen: Gekko will not parse x[-0007] as a something that can
+                //be parsed into a string --> it will always be interpreted as a lag, because the
+                //first char after '[' is a '-'. So x[-...] or x[+...] are always lags or leads.
+                //This is to avoid x[5] being interpreted as x leaded 5 periods, rather than, say,
+                //five-year olds in the population.
+                keys[i] = "-" + z + (-ii).ToString(); //b = 3, ii = -7 --> "-0007"
+            }
+            else
+            {
+                keys[i] = z + ii.ToString(); //b = 3, ii = 7 --> "0007"
+            }
         }
 
         public static IVariable GetListOfIVariablesFromListOfScalarStrings(IVariable rv)
