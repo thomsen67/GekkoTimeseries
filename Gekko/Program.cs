@@ -177,11 +177,7 @@ namespace Gekko
         public Series this[string s]
         {
             get
-            {
-                if(s.Contains("ollecti"))
-                {
-
-                }
+            {                
                 Series ts = null; storage.TryGetValue(s, out ts);
                 if (ts == null)
                 {
@@ -36863,7 +36859,7 @@ namespace Gekko
             }
         }
 
-        public static List<string> DecompGetVars(DecompData decompData, string varname, string expressionText)
+        public static List<string> DecompGetVars(DecompData decompData, string varname, string expressionText, GekkoDictionary<string, bool>ignore)
         {
             List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys);
             vars.Sort(StringComparer.OrdinalIgnoreCase);
@@ -36873,10 +36869,10 @@ namespace Gekko
                 vars2 = new List<string>(vars);                
             }
             else
-            {               
-                
+            {                   
                 foreach (string var in vars)
                 {
+                    //making sure that the variable we are going to decompose is shown at top
                     string[] ss = var.Split('¤');
                     string varnameWithoutFirstBank = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
                     if (ss[1] == "[0]" && G.Equal(varname, varnameWithoutFirstBank)) vars2.Add(var);
@@ -36888,7 +36884,9 @@ namespace Gekko
                 }
                 foreach (string var in vars)
                 {
+                    //adding the rest of the variables, except the variable we are going to decompose
                     if (G.Equal(vars2[0], var)) continue;
+                    if (ignore.ContainsKey(var)) continue;  //variables that are eliminated via links
                     vars2.Add(var);
                 }
             }            
@@ -36898,6 +36896,7 @@ namespace Gekko
         public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2)
         {
             
+
             Table tab = new Table();
             int iOffset = 0;
             if (format.showErrors) iOffset = 1;
@@ -36936,12 +36935,10 @@ namespace Gekko
                     if (code1 == "n" || code1 == "xn" || code1 == "x")
                     {
                         d = decompTables.cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
-                                                                                 //o.cellsGrad.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                     }
                     else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
                     {
-                        d = decompTables.cellsRef[varname].GetData(smpl, t2);
-                        //o.decompTables.cellsGradRef.TryGetValue(s + "¤" + t2.ToString(), out d);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                        d = decompTables.cellsRef[varname].GetData(smpl, t2);                        
                     }
                     else if (code1 == "d")
                     {
@@ -37049,8 +37046,6 @@ namespace Gekko
                         double dd2 = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
                         double dLhsLag2 = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
-
-
                     }
                     else if (code1 == "xmp")
                     {

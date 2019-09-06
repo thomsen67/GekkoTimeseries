@@ -858,13 +858,20 @@ namespace Gekko
 
         public void DeleteRow(int row)
         {
+            //TODO: kvp.Value.mergeCellAnchorRow and kvp.Value.mergeCellShipRow
+            //      for remaining cells should be corrected too, but for now we
+            //      we skip this since merging over rows is not used at the moment
+            //      anyway.
+
+            DeleteRowHelper(row);
+            this.UpdateTable();  //to get rowinfo etc updated
+        }
+        
+        private void DeleteRowHelper(int row)
+        {
             List<Coord> toRemove = new List<Coord>();
             foreach (KeyValuePair<Coord, Cell> kvp in this._data)
             {
-                //TODO: kvp.Value.mergeCellAnchorRow and kvp.Value.mergeCellShipRow
-                //      for remaining cells should be corrected too, but for now we
-                //      we skip this since merging over rows is not used at the moment
-                //      anyway.
                 if (kvp.Key.Row == row)
                 {
                     toRemove.Add(kvp.Key);
@@ -878,7 +885,6 @@ namespace Gekko
             {
                 this._data.Remove(cell);
             }
-            this.UpdateTable();  //to get rowinfo etc updated
         }
 
         public List<string> PrintText()

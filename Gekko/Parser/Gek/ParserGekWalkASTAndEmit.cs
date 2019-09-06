@@ -3495,26 +3495,48 @@ namespace Gekko.Parser.Gek
                             string minus = HandleNegate(node);
                             byte b = 0;
 
-                            if (minus == "" && node[0].Text.StartsWith("0"))
+                            if (minus == "")
                             {
-                                //#8952042732435
-                                //x[-01] will not become x['-01']
-                                //but x[01] will become x['01'], if x is an array-series. They way this is done is that
-                                //the ScalarVal contains info on trailing zeroes, which can be used later on. This info
-                                //is not stored in databanks or anything, and they will not survive addition, multiplication,
-                                //etc.  
-                                for (byte i = 0; i < node[0].Text.Length; i++)
+                                if (node[0].Text.StartsWith("0"))
                                 {
-                                    if (node[0].Text[i] != '0')
+                                    //#8952042732435
+                                    //x[-01] will not become x['-01']
+                                    //but x[01] will become x['01'], if x is an array-series. They way this is done is that
+                                    //the ScalarVal contains info on trailing zeroes, which can be used later on. This info
+                                    //is not stored in databanks or anything, and they will not survive addition, multiplication,
+                                    //etc.  
+                                    for (byte i = 0; i < node[0].Text.Length; i++)
                                     {
-                                        b = i;
+                                        if (node[0].Text[i] != '0')
+                                        {
+                                            b = i;
+                                            break;
+                                        }
+                                        if (i > 250)
+                                        {
+                                            G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
+                                            throw new GekkoException();
+                                        }
                                     }
-                                    if (i > 250)
+
+                                    if (b == 0)
                                     {
-                                        G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
-                                        throw new GekkoException();
+                                        //for instance '000', has 2 trailing zeroes
+                                        //if b == 0 here, all chars are '0'. So we just subtract 1 from length
+                                        if (node[0].Text.Length > 250)
+                                        {
+                                            G.Writeln2("*** ERROR: Did not expect so many trailing zeroes: " + node[0].Text);
+                                            throw new GekkoException();
+                                        }
+                                        b = (byte)(node[0].Text.Length - 1);
                                     }
+
+
                                 }
+                            }
+                            else
+                            {
+                                //do nothing, if it starts with a minus
                             }
 
                             string intWithNumber = "i" + ++Globals.counter;

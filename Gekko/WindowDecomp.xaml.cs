@@ -1305,22 +1305,27 @@ namespace Gekko
                     lhsClone = decompDatas[parentI][parentJ].cellsContribD[name].DeepClone(null) as Series;
                 }
 
+                GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
                 //linking
                 //linking
                 //linking
+
+                //Takes the link equations, skipping the first one (which is the "normal" equation)
                 for (int i = 1; i < this.decompOptions2.link.Count; i++)
                 {
-
+                    //For each variable name in the link equation
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
                     {
 
                         //adjust the table according to link variable, so it fits with the destination table
                         string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
-                        Series linkParent = decompDatas[parentI][parentJ].cellsContribD[linkVariable];
+                        if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
 
                         int j = FindLinkJ(decompDatas, i, linkVariable);
 
-                        Series linkChild = decompDatas[i][j].cellsContribD[linkVariable];
+                        Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable);                        
+                        Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable);
 
                         List<double> factors = new List<double>();
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
@@ -1375,7 +1380,7 @@ namespace Gekko
                 string lhsName = null;
                 if (varnamesFirstLink != null) lhsName = varnamesFirstLink[0];
 
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText));
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore));
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 
                 this.decompOptions2.decompData = decompDatas[parentI][parentJ];
@@ -1429,6 +1434,17 @@ namespace Gekko
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
                 }
             }
+        }
+
+        private static Series FindLinkSeries(List<List<DecompData>> decompDatas, int i, int j, string linkVariable)
+        {
+            if (!decompDatas[i][j].cellsContribD.ContainsKey(linkVariable))
+            {
+                G.Writeln2("*** ERROR: Could not find link variable '" + linkVariable + "' in link equation #" + i);
+                throw new GekkoException();
+            }
+            Series linkParent = decompDatas[i][j].cellsContribD[linkVariable];
+            return linkParent;
         }
 
         private int FindLinkJ(List<List<DecompData>> decompDatas, int i, string linkVariable)
@@ -1767,13 +1783,8 @@ namespace Gekko
 
         private void MakeGuiTable2(Table table, DecompOptions2 decompOptions)
         {
-
             CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
-
-            //DateTime t0 = DateTime.Now;
             PutTableIntoGrid2(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
-            //MessageBox.Show("Took " + (DateTime.Now - t0).TotalMilliseconds);
-
             CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
             PutTableIntoGrid2(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
             CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
