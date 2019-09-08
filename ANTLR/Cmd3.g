@@ -1087,6 +1087,7 @@ Y2                    = 'Y2'                       ;
     FILEWIDTH        = 'FILEWIDTH'       ;
     FILTER        = 'FILTER'       ;
     FINDMISSINGDATA      = 'FINDMISSINGDATA'     ;
+	PYTHON      = 'PYTHON'     ;
 	DEP = 'DEP';
 	BROWSER      = 'BROWSER'     ;
     FIRST            = 'FIRST';
@@ -1708,6 +1709,7 @@ d.Add("Y" ,Y);
                                         d.Add("filewidth"               , FILEWIDTH  );
                                         d.Add("filter"               , FILTER  );
 										d.Add("findmissingdata"               , FINDMISSINGDATA  );
+										d.Add("python"               , PYTHON  );
 										d.Add("dep"               , DEP  );
                                         d.Add("browser"         , BROWSER);
                                         d.Add("first"    , FIRST  );
@@ -3831,6 +3833,8 @@ optionType:
 			 | PRINT WIDTH '='? Integer -> PRINT WIDTH ^(ASTINTEGER Integer)
 			 | PRINT SPLIT '='? yesNoSimple -> PRINT SPLIT ^(ASTBOOL yesNoSimple)
 
+			 | PYTHON EXE FOLDER '='? fileName -> PYTHON EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
+
 			 | R EXE FOLDER '='? fileName -> R EXE FOLDER ^(ASTSTRINGSIMPLE fileName)
 			 | R EXE PATH '='? fileName -> R EXE PATH ^(ASTSTRINGSIMPLE fileName)  //obsolete, same as above and for legacy
 
@@ -4169,6 +4173,7 @@ ident2: 					Ident |
   EXO|
   EXPORT|
   FINDMISSINGDATA|
+  PYTHON|
   BROWSER|
   FOR|
   FUNCTION|
@@ -4919,6 +4924,7 @@ ident3: 					Ident |
   NOGDIF|
   NOLEV|
   NOMAX|
+  PYTHON|
   NONANNUAL|
   CURRENT|
   NONE|

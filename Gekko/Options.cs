@@ -137,7 +137,9 @@ namespace Gekko
         public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
         
         public string r_exe_folder = "";  //there will probably be more R options later on
-        public string r_exe_path = "";  //old name
+        public string r_exe_path = "";  //old name, delete at some point
+
+        public string python_exe_folder = "";  //there will probably be more Python options later on
 
         //DEAD!!
         public bool series_array_ignoremissing = false;  //returns 0 (or skips) a non-existing array-series
