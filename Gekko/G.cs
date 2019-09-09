@@ -2200,44 +2200,27 @@ namespace Gekko
 
                 try
                 {
-                    RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
-                    string[] version_names = installed_versions.GetSubKeyNames();
-                    //version names start with 'v', eg, 'v3.5' which needs to be trimmed off before conversion
-                    double Framework = Convert.ToDouble(version_names[version_names.Length - 1].Remove(0, 1), CultureInfo.InvariantCulture);
-                    int SP = Convert.ToInt32(installed_versions.OpenSubKey(version_names[version_names.Length - 1]).GetValue("SP", 0));
-                    if (SP > 0) sb.AppendLine(" Microsoft .NET version: " + Framework + ", service pack " + SP);
-                    else sb.AppendLine(" Microsoft .NET version: " + Framework);
-                  
-                }
-                catch { };  //fail silently
+                    if (false)
+                    {
+                        RegistryKey installed_versions = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP");
+                        string[] version_names = installed_versions.GetSubKeyNames();
+                        //version names start with 'v', eg, 'v3.5' which needs to be trimmed off before conversion
+                        double Framework = Convert.ToDouble(version_names[version_names.Length - 1].Remove(0, 1), CultureInfo.InvariantCulture);
+                        int SP = Convert.ToInt32(installed_versions.OpenSubKey(version_names[version_names.Length - 1]).GetValue("SP", 0));
+                        if (SP > 0) sb.AppendLine(" Microsoft .NET version: " + Framework + ", service pack " + SP);
+                        else sb.AppendLine(" Microsoft .NET version: " + Framework);
+                    }
+                    else
+                    {
+                        List<string> ss1 = GetVersionFromRegistry();
+                        List<string> ss2 = Get45PlusFromRegistry();
+                        sb.AppendLine(" Microsoft .NET framework versions installed:");
+                        foreach (string ss in ss1) sb.AppendLine("   " + ss.Trim());
+                        foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
+                    }
 
-                string file = Application.StartupPath + "\\buildInfo.xml";
-                if (File.Exists(file))
-                {
-                    XmlDocument doc = new XmlDocument();
-                    try
-                    {
-                        doc.Load(file);
-                    }
-                    catch (Exception e)
-                    {
-                        //silent about this
-                    }
-                    XmlElement root = doc.DocumentElement;
-                    XmlNodeList nodes = root.SelectNodes("/version"); // You can filter elements here using XPath
-                    foreach (XmlNode node in nodes)
-                    {
-                        string revision = node["revision"].InnerText;
-                        string revisionRange = node["revisionRange"].InnerText;
-                        string revisionTime = node["revisionTime"].InnerText;
-                        string modified = node["modified"].InnerText;
-                        string buildTime = node["buildTime"].InnerText;
-                        string url = node["url"].InnerText;
-                        //sb.AppendLine(" SVN repository " + url);
-                        //sb.AppendLine(" SVN revision #" + revision + " (" + revisionRange + ")" + " at " + revisionTime + " (" + modified + ")");
-                        sb.AppendLine(" Build time of gekko.exe: " + buildTime);
-                    }
                 }
+                catch { };  //fail silently               
                 
 
             }
@@ -2269,6 +2252,120 @@ namespace Gekko
             return sb;
         }
 
+        private static List<string> Get45PlusFromRegistry()
+        {
+            List<string> ss = new List<string>();
+
+            const string subkey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
+
+            using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(subkey))
+            {
+                if (ndpKey != null && ndpKey.GetValue("Release") != null)
+                {
+                    ss.Add($"{CheckFor45PlusVersion((int)ndpKey.GetValue("Release"))}");
+                }
+                else
+                {
+                    ss.Add("4.5 or later is not detected.");
+                }
+            }
+            return ss;
+        }
+
+        private static string CheckFor45PlusVersion(int releaseKey)
+        {
+            if (releaseKey >= 528040)
+                return "4.8 or later";
+            if (releaseKey >= 461808)
+                return "4.7.2";
+            if (releaseKey >= 461308)
+                return "4.7.1";
+            if (releaseKey >= 460798)
+                return "4.7";
+            if (releaseKey >= 394802)
+                return "4.6.2";
+            if (releaseKey >= 394254)
+                return "4.6.1";
+            if (releaseKey >= 393295)
+                return "4.6";
+            if (releaseKey >= 379893)
+                return "4.5.2";
+            if (releaseKey >= 378675)
+                return "4.5.1";
+            if (releaseKey >= 378389)
+                return "4.5";
+            // This code should never execute. A non-null release key should mean
+            // that 4.5 or later is installed.
+            return "No 4.5 or later version detected";
+        }
+
+        private static List<string> GetVersionFromRegistry()
+        {
+            List<string> ss = new List<string>();
+            // Opens the registry key for the .NET Framework entry.
+            using (RegistryKey ndpKey =
+                    RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).
+                    OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\"))
+            {
+                foreach (var versionKeyName in ndpKey.GetSubKeyNames())
+                {
+                    // Skip .NET Framework 4.5 version information.
+                    if (versionKeyName == "v4")
+                    {
+                        continue;
+                    }
+
+                    if (versionKeyName.StartsWith("v"))
+                    {
+
+                        RegistryKey versionKey = ndpKey.OpenSubKey(versionKeyName);
+                        // Get the .NET Framework version value.
+                        var name = (string)versionKey.GetValue("Version", "");
+                        // Get the service pack (SP) number.
+                        var sp = versionKey.GetValue("SP", "").ToString();
+
+                        // Get the installation flag, or an empty string if there is none.
+                        var install = versionKey.GetValue("Install", "").ToString();
+                        if (string.IsNullOrEmpty(install)) // No install info; it must be in a child subkey.
+                            ss.Add($"{versionKeyName}  {name}");
+                        else
+                        {
+                            if (!(string.IsNullOrEmpty(sp)) && install == "1")
+                            {
+                                ss.Add($"{versionKeyName}  {name}  SP{sp}");
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            continue;
+                        }
+                        foreach (var subKeyName in versionKey.GetSubKeyNames())
+                        {
+                            RegistryKey subKey = versionKey.OpenSubKey(subKeyName);
+                            name = (string)subKey.GetValue("Version", "");
+                            if (!string.IsNullOrEmpty(name))
+                                sp = subKey.GetValue("SP", "").ToString();
+
+                            install = subKey.GetValue("Install", "").ToString();
+                            if (string.IsNullOrEmpty(install)) //No install info; it must be later.
+                                ss.Add($"{versionKeyName}  {name}");
+                            else
+                            {
+                                if (!(string.IsNullOrEmpty(sp)) && install == "1")
+                                {
+                                    ss.Add($"{subKeyName}  {name}  SP{sp}");
+                                }
+                                else if (install == "1")
+                                {
+                                    ss.Add($"  {subKeyName}  {name}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return ss;
+        }
 
         public static String oddX0000Hack(String val)
         {            
