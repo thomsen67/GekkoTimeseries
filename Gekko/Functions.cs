@@ -2686,6 +2686,122 @@ namespace Gekko
             }
         }
 
+        public static IVariable isUpper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                bool b = Helper_IsUpper(s1);
+                if (b) return new ScalarVal(1d);
+                else return new ScalarVal(0d);
+            }   
+            else
+            {
+                FunctionError("isUpper", ths);  //throws exception
+                return null;
+            }
+        }
+
+        public static IVariable isLower(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);                
+                bool b = Helper_IsLower(s1);
+                if (b) return new ScalarVal(1d);
+                else return new ScalarVal(0d);
+            }
+            else
+            {
+                FunctionError("isLower", ths);  //throws exception
+                return null;
+            }
+        }
+
+        public static IVariable isAlpha(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                bool b = Helper_IsLetter(s1);
+                if (b) return new ScalarVal(1d);
+                else return new ScalarVal(0d);
+            }
+            else
+            {
+                FunctionError("isAlpha", ths);  //throws exception
+                return null;
+            }
+        }
+
+        public static IVariable isNumeric(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() == EVariableType.String)
+            {
+                string s1 = O.ConvertToString(ths);
+                bool b = Helper_IsDigit(s1);
+                if (b) return new ScalarVal(1d);
+                else return new ScalarVal(0d);
+            }
+            else
+            {
+                FunctionError("isNumeric", ths);  //throws exception
+                return null;
+            }
+        }        
+
+        public static bool Helper_IsUpper(string value)
+        {
+            // Consider string to be uppercase if it has no lowercase letters.
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (char.IsLower(value[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool Helper_IsLower(string value)
+        {
+            // Consider string to be lowercase if it has no uppercase letters.
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (char.IsUpper(value[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool Helper_IsLetter(string value)
+        {
+            // Consider string to be lowercase if it has no uppercase letters.
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!char.IsLetter(value[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool Helper_IsDigit(string value)
+        {
+            // Consider string to be lowercase if it has no uppercase letters.
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (!char.IsDigit(value[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static IVariable lower(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             //does not exist in AREMOS
