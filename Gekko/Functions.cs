@@ -3259,6 +3259,36 @@ namespace Gekko
             return new ScalarString(Program.GetDateStamp());
         }
 
+        public static IVariable currentyear(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Year);
+        }
+
+        public static IVariable currentmonth(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Month);
+        }
+
+        public static IVariable currentday(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Day);
+        }
+
+        public static IVariable currenthour(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Hour);
+        }
+
+        public static IVariable currentminute(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Minute);
+        }
+
+        public static IVariable currentsecond(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarVal((double)DateTime.Now.Second);
+        }
+
         public static IVariable filteredperiods(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             GekkoTime t1 = GekkoTime.tNull;
