@@ -2686,7 +2686,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable isUpper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        public static IVariable isupper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() == EVariableType.String)
             {
@@ -2702,7 +2702,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable isLower(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        public static IVariable islower(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() == EVariableType.String)
             {
@@ -2718,7 +2718,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable isAlpha(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        public static IVariable isalpha(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() == EVariableType.String)
             {
@@ -2734,7 +2734,7 @@ namespace Gekko
             }
         }
 
-        public static IVariable isNumeric(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        public static IVariable isnumeric(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() == EVariableType.String)
             {

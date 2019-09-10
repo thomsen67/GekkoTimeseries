@@ -24377,6 +24377,7 @@ namespace Gekko
                 eo.excelData = new double[numberOfRows, numberOfCols];
                 eo.excelRowLabels = new string[numberOfRows, 1];
                 eo.excelColumnLabels = new string[1, numberOfCols];
+                eo.excelColumnLabelsGekkoTime = new GekkoTime[1, numberOfCols];
                 eo.transpose = "no"; if (isCols) eo.transpose = "yes"; //kind of a workaround
 
                 for (int i = 0; i < list.Count; i++)
@@ -24398,6 +24399,7 @@ namespace Gekko
                     foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
                     {
                         eo.excelColumnLabels[0, periodCounter] = gt.ToString();
+                        eo.excelColumnLabelsGekkoTime[0, periodCounter] = gt;
                         double var1 = ts.GetDataSimple(gt);
                         if (G.isNumericalError(var1)) var1 = 9.99999e+99;
                         eo.excelData[i, periodCounter] = var1;
@@ -30297,6 +30299,7 @@ namespace Gekko
                 ExcelOptions eo = new ExcelOptions();
                 eo.excelRowLabels = new string[tab2.GetRowMaxNumber() - startRows, 1];
                 eo.excelColumnLabels = new string[1, tab2.GetColMaxNumber() - startCols];
+                eo.excelColumnLabelsGekkoTime = new GekkoTime[1, tab2.GetColMaxNumber() - startCols];
                 eo.excelData = G.CreateArrayDouble(tab2.GetRowMaxNumber() - startRows, tab2.GetColMaxNumber() - startCols, double.NaN);
 
                 for (int i = 1; i <= tab2.GetRowMaxNumber(); i++)
@@ -30326,6 +30329,7 @@ namespace Gekko
                                 string s = cell2.CellText.TextData[0];
                                 if (s == null) s = "";
                                 eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
+                                eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = G.FromStringToDate(s);  //a hack, the cell ought to be date format
                             }
                             else
                             {
@@ -39221,6 +39225,8 @@ namespace Gekko
             //7. append+     filename+     sheet-            append to filename, 'Sheet1' (first sheet)         ...use existing file
             //8. append+     filename+     sheet+            append to filename, sheetname                      ...use existing file
 
+            bool useExcelDates = true;
+
             try
             {
 
@@ -39937,7 +39943,7 @@ namespace Gekko
                     {
                         string[,] data3 = null;
                         if (isTranspose)
-                        {
+                        {                         
                             data3 = Transpose(eo.excelColumnLabels);
                             if (!eo.isClip) range.set_Value(Missing.Value, data3);
                         }
@@ -42924,6 +42930,7 @@ namespace Gekko
         public bool isClip = false;
         public string[,] excelRowLabels = null;
         public string[,] excelColumnLabels = null;
+        public GekkoTime[,] excelColumnLabelsGekkoTime = null;
         public double[,] excelData = null;
     }
 
