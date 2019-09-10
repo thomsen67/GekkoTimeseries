@@ -8641,63 +8641,106 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ExcelAndCsvDateFormats()
         {
-            
+
+            int counter = 0;
             for (int i = 0; i < 2; i++)  //cols or not
             {
                 for (int f = 0; f < 4; f++)  //freq
                 {
-
-                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
-                    I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
-
-                    string cols = null;
-                    string freq = "a";
-                    string time = "2010 2012";
-
-                    if (i == 1) cols = "cols ";
-
-                    if (f == 1) { freq = "q"; time = "2010q1 2010q3"; }
-                    else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
-                    else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
-
-                    I("reset;");
-                    I("option freq " + freq + ";");
-                    I("time " + time + ";");                    
-                    I("x = 2, 1, -1;");
-                    I("sheet <" + cols + "> x file = temp.xlsx;"); //expressions can not be read afterwards
-                    I("reset;");
-                    I("option freq " + freq + ";");
-                    I("time " + time + ";");
-                    I("import <xlsx " + cols + " all> temp.xlsx;");  //without <all>, the data is truncated, which is not supported for U freq
-                    if (freq == "a")
+                    for (int k = 0; k < 2; k++) //use SHEET or EXPORT<xlsx>
                     {
-                        _AssertSeries(First(), "x!a", 2010, 2d, sharedDelta);
-                        _AssertSeries(First(), "x!a", 2011, 1d, sharedDelta);
-                        _AssertSeries(First(), "x!a", 2012, -1d, sharedDelta);
-                    }
-                    else if (freq == "q")
-                    {
-                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 1, 2d, sharedDelta);
-                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 2, 1d, sharedDelta);
-                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 3, -1d, sharedDelta);
+                        for (int t = 0; t < 2; t++) //type, xlsx or csv
+                        {
+                            for (int datetype = 0; datetype < 2; datetype++) //text or excel
+                            {
+                                for (int dateformat = 0; dateformat < 2; dateformat++) //gekko or yyyy-mm-dd
+                                {
+                                    for (int dateday = 0; dateday < 2; dateday++) //first or last
+                                    {
 
-                    }
-                    else if (freq == "m")
-                    {
-                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 1, 2d, sharedDelta);
-                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 2, 1d, sharedDelta);
-                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 3, -1d, sharedDelta);
+                                        if (k == 0 && t == 1)
+                                        {
+                                            continue;  //we cannot do SHEET and afterwards IMPORT<csv>
+                                        }
 
-                    }
-                    else if (freq == "u")
-                    {
-                        _AssertSeries(First(), "x!u", EFreq.U, 1, 1, 2d, sharedDelta);
-                        _AssertSeries(First(), "x!u", EFreq.U, 2, 1, 1d, sharedDelta);
-                        _AssertSeries(First(), "x!u", EFreq.U, 3, 1, -1d, sharedDelta);
-                    }
+                                        string s_datetype = "text";
+                                        if (datetype == 1) s_datetype = "excel";
 
+                                        string s_dateformat = "gekko";
+                                        if (dateformat == 1) s_dateformat = "yyyy-mm-dd";                                        
+                                        if (dateday == 0) s_dateformat += " first";
+                                        else if (dateday == 1) s_dateformat += " last";
+
+                                        s_datetype = "'" + s_datetype + "'";
+                                        s_dateformat = "'" + s_dateformat + "'";
+
+                                        //note: 'gekko first' or 'gekko last' will have no effect
+
+                                        counter++;
+
+                                        Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                                        I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+
+                                        string cols = null;
+                                        string freq = "a";
+                                        string time = "2010 2012";
+
+                                        string tpe = "xlsx";
+                                        if (t == 1) tpe = "csv";
+
+                                        if (i == 1) cols = "cols ";
+
+                                        if (f == 1) { freq = "q"; time = "2010q1 2010q3"; }
+                                        else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
+                                        else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
+
+                                        I("reset;");
+                                        I("option freq " + freq + ";");
+                                        I("time " + time + ";");
+                                        I("x = 2, 1, -1;");
+
+                                        if (k == 0) I("sheet <" + cols + " dateformat=" + s_dateformat + " datetype=" + s_datetype + "> x file = temp.xlsx;"); //expressions can not be read afterwards
+                                        else I("export <" + tpe + " " + cols + " dateformat=" + s_dateformat + " datetype=" + s_datetype + "> x file = temp;"); //expressions can not be read afterwards
+
+                                        I("reset;");
+                                        I("option freq " + freq + ";");
+                                        I("time " + time + ";");
+                                        I("import <" + tpe + " " + cols + " all> temp;");  //without <all>, the data is truncated, which is not supported for U freq
+                                        if (freq == "a")
+                                        {
+                                            _AssertSeries(First(), "x!a", 2010, 2d, sharedDelta);
+                                            _AssertSeries(First(), "x!a", 2011, 1d, sharedDelta);
+                                            _AssertSeries(First(), "x!a", 2012, -1d, sharedDelta);
+                                        }
+                                        else if (freq == "q")
+                                        {
+                                            _AssertSeries(First(), "x!q", EFreq.Q, 2010, 1, 2d, sharedDelta);
+                                            _AssertSeries(First(), "x!q", EFreq.Q, 2010, 2, 1d, sharedDelta);
+                                            _AssertSeries(First(), "x!q", EFreq.Q, 2010, 3, -1d, sharedDelta);
+
+                                        }
+                                        else if (freq == "m")
+                                        {
+                                            _AssertSeries(First(), "x!m", EFreq.M, 2010, 1, 2d, sharedDelta);
+                                            _AssertSeries(First(), "x!m", EFreq.M, 2010, 2, 1d, sharedDelta);
+                                            _AssertSeries(First(), "x!m", EFreq.M, 2010, 3, -1d, sharedDelta);
+
+                                        }
+                                        else if (freq == "u")
+                                        {
+                                            _AssertSeries(First(), "x!u", EFreq.U, 1, 1, 2d, sharedDelta);
+                                            _AssertSeries(First(), "x!u", EFreq.U, 2, 1, 1d, sharedDelta);
+                                            _AssertSeries(First(), "x!u", EFreq.U, 3, 1, -1d, sharedDelta);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+
+            Assert.AreEqual(counter, 8 * 24);  //counting them so we are sure all are done!
         }
 
         [TestMethod]
