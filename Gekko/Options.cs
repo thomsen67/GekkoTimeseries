@@ -79,6 +79,7 @@ namespace Gekko
         //public string interface_alias_file = "";
         public string interface_clipboard_decimalseparator = "period";
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
+        public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
         public bool interface_databank_swap = false; //a bit dangerous...
         public string interface_debug = "dialog";  //or "none"        
         public string interface_excel_language = "danish";

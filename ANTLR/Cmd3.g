@@ -1012,6 +1012,7 @@ Y2                    = 'Y2'                       ;
 	GCM = 'GCM';
     COLORS           = 'COLORS'          ;
     COLS             = 'COLS';
+	DELIMITER = 'DELIMITER';
 	DATEFORMAT = 'DATEFORMAT';
 	DATETYPE = 'DATETYPE';
     COMMA            = 'COMMA';
@@ -1640,6 +1641,7 @@ d.Add("Y" ,Y);
 										d.Add("dateformat"  , DATEFORMAT );
 										d.Add("datetype"  , DATETYPE );
                                         d.Add("cols"  , COLS );
+										d.Add("delimiter"  , DELIMITER );
                                         d.Add("comma"   , COMMA               );
                                         d.Add("command"     , COMMAND       );
                                         d.Add("command1"     , COMMAND1       );
@@ -3783,6 +3785,7 @@ optionType:
 			 | INTERFACE ALIAS '='? yesNoSimple -> INTERFACE ALIAS ^(ASTBOOL yesNoSimple)			 
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
+			 | INTERFACE CSV DELIMITER '='? name -> INTERFACE CSV DELIMITER ^(ASTSTRINGSIMPLE name)
 			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			
 			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
              | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
@@ -4312,6 +4315,7 @@ ident2: 					Ident |
   COLNAMES|
   COLORS|
   COLS|
+  DELIMITER|
   DATEFORMAT|
   DATETYPE|
   COMMAND1|
@@ -4759,6 +4763,7 @@ ident3: 					Ident |
   COLNAMES|
   COLORS|
   COLS|
+  DELIMITER|
   DATEFORMAT|
   DATETYPE|
   COMMAND1|

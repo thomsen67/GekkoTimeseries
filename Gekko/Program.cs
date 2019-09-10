@@ -25552,7 +25552,10 @@ namespace Gekko
                             }
                             else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
                             {
-                                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
+                                //s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0,0000000000E+00}", data);
+                                NumberFormatInfo nfi = new NumberFormatInfo();
+                                nfi.NumberDecimalSeparator = ",";                                
+                                s = string.Format(nfi, "{0:0.0000000000E+00}", data);
                             }
                             else
                             {
@@ -25600,6 +25603,14 @@ namespace Gekko
                 tab = tab.Transpose();
             }
 
+            string csvDelimiter = ";";
+            if (G.Equal(Program.options.interface_csv_delimiter, "comma")) csvDelimiter = ",";
+
+            if (G.Equal(Program.options.interface_csv_delimiter, "comma") && G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+            {
+                G.Writeln2("+++ WARNING: Using comma both as decimal separator and field delimiter is not advised");
+            }
+
             using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
             using (StreamWriter file = G.GekkoStreamWriter(fs))
             {
@@ -25612,7 +25623,7 @@ namespace Gekko
                         if (c.type == ECellLightType.None) continue;  //skip
                         if (format == EdataFormat.Csv)
                         {
-                            if (jj > 1) file.Write(";");
+                            if (jj > 1) file.Write(csvDelimiter);
                             file.Write(c.text);
                         }
                         else
