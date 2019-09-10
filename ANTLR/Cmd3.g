@@ -48,6 +48,8 @@ tokens {
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
+	ASTOPT_STRING_DATEFORMAT;
+	ASTOPT_STRING_DATETYPE;
 	ASTL0;
 	ASTFILENAMESTRING;
 	ASTBLOCKOPTION;
@@ -1010,6 +1012,8 @@ Y2                    = 'Y2'                       ;
 	GCM = 'GCM';
     COLORS           = 'COLORS'          ;
     COLS             = 'COLS';
+	DATEFORMAT = 'DATEFORMAT';
+	DATETYPE = 'DATETYPE';
     COMMA            = 'COMMA';
     COMMAND              = 'COMMAND'             ;
     COMMAND1             = 'COMMAND1'            ;
@@ -1633,6 +1637,8 @@ d.Add("Y" ,Y);
 										d.Add("gcm"  , GCM );
                                         d.Add("collapse"  , COLLAPSE );										
                                         d.Add("colors"  , COLORS );
+										d.Add("dateformat"  , DATEFORMAT );
+										d.Add("datetype"  , DATETYPE );
                                         d.Add("cols"  , COLS );
                                         d.Add("comma"   , COMMA               );
                                         d.Add("command"     , COMMAND       );
@@ -3271,6 +3277,9 @@ prtOpt1Helper:              filter
 						  | REF EQUAL name -> ^(ASTOPT_STRING_REF name)
 						  | MISSING EQUAL name -> ^(ASTOPT_STRING_MISSING name)
 						  | SPLIT (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLIT yesNo?)
+						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
+						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
+
 						    ;
 linetypeHelper:             LINESPOINTS -> ASTLINESPOINTS
 						  | LINES -> ASTLINES
@@ -3661,6 +3670,8 @@ writeOpt1h:                 TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)  /
 						  | COLS (EQUAL yesNo)? -> ^(ASTOPT_STRING_COLS yesNo?)	
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
+						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						  ;						  
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4301,6 +4312,8 @@ ident2: 					Ident |
   COLNAMES|
   COLORS|
   COLS|
+  DATEFORMAT|
+  DATETYPE|
   COMMAND1|
   COMMAND2|
   COMMAND|
@@ -4746,6 +4759,8 @@ ident3: 					Ident |
   COLNAMES|
   COLORS|
   COLS|
+  DATEFORMAT|
+  DATETYPE|
   COMMAND1|
   COMMAND2|
   COMMAND|

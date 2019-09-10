@@ -9688,6 +9688,9 @@ namespace Gekko
             public string opt_split = "no";       //split "PRT x, y;" into "PRT x, PRT y;"
             public string opt_missing = null;
 
+            public string opt_dateformat = null;
+            public string opt_datetype = null;
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);                
@@ -10712,6 +10715,9 @@ namespace Gekko
             public string opt_op = null;
             public string opt_all = null;            
             public string type = null; //write or export
+            public string opt_dateformat = null;
+            public string opt_datetype = null;
+
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

@@ -1907,6 +1907,60 @@ namespace Gekko
             return t;
         }
 
+        public static DateTime DateHelper2(double data)
+        {
+            return DateTime.FromOADate(data);
+        }
+
+        public static void DateHelper1(GekkoTime gt, bool first, string format, out DateTime dt, out string f)
+        {
+            dt = new DateTime();
+            f = null;
+
+            int y = gt.super;
+            int m = -12345;
+            int d = -12345;
+
+            if (gt.freq == EFreq.A)
+            {
+                if (format == null) f = "yyyy";
+                if (first) { m = 1; d = 1; }
+                else { m = 12; d = 31; }                
+            }
+            else if (gt.freq == EFreq.Q)
+            {
+                if (format == null) f = "yyyy-mm";
+                if (gt.sub == 1)
+                {
+                    if (first) { m = 1; d = 1; }
+                    else { m = 3; d = DateTime.DaysInMonth(y, m); }
+                }
+                else if (gt.sub == 2)
+                {
+                    if (first) { m = 4; d = 1; }
+                    else { m = 6; d = DateTime.DaysInMonth(y, m); }
+                }
+                else if (gt.sub == 3)
+                {
+                    if (first) { m = 7; d = 1; }
+                    else { m = 9; d = DateTime.DaysInMonth(y, m); }
+                }
+                else
+                {
+                    if (first) { m = 10; d = 1; }
+                    else { m = 12; d = DateTime.DaysInMonth(y, m); }
+                }
+            }
+            else if (gt.freq == EFreq.M)
+            {
+                if (format == null) f = "yyyy"; f = "yyyy-mm";
+                m = gt.sub;
+                if (first) d = 1;
+                else d = DateTime.DaysInMonth(y, m);
+            }
+            dt = new DateTime(y, m, d);
+        }
+
         public static int GekkoMin(int i1, int i2) {
             //if both are missing, a missing is returned
             if (i1 == -12345) return i2;

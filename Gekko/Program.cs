@@ -15756,7 +15756,7 @@ namespace Gekko
 
             if (o.opt_xls == null && o.opt_xlsx == null)
             {
-                G.Writeln2("*** ERROR: IMPORT<collapse=...> should be used with <xls> or <xlsx>");
+                G.Writeln2("*** ERROR: IMPORT<collapse=...> should be used with xls- or xlsx-files");
                 throw new GekkoException();
             }
 
@@ -15842,7 +15842,7 @@ namespace Gekko
                     DateTime temp = DateTime.MinValue;
                     try
                     {
-                        temp = DateTime.FromOADate(c.data);
+                        temp = G.DateHelper2(c.data);
                     }
                     catch
                     {
@@ -15977,6 +15977,8 @@ namespace Gekko
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
             G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
+
+        
 
         public static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, CellLight cell)
         {
@@ -24195,7 +24197,7 @@ namespace Gekko
                 {
                     //2D format
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), variablesType);
+                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, variablesType);
                     return 0;
                 }
                 else if (o.opt_gcm != null)
@@ -24360,7 +24362,7 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, EVariablesForWrite variablesType)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, EVariablesForWrite variablesType)
         {
             ExcelOptions eo = new ExcelOptions();
 
@@ -24440,7 +24442,7 @@ namespace Gekko
 
             eo.fileName = fileName;
 
-            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries);
+            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat);
         }
 
         public static void ArrayTimeseriesTip(string name)
@@ -30340,7 +30342,7 @@ namespace Gekko
                     }
                 }
 
-                CreateExcelWorkbook2(eo, o, IsMulprt(o), false);
+                CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat);
                 return;
             }
             else if (type == EPrintTypes.Clip)
@@ -39190,17 +39192,12 @@ namespace Gekko
             //G.Writeln("full excel " + G.Seconds(t00));
             return matrix;
         }
-
-        //public static ExcelDataForCplot CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt)
-        //{
-        //    return CreateExcelWorkbookPIA(eo, oPrt, isMulprt);
-        //}
-
-        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix)
+                
+        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat)
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix);
+                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix, dateformat);
             }
             else
             {
@@ -39213,7 +39210,7 @@ namespace Gekko
             }
         }
 
-        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix)
+        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat)
         {
 
             //1. append-     filename-     sheet-            show fakefilename sheet='Data'
@@ -39225,7 +39222,27 @@ namespace Gekko
             //7. append+     filename+     sheet-            append to filename, 'Sheet1' (first sheet)         ...use existing file
             //8. append+     filename+     sheet+            append to filename, sheetname                      ...use existing file
 
-            bool useExcelDates = true;
+            bool useExcelDates = false;  //default
+            bool isFirst = true;  //default
+            string format = null;
+             
+            //if(!G.NullOrEmpty()
+
+            //if (ss5.Length == 2 && G.Equal(ss5[1], "first"))
+            //{
+            //    isFirst = true;
+            //}
+            //else if (ss5.Length == 2 && G.Equal(ss5[1], "last"))
+            //{
+            //    isFirst = false;
+            //}
+            //else
+            //{
+            //    G.Writeln2("*** ERROR: Expected 'first' or 'last' in dateformat");
+            //    throw new GekkoException();
+            //}
+            //string format = ss5[0];
+            //if (G.Equal(ss5[0], "excel")) useExcelDates = true;
 
             try
             {
@@ -39455,59 +39472,99 @@ namespace Gekko
                     }
 
                     //DATES ROW ---------------------------------------------------------------------
-
+                    
                     if (isDates)
                     {
 
                         object[,] data2 = null;
-                        object[][] data22 = null;
+                        object[][] datesData = null;
 
-                        if (options.freq == EFreq.A)
+                        if (useExcelDates)
                         {
-                            //else the cells are left-justified and with a green triangle (warning)
-                            int[,] datatmp = null;
+                            //cf. DateTime.FromOADate(excelvalue);
+
+                            
+
+
                             if (isTranspose)
                             {
-                                datatmp = Transpose(excelColumnLabelsAnnual);
+
+                                for (int i = d2; i <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
+                                {
+                                    for (int j = d1 - 1; j <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
+                                    {
+                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d1 - 1), i - d2];
+                                        DateTime dt; string f; G.DateHelper1(gt, isFirst, format, out dt, out f);
+                                        ws.SetValue(i, j, dt);
+                                        ws.Cells[i, j].Style.Numberformat.Format = f;
+                                    }
+                                }
                             }
                             else
                             {
-                                datatmp = excelColumnLabelsAnnual;
+                                for (int i = d1 - 1; i <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; i++)
+                                {
+                                    for (int j = d2; j <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; j++)
+                                    {
+                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d2 - 1), j - d2];
+                                        DateTime dt; string f; G.DateHelper1(gt, isFirst, format, out dt, out f);                                        
+                                        ws.SetValue(i, j, dt);
+                                        ws.Cells[i, j].Style.Numberformat.Format = f;
+                                    }
+                                }
                             }
-                            data22 = ToJaggedArray(datatmp);
                         }
                         else
                         {
-                            string[,] data3 = null;
-                            if (isTranspose)
+                            if (options.freq == EFreq.A)
                             {
-                                data3 = Transpose(eo.excelColumnLabels);
+                                //else the cells are left-justified and with a green triangle (warning)
+                                int[,] datesData2 = null;
+                                if (isTranspose)
+                                {
+                                    datesData2 = Transpose(excelColumnLabelsAnnual);
+                                }
+                                else
+                                {
+                                    datesData2 = excelColumnLabelsAnnual;
+                                }
+                                datesData = ToJaggedArray(datesData2);
                             }
                             else
                             {
-                                data3 = eo.excelColumnLabels;
+                                object[,] data3 = null;
+                                if (isTranspose)
+                                {                                    
+                                    data3 = Transpose(eo.excelColumnLabels);
+                                }
+                                else
+                                {                                    
+                                    data3 = eo.excelColumnLabels;                                    
+                                }
+                                datesData = ToJaggedArray(data3);
                             }
-                            data22 = ToJaggedArray(data3);
-                        }
 
-                        if (isTranspose)
-                        {
-                            ws.Cells[d1, d2 - 1, d1 + data22.Length - 1, d2 - 1 + data22[0].Length - 1].LoadFromArrays(data22);
-                        }
-                        else
-                        {
-                            ws.Cells[d1 - 1, d2, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1].LoadFromArrays(data22);
-                            if (isColors)
+                            if (isTranspose)
                             {
-                                int minus = 0;
-                                if (isNames) minus = 1;
-                                ExcelRange range = ws.Cells[d1 - 1, d2 - minus, d1 - 1 + data22.Length - 1, d2 + data22[0].Length - 1];
-                                range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
-                                range.Style.Fill.BackgroundColor.SetColor(Globals.LightBlueWord);
-                                range.Style.Font.Color.SetColor(Color.White);
+                                ws.Cells[d1, d2 - 1, d1 + datesData.Length - 1, d2 - 1 + datesData[0].Length - 1].LoadFromArrays(datesData);
+                            }
+                            else
+                            {
+                                ws.Cells[d1 - 1, d2, d1 - 1 + datesData.Length - 1, d2 + datesData[0].Length - 1].LoadFromArrays(datesData);
+                                                                
                             }
                         }
 
+                        if (!isTranspose && isColors)
+                        {
+                            int minus = 0;
+                            if (isNames) minus = 1;
+                            ExcelRange range = ws.Cells[d1 - 1, d2 - minus, d1 - 1 + eo.excelColumnLabels.GetLength(0) - 1, d2 + eo.excelColumnLabels.GetLength(1) - 1];
+                            range.Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                            range.Style.Fill.BackgroundColor.SetColor(Globals.LightBlueWord);
+                            range.Style.Font.Color.SetColor(Color.White);
+                        }
+                        
                         clipData.dates = (string[,])data2;
                     }
 
@@ -39596,6 +39653,8 @@ namespace Gekko
 
             return null;
         }
+
+        
 
         public static object[][] ToJaggedArray<T>(T[,] twoDimensionalArray)
         {
@@ -40280,6 +40339,19 @@ namespace Gekko
             return y;
         }
 
+        public static GekkoTime[,] Transpose(GekkoTime[,] x)
+        {
+            GekkoTime[,] y = new GekkoTime[x.GetLength(1), x.GetLength(0)];
+            for (int i = 0; i < x.GetLength(0); i++)
+            {
+                for (int j = 0; j < x.GetLength(1); j++)
+                {
+                    y[j, i] = x[i, j];
+                }
+            }
+            return y;
+        }
+
         public static void Rungenr(int i)
         {
             if (i == 1)
@@ -40504,6 +40576,37 @@ namespace Gekko
             }
             return y;
         }
+
+        public static DateTime[,] Transpose(DateTime[,] x)
+        {
+            DateTime[,] y = new DateTime[x.GetLength(1), x.GetLength(0)];
+            for (int i = 0; i < x.GetLength(0); i++)
+            {
+                for (int j = 0; j < x.GetLength(1); j++)
+                {
+                    y[j, i] = x[i, j];
+                }
+            }
+            return y;
+        }
+
+        public static DateTime[,] Transform(GekkoTime[,] x)
+        {
+            DateTime[,] y = new DateTime[x.GetLength(0), x.GetLength(1)];
+            for (int i = 0; i < x.GetLength(0); i++)
+            {
+                for (int j = 0; j < x.GetLength(1); j++)
+                {
+                    //y[j, i] = x[i, j];
+                    y[i, j] = DateTime.Now;
+                }
+            }
+            return y;
+        }
+
+
+
+
 
         public static string GetExcelVersion2(eOfficeVersion input)
         {
