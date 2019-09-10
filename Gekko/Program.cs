@@ -1431,6 +1431,7 @@ namespace Gekko
             //does not handle ';' inside a quoted string
 
             char delimiter = ';';
+            if (G.Equal(Program.options.interface_csv_delimiter, "comma")) delimiter = ',';
                         
             string freqHere = G.GetFreq(Program.options.freq);
 

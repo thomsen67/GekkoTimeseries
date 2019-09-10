@@ -3472,8 +3472,7 @@ run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, input
 						  // The rule stipulates that import must be before other settings, and there must be file=, and there must be an option field.
 						  // We also have a SHEET without import, see the prt rule
 sheetImport               : SHEET sheetImportOpt1 seqOfBankvarnames FILE '=' fileName -> ^({token("ASTSHEETIMPORT", ASTSHEETIMPORT, input.LT(1).Line)} ^(ASTPLACEHOLDER sheetImportOpt1) ^(ASTHANDLEFILENAME fileName?) seqOfBankvarnames);
-sheetImportOpt1           : ISNOTQUAL
-						  | leftAngle2          IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
+sheetImportOpt1           : leftAngle2          IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER  sheetImportOpt1h*  //error here if the placeholder is not here
 						  | leftAngleNo2 dates? IMPORT sheetImportOpt1h* RIGHTANGLE -> ASTPLACEHOLDER ^(ASTDATES dates?) sheetImportOpt1h*
 						  ;
 

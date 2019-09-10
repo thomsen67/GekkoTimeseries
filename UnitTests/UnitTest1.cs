@@ -2447,30 +2447,7 @@ namespace UnitTests
 
         }
 
-        [TestMethod]
-        public void _Test_DataDateFormatCsvExcel()
-        {
-            I("reset;");
-            I("time 2001 2003;");
-            I("x = 2, 3, 4;");
-            I("export <csv dateformat='yyyy-mm-dd a'> temp;");
-            I("reset;");
-            I("import <csv dateformat='yyyy-mm-dd'> temp;");
-            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 3d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 4d, sharedDelta);
-
-            I("reset;");            
-            I("option freq q;");
-            I("time 2001q1 2001q3;");
-            I("x = 2, 3, 4;");
-            I("export <csv dateformat='yyyy-mm-dd '> temp;");
-            I("reset;");
-            I("import <csv dateformat='yyyy-mm-dd'> temp;");
-            _AssertSeries(First(), "x!a", 2001, 2d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 3d, sharedDelta);
-            _AssertSeries(First(), "x!a", 2001, 4d, sharedDelta);
-        }
+        
 
         [TestMethod]
         public void _Test_PrintSumMultiplier()
@@ -8664,27 +8641,61 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ExcelAndCsvDateFormats()
         {
+            
             for (int i = 0; i < 2; i++)  //cols or not
             {
-                for (int f = 0; f < 2; f++)  //freq
+                for (int f = 0; f < 4; f++)  //freq
                 {
+
+                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
 
                     string cols = null;
                     string freq = "a";
                     string time = "2010 2012";
+
                     if (i == 1) cols = "cols ";
+
                     if (f == 1) { freq = "q"; time = "2010q1 2010q3"; }
                     else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
+                    else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
 
-                    I("reset; time " + time + ";");
+                    I("reset;");
                     I("option freq " + freq + ";");
+                    I("time " + time + ";");                    
                     I("x = 2, 1, -1;");
                     I("sheet <" + cols + "> x file = temp.xlsx;"); //expressions can not be read afterwards
                     I("reset;");
-                    I("import <xlsx " + cols + "> temp.xlsx;");
-                    _AssertSeries(First(), "x!a", 2010, 2d, sharedDelta);
-                    _AssertSeries(First(), "x!a", 2011, 1d, sharedDelta);
-                    _AssertSeries(First(), "x!a", 2012, -1d, sharedDelta);
+                    I("option freq " + freq + ";");
+                    I("time " + time + ";");
+                    I("import <xlsx " + cols + " all> temp.xlsx;");  //without <all>, the data is truncated, which is not supported for U freq
+                    if (freq == "a")
+                    {
+                        _AssertSeries(First(), "x!a", 2010, 2d, sharedDelta);
+                        _AssertSeries(First(), "x!a", 2011, 1d, sharedDelta);
+                        _AssertSeries(First(), "x!a", 2012, -1d, sharedDelta);
+                    }
+                    else if (freq == "q")
+                    {
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 1, 2d, sharedDelta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 2, 1d, sharedDelta);
+                        _AssertSeries(First(), "x!q", EFreq.Q, 2010, 3, -1d, sharedDelta);
+
+                    }
+                    else if (freq == "m")
+                    {
+                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 1, 2d, sharedDelta);
+                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 2, 1d, sharedDelta);
+                        _AssertSeries(First(), "x!m", EFreq.M, 2010, 3, -1d, sharedDelta);
+
+                    }
+                    else if (freq == "u")
+                    {
+                        _AssertSeries(First(), "x!u", EFreq.U, 1, 1, 2d, sharedDelta);
+                        _AssertSeries(First(), "x!u", EFreq.U, 2, 1, 1d, sharedDelta);
+                        _AssertSeries(First(), "x!u", EFreq.U, 3, 1, -1d, sharedDelta);
+                    }
+
                 }
             }
         }

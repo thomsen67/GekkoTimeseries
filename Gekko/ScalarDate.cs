@@ -96,8 +96,16 @@ namespace Gekko
 
         public IVariable Negate(GekkoSmpl t)
         {
-            G.Writeln2("*** ERROR: You cannot use minus on DATE");                
-            throw new GekkoException();
+            if (this.date.freq == EFreq.U)
+            {
+                GekkoTime gt = this.date;
+                return new ScalarDate(new GekkoTime(EFreq.U, -gt.super, 1));
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: You cannot use minus on date: " + this.date.ToString());
+                throw new GekkoException();
+            }
         }
 
         //public void InjectAdd(GekkoSmpl t, IVariable x, IVariable y)
