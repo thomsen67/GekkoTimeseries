@@ -1912,10 +1912,11 @@ namespace Gekko
             return DateTime.FromOADate(data);
         }
 
-        public static void DateHelper1(GekkoTime gt, bool first, string format, out DateTime dt, out string f)
+        public static void DateHelper1(GekkoTime gt, bool first, string format, out DateTime dt, out string f, out string date_as_string)
         {
             dt = new DateTime();
-            f = null;
+            f = format;
+            date_as_string = null;
 
             int y = gt.super;
             int m = -12345;
@@ -1959,6 +1960,7 @@ namespace Gekko
                 else d = DateTime.DaysInMonth(y, m);
             }
             dt = new DateTime(y, m, d);
+            date_as_string = dt.ToString(format.ToLower().Replace("m", "M")); //lowercase 'm' is understood as minutes in C#
         }
 
         public static int GekkoMin(int i1, int i2) {

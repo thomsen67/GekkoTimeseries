@@ -39236,7 +39236,7 @@ namespace Gekko
 
             bool useExcelDates = false;  //default
             bool isFirst = true;  //default
-            string format = "yyyy-mm-dd";
+            string format = null;
             if (dateformat != null)
             {
                 format = dateformat;
@@ -39254,9 +39254,7 @@ namespace Gekko
             }
 
             if (G.Equal(datetype, "text")) useExcelDates = false;
-            else if (G.Equal(datetype, "excel")) useExcelDates = true;
-
-
+            else if (G.Equal(datetype, "excel")) useExcelDates = true;            
 
             try
             {
@@ -39300,6 +39298,11 @@ namespace Gekko
                 //Creates a blank workbook. Use the using statment, so the package is disposed when we are done.
                 using (ExcelPackage excel = isAppend ? new ExcelPackage(new FileInfo(fileNameWithPathOriginal)) : new ExcelPackage())
                 {
+                    if (G.Equal(Path.GetExtension(fileNameWithPath), ".xlsm"))
+                    {
+                        //this injects some empty VBA code, and the file will then be of .xlsm type.
+                        if (excel.Workbook.VbaProject == null) excel.Workbook.CreateVBAProject();                        
+                    }                  
 
                     if (copyLocal)
                     {
@@ -39496,10 +39499,7 @@ namespace Gekko
                         if (useExcelDates)
                         {
                             //cf. DateTime.FromOADate(excelvalue);
-
                             
-
-
                             if (isTranspose)
                             {
 
@@ -39508,7 +39508,7 @@ namespace Gekko
                                     for (int j = d1 - 1; j <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d1 - 1), i - d2];
-                                        DateTime dt; string f; G.DateHelper1(gt, isFirst, format, out dt, out f);
+                                        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -39521,7 +39521,7 @@ namespace Gekko
                                     for (int j = d2; j <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; j++)
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d2 - 1), j - d2];
-                                        DateTime dt; string f; G.DateHelper1(gt, isFirst, format, out dt, out f);                                        
+                                        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -39530,33 +39530,53 @@ namespace Gekko
                         }
                         else
                         {
-                            if (options.freq == EFreq.A)
+                            //text based dates
+
+                            if (format == null)
                             {
-                                //else the cells are left-justified and with a green triangle (warning)
-                                int[,] datesData2 = null;
-                                if (isTranspose)
+                                //text based without format --> 2010, 2010q3, 2010m3
+
+                                if (options.freq == EFreq.A)
                                 {
-                                    datesData2 = Transpose(excelColumnLabelsAnnual);
+                                    //else the cells are left-justified and with a green triangle (warning)
+                                    int[,] datesData2 = null;
+                                    if (isTranspose)
+                                    {
+                                        datesData2 = Transpose(excelColumnLabelsAnnual);
+                                    }
+                                    else
+                                    {
+                                        datesData2 = excelColumnLabelsAnnual;
+                                    }
+                                    datesData = ToJaggedArray(datesData2);
                                 }
                                 else
                                 {
-                                    datesData2 = excelColumnLabelsAnnual;
+                                    object[,] data3 = null;
+                                    if (isTranspose) data3 = Transpose(eo.excelColumnLabels);
+                                    else data3 = eo.excelColumnLabels;                                    
+                                    datesData = ToJaggedArray(data3);
                                 }
-                                datesData = ToJaggedArray(datesData2);
                             }
                             else
                             {
+                                string[,] tmp = new string[eo.excelColumnLabelsGekkoTime.GetLength(0), eo.excelColumnLabelsGekkoTime.GetLength(1)];
+                                for (int i = 0; i < eo.excelColumnLabelsGekkoTime.GetLength(0); i++)
+                                {
+                                    for (int j = 0; j < eo.excelColumnLabelsGekkoTime.GetLength(1); j++)
+                                    {
+                                        DateTime dt; string f; string date_as_string;
+                                        G.DateHelper1(eo.excelColumnLabelsGekkoTime[i, j], isFirst, format, out dt, out f, out date_as_string);
+                                        tmp[i, j] = date_as_string;
+                                    }
+                                }
                                 object[,] data3 = null;
-                                if (isTranspose)
-                                {                                    
-                                    data3 = Transpose(eo.excelColumnLabels);
-                                }
-                                else
-                                {                                    
-                                    data3 = eo.excelColumnLabels;                                    
-                                }
+                                if (isTranspose) data3 = Transpose(tmp);
+                                else data3 = tmp;
                                 datesData = ToJaggedArray(data3);
                             }
+
+
 
                             if (isTranspose)
                             {
