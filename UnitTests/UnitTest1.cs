@@ -8663,6 +8663,19 @@ namespace UnitTests
                                             continue;  //we cannot do SHEET and afterwards IMPORT<csv>
                                         }
 
+                                        if (dateformat == 0 && dateday == 1)
+                                        {
+                                            continue;  //dateformat=gekko ignores dateday, so we skip one of them to not waste time
+                                        }
+
+                                        G.Writeln2("-----------------------------------------------");
+                                        G.Writeln2("-----------------------------------------------");
+                                        G.Writeln2("COMBINATION i=" + i + " f=" + f + " k=" + k + " t=" + t + " datetype=" + datetype + " dateformat=" + dateformat + " dateday=" + dateday);
+                                        G.Writeln2("-----------------------------------------------");
+                                        G.Writeln2("-----------------------------------------------");
+                                        G.Writeln2("-----------------------------------------------");
+
+
                                         string s_datetype = "text";
                                         if (datetype == 1) s_datetype = "excel";
 

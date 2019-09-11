@@ -1431,7 +1431,7 @@ namespace Gekko
             //does not handle ';' inside a quoted string
 
             char delimiter = ';';
-            if (G.Equal(Program.options.interface_csv_delimiter, "comma")) delimiter = ',';
+            if (G.Equal(Program.options.interface_csv_delimiter , "comma")) delimiter = ',';
                         
             string freqHere = G.GetFreq(Program.options.freq);
 
@@ -24198,7 +24198,7 @@ namespace Gekko
                 {
                     //2D format
                     CheckSomethingToWrite(listFilteredForCurrentFreq);
-                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, variablesType);
+                    WriteToExcel(fileName, tStart, tEnd, listFilteredForCurrentFreq, G.Equal(o.opt_cols, "yes"), o.opt_dateformat, o.opt_datetype, variablesType);
                     return 0;
                 }
                 else if (o.opt_gcm != null)
@@ -24363,7 +24363,7 @@ namespace Gekko
             }
         }
 
-        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, EVariablesForWrite variablesType)
+        private static void WriteToExcel(string fileName, GekkoTime tStart, GekkoTime tEnd, List<ToFrom> list, bool isCols, string dateformat, string datetype, EVariablesForWrite variablesType)
         {
             ExcelOptions eo = new ExcelOptions();
 
@@ -24443,7 +24443,7 @@ namespace Gekko
 
             eo.fileName = fileName;
 
-            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat);
+            Program.CreateExcelWorkbook2(eo, null, false, variablesType == EVariablesForWrite.OneNonSeries, dateformat, datetype);
         }
 
         public static void ArrayTimeseriesTip(string name)
@@ -30354,7 +30354,7 @@ namespace Gekko
                     }
                 }
 
-                CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat);
+                CreateExcelWorkbook2(eo, o, IsMulprt(o), false, o.opt_dateformat, o.opt_datetype);
                 return;
             }
             else if (type == EPrintTypes.Clip)
@@ -39205,11 +39205,11 @@ namespace Gekko
             return matrix;
         }
                 
-        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat)
+        public static ExcelDataForClip CreateExcelWorkbook2(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
         {
             if (G.Equal(Program.options.sheet_engine, "internal"))
             {
-                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix, dateformat);
+                return CreateExcelWorkbookEPPlus(eo, oPrt, isMulprt, isMatrix, dateformat, datetype);
             }
             else
             {
@@ -39222,7 +39222,7 @@ namespace Gekko
             }
         }
 
-        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat)
+        private static ExcelDataForClip CreateExcelWorkbookEPPlus(ExcelOptions eo, O.Prt oPrt, bool isMulprt, bool isMatrix, string dateformat, string datetype)
         {
 
             //1. append-     filename-     sheet-            show fakefilename sheet='Data'
@@ -39236,25 +39236,27 @@ namespace Gekko
 
             bool useExcelDates = false;  //default
             bool isFirst = true;  //default
-            string format = null;
-             
-            //if(!G.NullOrEmpty()
+            string format = "yyyy-mm-dd";
+            if (dateformat != null)
+            {
+                format = dateformat;
 
-            //if (ss5.Length == 2 && G.Equal(ss5[1], "first"))
-            //{
-            //    isFirst = true;
-            //}
-            //else if (ss5.Length == 2 && G.Equal(ss5[1], "last"))
-            //{
-            //    isFirst = false;
-            //}
-            //else
-            //{
-            //    G.Writeln2("*** ERROR: Expected 'first' or 'last' in dateformat");
-            //    throw new GekkoException();
-            //}
-            //string format = ss5[0];
-            //if (G.Equal(ss5[0], "excel")) useExcelDates = true;
+                if (dateformat.Trim().EndsWith(" first", StringComparison.OrdinalIgnoreCase))
+                {
+                    format = dateformat.Trim().Substring(0, dateformat.Trim().Length - " first".Length);
+                    isFirst = true;
+                }
+                else if (dateformat.Trim().EndsWith(" last", StringComparison.OrdinalIgnoreCase))
+                {
+                    format = dateformat.Trim().Substring(0, dateformat.Trim().Length - " last".Length);
+                    isFirst = false;
+                }
+            }
+
+            if (G.Equal(datetype, "text")) useExcelDates = false;
+            else if (G.Equal(datetype, "excel")) useExcelDates = true;
+
+
 
             try
             {

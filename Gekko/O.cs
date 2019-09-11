@@ -7046,7 +7046,9 @@ namespace Gekko
             public string opt_sheet = null;
             public string opt_all = null;            
             public string type = null;  //read or import
-            
+            public string opt_dateformat = null;
+            public string opt_datetype = null;
+
 
 
             public P p = null;

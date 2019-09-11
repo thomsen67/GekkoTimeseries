@@ -3450,6 +3450,8 @@ readOpt1h:                  MERGE (EQUAL yesNo)? -> ^(ASTOPT_STRING_MERGE yesNo?
 						  | COLLAPSE '=' name -> ^(ASTOPT_STRING_COLLAPSE name)						  
 						  | RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT yesNo?)	
 						  | ALL (EQUAL yesNo)? -> ^(ASTOPT_STRING_ALL yesNo?)	
+						  | DATEFORMAT EQUAL expression -> ^(ASTOPT_STRING_DATEFORMAT expression)
+						  | DATETYPE EQUAL expression -> ^(ASTOPT_STRING_DATETYPE expression)
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
