@@ -29678,6 +29678,7 @@ namespace Gekko
                                     if (j == 1)
                                     {
                                         table.Set(i, j, year.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                        DateHack(table, i, j, sameFreq, year, 1);
                                     }
                                 }
                             }
@@ -29691,7 +29692,7 @@ namespace Gekko
                         if ((type != EPrintTypes.Plot && freqs[3]) || (type == EPrintTypes.Plot && freqColumn == EFreq.M))
                         {
                             // --------------------------
-                            EFreq freqInThisTableRow = EFreq.M;
+                            EFreq freqHere = EFreq.M;
                             int subHere = 1;
                             i++;
                             int sumOver = 1;
@@ -29699,10 +29700,11 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
-                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqInThisTableRow, subHere, sumOver, skipCounter, cc);
+                                PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
                     }
@@ -29719,10 +29721,10 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
-
                                 PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
@@ -29739,7 +29741,8 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m3"); if (rows) table.SetAlign(i, j, Align.Right);                                
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29776,6 +29779,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -29796,7 +29800,8 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "q1"); if (rows) table.SetAlign(i, j, Align.Right);                                
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29825,11 +29830,11 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m4"); if (rows) table.SetAlign(i, j, Align.Right);                                
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
-
                                 PrintHelper3(smpl, type, sameFreq, table, containerExplode.Count, i, j, iPlot, operator2, o.guiGraphIsLogTransform, scalarValueWork, tsWork, scalarValueRef, tsRef, year, freqHere, subHere, sumOver, skipCounter, cc);
                             }
                         }
@@ -29846,7 +29851,8 @@ namespace Gekko
                             // --------------------------
                             if (j == 1)
                             {
-                                table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, uglyYear + "m5"); if (rows) table.SetAlign(i, j, Align.Right);                                
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29868,6 +29874,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m6"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29904,6 +29911,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -29925,6 +29933,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "q2"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29968,6 +29977,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m7"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -29989,6 +29999,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m8"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30010,6 +30021,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m9"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30046,6 +30058,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -30068,6 +30081,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "q3"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30100,6 +30114,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m10"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30121,6 +30136,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m11"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30142,6 +30158,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "m12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30178,6 +30195,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "mSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -30215,6 +30233,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "mSUM12"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -30235,6 +30254,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, uglyYear + "q4"); if (rows) table.SetAlign(i, j, Align.Right);
+                                DateHack(table, i, j, freqHere, year, subHere);
                             }
                             else
                             {
@@ -30271,6 +30291,7 @@ namespace Gekko
                                 if (j == 1)
                                 {
                                     table.Set(i, j, uglyYear + "qSUM"); if (rows) table.SetAlign(i, j, Align.Right);
+                                    //no date hack
                                 }
                                 else
                                 {
@@ -30316,6 +30337,7 @@ namespace Gekko
                                 {
                                     table.Set(i, j, uglyYear + "a");
                                     if (rows) table.SetAlign(i, j, Align.Right);
+                                    DateHack(table, i, j, freqHere, year, subHere);
                                 }
                             }
                             else
@@ -30408,7 +30430,7 @@ namespace Gekko
                                 string s = cell2.CellText.TextData[0];
                                 if (s == null) s = "";
                                 eo.excelColumnLabels[i - 1, j - 1 - startCols] = s;
-                                eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = G.FromStringToDate(s);  //a hack, the cell ought to be date format
+                                eo.excelColumnLabelsGekkoTime[i - 1, j - 1 - startCols] = cell2.date_hack; //a hack, the cell ought to be date format
                             }
                             else
                             {
@@ -30453,6 +30475,11 @@ namespace Gekko
                 CrossThreadStuff.CopyButtonEnabled(true);
 
             }
+        }
+
+        private static void DateHack(Table table, int i, int j, EFreq freq, int year, int sub)
+        {
+            table.Get(i, j).date_hack = new GekkoTime(freq, year, sub);
         }
 
         public static EPrintTypes GetPrintType(O.Prt o)
@@ -32328,112 +32355,26 @@ namespace Gekko
             if (s2 == "9.99999E+99" || s2 == "9,99999E+99"  //I think this is funny number made in Excel printing routine, to signal missing value
                 || G.isNumericalError(d2) || d2 == Globals.missingVariableArtificialNumber)  //NumericalError is 'M', and the number Globals.missingVariableArtificialNumber is a signal from a table that variable is non-existing ('N')
             {
-                s2 = "=na()";
-                if (G.Equal(Program.options.interface_excel_language, "danish"))
-                {
-                    s2 = "=ikke.tilgængelig()";
-                }
+                s2 = "=" + NaForExcelInDifferentLanguages(0);
             }
             return s2;
         }
 
-        //private static void Cplot(string transpose, string dates, string labels, ExcelDataForClip ed)
-        //{
-        //    int rows = ed.data.GetLength(0);
-        //    int cols = ed.data.GetLength(1);
-        //    string[,] x = new string[rows + 1, cols + 1]; //hmmm what if not there...
-
-        //    bool hasDates = true;
-        //    if (G.Equal(dates, "no"))
-        //    {
-        //        hasDates = false;
-        //    }
-
-        //    bool hasLabels = true;
-        //    if (G.Equal(labels, "no"))
-        //    {
-        //        hasLabels = false;
-        //    }
-
-        //    bool isTranspose = false;
-        //    if (G.Equal(transpose, "yes"))
-        //    {
-        //        isTranspose = true;
-        //    }
-
-        //    x[0, 0] = "";
-
-        //    if (isTranspose)
-        //    {
-        //        for (int col = 0; col < cols; col++)
-        //        {
-        //            if (hasLabels) x[0, col + 1] = ed.varnames[0, col];
-        //        }
-        //        for (int row = 0; row < rows; row++)
-        //        {
-        //            if (hasDates) x[row + 1, 0] = ed.dates[row, 0];
-        //        }
-        //    }
-        //    else
-        //    {
-        //        for (int col = 0; col < cols; col++)
-        //        {
-        //            if (hasDates) x[0, col + 1] = ed.dates[0, col];
-        //        }
-        //        for (int row = 0; row < rows; row++)
-        //        {
-        //            if (hasLabels) x[row + 1, 0] = ed.varnames[row, 0];
-        //        }
-        //    }
-
-        //    for (int row = 0; row < rows; row++)
-        //    {
-        //        for (int col = 0; col < cols; col++)
-        //        {
-        //            x[row + 1, col + 1] = PrepareDataForClipboard(ed.data[row, col]);
-        //        }
-        //    }
-
-        //    int rowStart = 0;
-        //    int colStart = 0;
-
-        //    if (isTranspose)
-        //    {
-        //        if (!hasLabels) rowStart = 1;
-        //        if (!hasDates) colStart = 1;
-        //    }
-        //    else
-        //    {
-        //        if (!hasLabels) colStart = 1;
-        //        if (!hasDates) rowStart = 1;
-        //    }
-
-        //    StringBuilder s = new StringBuilder();
-        //    if (ed.stamp != null)
-        //    {
-        //        s.Append(ed.stamp);
-        //        s.Append("\n");
-        //    }
-
-        //    if (ed.heading != null)
-        //    {
-        //        s.Append(ed.heading);
-        //        s.Append("\n");
-        //    }
-
-        //    for (int i = rowStart; i < rows + 1; i++)
-        //    {
-        //        for (int j = colStart; j < cols + 1; j++)
-        //        {
-        //            if (j - colStart > 0) s.Append("\t");
-        //            string s2 = x[i, j];
-        //            s.Append(s2);
-        //        }
-        //        if (i < rows) s.Append("\n");
-        //    }
-        //    System.Windows.Forms.Clipboard.SetText(s.ToString(), System.Windows.Forms.TextDataFormat.Text);
-        //    G.Writeln2("CSHEET: You may now paste (Ctrl-V) cells into your spreadsheet (e.g. Excel)");
-        //}
+        private static string NaForExcelInDifferentLanguages(int i)
+        {
+            string s2 = null;
+            if (i == 0)
+            {
+                s2 = "na()";
+                if (G.Equal(Program.options.interface_excel_language, "danish")) s2 = "ikke.tilgængelig()";
+                return s2;
+            }
+            else if(i==1)
+            {
+                s2 = "na()";
+            }
+            return s2;
+        }               
 
         private static void GraphThreadFunction(Object o)
         {
@@ -39504,8 +39445,7 @@ namespace Gekko
                     }
                     else clipData.data = data;
 
-                    string na = "na()";
-                    if (G.Equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
+                    string na = NaForExcelInDifferentLanguages(1);
 
                     for (int i = 0; i < data.GetLength(0); i++)
                     {
@@ -39513,8 +39453,8 @@ namespace Gekko
                         {
                             if (data[i, j] == 9.99999e99d || G.isNumericalError(data[i, j]))
                             {
-                                //ws.Cells[d1 + i, d2 + j].Value = "=" + na;
-                                ws.Cells[d1 + i, d2 + j].Formula = na;
+                                //ws.Cells[d1 + i, d2 + j].Value = na;
+                                ws.Cells[d1 + i, d2 + j].Formula = "=" + na;
                             }
                         }
                     }
@@ -40018,10 +39958,9 @@ namespace Gekko
                     double[,] data = eo.excelData;
                     if (!eo.isClip) range.set_Value(Missing.Value, data);
                     cplotData.data = data;
-                }
+                }                
 
-                string na = "na()";
-                if (G.Equal(Program.options.interface_excel_language, "danish")) na = "ikke.tilgængelig()";
+                string na = NaForExcelInDifferentLanguages(0);
 
                 if (!eo.isClip)
                 {

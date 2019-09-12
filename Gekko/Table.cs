@@ -1517,10 +1517,14 @@ namespace Gekko
 
         //if one of these three it is a normal cell
         public Text CellText { get; set; }
+
         public string date;  //FIXME: quarters etc. Really ought to be a GekkoTime object
+        public GekkoTime date_hack = GekkoTime.tNull;  //used to smuggle in dates, until above issue is fixed 
+
         public double number;
         public bool numberShouldShowAsN = false;
         public string numberFormat = "F15.4";  //default, way too wide and precise in most cases
+        
 
         public string backgroundColor = "Transparent";
 

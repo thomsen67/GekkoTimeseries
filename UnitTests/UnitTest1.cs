@@ -8676,7 +8676,12 @@ namespace UnitTests
                                         if (f == 3 && dateformat == 1)
                                         {
                                             continue;  //cannot use dateformat=yyyy-mm-dd (or other) with undated freq, only dateformat=gekko is ok
-                                        }                                        
+                                        }
+
+                                        if (f == 3 && datetype == 1)
+                                        {
+                                            continue;  //cannot use read/write to Excel, using Excel-dates together with undated frequency
+                                        }
 
                                         G.Writeln2("-----------------------------------------------");
                                         G.Writeln2("-----------------------------------------------");
@@ -8763,7 +8768,7 @@ namespace UnitTests
                 }
             }
 
-            Assert.AreEqual(counter, 8 * 24);  //counting them so we are sure all are done!
+            Assert.AreEqual(counter, 96);  //counting them so we are sure all are done!
         }
 
         [TestMethod]
