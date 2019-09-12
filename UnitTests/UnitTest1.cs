@@ -8655,7 +8655,7 @@ namespace UnitTests
                             {
                                 for (int dateformat = 0; dateformat < 2; dateformat++) //gekko or yyyy-mm-dd
                                 {
-                                    for (int dateday = 0; dateday < 2; dateday++) //first or last
+                                    for (int datefirstLast = 0; datefirstLast < 2; datefirstLast++) //first or last
                                     {
 
                                         if (k == 0 && t == 1)
@@ -8663,14 +8663,24 @@ namespace UnitTests
                                             continue;  //we cannot do SHEET and afterwards IMPORT<csv>
                                         }
 
-                                        if (dateformat == 0 && dateday == 1)
+                                        if (t == 1 && datetype == 1)
+                                        {
+                                            continue;  //we cannot do import <csv datetype='excel'>, same for export etc.
+                                        }
+
+                                        if (dateformat == 0 && datefirstLast == 1)
                                         {
                                             continue;  //dateformat=gekko ignores dateday, so we skip one of them to not waste time
                                         }
 
+                                        if (f == 3 && dateformat == 1)
+                                        {
+                                            continue;  //cannot use dateformat=yyyy-mm-dd (or other) with undated freq, only dateformat=gekko is ok
+                                        }                                        
+
                                         G.Writeln2("-----------------------------------------------");
                                         G.Writeln2("-----------------------------------------------");
-                                        G.Writeln2("COMBINATION i=" + i + " f=" + f + " k=" + k + " t=" + t + " datetype=" + datetype + " dateformat=" + dateformat + " dateday=" + dateday);
+                                        G.Writeln2("COMBINATION i=" + i + " f=" + f + " k=" + k + " t=" + t + " datetype=" + datetype + " dateformat=" + dateformat + " datefirstlast=" + datefirstLast);
                                         G.Writeln2("-----------------------------------------------");
                                         G.Writeln2("-----------------------------------------------");
                                         G.Writeln2("-----------------------------------------------");
@@ -8681,8 +8691,8 @@ namespace UnitTests
 
                                         string s_dateformat = "gekko";
                                         if (dateformat == 1) s_dateformat = "yyyy-mm-dd";                                        
-                                        if (dateday == 0) s_dateformat += " first";
-                                        else if (dateday == 1) s_dateformat += " last";
+                                        if (datefirstLast == 0) s_dateformat += " first";
+                                        else if (datefirstLast == 1) s_dateformat += " last";
 
                                         s_datetype = "'" + s_datetype + "'";
                                         s_dateformat = "'" + s_dateformat + "'";
@@ -8718,7 +8728,7 @@ namespace UnitTests
                                         I("reset;");
                                         I("option freq " + freq + ";");
                                         I("time " + time + ";");
-                                        I("import <" + tpe + " " + cols + " all> temp;");  //without <all>, the data is truncated, which is not supported for U freq
+                                        I("import <" + tpe + " " + cols + " dateformat=" + s_dateformat + " datetype=" + s_datetype + " all > temp;");  //without <all>, the data is truncated, which is not supported for U freq
                                         if (freq == "a")
                                         {
                                             _AssertSeries(First(), "x!a", 2010, 2d, sharedDelta);

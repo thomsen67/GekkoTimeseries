@@ -7070,6 +7070,8 @@ namespace Gekko
                         hlp.t1 = truncate.t1;
                         hlp.t2 = truncate.t2;
                     }
+                    hlp.dateformat = this.opt_dateformat;
+                    hlp.datetype = this.opt_datetype;
 
                     bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
 

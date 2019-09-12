@@ -1905,17 +1905,17 @@ namespace Gekko
                 else return GekkoTime.tNull;
             }
             return t;
-        }
-
-        public static DateTime DateHelper2(double data)
-        {
-            return DateTime.FromOADate(data);
-        }
+        }        
 
         public static void DateHelper1(GekkoTime gt, bool first, string format, out DateTime dt, out string f, out string date_as_string)
         {
+            //format can be null, 'gekko' or 'yyyy-dd-mm'-style
+
             dt = new DateTime();
-            f = format;
+
+            f = null;
+            //f = format;
+
             date_as_string = null;
 
             int y = gt.super;
@@ -1926,7 +1926,7 @@ namespace Gekko
             {
                 if (format == null) f = "yyyy";
                 if (first) { m = 1; d = 1; }
-                else { m = 12; d = 31; }                
+                else { m = 12; d = 31; }
             }
             else if (gt.freq == EFreq.Q)
             {
@@ -1959,8 +1959,59 @@ namespace Gekko
                 if (first) d = 1;
                 else d = DateTime.DaysInMonth(y, m);
             }
+            else if (gt.freq == EFreq.U)
+            {
+                G.Writeln2("*** ERROR: You cannot use dateformat together with an undated frequency");
+                throw new GekkoException();
+            }
+
+            //Now: three possibilities regarding format:
+            //format == null                   --> f has 'yyyy-mm-dd'-style value (custom)
+            //format == 'gekko'                --> f = null
+            //format == 'yyyy-mm-dd'-style     --> f = null
+
+            if (format != null && !G.Equal(format, "gekko")) f = format;
+
+            //Now: three possibilities regarding format:
+            //format == null                   --> f = 'yyyy-mm-dd'-style value (custom)
+            //format == 'gekko'                --> f = null
+            //format == 'yyyy-mm-dd'-style     --> f = 'yyyy-mm-dd'-style
+
             dt = new DateTime(y, m, d);
-            date_as_string = dt.ToString(format.ToLower().Replace("m", "M")); //lowercase 'm' is understood as minutes in C#
+            if (G.Equal(format, "gekko"))
+            {
+                date_as_string = gt.ToString();                
+            }
+            else
+            {
+                date_as_string = G.DateHelper3(format, dt); //lowercase 'm' is understood as minutes in C#
+            }
+        }
+
+        public static DateTime DateHelper2(double data)
+        {
+            return DateTime.FromOADate(data);
+        }
+
+        public static string DateHelper3(string format, DateTime dt)
+        {
+            string s = dt.ToString(format.ToLower().Replace("m", "M"));            
+            return s;
+        }
+
+        public static DateTime DateHelper4(string format, string s)
+        {
+            DateTime dt = new DateTime();
+            try
+            {
+                dt = DateTime.ParseExact(s, format.ToLower().Replace("m", "M"), null);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: The date '" + s + "' does not comply with the format '" + format + "'");
+                throw new GekkoException();
+            }
+            return dt;
         }
 
         public static int GekkoMin(int i1, int i2) {
