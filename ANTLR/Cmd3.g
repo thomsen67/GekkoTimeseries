@@ -2293,6 +2293,7 @@ wildcard7:         		      triplestars -> ASTTRIPLESTARS  //everything
 
 seqOfBankvarnames:          seqItem (COMMA2 seqItem)* ->  ^(ASTBANKVARNAMELIST seqItem+);
 seqOfBankvarnames2:         seqOfBankvarnames;  //alias
+seqOfBankvarnames3:         seqOfBankvarnames;  //alias
 seqOfBankvarnamesOnly1:     seqItem -> ^(ASTBANKVARNAMELIST seqItem);
 
 //accepts filenames without hyphens, but also strings (for instance 'text' or %s). So data.gbk or 'data.gbk' but not {'data.gbk'}.
@@ -2722,7 +2723,7 @@ closeOpt1h:				    SAVE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SAVE yesNo?)
 // COLLAPSE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames collapseMethod?);
+collapse:				    COLLAPSE seqOfBankvarnames '=' seqOfBankvarnames2 collapseMethod? -> ^({token("ASTCOLLAPSE", ASTCOLLAPSE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 collapseMethod?);
 collapseMethod:			    name;
 //collapseMethod:			    FIRST|LAST|AVG|TOTAL;
 
@@ -2747,7 +2748,7 @@ compareOpt1h:				ABS EQUAL expression -> ^(ASTOPT_VAL_ABS expression)
 // COPY
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames)? -> ^({token("ASTCOPY", ASTCOPY, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames?);
+copy:                       COPY copyOpt1? assignmentType seqOfBankvarnames (asOrTo seqOfBankvarnames2)? -> ^({token("ASTCOPY", ASTCOPY, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) ^(ASTPLACEHOLDER ^(ASTOPT_ copyOpt1?)) seqOfBankvarnames seqOfBankvarnames2?);
 copyOpt1                  : ISNOTQUAL
 						  | leftAngle2          copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 copyOpt1h*)		
 						  | leftAngleNo2 dates? copyOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES_TYPE2 dates?) copyOpt1h*)
@@ -2765,7 +2766,7 @@ copyOpt1h                 : RESPECT (EQUAL yesNo)? -> ^(ASTOPT_STRING_RESPECT ye
 // COUNT
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-count:                      COUNT countOpt1? assignmentType seqOfBankvarnames2 -> ^({token("ASTCOUNT", ASTCOUNT, input.LT(1).Line)} ^(ASTPLACEHOLDER countOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames2);
+count:                      COUNT countOpt1? assignmentType seqOfBankvarnames -> ^({token("ASTCOUNT", ASTCOUNT, input.LT(1).Line)} ^(ASTPLACEHOLDER countOpt1?) ASTPLACEHOLDER ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames);
 countOpt1:                  ISNOTQUAL | leftAngle countOpt1h* RIGHTANGLE -> ^(ASTOPT1 countOpt1h*);							
 countOpt1h:                 BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //name can be without quotes											  
 						    ;
@@ -3016,7 +3017,7 @@ ini:					    INI -> ^({token("ASTINI", ASTINI, input.LT(1).Line)});
 // INTERPOLATE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames interpolateMethod?);
+interpolate:				INTERPOLATE seqOfBankvarnames '=' seqOfBankvarnames2 interpolateMethod? -> ^({token("ASTINTERPOLATE", ASTINTERPOLATE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 interpolateMethod?);
 interpolateMethod:			name;
 //interpolateMethod:			REPEAT | PRORATE;
 
@@ -3395,7 +3396,7 @@ rebaseOpt1h:                BANK EQUAL name -> ^(ASTOPT_STRING_BANK name)  //nam
 // RENAME
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames -> ^({token("ASTRENAME", ASTRENAME, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames renameOpt1?);
+rename:                     RENAME renameOpt1? assignmentType seqOfBankvarnames asOrTo seqOfBankvarnames2 -> ^({token("ASTRENAME", ASTRENAME, input.LT(1).Line)} ^(ASTPLACEHOLDER assignmentType) seqOfBankvarnames seqOfBankvarnames2 renameOpt1?);
 renameOpt1:                 ISNOTQUAL | leftAngle renameOpt1h* RIGHTANGLE -> renameOpt1h*;
 renameOpt1h:                FROMBANK EQUAL name -> ^(ASTOPT_STRING_FROMBANK name)
 						  |	asOrToBank EQUAL name -> ^(ASTOPT_STRING_TOBANK name)
@@ -3511,7 +3512,7 @@ simOpt1h:                   FIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_FIX yesNo?)
 // SMOOTH
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames smoothOpt2? seqOfBankvarnames? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} ^(ASTPLACEHOLDER smoothOpt2?) seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames?);
+smooth:                     SMOOTH seqOfBankvarnames EQUAL seqOfBankvarnames2 smoothOpt2? seqOfBankvarnames3? -> ^({token("ASTSMOOTH", ASTSMOOTH, input.LT(1).Line)} ^(ASTPLACEHOLDER smoothOpt2?) seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3?);
 smoothOpt2:                 smoothOpt2h;  //can only choose 1
 smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesNo?)
                           | REPEAT (EQUAL yesNo)? -> ^(ASTOPT_STRING_REPEAT yesNo?)
@@ -3524,8 +3525,8 @@ smoothOpt2h:                SPLINE (EQUAL yesNo)? -> ^(ASTOPT_STRING_SPLINE yesN
 // SPLICE
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames expression seqOfBankvarnames -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames expression     )
-                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames seqOfBankvarnames            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames seqOfBankvarnames )  //no date
+splice:                     SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 expression seqOfBankvarnames3 -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 expression     )
+                          | SPLICE seqOfBankvarnames EQUAL seqOfBankvarnames2 seqOfBankvarnames3            -> ^({token("ASTSPLICE", ASTSPLICE, input.LT(1).Line)} seqOfBankvarnames seqOfBankvarnames2 seqOfBankvarnames3 )  //no date
 						    ;
 spliceOpt1:                 ISNOTQUAL
 						  | leftAngle        spliceOpt1h* RIGHTANGLE -> spliceOpt1h*												
@@ -3643,7 +3644,7 @@ translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 ye
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)}  writeHelper ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames))						  
+write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames2)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)}  writeHelper ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames2))						  
 						  | writeHelper writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)} writeHelper ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))						  
 						    ;
 
