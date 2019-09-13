@@ -25496,7 +25496,7 @@ namespace Gekko
         private static int CsvPrnWrite(List<ToFrom> vars, string filename, GekkoTime per1, GekkoTime per2, EdataFormat dateFormat, bool cols, string dateformat)
         {
 
-            bool isFirst = false;
+            bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
 
             int prnWidth = 18;
