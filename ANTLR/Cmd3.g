@@ -3644,7 +3644,7 @@ translateOpt1h:             GEKKO18 (EQUAL yesNo)? -> ^(ASTOPT_STRING_GEKKO18 ye
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 						    //!!!2x2 identical lines ONLY because of token stuff
-write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames2)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)}  writeHelper ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames2))						  
+write:					    writeHelper writeOpt1? seqOfBankvarnames (asOrTo seqOfBankvarnames2)? FILE '=' fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)}  writeHelper ^(ASTPLACEHOLDER writeOpt1?) ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST seqOfBankvarnames) ^(ASTNAMESLIST seqOfBankvarnames2?))						  
 						  | writeHelper writeOpt1? fileName -> ^({token("ASTWRITE", ASTWRITE, input.LT(1).Line)} writeHelper ^(ASTPLACEHOLDER writeOpt1?)  ^(ASTHANDLEFILENAME fileName) ^(ASTNAMESLIST) ^(ASTNAMESLIST))						  
 						    ;
 
