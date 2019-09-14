@@ -24121,6 +24121,14 @@ namespace Gekko
             List<ToFrom> list = null;
             if (o.list1 != null)
             {
+                if (o.list2 == null)
+                {
+                    o.list2 = new List();
+                    for (int i = 0; i < o.list1.list.Count; i++)
+                    {
+                        o.list2.Add(new ScalarString("First:*"));  //for instance: EXPORT <csv> fx*, fy*, where we will "simulate" an EXPORT <csv> fx*, fy* TO first:*, first:*
+                    }
+                }
                 list = SearchFromTo(o.list1, o.list2, o.opt_frombank, null, EWildcardSearchType.Write, null);
             }            
             
@@ -25567,8 +25575,8 @@ namespace Gekko
                 foreach (ToFrom var in vars)
                 {
                     j = 1;
-                    string s3 = G.Chop_GetName(var.s2);
-                    
+                    string s3 = G.Chop_GetName(var.s2);  //If for instance export <csv> fy* file = test; the .s2 will be varnames with first bank glued on (typically work), and this bank is removed here.
+
                     IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
                     Series ts = iv as Series;
                     
