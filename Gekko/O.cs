@@ -1761,14 +1761,24 @@ namespace Gekko
                 else
                 {
                     Databank db = null;
-                    if (dbName == null)
+
+                    if (IsAllSpecialDatabank(dbName))
                     {
-                        LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq 
-                        db = HandleLocalGlobalBank(lg);
+                        G.Writeln("*** ERROR: all:x = ... is not supported, use first:x = ... instead to circumvent LOCAL/GLOBAL<all>.");
+                        throw new GekkoException();
                     }
                     else
                     {
-                        db = Program.databanks.GetDatabank(dbName, true);
+
+                        if (dbName == null)
+                        {
+                            LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq 
+                            db = HandleLocalGlobalBank(lg);
+                        }
+                        else
+                        {
+                            db = Program.databanks.GetDatabank(dbName, true);
+                        }
                     }
                     ib = db;
                 }
@@ -1850,8 +1860,10 @@ namespace Gekko
             //varname is used for local/global stuff, faster than chopping up varnameWithFreq up now
             //Can either look up stuff in a Map, or in a databank
 
+            bool isAllSpecialDatabank = IsAllSpecialDatabank(dbName); // all:x should be understood as just x, circumventing any local<all> or global<all>
+
             bool errorIfNotFound = settings.create == ECreatePossibilities.NoneReportError;  //else it will return null
-            
+
             IVariable rv = null;
             string frombank = null;
 
@@ -1863,7 +1875,7 @@ namespace Gekko
                 {
                     varnameWithFreq = G.Chop_AddBank(varnameWithFreq, dbName);
                 }
-                
+
                 List<string> names = Program.Search(new List(new List<string>() { varnameWithFreq }), frombank, EVariableType.Var);
 
                 if (Globals.fixWildcardLabel && smpl != null)
@@ -1894,9 +1906,9 @@ namespace Gekko
                 if (map == null)
                 {
                     //It must be a databank then
-                    if (dbName == null)
+                    if (dbName == null || isAllSpecialDatabank)
                     {
-                        //No explicit databank name is provided
+                        //No explicit databank name is provided, or an all:x
 
                         if (varname.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
                         {
@@ -1907,9 +1919,8 @@ namespace Gekko
                         }
                         else
                         {
-                            LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
 
-                            //databank name not given, for instance "PRT x"
+                            //databank name not given, for instance "PRT x", or it is given as "PRT all:x"
                             //Searching only if:
                             //  (1) OPTION databank search = yes
                             //  (2) settings.canSearch = true (deactivated for commands like DOC, TRUNCATE and others)
@@ -1919,7 +1930,7 @@ namespace Gekko
 
                             if (smpl != null && smpl.bankNumber == 1 && !G.StartsWithSigil(varnameWithFreq))
                             {
-                                //Ref lookup
+                                //Ref lookup, also overrules local/global
                                 Databank db = null;
                                 db = Program.databanks.GetRef();
                                 rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
@@ -1928,11 +1939,14 @@ namespace Gekko
                             {
                                 //non-Ref lookup         
 
-                                if (lg != LocalGlobal.ELocalGlobalType.None)
-                                {
-                                    //the variable has been stated with LOCAL or GLOBAL keyword
+                                LocalGlobal.ELocalGlobalType lg = Program.databanks.localGlobal.GetValue(varname);  //varname is always without freq
 
-                                    //really should be handled under lookup in specific bank
+                                if (lg != LocalGlobal.ELocalGlobalType.None && !isAllSpecialDatabank)
+                                {
+                                    //the variable x has been stated with LOCAL or GLOBAL keyword, and all:x is not used
+                                    //Really should be handled under lookup in specific bank, since the logic
+                                    //is just as if local:x had been stated, and not just x.
+
                                     Databank db = HandleLocalGlobalBank(lg);
                                     rv = LookupHelperFindVariableInSpecificBank(varnameWithFreq, settings, db);
                                     if (rv == null)
@@ -1942,53 +1956,54 @@ namespace Gekko
                                         throw new GekkoException();
                                     }
                                 }
-
-                                bool canSearch = Program.options.databank_search && settings.canSearch;
-                                rv = Program.databanks.GetVariableWithSearch(varnameWithFreq, canSearch);
-
-                                if (rv == null)
+                                else
                                 {
-                                    if (settings.create == ECreatePossibilities.NoneReportError)
+
+                                    bool canSearch = Program.options.databank_search && settings.canSearch;
+                                    rv = Program.databanks.GetVariableWithSearch(varnameWithFreq, canSearch);
+
+                                    if (rv == null)
                                     {
-                                        //     Local
-                                        //  0. Work
-                                        //  1. Ref
-                                        //  2. OPEN1
-                                        //  3. OPEN2
-                                        //     Global
-                                        //
-                                        string s = null;
-                                        string ss = null;
-                                        string sss = null;
-                                        if (!canSearch)
+                                        if (settings.create == ECreatePossibilities.NoneReportError)
                                         {
-                                            if (Program.databanks.GetLocal().storage.Count > 0 || Program.databanks.GetGlobal().storage.Count > 0) sss = " (or Local/Global)";
-                                            ss = "the first-position" + sss + " databank";
+                                            //     Local
+                                            //  0. Work
+                                            //  1. Ref
+                                            //  2. OPEN1
+                                            //  3. OPEN2
+                                            //     Global
+                                            //
+                                            string s = null;
+                                            string ss = null;
+                                            string sss = null;
+                                            if (!canSearch)
+                                            {
+                                                if (Program.databanks.GetLocal().storage.Count > 0 || Program.databanks.GetGlobal().storage.Count > 0) sss = " (or Local/Global)";
+                                                ss = "the first-position" + sss + " databank";
+                                            }
+                                            else
+                                            {
+                                                ss = "any open databank";
+                                                if (Program.databanks.GetRef().storage.Count() > 0) s = " (excluding Ref)";
+                                            }
+                                            G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ss + s);
+                                            throw new GekkoException();
+                                        }
+                                        else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
+                                        {
+                                            ////This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
+                                            ////This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
+                                            //G.Writeln2("*** ERROR: Internal error #98253298");
+                                            //throw new GekkoException();
+                                            //it is probably ok to create it here like this                                            
+                                            //never mind...
+                                            rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
+                                            Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
                                         }
                                         else
                                         {
-                                            ss = "any open databank";
-                                            if (Program.databanks.GetRef().storage.Count() > 0) s = " (excluding Ref)";
+                                            //just return the null
                                         }
-                                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq) + " in " + ss + s);
-                                        throw new GekkoException();
-                                    }
-                                    else if (settings.create == ECreatePossibilities.Can || settings.create == ECreatePossibilities.Must)
-                                    {
-                                        ////This should actually not be possible, since calling with noSearch=false and .Can or .Must is caught as an error earlier on in GetIVariableFromString()
-                                        ////This is a variable x without bankcolon, and with autosearch true. In that case, we refuse to create it.
-                                        //G.Writeln2("*** ERROR: Internal error #98253298");
-                                        //throw new GekkoException();
-
-                                        //it is probably ok to create it here like this
-                                        //issue: what if it series is present in Local/Global
-                                        //never mind...
-                                        rv = new Series(G.GetFreq(G.Chop_GetFreq(varnameWithFreq)), varnameWithFreq);  //brand new
-                                        Program.databanks.GetFirst().AddIVariableWithOverwrite(rv);
-                                    }
-                                    else
-                                    {
-                                        //just return the null
                                     }
                                 }
                             }
@@ -2026,7 +2041,11 @@ namespace Gekko
             return rv;
         }
 
-        
+        private static bool IsAllSpecialDatabank(string dbName)
+        {
+            return G.Equal(dbName, Globals.All);
+        }
+
 
         private static List ReadListFile(string varname)
         {

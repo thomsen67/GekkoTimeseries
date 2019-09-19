@@ -2351,12 +2351,13 @@ namespace Gekko.Parser.Gek
 
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);                            
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
-
                             string ss = null;
                             if (Globals.functionFuncArguments) ss = "New";
-
                             w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p" + vars + ") => " + G.NL);
-                            w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);                            
+
+                            w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
+                            //w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
+
                             w.headerCs.AppendLine("}" + G.NL);
                             
                             node.Code.A(sb.ToString());                            

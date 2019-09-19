@@ -12983,8 +12983,12 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DatabankLocalGlobal()
         {
-
-
+            I("reset;");
+            I("local:%x = 3;");
+            I("function val f(val %z); return 2 * %z; end;");
+            I("%a = f(%x);");
+            _AssertScalarVal(First(), "%a", 6d, sharedDelta);
+                       
 
             // ===========================================================
             // ================= test get/set of local and global databank
@@ -13117,8 +13121,7 @@ namespace UnitTests
             _AssertScalarString(First(), "%s1", "first");
             _AssertScalarString(First(), "%s2", "global");
             _AssertScalarString(First(), "%s3", "first");
-
-
+            
             I("RESET;");
             I("LOCAL<all>;");
             I("%s1 = 'local';");
@@ -13133,6 +13136,21 @@ namespace UnitTests
             Assert.AreEqual(First().storage.Count, 2);
             _AssertScalarString(First(), "%s1", "first");
             _AssertScalarString(First(), "%s3", "first");
+
+            //----------> test "all:" special bank
+            I("RESET;");
+            I("%s0 = 'first';");
+            I("LOCAL<all>;");
+            I("%s1 = 'local';");
+            I("%s2 = %s1;");
+            FAIL("%s3 = %s0;");
+            I("%s3 = all:%s0;");  
+            Assert.AreEqual(Local().storage.Count, 3);
+            _AssertScalarString(Local(), "%s1", "local");
+            _AssertScalarString(Local(), "%s2", "local");
+            _AssertScalarString(Local(), "%s3", "first");
+            Assert.AreEqual(First().storage.Count, 1);
+            _AssertScalarString(First(), "%s0", "first");
 
             I("RESET;");
             I("GLOBAL<all>;");
@@ -16560,11 +16578,7 @@ namespace UnitTests
             //_AssertSeries(First(), "xx", 2002, 2d, sharedDelta);
             //_AssertSeries(First(), "xx", 2003, 3d, sharedDelta);
             //_AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
-
-            I("time 2001 2004;");
-            I("#x = [1; 2; 3];");
-            I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
-
+            
             // -----------
 
             I("RESET; TIME 2001 2005;");
@@ -17446,7 +17460,11 @@ namespace UnitTests
             Assert.AreEqual(m.colnames.Count, 4);
             I("PRT #a;");
 
-            
+
+            I("time 2001 2004;");
+            I("#x = [1; 2; 3];");
+            I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
+
         }
 
         [TestMethod]

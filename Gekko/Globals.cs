@@ -264,12 +264,13 @@ namespace Gekko
         public const string Work = "Work";
         public const string Ref = "Ref";
         public const string First = "First";
+        public const string All = "All";  //circumvent a LOCAL<all>
         public const string Local = "Local";
         public const string Global = "Global";
 
         //only used as keys in switches etc.
         public const string ref_name = "ref";
-        public const string first_name = "first";
+        public const string first_name = "first";        
         public const string local_name = "local";
         public const string global_name = "global";
 

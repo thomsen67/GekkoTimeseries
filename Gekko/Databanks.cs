@@ -133,7 +133,7 @@ namespace Gekko
                     {
                         foreach (Databank db in this.storage)
                         {
-                            if (G.Equal(db.name, databank)) return db;
+                            if (G.Equal(db.name, databank_lower)) return db;
                         }
                     }
                     break;
@@ -234,6 +234,11 @@ namespace Gekko
             else if (G.Equal(name, Globals.First))
             {
                 G.Writeln2("*** ERROR: The databank name 'First' is reserved and cannot be used.");
+                throw new GekkoException();
+            }
+            else if (G.Equal(name, Globals.All))
+            {
+                G.Writeln2("*** ERROR: The databank name 'All' is reserved and cannot be used.");
                 throw new GekkoException();
             }
             else if (G.Equal(name, Globals.Local))
@@ -345,6 +350,11 @@ namespace Gekko
             else if (G.Equal(databank.name, Globals.First))
             {
                 G.Writeln2("*** ERROR: The databank name 'First' is reserved and cannot be used.");
+                throw new GekkoException();
+            }
+            else if (G.Equal(databank.name, Globals.All))
+            {
+                G.Writeln2("*** ERROR: The databank name 'All' is reserved and cannot be used.");
                 throw new GekkoException();
             }
             else if (G.Equal(databank.name, Globals.Local))
