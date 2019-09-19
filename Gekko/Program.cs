@@ -7839,7 +7839,7 @@ namespace Gekko
         //    }
         //}
 
-        public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, P p)
+        public static void EmitCodeFromANTLR(string text, string fileName, bool isLibrary, int skip, P p)
         {
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
@@ -7865,8 +7865,6 @@ namespace Gekko
                 string commandLinesFlat = null;
                 //It is either txt or fileName, depending of how method is called
 
-                List<string> commandLines = new List<string>();
-
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Handle start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
                 if (fileName != "")
@@ -7878,6 +7876,20 @@ namespace Gekko
                     }
                     string input = GetTextFromFileWithWait(fileName);
                     commandLinesFlat = HandleObeyFiles2(input);
+                    if (skip != 0)
+                    {
+                        List<string> ss = Program.CreateListOfStringsFromString(commandLinesFlat);
+                        commandLinesFlat = "";
+                        for (int ii = 0; ii < skip; ii++)
+                        {
+                            if (ii == ss.Count)
+                            {
+                                G.Writeln2("Skip is set after file end");
+                                break;
+                            }
+                            commandLinesFlat += ss[ii] + G.NL;
+                        }                                                
+                    }
                     ph.isOneLinerFromGui = false;
                 }
                 else if (text != "")
@@ -14273,8 +14285,6 @@ namespace Gekko
                     }
                 }
 
-
-                
                 if (s2.Length == 7)
                 {
 
@@ -14986,7 +14996,10 @@ namespace Gekko
             P p = new P();
             Program.XmlTable(file, "txt", null, p);
             Program.Pipe("temptabtotextfile.txt", null);  //no append
-            Program.Run(Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension, p);
+            O.Run o = new O.Run();
+            o.fileName = Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension;
+            o.p = p;
+            Program.Run(o);
             Program.Pipe("con", null);
 
             string s = GetTextFromFileWithWait(Program.options.folder_working + "\\" + "temptabtotextfile.txt");
@@ -16224,26 +16237,17 @@ namespace Gekko
             return s;
         }
 
-        public static void Run(string fileName, P p)
+        public static void Run(O.Run o)
         {
             bool cancel = false;
+            string fileName = o.fileName;
             if (fileName == "*")
             {
                 Program.SelectFile(Globals.extensionCommand, ref fileName, ref cancel);
             }
             if (cancel) return;
-            AddAbstract(fileName, true, false, p);
-        }
-
-        public static void Library(string fileName, P p)
-        {
-            if (fileName == "*")
-            {
-                G.Writeln2("*** ERROR: You cannot use LIBRARY *;");
-                throw new GekkoException();
-            }
-            AddAbstract(fileName, true, true, p);
-        }
+            RunHelper(o);
+        }        
 
         public static void Ini(P p)
         {
@@ -16260,7 +16264,7 @@ namespace Gekko
             {
                 Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
                 Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from program folder");
             }
@@ -16279,21 +16283,18 @@ namespace Gekko
             {
                 Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
                 Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-                Program.EmitCodeFromANTLR("", fileName2, false, p);
+                Program.EmitCodeFromANTLR("", fileName2, false, 0, p);
                 G.Writeln();
                 G.Writeln("Finished running INI file ('" + Path.GetFileName(Globals.cmdPathAndFileName) + "') from working folder");
             }
         }
 
-        public static void AddAbstract(string s, bool run, bool isLibrary, P p)
+        public static void RunHelper(O.Run o)
         {
-            s = G.StripQuotes(s);
-            if (run)
-            {
-                s = Program.AddExtension(s, "." + Globals.extensionCommand);
-            }
-            else throw new GekkoException();
-
+            string s = o.fileName;
+            s = G.StripQuotes(s);            
+            s = Program.AddExtension(s, "." + Globals.extensionCommand);            
+            
             List<string> folders = new List<string>();
             folders.Add(Program.options.folder_command);
             folders.Add(Program.options.folder_command1);
@@ -16304,21 +16305,11 @@ namespace Gekko
             if (fileName2 == null)
             {
                 //calling RUN gekko.ini here manually will fail if the file does not exist, which is fine
-                G.Writeln2("*** ERROR: Could not find file: " + s);
-                if (isLibrary)
-                {
-                    G.Writeln("*** ERROR: A function with that name is used, looking for definition .gcm");
-                }
+                G.Writeln2("*** ERROR: Could not find file: " + s);                
                 throw new GekkoException();
             }
-
-            if (!isLibrary)
-            {
-                Globals.cmdPathAndFileName = fileName2;  //always contains a path, is used if there is a lexer error
-                Globals.cmdFileName = Path.GetFileName(Globals.cmdPathAndFileName);
-            }
-
-            Program.EmitCodeFromANTLR("", fileName2, isLibrary, p);
+            
+            Program.EmitCodeFromANTLR("", fileName2, false, (int)o.opt_skip, o.p);
 
             if (G.Equal(s, Globals.autoExecCmdFileName))
             {
@@ -27743,7 +27734,7 @@ namespace Gekko
         public static void obeyCommandCalledFromGUI(string s, P p)
         {            
             //Globals.prtCsSnippets.Clear();  //to save RAM for long sessions, should be ok to delete it here (otherwise we will just get an exception)
-            Program.EmitCodeFromANTLR(s, "", false, p);
+            Program.EmitCodeFromANTLR(s, "", false, 0, p);
             //if (!G.IsUnitTesting()) ShowPeriodInStatusField("");
         }
 

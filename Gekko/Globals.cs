@@ -833,7 +833,7 @@ namespace Gekko
 
         public static string detectedRPath = null;
         public static string detectedPythonPath = null;
-
+        
         public static string guiDialogErrorText = "ERROR: Would you like to abort (Y), or ignore the error (N)";
         public static string guiDialogErrorCaption = "Error handling";
 

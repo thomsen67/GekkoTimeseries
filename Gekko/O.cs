@@ -8510,26 +8510,13 @@ namespace Gekko
         public class Run
         {
             public string fileName = null;
+            public double opt_skip = 0d;
             public P p = null;
             public void Exe()
             {
-                if (false && Globals.runningOnTTComputer)
-                {                    
-                    Program.Run("tt.gcm", this.p);
-                }
-                else Program.Run(this.fileName, this.p);
+                Program.Run(this);
             }
-        }
-
-        public class Library
-        {
-            public string fileName = null;
-            public P p = null;
-            public void Exe()
-            {
-                Program.Library(this.fileName, this.p);
-            }
-        }
+        }                
 
         public class Doc
         {
@@ -9570,7 +9557,10 @@ namespace Gekko
 
                     Globals.lastCalledMenuTable = tableFileName;
                     Program.XmlTable(tableFileName, this.opt_html, this.opt_window, p);
-                    Program.Run(Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension, p);
+                    O.Run o = new O.Run();
+                    o.fileName = Globals.localTempFilesLocation + "\\" + "tablecode." + Globals.defaultCommandFileExtension;
+                    o.p = p;
+                    Program.Run(o);
                 }
             }
             

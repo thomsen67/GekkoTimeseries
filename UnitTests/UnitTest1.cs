@@ -16561,6 +16561,12 @@ namespace UnitTests
             //_AssertSeries(First(), "xx", 2003, 3d, sharedDelta);
             //_AssertSeries(First(), "xx", 2004, double.NaN, sharedDelta);
 
+            I("time 2001 2004;");
+            I("#x = [1; 2; 3];");
+            I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
+
+            // -----------
+
             I("RESET; TIME 2001 2005;");
             I("xx1 = (1, 2, 3, 4, 5);");
             //I("#m = xx1;");  //autoconverted into matrix    WHY??? --> does not work anymore! Too easy to misunderstand as a 1-element naked list

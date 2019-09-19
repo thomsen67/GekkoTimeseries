@@ -670,6 +670,7 @@ ASTOPT_STRING_Y2;
 	ASTOPT_VAL_PDEC;
 
     ASTOPT_VAL_LAG;
+	ASTOPT_VAL_SKIP;
     ASTOPT_VAL_REPLACE;
     ASTOPT_VAL_YMAX;
     ASTOPT_VAL_YMIN;
@@ -3465,7 +3466,10 @@ restart:                    RESTART -> ^({token("ASTRESTART", ASTRESTART, input.
 // RUN
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-run:                        RUN fileNameStar -> ^({token("ASTRUN", ASTRUN, input.LT(1).Line)} fileNameStar);
+run:                        RUN runOpt1? fileNameStar -> ^({token("ASTRUN", ASTRUN, input.LT(1).Line)} fileNameStar runOpt1?);
+
+runOpt1:                    ISNOTQUAL | leftAngle runOpt1h* RIGHTANGLE -> runOpt1h*;						
+runOpt1h:                   SKIP EQUAL expression -> ^(ASTOPT_VAL_SKIP expression);	
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // SHEET<import>

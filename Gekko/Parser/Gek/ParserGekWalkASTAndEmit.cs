@@ -5775,39 +5775,13 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
                             node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
+                            if (node[1] != null) node.Code.A(node[1].Code + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                             node.Code.A(LocalCode2(Num(node), null)); //see LocalCode1
                         }
-                        break;
-                    //case "ASTRUN":
-                    //    {
-                    //        node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
-                    //        //HMMM is this right:
-                    //        node.Code.A("o" + Num(node) + ".fileName = " + node[0].Code + ".GetString();" + G.NL);
-                    //        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                    //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                    //    }
-                    //    break;
-                    case "ASTLIBRARY":
-                        {
-                            if(node.Number != 0)
-                            {
-                                G.Writeln2("*** ERROR: The LIBRARY command must be the first command in a command file");
-                                throw new GekkoException();
-                            }
-                            string libName = node[0].Text;  //simple ident name
-                            O.Library o = new O.Library();
-                            o.fileName = libName;
-                            o.p = p;
-                            o.Exe();                            
-                        }
-                        break;
-                    //case "ASTSCALAR":
-                    //    {
-                    //        HandleScalar(node, false, w);                            
-                    //    }
-                    //    break;
+                        break;                    
+                    
                     case "ASTSTAMP":
                         {
                             node.Code.A("Program.Stamp();" + G.NL);

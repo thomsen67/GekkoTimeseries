@@ -137,6 +137,10 @@ namespace Gekko
                 foreach (IVariable item in (ths as List).list) rv.Add(getbank(smpl, _t1, _t2, item));
                 return rv;
             }
+            if (ths.Type() == EVariableType.Series)
+            {
+                return new ScalarString((ths as Series).GetParentDatabank().name);
+            }
             else
             {
                 string ss = G.Chop_GetBank(O.ConvertToString(ths));
@@ -153,6 +157,10 @@ namespace Gekko
                 List rv = new List();
                 foreach (IVariable item in (ths as List).list) rv.Add(getname(smpl, _t1, _t2, item));
                 return rv;
+            }
+            if (ths.Type() == EVariableType.Series)
+            {
+                return new ScalarString(G.Chop_GetName((ths as Series).GetName()));
             }
             else
             {
@@ -175,6 +183,10 @@ namespace Gekko
                 GekkoTime gt = (ths as ScalarDate).date;
                 return new ScalarString(G.GetFreq(gt.freq));
             }
+            if (ths.Type() == EVariableType.Series)
+            {
+                return new ScalarString(G.GetFreq((ths as Series).freq));
+            }
             else
             {
                 return new ScalarString(G.Chop_GetFreq(O.ConvertToString(ths)));
@@ -190,6 +202,10 @@ namespace Gekko
                 List rv = new List();
                 foreach (IVariable item in (ths as List).list) rv.Add(getnameandfreq(smpl, _t1, _t2, item));
                 return rv;
+            }
+            if (ths.Type() == EVariableType.Series)
+            {
+                return new ScalarString((ths as Series).GetName());
             }
             else
             {
@@ -3289,6 +3305,11 @@ namespace Gekko
             return new ScalarVal((double)DateTime.Now.Second);
         }
 
+        public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            return new ScalarString(Program.options.folder_working);
+        }
+
         public static IVariable filteredperiods(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             GekkoTime t1 = GekkoTime.tNull;
@@ -3392,7 +3413,13 @@ namespace Gekko
             }
             else if (G.Equal(s2, "dataStart"))
             {
-                return new ScalarDate(ts.GetRealDataPeriodFirst());
+                GekkoTime gt = ts.GetRealDataPeriodFirst();
+                if (gt.IsNull())
+                {
+                    G.Writeln2("*** ERROR: 'dataStart': The series has no data or is timeless");
+                    throw new GekkoException();
+                }
+                return new ScalarDate(gt);
             }
             else if (G.Equal(s2, "perEnd"))
             {
@@ -3400,7 +3427,13 @@ namespace Gekko
             }
             else if (G.Equal(s2, "dataEnd"))
             {
-                return new ScalarDate(ts.GetRealDataPeriodLast());
+                GekkoTime gt = ts.GetRealDataPeriodLast();
+                if (gt.IsNull())
+                {
+                    G.Writeln2("*** ERROR: 'dataEnd': The series has no data or is timeless");
+                    throw new GekkoException();
+                }
+                return new ScalarDate(gt);
             }
             else if (G.Equal(s2, "freq"))
             {

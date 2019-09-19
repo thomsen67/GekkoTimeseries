@@ -28,12 +28,11 @@ namespace Gekko.Parser.Gek
             ConvertHelper ch2 = new ConvertHelper();
 
             string textInput = ph.commandsText + "\r\n" + "\r\n"; //newlines for ease of use of ANTLR
-
+            
             ANTLRStringStream input = new ANTLRStringStream(textInput);
 
             List<string> errors = null;
             CommonTree t = null;
-
 
             if (Globals.printAST) G.Writeln2(ph.commandsText, Color.Green);
             // Create a lexer attached to that input            

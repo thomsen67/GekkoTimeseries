@@ -1102,7 +1102,7 @@ namespace Gekko
                         }
                     }
                 }                
-            }
+            }            
             return rv;
         }
 
@@ -1128,7 +1128,7 @@ namespace Gekko
                         }
                     }
                 }
-            }
+            }            
             return rv;
         }
 
