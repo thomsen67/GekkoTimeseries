@@ -2494,8 +2494,8 @@ namespace Gekko
                                     string s = ss.string2;
                                     string s2 = G.Chop_GetName(s);
                                     //This will create them if no already there
-                                    IVariable iv2 = O.GetIVariableFromString( O.UnChop("first", s2, freq,null), O.ECreatePossibilities.Can);
-                                    IVariable iv3 = O.GetIVariableFromString(O.UnChop("ref", s2, freq, null), O.ECreatePossibilities.Can);                                    
+                                    IVariable iv2 = O.GetIVariableFromString(O.UnChop(Globals.First.ToLower(), s2, freq, null), O.ECreatePossibilities.Can);
+                                    IVariable iv3 = O.GetIVariableFromString(O.UnChop(Globals.Ref.ToLower(), s2, freq, null), O.ECreatePossibilities.Can);
                                 }
                             }
                         }
