@@ -2591,8 +2591,8 @@ namespace Gekko
                     }
                 }
                 else
-                {
-                    G.Writeln2("*** ERROR: A normal series on the left-hand side must be []-indexed with date or val");
+                {                    
+                    G.Writeln2("*** ERROR: A normal series " + this.GetNameAndFreqPretty(true) + " on the left-hand side must be []-indexed with date or val");
                     throw new GekkoException();
                 }
             }
@@ -2653,7 +2653,7 @@ namespace Gekko
             Series tsCopy = new Series(this.freq, this.name);  //this will create t½he .meta object - the .data object is always there
 
             tsCopy.type = this.type;
-            
+
             //BEWARE: Be careful when using .dataOffsetLag! #772439872435
             tsCopy.dataOffsetLag = this.dataOffsetLag;  //probably 0 in all cases
 
@@ -2669,16 +2669,17 @@ namespace Gekko
             }
             tsCopy.data.anchorPeriod = this.data.anchorPeriod;
             tsCopy.data.anchorPeriodPositionInArray = this.data.anchorPeriodPositionInArray;  //!!! DO NOT USE ANY .dataLag here, it is dealt with somewhere else
-            
+
             if (this.type == ESeriesType.ArraySuper)
             {
                 //Clone the array-subseries
                 tsCopy.dimensions = this.dimensions;
-                tsCopy.dimensionsStorage = new MapMultidim();                
+                tsCopy.dimensionsStorage = new MapMultidim();
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate));
                 }
+                tsCopy.DeepCleanup(); //necessary to get the pointers back and forth right
             }
 
             if (this.type != ESeriesType.Light)

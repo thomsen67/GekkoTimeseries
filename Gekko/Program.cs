@@ -37026,7 +37026,23 @@ namespace Gekko
 
         public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2)
         {
+            DataTable dt = new DataTable();
+
             
+            if (false)
+            {
+                // Create a DataTable and add two Columns to it                
+                dt.Columns.Add("Name", typeof(string));
+                dt.Columns.Add("Age", typeof(int));
+                // Create a DataRow, add Name and Age data, and add to the DataTable
+                DataRow dr = dt.NewRow();
+                dr["Name"] = "Mohammad"; // or dr[0]="Mohammad";
+                dr["Age"] = 24; // or dr[1]=24;
+                dt.Rows.Add(dr);
+            }
+
+            dt.Columns.Add("<t>", typeof(GekkoTime)); //"<...>" so that it does not collide with a variable name
+            dt.Columns.Add("<value>", typeof(double)); //"<...>" so that it does not collide with a variable name
 
             Table tab = new Table();
             int iOffset = 0;
@@ -37037,6 +37053,53 @@ namespace Gekko
                 tab.Set(1, 1, "%");
             }
 
+            foreach (string item in vars2)
+            {
+                IVariable iv2 = O.GetIVariableFromString("bqrsm", O.ECreatePossibilities.NoneReturnNull);
+                
+                string colname = null;
+
+                //See #876435924365                        
+                string[] ss = item.Split('¤');
+                string fullName = ss[0];
+                string lag = ss[1];
+                if (lag == "[0]") lag = null;
+
+                string dbName, varName, freq; string[] indexes; char firstChar;
+                O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+                
+                if (!dt.Columns.Contains(dbName)) dt.Columns.Add(dbName, typeof(string));
+                if (!dt.Columns.Contains(varName)) dt.Columns.Add(varName, typeof(string));
+
+                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                if(fullName.Contains("bqrsm"))
+                {
+
+                }
+                string[] domains = null; if (indexes != null) domains = new string[indexes.Length];
+                if (iv != null)
+                {
+                    Series ts = iv as Series;
+                    if (ts?.mmi?.parent?.meta?.domains != null)
+                    {
+                        for (int i = 0; i < ts.mmi.parent.meta.domains.Length; i++) {
+                            domains[i] = ts.mmi.parent.meta.domains[i];
+                        }
+                    }
+                }
+                if (domains != null)
+                {
+                    foreach (string domain in domains)
+                    {
+                        string d = "<universe>"; //"<...>" so that it does not collide with a variable name
+                        if (domain != null)
+                            d = domain;
+                        if (!dt.Columns.Contains(d)) dt.Columns.Add(d, typeof(string));
+                    }
+                }
+            }
+
+
             int j = 0;
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
@@ -37044,15 +37107,19 @@ namespace Gekko
                 int i = 0;
                 double lhsSum = 0d;
                 double rhsSum = 0d;
-                foreach (string varname in vars2)
+                foreach (string item in vars2)
                 {
                     i++;
+                    string nameWithBankAndFreqAndIndexes = null; //since i starts at 1, these are always set just below
+                    string lag = null; //since i starts at 1, these are always set just below
                     if (j == 1)
-                    {
+                    {                        
                         //See #876435924365                        
-                        string[] ss = varname.Split('¤');
-                        if (ss[1] == "[0]") ss[1] = "";
-                        tab.Set(i + 1, 1, G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name) + ss[1]);
+                        string[] ss = item.Split('¤');
+                        nameWithBankAndFreqAndIndexes = ss[0];
+                        lag = ss[1];
+                        if (lag == "[0]") lag = "";                                                
+                        tab.Set(i + 1, 1, G.Chop_RemoveBank(nameWithBankAndFreqAndIndexes, Program.databanks.GetFirst().name) + lag);
                     }
 
                     if (i == 1)
@@ -37063,129 +37130,128 @@ namespace Gekko
                         tab.Set(new Coord(1, j + 1), c);
                     }
 
-
                     double d = double.NaN;
                     if (code1 == "n" || code1 == "xn" || code1 == "x")
                     {
-                        d = decompTables.cellsQuo[varname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+                        d = decompTables.cellsQuo[item].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
                     }
                     else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
                     {
-                        d = decompTables.cellsRef[varname].GetData(smpl, t2);                        
+                        d = decompTables.cellsRef[item].GetData(smpl, t2);                        
                     }
                     else if (code1 == "d")
                     {
-                        d = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribD[item].GetData(smpl, t2);
                     }
                     else if (code1 == "rd")
                     {
-                        d = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribDRef[item].GetData(smpl, t2);
                     }
                     else if (code1 == "xd")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1));
                         d = d1 - d0;
                     }
                     else if (code1 == "xrd")
                     {
-                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsRef[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1));
                         d = d1 - d0;
                     }
                     else if (code1 == "m")
                     {
-                        d = decompTables.cellsContribM[varname].GetData(smpl, t2);
+                        d = decompTables.cellsContribM[item].GetData(smpl, t2);
                     }
                     else if (code1 == "xm")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[item].GetData(smpl, t2);
                         d = d1 - d0;
                     }
                     else if (code1 == "p")
                     {
-                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dd = decompTables.cellsContribD[item].GetData(smpl, t2);
                         double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "rp")
                     {
-                        double dd = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dd = decompTables.cellsContribDRef[item].GetData(smpl, t2);
                         double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "xp")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "xrp")
                     {
-                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsRef[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "q")
                     {
-                        double dd = decompTables.cellsContribM[varname].GetData(smpl, t2);
+                        double dd = decompTables.cellsContribM[item].GetData(smpl, t2);
                         double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2);
                         d = (dd / dLhsLag) * 100d;
                     }
                     else if (code1 == "xq")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2);
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsRef[item].GetData(smpl, t2);
                         d = (d1 / d0 - 1d) * 100d;
                     }
                     else if (code1 == "dp")
                     {
-                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
-                        double dd_lag = decompTables.cellsContribD[varname].GetData(smpl, t2.Add(-1));
+                        double dd = decompTables.cellsContribD[item].GetData(smpl, t2);
+                        double dd_lag = decompTables.cellsContribD[item].GetData(smpl, t2.Add(-1));
                         double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
                         double dLhsLag_lag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                     }
                     else if (code1 == "rdp")
                     {
-                        double dd = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
-                        double dd_lag = decompTables.cellsContribDRef[varname].GetData(smpl, t2.Add(-1));
+                        double dd = decompTables.cellsContribDRef[item].GetData(smpl, t2);
+                        double dd_lag = decompTables.cellsContribDRef[item].GetData(smpl, t2.Add(-1));
                         double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         double dLhsLag_lag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
                     }
                     else if (code1 == "xdp")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d1_lag = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d0_lag = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d1_lag = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1));
+                        double d0 = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1));
+                        double d0_lag = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                     }
                     else if (code1 == "xrdp")
                     {
-                        double d1 = decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d1_lag = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
-                        double d0 = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
-                        double d0_lag = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1).Add(-1));
+                        double d1 = decompTables.cellsRef[item].GetData(smpl, t2);
+                        double d1_lag = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1));
+                        double d0 = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1));
+                        double d0_lag = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1).Add(-1));
                         d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
                     }
                     else if (code1 == "mp")  // <p> - <rp>
                     {
-                        double dd = decompTables.cellsContribD[varname].GetData(smpl, t2);
+                        double dd = decompTables.cellsContribD[item].GetData(smpl, t2);
                         double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
 
-                        double dd2 = decompTables.cellsContribDRef[varname].GetData(smpl, t2);
+                        double dd2 = decompTables.cellsContribDRef[item].GetData(smpl, t2);
                         double dLhsLag2 = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
                         d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
                     }
                     else if (code1 == "xmp")
                     {
-                        double d1 = decompTables.cellsQuo[varname].GetData(smpl, t2);
-                        double d0 = decompTables.cellsQuo[varname].GetData(smpl, t2.Add(-1));
-                        double d1_ref = decompTables.cellsRef[varname].GetData(smpl, t2);
-                        double d0_ref = decompTables.cellsRef[varname].GetData(smpl, t2.Add(-1));
+                        double d1 = decompTables.cellsQuo[item].GetData(smpl, t2);
+                        double d0 = decompTables.cellsQuo[item].GetData(smpl, t2.Add(-1));
+                        double d1_ref = decompTables.cellsRef[item].GetData(smpl, t2);
+                        double d0_ref = decompTables.cellsRef[item].GetData(smpl, t2.Add(-1));
                         d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
                     }
                     else
