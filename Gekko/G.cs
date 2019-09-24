@@ -1978,9 +1978,14 @@ namespace Gekko
             //format == 'yyyy-mm-dd'-style     --> f = 'yyyy-mm-dd'-style
 
             dt = new DateTime(y, m, d);
-            if (G.Equal(format, "gekko"))
+            if (format == null)
             {
-                date_as_string = gt.ToString();                
+                //Not sure if this is right, using f?? Probably ok.
+                date_as_string = G.DateHelper3(f, dt); //lowercase 'm' is understood as minutes in C#
+            }
+            else if (G.Equal(format, "gekko"))
+            {
+                date_as_string = gt.ToString();
             }
             else
             {

@@ -8639,6 +8639,37 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ExcelTransposed()
+        {
+            //Visual test has been performed regarding the placement of dates in the Excel case (there was a bug originally)
+            //IMPORT<sheet> does not look at dates at all
+            //Also <date=no>, <names=no>, <date=no names=no> have been checked visually for all combinations
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                    string s = null;
+                    string cols = null;
+                    if (i == 1) s = "datetype = 'excel'";
+                    if (j == 1) cols = " cols";
+                    I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                    I("OPTION freq q; TIME 2010q1 2010q4;");
+                    I("x1 = 1, 2, 3, 4; x2 = 10, 12, 14, 16; x3 = 20, 25, m(), 35;");
+                    I("SHEET<" + s + " cell = 'B4'" + cols + "> x1 + x2 + x3 file = data.xlsx;");
+                    I("RESET; OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                    I("OPTION freq q; TIME 2010q1 2010q4;");
+                    I("SHEET<import cell = 'C5'" + cols + "> x file = data.xlsx;");
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2010, 1, 31d, sharedDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2010, 2, 39d, sharedDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2010, 3, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "x!q", EFreq.Q, 2010, 4, 55d, sharedDelta);
+                }
+            }
+        }
+
+        [TestMethod]
         public void _Test_ExcelAndCsvDateFormats()
         {
 

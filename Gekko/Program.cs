@@ -37027,20 +37027,7 @@ namespace Gekko
         public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2)
         {
             DataTable dt = new DataTable();
-
-            
-            if (false)
-            {
-                // Create a DataTable and add two Columns to it                
-                dt.Columns.Add("Name", typeof(string));
-                dt.Columns.Add("Age", typeof(int));
-                // Create a DataRow, add Name and Age data, and add to the DataTable
-                DataRow dr = dt.NewRow();
-                dr["Name"] = "Mohammad"; // or dr[0]="Mohammad";
-                dr["Age"] = 24; // or dr[1]=24;
-                dt.Rows.Add(dr);
-            }
-
+                        
             dt.Columns.Add("<t>", typeof(GekkoTime)); //"<...>" so that it does not collide with a variable name
             dt.Columns.Add("<value>", typeof(double)); //"<...>" so that it does not collide with a variable name
 
@@ -37055,42 +37042,7 @@ namespace Gekko
 
             foreach (string item in vars2)
             {                              
-                string colname = null;
-
-                //See #876435924365                        
-                string[] ss = item.Split('¤');
-                string fullName = ss[0];
-                string lag = ss[1];
-                if (lag == "[0]") lag = null;
-
-                string dbName, varName, freq; string[] indexes; char firstChar;
-                O.Chop(fullName, out dbName, out varName, out freq, out indexes);
                 
-                if (!dt.Columns.Contains(dbName)) dt.Columns.Add(dbName, typeof(string));
-                if (!dt.Columns.Contains(varName)) dt.Columns.Add(varName, typeof(string));
-
-                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);                
-                string[] domains = null; if (indexes != null) domains = new string[indexes.Length];
-                if (iv != null)
-                {
-                    Series ts = iv as Series;
-                    if (ts?.mmi?.parent?.meta?.domains != null)
-                    {
-                        for (int i = 0; i < ts.mmi.parent.meta.domains.Length; i++) {
-                            domains[i] = ts.mmi.parent.meta.domains[i];
-                        }
-                    }
-                }
-                if (domains != null)
-                {
-                    foreach (string domain in domains)
-                    {
-                        string d = "<#universe>"; //"<...>" so that it does not collide with a variable name
-                        if (domain != null)
-                            d = domain;
-                        if (!dt.Columns.Contains(d)) dt.Columns.Add(d, typeof(string));
-                    }
-                }
             }
 
 
@@ -37104,16 +37056,55 @@ namespace Gekko
                 foreach (string colname in vars2)
                 {
                     i++;
-                    string name = null; //since i starts at 1, these are always set just below
-                    string lag = null; //since i starts at 1, these are always set just below
-                    if (j == 1)
-                    {                        
-                        //See #876435924365                        
+
+                    string dbName = null; string varName = null; string freq = null; string lag = null; string[] indexes = null;
+                    string[] domains = null;
+
+                    //See #876435924365
+
+                    if (j == 1)  //no need to do this for every t
+                    {
+
                         string[] ss = colname.Split('¤');
-                        name = ss[0];
+                        string fullName = ss[0];
                         lag = ss[1];
-                        if (lag == "[0]") lag = "";                                                
-                        tab.Set(i + 1, 1, G.Chop_RemoveBank(name, Program.databanks.GetFirst().name) + lag);
+                        if (lag == "[0]") lag = null;
+
+                        char firstChar;
+                        O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+
+                        if (!dt.Columns.Contains(dbName)) dt.Columns.Add(dbName, typeof(string));
+                        if (!dt.Columns.Contains(varName)) dt.Columns.Add(varName, typeof(string));
+
+                        if (indexes != null) domains = new string[indexes.Length];
+
+                        if (domains != null)
+                        {
+                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                            //So in this case, #a and #sector would be added as columns
+                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                            if (iv != null)
+                            {
+                                Series ts = iv as Series;
+                                if (ts?.mmi?.parent?.meta?.domains != null)
+                                {
+                                    for (int ii = 0; i < ts.mmi.parent.meta.domains.Length; ii++)
+                                    {
+                                        domains[ii] = ts.mmi.parent.meta.domains[ii];
+                                    }
+                                }
+                            }
+
+                            foreach (string domain in domains)
+                            {
+                                string setname = "<#universe>"; //"<...>" so that it does not collide with a variable name
+                                if (domain != null) setname = domain;
+                                if (!dt.Columns.Contains(setname)) dt.Columns.Add(setname, typeof(string));
+                            }
+                        }
+
+                        //See #876435924365                                                
+                        tab.Set(i + 1, 1, G.Chop_RemoveBank(varName, Program.databanks.GetFirst().name) + lag);
                     }
 
                     if (i == 1)
@@ -39535,11 +39526,22 @@ namespace Gekko
                             if (isTranspose)
                             {
 
-                                for (int i = d2; i <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
+                                //for (int i = d2; i <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
+                                //{
+                                //    for (int j = d1 - 1; j <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
+                                //    {
+                                //        GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d1 - 1), i - d2];
+                                //        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
+                                //        ws.SetValue(i, j, dt);
+                                //        ws.Cells[i, j].Style.Numberformat.Format = f;
+                                //    }
+                                //}
+
+                                for (int i = d1; i <= d1 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; i++)
                                 {
-                                    for (int j = d1 - 1; j <= d1 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
+                                    for (int j = d2 - 1; j <= d2 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
                                     {
-                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d1 - 1), i - d2];
+                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d2 - 1), i - d1];
                                         DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
@@ -39552,7 +39554,7 @@ namespace Gekko
                                 {
                                     for (int j = d2; j <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; j++)
                                     {
-                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d2 - 1), j - d2];
+                                        GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d1 - 1), j - d2];
                                         DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
