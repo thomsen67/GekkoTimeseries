@@ -37059,7 +37059,7 @@ namespace Gekko
 
                     string dbName = null; string varName = null; string freq = null; string lag = null; string[] indexes = null;
                     string[] domains = null;
-
+                    
                     //See #876435924365
 
                     if (j == 1)  //no need to do this for every t
@@ -37103,8 +37103,11 @@ namespace Gekko
                             }
                         }
 
-                        //See #876435924365                                                
-                        tab.Set(i + 1, 1, G.Chop_RemoveBank(varName, Program.databanks.GetFirst().name) + lag);
+                        //See #876435924365              
+                        string bank2 = dbName;
+                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                        string name2 = O.UnChop(null, varName, null, indexes);
+                        tab.Set(i + 1, 1, name2 + lag);
                     }
 
                     if (i == 1)
