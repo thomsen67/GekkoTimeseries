@@ -37037,16 +37037,17 @@ namespace Gekko
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
 
-            string col_t = "<t>";            
-            string col_variable = "<variable>";
-            string col_lag = "<lag>";
-            string col_universe = "<universe>";
-            string col_value = "<value>";
+            string extra = "gekkopivot__";
+            string col_t = extra + "t";
+            string col_variable = extra + "variable";
+            string col_lag = extra + "lag";
+            string col_universe = extra + "universe";
+            string col_value = extra + "value";
 
-            dt.Columns.Add(col_t, typeof(GekkoTime));
+            dt.Columns.Add(col_t, typeof(string));
             dt.Columns.Add(col_value, typeof(double));
             dt.Columns.Add(col_variable, typeof(string));
-            dt.Columns.Add(col_lag, typeof(int));
+            dt.Columns.Add(col_lag, typeof(string));
             dt.Columns.Add(col_universe, typeof(string));
 
             Table tab = new Table();
@@ -37056,7 +37057,7 @@ namespace Gekko
             if (format.isPercentageType)
             {
                 tab.Set(1, 1, "%");
-            }            
+            }
 
             int j = 0;
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
@@ -37071,28 +37072,28 @@ namespace Gekko
 
                     string dbName = null; string varName = null; string freq = null; string[] indexes = null;
                     string[] domains = null;
-                    int iLag = 0;
 
                     //See #876435924365
 
-                    if (j == 1)  //no need to do this for every t
+                    string lag = null;
+
+                    if (true)  
                     {
+                        //there is some repeated work done here, but not really bad
+                        //problem is we prefer to do one period at a time, to sum up, adjust etc.
+
 
                         string[] ss = colname.Split('¤');
                         string fullName = ss[0];
-                        string lag = ss[1];
+                        lag = ss[1];
                         if (lag == "[0]")
                         {
                             lag = null;
                         }
-                        else
-                        {
-                            iLag = int.Parse(lag.Trim().Substring(1, lag.Trim().Length - 2));
-                        }
 
                         char firstChar;
                         O.Chop(fullName, out dbName, out varName, out freq, out indexes);
-                        
+
                         if (indexes != null) domains = new string[indexes.Length];
 
                         if (domains != null)
@@ -37124,7 +37125,7 @@ namespace Gekko
                         string bank2 = dbName;
                         if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
                         string name2 = O.UnChop(null, varName, null, indexes);
-                        tab.Set(i + 1, 1, name2 + lag);
+                        if (j == 1) tab.Set(i + 1, 1, name2 + lag);
                     }
 
                     if (i == 1)
@@ -37149,9 +37150,13 @@ namespace Gekko
                     DecomposeInsertValue(tab, j, i, d, format);
 
                     DataRow dr = dt.NewRow();
-                    dr[col_t] = t2;                    
+                    dr[col_t] = t2.ToString();
                     dr[col_variable] = varName;
-                    dr[col_lag] = iLag;
+
+                    string lag2 = "none";
+                    if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                    dr[col_lag] = lag2;
+
                     if (indexes != null)
                     {
                         for (int ii = 0; ii < indexes.Length; ii++)
@@ -37234,13 +37239,189 @@ namespace Gekko
 
             //https://michaeljswart.com/2011/06/forget-about-pivot/
             //https://stackoverflow.com/questions/12866685/dynamic-pivot-using-c-sharp-linq
-            GetInversedDataTable(dt, col_variable, col_t, col_value, "M", true);
+            //DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "", true);
+            //tab = DecomposePutIntoTableHelper2(tab2);
+
+            //dt = new DataTable();
+            //dt.Columns.Add("EmployeeID", Type.GetType("System.String"));
+            //dt.Columns.Add("OrderID", Type.GetType("System.Int32"));
+            //dt.Columns.Add("Amount", Type.GetType("System.Decimal"));
+            //dt.Columns.Add("Cost", Type.GetType("System.Decimal"));
+            //dt.Columns.Add("Date", Type.GetType("System.String"));
+            //dt.Rows.Add(new object[] { "Sam", 1, 25.00, 13.00, "01/10/2007" });
+            //dt.Rows.Add(new object[] { "Sam", 2, 512.00, 1.00, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Sam", 3, 512.00, 1.00, "03/10/2007" });
+            //dt.Rows.Add(new object[] { "Tom", 4, 50.00, 1.00, "04/10/2007" });
+            //dt.Rows.Add(new object[] { "Tom", 5, 3.00, 7.00, "03/10/2007" });
+            //dt.Rows.Add(new object[] { "Tom", 6, 78.75, 12.00, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Sue", 7, 11.00, 7.00, "01/10/2007" });
+            //dt.Rows.Add(new object[] { "Sue", 8, 2.50, 66.20, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Sue", 9, 2.50, 22.00, "03/10/2007" });
+            //dt.Rows.Add(new object[] { "Jack", 10, 6.00, 23.00, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Jack", 11, 117.00, 199.00, "04/10/2007" });
+            //dt.Rows.Add(new object[] { "Jack", 12, 13.00, 2.60, "01/10/2007" });
+            //dt.Rows.Add(new object[] { "Jack", 13, 11.40, 99.80, "03/10/2007" });
+            //dt.Rows.Add(new object[] { "Phill", 14, 37.00, 2.10, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Phill", 15, 65.20, 99.30, "04/10/2007" });
+            //dt.Rows.Add(new object[] { "Phill", 16, 34.10, 27.00, "02/10/2007" });
+            //dt.Rows.Add(new object[] { "Phill", 17, 17.00, 959.00, "04/10/2007" });
+            //DataTable tab2 = GetInversedDataTable(dt, "Date", "EmployeeID", "Cost", "-", true);
+            //tab = DecomposePutIntoTableHelper2(tab2);            
+
+            if (false)
+            {
+                tab = DecomposePutIntoTableHelper2(dt);
+            }
+            else
+            {
+                DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "-", true);
+                tab = DecomposePutIntoTableHelper2(tab2);
+            }
 
             return tab;
         }
 
+        private static Table DecomposePutIntoTableHelper2(DataTable tab2)
+        {
+            Table tab = new Table();
+            for (int jj = 0; jj < tab2.Columns.Count; jj++)
+            {
+                tab.Set(1, jj + 1, tab2.Columns[jj].ToString());
+            }
+        
+            int i = 1; int j = 0;
+            foreach (DataRow row in tab2.Rows)
+            {
+                i++; j = 0;
+                foreach (DataColumn col in tab2.Columns)
+                {
+                    j++;
+                    tab.Set(i, j, row[col].ToString());
+                }
+            }
+            return tab;
+        }
 
-        public static DataTable GetInversedDataTable(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
+        /// <summary>
+        /// Gets a Inverted DataTable
+        /// </summary>
+        /// <param name="table">Provided DataTable</param>
+        /// <param name="columnX">X Axis Column</param>
+        /// <param name="columnY">Y Axis Column</param>
+        /// <param name="columnZ">Z Axis Column (values)</param>
+        /// <param name="columnsToIgnore">Whether to ignore some column, it must be 
+        /// provided here</param>
+        /// <param name="nullValue">null Values to be filled</param> 
+        /// <returns>C# Pivot Table Method  - Felipe Sabino</returns>
+        public static DataTable GetInversedDataTable(DataTable table, string columnX,
+             string columnY, string columnZ, string nullValue, bool sumValues)
+        {
+            //Create a DataTable to Return
+            DataTable returnTable = new DataTable();
+
+            if (columnX == "")
+                columnX = table.Columns[0].ColumnName;
+
+            //Add a Column at the beginning of the table
+            returnTable.Columns.Add(columnY);
+
+
+            //Read all DISTINCT values from columnX Column in the provided DataTale
+            List<string> columnXValues = new List<string>();
+
+            foreach (DataRow dr in table.Rows)
+            {
+                string columnXTemp = dr[columnX].ToString();
+                if (!columnXValues.Contains(columnXTemp))
+                {
+                    //Read each row value, if it's different from others provided, add to 
+                    //the list of values and creates a new Column with its value.
+                    columnXValues.Add(columnXTemp);
+                    returnTable.Columns.Add(columnXTemp);
+                }
+            }
+
+            //Verify if Y and Z Axis columns re provided
+            if (columnY != "" && columnZ != "")
+            {
+                //Read DISTINCT Values for Y Axis Column
+                List<string> columnYValues = new List<string>();
+
+                foreach (DataRow dr in table.Rows)
+                {
+                    if (!columnYValues.Contains(dr[columnY].ToString()))
+                        columnYValues.Add(dr[columnY].ToString());
+                }
+
+                //Loop all Column Y Distinct Value
+                foreach (string columnYValue in columnYValues)
+                {
+                    //Creates a new Row
+                    DataRow drReturn = returnTable.NewRow();
+                    drReturn[0] = columnYValue;
+                    //foreach column Y value, The rows are selected distincted
+                    DataRow[] rows = table.Select(columnY + "='" + columnYValue + "'");
+
+                    //Read each row to fill the DataTable
+                    foreach (DataRow dr in rows)
+                    {
+                        string rowColumnTitle = dr[columnX].ToString();
+
+                        //Read each column to fill the DataTable
+                        foreach (DataColumn dc in returnTable.Columns)
+                        {
+                            if (dc.ColumnName == rowColumnTitle)
+                            {
+                                //If Sum of Values is True it try to perform a Sum
+                                //If sum is not possible due to value types, the value 
+                                // displayed is the last one read
+                                if (sumValues)
+                                {
+                                    try
+                                    {
+                                        decimal d1 = Convert.ToDecimal(drReturn[rowColumnTitle]);
+                                        decimal d2 = Convert.ToDecimal(dr[columnZ]);
+                                        drReturn[rowColumnTitle] = d1 + d2;
+                                    }
+                                    catch
+                                    {
+                                        drReturn[rowColumnTitle] = dr[columnZ];
+                                    }
+                                }
+                                else
+                                {
+                                    drReturn[rowColumnTitle] = dr[columnZ];
+                                }
+                            }
+                        }
+                    }
+                    returnTable.Rows.Add(drReturn);
+                }
+            }
+            else
+            {
+                throw new Exception("The columns to perform inversion are not provided");
+            }
+
+            //if a nullValue is provided, fill the datable with it
+            if (nullValue != "")
+            {
+                foreach (DataRow dr in returnTable.Rows)
+                {
+                    foreach (DataColumn dc in returnTable.Columns)
+                    {
+                        if (dr[dc.ColumnName].ToString() == "")
+                            dr[dc.ColumnName] = nullValue;
+                    }
+                }
+            }
+
+            return returnTable;
+        }
+
+
+
+        public static DataTable GetInversedDataTableSLET(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
         {
             //Create a DataTable to Return
             DataTable returnTable = new DataTable();
