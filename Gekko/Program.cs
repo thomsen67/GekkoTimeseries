@@ -37239,49 +37239,28 @@ namespace Gekko
 
             //https://michaeljswart.com/2011/06/forget-about-pivot/
             //https://stackoverflow.com/questions/12866685/dynamic-pivot-using-c-sharp-linq
-            //DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "", true);
-            //tab = DecomposePutIntoTableHelper2(tab2);
 
-            //dt = new DataTable();
-            //dt.Columns.Add("EmployeeID", Type.GetType("System.String"));
-            //dt.Columns.Add("OrderID", Type.GetType("System.Int32"));
-            //dt.Columns.Add("Amount", Type.GetType("System.Decimal"));
-            //dt.Columns.Add("Cost", Type.GetType("System.Decimal"));
-            //dt.Columns.Add("Date", Type.GetType("System.String"));
-            //dt.Rows.Add(new object[] { "Sam", 1, 25.00, 13.00, "01/10/2007" });
-            //dt.Rows.Add(new object[] { "Sam", 2, 512.00, 1.00, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Sam", 3, 512.00, 1.00, "03/10/2007" });
-            //dt.Rows.Add(new object[] { "Tom", 4, 50.00, 1.00, "04/10/2007" });
-            //dt.Rows.Add(new object[] { "Tom", 5, 3.00, 7.00, "03/10/2007" });
-            //dt.Rows.Add(new object[] { "Tom", 6, 78.75, 12.00, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Sue", 7, 11.00, 7.00, "01/10/2007" });
-            //dt.Rows.Add(new object[] { "Sue", 8, 2.50, 66.20, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Sue", 9, 2.50, 22.00, "03/10/2007" });
-            //dt.Rows.Add(new object[] { "Jack", 10, 6.00, 23.00, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Jack", 11, 117.00, 199.00, "04/10/2007" });
-            //dt.Rows.Add(new object[] { "Jack", 12, 13.00, 2.60, "01/10/2007" });
-            //dt.Rows.Add(new object[] { "Jack", 13, 11.40, 99.80, "03/10/2007" });
-            //dt.Rows.Add(new object[] { "Phill", 14, 37.00, 2.10, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Phill", 15, 65.20, 99.30, "04/10/2007" });
-            //dt.Rows.Add(new object[] { "Phill", 16, 34.10, 27.00, "02/10/2007" });
-            //dt.Rows.Add(new object[] { "Phill", 17, 17.00, 959.00, "04/10/2007" });
-            //DataTable tab2 = GetInversedDataTable(dt, "Date", "EmployeeID", "Cost", "-", true);
-            //tab = DecomposePutIntoTableHelper2(tab2);            
+            int type = 1;  //normal is 3, raw table is 1, pooling is 2
 
-            if (false)
+            if (type == 1)
             {
-                tab = DecomposePutIntoTableHelper2(dt);
+                tab = DecomposePutIntoTableHelper2(dt, col_value, false);
+            }
+            else if (type == 2)
+            {
+                //DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "-", true);
+                DataTable tab2 = GetInversedDataTable(dt, col_t, col_universe, col_value, "-", true);
+                tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
             else
             {
-                DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "-", true);
-                tab = DecomposePutIntoTableHelper2(tab2);
+                //do nothing
             }
 
             return tab;
         }
 
-        private static Table DecomposePutIntoTableHelper2(DataTable tab2)
+        private static Table DecomposePutIntoTableHelper2(DataTable tab2, string col_value, bool isValues)
         {
             Table tab = new Table();
             for (int jj = 0; jj < tab2.Columns.Count; jj++)
@@ -37296,10 +37275,44 @@ namespace Gekko
                 foreach (DataColumn col in tab2.Columns)
                 {
                     j++;
-                    tab.Set(i, j, row[col].ToString());
+                    if (i > 1 && j > 1)
+                    {
+                        if (isValues)
+                        {
+                            DecomposePutIntoTableHelper2Cast(tab, i, j, row, col);
+                        }
+                        else
+                        {
+                            if (col.ColumnName == col_value)
+                            {
+                                DecomposePutIntoTableHelper2Cast(tab, i, j, row, col);
+                            }
+                            else
+                            {
+                                tab.Set(i, j, row[col].ToString());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        tab.Set(i, j, row[col].ToString());
+                    }
                 }
             }
             return tab;
+        }
+
+        private static void DecomposePutIntoTableHelper2Cast(Table tab, int i, int j, DataRow row, DataColumn col)
+        {
+            double d = double.NaN;
+            Object o = row[col];
+            if (o.GetType() == typeof(double)) d = (double)row[col];
+            else
+            {
+                string s = o as string;
+                double.TryParse(s, out d);
+            }
+            tab.Set(new Coord(i, j), null, d, CellType.Number, "f13.4");
         }
 
         /// <summary>
@@ -37313,18 +37326,17 @@ namespace Gekko
         /// provided here</param>
         /// <param name="nullValue">null Values to be filled</param> 
         /// <returns>C# Pivot Table Method  - Felipe Sabino</returns>
-        public static DataTable GetInversedDataTable(DataTable table, string columnX,
-             string columnY, string columnZ, string nullValue, bool sumValues)
+        public static DataTable GetInversedDataTable(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
         {
+            //https://www.codeproject.com/Articles/22008/C-Pivot-Table
+
             //Create a DataTable to Return
             DataTable returnTable = new DataTable();
 
-            if (columnX == "")
-                columnX = table.Columns[0].ColumnName;
+            if (columnX == "") columnX = table.Columns[0].ColumnName;
 
             //Add a Column at the beginning of the table
             returnTable.Columns.Add(columnY);
-
 
             //Read all DISTINCT values from columnX Column in the provided DataTale
             List<string> columnXValues = new List<string>();
@@ -37379,9 +37391,15 @@ namespace Gekko
                                 {
                                     try
                                     {
-                                        decimal d1 = Convert.ToDecimal(drReturn[rowColumnTitle]);
-                                        decimal d2 = Convert.ToDecimal(dr[columnZ]);
+                                        Object o1 = drReturn[rowColumnTitle];
+                                        Object o2 = dr[columnZ];
+                                        decimal d1 = Convert.ToDecimal(o1);
+                                        decimal d2 = Convert.ToDecimal(o2);                                        
                                         drReturn[rowColumnTitle] = d1 + d2;
+
+                                     //   drReturn[rowColumnTitle] =
+                                     //Convert.ToDecimal(drReturn[rowColumnTitle]) +
+                                     //Convert.ToDecimal(dr[columnZ]);
                                     }
                                     catch
                                     {
