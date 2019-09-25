@@ -37037,12 +37037,13 @@ namespace Gekko
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
 
-            string extra = "gekkopivot__";
-            string col_t = extra + "t";
-            string col_variable = extra + "variable";
-            string col_lag = extra + "lag";
-            string col_universe = extra + "universe";
-            string col_value = extra + "value";
+            string internalColumnIdentifyer = "gekkopivot__";
+            string internalSetIdentifyer = "gekkoset__";
+            string col_t = internalColumnIdentifyer + "t";
+            string col_variable = internalColumnIdentifyer + "variable";
+            string col_lag = internalColumnIdentifyer + "lag";
+            string col_universe = internalColumnIdentifyer + "universe";
+            string col_value = internalColumnIdentifyer + "value";
 
             dt.Columns.Add(col_t, typeof(string));
             dt.Columns.Add(col_value, typeof(double));
@@ -37077,7 +37078,7 @@ namespace Gekko
 
                     string lag = null;
 
-                    if (true)  
+                    if (true)
                     {
                         //there is some repeated work done here, but not really bad
                         //problem is we prefer to do one period at a time, to sum up, adjust etc.
@@ -37108,15 +37109,15 @@ namespace Gekko
                                 {
                                     for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
                                     {
-                                        domains[ii] = ts.mmi.parent.meta.domains[ii];
+                                        domains[ii] = ConvertSetname(internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);                                        
                                     }
                                 }
                             }
 
                             foreach (string domain in domains)
                             {
-                                string setname = col_universe; //"<...>" so that it does not collide with a variable name
-                                if (domain != null) setname = domain;
+                                string setname = domain;
+                                if (setname == null) setname = col_universe;
                                 if (!dt.Columns.Contains(setname)) dt.Columns.Add(setname, typeof(string));
                             }
                         }
@@ -37149,13 +37150,13 @@ namespace Gekko
 
                     DecomposeInsertValue(tab, j, i, d, format);
 
-                    DataRow dr = dt.NewRow();
-                    dr[col_t] = t2.ToString();
-                    dr[col_variable] = varName;
+                    DataRow dr = dt.NewRow();                                        
+                    DecomposeAddToRow(dr, col_t, t2.ToString());
+                    DecomposeAddToRow(dr, col_variable, varName);
 
-                    string lag2 = "none";
+                    string lag2 = null;
                     if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
-                    dr[col_lag] = lag2;
+                    DecomposeAddToRow(dr, col_lag, lag2);                    
 
                     if (indexes != null)
                     {
@@ -37168,15 +37169,18 @@ namespace Gekko
                                 if (domain != null)
                                 {
                                     dr[domain] = index;
+                                    DecomposeAddToRow(dr, domain, index);
                                 }
                                 else
                                 {
                                     dr[col_universe] = index;  //column <#universe>, the universal set (that is, no domain)
+                                    DecomposeAddToRow(dr, col_universe, index);
                                 }
                             }
                         }
                     }
-                    dr[col_value] = d;
+                    dr[col_value] = d;                    
+
                     dt.Rows.Add(dr);
 
                     if (i == 1 && format.showErrors)
@@ -37189,7 +37193,6 @@ namespace Gekko
                             tab.Get(i + 1, 1).backgroundColor = "LightRed";
                         }
                     }
-
                 }
                 if (code1 == "d" || code1 == "rd" || code1 == "m" || code1 == "p" || code1 == "rp" || code1 == "q" || code1 == "dp" || code1 == "rdp" || code1 == "mp")
                 {
@@ -37237,11 +37240,23 @@ namespace Gekko
                 }
             }
 
-            //https://michaeljswart.com/2011/06/forget-about-pivot/
-            //https://stackoverflow.com/questions/12866685/dynamic-pivot-using-c-sharp-linq
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    if (col.ColumnName != col_value)
+                    {
+                        if (string.IsNullOrEmpty(row[col] as string))
+                        {
+                            string s = "gekko_null";
+                            row[col] = s;
+                        }
+                    }
+                }
+            }
 
-            int type = 1;  //normal is 3, raw table is 1, pooling is 2
-
+            int type = 3;  //normal is 3, raw table is 1, pooling is 2
+            
             if (type == 1)
             {
                 tab = DecomposePutIntoTableHelper2(dt, col_value, false);
@@ -37249,7 +37264,7 @@ namespace Gekko
             else if (type == 2)
             {
                 //DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "-", true);
-                DataTable tab2 = GetInversedDataTable(dt, col_t, col_universe, col_value, "-", true);
+                DataTable tab2 = GetInversedDataTable(dt, internalSetIdentifyer + "a", col_variable, col_value, "-", true);
                 tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
             else
@@ -37258,6 +37273,22 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        private static string ConvertSetname(string internalSetIdentifyer, string col_universe, string domain)
+        {
+            string domain2 = domain;
+            if (domain2 != null) domain2 = internalSetIdentifyer + domain2.Replace("#", "");
+            string setname = col_universe; //"<...>" so that it does not collide with a variable name
+            if (domain2 != null) setname = domain2;
+            return setname;
+        }
+
+        private static void DecomposeAddToRow(DataRow dr, string col_variable, string varName)
+        {
+            //string s = varName;
+            //if (string.IsNullOrEmpty(varName)) varName = "gekko_empty";
+            dr[col_variable] = varName;
         }
 
         private static Table DecomposePutIntoTableHelper2(DataTable tab2, string col_value, bool isValues)
