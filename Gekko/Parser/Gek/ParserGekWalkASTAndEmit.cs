@@ -5557,11 +5557,11 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
-                    case "ASTDECOMPROWS":
+                    case "ASTDECOMPCOLS":
                         {
                             for (int i = 0; i < node.ChildrenCount(); i++)
                             {
-                                node.Code.A("o" + Num(node) + ".rows.Add(" + node[i].Code + ");" + G.NL);
+                                node.Code.A("o" + Num(node) + ".cols.Add(" + node[i].Code + ");" + G.NL);
                             }
                         }
                         break;
