@@ -5557,12 +5557,14 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
-                    case "ASTDECOMPCOLS":
+                    case "ASTDECOMPROWS":
                         {
-                            for (int i = 0; i < node.ChildrenCount(); i++)
-                            {
-                                node.Code.A("o" + Num(node) + ".cols.Add(" + node[i].Code + ");" + G.NL);
-                            }
+                            node.Code.A("o" + Num(node) + ".rows.Add(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTDECOMPCOLS":
+                        {                            
+                            node.Code.A("o" + Num(node) + ".cols.Add(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTDECOMPWHERE2":

@@ -1380,11 +1380,11 @@ namespace Gekko
                 string lhsName = null;
                 if (varnamesFirstLink != null) lhsName = varnamesFirstLink[0];
 
-                if (false)
-                {
-                    Table table2 = Program.DecomposePutIntoTable2_OLDDELETE(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore));
-                }
-                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore));
+                //if (false)
+                //{
+                //    Table table2 = Program.DecomposePutIntoTable2_OLDDELETE(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore));
+                //}
+                Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore), decompOptions2);
                 //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
 
                 this.decompOptions2.decompData = decompDatas[parentI][parentJ];
@@ -2186,9 +2186,12 @@ namespace Gekko
 
         public List<string> vars2 = null;
 
-        public List<List<string>> where = new List<List<string>>();
-        public List<List<string>> agg = new List<List<string>>();
         public List<Link> link = new List<Link>();
+        public List<List<string>> where = new List<List<string>>();
+        public List<List<string>> group = new List<List<string>>();
+        public List<string> rows = new List<string>();
+        public List<string> cols = new List<string>();
+        
 
         public DecompOptions2 Clone()
         {
@@ -2234,14 +2237,14 @@ namespace Gekko
                 d.where.Add(temp);
             }
 
-            foreach (List<string> x1 in this.agg)
+            foreach (List<string> x1 in this.group)
             {
                 List<string> temp = new List<string>();
                 foreach (string x2 in x1)
                 {
                     temp.Add(x2);
                 }
-                d.agg.Add(temp);
+                d.group.Add(temp);
             }
 
             foreach (Link x1 in this.link)
@@ -2252,6 +2255,20 @@ namespace Gekko
                 temp.expressions = x1.expressions; //probably ok not to clone
                 d.link.Add(temp);
             }
+
+            List<string> tempCols = new List<string>();
+            foreach (string s in this.cols)
+            {
+                tempCols.Add(s);
+            }
+            d.cols = tempCols;
+
+            List<string> tempRows = new List<string>();
+            foreach (string s in this.rows)
+            {
+                tempRows.Add(s);
+            }
+            d.rows = tempRows;
 
             return d;
         }
