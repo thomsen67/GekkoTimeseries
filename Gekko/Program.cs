@@ -37255,15 +37255,14 @@ namespace Gekko
                 }
             }
 
-            int type = 3;  //normal is 3, raw table is 1, pooling is 2
+            int type = 2;  //normal is 3, raw table is 1, pooling is 2
             
             if (type == 1)
             {
                 tab = DecomposePutIntoTableHelper2(dt, col_value, false);
             }
             else if (type == 2)
-            {
-                //DataTable tab2 = GetInversedDataTable(dt, col_t, col_variable, col_value, "-", true);
+            {                
                 DataTable tab2 = GetInversedDataTable(dt, internalSetIdentifyer + "a", col_variable, col_value, "-", true);
                 tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
@@ -37345,18 +37344,7 @@ namespace Gekko
             }
             tab.Set(new Coord(i, j), null, d, CellType.Number, "f13.4");
         }
-
-        /// <summary>
-        /// Gets a Inverted DataTable
-        /// </summary>
-        /// <param name="table">Provided DataTable</param>
-        /// <param name="columnX">X Axis Column</param>
-        /// <param name="columnY">Y Axis Column</param>
-        /// <param name="columnZ">Z Axis Column (values)</param>
-        /// <param name="columnsToIgnore">Whether to ignore some column, it must be 
-        /// provided here</param>
-        /// <param name="nullValue">null Values to be filled</param> 
-        /// <returns>C# Pivot Table Method  - Felipe Sabino</returns>
+        
         public static DataTable GetInversedDataTable(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
         {
             //https://www.codeproject.com/Articles/22008/C-Pivot-Table

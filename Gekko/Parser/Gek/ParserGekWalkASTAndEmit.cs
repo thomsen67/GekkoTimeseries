@@ -5557,6 +5557,14 @@ namespace Gekko.Parser.Gek
                             }
                         }
                         break;
+                    case "ASTDECOMPROWS":
+                        {
+                            for (int i = 0; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A("o" + Num(node) + ".rows.Add(" + node[i].Code + ");" + G.NL);
+                            }
+                        }
+                        break;
                     case "ASTDECOMPWHERE2":
                         {
                             node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + "}");                            
@@ -5582,11 +5590,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDECOMPLINK":
-                        {
-                            //for (int i = 0; i < node.ChildrenCount(); i++)
-                            //{
-                            //    node.Code.A("o" + Num(node) + ".link.Add(" + node[i].Code + ");" + G.NL);
-                            //}
+                        {                            
                             GetCodeFromAllChildren(node);
                         }
                         break;

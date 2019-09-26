@@ -8920,6 +8920,8 @@ namespace Gekko
             public List<List<IVariable>> where = new List<List<IVariable>>();
             public List<List<IVariable>> group = new List<List<IVariable>>();            
             public List<DecompItems> decompItems = new List<DecompItems>();  //second, third etc. elements are links
+            public List<IVariable> rows = new List<IVariable>();
+            public List<IVariable> cols = new List<IVariable>();
 
             public void Exe()
             {
