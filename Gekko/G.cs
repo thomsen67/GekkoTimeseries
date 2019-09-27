@@ -2330,6 +2330,18 @@ namespace Gekko
                         foreach (string ss in ss1) sb.AppendLine("   " + ss.Trim());
                         foreach (string ss in ss2) sb.AppendLine("   " + ss.Trim());
                     }
+                    
+                    foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_ComputerSystem").Get())
+                    {
+                        sb.AppendLine("Number of physical processors: " + item["NumberOfProcessors"]);
+                    }
+
+                    int coreCount = 0;
+                    foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get())
+                    {
+                        coreCount += int.Parse(item["NumberOfCores"].ToString());
+                    }
+                    sb.AppendLine("Number of cores: " + coreCount);
 
                 }
                 catch { };  //fail silently               

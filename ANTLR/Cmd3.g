@@ -298,6 +298,7 @@ ASTCOMPARE2;
 	ASTEVAL;
     ASTDECOMP;
 	ASTDECOMP2;
+	ASTDECOMP3;
     ASTDECOMPITEMS;
 	ASTDECOMPITEMS2;
 	ASTDECOMPITEMSNAME;
@@ -1050,6 +1051,7 @@ Y2                    = 'Y2'                       ;
     DECIMALSEPARATOR = 'DECIMALSEPARATOR';
     DECOMP           = 'DECOMP'          ;
 	DECOMP2           = 'DECOMP2'          ;
+	DECOMP3           = 'DECOMP3'          ;
 	EVAL           = 'EVAL'          ;
     DELETE           = 'DELETE'          ;
     DETAILS          = 'DETAILS';
@@ -1677,6 +1679,7 @@ d.Add("Y" ,Y);
                                         d.Add("decimalseparator"       , DECIMALSEPARATOR    );
                                         d.Add("decomp"  , DECOMP    );
 										d.Add("decomp2"  , DECOMP2    );
+										d.Add("decomp3"  , DECOMP3    );
 										d.Add("eval"  , EVAL    );
                                         d.Add("delete"  , DELETE    );
                                         d.Add("details"  , DETAILS   );
@@ -2479,6 +2482,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | cut                  SEMICOLON!
 						  | decomp               SEMICOLON!
 						  | decomp2              SEMICOLON!
+						  | decomp3              SEMICOLON!
 						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -2797,6 +2801,10 @@ decompExpression:           expression;
 
 decomp2:               	  	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar1  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
                        	  |	DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar2  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
+						    ;
+
+decomp3:               	  	DECOMP3 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP3¤"+($decompVar1.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar1  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
+                       	  |	DECOMP3 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP3¤"+($decompVar2.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar2  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?))
 						    ;
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
@@ -4176,6 +4184,7 @@ ident2: 					Ident |
   DATE|
   DECOMP|
   DECOMP2|
+  DECOMP3|
   EVAL|
   DELETE|
   DISP|

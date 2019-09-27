@@ -2214,6 +2214,7 @@ namespace Gekko
             d.guiDecompIsBaseline = this.guiDecompIsBaseline;
             d.guiDecompTransformationCode = this.guiDecompTransformationCode;
             d.modelHash = this.modelHash;
+            d.type = this.type;
             
             //d.decimalsLevel = this.decimalsLevel;
             

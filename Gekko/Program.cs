@@ -12391,8 +12391,10 @@ namespace Gekko
             decompOptions2.name = o.name;
             decompOptions2.isNew = true;
 
-            decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
-            decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
+            if (o.rows.Count > 0) decompOptions2.rows = O.Restrict(o.rows[0] as List, false, true, false, false);
+            if (o.cols.Count > 0) decompOptions2.cols = O.Restrict(o.cols[0] as List, false, true, false, false);
+
+            decompOptions2.type = o.type;
 
             foreach (List<IVariable> liv in o.where)
             {
@@ -37045,6 +37047,7 @@ namespace Gekko
             string col_lag = internalColumnIdentifyer + "lag";
             string col_universe = internalColumnIdentifyer + "universe";
             string col_value = internalColumnIdentifyer + "value";
+            string gekko_null = "null";
 
             dt.Columns.Add(col_t, typeof(string));
             dt.Columns.Add(col_value, typeof(double));
@@ -37249,15 +37252,18 @@ namespace Gekko
                     {
                         if (string.IsNullOrEmpty(row[col] as string))
                         {
-                            string s = "gekko_null";
+                            string s = gekko_null;
                             row[col] = s;
                         }
                     }
                 }
             }            
 
-            int type = 2;  //normal is 3, raw table is 1, pooling is 2
-            
+            int type = -12345;  //normal is 3, raw table is 1, pooling is 2
+            if (decompOptions2.type == "ASTDECOMP2") type = 3;
+            else if (decompOptions2.type == "ASTDECOMP3") type = 2;
+            //type = 1; //set this for raw table
+
             if (type == 1)
             {
                 tab = DecomposePutIntoTableHelper2(dt, col_value, false);
@@ -37273,15 +37279,15 @@ namespace Gekko
                 rc.Add(decompOptions2.rows[0]);
                 rc.Add(decompOptions2.cols[0]);
                 for (int i = 0; i < 2; i++)
-                {
-                    if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
+                {                    
                     if (G.Equal(rc[i], "time")) rc[i] = col_t;
                     if (G.Equal(rc[i], "vars")) rc[i] = col_variable;
                     if (G.Equal(rc[i], "lags")) rc[i] = col_lag;
-                    if (G.Equal(rc[i], "sets")) rc[i] = col_universe;
+                    if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
+                    if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
                 }
 
-                DataTable tab2 = GetInversedDataTable(dt, rc[1], rc[0], col_value, "-", true);
+                DataTable tab2 = GetInversedDataTable(dt, rc[0], rc[1], col_value, "-", true);
                 tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
             else
@@ -37311,7 +37317,7 @@ namespace Gekko
         private static Table DecomposePutIntoTableHelper2(DataTable tab2, string col_value, bool isValues)
         {
             Table tab = new Table();
-            for (int jj = 0; jj < tab2.Columns.Count; jj++)
+            for (int jj = 1; jj < tab2.Columns.Count; jj++)  //1: skip (1, 1) element
             {
                 tab.Set(1, jj + 1, tab2.Columns[jj].ToString());
             }
@@ -37321,8 +37327,9 @@ namespace Gekko
             {
                 i++; j = 0;
                 foreach (DataColumn col in tab2.Columns)
-                {
+                {                    
                     j++;
+                    //starts at i = 2, j = 1
                     if (i > 1 && j > 1)
                     {
                         if (isValues)
@@ -37337,13 +37344,15 @@ namespace Gekko
                             }
                             else
                             {
-                                tab.Set(i, j, row[col].ToString());
+                                string s = row[col].ToString();                                
+                                tab.Set(i, j, s);
                             }
                         }
                     }
                     else
                     {
-                        tab.Set(i, j, row[col].ToString());
+                        string s = row[col].ToString();                        
+                        tab.Set(i, j, s);
                     }
                 }
             }
@@ -37363,24 +37372,25 @@ namespace Gekko
             tab.Set(new Coord(i, j), null, d, CellType.Number, "f13.4");
         }
         
-        public static DataTable GetInversedDataTable(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
+        public static DataTable GetInversedDataTable(DataTable table, string rowVariable, string colVariable, string valuesVariable, string nullValue, bool sumValues)
         {
             //https://www.codeproject.com/Articles/22008/C-Pivot-Table
 
             //Create a DataTable to Return
             DataTable returnTable = new DataTable();
 
-            if (columnX == "") columnX = table.Columns[0].ColumnName;
+            if (colVariable == "") colVariable = table.Columns[0].ColumnName;
 
             //Add a Column at the beginning of the table
-            returnTable.Columns.Add(columnY);
+            returnTable.Columns.Add(rowVariable);
 
             //Read all DISTINCT values from columnX Column in the provided DataTale
             List<string> columnXValues = new List<string>();
 
             foreach (DataRow dr in table.Rows)
             {
-                string columnXTemp = dr[columnX].ToString();
+                //colVariable could be several, columnXTemp = s1, s2, s3, ... 
+                string columnXTemp = dr[colVariable].ToString();
                 if (!columnXValues.Contains(columnXTemp))
                 {
                     //Read each row value, if it's different from others provided, add to 
@@ -37391,15 +37401,15 @@ namespace Gekko
             }
 
             //Verify if Y and Z Axis columns re provided
-            if (columnY != "" && columnZ != "")
+            if (rowVariable != "" && valuesVariable != "")
             {
                 //Read DISTINCT Values for Y Axis Column
                 List<string> columnYValues = new List<string>();
 
                 foreach (DataRow dr in table.Rows)
                 {
-                    if (!columnYValues.Contains(dr[columnY].ToString()))
-                        columnYValues.Add(dr[columnY].ToString());
+                    if (!columnYValues.Contains(dr[rowVariable].ToString()))
+                        columnYValues.Add(dr[rowVariable].ToString());
                 }
 
                 //Loop all Column Y Distinct Value
@@ -37409,12 +37419,12 @@ namespace Gekko
                     DataRow drReturn = returnTable.NewRow();
                     drReturn[0] = columnYValue;
                     //foreach column Y value, The rows are selected distincted
-                    DataRow[] rows = table.Select(columnY + "='" + columnYValue + "'");
+                    DataRow[] rows = table.Select(rowVariable + "='" + columnYValue + "'");
 
                     //Read each row to fill the DataTable
                     foreach (DataRow dr in rows)
                     {
-                        string rowColumnTitle = dr[columnX].ToString();
+                        string rowColumnTitle = dr[colVariable].ToString();
 
                         //Read each column to fill the DataTable
                         foreach (DataColumn dc in returnTable.Columns)
@@ -37429,7 +37439,7 @@ namespace Gekko
                                     try
                                     {
                                         Object o1 = drReturn[rowColumnTitle];
-                                        Object o2 = dr[columnZ];
+                                        Object o2 = dr[valuesVariable];
                                         decimal d1 = Convert.ToDecimal(o1);
                                         decimal d2 = Convert.ToDecimal(o2);                                        
                                         drReturn[rowColumnTitle] = d1 + d2;
@@ -37440,12 +37450,12 @@ namespace Gekko
                                     }
                                     catch
                                     {
-                                        drReturn[rowColumnTitle] = dr[columnZ];
+                                        drReturn[rowColumnTitle] = dr[valuesVariable];
                                     }
                                 }
                                 else
                                 {
-                                    drReturn[rowColumnTitle] = dr[columnZ];
+                                    drReturn[rowColumnTitle] = dr[valuesVariable];
                                 }
                             }
                         }

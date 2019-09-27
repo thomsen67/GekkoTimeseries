@@ -9002,7 +9002,7 @@ namespace UnitTests
 
 
                 // =========== levels =========================                
-                I("decomp2 <2011 2012 xn> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c     COLS #a, #o;");  //, i in e_i
+                I("decomp2 <2011 2012 xn> " + lhs + " LINK v[c] in e_c   WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'          COLS #a, #o;");  //, i in e_i
                 table = Globals.lastDecompTable;
                 double ylevel2011 = 499d; double ylevel2012 = 504d;
                 double ylevel2011b = 502d; double ylevel2012b = 501d;
@@ -9072,7 +9072,7 @@ namespace UnitTests
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                 // =========== differences, decomposed =========================                
-                I("decomp2 <2011 2012 d> " + lhs + "     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'     LINK v[c] in e_c       COLS #a, #o;");   //, i in e_i
+                I("decomp2 <2011 2012 d> " + lhs + " LINK v[c] in e_c     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'           COLS #a, #o;");   //, i in e_i
                 table = Globals.lastDecompTable;
                                
                 double ydif2011 = -0.44d; double ydif2012 = 1.1d;

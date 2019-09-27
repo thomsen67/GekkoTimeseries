@@ -5542,10 +5542,12 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDECOMP2":
+                    case "ASTDECOMP3":
                         {
                             node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".type = @`" + node.Text + "`;" + G.NL);
                             node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;                    
@@ -5559,12 +5561,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPROWS":
                         {
-                            node.Code.A("o" + Num(node) + ".rows.Add(" + node[0].Code + ");" + G.NL);
+                            if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".rows.Add(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTDECOMPCOLS":
-                        {                            
-                            node.Code.A("o" + Num(node) + ".cols.Add(" + node[0].Code + ");" + G.NL);
+                        {
+                            if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".cols.Add(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTDECOMPWHERE2":
