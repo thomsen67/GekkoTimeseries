@@ -28539,7 +28539,7 @@ namespace Gekko
             }
 
             Table tab = new Table();
-
+            
             tab.Set(1, 1, "Variable");
             tab.Set(1, 2, "Estimate");
             tab.Set(1, 3, "Std error");
@@ -28559,8 +28559,7 @@ namespace Gekko
                 tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
 
-                int digits = -(int)RoundDecimals1(coeff) + 6;  //can be negative
-                if (digits < 0) digits = 0;
+                int digits = GetDigits(coeff, 6);
 
                 double se = double.NaN;
                 double t = double.NaN;
@@ -28624,6 +28623,63 @@ namespace Gekko
             
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
+
+            if (o.opt_dump != null)
+            {
+                string fileName = "ols.frm";
+                if (!G.Equal(o.opt_dump, "yes")) fileName = o.opt_dump;
+                
+                bool append = false;
+                if (G.Equal(o.opt_dumpoptions, "append")) append = true;
+
+                try
+                {
+                    string s = null;
+                    s += "FRML _i ";
+                    s += G.ReplaceGlueNew(o.expressionsText[0]) + " = ";
+                    for (int i = 0; i < o.expressionsText.Count - 1; i++)
+                    {
+                        if (i > 0)
+                        {
+                            if (name_param.data[i, 0] >= 0) s += " +";
+                            else s += " ";
+                        }
+                        string var = G.ReplaceGlueNew(o.expressionsText[i + 1]);
+                        var = var.Replace(" ", "");
+                        if (var.Contains("+") || var.Contains("-")) var = "(" + var + ")";
+                        s += Program.NumberFormat(name_param.data[i, 0], "f" + GetDigits(name_param.data[i, 0], 6)) + "*" + var;
+                    }
+                    if (constant == 1)
+                    {
+                        if (name_param.data[o.expressionsText.Count - 1, 0] >= 0) s += " +";
+                        else s += " ";
+                        s += Program.NumberFormat(name_param.data[o.expressionsText.Count - 1, 0], "f" + GetDigits(name_param.data[o.expressionsText.Count - 1, 0], 6));
+                    }
+                    s += ";";
+
+                    GekkoFileReadOrWrite option = GekkoFileReadOrWrite.Write;
+                    if (append) option = GekkoFileReadOrWrite.WriteAppend;
+
+                    using (FileStream fs = WaitForFileStream(Program.CreateFullPathAndFileName(fileName), option))
+                    using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                    {
+                        sw.WriteLine(s);                        
+                    }
+                    G.Writeln2("Dumped OLS result as an equation inside the file '" + fileName + "'");
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: OLS<dump> failed: is the file '" + fileName + "' blocked?");
+                    throw new GekkoException();
+                }
+            }
+        }
+
+        private static int GetDigits(double coeff, int i)
+        {
+            int digits = -(int)RoundDecimals1(coeff) + i;  //can be negative
+            if (digits < 0) digits = 0;
+            return digits;
         }
 
         public static double StandardDeviation(List<double> valueList)

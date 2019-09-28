@@ -10314,6 +10314,8 @@ namespace Gekko
             //public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
             public IVariable impose = null;
             public string opt_constant = null;
+            public string opt_dump = null;
+            public string opt_dumpoptions = null;
             public List<IVariable> expressions = null;
             public List<string> expressionsText = null;
             public void Exe()

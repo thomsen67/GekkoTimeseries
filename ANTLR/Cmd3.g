@@ -49,6 +49,7 @@ tokens {
 	ASTLOCAL;
 	ASTARGS;
 	ASTCOLON;
+	ASTOPT_STRING_DUMPOPTIONS;
 	ASTOPT_STRING_DATEFORMAT;
 	ASTOPT_STRING_DATETYPE;
 	ASTL0;
@@ -1071,6 +1072,7 @@ Y2                    = 'Y2'                       ;
     DUMOFF           = 'DUMOFF'          ;
     DUMON            = 'DUMON'           ;
     DUMP             = 'DUMP'            ;
+	DUMPOPTIONS             = 'DUMPOPTIONS'            ;
     EDIT = 'EDIT';
     EFTER            = 'EFTER'           ;
     ELSE             = 'ELSE'            ;
@@ -1699,6 +1701,7 @@ d.Add("Y" ,Y);
                                         d.Add("dumoff"  , DUMOFF    );
                                         d.Add("dumon"   , DUMON     );
                                         d.Add("dump"    , DUMP      );
+										d.Add("dumpoptions"    , DUMPOPTIONS      );
                                         d.Add("EDIT" ,EDIT);
                                         d.Add("efter"   , EFTER     );
                                         d.Add("else"    , ELSE);
@@ -3093,6 +3096,8 @@ olsImpose:                  IMPOSE EQUAL expression -> ^(ASTIMPOSE expression?);
 olsOpt1:                    ISNOTQUAL | leftAngle olsOpt1h* RIGHTANGLE -> olsOpt1h*;
 olsOpt1h:                   dates -> ^(ASTDATES dates)
 						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
+						  | DUMP (EQUAL fileName)? -> ^(ASTOPT_STRING_DUMP fileName?)
+						  | DUMPOPTIONS EQUAL expression -> ^(ASTOPT_STRING_DUMPOPTIONS expression)	
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4372,6 +4377,7 @@ ident2: 					Ident |
   DUMOF|
   DUMON|
   DUMP|
+  DUMPOPTIONS|
   D|
   EFTER|
   ELEMENTS|
