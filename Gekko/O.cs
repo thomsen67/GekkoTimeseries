@@ -4781,7 +4781,10 @@ namespace Gekko
             public string name = null;        
             public List<O.Prt.Element> prtElements = new List<O.Prt.Element>();
             public IVariable impose = null;
-            public string opt_constant = null;                
+            public string opt_constant = null;
+
+            public string opt_dump = null;
+            public string opt_dumpoptions = null;
             public void Exe()
             {
                 Program.Ols(this);
