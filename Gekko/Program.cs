@@ -2398,12 +2398,7 @@ namespace Gekko
                                     //---------------------------
                                     // handle array-timeseries
                                     //---------------------------
-
-                                    if (Globals.runningOnTTComputer && iv.Type() == EVariableType.Series && G.Equal(((Series)iv).name, "bqrsm!a"))
-                                    {
-
-                                    }
-
+                                    
                                     if (tsExisting == null)
                                     {
                                         databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!

@@ -2678,10 +2678,11 @@ namespace Gekko
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
                     MapMultidimItem item = kvp.Key.Clone();
-                    item.parent = null;  //safety, must be re-pointed
-                    tsCopy.dimensionsStorage.storage.Add(item, kvp.Value.DeepClone(truncate));
-                }
-                tsCopy.DeepCleanup(); //necessary to get the pointers back and forth right
+                    item.parent = tsCopy;  //must be re-pointed
+                    Series subseries = kvp.Value.DeepClone(truncate) as Series;
+                    subseries.mmi = item; //the sub-ser
+                    tsCopy.dimensionsStorage.storage.Add(item, subseries);
+                }                
             }
 
             if (this.type != ESeriesType.Light)
