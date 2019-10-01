@@ -2677,7 +2677,9 @@ namespace Gekko
                 tsCopy.dimensionsStorage = new MapMultidim();
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
-                    tsCopy.dimensionsStorage.storage.Add(kvp.Key, kvp.Value.DeepClone(truncate));
+                    MapMultidimItem item = kvp.Key.Clone();
+                    item.parent = null;  //safety, must be re-pointed
+                    tsCopy.dimensionsStorage.storage.Add(item, kvp.Value.DeepClone(truncate));
                 }
                 tsCopy.DeepCleanup(); //necessary to get the pointers back and forth right
             }

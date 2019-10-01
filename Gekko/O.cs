@@ -1814,7 +1814,7 @@ namespace Gekko
                     IVariable ivar2 = ib.GetIVariable(varnameWithFreq);
                     if (ivar2 == null)
                     {
-                        G.Writeln2("*** ERROR: Could not find variable '" + G.GetNameAndFreqPretty(varnameWithFreq, true) + "' for use in dot- or []-indexing");
+                        G.Writeln2("*** ERROR: Could not find variable " + G.GetNameAndFreqPretty(varnameWithFreq, true) + " for use in dot- or []-indexing");
                         throw new GekkoException();
                     }
                     else

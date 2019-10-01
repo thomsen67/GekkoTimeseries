@@ -113,7 +113,43 @@ namespace Gekko
                 throw new GekkoException();
             }
             return new ScalarVal(gt.sub);
-        }                
+        }
+
+        public static IVariable getparent(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Series)
+            {                
+                G.Writeln2("*** ERROR: getparent() expects series input");
+                throw new GekkoException();
+            }
+
+            Series ts = ths as Series;
+
+            if (ts.type == ESeriesType.ArraySuper)
+            {
+                G.Writeln2("*** ERROR: getparent(): this is already an array parent-series");
+                throw new GekkoException();
+            }
+            else if (ts.type == ESeriesType.Light)
+            {
+                G.Writeln2("*** ERROR: getparent(): an expression cannot have a parent series");
+                throw new GekkoException();
+            }
+            if (ts.mmi == null)
+            {
+                G.Writeln2("*** ERROR: getparent(): this series is not an array subseries");
+                throw new GekkoException();
+            }
+
+            if (ts.mmi.parent == null)
+            {
+                G.Writeln2("*** ERROR: getparent(): this array subseries does not have a parent series assigned to it");
+                throw new GekkoException();
+            }
+
+            return ts.mmi.parent;
+            
+        }
 
         // ===========================================================================================================================
         // ========================= functions to manipulate dates end ===============================================================

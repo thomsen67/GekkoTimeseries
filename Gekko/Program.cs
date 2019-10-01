@@ -2399,6 +2399,11 @@ namespace Gekko
                                     // handle array-timeseries
                                     //---------------------------
 
+                                    if (Globals.runningOnTTComputer && iv.Type() == EVariableType.Series && G.Equal(((Series)iv).name, "bqrsm!a"))
+                                    {
+
+                                    }
+
                                     if (tsExisting == null)
                                     {
                                         databank.AddIVariable(name, tsProtobuf); //the sub-timeseries will follow automatically!
@@ -3091,7 +3096,7 @@ namespace Gekko
                         DateTime dt3 = DateTime.Now;
                         deserializedDatabank = Serializer.Deserialize<Databank>(fs);
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
-                        {
+                        {                            
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
@@ -23851,7 +23856,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR: input must b a string or list of strings");
+                G.Writeln2("*** ERROR: Input must be a string or list of strings");
                 throw new GekkoException();
             }
 

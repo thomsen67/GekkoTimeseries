@@ -8803,6 +8803,74 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ArraySeriesParentPointer()
+        {
+            I("RESET; TIME 2001 2003;");
+            I("x1 = series(1);");
+            I("x1[a] = 2;");
+            I("x1.setdomains(('#a1',));");
+            I("#i1 = x1[a].getparent().getdomains();");
+            I("#j1 = x1.getdomains();");
+            _AssertListString(First(), "#i1", 1, "#a1");
+            _AssertListString(First(), "#j1", 1, "#a1");
+
+            I("WRITE x1bank;");
+
+            I("x2 = x1;");
+            I("x2.setdomains(('#a2',));");
+            I("#i2 = x2[a].getparent().getdomains();");            
+            _AssertListSize(First(), "#i2", 1); _AssertListString(First(), "#i2", 1, "#a2");
+
+            I("RESET; TIME 2001 2003;");
+            I("open x1bank; copy x1bank:*; close x1bank;");
+            I("x1.setdomains(('#a3',));");
+            I("#i3 = x1[a].getparent().getdomains();");
+            _AssertListString(First(), "#i3", 1, "#a3");
+
+            I("RESET; TIME 2001 2003;");
+            I("READ x1bank;");
+            I("x1.setdomains(('#a4',));");
+            I("#i4 = x1[a].getparent().getdomains();");            
+            _AssertListString(First(), "#i4", 1, "#a4");
+
+            
+
+            return;
+
+            // --------- x1 has no domains to begin withns ----
+                        
+            I("RESET; TIME 2001 2003;");
+            I("x1 = series(1);");
+            I("x1[a] = 2;");            
+            I("WRITE x1bank;");
+
+            I("x2 = x1;");
+            I("x2.setdomains(('#a2',));");
+            I("#i2 = x2[a].getparent().getdomains();");
+            I("#j2 = x2.getdomains();");
+            _AssertListString(First(), "#i1", 1, "#a1");
+            _AssertListString(First(), "#j1", 1, "#a1");
+            _AssertListSize(First(), "#i2", 1); _AssertListString(First(), "#i2", 1, "#a2");
+            _AssertListSize(First(), "#j2", 1); _AssertListString(First(), "#j2", 1, "#a2");
+
+            I("RESET; TIME 2001 2003;");
+            I("READ x1bank;");
+            I("x1.setdomains(('#a1',));");
+            I("#i1 = x1[a].getparent().getdomains();");
+            I("#j1 = x1.getdomains();");
+            _AssertListString(First(), "#i1", 1, "#a1");
+            _AssertListString(First(), "#j1", 1, "#a1");
+
+            I("RESET; TIME 2001 2003;");
+            I("OPEN x1bank; copy x1bank:*; close x1bank;");
+            I("x1.setdomains(('#a1',));");
+            I("#i1 = x1[a].getparent().getdomains();");
+            I("#j1 = x1.getdomains();");
+            _AssertListString(First(), "#i1", 1, "#a1");
+            _AssertListString(First(), "#j1", 1, "#a1");
+        }
+
+        [TestMethod]
         public void _Test_Decomp1()
         {
             Table table = null;
