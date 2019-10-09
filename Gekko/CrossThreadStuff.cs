@@ -48,9 +48,6 @@ namespace Gekko
             else
             {
                 // It's on the same thread, no need for Invoke
-
-
-
                 RichTextBox textBox = Gui.gui.textBox2;
                 string path = "";
                 string f1 = Path.GetFileNameWithoutExtension(text);

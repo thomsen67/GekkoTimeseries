@@ -16325,50 +16325,65 @@ write datatest;
 
         public static void Model(O.Model o)
         {
-            string fileName = o.fileName;
             P p = o.p;
-
-            fileName = StripQuotes(fileName);
-
-            //Random random = new Random();
             Globals.modelRandomID = Program.RandomInt(11111111, 99999999);  //used in GetModelInfoPath()
 
-            bool cancel = false;
-            if (fileName == "*")
+            List<O.ModelHelper> mh = new List<O.ModelHelper>();
+            for (int i = 0; i < o.helper.Count / 2; i++)
             {
-                SelectFile("frm", ref fileName, ref cancel);
-                CrossThreadStuff.SetTextInput(fileName, "model");
-            }
-            if (cancel) return;
-
-            DateTime dt0 = DateTime.Now;
-
-            //fileName = SubstituteAssignVarsInExpression(fileName);
-            fileName = AddExtension(fileName, ".frm");
-
-            string fileNameSimple = fileName;
-
-            List<string> folders = new List<string>();
-            folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
-            fileName = SearchForFile(fileName, folders);  //calls CreateFullPathAndFileName()
-
-            Globals.modelPathAndFileName = fileName;  //always contains a path
-            Globals.modelFileName = Path.GetFileName(Globals.modelPathAndFileName);
-
-            if (!File.Exists(fileName))
-            {
-                G.Writeln2("*** ERROR: Could not find file '" + fileNameSimple + "'.");
-                throw new GekkoException();
+                O.ModelHelper h = new O.ModelHelper();
+                h.fileName = O.GetString(o.helper[i * 2]);
+                h.type = O.GetString(o.helper[i * 2 + 1]);
+                if (i == 0) h.m = o.listItems;
+                else if (i == 1) h.m = o.listItems0;
+                else if (i == 2) h.m = o.listItems1;
+                else if (i == 3) h.m = o.listItems2;
+                //cannot be more than that
+                mh.Add(h);
             }
 
-            string textInputRaw = Program.GetTextFromFileWithWait(fileName);  //textInputRaw is without any VARLIST$
-            //TODO: keep the old version, so model command can be undone (like undo sim)
+            string modelName = O.GetString(o.modelName);
+            Globals.modelPathAndFileName = modelName;
+            Globals.modelFileName = modelName;
+
+            string modelText = null;
+            foreach (O.ModelHelper h in mh)
+            {
+                string fileName = StripQuotes(h.fileName);
+                bool cancel = false;
+                if (fileName == "*")
+                {
+                    SelectFile("frm", ref fileName, ref cancel);                                        
+                    if (true)
+                    {
+                        //will only replace if there is only 1 star
+                        CrossThreadStuff.SetTextInput(fileName, "model");
+                    }
+                }
+                if (cancel) return;
+                fileName = AddExtension(fileName, ".frm");
+                h.fileNameSimple = fileName;
+                List<string> folders = new List<string>();
+                folders.Add(Program.options.folder_model); //looks here first, after looking in working folder
+                fileName = SearchForFile(fileName, folders);  //calls CreateFullPathAndFileName()
+                if (!File.Exists(fileName))
+                {
+                    G.Writeln2("*** ERROR: Could not find file '" + h.fileNameSimple + "'.");
+                    throw new GekkoException();
+                }
+                h.fileName = fileName;  //put it back, with path and all
+                string textInputRaw = Program.GetTextFromFileWithWait(fileName);
+                modelText += textInputRaw;
+            }
+
             Program.model = new Model();
-            Program.model.modelInfo.fileName = fileName;
-            //this also creates Program.model.varlist if there is a varlist
+            Program.model.modelInfo.fileName = modelName;
+            //this also creates Program.model.varlist if there is a varlist 
 
             ModelCommentsHelper modelCommentsHelper = new ModelCommentsHelper();
-            string textInput = Program.HandleModelFiles(textInputRaw, modelCommentsHelper);
+            string textInput = Program.HandleModelFiles(modelText, modelCommentsHelper);            
+
+            DateTime dt0 = DateTime.Now;                       
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
             
@@ -16400,7 +16415,7 @@ write datatest;
 
                         G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
                         Program.model.modelInfo.loadedFromMdlFile = true;
-                        Program.model.modelInfo.fileName = fileName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
+                        Program.model.modelInfo.fileName = modelName;  //otherwise the filename will be the file used when the cache-file was made (these are often equal of course, but not always).
                     }
                     catch
                     {
@@ -16429,7 +16444,7 @@ write datatest;
             else
             {
                 DateTime t1 = DateTime.Now;
-                ParserOLD.EmitModelFromANTLR(textInput, fileName);
+                ParserOLD.EmitModelFromANTLR(textInput, modelName);
                 parsingSeconds = G.Seconds(t1);
 
                 ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.

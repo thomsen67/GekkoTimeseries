@@ -352,6 +352,7 @@ namespace Gekko.Parser.Gek
             if (p.lastFileSentToANTLR == "") text = "*** ERROR: Internal Gekko error regarding user input";
             WriteCompileErrorMessage(text, p.lastFileSentToANTLR);
             throw new GekkoException();
+
         }
 
         private static void FuncProc(string name, out string s, out string method)

@@ -4819,11 +4819,29 @@ namespace Gekko
             }
         }
 
+        public class ModelHelper
+        {
+            public string fileName = null;
+            public string fileNameSimple = null;  //may be without path, else same as fileName
+            public string type = null;
+            public List<string> m = null;
+            //public ModelCommentsHelper modelCommentsHelper = null;
+        }
+
         public class Model
         {
             public string fileName = null;
+            public string opt_info = null;
+            public IVariable modelName = null;
             public bool info = false;
             public P p = null;
+            public List<IVariable> helper = new List<IVariable>();
+            public List<string> listItems;
+            public List<string> listItems0;
+            public List<string> listItems1;
+            public List<string> listItems2;
+            public List<string> listItems3;            
+
             public void Exe()
             {                
                 Program.Model(this);

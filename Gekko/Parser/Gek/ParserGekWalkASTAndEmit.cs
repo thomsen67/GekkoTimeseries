@@ -2700,9 +2700,23 @@ namespace Gekko.Parser.Gek
                         break;                    
                     case "ASTMODEL":
                         {
+                            //node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
+                            //node.Code.A("o" + Num(node) + ".p = p;");                            
+                            //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+
                             node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".p = p;");
-                            GetCodeFromAllChildren(node); //gets filename
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".helper = new List<IVariable>();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".modelName = " + node[0].Code + ";" + G.NL);
+                            for (int i = 0; i < node[1].ChildrenCount(); i++)
+                            {
+                                string s = node[1][i].Code.ToString();
+                                node.Code.A("o" + Num(node) + ".helper.Add(" + s + ");" + G.NL);
+                            }
+                            for (int i = 2; i < node.ChildrenCount(); i++)
+                            {
+                                node.Code.A(node[i].Code);
+                            }
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;

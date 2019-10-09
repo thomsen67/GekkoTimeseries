@@ -2206,7 +2206,17 @@ mode                      : MODE mode2 -> ^({token("ASTMODE", ASTMODE, $MODE.Lin
 						  ;	
 mode2                     : MIXED | SIM | DATA;
 
-model                     : MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
+//model                     : MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
+//						  ;
+
+model                     : MODEL modelOpt1? name EQUAL modelHelper -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} name modelHelper modelOpt1?);
+modelHelper               : modelItem4 | modelItem3 | modelItem2 | modelItem1;
+modelItem1                : fileName '<' name EQUAL listItems '>' -> ^(ASTPLACEHOLDER fileName name) listItems;
+modelItem2                : fileName '<' name EQUAL listItems '>' ',' fileName '<' name EQUAL listItems0 '>' -> ^(ASTPLACEHOLDER fileName name fileName name) listItems listItems0;
+modelItem3                : fileName '<' name EQUAL listItems '>' ',' fileName '<' name EQUAL listItems0 '>' ',' fileName '<' name EQUAL listItems1 '>' -> ^(ASTPLACEHOLDER fileName name fileName name fileName name) listItems listItems0 listItems1;
+modelItem4                : fileName '<' name EQUAL listItems '>' ',' fileName '<' name EQUAL listItems0 '>' ',' fileName '<' name EQUAL listItems1 '>' ',' fileName '<' name EQUAL listItems2 '>' -> ^(ASTPLACEHOLDER fileName name fileName name fileName name) listItems listItems0 listItems1 listItems2;
+modelOpt1                 : ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
+modelOpt1h                : INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?);
 
 						  //necessay to split it in two instead of using nameWithDot? Else, "OLS dlog(pcp) = ..." will get name=dlog and lhs=(pcp)
 ols                       : OLS olsOpt1? olsElements olsImpose? -> ^({token("ASTOLS", ASTOLS, $OLS.Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) olsImpose? olsElements)
@@ -2660,11 +2670,6 @@ pipeOpt1h                 : HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 						  | CONTINUE (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONTINUE yesNo?)						
 						  | STOP (EQUAL yesNo)? -> ^(ASTOPT_STRING_STOP yesNo?)											
 						  ;
-
-modelOpt1                 : ISNOTQUAL | leftAngle modelOpt1h* RIGHTANGLE -> modelOpt1h*;
-modelOpt1h                : INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
-						  ;
-
 
 openOpt1                  : ISNOTQUAL | leftAngle openOpt1h* RIGHTANGLE -> openOpt1h*;
 openOpt1h                 : TSD (EQUAL yesNo)? -> ^(ASTOPT_STRING_TSD yesNo?)
