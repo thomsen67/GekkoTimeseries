@@ -1,13 +1,5 @@
-set CLASSPATH=%CLASSPATH%;C:\Program Files (x86)\ANTLR\antlr-3.1.3.jar
+set CLASSPATH=%CLASSPATH%;C:\Thomas\Software\ANTLR\antlr-3.1.3.jar
 
-
-"c:\Program Files (x86)\Java\jre6\bin\java.exe" org.antlr.Tool -traceParser Model.g >> ljadsf
-
-
-rem set CLASSPATH=%CLASSPATH%
-rem C:\Program Files (x86)\ANTLR\antlr-3.3\lib\antlr-3.3-complete.jar java org.antlr.Tool -traceParser Cmd.g >> ljadsf
-
-rem set CLASSPATH=%CLASSPATH%;
-rem start "" "java -jar C:\Program Files (x86)\ANTLR\antlr-3.3\lib\antlr-3.1.3.jar java org.antlr.Tool -traceParser Cmd.g" >> ljadsf
+"c:\Thomas\Software\Java\jre6\bin\java.exe" -Xmx1500m org.antlr.Tool -Xconversiontimeout 60000 -traceParser Model.g >> ljadsf
 
 pause

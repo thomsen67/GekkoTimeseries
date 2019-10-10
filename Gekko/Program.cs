@@ -515,6 +515,8 @@ namespace Gekko
         public bool isAfter2Model = false; //if equation is after AFTER2$ Here, both isAfterModel and isAfter2Model are true at same time
         [ProtoMember(27)]
         public string modelBlock = "";
+        [ProtoMember(28)]
+        public string modelFile = "";
     }
 
     /// <summary>
@@ -9642,7 +9644,7 @@ write datatest;
                         }
                     }
 
-                    if (eq != null && eq.modelBlock != null && eq.modelBlock != "" && eq.modelBlock != "Unnamed")
+                    if (eq != null && eq.modelBlock != null && eq.modelBlock != "" && eq.modelBlock != Globals.modelBlockUnknown)
                     {
                         WriteHtml(sb, "Modelblock: " + eq.modelBlock);
                     }
@@ -12885,8 +12887,11 @@ write datatest;
                 sb = new StringBuilder();
                 comment = new StringBuilder();
                 int nestedCommentCounter = 0;
-                foreach (string s in linesNew)
+                int lineCounter = 0;
+                for (int ii = 0; ii < linesNew.Count; ii++)
                 {
+                    lineCounter++;
+                    string s = linesNew[ii];
                     string s2 = s.Trim();
                     if (i == 0)
                     {
@@ -12907,7 +12912,15 @@ write datatest;
                     if (s2.StartsWith("()") || s2.StartsWith("//"))
                     {
                         ExtractComment(comment, s2, modelCommentsHelper);
-                        if (!s2.Contains("###"))
+                        if (s2.Contains(Globals.modelBlockSymbols))
+                        {
+                            //string blockName = GetTextInsideModelBlockMarker(s2);
+                            //if (blockName.StartsWith(Globals.modelBlockSymbols2))
+                            //{
+                            //    s2 = s2 + " " + lineCounter.ToString();
+                            //}
+                        }
+                        else
                         {
                             continue;  //we ignore a normal comment. But if the comment contains '###'
                                        //it will be hashed. So model block lines count in hash code!
@@ -12969,19 +12982,21 @@ write datatest;
             return;
         }
 
-        private static string IdentifyModelBlock(string s2)
+        public static string GetTextInsideModelBlockMarker(string s)
         {
-            string s3 = s2;
-            if (s2.Contains("###"))
-            {
-                string[] xx = s2.Split(new string[] { "###" }, StringSplitOptions.None);
-                if (xx.Length > 1)
-                {
-                    s3 = "MODELBLOCK " + xx[1].Trim();
-                }
-            }
-            return s3;
+            //is always trimmed
+            string modelBlock;
+            string[] ss = s.Split(new string[] { Globals.modelBlockSymbols }, StringSplitOptions.None);
+            modelBlock = ss[1].Trim();  //since it comes from the parser, there are always 2 or 3 elements in ss
+            //if (modelBlock.Length > 0)
+            //{
+            //    //first letter always set to upper-case
+            //    modelBlock = char.ToUpper(modelBlock[0]) + modelBlock.Substring(1);
+            //}
+
+            return modelBlock;
         }
+
 
         private static void ExtractComment(StringBuilder sb, string s2, ModelCommentsHelper modelCommentsHelper)
         {
@@ -15588,7 +15603,7 @@ write datatest;
 
                             EquationHelper found = Program.FindEquationByMeansOfVariableName(var);
 
-                            if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != "Unnamed")
+                            if (found != null && found.modelBlock != null && found.modelBlock != "" && found.modelBlock != Globals.modelBlockUnknown)
                             {
                                 G.Writeln("Modelblock: " + found.modelBlock);
                             }
@@ -16373,6 +16388,7 @@ write datatest;
                 }
                 h.fileName = fileName;  //put it back, with path and all
                 string textInputRaw = Program.GetTextFromFileWithWait(fileName);
+                modelText += "// " + Globals.modelBlockSymbols + " " + Globals.modelBlockSymbols2 + " " + h.fileName + " " + Globals.modelBlockSymbols + "" + G.NL;
                 modelText += textInputRaw;
             }
 

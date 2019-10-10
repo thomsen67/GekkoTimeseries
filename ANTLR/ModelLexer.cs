@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2017-04-28 15:07:56
+// $ANTLR 3.1.3 Mar 18, 2009 10:09:25 Model.g 2019-10-09 14:11:25
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 168, 219
@@ -16,95 +16,97 @@ using Stack 		= Antlr.Runtime.Collections.StackList;
 namespace  Gekko 
 {
 public partial class ModelLexer : Lexer {
-    public const int ASTPOW = 38;
+    public const int ASTPOW = 39;
     public const int ASTMODELBLOCK = 22;
-    public const int ASTVARIABLE = 28;
-    public const int MOD = 45;
-    public const int LETTER = 55;
+    public const int ASTVARIABLE = 29;
+    public const int MOD = 47;
+    public const int LETTER = 57;
     public const int LOG = 4;
     public const int AFTER2 = 8;
     public const int EOF = -1;
-    public const int ASTINTEGER = 26;
-    public const int ASTASSIGNVAR = 25;
-    public const int HAT = 48;
+    public const int ASTINTEGER = 27;
+    public const int ASTASSIGNVAR = 26;
+    public const int T__93 = 93;
+    public const int HAT = 50;
     public const int T__91 = 91;
+    public const int T__92 = 92;
     public const int T__90 = 90;
     public const int EXP = 5;
-    public const int Comment = 60;
-    public const int ASTVAL = 39;
+    public const int Comment = 62;
+    public const int ASTVAL = 40;
     public const int VAL = 9;
-    public const int D = 64;
-    public const int Double = 42;
-    public const int E = 65;
-    public const int F = 66;
-    public const int G = 67;
-    public const int A = 51;
-    public const int B = 62;
-    public const int C = 63;
-    public const int L = 72;
-    public const int M = 53;
-    public const int N = 73;
-    public const int NESTED_ML_COMMENT = 61;
-    public const int O = 74;
-    public const int H = 68;
-    public const int I = 69;
-    public const int J = 70;
-    public const int NEWLINE2 = 58;
-    public const int K = 71;
-    public const int NEWLINE3 = 59;
-    public const int U = 79;
-    public const int T = 78;
-    public const int W = 81;
-    public const int WHITESPACE = 56;
-    public const int V = 80;
-    public const int Q = 52;
-    public const int P = 75;
-    public const int ASTFRML = 37;
-    public const int S = 77;
+    public const int D = 66;
+    public const int Double = 44;
+    public const int E = 67;
+    public const int F = 68;
+    public const int G = 69;
+    public const int A = 53;
+    public const int B = 64;
+    public const int C = 65;
+    public const int L = 74;
+    public const int M = 55;
+    public const int N = 75;
+    public const int NESTED_ML_COMMENT = 63;
+    public const int O = 76;
+    public const int H = 70;
+    public const int I = 71;
+    public const int J = 72;
+    public const int NEWLINE2 = 60;
+    public const int K = 73;
+    public const int NEWLINE3 = 61;
+    public const int U = 81;
+    public const int T = 80;
+    public const int WHITESPACE = 58;
+    public const int W = 83;
+    public const int V = 82;
+    public const int Q = 54;
+    public const int P = 77;
+    public const int ASTFRML = 38;
+    public const int S = 79;
     public const int MULT = 14;
-    public const int R = 76;
-    public const int T__85 = 85;
+    public const int R = 78;
     public const int T__87 = 87;
-    public const int T__86 = 86;
+    public const int Y = 85;
     public const int T__89 = 89;
-    public const int Y = 83;
     public const int T__88 = 88;
-    public const int X = 82;
-    public const int ASTAFTER2 = 24;
-    public const int Z = 84;
-    public const int Ident = 44;
-    public const int ASTEXPRESSION = 29;
+    public const int X = 84;
+    public const int Z = 86;
+    public const int ASTAFTER2 = 25;
+    public const int Ident = 46;
+    public const int ASTEXPRESSION = 30;
     public const int VARLIST = 10;
-    public const int ASTLAGFUNCTION = 32;
-    public const int ASTLAGORLEAD = 36;
+    public const int ASTLAGFUNCTION = 33;
+    public const int ASTLAGORLEAD = 37;
     public const int FALSE = 21;
-    public const int Modelblock = 41;
-    public const int ASTSIMPLEFUNCTION = 34;
+    public const int Modelblock = 42;
+    public const int ASTSIMPLEFUNCTION = 35;
     public const int RB = 17;
     public const int RP = 18;
-    public const int ASTVARIABLELAGLEAD = 35;
-    public const int ASTFUNCTION = 31;
-    public const int ASTAFTER = 23;
-    public const int AssignVar = 46;
-    public const int Exponent = 50;
-    public const int ASTVARLIST = 40;
-    public const int ASTFRMLCODE = 30;
+    public const int ASTVARIABLELAGLEAD = 36;
+    public const int ASTFUNCTION = 32;
+    public const int ASTAFTER = 24;
+    public const int AssignVar = 48;
+    public const int Exponent = 52;
+    public const int ASTMODELBLOCKEND = 23;
+    public const int ModelblockEnd = 43;
+    public const int ASTVARLIST = 41;
+    public const int ASTFRMLCODE = 31;
     public const int PLUS = 11;
     public const int FRML = 6;
-    public const int DIGIT = 49;
+    public const int DIGIT = 51;
     public const int DOT = 19;
     public const int NEGATE = 13;
     public const int AFTER = 7;
     public const int MINUS = 12;
     public const int TRUE = 20;
-    public const int ASTLEFTSIDE = 33;
-    public const int NEWLINE = 57;
-    public const int STARS = 47;
+    public const int ASTLEFTSIDE = 34;
+    public const int NEWLINE = 59;
+    public const int STARS = 49;
     public const int LB = 16;
-    public const int ASTDOUBLE = 27;
+    public const int ASTDOUBLE = 28;
     public const int DIV = 15;
-    public const int DATE = 54;
-    public const int Integer = 43;
+    public const int DATE = 56;
+    public const int Integer = 45;
 
       public override void ReportError(RecognitionException e) {
             string hdr = GetErrorHeader(e);
@@ -466,52 +468,6 @@ public partial class ModelLexer : Lexer {
     }
     // $ANTLR end "FALSE"
 
-    // $ANTLR start "T__85"
-    public void mT__85() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = T__85;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:53:7: ( '=' )
-            // Model.g:53:9: '='
-            {
-            	Match('='); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "T__85"
-
-    // $ANTLR start "T__86"
-    public void mT__86() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = T__86;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:54:7: ( '(' )
-            // Model.g:54:9: '('
-            {
-            	Match('('); 
-
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "T__86"
-
     // $ANTLR start "T__87"
     public void mT__87() // throws RecognitionException [2]
     {
@@ -519,10 +475,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = T__87;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:55:7: ( ',' )
-            // Model.g:55:9: ','
+            // Model.g:53:7: ( '=' )
+            // Model.g:53:9: '='
             {
-            	Match(','); 
+            	Match('='); 
 
             }
 
@@ -542,10 +498,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = T__88;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:56:7: ( '[' )
-            // Model.g:56:9: '['
+            // Model.g:54:7: ( '(' )
+            // Model.g:54:9: '('
             {
-            	Match('['); 
+            	Match('('); 
 
             }
 
@@ -565,10 +521,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = T__89;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:57:7: ( ']' )
-            // Model.g:57:9: ']'
+            // Model.g:55:7: ( ',' )
+            // Model.g:55:9: ','
             {
-            	Match(']'); 
+            	Match(','); 
 
             }
 
@@ -588,10 +544,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = T__90;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:58:7: ( '$' )
-            // Model.g:58:9: '$'
+            // Model.g:56:7: ( '[' )
+            // Model.g:56:9: '['
             {
-            	Match('$'); 
+            	Match('['); 
 
             }
 
@@ -611,6 +567,52 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = T__91;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // Model.g:57:7: ( ']' )
+            // Model.g:57:9: ']'
+            {
+            	Match(']'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "T__91"
+
+    // $ANTLR start "T__92"
+    public void mT__92() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = T__92;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // Model.g:58:7: ( '$' )
+            // Model.g:58:9: '$'
+            {
+            	Match('$'); 
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "T__92"
+
+    // $ANTLR start "T__93"
+    public void mT__93() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = T__93;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
             // Model.g:59:7: ( ';' )
             // Model.g:59:9: ';'
             {
@@ -625,7 +627,7 @@ public partial class ModelLexer : Lexer {
     	{
         }
     }
-    // $ANTLR end "T__91"
+    // $ANTLR end "T__93"
 
     // $ANTLR start "PLUS"
     public void mPLUS() // throws RecognitionException [2]
@@ -634,8 +636,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = PLUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:223:6: ( '+' )
-            // Model.g:223:8: '+'
+            // Model.g:225:6: ( '+' )
+            // Model.g:225:8: '+'
             {
             	Match('+'); 
 
@@ -657,8 +659,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = MINUS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:224:7: ( '-' )
-            // Model.g:224:9: '-'
+            // Model.g:226:7: ( '-' )
+            // Model.g:226:9: '-'
             {
             	Match('-'); 
 
@@ -680,8 +682,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = MULT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:226:6: ( '*' )
-            // Model.g:226:8: '*'
+            // Model.g:228:6: ( '*' )
+            // Model.g:228:8: '*'
             {
             	Match('*'); 
 
@@ -703,8 +705,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = DIV;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:227:5: ( '/' )
-            // Model.g:227:7: '/'
+            // Model.g:229:5: ( '/' )
+            // Model.g:229:7: '/'
             {
             	Match('/'); 
 
@@ -726,8 +728,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = MOD;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:228:5: ( '%' )
-            // Model.g:228:7: '%'
+            // Model.g:230:5: ( '%' )
+            // Model.g:230:7: '%'
             {
             	Match('%'); 
 
@@ -749,8 +751,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = STARS;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:231:10: ( '**' )
-            // Model.g:231:17: '**'
+            // Model.g:233:10: ( '**' )
+            // Model.g:233:17: '**'
             {
             	Match("**"); 
 
@@ -773,8 +775,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = HAT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:232:8: ( '^' )
-            // Model.g:232:17: '^'
+            // Model.g:234:8: ( '^' )
+            // Model.g:234:17: '^'
             {
             	Match('^'); 
 
@@ -796,10 +798,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = Integer;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:245:9: ( ( DIGIT )+ )
-            // Model.g:245:11: ( DIGIT )+
+            // Model.g:247:9: ( ( DIGIT )+ )
+            // Model.g:247:11: ( DIGIT )+
             {
-            	// Model.g:245:11: ( DIGIT )+
+            	// Model.g:247:11: ( DIGIT )+
             	int cnt1 = 0;
             	do 
             	{
@@ -815,7 +817,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt1) 
             		{
             			case 1 :
-            			    // Model.g:245:12: DIGIT
+            			    // Model.g:247:12: DIGIT
             			    {
             			    	mDIGIT(); 
 
@@ -853,15 +855,15 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = Double;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:248:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
+            // Model.g:250:5: ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent )
             int alt8 = 3;
             alt8 = dfa8.Predict(input);
             switch (alt8) 
             {
                 case 1 :
-                    // Model.g:249:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
+                    // Model.g:251:8: ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )?
                     {
-                    	// Model.g:249:8: ( '0' .. '9' )+
+                    	// Model.g:251:8: ( '0' .. '9' )+
                     	int cnt2 = 0;
                     	do 
                     	{
@@ -877,7 +879,7 @@ public partial class ModelLexer : Lexer {
                     	    switch (alt2) 
                     		{
                     			case 1 :
-                    			    // Model.g:249:9: '0' .. '9'
+                    			    // Model.g:251:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -897,7 +899,7 @@ public partial class ModelLexer : Lexer {
                     		;	// Stops C# compiler whining that label 'loop2' has no statements
 
                     	mDOT(); 
-                    	// Model.g:249:26: ( '0' .. '9' )*
+                    	// Model.g:251:26: ( '0' .. '9' )*
                     	do 
                     	{
                     	    int alt3 = 2;
@@ -912,7 +914,7 @@ public partial class ModelLexer : Lexer {
                     	    switch (alt3) 
                     		{
                     			case 1 :
-                    			    // Model.g:249:27: '0' .. '9'
+                    			    // Model.g:251:27: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -927,7 +929,7 @@ public partial class ModelLexer : Lexer {
                     	loop3:
                     		;	// Stops C# compiler whining that label 'loop3' has no statements
 
-                    	// Model.g:249:40: ( Exponent )?
+                    	// Model.g:251:40: ( Exponent )?
                     	int alt4 = 2;
                     	int LA4_0 = input.LA(1);
 
@@ -938,7 +940,7 @@ public partial class ModelLexer : Lexer {
                     	switch (alt4) 
                     	{
                     	    case 1 :
-                    	        // Model.g:249:40: Exponent
+                    	        // Model.g:251:40: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -951,10 +953,10 @@ public partial class ModelLexer : Lexer {
                     }
                     break;
                 case 2 :
-                    // Model.g:250:9: DOT ( '0' .. '9' )+ ( Exponent )?
+                    // Model.g:252:9: DOT ( '0' .. '9' )+ ( Exponent )?
                     {
                     	mDOT(); 
-                    	// Model.g:250:13: ( '0' .. '9' )+
+                    	// Model.g:252:13: ( '0' .. '9' )+
                     	int cnt5 = 0;
                     	do 
                     	{
@@ -970,7 +972,7 @@ public partial class ModelLexer : Lexer {
                     	    switch (alt5) 
                     		{
                     			case 1 :
-                    			    // Model.g:250:15: '0' .. '9'
+                    			    // Model.g:252:15: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -989,7 +991,7 @@ public partial class ModelLexer : Lexer {
                     	loop5:
                     		;	// Stops C# compiler whining that label 'loop5' has no statements
 
-                    	// Model.g:250:29: ( Exponent )?
+                    	// Model.g:252:29: ( Exponent )?
                     	int alt6 = 2;
                     	int LA6_0 = input.LA(1);
 
@@ -1000,7 +1002,7 @@ public partial class ModelLexer : Lexer {
                     	switch (alt6) 
                     	{
                     	    case 1 :
-                    	        // Model.g:250:29: Exponent
+                    	        // Model.g:252:29: Exponent
                     	        {
                     	        	mExponent(); 
 
@@ -1013,9 +1015,9 @@ public partial class ModelLexer : Lexer {
                     }
                     break;
                 case 3 :
-                    // Model.g:251:8: ( '0' .. '9' )+ Exponent
+                    // Model.g:253:8: ( '0' .. '9' )+ Exponent
                     {
-                    	// Model.g:251:8: ( '0' .. '9' )+
+                    	// Model.g:253:8: ( '0' .. '9' )+
                     	int cnt7 = 0;
                     	do 
                     	{
@@ -1031,7 +1033,7 @@ public partial class ModelLexer : Lexer {
                     	    switch (alt7) 
                     		{
                     			case 1 :
-                    			    // Model.g:251:9: '0' .. '9'
+                    			    // Model.g:253:9: '0' .. '9'
                     			    {
                     			    	MatchRange('0','9'); 
 
@@ -1070,8 +1072,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:256:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // Model.g:256:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // Model.g:258:5: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
+            // Model.g:258:9: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -1084,7 +1086,7 @@ public partial class ModelLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Model.g:256:23: ( '+' | '-' )?
+            	// Model.g:258:23: ( '+' | '-' )?
             	int alt9 = 2;
             	int LA9_0 = input.LA(1);
 
@@ -1114,7 +1116,7 @@ public partial class ModelLexer : Lexer {
 
             	}
 
-            	// Model.g:256:38: ( '0' .. '9' )+
+            	// Model.g:258:38: ( '0' .. '9' )+
             	int cnt10 = 0;
             	do 
             	{
@@ -1130,7 +1132,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt10) 
             		{
             			case 1 :
-            			    // Model.g:256:40: '0' .. '9'
+            			    // Model.g:258:40: '0' .. '9'
             			    {
             			    	MatchRange('0','9'); 
 
@@ -1166,10 +1168,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = DATE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:259:6: ( ( '0' .. '9' )+ ( A | Q | M ) ( '0' .. '9' )+ )
-            // Model.g:259:10: ( '0' .. '9' )+ ( A | Q | M ) ( '0' .. '9' )+
+            // Model.g:261:6: ( ( '0' .. '9' )+ ( A | Q | M ) ( '0' .. '9' )+ )
+            // Model.g:261:10: ( '0' .. '9' )+ ( A | Q | M ) ( '0' .. '9' )+
             {
-            	// Model.g:259:10: ( '0' .. '9' )+
+            	// Model.g:261:10: ( '0' .. '9' )+
             	int cnt11 = 0;
             	do 
             	{
@@ -1185,7 +1187,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt11) 
             		{
             			case 1 :
-            			    // Model.g:259:11: '0' .. '9'
+            			    // Model.g:261:11: '0' .. '9'
             			    {
             			    	MatchRange('0','9'); 
 
@@ -1215,7 +1217,7 @@ public partial class ModelLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Model.g:259:32: ( '0' .. '9' )+
+            	// Model.g:261:32: ( '0' .. '9' )+
             	int cnt12 = 0;
             	do 
             	{
@@ -1231,7 +1233,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt12) 
             		{
             			case 1 :
-            			    // Model.g:259:33: '0' .. '9'
+            			    // Model.g:261:33: '0' .. '9'
             			    {
             			    	MatchRange('0','9'); 
 
@@ -1269,8 +1271,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = AssignVar;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:261:11: ( '%' ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // Model.g:261:13: '%' ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // Model.g:263:11: ( '%' ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // Model.g:263:13: '%' ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	Match('%'); 
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -1284,7 +1286,7 @@ public partial class ModelLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Model.g:261:30: ( DIGIT | LETTER | '_' )*
+            	// Model.g:263:30: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt13 = 2;
@@ -1343,8 +1345,8 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = Ident;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:263:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
-            // Model.g:263:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
+            // Model.g:265:7: ( ( LETTER | '_' ) ( DIGIT | LETTER | '_' )* )
+            // Model.g:265:9: ( LETTER | '_' ) ( DIGIT | LETTER | '_' )*
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || input.LA(1) == '_' || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
             	{
@@ -1357,7 +1359,7 @@ public partial class ModelLexer : Lexer {
             	    Recover(mse);
             	    throw mse;}
 
-            	// Model.g:263:22: ( DIGIT | LETTER | '_' )*
+            	// Model.g:265:22: ( DIGIT | LETTER | '_' )*
             	do 
             	{
             	    int alt14 = 2;
@@ -1417,10 +1419,10 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = WHITESPACE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:265:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
-            // Model.g:265:14: ( '\\t' | ' ' | '\\u000C' )+
+            // Model.g:267:12: ( ( '\\t' | ' ' | '\\u000C' )+ )
+            // Model.g:267:14: ( '\\t' | ' ' | '\\u000C' )+
             {
-            	// Model.g:265:14: ( '\\t' | ' ' | '\\u000C' )+
+            	// Model.g:267:14: ( '\\t' | ' ' | '\\u000C' )+
             	int cnt15 = 0;
             	do 
             	{
@@ -1485,13 +1487,13 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = NEWLINE;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:267:12: ( ( ( '\\r' )? '\\n' ) )
-            // Model.g:267:16: ( ( '\\r' )? '\\n' )
+            // Model.g:269:12: ( ( ( '\\r' )? '\\n' ) )
+            // Model.g:269:16: ( ( '\\r' )? '\\n' )
             {
-            	// Model.g:267:16: ( ( '\\r' )? '\\n' )
-            	// Model.g:267:17: ( '\\r' )? '\\n'
+            	// Model.g:269:16: ( ( '\\r' )? '\\n' )
+            	// Model.g:269:17: ( '\\r' )? '\\n'
             	{
-            		// Model.g:267:17: ( '\\r' )?
+            		// Model.g:269:17: ( '\\r' )?
             		int alt16 = 2;
             		int LA16_0 = input.LA(1);
 
@@ -1502,7 +1504,7 @@ public partial class ModelLexer : Lexer {
             		switch (alt16) 
             		{
             		    case 1 :
-            		        // Model.g:267:18: '\\r'
+            		        // Model.g:269:18: '\\r'
             		        {
             		        	Match('\r'); 
 
@@ -1528,17 +1530,17 @@ public partial class ModelLexer : Lexer {
     }
     // $ANTLR end "NEWLINE"
 
-    // $ANTLR start "Modelblock"
-    public void mModelblock() // throws RecognitionException [2]
+    // $ANTLR start "ModelblockEnd"
+    public void mModelblockEnd() // throws RecognitionException [2]
     {
     		try
     		{
-            int _type = Modelblock;
+            int _type = ModelblockEnd;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:269:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* )
-            // Model.g:269:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            // Model.g:271:14: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '######' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* )
+            // Model.g:271:16: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '######' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
             {
-            	// Model.g:269:14: ( '()' | '//' )
+            	// Model.g:271:16: ( '()' | '//' )
             	int alt17 = 2;
             	int LA17_0 = input.LA(1);
 
@@ -1560,7 +1562,7 @@ public partial class ModelLexer : Lexer {
             	switch (alt17) 
             	{
             	    case 1 :
-            	        // Model.g:269:15: '()'
+            	        // Model.g:271:17: '()'
             	        {
             	        	Match("()"); 
 
@@ -1568,7 +1570,7 @@ public partial class ModelLexer : Lexer {
             	        }
             	        break;
             	    case 2 :
-            	        // Model.g:269:22: '//'
+            	        // Model.g:271:24: '//'
             	        {
             	        	Match("//"); 
 
@@ -1578,7 +1580,7 @@ public partial class ModelLexer : Lexer {
 
             	}
 
-            	// Model.g:269:28: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            	// Model.g:271:30: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
             	do 
             	{
             	    int alt18 = 2;
@@ -1593,7 +1595,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt18) 
             		{
             			case 1 :
-            			    // Model.g:269:29: ~ ( NEWLINE2 | NEWLINE3 | '#' )
+            			    // Model.g:271:31: ~ ( NEWLINE2 | NEWLINE3 | '#' )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\"') || (input.LA(1) >= '$' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -1618,9 +1620,9 @@ public partial class ModelLexer : Lexer {
             	loop18:
             		;	// Stops C# compiler whining that label 'loop18' has no statements
 
-            	Match("###"); 
+            	Match("######"); 
 
-            	// Model.g:269:63: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            	// Model.g:271:68: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
             	do 
             	{
             	    int alt19 = 2;
@@ -1635,7 +1637,7 @@ public partial class ModelLexer : Lexer {
             	    switch (alt19) 
             		{
             			case 1 :
-            			    // Model.g:269:64: ~ ( NEWLINE2 | NEWLINE3 | '#' )
+            			    // Model.g:271:69: ~ ( NEWLINE2 | NEWLINE3 | '#' )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\"') || (input.LA(1) >= '$' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -1660,24 +1662,84 @@ public partial class ModelLexer : Lexer {
             	loop19:
             		;	// Stops C# compiler whining that label 'loop19' has no statements
 
-            	Match("###"); 
 
-            	// Model.g:269:97: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "ModelblockEnd"
+
+    // $ANTLR start "Modelblock"
+    public void mModelblock() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = Modelblock;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // Model.g:273:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* )
+            // Model.g:273:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )* '###' (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            {
+            	// Model.g:273:14: ( '()' | '//' )
+            	int alt20 = 2;
+            	int LA20_0 = input.LA(1);
+
+            	if ( (LA20_0 == '(') )
+            	{
+            	    alt20 = 1;
+            	}
+            	else if ( (LA20_0 == '/') )
+            	{
+            	    alt20 = 2;
+            	}
+            	else 
+            	{
+            	    NoViableAltException nvae_d20s0 =
+            	        new NoViableAltException("", 20, 0, input);
+
+            	    throw nvae_d20s0;
+            	}
+            	switch (alt20) 
+            	{
+            	    case 1 :
+            	        // Model.g:273:15: '()'
+            	        {
+            	        	Match("()"); 
+
+
+            	        }
+            	        break;
+            	    case 2 :
+            	        // Model.g:273:22: '//'
+            	        {
+            	        	Match("//"); 
+
+
+            	        }
+            	        break;
+
+            	}
+
+            	// Model.g:273:28: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
             	do 
             	{
-            	    int alt20 = 2;
-            	    int LA20_0 = input.LA(1);
+            	    int alt21 = 2;
+            	    int LA21_0 = input.LA(1);
 
-            	    if ( ((LA20_0 >= '\u0000' && LA20_0 <= '\t') || (LA20_0 >= '\u000B' && LA20_0 <= '\"') || (LA20_0 >= '$' && LA20_0 <= '\uFFFF')) )
+            	    if ( ((LA21_0 >= '\u0000' && LA21_0 <= '\t') || (LA21_0 >= '\u000B' && LA21_0 <= '\"') || (LA21_0 >= '$' && LA21_0 <= '\uFFFF')) )
             	    {
-            	        alt20 = 1;
+            	        alt21 = 1;
             	    }
 
 
-            	    switch (alt20) 
+            	    switch (alt21) 
             		{
             			case 1 :
-            			    // Model.g:269:98: ~ ( NEWLINE2 | NEWLINE3 | '#' )
+            			    // Model.g:273:29: ~ ( NEWLINE2 | NEWLINE3 | '#' )
             			    {
             			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\"') || (input.LA(1) >= '$' && input.LA(1) <= '\uFFFF') ) 
             			    	{
@@ -1695,82 +1757,22 @@ public partial class ModelLexer : Lexer {
             			    break;
 
             			default:
-            			    goto loop20;
+            			    goto loop21;
             	    }
             	} while (true);
 
-            	loop20:
-            		;	// Stops C# compiler whining that label 'loop20' has no statements
+            	loop21:
+            		;	// Stops C# compiler whining that label 'loop21' has no statements
 
+            	Match("###"); 
 
-            }
-
-            state.type = _type;
-            state.channel = _channel;
-        }
-        finally 
-    	{
-        }
-    }
-    // $ANTLR end "Modelblock"
-
-    // $ANTLR start "Comment"
-    public void mComment() // throws RecognitionException [2]
-    {
-    		try
-    		{
-            int _type = Comment;
-    	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:271:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
-            // Model.g:271:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
-            {
-            	// Model.g:271:14: ( '()' | '//' )
-            	int alt21 = 2;
-            	int LA21_0 = input.LA(1);
-
-            	if ( (LA21_0 == '(') )
-            	{
-            	    alt21 = 1;
-            	}
-            	else if ( (LA21_0 == '/') )
-            	{
-            	    alt21 = 2;
-            	}
-            	else 
-            	{
-            	    NoViableAltException nvae_d21s0 =
-            	        new NoViableAltException("", 21, 0, input);
-
-            	    throw nvae_d21s0;
-            	}
-            	switch (alt21) 
-            	{
-            	    case 1 :
-            	        // Model.g:271:15: '()'
-            	        {
-            	        	Match("()"); 
-
-
-            	        }
-            	        break;
-            	    case 2 :
-            	        // Model.g:271:22: '//'
-            	        {
-            	        	Match("//"); 
-
-
-            	        }
-            	        break;
-
-            	}
-
-            	// Model.g:271:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	// Model.g:273:63: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
             	do 
             	{
             	    int alt22 = 2;
             	    int LA22_0 = input.LA(1);
 
-            	    if ( ((LA22_0 >= '\u0000' && LA22_0 <= '\t') || (LA22_0 >= '\u000B' && LA22_0 <= '\uFFFF')) )
+            	    if ( ((LA22_0 >= '\u0000' && LA22_0 <= '\t') || (LA22_0 >= '\u000B' && LA22_0 <= '\"') || (LA22_0 >= '$' && LA22_0 <= '\uFFFF')) )
             	    {
             	        alt22 = 1;
             	    }
@@ -1779,9 +1781,9 @@ public partial class ModelLexer : Lexer {
             	    switch (alt22) 
             		{
             			case 1 :
-            			    // Model.g:271:29: ~ ( NEWLINE2 | NEWLINE3 )
+            			    // Model.g:273:64: ~ ( NEWLINE2 | NEWLINE3 | '#' )
             			    {
-            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
+            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\"') || (input.LA(1) >= '$' && input.LA(1) <= '\uFFFF') ) 
             			    	{
             			    	    input.Consume();
 
@@ -1804,6 +1806,150 @@ public partial class ModelLexer : Lexer {
             	loop22:
             		;	// Stops C# compiler whining that label 'loop22' has no statements
 
+            	Match("###"); 
+
+            	// Model.g:273:97: (~ ( NEWLINE2 | NEWLINE3 | '#' ) )*
+            	do 
+            	{
+            	    int alt23 = 2;
+            	    int LA23_0 = input.LA(1);
+
+            	    if ( ((LA23_0 >= '\u0000' && LA23_0 <= '\t') || (LA23_0 >= '\u000B' && LA23_0 <= '\"') || (LA23_0 >= '$' && LA23_0 <= '\uFFFF')) )
+            	    {
+            	        alt23 = 1;
+            	    }
+
+
+            	    switch (alt23) 
+            		{
+            			case 1 :
+            			    // Model.g:273:98: ~ ( NEWLINE2 | NEWLINE3 | '#' )
+            			    {
+            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\"') || (input.LA(1) >= '$' && input.LA(1) <= '\uFFFF') ) 
+            			    	{
+            			    	    input.Consume();
+
+            			    	}
+            			    	else 
+            			    	{
+            			    	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            			    	    Recover(mse);
+            			    	    throw mse;}
+
+
+            			    }
+            			    break;
+
+            			default:
+            			    goto loop23;
+            	    }
+            	} while (true);
+
+            	loop23:
+            		;	// Stops C# compiler whining that label 'loop23' has no statements
+
+
+            }
+
+            state.type = _type;
+            state.channel = _channel;
+        }
+        finally 
+    	{
+        }
+    }
+    // $ANTLR end "Modelblock"
+
+    // $ANTLR start "Comment"
+    public void mComment() // throws RecognitionException [2]
+    {
+    		try
+    		{
+            int _type = Comment;
+    	int _channel = DEFAULT_TOKEN_CHANNEL;
+            // Model.g:276:12: ( ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )* )
+            // Model.g:276:14: ( '()' | '//' ) (~ ( NEWLINE2 | NEWLINE3 ) )*
+            {
+            	// Model.g:276:14: ( '()' | '//' )
+            	int alt24 = 2;
+            	int LA24_0 = input.LA(1);
+
+            	if ( (LA24_0 == '(') )
+            	{
+            	    alt24 = 1;
+            	}
+            	else if ( (LA24_0 == '/') )
+            	{
+            	    alt24 = 2;
+            	}
+            	else 
+            	{
+            	    NoViableAltException nvae_d24s0 =
+            	        new NoViableAltException("", 24, 0, input);
+
+            	    throw nvae_d24s0;
+            	}
+            	switch (alt24) 
+            	{
+            	    case 1 :
+            	        // Model.g:276:15: '()'
+            	        {
+            	        	Match("()"); 
+
+
+            	        }
+            	        break;
+            	    case 2 :
+            	        // Model.g:276:22: '//'
+            	        {
+            	        	Match("//"); 
+
+
+            	        }
+            	        break;
+
+            	}
+
+            	// Model.g:276:28: (~ ( NEWLINE2 | NEWLINE3 ) )*
+            	do 
+            	{
+            	    int alt25 = 2;
+            	    int LA25_0 = input.LA(1);
+
+            	    if ( ((LA25_0 >= '\u0000' && LA25_0 <= '\t') || (LA25_0 >= '\u000B' && LA25_0 <= '\uFFFF')) )
+            	    {
+            	        alt25 = 1;
+            	    }
+
+
+            	    switch (alt25) 
+            		{
+            			case 1 :
+            			    // Model.g:276:29: ~ ( NEWLINE2 | NEWLINE3 )
+            			    {
+            			    	if ( (input.LA(1) >= '\u0000' && input.LA(1) <= '\t') || (input.LA(1) >= '\u000B' && input.LA(1) <= '\uFFFF') ) 
+            			    	{
+            			    	    input.Consume();
+
+            			    	}
+            			    	else 
+            			    	{
+            			    	    MismatchedSetException mse = new MismatchedSetException(null,input);
+            			    	    Recover(mse);
+            			    	    throw mse;}
+
+
+            			    }
+            			    break;
+
+            			default:
+            			    goto loop25;
+            	    }
+            	} while (true);
+
+            	loop25:
+            		;	// Stops C# compiler whining that label 'loop25' has no statements
+
             	 _channel=HIDDEN; 
 
             }
@@ -1824,64 +1970,64 @@ public partial class ModelLexer : Lexer {
     		{
             int _type = NESTED_ML_COMMENT;
     	int _channel = DEFAULT_TOKEN_CHANNEL;
-            // Model.g:275:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
-            // Model.g:275:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
+            // Model.g:280:5: ( '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/' )
+            // Model.g:280:9: '/*' ( options {greedy=false; } : NESTED_ML_COMMENT | . )* '*/'
             {
             	Match("/*"); 
 
-            	// Model.g:276:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
+            	// Model.g:281:9: ( options {greedy=false; } : NESTED_ML_COMMENT | . )*
             	do 
             	{
-            	    int alt23 = 3;
-            	    int LA23_0 = input.LA(1);
+            	    int alt26 = 3;
+            	    int LA26_0 = input.LA(1);
 
-            	    if ( (LA23_0 == '*') )
+            	    if ( (LA26_0 == '*') )
             	    {
-            	        int LA23_1 = input.LA(2);
+            	        int LA26_1 = input.LA(2);
 
-            	        if ( (LA23_1 == '/') )
+            	        if ( (LA26_1 == '/') )
             	        {
-            	            alt23 = 3;
+            	            alt26 = 3;
             	        }
-            	        else if ( ((LA23_1 >= '\u0000' && LA23_1 <= '.') || (LA23_1 >= '0' && LA23_1 <= '\uFFFF')) )
+            	        else if ( ((LA26_1 >= '\u0000' && LA26_1 <= '.') || (LA26_1 >= '0' && LA26_1 <= '\uFFFF')) )
             	        {
-            	            alt23 = 2;
+            	            alt26 = 2;
             	        }
 
 
             	    }
-            	    else if ( (LA23_0 == '/') )
+            	    else if ( (LA26_0 == '/') )
             	    {
-            	        int LA23_2 = input.LA(2);
+            	        int LA26_2 = input.LA(2);
 
-            	        if ( (LA23_2 == '*') )
+            	        if ( (LA26_2 == '*') )
             	        {
-            	            alt23 = 1;
+            	            alt26 = 1;
             	        }
-            	        else if ( ((LA23_2 >= '\u0000' && LA23_2 <= ')') || (LA23_2 >= '+' && LA23_2 <= '\uFFFF')) )
+            	        else if ( ((LA26_2 >= '\u0000' && LA26_2 <= ')') || (LA26_2 >= '+' && LA26_2 <= '\uFFFF')) )
             	        {
-            	            alt23 = 2;
+            	            alt26 = 2;
             	        }
 
 
             	    }
-            	    else if ( ((LA23_0 >= '\u0000' && LA23_0 <= ')') || (LA23_0 >= '+' && LA23_0 <= '.') || (LA23_0 >= '0' && LA23_0 <= '\uFFFF')) )
+            	    else if ( ((LA26_0 >= '\u0000' && LA26_0 <= ')') || (LA26_0 >= '+' && LA26_0 <= '.') || (LA26_0 >= '0' && LA26_0 <= '\uFFFF')) )
             	    {
-            	        alt23 = 2;
+            	        alt26 = 2;
             	    }
 
 
-            	    switch (alt23) 
+            	    switch (alt26) 
             		{
             			case 1 :
-            			    // Model.g:276:36: NESTED_ML_COMMENT
+            			    // Model.g:281:36: NESTED_ML_COMMENT
             			    {
             			    	mNESTED_ML_COMMENT(); 
 
             			    }
             			    break;
             			case 2 :
-            			    // Model.g:276:56: .
+            			    // Model.g:281:56: .
             			    {
             			    	MatchAny(); 
 
@@ -1889,12 +2035,12 @@ public partial class ModelLexer : Lexer {
             			    break;
 
             			default:
-            			    goto loop23;
+            			    goto loop26;
             	    }
             	} while (true);
 
-            	loop23:
-            		;	// Stops C# compiler whining that label 'loop23' has no statements
+            	loop26:
+            		;	// Stops C# compiler whining that label 'loop26' has no statements
 
             	Match("*/"); 
 
@@ -1916,8 +2062,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:281:19: ( '\\n' )
-            // Model.g:281:21: '\\n'
+            // Model.g:286:19: ( '\\n' )
+            // Model.g:286:21: '\\n'
             {
             	Match('\n'); 
 
@@ -1935,8 +2081,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:282:19: ( '\\r\\n' )
-            // Model.g:282:21: '\\r\\n'
+            // Model.g:287:19: ( '\\r\\n' )
+            // Model.g:287:21: '\\r\\n'
             {
             	Match("\r\n"); 
 
@@ -1955,8 +2101,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:283:16: ( '0' .. '9' )
-            // Model.g:283:18: '0' .. '9'
+            // Model.g:288:16: ( '0' .. '9' )
+            // Model.g:288:18: '0' .. '9'
             {
             	MatchRange('0','9'); 
 
@@ -1974,7 +2120,7 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:284:16: ( 'a' .. 'z' | 'A' .. 'Z' )
+            // Model.g:289:16: ( 'a' .. 'z' | 'A' .. 'Z' )
             // Model.g:
             {
             	if ( (input.LA(1) >= 'A' && input.LA(1) <= 'Z') || (input.LA(1) >= 'a' && input.LA(1) <= 'z') ) 
@@ -2003,8 +2149,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:286:11: ( ( 'a' | 'A' ) )
-            // Model.g:286:12: ( 'a' | 'A' )
+            // Model.g:291:11: ( ( 'a' | 'A' ) )
+            // Model.g:291:12: ( 'a' | 'A' )
             {
             	if ( input.LA(1) == 'A' || input.LA(1) == 'a' ) 
             	{
@@ -2032,8 +2178,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:287:11: ( ( 'b' | 'B' ) )
-            // Model.g:287:12: ( 'b' | 'B' )
+            // Model.g:292:11: ( ( 'b' | 'B' ) )
+            // Model.g:292:12: ( 'b' | 'B' )
             {
             	if ( input.LA(1) == 'B' || input.LA(1) == 'b' ) 
             	{
@@ -2061,8 +2207,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:288:11: ( ( 'c' | 'C' ) )
-            // Model.g:288:12: ( 'c' | 'C' )
+            // Model.g:293:11: ( ( 'c' | 'C' ) )
+            // Model.g:293:12: ( 'c' | 'C' )
             {
             	if ( input.LA(1) == 'C' || input.LA(1) == 'c' ) 
             	{
@@ -2090,8 +2236,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:289:11: ( ( 'd' | 'D' ) )
-            // Model.g:289:12: ( 'd' | 'D' )
+            // Model.g:294:11: ( ( 'd' | 'D' ) )
+            // Model.g:294:12: ( 'd' | 'D' )
             {
             	if ( input.LA(1) == 'D' || input.LA(1) == 'd' ) 
             	{
@@ -2119,8 +2265,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:290:11: ( ( 'e' | 'E' ) )
-            // Model.g:290:12: ( 'e' | 'E' )
+            // Model.g:295:11: ( ( 'e' | 'E' ) )
+            // Model.g:295:12: ( 'e' | 'E' )
             {
             	if ( input.LA(1) == 'E' || input.LA(1) == 'e' ) 
             	{
@@ -2148,8 +2294,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:291:11: ( ( 'f' | 'F' ) )
-            // Model.g:291:12: ( 'f' | 'F' )
+            // Model.g:296:11: ( ( 'f' | 'F' ) )
+            // Model.g:296:12: ( 'f' | 'F' )
             {
             	if ( input.LA(1) == 'F' || input.LA(1) == 'f' ) 
             	{
@@ -2177,8 +2323,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:292:11: ( ( 'g' | 'G' ) )
-            // Model.g:292:12: ( 'g' | 'G' )
+            // Model.g:297:11: ( ( 'g' | 'G' ) )
+            // Model.g:297:12: ( 'g' | 'G' )
             {
             	if ( input.LA(1) == 'G' || input.LA(1) == 'g' ) 
             	{
@@ -2206,8 +2352,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:293:11: ( ( 'h' | 'H' ) )
-            // Model.g:293:12: ( 'h' | 'H' )
+            // Model.g:298:11: ( ( 'h' | 'H' ) )
+            // Model.g:298:12: ( 'h' | 'H' )
             {
             	if ( input.LA(1) == 'H' || input.LA(1) == 'h' ) 
             	{
@@ -2235,8 +2381,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:294:11: ( ( 'i' | 'I' ) )
-            // Model.g:294:12: ( 'i' | 'I' )
+            // Model.g:299:11: ( ( 'i' | 'I' ) )
+            // Model.g:299:12: ( 'i' | 'I' )
             {
             	if ( input.LA(1) == 'I' || input.LA(1) == 'i' ) 
             	{
@@ -2264,8 +2410,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:295:11: ( ( 'j' | 'J' ) )
-            // Model.g:295:12: ( 'j' | 'J' )
+            // Model.g:300:11: ( ( 'j' | 'J' ) )
+            // Model.g:300:12: ( 'j' | 'J' )
             {
             	if ( input.LA(1) == 'J' || input.LA(1) == 'j' ) 
             	{
@@ -2293,8 +2439,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:296:11: ( ( 'k' | 'K' ) )
-            // Model.g:296:12: ( 'k' | 'K' )
+            // Model.g:301:11: ( ( 'k' | 'K' ) )
+            // Model.g:301:12: ( 'k' | 'K' )
             {
             	if ( input.LA(1) == 'K' || input.LA(1) == 'k' ) 
             	{
@@ -2322,8 +2468,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:297:11: ( ( 'l' | 'L' ) )
-            // Model.g:297:12: ( 'l' | 'L' )
+            // Model.g:302:11: ( ( 'l' | 'L' ) )
+            // Model.g:302:12: ( 'l' | 'L' )
             {
             	if ( input.LA(1) == 'L' || input.LA(1) == 'l' ) 
             	{
@@ -2351,8 +2497,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:298:11: ( ( 'm' | 'M' ) )
-            // Model.g:298:12: ( 'm' | 'M' )
+            // Model.g:303:11: ( ( 'm' | 'M' ) )
+            // Model.g:303:12: ( 'm' | 'M' )
             {
             	if ( input.LA(1) == 'M' || input.LA(1) == 'm' ) 
             	{
@@ -2380,8 +2526,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:299:11: ( ( 'n' | 'N' ) )
-            // Model.g:299:12: ( 'n' | 'N' )
+            // Model.g:304:11: ( ( 'n' | 'N' ) )
+            // Model.g:304:12: ( 'n' | 'N' )
             {
             	if ( input.LA(1) == 'N' || input.LA(1) == 'n' ) 
             	{
@@ -2409,8 +2555,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:300:11: ( ( 'o' | 'O' ) )
-            // Model.g:300:12: ( 'o' | 'O' )
+            // Model.g:305:11: ( ( 'o' | 'O' ) )
+            // Model.g:305:12: ( 'o' | 'O' )
             {
             	if ( input.LA(1) == 'O' || input.LA(1) == 'o' ) 
             	{
@@ -2438,8 +2584,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:301:11: ( ( 'p' | 'P' ) )
-            // Model.g:301:12: ( 'p' | 'P' )
+            // Model.g:306:11: ( ( 'p' | 'P' ) )
+            // Model.g:306:12: ( 'p' | 'P' )
             {
             	if ( input.LA(1) == 'P' || input.LA(1) == 'p' ) 
             	{
@@ -2467,8 +2613,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:302:11: ( ( 'q' | 'Q' ) )
-            // Model.g:302:12: ( 'q' | 'Q' )
+            // Model.g:307:11: ( ( 'q' | 'Q' ) )
+            // Model.g:307:12: ( 'q' | 'Q' )
             {
             	if ( input.LA(1) == 'Q' || input.LA(1) == 'q' ) 
             	{
@@ -2496,8 +2642,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:303:11: ( ( 'r' | 'R' ) )
-            // Model.g:303:12: ( 'r' | 'R' )
+            // Model.g:308:11: ( ( 'r' | 'R' ) )
+            // Model.g:308:12: ( 'r' | 'R' )
             {
             	if ( input.LA(1) == 'R' || input.LA(1) == 'r' ) 
             	{
@@ -2525,8 +2671,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:304:11: ( ( 's' | 'S' ) )
-            // Model.g:304:12: ( 's' | 'S' )
+            // Model.g:309:11: ( ( 's' | 'S' ) )
+            // Model.g:309:12: ( 's' | 'S' )
             {
             	if ( input.LA(1) == 'S' || input.LA(1) == 's' ) 
             	{
@@ -2554,8 +2700,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:305:11: ( ( 't' | 'T' ) )
-            // Model.g:305:12: ( 't' | 'T' )
+            // Model.g:310:11: ( ( 't' | 'T' ) )
+            // Model.g:310:12: ( 't' | 'T' )
             {
             	if ( input.LA(1) == 'T' || input.LA(1) == 't' ) 
             	{
@@ -2583,8 +2729,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:306:11: ( ( 'u' | 'U' ) )
-            // Model.g:306:12: ( 'u' | 'U' )
+            // Model.g:311:11: ( ( 'u' | 'U' ) )
+            // Model.g:311:12: ( 'u' | 'U' )
             {
             	if ( input.LA(1) == 'U' || input.LA(1) == 'u' ) 
             	{
@@ -2612,8 +2758,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:307:11: ( ( 'v' | 'V' ) )
-            // Model.g:307:12: ( 'v' | 'V' )
+            // Model.g:312:11: ( ( 'v' | 'V' ) )
+            // Model.g:312:12: ( 'v' | 'V' )
             {
             	if ( input.LA(1) == 'V' || input.LA(1) == 'v' ) 
             	{
@@ -2641,8 +2787,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:308:11: ( ( 'w' | 'W' ) )
-            // Model.g:308:12: ( 'w' | 'W' )
+            // Model.g:313:11: ( ( 'w' | 'W' ) )
+            // Model.g:313:12: ( 'w' | 'W' )
             {
             	if ( input.LA(1) == 'W' || input.LA(1) == 'w' ) 
             	{
@@ -2670,8 +2816,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:309:11: ( ( 'x' | 'X' ) )
-            // Model.g:309:12: ( 'x' | 'X' )
+            // Model.g:314:11: ( ( 'x' | 'X' ) )
+            // Model.g:314:12: ( 'x' | 'X' )
             {
             	if ( input.LA(1) == 'X' || input.LA(1) == 'x' ) 
             	{
@@ -2699,8 +2845,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:310:11: ( ( 'y' | 'Y' ) )
-            // Model.g:310:12: ( 'y' | 'Y' )
+            // Model.g:315:11: ( ( 'y' | 'Y' ) )
+            // Model.g:315:12: ( 'y' | 'Y' )
             {
             	if ( input.LA(1) == 'Y' || input.LA(1) == 'y' ) 
             	{
@@ -2728,8 +2874,8 @@ public partial class ModelLexer : Lexer {
     {
     		try
     		{
-            // Model.g:311:11: ( ( 'z' | 'Z' ) )
-            // Model.g:311:12: ( 'z' | 'Z' )
+            // Model.g:316:11: ( ( 'z' | 'Z' ) )
+            // Model.g:316:12: ( 'z' | 'Z' )
             {
             	if ( input.LA(1) == 'Z' || input.LA(1) == 'z' ) 
             	{
@@ -2754,10 +2900,10 @@ public partial class ModelLexer : Lexer {
 
     override public void mTokens() // throws RecognitionException 
     {
-        // Model.g:1:8: ( LOG | EXP | FRML | AFTER | AFTER2 | VAL | VARLIST | LB | RB | RP | DOT | TRUE | FALSE | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | PLUS | MINUS | MULT | DIV | MOD | STARS | HAT | Integer | Double | DATE | AssignVar | Ident | WHITESPACE | NEWLINE | Modelblock | Comment | NESTED_ML_COMMENT )
-        int alt24 = 37;
-        alt24 = dfa24.Predict(input);
-        switch (alt24) 
+        // Model.g:1:8: ( LOG | EXP | FRML | AFTER | AFTER2 | VAL | VARLIST | LB | RB | RP | DOT | TRUE | FALSE | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | PLUS | MINUS | MULT | DIV | MOD | STARS | HAT | Integer | Double | DATE | AssignVar | Ident | WHITESPACE | NEWLINE | ModelblockEnd | Modelblock | Comment | NESTED_ML_COMMENT )
+        int alt27 = 38;
+        alt27 = dfa27.Predict(input);
+        switch (alt27) 
         {
             case 1 :
                 // Model.g:1:10: LOG
@@ -2851,51 +2997,51 @@ public partial class ModelLexer : Lexer {
                 }
                 break;
             case 14 :
-                // Model.g:1:72: T__85
-                {
-                	mT__85(); 
-
-                }
-                break;
-            case 15 :
-                // Model.g:1:78: T__86
-                {
-                	mT__86(); 
-
-                }
-                break;
-            case 16 :
-                // Model.g:1:84: T__87
+                // Model.g:1:72: T__87
                 {
                 	mT__87(); 
 
                 }
                 break;
-            case 17 :
-                // Model.g:1:90: T__88
+            case 15 :
+                // Model.g:1:78: T__88
                 {
                 	mT__88(); 
 
                 }
                 break;
-            case 18 :
-                // Model.g:1:96: T__89
+            case 16 :
+                // Model.g:1:84: T__89
                 {
                 	mT__89(); 
 
                 }
                 break;
-            case 19 :
-                // Model.g:1:102: T__90
+            case 17 :
+                // Model.g:1:90: T__90
                 {
                 	mT__90(); 
 
                 }
                 break;
-            case 20 :
-                // Model.g:1:108: T__91
+            case 18 :
+                // Model.g:1:96: T__91
                 {
                 	mT__91(); 
+
+                }
+                break;
+            case 19 :
+                // Model.g:1:102: T__92
+                {
+                	mT__92(); 
+
+                }
+                break;
+            case 20 :
+                // Model.g:1:108: T__93
+                {
+                	mT__93(); 
 
                 }
                 break;
@@ -2998,21 +3144,28 @@ public partial class ModelLexer : Lexer {
                 }
                 break;
             case 35 :
-                // Model.g:1:203: Modelblock
+                // Model.g:1:203: ModelblockEnd
+                {
+                	mModelblockEnd(); 
+
+                }
+                break;
+            case 36 :
+                // Model.g:1:217: Modelblock
                 {
                 	mModelblock(); 
 
                 }
                 break;
-            case 36 :
-                // Model.g:1:214: Comment
+            case 37 :
+                // Model.g:1:228: Comment
                 {
                 	mComment(); 
 
                 }
                 break;
-            case 37 :
-                // Model.g:1:222: NESTED_ML_COMMENT
+            case 38 :
+                // Model.g:1:236: NESTED_ML_COMMENT
                 {
                 	mNESTED_ML_COMMENT(); 
 
@@ -3025,13 +3178,13 @@ public partial class ModelLexer : Lexer {
 
 
     protected DFA8 dfa8;
-    protected DFA24 dfa24;
+    protected DFA27 dfa27;
 	private void InitializeCyclicDFAs()
 	{
 	    this.dfa8 = new DFA8(this);
-	    this.dfa24 = new DFA24(this);
+	    this.dfa27 = new DFA27(this);
 
-	    this.dfa24.specialStateTransitionHandler = new DFA.SpecialStateTransitionHandler(DFA24_SpecialStateTransition);
+	    this.dfa27.specialStateTransitionHandler = new DFA.SpecialStateTransitionHandler(DFA27_SpecialStateTransition);
 	}
 
     const string DFA8_eotS =
@@ -3043,13 +3196,13 @@ public partial class ModelLexer : Lexer {
     const string DFA8_maxS =
         "\x01\x39\x01\x65\x03\uffff";
     const string DFA8_acceptS =
-        "\x02\uffff\x01\x02\x01\x01\x01\x03";
+        "\x02\uffff\x01\x02\x01\x03\x01\x01";
     const string DFA8_specialS =
         "\x05\uffff}>";
     static readonly string[] DFA8_transitionS = {
             "\x01\x02\x01\uffff\x0a\x01",
-            "\x01\x03\x01\uffff\x0a\x01\x0b\uffff\x01\x04\x1f\uffff\x01"+
-            "\x04",
+            "\x01\x04\x01\uffff\x0a\x01\x0b\uffff\x01\x03\x1f\uffff\x01"+
+            "\x03",
             "",
             "",
             ""
@@ -3081,55 +3234,58 @@ public partial class ModelLexer : Lexer {
 
         override public string Description
         {
-            get { return "247:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
+            get { return "249:1: Double : ( ( '0' .. '9' )+ DOT ( '0' .. '9' )* ( Exponent )? | DOT ( '0' .. '9' )+ ( Exponent )? | ( '0' .. '9' )+ Exponent );"; }
         }
 
     }
 
-    const string DFA24_eotS =
+    const string DFA27_eotS =
         "\x01\uffff\x05\x1a\x03\uffff\x01\x22\x02\x1a\x01\uffff\x01\x27"+
         "\x07\uffff\x01\x29\x01\x2c\x01\x2e\x01\uffff\x01\x2f\x03\uffff\x05"+
-        "\x1a\x02\uffff\x02\x1a\x01\x3a\x03\uffff\x01\x3a\x06\uffff\x01\x3c"+
-        "\x01\x3d\x02\x1a\x01\x40\x03\x1a\x01\x3a\x01\uffff\x01\x3a\x02\uffff"+
-        "\x01\x45\x01\x1a\x01\uffff\x01\x1a\x01\x48\x01\x1a\x01\x3a\x01\uffff"+
-        "\x01\x4c\x01\x1a\x01\uffff\x01\x4e\x01\x3a\x01\x51\x01\uffff\x01"+
-        "\x1a\x01\uffff\x02\x3a\x01\uffff\x01\x54\x01\x3a\x01\uffff\x02\x57"+
-        "\x01\uffff";
-    const string DFA24_eofS =
-        "\x58\uffff";
-    const string DFA24_minS =
+        "\x1a\x02\uffff\x02\x1a\x01\x3b\x03\uffff\x01\x3b\x06\uffff\x01\x3c"+
+        "\x01\x3d\x02\x1a\x01\x40\x03\x1a\x02\x3b\x03\uffff\x01\x45\x01\x1a"+
+        "\x01\uffff\x01\x1a\x01\x48\x01\x1a\x01\x3b\x01\uffff\x01\x4c\x01"+
+        "\x1a\x01\uffff\x01\x4e\x01\x3b\x01\x51\x01\uffff\x01\x1a\x01\uffff"+
+        "\x02\x3b\x01\uffff\x01\x55\x02\x3b\x01\uffff\x01\x58\x01\x3b\x01"+
+        "\uffff\x01\x58\x01\x5b\x01\uffff\x01\x5b";
+    const string DFA27_eofS =
+        "\x5d\uffff";
+    const string DFA27_minS =
         "\x01\x09\x01\x4f\x01\x58\x01\x52\x01\x46\x01\x41\x03\uffff\x01"+
         "\x30\x01\x72\x01\x61\x01\uffff\x01\x29\x07\uffff\x02\x2a\x01\x41"+
         "\x01\uffff\x01\x2e\x03\uffff\x01\x47\x01\x50\x01\x4d\x01\x54\x01"+
         "\x4c\x02\uffff\x01\x75\x01\x6c\x01\x00\x03\uffff\x01\x00\x06\uffff"+
         "\x02\x30\x01\x4c\x01\x45\x01\x30\x01\x4c\x01\x65\x01\x73\x01\x00"+
-        "\x01\uffff\x01\x23\x02\uffff\x01\x30\x01\x52\x01\uffff\x01\x49\x01"+
-        "\x30\x01\x65\x01\x23\x01\uffff\x01\x30\x01\x53\x01\uffff\x01\x30"+
-        "\x01\x00\x01\x30\x01\uffff\x01\x54\x01\uffff\x01\x00\x01\x23\x01"+
-        "\uffff\x01\x30\x01\x23\x01\uffff\x02\x00\x01\uffff";
-    const string DFA24_maxS =
+        "\x01\x23\x03\uffff\x01\x30\x01\x52\x01\uffff\x01\x49\x01\x30\x01"+
+        "\x65\x01\x23\x01\uffff\x01\x30\x01\x53\x01\uffff\x01\x30\x01\x00"+
+        "\x01\x30\x01\uffff\x01\x54\x01\uffff\x01\x23\x01\x00\x01\uffff\x01"+
+        "\x30\x02\x23\x01\uffff\x01\x00\x01\x23\x01\uffff\x02\x00\x01\uffff"+
+        "\x01\x00";
+    const string DFA27_maxS =
         "\x01\x7a\x01\x4f\x01\x58\x01\x52\x01\x46\x01\x41\x03\uffff\x01"+
         "\x39\x01\x72\x01\x61\x01\uffff\x01\x29\x07\uffff\x01\x2a\x01\x2f"+
         "\x01\x7a\x01\uffff\x01\x71\x03\uffff\x01\x47\x01\x50\x01\x4d\x01"+
         "\x54\x01\x52\x02\uffff\x01\x75\x01\x6c\x01\uffff\x03\uffff\x01\uffff"+
         "\x06\uffff\x02\x7a\x01\x4c\x01\x45\x01\x7a\x01\x4c\x01\x65\x01\x73"+
-        "\x01\uffff\x01\uffff\x01\x23\x02\uffff\x01\x7a\x01\x52\x01\uffff"+
-        "\x01\x49\x01\x7a\x01\x65\x01\x23\x01\uffff\x01\x7a\x01\x53\x01\uffff"+
-        "\x01\x7a\x01\uffff\x01\x7a\x01\uffff\x01\x54\x01\uffff\x01\uffff"+
-        "\x01\x23\x01\uffff\x01\x7a\x01\x23\x01\uffff\x02\uffff\x01\uffff";
-    const string DFA24_acceptS =
+        "\x01\uffff\x01\x23\x03\uffff\x01\x7a\x01\x52\x01\uffff\x01\x49\x01"+
+        "\x7a\x01\x65\x01\x23\x01\uffff\x01\x7a\x01\x53\x01\uffff\x01\x7a"+
+        "\x01\uffff\x01\x7a\x01\uffff\x01\x54\x01\uffff\x01\x23\x01\uffff"+
+        "\x01\uffff\x01\x7a\x02\x23\x01\uffff\x01\uffff\x01\x23\x01\uffff"+
+        "\x02\uffff\x01\uffff\x01\uffff";
+    const string DFA27_acceptS =
         "\x06\uffff\x01\x08\x01\x09\x01\x0a\x03\uffff\x01\x0e\x01\uffff"+
         "\x01\x10\x01\x11\x01\x12\x01\x13\x01\x14\x01\x15\x01\x16\x03\uffff"+
         "\x01\x1b\x01\uffff\x01\x20\x01\x21\x01\x22\x05\uffff\x01\x0b\x01"+
-        "\x1d\x03\uffff\x01\x0f\x01\x1a\x01\x17\x01\uffff\x01\x25\x01\x18"+
-        "\x01\x1f\x01\x19\x01\x1c\x01\x1e\x09\uffff\x01\x24\x01\uffff\x01"+
-        "\x01\x01\x02\x02\uffff\x01\x06\x04\uffff\x01\x03\x02\uffff\x01\x0c"+
-        "\x03\uffff\x01\x04\x01\uffff\x01\x0d\x02\uffff\x01\x05\x02\uffff"+
-        "\x01\x07\x02\uffff\x01\x23";
-    const string DFA24_specialS =
-        "\x26\uffff\x01\x04\x03\uffff\x01\x05\x0e\uffff\x01\x03\x10\uffff"+
-        "\x01\x06\x04\uffff\x01\x01\x05\uffff\x01\x00\x01\x02\x01\uffff}>";
-    static readonly string[] DFA24_transitionS = {
+        "\x1d\x03\uffff\x01\x0f\x01\x1a\x01\x17\x01\uffff\x01\x26\x01\x18"+
+        "\x01\x1f\x01\x19\x01\x1c\x01\x1e\x0a\uffff\x01\x25\x01\x01\x01\x02"+
+        "\x02\uffff\x01\x06\x04\uffff\x01\x03\x02\uffff\x01\x0c\x03\uffff"+
+        "\x01\x04\x01\uffff\x01\x0d\x02\uffff\x01\x05\x03\uffff\x01\x07\x02"+
+        "\uffff\x01\x23\x02\uffff\x01\x24\x01\uffff";
+    const string DFA27_specialS =
+        "\x26\uffff\x01\x05\x03\uffff\x01\x08\x0e\uffff\x01\x00\x10\uffff"+
+        "\x01\x03\x05\uffff\x01\x04\x05\uffff\x01\x07\x02\uffff\x01\x01\x01"+
+        "\x02\x01\uffff\x01\x06}>";
+    static readonly string[] DFA27_transitionS = {
             "\x01\x1b\x01\x1c\x01\uffff\x01\x1b\x01\x1c\x12\uffff\x01\x1b"+
             "\x03\uffff\x01\x11\x01\x17\x02\uffff\x01\x0d\x01\x08\x01\x15"+
             "\x01\x13\x01\x0e\x01\x14\x01\x09\x01\x16\x0a\x19\x01\uffff\x01"+
@@ -3176,11 +3332,11 @@ public partial class ModelLexer : Lexer {
             "",
             "\x01\x37",
             "\x01\x38",
-            "\x0a\x39\x01\uffff\x18\x39\x01\x3b\uffdc\x39",
+            "\x0a\x39\x01\uffff\x18\x39\x01\x3a\uffdc\x39",
             "",
             "",
             "",
-            "\x0a\x39\x01\uffff\x18\x39\x01\x3b\uffdc\x39",
+            "\x0a\x39\x01\uffff\x18\x39\x01\x3a\uffdc\x39",
             "",
             "",
             "",
@@ -3198,9 +3354,9 @@ public partial class ModelLexer : Lexer {
             "\x01\x41",
             "\x01\x42",
             "\x01\x43",
-            "\x0a\x39\x01\uffff\x18\x39\x01\x3b\uffdc\x39",
-            "",
+            "\x0a\x39\x01\uffff\x18\x39\x01\x3a\uffdc\x39",
             "\x01\x44",
+            "",
             "",
             "",
             "\x0a\x1a\x07\uffff\x1a\x1a\x04\uffff\x01\x1a\x01\uffff\x1a"+
@@ -3219,151 +3375,180 @@ public partial class ModelLexer : Lexer {
             "",
             "\x0a\x1a\x07\uffff\x1a\x1a\x04\uffff\x01\x1a\x01\uffff\x1a"+
             "\x1a",
-            "\x0a\x4f\x01\uffff\x18\x4f\x01\x50\uffdc\x4f",
+            "\x0a\x50\x01\uffff\x18\x50\x01\x4f\uffdc\x50",
             "\x0a\x1a\x07\uffff\x1a\x1a\x04\uffff\x01\x1a\x01\uffff\x1a"+
             "\x1a",
             "",
             "\x01\x52",
             "",
-            "\x0a\x4f\x01\uffff\x18\x4f\x01\x50\uffdc\x4f",
             "\x01\x53",
+            "\x0a\x50\x01\uffff\x18\x50\x01\x54\uffdc\x50",
             "",
             "\x0a\x1a\x07\uffff\x1a\x1a\x04\uffff\x01\x1a\x01\uffff\x1a"+
             "\x1a",
-            "\x01\x55",
+            "\x01\x56",
+            "\x01\x57",
             "",
-            "\x0a\x56\x01\uffff\x18\x56\x01\x3a\uffdc\x56",
-            "\x0a\x56\x01\uffff\x18\x56\x01\x3a\uffdc\x56",
-            ""
+            "\x0a\x59\x01\uffff\x18\x59\x01\x3b\uffdc\x59",
+            "\x01\x5a",
+            "",
+            "\x0a\x59\x01\uffff\x18\x59\x01\x3b\uffdc\x59",
+            "\x0a\x5c\x01\uffff\x18\x5c\x01\x3b\uffdc\x5c",
+            "",
+            "\x0a\x5c\x01\uffff\x18\x5c\x01\x3b\uffdc\x5c"
     };
 
-    static readonly short[] DFA24_eot = DFA.UnpackEncodedString(DFA24_eotS);
-    static readonly short[] DFA24_eof = DFA.UnpackEncodedString(DFA24_eofS);
-    static readonly char[] DFA24_min = DFA.UnpackEncodedStringToUnsignedChars(DFA24_minS);
-    static readonly char[] DFA24_max = DFA.UnpackEncodedStringToUnsignedChars(DFA24_maxS);
-    static readonly short[] DFA24_accept = DFA.UnpackEncodedString(DFA24_acceptS);
-    static readonly short[] DFA24_special = DFA.UnpackEncodedString(DFA24_specialS);
-    static readonly short[][] DFA24_transition = DFA.UnpackEncodedStringArray(DFA24_transitionS);
+    static readonly short[] DFA27_eot = DFA.UnpackEncodedString(DFA27_eotS);
+    static readonly short[] DFA27_eof = DFA.UnpackEncodedString(DFA27_eofS);
+    static readonly char[] DFA27_min = DFA.UnpackEncodedStringToUnsignedChars(DFA27_minS);
+    static readonly char[] DFA27_max = DFA.UnpackEncodedStringToUnsignedChars(DFA27_maxS);
+    static readonly short[] DFA27_accept = DFA.UnpackEncodedString(DFA27_acceptS);
+    static readonly short[] DFA27_special = DFA.UnpackEncodedString(DFA27_specialS);
+    static readonly short[][] DFA27_transition = DFA.UnpackEncodedStringArray(DFA27_transitionS);
 
-    protected class DFA24 : DFA
+    protected class DFA27 : DFA
     {
-        public DFA24(BaseRecognizer recognizer)
+        public DFA27(BaseRecognizer recognizer)
         {
             this.recognizer = recognizer;
-            this.decisionNumber = 24;
-            this.eot = DFA24_eot;
-            this.eof = DFA24_eof;
-            this.min = DFA24_min;
-            this.max = DFA24_max;
-            this.accept = DFA24_accept;
-            this.special = DFA24_special;
-            this.transition = DFA24_transition;
+            this.decisionNumber = 27;
+            this.eot = DFA27_eot;
+            this.eof = DFA27_eof;
+            this.min = DFA27_min;
+            this.max = DFA27_max;
+            this.accept = DFA27_accept;
+            this.special = DFA27_special;
+            this.transition = DFA27_transition;
 
         }
 
         override public string Description
         {
-            get { return "1:1: Tokens : ( LOG | EXP | FRML | AFTER | AFTER2 | VAL | VARLIST | LB | RB | RP | DOT | TRUE | FALSE | T__85 | T__86 | T__87 | T__88 | T__89 | T__90 | T__91 | PLUS | MINUS | MULT | DIV | MOD | STARS | HAT | Integer | Double | DATE | AssignVar | Ident | WHITESPACE | NEWLINE | Modelblock | Comment | NESTED_ML_COMMENT );"; }
+            get { return "1:1: Tokens : ( LOG | EXP | FRML | AFTER | AFTER2 | VAL | VARLIST | LB | RB | RP | DOT | TRUE | FALSE | T__87 | T__88 | T__89 | T__90 | T__91 | T__92 | T__93 | PLUS | MINUS | MULT | DIV | MOD | STARS | HAT | Integer | Double | DATE | AssignVar | Ident | WHITESPACE | NEWLINE | ModelblockEnd | Modelblock | Comment | NESTED_ML_COMMENT );"; }
         }
 
     }
 
 
-    protected internal int DFA24_SpecialStateTransition(DFA dfa, int s, IIntStream _input) //throws NoViableAltException
+    protected internal int DFA27_SpecialStateTransition(DFA dfa, int s, IIntStream _input) //throws NoViableAltException
     {
             IIntStream input = _input;
     	int _s = s;
         switch ( s )
         {
                	case 0 : 
-                   	int LA24_85 = input.LA(1);
+                   	int LA27_57 = input.LA(1);
 
                    	s = -1;
-                   	if ( ((LA24_85 >= '\u0000' && LA24_85 <= '\t') || (LA24_85 >= '\u000B' && LA24_85 <= '\"') || (LA24_85 >= '$' && LA24_85 <= '\uFFFF')) ) { s = 86; }
+                   	if ( (LA27_57 == '#') ) { s = 58; }
 
-                   	else if ( (LA24_85 == '#') ) { s = 58; }
+                   	else if ( ((LA27_57 >= '\u0000' && LA27_57 <= '\t') || (LA27_57 >= '\u000B' && LA27_57 <= '\"') || (LA27_57 >= '$' && LA27_57 <= '\uFFFF')) ) { s = 57; }
 
-                   	else s = 87;
+                   	else s = 59;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 1 : 
-                   	int LA24_79 = input.LA(1);
+                   	int LA27_89 = input.LA(1);
 
                    	s = -1;
-                   	if ( (LA24_79 == '#') ) { s = 80; }
+                   	if ( ((LA27_89 >= '\u0000' && LA27_89 <= '\t') || (LA27_89 >= '\u000B' && LA27_89 <= '\"') || (LA27_89 >= '$' && LA27_89 <= '\uFFFF')) ) { s = 89; }
 
-                   	else if ( ((LA24_79 >= '\u0000' && LA24_79 <= '\t') || (LA24_79 >= '\u000B' && LA24_79 <= '\"') || (LA24_79 >= '$' && LA24_79 <= '\uFFFF')) ) { s = 79; }
+                   	else if ( (LA27_89 == '#') ) { s = 59; }
 
-                   	else s = 58;
+                   	else s = 88;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 2 : 
-                   	int LA24_86 = input.LA(1);
+                   	int LA27_90 = input.LA(1);
 
                    	s = -1;
-                   	if ( ((LA24_86 >= '\u0000' && LA24_86 <= '\t') || (LA24_86 >= '\u000B' && LA24_86 <= '\"') || (LA24_86 >= '$' && LA24_86 <= '\uFFFF')) ) { s = 86; }
+                   	if ( ((LA27_90 >= '\u0000' && LA27_90 <= '\t') || (LA27_90 >= '\u000B' && LA27_90 <= '\"') || (LA27_90 >= '$' && LA27_90 <= '\uFFFF')) ) { s = 92; }
 
-                   	else if ( (LA24_86 == '#') ) { s = 58; }
+                   	else if ( (LA27_90 == '#') ) { s = 59; }
 
-                   	else s = 87;
+                   	else s = 91;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 3 : 
-                   	int LA24_57 = input.LA(1);
+                   	int LA27_74 = input.LA(1);
 
                    	s = -1;
-                   	if ( (LA24_57 == '#') ) { s = 59; }
+                   	if ( (LA27_74 == '#') ) { s = 79; }
 
-                   	else if ( ((LA24_57 >= '\u0000' && LA24_57 <= '\t') || (LA24_57 >= '\u000B' && LA24_57 <= '\"') || (LA24_57 >= '$' && LA24_57 <= '\uFFFF')) ) { s = 57; }
+                   	else if ( ((LA27_74 >= '\u0000' && LA27_74 <= '\t') || (LA27_74 >= '\u000B' && LA27_74 <= '\"') || (LA27_74 >= '$' && LA27_74 <= '\uFFFF')) ) { s = 80; }
 
-                   	else s = 58;
+                   	else s = 59;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 4 : 
-                   	int LA24_38 = input.LA(1);
+                   	int LA27_80 = input.LA(1);
 
                    	s = -1;
-                   	if ( ((LA24_38 >= '\u0000' && LA24_38 <= '\t') || (LA24_38 >= '\u000B' && LA24_38 <= '\"') || (LA24_38 >= '$' && LA24_38 <= '\uFFFF')) ) { s = 57; }
+                   	if ( (LA27_80 == '#') ) { s = 84; }
 
-                   	else if ( (LA24_38 == '#') ) { s = 59; }
+                   	else if ( ((LA27_80 >= '\u0000' && LA27_80 <= '\t') || (LA27_80 >= '\u000B' && LA27_80 <= '\"') || (LA27_80 >= '$' && LA27_80 <= '\uFFFF')) ) { s = 80; }
 
-                   	else s = 58;
+                   	else s = 59;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 5 : 
-                   	int LA24_42 = input.LA(1);
+                   	int LA27_38 = input.LA(1);
 
                    	s = -1;
-                   	if ( ((LA24_42 >= '\u0000' && LA24_42 <= '\t') || (LA24_42 >= '\u000B' && LA24_42 <= '\"') || (LA24_42 >= '$' && LA24_42 <= '\uFFFF')) ) { s = 57; }
+                   	if ( ((LA27_38 >= '\u0000' && LA27_38 <= '\t') || (LA27_38 >= '\u000B' && LA27_38 <= '\"') || (LA27_38 >= '$' && LA27_38 <= '\uFFFF')) ) { s = 57; }
 
-                   	else if ( (LA24_42 == '#') ) { s = 59; }
+                   	else if ( (LA27_38 == '#') ) { s = 58; }
 
-                   	else s = 58;
+                   	else s = 59;
 
                    	if ( s >= 0 ) return s;
                    	break;
                	case 6 : 
-                   	int LA24_74 = input.LA(1);
+                   	int LA27_92 = input.LA(1);
 
                    	s = -1;
-                   	if ( ((LA24_74 >= '\u0000' && LA24_74 <= '\t') || (LA24_74 >= '\u000B' && LA24_74 <= '\"') || (LA24_74 >= '$' && LA24_74 <= '\uFFFF')) ) { s = 79; }
+                   	if ( ((LA27_92 >= '\u0000' && LA27_92 <= '\t') || (LA27_92 >= '\u000B' && LA27_92 <= '\"') || (LA27_92 >= '$' && LA27_92 <= '\uFFFF')) ) { s = 92; }
 
-                   	else if ( (LA24_74 == '#') ) { s = 80; }
+                   	else if ( (LA27_92 == '#') ) { s = 59; }
 
-                   	else s = 58;
+                   	else s = 91;
+
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 7 : 
+                   	int LA27_86 = input.LA(1);
+
+                   	s = -1;
+                   	if ( ((LA27_86 >= '\u0000' && LA27_86 <= '\t') || (LA27_86 >= '\u000B' && LA27_86 <= '\"') || (LA27_86 >= '$' && LA27_86 <= '\uFFFF')) ) { s = 89; }
+
+                   	else if ( (LA27_86 == '#') ) { s = 59; }
+
+                   	else s = 88;
+
+                   	if ( s >= 0 ) return s;
+                   	break;
+               	case 8 : 
+                   	int LA27_42 = input.LA(1);
+
+                   	s = -1;
+                   	if ( ((LA27_42 >= '\u0000' && LA27_42 <= '\t') || (LA27_42 >= '\u000B' && LA27_42 <= '\"') || (LA27_42 >= '$' && LA27_42 <= '\uFFFF')) ) { s = 57; }
+
+                   	else if ( (LA27_42 == '#') ) { s = 58; }
+
+                   	else s = 59;
 
                    	if ( s >= 0 ) return s;
                    	break;
         }
-        NoViableAltException nvae24 =
-            new NoViableAltException(dfa.Description, 24, _s, input);
-        dfa.Error(nvae24);
-        throw nvae24;
+        NoViableAltException nvae27 =
+            new NoViableAltException(dfa.Description, 27, _s, input);
+        dfa.Error(nvae27);
+        throw nvae27;
     }
  
     

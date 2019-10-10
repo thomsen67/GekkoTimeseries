@@ -141,7 +141,7 @@
             this.checkBox2.TabIndex = 7;
             this.checkBox2.Text = "Divide model blocks";
             this.toolTip1.SetToolTip(this.checkBox2, "If set, this option divides the result into model blocks, i.e. blocks of equation" +
-                    "s in the model file. These blocks are identificed via \'###\'-markers in the model" +
+                    "s in the model file. These blocks are identificed via \'" + Globals.modelBlockSymbols + "\'-markers in the model" +
                     " (.frm) file.");
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);

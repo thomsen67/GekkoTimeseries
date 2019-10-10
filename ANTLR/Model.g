@@ -52,7 +52,7 @@ tokens {
 	DOT     = '.';
 	TRUE = 'true' ;
 	FALSE = 'false' ;
-    ASTMODELBLOCK;
+    ASTMODELBLOCK;	
     ASTAFTER;
     ASTAFTER2;
     ASTASSIGNVAR;
@@ -145,7 +145,7 @@ expr	:	(expr2)+ EOF;    //EOF is necessary in order to force the whole file to b
 expr2    :			
 		frml
 		| val
-		| Modelblock -> ^(ASTMODELBLOCK Modelblock)
+		| Modelblock -> ^(ASTMODELBLOCK Modelblock)		
 		| AFTER frmlEnding ->  ^(ASTAFTER)
 		| AFTER2 frmlEnding ->  ^(ASTAFTER2)		
 		| frmlEnding ->              //is just ignored

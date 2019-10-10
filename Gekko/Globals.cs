@@ -268,7 +268,12 @@ namespace Gekko
         
         public static string localTempFilesLocation = System.Windows.Forms.Application.LocalUserAppDataPath + "\\tempfiles";
         
-        public static bool saffierPrintIterations = false;        
+        public static bool saffierPrintIterations = false;
+
+        public const string modelBlockSymbols = "###";
+        public const string modelBlockSymbols2 = "modelfile = ";
+        public const string modelBlockSymbols3 = "endblock";
+        public const string modelBlockUnknown = "unknown_block";
 
         public static List<string>[] globalAl;
         public static List<string>[] globalAlType;

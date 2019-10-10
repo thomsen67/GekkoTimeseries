@@ -80,15 +80,28 @@ namespace Gekko
             }
             if (ast.Text == "ASTMODELBLOCK")
             {
-                string s = ast.GetChild(0).Text;
-                string[] ss = s.Split(new string[] { "###" }, StringSplitOptions.None);
-                wh.modelBlock = ss[1].Trim();  //since it comes from the parser, there are always 2 or 3 elements in ss
-                if (wh.modelBlock.Length > 0)
+                string s = ast.GetChild(0).Text;                
+
+                string block = Program.GetTextInsideModelBlockMarker(s);
+
+                if (block.StartsWith(Globals.modelBlockSymbols2))  //### modelfile = ..
                 {
-                    //first letter always set to upper-case
-                    wh.modelBlock = char.ToUpper(wh.modelBlock[0]) + wh.modelBlock.Substring(1);
+                    wh.modelFile = block.Substring(Globals.modelBlockSymbols2.Length + 1);
+                    wh.modelBlock = Globals.modelBlockUnknown;
+                }
+                else
+                {
+                    if (G.equal(block, Globals.modelBlockSymbols3)) //### endblock;
+                    {
+                        wh.modelBlock = Globals.modelBlockUnknown;                                               
+                    }
+                    else
+                    {
+                        wh.modelBlock = block;
+                    }                    
                 }
             }
+
             if (ast.Text == "ASTAFTER")
             {
                 if (wh.after2Encountered)
@@ -121,6 +134,7 @@ namespace Gekko
                 equationNode.parent = null;  //has no parent
                 helper = new EquationHelper();
                 helper.modelBlock = wh.modelBlock;
+                helper.modelFile = wh.modelFile;
                 helper.equationNumber = model.equations.Count;
                 helper.equationsNodeRoot = equationNode;
                 //if( helper.isAfterModel
@@ -166,7 +180,8 @@ namespace Gekko
             {
                 helper.equationText = wh.frmlItems[wh.frmlItemsCounter];
             }
-        }        
+        }
+        
 
         public static List<string> IntelliParserNew(string s2)
         {
@@ -685,8 +700,30 @@ namespace Gekko
 
             WalkerHelper2 wh2 = new WalkerHelper2();
             wh2.vals = vals;
+            string currentFile = "";
             foreach (EquationHelper eh in Program.model.equations)
             {
+
+                //if several files are stitched together, we have the following structure:
+                //### modelfile = f1
+                //    here, eqs are "noblock"
+                //### block b1
+                //    here, eqs are "b1"
+                //### endblock
+                //    here, eqs are "noblock"
+                //### modelfile = f2
+                //    here, eqs are "noblock"
+                //### block b1
+                //    here, eqs are "b1"
+                //### endblock
+                //    here, eqs are "noblock"
+                //Since a file may end with an open block, blocks are reset for each file
+
+                if (currentFile != eh.modelFile)
+                {
+
+                }
+                                
                 //call of recursive method
                 wh2.rightHandSideCsCode = new StringBuilder2();  //clearing it for each equation, contains long, short and human versions
                 wh2.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
@@ -705,9 +742,13 @@ namespace Gekko
                 eh.csCodeLhsJacobi = wh2.leftHandSideCsCodeJacobi.ToString();
                 eh.csCodeLhsHuman = wh2.leftHandSideHumanReadable.ToString();
                 eh.bNumberLhs = wh2.leftHandSideBNumber;
+
+                if (true)  //qwerty
+                {
+                    G.Writeln2(eh.modelFile + " " + eh.lhs);
+                    G.Writeln(eh.modelBlock + " ");
+                }
             }
-
-
 
             //move reverted equations, and compact the others (and renumber them).
             List<EquationHelper> equationsNew = new List<EquationHelper>();
@@ -848,7 +889,7 @@ namespace Gekko
             Program.model.modelInfo.endoAfter2 = after2Vars;
 
             return;
-        }
+        }        
 
         public static void PrintModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
@@ -3492,7 +3533,8 @@ namespace Gekko
         public List<string> inputFileLines = new List<string>();
         public bool afterEncountered = false;
         public bool after2Encountered = false;
-        public string modelBlock = "Unnamed";
+        public string modelBlock = Globals.modelBlockUnknown;
+        public string modelFile = null;
     }
     
 
