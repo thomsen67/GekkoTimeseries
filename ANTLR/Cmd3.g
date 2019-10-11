@@ -639,6 +639,8 @@ ASTOPT_STRING_Y2;
     ASTOPT_STRING_PRIM;
     ASTOPT_STRING_PRN;
 	ASTOPT_STRING_MATRIX;
+	ASTOPT_STRING_LIST;
+	ASTOPT_STRING_MAP;
     ASTOPT_STRING_PROT;
     ASTOPT_STRING_Q;
     ASTOPT_STRING_REPEAT;
@@ -3499,6 +3501,8 @@ sheetImportOpt1h          : CELL '=' expression -> ^(ASTOPT_STRING_CELL expressi
 						  | ROWS (EQUAL yesNo)? -> ^(ASTOPT_STRING_ROWS yesNo?)
 						  | SHEET '=' expression -> ^(ASTOPT_STRING_SHEET expression)
 						  | MATRIX (EQUAL yesNo)? -> ^(ASTOPT_STRING_MATRIX yesNo?)		
+						  | LIST (EQUAL yesNo)? -> ^(ASTOPT_STRING_LIST yesNo?)		
+						  | MAP (EQUAL yesNo)? -> ^(ASTOPT_STRING_MAP yesNo?)		
 						  | MISSING (EQUAL yesNo)? -> ^(ASTOPT_STRING_MISSING yesNo?)		
 						  ;
 

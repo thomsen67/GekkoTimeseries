@@ -2781,30 +2781,44 @@ namespace Gekko
             return columnName;
         }
 
+        public enum ESheetCollection
+        {
+            Matrix,
+            List,
+            Map,
+            None
+        }
+
         public static void SheetImport(O.SheetImport o)
         {
             List<string> listItems = null;
 
-            if (G.Equal(o.opt_matrix, "yes"))
+            ESheetCollection type = ESheetCollection.None;
+            if (G.Equal(o.opt_matrix, "yes")) type = ESheetCollection.Matrix;
+            else if (G.Equal(o.opt_list, "yes")) type = ESheetCollection.List;
+            else if (G.Equal(o.opt_map, "yes")) type = ESheetCollection.Map;
+
+            if (type != ESheetCollection.None)
             {
-                listItems = O.Restrict(o.names, true, true, false, false);                
+                listItems = O.Restrict(o.names, true, true, false, false);
             }
             else
             {
                 listItems = O.Restrict(o.names, true, false, true, false);
             }
 
-            string matrixName = null;
-            if (G.Equal(o.opt_matrix, "yes"))
+            string collectionName = null;
+
+            if (type != ESheetCollection.None)
             {
                 if (listItems.Count == 0 || listItems.Count > 1)
                 {
-                    G.Writeln2("*** ERROR: For SHEET<import matrix>, only 1 matrix name must be provided");
+                    G.Writeln2("*** ERROR: For SHEET<import " + type.ToString().ToLower() + ">, only 1 name must be provided");
                     throw new GekkoException();
                 }
-                matrixName = listItems[0];
+                collectionName = listItems[0];
             }
-
+            
             bool isMissing = false;
             if (G.Equal(o.opt_missing, "yes"))
             {
@@ -2815,19 +2829,19 @@ namespace Gekko
             string fileName = o.fileName;
             fileName = AddExtension(fileName, ".xlsx");
             fileName = Program.CreateFullPathAndFileNameFromFolder(fileName, null);
-            TableLight matrix = ReadExcelWorkbook(fileName, o.opt_sheet);
+            TableLight inputTable = ReadExcelWorkbook(fileName, o.opt_sheet);
 
             bool transpose = false;  //corresponding to row-wise reading
             if (G.Equal(o.opt_cols, "yes"))
             {
                 transpose = true;
-                if (matrixName != null) G.Writeln2("+++ NOTE: Because of <rows> option, the matrix " + matrixName + " is transposed");
+                if (type != ESheetCollection.None) G.Writeln2("+++ NOTE: Because of <cols> option, the resulting " + type.ToString().ToLower() + " is transposed");
             }
 
             if (transpose)
             {
                 //reading downwards by cols
-                matrix = matrix.Transpose();
+                inputTable = inputTable.Transpose();
             }
 
             int obs = GekkoTime.Observations(o.t1, o.t2);
@@ -2851,7 +2865,7 @@ namespace Gekko
 
             //check between 1... large number
 
-            if (matrixName == null)
+            if (type == ESheetCollection.None)
             {
                 for (int row = 1 + rowOffset; row < 1 + rowOffset + n; row++)
                 {
@@ -2859,7 +2873,7 @@ namespace Gekko
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
                     {
                         double v = double.NaN;
-                        CellLight cell = matrix.Get(row, col);
+                        CellLight cell = inputTable.Get(row, col);
                         if (cell.type == ECellLightType.None) continue;
                         v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
                         ts.SetData(o.t1.Add(col - 1 - colOffset), v);
@@ -2868,36 +2882,70 @@ namespace Gekko
             }
             else
             {
+                Matrix outputMatrix = null;
+                List outputList = null;
+                Map outputMap = null;
+                
 
-                Matrix mm = null;
-
-                int rr = matrix.GetRowMaxNumber() - rowOffset;
-                int cc = matrix.GetColMaxNumber() - colOffset;
-
+                int rr = inputTable.GetRowMaxNumber() - rowOffset;
+                int cc = inputTable.GetColMaxNumber() - colOffset;
                 if (rr <= 0 || cc <= 0)
                 {
-                    G.Writeln2("*** ERROR: Matrix has no data");
+                    G.Writeln2("*** ERROR: There is not data in the sheet area");
                     throw new GekkoException();
                 }
 
-                if (isMissing) mm = new Matrix(rr, cc, double.NaN);
-                else mm = new Matrix(rr, cc);
-
-                for (int row = 1 + rowOffset; row < 1 + rowOffset + matrix.GetRowMaxNumber(); row++)
+                if (type == ESheetCollection.Matrix)
                 {
-                    for (int col = 1 + colOffset; col < 1 + colOffset + matrix.GetColMaxNumber(); col++)
+                    if (isMissing) outputMatrix = new Matrix(rr, cc, double.NaN);
+                    else outputMatrix = new Matrix(rr, cc);
+                }
+                else if (type == ESheetCollection.List) outputList = new List();
+                else if (type == ESheetCollection.Map) outputMap = new Map();
+
+                for (int row = 1 + rowOffset; row <= inputTable.GetRowMaxNumber(); row++)
+                {
+                    if (type == ESheetCollection.List)
+                    {
+                        outputList.Add(new List());  //adding a new row
+                    }
+                    for (int col = 1 + colOffset; col <= inputTable.GetColMaxNumber(); col++)
                     {
                         double v = double.NaN;
-                        CellLight cell = matrix.Get(row, col);
-                        if (cell.type == ECellLightType.None) continue;
+                        CellLight cell = inputTable.Get(row, col);
+                        if (cell.type == ECellLightType.None)
+                        {
+                            if (type == ESheetCollection.List)
+                            {
+                                double d = 0d;
+                                if (isMissing) d = double.NaN;
+                                (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarVal(d));
+                            }                            
+                            continue;
+                        }
                         v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
-                        mm.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
+                        if (type == ESheetCollection.Matrix)
+                        {
+                            outputMatrix.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
+                        }
+                        else if (type == ESheetCollection.List)
+                        {
+                            (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarVal(v));
+                        }
+                        else if (type == ESheetCollection.Map)
+                        {
+
+                            string coord = Globals.symbolScalar + GetExcelCell(row - 1 - rowOffset + 1, col - 1 - colOffset + 1, transpose);  //1 is added, so that first coord is called with i = 1, j = 1, not i = 0, j = 0.
+                            outputMap.Add(coord, new ScalarVal(v));  //topleft will always be "%a1"
+                        }
                     }
                 }
-
-                O.AddIVariableWithOverwriteFromString(matrixName, mm);
-
-                G.Writeln2("Matrix " + matrixName + " imported (" + rr + "x" + cc + ")");
+                IVariable output = null;
+                if (type == ESheetCollection.Matrix) output = outputMatrix;
+                else if (type == ESheetCollection.List) output = outputList;
+                else if (type == ESheetCollection.Map) output = outputMap;
+                O.AddIVariableWithOverwriteFromString(collectionName, output);
+                G.Writeln2("Imported " + type.ToString().ToLower() + " " + collectionName + " (" + rr + "x" + cc + " elements)");
             }
         }
 
@@ -2921,9 +2969,7 @@ namespace Gekko
             }
             else throw new GekkoException();
             return v;
-        }
-
-        
+        }        
 
         private static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
@@ -30924,7 +30970,15 @@ namespace Gekko
                 else if (x.Type() == EVariableType.Val)
                 {
                     PrintLabel(labelGiven);
-                    G.Writeln(((ScalarVal)x).val.ToString());
+                    double d = ((ScalarVal)x).val;
+                    if (G.isNumericalError(d))
+                    {
+                        G.Writeln(Globals.printNaNIndicator);
+                    }
+                    else
+                    {
+                        G.Writeln(d.ToString());
+                    }
                 }
                 else if (x.Type() == EVariableType.Date)
                 {
@@ -30986,13 +31040,21 @@ namespace Gekko
                     ////See also #83490837432, these should be merged/fusioned
                     //We use same format as for normal PRT of series, but the width is truncated regarding blanks
                     double d = ((ScalarVal)x).val;
-                    //string format = "f" + Program.options.print_fields_nwidth + "." + Program.options.print_fields_ndec + "";
-                    //G.FormatNumber(d, format, false, false).Trim();
-                    string z = "";
-                    for (int i = 0; i < Program.options.print_fields_ndec; i++) z += "#";
-                    string format = "0." + z;
-                    string s3 = d.ToString("0." + z, CultureInfo.InvariantCulture);
-                    s += s3;
+
+                    if (G.isNumericalError(d))
+                    {
+                        s += Globals.printNaNIndicator;
+                    }
+                    else
+                    {
+                        //string format = "f" + Program.options.print_fields_nwidth + "." + Program.options.print_fields_ndec + "";
+                        //G.FormatNumber(d, format, false, false).Trim();
+                        string z = "";
+                        for (int i = 0; i < Program.options.print_fields_ndec; i++) z += "#";
+                        string format = "0." + z;
+                        string s3 = d.ToString("0." + z, CultureInfo.InvariantCulture);
+                        s += s3;
+                    }                                        
                 }
                 else
                 {

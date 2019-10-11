@@ -7516,6 +7516,8 @@ namespace Gekko
             public string opt_rows = null;
             public string opt_cols = null;
             public string opt_matrix = null;
+            public string opt_list = null;
+            public string opt_map = null;
             public string opt_missing = null;  //used for matrix   
             public void Exe()
             {
