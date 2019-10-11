@@ -270,6 +270,66 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void Test__Submodel()
+        {
+            //==================== .1 lags ===========================================
+            Databank work = First();
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\models\submodel';");
+            I("RESET; TIME 2020 2021;");
+            I("MODEL m1;");            
+            I("CREATE y, c, i, g, x;");
+            I("series i = 50; series g = 150; series y = 0; series c = 0; series x = 0;");            
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 1000d, 0.001d);
+            AssertHelper(First(), "c", 2021, 800d, 0.001d);
+            I("series i = 50; series g = 150; series y = 0; series c = 0; series x = 0;");
+            I("MODEL m = m1 <removeblock = consumption>;");
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 200d, 0.001d);
+            AssertHelper(First(), "c", 2021, 0d, 0.001d);
+            I("series i = 50; series g = 150; series y = 0; series c = 0; series x = 0;");
+            I("MODEL m = m1 <setblock = consumption>;");
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 0d, 0.001d);
+            AssertHelper(First(), "c", 2021, 0d, 0.001d);
+            I("series i = 50; series g = 150; series y = 0; series c = 0; series x = 0;");
+            FAIL("MODEL m = m1 <setblock = consumption>,  m2 <setblock = consumption>;");
+            I("MODEL m = m1 <removeblock = consumption>,  m2 <setblock = consumption>;");
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 2000d, 0.001d);
+            AssertHelper(First(), "c", 2021, 1800d, 0.001d);
+
+            // --------- more means than goals
+
+            I("RESET; TIME 2020 2021;");
+            I("MODEL m1;");
+            I("CREATE y, c, i, g, x, i0, g0, a;");
+            I("series i = 50; series g = 150; series y = 0; series c = 0; series x = 0;");
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 1000d, 0.001d);
+            AssertHelper(First(), "c", 2021, 800d, 0.001d);
+            I("CLONE;");
+            I("SERIES i0 = i;");
+            I("SERIES g0 = g;");
+            I("SERIES a = 0;");
+            I("MODEL m = m1 <removeblock = null>,  m3 <removeblock = null>;");
+            I("EXO y;");
+            I("ENDO a;");
+            I("SERIES y * 1.02;");
+            I("SIM <2021 2021 fix>;");
+            I("gmulprt y, i, g, i0, g0, a;");
+            AssertHelper(First(), "y", 2021, 1020d, 0.001d);
+            AssertHelper(First(), "a", 2021, 2d, 0.001d);
+            AssertHelper(First(), "i", 2021, 52d, 0.001d);
+            AssertHelper(First(), "g", 2021, 152d, 0.001d);
+            I("MODEL m1;");
+            I("UNFIX;");
+            I("series i = 52; series g = 152; series y = 0; series c = 0; series x = 0;");
+            I("SIM <2021 2021>;");
+            AssertHelper(First(), "y", 2021, 1020d, 0.001d);                        
+        }
+
+        [TestMethod]
         public void Test__Lags()
         {
             //==================== .1 lags ===========================================

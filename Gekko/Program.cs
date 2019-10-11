@@ -16343,26 +16343,38 @@ write datatest;
             P p = o.p;
             Globals.modelRandomID = Program.RandomInt(11111111, 99999999);  //used in GetModelInfoPath()
 
-            List<O.ModelHelper> mh = new List<O.ModelHelper>();
-            for (int i = 0; i < o.helper.Count / 2; i++)
-            {
-                O.ModelHelper h = new O.ModelHelper();
-                h.fileName = O.GetString(o.helper[i * 2]);
-                h.type = O.GetString(o.helper[i * 2 + 1]);
-                if (i == 0) h.m = o.listItems;
-                else if (i == 1) h.m = o.listItems0;
-                else if (i == 2) h.m = o.listItems1;
-                else if (i == 3) h.m = o.listItems2;
-                //cannot be more than that
-                mh.Add(h);
-            }
+            bool oldFashion = false;
+            if (o.helper.Count == 0) oldFashion = true;
 
-            string modelName = O.GetString(o.modelName);
-            Globals.modelPathAndFileName = modelName;
-            Globals.modelFileName = modelName;
+            List<O.ModelHelper> mhs = new List<O.ModelHelper>();
+            string modelName = null;
+            if (oldFashion)
+            {
+                //old fashion
+                O.ModelHelper h = new O.ModelHelper();
+                h.fileName = o.fileName;
+                h.type = "removeblock";
+                h.m = new List<string>();  //no items!
+                mhs.Add(h);                
+            }
+            else
+            {
+                for (int i = 0; i < o.helper.Count / 2; i++)
+                {
+                    O.ModelHelper h = new O.ModelHelper();
+                    h.fileName = O.GetString(o.helper[i * 2]);
+                    h.type = O.GetString(o.helper[i * 2 + 1]);
+                    if (i == 0) h.m = o.listItems;
+                    else if (i == 1) h.m = o.listItems0;
+                    else if (i == 2) h.m = o.listItems1;
+                    else if (i == 3) h.m = o.listItems2;
+                    //cannot be more than that
+                    mhs.Add(h);
+                }                
+            }                       
 
             string modelText = null;
-            foreach (O.ModelHelper h in mh)
+            foreach (O.ModelHelper h in mhs)
             {
                 string fileName = StripQuotes(h.fileName);
                 bool cancel = false;
@@ -16388,8 +16400,24 @@ write datatest;
                 }
                 h.fileName = fileName;  //put it back, with path and all
                 string textInputRaw = Program.GetTextFromFileWithWait(fileName);
-                modelText += "// " + Globals.modelBlockSymbols + " " + Globals.modelBlockSymbols2 + " " + h.fileName + " " + Globals.modelBlockSymbols + "" + G.NL;
+                if (!oldFashion)
+                {
+                    modelText += "// " + Globals.modelBlockSymbols + " " + Globals.modelBlockSymbols2 + " " + h.fileName + " " + Globals.modelBlockSymbols + "" + G.NL;
+                }
                 modelText += textInputRaw;
+            }
+
+            if (oldFashion)
+            {
+                modelName = mhs[0].fileName;
+                Globals.modelPathAndFileName = modelName;
+                Globals.modelFileName = Path.GetFileName(modelName);
+            }
+            else
+            {
+                modelName = O.GetString(o.modelName);
+                Globals.modelPathAndFileName = modelName;
+                Globals.modelFileName = modelName;
             }
 
             Program.model = new Model();
@@ -16403,8 +16431,11 @@ write datatest;
 
             string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + modelCommentsHelper.modelHashTrue + ".mdl";
             
-            if (Program.options.model_cache == true)
+            if (Program.options.model_cache == true && oldFashion)
             {
+                //problem with !oldFashion is that the removed blocks are not registered in the MD5 hash, so 
+                //a MODEL m = a <removeblock = b> would not be thought as different from MODEL m = a <removeblock = c>.
+                //Therefore, not cache use when doing blocks (for now).
                 if (File.Exists(mdlFileNameAndPath))
                 {
                     try
@@ -16460,7 +16491,11 @@ write datatest;
             else
             {
                 DateTime t1 = DateTime.Now;
-                ParserOLD.EmitModelFromANTLR(textInput, modelName);
+                
+                //ParseModel() is reasonably fast. But needs only to be run when new model is called.
+                ParserOLD.ParseModel(textInput, modelName, mhs);  //bool resTypeGaussSeidel = false;
+                Program.GuiSetModelName();
+
                 parsingSeconds = G.Seconds(t1);
 
                 ParserOLD.OrderAndCompileModel(ECompiledModelType.Gauss, true, false);  //default.

@@ -2699,11 +2699,15 @@ namespace Gekko.Parser.Gek
                         }
                         break;                    
                     case "ASTMODEL":
+                        {                            
+                            node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;");
+                            GetCodeFromAllChildren(node); //gets filename
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                        }
+                        break;
+                    case "ASTMODEL2":
                         {
-                            //node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
-                            //node.Code.A("o" + Num(node) + ".p = p;");                            
-                            //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-
                             node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".helper = new List<IVariable>();" + G.NL);

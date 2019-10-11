@@ -361,13 +361,6 @@ namespace Gekko
                 result = temp;
             }
             return result;
-        }        
-
-        public static void EmitModelFromANTLR(string textInput, string modelName)
-        {
-            //ParseModel() is reasonably fast. But needs only to be run when new model is called.
-            ParseModel(textInput, modelName);  //bool resTypeGaussSeidel = false;
-            Program.GuiSetModelName();
         }
 
         public static void OrderAndCompileModel(ECompiledModelType modelType, bool isCalledFromModelStatement, bool isFix)
@@ -611,7 +604,7 @@ namespace Gekko
             return ss.ToString();
         }
 
-        private static void ParseModel(string textInput, string modelName)
+        public static void ParseModel(string textInput, string modelName, List<O.ModelHelper> mhs)
         {
             ANTLRStringStream input = new ANTLRStringStream(textInput + "\n");  //a newline for ease of use of ANTLR
 
@@ -701,8 +694,42 @@ namespace Gekko
             WalkerHelper2 wh2 = new WalkerHelper2();
             wh2.vals = vals;
             string currentFile = "";
+
+            List<EquationHelper> equationsNew2 = new List<EquationHelper>();
             foreach (EquationHelper eh in Program.model.equations)
-            {
+            {                
+                bool skip = false;
+                foreach (O.ModelHelper mh in mhs)
+                {
+                    if (mh.fileName == eh.modelFile)
+                    {
+                        //there can only be 1 of these where filename matches                        
+                        if (G.equal(mh.type, "setblock"))  //type can only be either setblock or removeblock
+                        {
+                            if (G.Contains(mh.m, eh.modelBlock))
+                            {
+                                //ok
+                            }
+                            else
+                            {
+                                skip = true;
+                            }
+                        }
+                        else if (G.equal(mh.type, "removeblock"))
+                        {
+                            if (G.Contains(mh.m, eh.modelBlock))
+                            {
+                                skip = true;
+                            }
+                            else
+                            {
+                                //ok
+                            }
+                        }
+                        break;  //no need to searh for more models
+                    }
+                }
+                if (skip) continue;
 
                 //if several files are stitched together, we have the following structure:
                 //### modelfile = f1
@@ -718,12 +745,7 @@ namespace Gekko
                 //### endblock
                 //    here, eqs are "noblock"
                 //Since a file may end with an open block, blocks are reset for each file
-
-                if (currentFile != eh.modelFile)
-                {
-
-                }
-                                
+                                                
                 //call of recursive method
                 wh2.rightHandSideCsCode = new StringBuilder2();  //clearing it for each equation, contains long, short and human versions
                 wh2.leftHandSideCsCodeGauss = new StringBuilder();  //clearing it for each equation
@@ -743,12 +765,16 @@ namespace Gekko
                 eh.csCodeLhsHuman = wh2.leftHandSideHumanReadable.ToString();
                 eh.bNumberLhs = wh2.leftHandSideBNumber;
 
-                if (true)  //qwerty
+                if (false)  //qwerty
                 {
                     G.Writeln2(eh.modelFile + " " + eh.lhs);
                     G.Writeln(eh.modelBlock + " ");
                 }
+
+                equationsNew2.Add(eh);
             }
+            Program.model.equations = equationsNew2;
+
 
             //move reverted equations, and compact the others (and renumber them).
             List<EquationHelper> equationsNew = new List<EquationHelper>();

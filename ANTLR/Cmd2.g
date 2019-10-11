@@ -341,6 +341,7 @@ ASTOPT_STRING_ALL;
     ASTMISSING;
     ASTMODE;
     ASTMODEL;
+	ASTMODEL2;
     ASTMODELFILE;
     ASTMODEQUESTION;
     ASTMP;
@@ -2209,7 +2210,9 @@ mode2                     : MIXED | SIM | DATA;
 //model                     : MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?);
 //						  ;
 
-model                     : MODEL modelOpt1? name EQUAL modelHelper -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} name modelHelper modelOpt1?);
+model                     : MODEL modelOpt1? name EQUAL modelHelper -> ^({token("ASTMODEL2", ASTMODEL2, $MODEL.Line)} name modelHelper modelOpt1?)
+						  | MODEL modelOpt1? fileNameStar -> ^({token("ASTMODEL", ASTMODEL, $MODEL.Line)} ^(ASTHANDLEFILENAME fileNameStar) modelOpt1?)
+						  ;
 modelHelper               : modelItem4 | modelItem3 | modelItem2 | modelItem1;
 modelItem1                : fileName '<' name EQUAL listItems '>' -> ^(ASTPLACEHOLDER fileName name) listItems;
 modelItem2                : fileName '<' name EQUAL listItems '>' ',' fileName '<' name EQUAL listItems0 '>' -> ^(ASTPLACEHOLDER fileName name fileName name) listItems listItems0;
