@@ -2871,11 +2871,10 @@ namespace Gekko
                 {
                     Series ts = O.GetIVariableFromString(listItems[row - 1 - rowOffset], O.ECreatePossibilities.Must) as Series;
                     for (int col = 1 + colOffset; col < 1 + colOffset + obs; col++)
-                    {
-                        double v = double.NaN;
+                    {                        
                         CellLight cell = inputTable.Get(row, col);
                         if (cell.type == ECellLightType.None) continue;
-                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        double v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
                         ts.SetData(o.t1.Add(col - 1 - colOffset), v);
                     }
                 }
@@ -2884,8 +2883,7 @@ namespace Gekko
             {
                 Matrix outputMatrix = null;
                 List outputList = null;
-                Map outputMap = null;
-                
+                Map outputMap = null;               
 
                 int rr = inputTable.GetRowMaxNumber() - rowOffset;
                 int cc = inputTable.GetColMaxNumber() - colOffset;
@@ -2911,19 +2909,17 @@ namespace Gekko
                     }
                     for (int col = 1 + colOffset; col <= inputTable.GetColMaxNumber(); col++)
                     {
-                        double v = double.NaN;
+                        
                         CellLight cell = inputTable.Get(row, col);
                         if (cell.type == ECellLightType.None)
                         {
                             if (type == ESheetCollection.List)
                             {
-                                double d = 0d;
-                                if (isMissing) d = double.NaN;
-                                (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarVal(d));
+                                (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarString(""));
                             }                            
                             continue;
                         }
-                        v = GetValueFromSpreadsheetCell(transpose, row, col, v, cell);
+                        double v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
                         if (type == ESheetCollection.Matrix)
                         {
                             outputMatrix.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
@@ -2949,8 +2945,9 @@ namespace Gekko
             }
         }
 
-        private static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, double v, CellLight cell)
+        public static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, CellLight cell)
         {
+            double v = double.NaN;
             if (cell.type == ECellLightType.String)
             {
                 if (IsNonAvailableText(cell.text))
@@ -2967,9 +2964,14 @@ namespace Gekko
             {
                 v = cell.data;
             }
-            else throw new GekkoException();
+            else
+            {
+                G.Writeln2("*** ERROR: Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
+                throw new GekkoException();
+            }
             return v;
-        }        
+        }
+
 
         private static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
@@ -16105,36 +16107,7 @@ namespace Gekko
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
             G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
-
         
-
-        public static double GetValueFromSpreadsheetCell(bool transpose, int row, int col, CellLight cell)
-        {
-            double v = double.NaN;
-            if (cell.type == ECellLightType.String)
-            {
-                if (IsNonAvailableText(cell.text))
-                {
-                    //keep NaN
-                }
-                else
-                {
-                    G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ", content: '" + cell.text + "'");
-                    throw new GekkoException();
-                }
-            }
-            else if (cell.type == ECellLightType.Double)
-            {
-                v = cell.data;
-            }
-            else
-            {
-                G.Writeln2("*** ERROR: Could not understand spreadsheet cell " + GetExcelCell(row, col, transpose) + " as a number");
-                throw new GekkoException();
-            }
-            return v;
-        }
-
         public static void FromXls(string s, out int rowOffset, out int colOffset, bool transpose)
         {
             //0-based
