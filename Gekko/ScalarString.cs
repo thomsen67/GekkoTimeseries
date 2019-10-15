@@ -344,10 +344,14 @@ namespace Gekko
                 {
                     Range index_range = index as Range;
 
-                    //slice like %s[2..5], substring
+                    //slice like %s[2..5], substring, can also use %s[2..] or %s[..5]
 
-                    int ival1 = O.ConvertToInt(index_range.first);
-                    int ival2 = O.ConvertToInt(index_range.last);
+                    int ival1 = 1;
+                    int ival2 = this.string2.Length;
+
+                    if (index_range.first != null) ival1 = O.ConvertToInt(index_range.first);
+                    if (index_range.last != null) ival2 = O.ConvertToInt(index_range.last);
+
                     if (ival1 > this.string2.Length || ival2 > this.string2.Length || ival2 < ival1 || ival1 < 1 || ival2 < 1)
                     {
                         G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");

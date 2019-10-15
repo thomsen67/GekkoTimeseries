@@ -3007,7 +3007,7 @@ namespace Gekko
                             break;
                         default:
                             {
-                                G.Writeln2("*** ERROR: Expected IVariable to be 1 of 7 types");
+                                G.Writeln2("*** ERROR: Expected variable to be series, val, date, string, list, map or matrix");
                                 throw new GekkoException();
                             }
                             break;

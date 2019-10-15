@@ -444,7 +444,7 @@ namespace Gekko
 
         public static bool IsGekkoNull(IVariable x1)
         {
-            return x1.Type() == EVariableType.GekkoNull;
+            return x1.Type() == EVariableType.Null;
         }
 
 

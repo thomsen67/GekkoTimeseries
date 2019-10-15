@@ -108,7 +108,7 @@ namespace Gekko
                 {
                     Range index_range = index as Range;
 
-                    if (index_range.first.Type() == EVariableType.String && index_range.last.Type() == EVariableType.String)
+                    if (index_range.first != null && index_range.first.Type() == EVariableType.String && index_range.last != null && index_range.last.Type() == EVariableType.String)
                     {
                         string s1 = O.ConvertToString(index_range.first);
                         string s2 = O.ConvertToString(index_range.last);
@@ -123,10 +123,11 @@ namespace Gekko
                     }
                     else
                     {
-                        //slice like #m[2..5]
-
-                        int ival1 = O.ConvertToInt(index_range.first);
-                        int ival2 = O.ConvertToInt(index_range.last);
+                        //slice like #m[2..5], or #m[2..] or #m[..5] or even #m[..]
+                        int ival1 = 1;
+                        int ival2 = this.list.Count;
+                        if (index_range.first != null) ival1 = O.ConvertToInt(index_range.first);
+                        if (index_range.last != null) ival2 = O.ConvertToInt(index_range.last);
                         if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
                         {
                             G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
@@ -171,6 +172,9 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+            //else if (indexes.Length == 1)
+            //{
+            //}
             else
             {
                 G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");

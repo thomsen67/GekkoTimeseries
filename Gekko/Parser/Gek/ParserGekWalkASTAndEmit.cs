@@ -2587,9 +2587,7 @@ namespace Gekko.Parser.Gek
 
                                 //NOTE: local functions are in C#7, but to compile them .NET 4.6 is necessary. So use Func<> for now, small speed penalty.
                                 //sb1.AppendLine(iv + " " + funcName + "(" + parentListLoopVars1 + ")" + " {");
-
-                                //#ttqwerty
-
+                                                                
                                 if (node.localInsideLoopVariablesCs != null)
                                 {
                                     sb1.AppendLine(node.localInsideLoopVariablesCs);
@@ -4414,8 +4412,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         else
                                         {
-
-                                            //#ttqwerty
+                                                                                        
                                             string name = Globals.listLoopMovedStuff + ++Globals.counter;
 
                                             if (Globals.bugfix_speedup3)

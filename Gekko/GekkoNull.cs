@@ -7,6 +7,8 @@ namespace Gekko
 {
     class GekkoNull : IVariable
     {
+        public static GekkoNull gekkoNull = new GekkoNull();
+        
         // ----------------------------------------------------
         // --------------object functions start----------------
         // ----------------------------------------------------
@@ -29,98 +31,114 @@ namespace Gekko
 
         public double GetValOLD(GekkoSmpl t)
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public double GetVal(GekkoTime t)
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public double ConvertToVal()
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public string ConvertToString()
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public IVariable Indexer(GekkoSmpl t, O.EIndexerType indexerType, params IVariable[] indexes)
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public List<IVariable> ConvertToList()
         {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
         public EVariableType Type()
         {
-            return EVariableType.GekkoNull;
+            return EVariableType.Null;
         }
 
         public IVariable Negate(GekkoSmpl t)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
                         
         public IVariable Add(GekkoSmpl smpl, IVariable input)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public IVariable Subtract(GekkoSmpl smpl, IVariable input)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public IVariable Concat(GekkoSmpl t, IVariable x)
-        {            
+        {
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
             throw new GekkoException();
         }
 
 
         public IVariable Multiply(GekkoSmpl smpl, IVariable input)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public IVariable Divide(GekkoSmpl smpl, IVariable input)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public IVariable Power(GekkoSmpl smpl, IVariable input)
         {
-            return this;
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public void IndexerSetData(GekkoSmpl smpl, IVariable rhsExpression, O.Assignment options, params IVariable[] dims)
         {
-            return; //the "this" object stays untouched (that is, GekkoNull)
+            G.Writeln2("*** ERROR: Invalid operation on null/empty value");
+            throw new GekkoException();
         }
 
         public IVariable DeepClone(GekkoSmplSimple truncate)
         {
-            throw new GekkoException();
+            return gekkoNull;
         }
 
         public void DeepTrim()
         {
-            throw new GekkoException();
+            return;
         }
 
         public void DeepCleanup()
         {
-            throw new GekkoException();
+            return;
         }
+
     }
 }

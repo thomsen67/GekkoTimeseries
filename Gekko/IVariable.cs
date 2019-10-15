@@ -18,7 +18,7 @@ namespace Gekko
         Matrix,
         Var,
         Range,              
-        GekkoNull,
+        Null,
         Name
     }
 

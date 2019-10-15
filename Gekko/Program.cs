@@ -1906,10 +1906,19 @@ namespace Gekko
 
         private static bool IsNonAvailableText(string text)
         {
+            return IsNonAvailableText(text, true);
+        }
+
+        private static bool IsNonAvailableText(string text, bool alsoMAndNa)
+        {
             //the last ones are the Danish codes
             //the M is Gekko standard for missing value, NA is also allowed, both also with "".
             bool isNonAvailableText = false;
-            if (G.Equal(text, "M") || G.Equal(text, "\"M\"") || G.Equal(text, "NA") || G.Equal(text, "\"NA\"") || G.Equal(text, "#N/A") || G.Equal(text, "#NAME?") || G.Equal(text, "#I/T") || G.Equal(text, "#NAVN?")) isNonAvailableText = true;
+            if(alsoMAndNa)
+            {
+                if (G.Equal(text, "M") || G.Equal(text, "\"M\"") || G.Equal(text, "NA") || G.Equal(text, "\"NA\"")) isNonAvailableText = true;
+            }
+            if (G.Equal(text, "#N/A") || G.Equal(text, "#NAME?") || G.Equal(text, "#I/T") || G.Equal(text, "#NAVN?")) isNonAvailableText = true;
             return isNonAvailableText;
         }
 
@@ -2915,25 +2924,69 @@ namespace Gekko
                         {
                             if (type == ESheetCollection.List)
                             {
-                                (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarString(""));
+                                (outputList.list[row - 1 - rowOffset] as List).Add(GekkoNull.gekkoNull);
                             }                            
                             continue;
-                        }
-                        double v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
+                        }                        
+
                         if (type == ESheetCollection.Matrix)
                         {
+                            double v = GetValueFromSpreadsheetCell(transpose, row, col, cell);
                             outputMatrix.data[row - 1 - rowOffset, col - 1 - colOffset] = v;
                         }
-                        else if (type == ESheetCollection.List)
-                        {
-                            (outputList.list[row - 1 - rowOffset] as List).Add(new ScalarVal(v));
-                        }
-                        else if (type == ESheetCollection.Map)
+                        else if (type == ESheetCollection.List || type == ESheetCollection.Map)
                         {
 
-                            string coord = Globals.symbolScalar + GetExcelCell(row - 1 - rowOffset + 1, col - 1 - colOffset + 1, transpose);  //1 is added, so that first coord is called with i = 1, j = 1, not i = 0, j = 0.
-                            outputMap.Add(coord, new ScalarVal(v));  //topleft will always be "%a1"
-                        }
+                            bool isNaNText = false;
+                            if(cell.type==ECellLightType.String)
+                            {
+                                if (IsNonAvailableText(cell.text, false)) isNaNText = true;  //will not be true if M or NA
+                            }
+
+                            IVariable iv = null;
+                            if (isNaNText)
+                            {
+                                iv = new ScalarVal(double.NaN);
+                            }
+                            else if (cell.type == ECellLightType.DateTime)
+                            {
+                                int sub = -12345;
+                                EFreq freq = Program.options.freq;
+                                int super = Program.FromDateTimeToGekkoTime(freq, ref sub, cell.dateTime);  //uses current freq                                
+                                iv = new ScalarDate(new GekkoTime(freq, super, sub));
+                            }
+                            else if (cell.type == ECellLightType.Double)
+                            {
+                                //will not try to interpret a string like M or NA or #I/T as a missing,
+                                //since it IS not a string here
+                                iv = new ScalarVal(GetValueFromSpreadsheetCell(transpose, row, col, cell));
+                            }
+                            else if (cell.type == ECellLightType.String)
+                            {
+                                //A string like #I/T has isNaNText = true and is handled above
+                                //but we may have a M or NA here, which will just become a string
+                                //later on: maybe option for M and NA strings...?
+                                iv = new ScalarString(cell.text);
+                            }
+                            else if (cell.type == ECellLightType.None)
+                            {
+                                iv = GekkoNull.gekkoNull;
+                            }
+                            else
+                            {
+                                throw new GekkoException();
+                            }
+
+                            if (type == ESheetCollection.List)
+                            {
+                                (outputList.list[row - 1 - rowOffset] as List).Add(iv);
+                            }
+                            else
+                            {
+                                string coord = Globals.symbolScalar + GetExcelCell(row - 1 - rowOffset + 1, col - 1 - colOffset + 1, transpose);  //1 is added, so that first coord is called with i = 1, j = 1, not i = 0, j = 0.
+                                outputMap.Add(coord, iv); //topleft will always be "%a1"
+                            }                            
+                        }                        
                     }
                 }
                 IVariable output = null;
@@ -16028,32 +16081,11 @@ namespace Gekko
                 {
                     DateTime dt = dateList[j - j_data];
                     CellLight c = matrix.Get(i, j);
-
                     double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);
-
-                    if (freq == EFreq.M)
-                    {
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, dt.Month);
-                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
-                    }
-                    else if (freq == EFreq.Q)
-                    {
-                        int mPerQ = Globals.freqMSubperiods / Globals.freqQSubperiods;  //3
-                        int quarter = (dt.Month - 1) / mPerQ + 1;
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, quarter);
-                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
-                    }
-                    else if (freq == EFreq.A)
-                    {
-                        GekkoTime gt = new GekkoTime(freq, dt.Year, 1);
-                        HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
-                    }
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Expected frequency a, q or m");
-                        throw new GekkoException();
-                    }
-
+                    int subPer = -12345;
+                    int per = Program.FromDateTimeToGekkoTime(freq, ref subPer, dt);
+                    GekkoTime gt = new GekkoTime(freq, per, subPer);
+                    HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);                    
                 }
 
                 if (emethod == ECollapseMethod.Avg)
@@ -29181,7 +29213,7 @@ namespace Gekko
         {
             //if (iv == null) return false;
             bool b = true;
-            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val && iv.Type() != EVariableType.GekkoNull)
+            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val && iv.Type() != EVariableType.Null)
             {
                 b = false;
             }            
