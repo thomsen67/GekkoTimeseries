@@ -2245,7 +2245,7 @@ seqItemNaked:                 MINUS seqItem7Naked 	(REP repN)?	-> ^(ASTNAKEDLIST
 							| ident leftParenGlue RIGHTPAREN -> ^(ASTNAKEDLISTMISS ident) //must catch m() or miss()
 						      ;
 
-seqItem7Naked:                bank7Naked? name7 indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7) ^(ASTPLACEHOLDER indexer7Naked?));
+seqItem7Naked:                bank7Naked? name7 freq7Naked? indexer7Naked? -> ^(ASTSEQ7 ^(ASTPLACEHOLDER bank7Naked?) ^(ASTPLACEHOLDER name7 freq7Naked?) ^(ASTPLACEHOLDER indexer7Naked?));
 bank7Naked:					  AT GLUE -> ASTAT
 							| name7 COLON -> name7 ASTCOLON
 							  ;

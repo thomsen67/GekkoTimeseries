@@ -92,17 +92,17 @@ namespace Gekko
                     else if (ival == 0)
                     {
                         G.Writeln2("*** ERROR: Illegal [0] list indexing. Use #m.len() or len(#m) instead of #m[0] to get the length of list #m.");
-                        throw new GekkoException();                        
+                        throw new GekkoException();
                     }
                     else if (ival > this.list.Count)
                     {
                         G.Writeln2("*** ERROR: Illegal LIST indexer [" + ival + "]: larger than length of list (" + this.list.Count + ")");
                         throw new GekkoException();
                     }
-                    
-                    return this.list[ival - 1];                    
+
+                    return this.list[ival - 1];
                     //return this.list[ival - 1].DeepClone();
-                    
+
                 }
                 else if (index.Type() == EVariableType.Range)
                 {
@@ -144,9 +144,9 @@ namespace Gekko
                     }
                 }
                 else if (index.Type() == EVariableType.String)
-                {                    
+                {
                     string s5 = ((ScalarString)index).string2;
-                    if(s5.Contains("?") || s5.Contains("*"))
+                    if (s5.Contains("?") || s5.Contains("*"))
                     {
                         //Wildcard: return a list of those
                         List<string> found = Program.Search(s5, new List<string>(Program.GetListOfStringsFromListOfIvariables(this.list.ToArray()))); //the list items are sorted, not like a dict                        
@@ -164,7 +164,7 @@ namespace Gekko
                             }
                         }
                         return Globals.scalarVal0;
-                    }                    
+                    }
                 }
                 else
                 {
@@ -172,9 +172,25 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            //else if (indexes.Length == 1)
-            //{
-            //}
+            else if (indexes.Length == 2)
+            {
+                if (indexes[0].Type() == EVariableType.Val)
+                {
+                    //#m[3, 5] or #m[3, 4..5]
+                    return this.Indexer(t, indexerType, indexes[0]).Indexer(t, indexerType, indexes[1]);
+                }
+                //else if (indexes[0].Type() == EVariableType.Range)
+                //{
+                //    //this corresponds to selecting a column. Note that #m[4..5, 5] is different from #m[4..5][5]! But that is the whole point
+                //    //of implementing [..., ...] for lists.
+                //    //
+                //}
+                else
+                {
+                    G.Writeln2("*** ERROR: Invalid use of [..., ...] indexer on list");
+                    throw new GekkoException();
+                }
+            }
             else
             {
                 G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");
