@@ -128,11 +128,7 @@ namespace Gekko
                         int ival2 = this.list.Count;
                         if (index_range.first != null) ival1 = O.ConvertToInt(index_range.first);
                         if (index_range.last != null) ival2 = O.ConvertToInt(index_range.last);
-                        if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
-                        {
-                            G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
-                            throw new GekkoException();
-                        }
+                        CheckRange(ival1, ival2, false);
                         List<IVariable> tmp = new List<Gekko.IVariable>();
                         for (int i = ival1 - 1; i <= ival2 - 1; i++)
                         {
@@ -176,15 +172,49 @@ namespace Gekko
             {
                 if (indexes[0].Type() == EVariableType.Val)
                 {
-                    //#m[3, 5] or #m[3, 4..5]
+                    //#m[3, 5] or #m[3, 4..5] or #m[1..2, 4..5]
                     return this.Indexer(t, indexerType, indexes[0]).Indexer(t, indexerType, indexes[1]);
                 }
-                //else if (indexes[0].Type() == EVariableType.Range)
-                //{
-                //    //this corresponds to selecting a column. Note that #m[4..5, 5] is different from #m[4..5][5]! But that is the whole point
-                //    //of implementing [..., ...] for lists.
-                //    //
-                //}
+                else if (indexes[0].Type() == EVariableType.Range)
+                {
+                    //#m[1..2, 4]
+                    //this corresponds to selecting a column. Note that #m[1..2, 4] is different from #m[1..2][4]!
+                                        
+                    Range index_range1 = indexes[0] as Range;
+                    int ival1 = 1;
+                    int ival2 = this.list.Count;
+                    if (index_range1.first != null) ival1 = O.ConvertToInt(index_range1.first);
+                    if (index_range1.last != null) ival2 = O.ConvertToInt(index_range1.last);
+                    CheckRange(ival1, ival2, true);
+
+                    List m = null;
+                    if (indexes[1].Type() == EVariableType.Val)
+                    {
+                        int j = O.ConvertToInt(indexes[1]);
+                        m = GetColumnSlice(ival1, ival2, j);
+                    }
+                    else if (indexes[1].Type() == EVariableType.Range)
+                    {
+                        int jval1 = 1;
+                        int jval2 = this.list.Count;
+                        Range index_range2 = indexes[1] as Range;
+                        if (index_range2.first != null) jval1 = O.ConvertToInt(index_range2.first);
+                        if (index_range2.last != null) jval2 = O.ConvertToInt(index_range2.last);
+                        m = new List();
+                        for (int j = jval1; j <= jval2; j++)
+                        {
+                            List m3 = GetColumnSlice(ival1, ival2, j);
+                            m.list.Add(m3);
+                        }
+                        m = Functions.t(null, null, null, m) as List;
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Expected value or range for second dimension of indexer");
+                        throw new GekkoException();
+                    }
+                    return m;
+                }
                 else
                 {
                     G.Writeln2("*** ERROR: Invalid use of [..., ...] indexer on list");
@@ -196,7 +226,39 @@ namespace Gekko
                 G.Writeln2("*** ERROR: Cannot use " + indexes.Length + "-dimensional indexer on LIST");
                 throw new GekkoException();
             }
-        }        
+        }
+
+        private List GetColumnSlice(int ival1, int ival2, int j)
+        {
+            List m = new List();
+            for (int i = ival1; i <= ival2; i++)
+            {
+                List m2 = this.list[i - 1] as List;
+                if (m2 == null)
+                {
+                    G.Writeln2("*** ERROR: element " + i + " of list is not a (sub)list");
+                    throw new GekkoException();
+                }
+                if (j < 1 || j > m2.list.Count)
+                {
+                    G.Writeln2("*** ERROR: Sublist " + i + " of list has illegal index (" + j + ")");
+                    throw new GekkoException();
+                }
+                m.list.Add(m2.list[j - 1]);
+            }
+
+            return m;
+        }
+
+        private void CheckRange(int ival1, int ival2, bool twod)
+        {
+            if (ival1 > this.list.Count || ival2 > this.list.Count || ival2 < ival1 || ival1 < 1 || ival2 < 1)
+            {
+                if (twod) G.Writeln2("*** ERROR: Invalid range in first dimension, [" + ival1 + " .. " + ival2 + ", ...]");
+                else G.Writeln2("*** ERROR: Invalid range, [" + ival1 + " .. " + ival2 + "]");
+                throw new GekkoException();
+            }
+        }
 
         public IVariable Negate(GekkoSmpl t)
         {

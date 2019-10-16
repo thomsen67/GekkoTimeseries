@@ -904,23 +904,60 @@ namespace Gekko
 
         public static IVariable t(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1)
         {
-            if (x1.Type() != EVariableType.Matrix)
+            if (x1.Type() == EVariableType.Matrix)
             {
-                G.Writeln("*** ERROR: t(): transpose can only be used on matrices");
+                Matrix x = (Matrix)x1;
+                int d1 = x.data.GetLength(0);
+                int d2 = x.data.GetLength(1);
+                Matrix y = new Matrix(d2, d1);
+                for (int i = 0; i < d1; i++)
+                {
+                    for (int j = 0; j < d2; j++)
+                    {
+                        y.data[j, i] = x.data[i, j];
+                    }
+                }
+                return y;
+            }
+            else if (x1.Type() == EVariableType.List)
+            {
+                List m = x1 as List;
+                int max = 0;
+                foreach (IVariable iv in m.list)
+                {
+                    List mm = iv as List;
+                    if (mm == null)
+                    {
+                        G.Writeln("*** ERROR: t(): transpose on list only when it contains sublists");
+                        throw new GekkoException();
+                    }
+                    max = Math.Max(max, mm.list.Count);
+                }
+                List rv = new List();
+                for (int i = 0; i < max; i++)
+                {
+                    List tmp = new List();
+                    for (int j = 0; j < m.list.Count; j++)
+                    {
+                        tmp.list.Add(GekkoNull.gekkoNull);
+                    }
+                    rv.list.Add(tmp);
+                }
+
+                for (int j = 0; j < m.list.Count; j++)
+                {
+                    for (int i = 0; i < (m.list[j] as List).list.Count; i++)
+                    {
+                        (rv.list[i] as List).list[j] = (m.list[j] as List).list[i]; //no need to clone, since assignments alway clone anyway
+                    }
+                }
+                return rv;
+            }
+            else
+            {
+                G.Writeln("*** ERROR: t(): transpose can only be used on list or matrix");
                 throw new GekkoException();
             }
-            Matrix x = (Matrix)x1;
-            int d1 = x.data.GetLength(0);
-            int d2 = x.data.GetLength(1);
-            Matrix y = new Matrix(d2, d1);
-            for (int i = 0; i < d1; i++)
-            {
-                for (int j = 0; j < d2; j++)
-                {
-                    y.data[j, i] = x.data[i, j];
-                }
-            }
-            return y;
         }
 
         //Converts timeseries to matrix
@@ -967,6 +1004,7 @@ namespace Gekko
                     m.data[counter, varcount] = ts.GetData(smpl, gt);
                 }
             }
+
             return m;
         }
 

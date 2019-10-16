@@ -29152,7 +29152,7 @@ namespace Gekko
             else
             {
                 if (!IsSeriesType(x)) fail = true;
-                if (x.Type() == EVariableType.Series || G.IsGekkoNull(x)) seriesCounter++;
+                if (x.Type() == EVariableType.Series) seriesCounter++;
             }
         }
 
@@ -29213,7 +29213,7 @@ namespace Gekko
         {
             //if (iv == null) return false;
             bool b = true;
-            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val && iv.Type() != EVariableType.Null)
+            if (iv.Type() != EVariableType.Series && iv.Type() != EVariableType.Val)
             {
                 b = false;
             }            
