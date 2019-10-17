@@ -17576,21 +17576,16 @@ namespace UnitTests
             // 4  5  6
             // 7  8  9
             //10 11 12
-
-            I("%v1 = #m[2][1];");        //4
-            I("%v2 = #m[2, 1];");        //4
-
+            I("%v1 = #m[2][3];");        //6
+            I("%v2 = #m[2, 3];");        //6
             I("#m1 = #m[2, 2..3];");      //(5, 6)
             I("#m2 = #m[2][2..3];");      //(5, 6)
-
             I("#m3 = #m[2..4, 2];");     //(5, 8, 11) <-- note!
             I("#m4 = #m[2..4][2];");     //(7, 8, 9)
-
             I("#m5 = #m[2..4, 2..3];");   //((5,6), (8,9), (11,12))
             I("#m6 = #m[2..4][2..3];");   //((7,8,9), (10,11,12))
-
-            _AssertScalarVal(First(), "%v1", 4d);
-            _AssertScalarVal(First(), "%v2", 4d);
+            _AssertScalarVal(First(), "%v1", 6d);
+            _AssertScalarVal(First(), "%v2", 6d);
             _AssertListSize(First(), "#m1", 2);
             _AssertListSize(First(), "#m2", 2);
             _AssertListSize(First(), "#m3", 3);
@@ -17602,8 +17597,10 @@ namespace UnitTests
             _AssertListVal(First(), "#m3", new List<double> { 5d, 8d, 11d });
             _AssertListVal(First(), "#m4", new List<double> { 7d, 8d, 9d });
             Assert.AreEqual((((First().GetIVariable("#m5") as List).list[0] as List).list[1] as ScalarVal).val, 6d); //element [1][2]
+            Assert.AreEqual((((First().GetIVariable("#m5") as List).list[2] as List).list[0] as ScalarVal).val, 11d); //element [2][0]
             Assert.AreEqual((((First().GetIVariable("#m6") as List).list[0] as List).list[1] as ScalarVal).val, 8d); //element [1][2]
-            
+            Assert.AreEqual((((First().GetIVariable("#m6") as List).list[1] as List).list[2] as ScalarVal).val, 12d); //element [2][3]
+
         }
 
         
