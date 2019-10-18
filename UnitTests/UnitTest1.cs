@@ -13081,6 +13081,32 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Mute()
+        {
+            I("RESET;");
+            I("tell 'a1';");
+            I("option interface mute = yes;");
+            I("tell 'a2';");
+            I("option interface mute = no;");
+            I("tell 'a3';");
+            Assert.IsFalse(Globals.unitTestScreenOutput.ToString().Contains("a2"));
+
+            I("RESET;");
+            I("pipe deleteme.txt;");
+            I("tell 'a1';");
+            I("option interface mute = yes;");
+            I("tell 'a2';");
+            I("option interface mute = no;");
+            I("tell 'a3';");
+            I("pipe<stop>;");
+            I("%s = readfile('deleteme.txt');");            
+            ScalarString ss = Program.databanks.GetDatabank("Work").GetIVariable("%s") as ScalarString;
+            Assert.IsFalse(ss.string2.Contains("a2"));
+
+        }
+
+
+        [TestMethod]
         public void _Test_DatabankLocalGlobal()
         {
             I("reset;");

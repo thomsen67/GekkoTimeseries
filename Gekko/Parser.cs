@@ -855,7 +855,7 @@ namespace Gekko
         public static void PrintModelParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
         {
             if (Globals.threadIsInProcessOfAborting) return;
-            if (Globals.pipe == true) Program.Pipe("con", null);
+            Program.StopPipeAndMute(2);
             int number = 0;
             foreach (string s in errors)
             {
@@ -1009,7 +1009,7 @@ namespace Gekko
                 //ignore, probably an error dublet
                 return;
             }
-            if (Globals.pipe == true) Program.Pipe("con", null);
+            Program.StopPipeAndMute(2);
             int number = 0;
             foreach (string s in errors)
             {

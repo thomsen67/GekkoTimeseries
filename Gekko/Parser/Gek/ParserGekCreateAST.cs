@@ -820,7 +820,7 @@ namespace Gekko.Parser.Gek
                 //ignore, probably an error dublet
                 return;
             }
-            if (Globals.pipe == true) Program.Pipe("con", null);
+            Program.StopPipeAndMute(2);
             int number = 0;
             foreach (string s in errors)
             {
@@ -955,11 +955,11 @@ namespace Gekko.Parser.Gek
         }
 
         public static void PrintParserErrors(List<string> errors, List<string> inputFileLines, ParseHelper ph)
-        {            
+        {
             List<string> lineTemp2 = new List<string>();
             List<string> lineTemp2Numbers = new List<string>();
             if (Globals.threadIsInProcessOfAborting) return;
-            if (Globals.pipe == true) Program.Pipe("con", null);
+            Program.StopPipeAndMute(2);
             int number = 0;
             foreach (string s in errors)
             {
@@ -1010,7 +1010,7 @@ namespace Gekko.Parser.Gek
                     errorMessage = errorMessage.Replace(" RIGHTCURLY", " '}'");
                     errorMessage = errorMessage.Replace(" LEFTPAREN", " '('");
                     errorMessage = errorMessage.Replace(" RIGHTPAREN", " ')'");
-                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");                    
+                    errorMessage = errorMessage.Replace(" LEFTBRACKETGLUE", " '['");
                     errorMessage = errorMessage.Replace(" LEFTBRACKET", " '['");
                     errorMessage = errorMessage.Replace(" RIGHTBRACKET", " ']'");
                     errorMessage = errorMessage.Replace(" LEFTANGLESIMPLE", " '<'");
@@ -1024,22 +1024,22 @@ namespace Gekko.Parser.Gek
                     errorMessage = errorMessage.Replace(" EQUAL", " '='");
                     errorMessage = errorMessage.Replace(" BACKSLASH", " '\\'");
                     errorMessage = errorMessage.Replace(" DOLLAR", " '$'");
-                    errorMessage = errorMessage.Replace(" QUESTION", " '?'");                                       
-                    
+                    errorMessage = errorMessage.Replace(" QUESTION", " '?'");
+
                     errorMessage = errorMessage.Replace("EOF", "[End of input]");
                     errorMessage = errorMessage.Replace(@"'\\r\\n'", "[Newline]");  //easier to understand
                     errorMessage = errorMessage.Replace("expecting set", "");  //not meningful                
                     errorMessage = errorMessage.Replace("required (...)+ loop did not match anything at input", "unexpected input");  //different phrase in order to distinguish these two
                     errorMessage = errorMessage.Replace("no viable alternative at input", "did not expect input");  //different phrase in order to distinguish these two
-                    
+
                     if (errorMessage.Contains("'<[End of input]>' expecting END"))
                     {
                         errorMessage += G.NL + "  Check your loop structures";
                         errorMessage += G.NL + "  (FOR) and conditionals (IF).";
                         errorMessage += G.NL + "  For each FOR or IF, an";
-                        errorMessage += G.NL + "  END is expected.";                        
+                        errorMessage += G.NL + "  END is expected.";
                     }
-                    
+
                 }
 
 
@@ -1172,7 +1172,7 @@ namespace Gekko.Parser.Gek
             //    }                
             //}                       
         }
-
+        
         private static void CheckForBadDouble(string lineTemp)
         {
             string xx = G.ReplaceGlueNew(lineTemp.Trim());

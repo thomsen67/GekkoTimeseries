@@ -1140,8 +1140,7 @@ namespace Gekko
         public static void GekkoExceptionCleanup(P p)
         {
             //This method is also called when exceptions arise in unit testing (FAIL() method)
-            Program.ReleasePipe();
-            Program.ReleasePipe2();
+            StopPipeAndMute(1);
 
             if (Globals.threadIsInProcessOfAborting)
             {
@@ -1167,6 +1166,27 @@ namespace Gekko
             if (Globals.applicationIsInProcessOfAborting)
             {
                 Application.Exit();  //will go to #3452345523 after
+            }
+        }                
+
+        public static void StopPipeAndMute(int i)
+        {
+            if (i == 1)
+            {
+                Program.ReleasePipe();
+                Program.ReleasePipe2();
+                              
+            }
+            else if (i == 2)
+            {
+                if (Globals.pipe == true) Program.Pipe("con", null);             
+            }
+
+            //in both cases:
+            if (G.Equal(Program.options.interface_mute, "yes"))
+            {
+                Program.options.interface_mute = "no";
+                G.Writeln2("+++ NOTE: Because of errors, OPTION interface mute = 'no'");
             }
         }
 
@@ -20125,8 +20145,10 @@ namespace Gekko
                     Globals.pipe = false;
                     Globals.pipeFileHelper.pipeFile = null;
                     Globals.pipeFileHelper.pipeFileFileWithPath = "";
-                    if (!mute) G.Writeln2("Directing output to main window");
-                    if (G.Equal(fileName, "con")) G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
+                    if (!mute)
+                        G.Writeln2("Directing output to main window");
+                    if (G.Equal(fileName, "con"))
+                        G.Writeln("+++ WARNING: please use PIPE<stop> instead of PIPE con");
                 }
             }
             else if(pause)

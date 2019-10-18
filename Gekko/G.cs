@@ -3136,7 +3136,7 @@ namespace Gekko
             
             if (s.Contains("*** ERROR"))
             {
-                mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
+                mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping or muting
                 if (Globals.errorMemory == null) Globals.errorMemory = new StringBuilder();
             }
             if (s.Contains("+++ WARNING")) mustAlsoPrintOnScreen = true;  //so we get an error on screen even if piping
@@ -3155,6 +3155,9 @@ namespace Gekko
             }
 
             bool isPiping = false;
+            bool isMuting = false;
+
+            if (G.Equal(Program.options.interface_mute, "yes")) isMuting = true;
 
             //Not piping to normal pipe file if there is a pipe to pipe2-file (eg. for "p fy file=output.txt")
             if (!Globals.pipe2 && Globals.pipe && Globals.pipeFileHelper.pipeFile != null)
@@ -3166,8 +3169,11 @@ namespace Gekko
                         isPiping = true;
                         try
                         {
-                            if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
-                            else Globals.pipeFileHelper.pipeFile.Write(s);
+                            if (!isMuting) //will also mute in the pipe file
+                            {
+                                if (newline) Globals.pipeFileHelper.pipeFile.WriteLine(s);
+                                else Globals.pipeFileHelper.pipeFile.Write(s);
+                            }
                         }
                         catch (IOException)
                         {
@@ -3190,37 +3196,33 @@ namespace Gekko
             {
                 try
                 {
-                isPiping = true;                
-                if (newline) Globals.pipeFileHelper2.pipeFile.WriteLine(s);
-                else Globals.pipeFileHelper2.pipeFile.Write(s);
-                //Globals.pipeFileHelper2.pipeFile.Flush();  //turned off
+                    isPiping = true;
+                    if (!isMuting)
+                    {
+                        if (newline) Globals.pipeFileHelper2.pipeFile.WriteLine(s);
+                        else Globals.pipeFileHelper2.pipeFile.Write(s);
+                    }
                 }
                 catch (Exception e)
                 {
                     G.Writeln2("*** ERROR: Could not PIPE to file: " + Globals.pipeFileHelper2.pipeFileFileWithPath);
                     throw new GekkoException();
                 }
-            }            
+            }      
 
-            if (!isPiping || mustAlsoPrintOnScreen)
+            if (!(isPiping || isMuting) || mustAlsoPrintOnScreen)
             {
                 if (G.IsUnitTesting())
                 {
                     if (newline)
-                    {
+                    {                        
                         Globals.unitTestScreenOutput.AppendLine(s);
-                        //Globals.unitTestWindow.WriteLine(s);
-                        //Console.Out.WriteLine(s);
-                        System.Diagnostics.Debug.WriteLine(s);
-                        //System.Diagnostics.Trace.WriteLine(s);
+                        System.Diagnostics.Debug.WriteLine(s);                        
                     }
                     else
                     {
-                        Globals.unitTestScreenOutput.Append(s);
-                        //Globals.unitTestWindow.Write(s);
-                        //Console.Out.Write(s);
+                        Globals.unitTestScreenOutput.Append(s);                        
                         System.Diagnostics.Debug.Write(s);
-                        //System.Diagnostics.Trace.Write(s);
                     }
                 }
                 else

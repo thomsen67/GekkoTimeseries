@@ -87,6 +87,7 @@ namespace Gekko
         public bool interface_help_copylocal = true;
         public bool interface_lagfix = true;
         public string interface_mode = "data";  //sim, data, mixed
+        public string interface_mute = "no";  //yes, no
         public bool interface_remote = false;  //remote control via remote.gcm
         public string interface_remote_file = "";
         public bool interface_sound = false;  //overall sound switch

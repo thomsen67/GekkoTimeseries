@@ -3810,6 +3810,7 @@ optionType:
 			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			
 			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
              | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
+			 | INTERFACE MUTE '='? name -> INTERFACE MUTE ^(ASTSTRINGSIMPLE name)
 			 | INTERFACE EXCEL LANGUAGE '='? optionInterfaceExcelLanguage -> INTERFACE EXCEL LANGUAGE ^(ASTSTRINGSIMPLE optionInterfaceExcelLanguage)
              | INTERFACE EXCEL MODERNLOOK '='? yesNoSimple -> INTERFACE EXCEL MODERNLOOK ^(ASTBOOL yesNoSimple)
              | INTERFACE HELP COPYLOCAL '='? yesNoSimple -> INTERFACE HELP COPYLOCAL ^(ASTBOOL yesNoSimple)
