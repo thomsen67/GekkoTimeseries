@@ -614,7 +614,7 @@ namespace Gekko.Parser.Gek
                         string returnType = node[0].Text;
                         string functionName = GetFunctionName2(node);  //node[1]
 
-                        if (node[2][0] != null && node[2][0].Text == "ASTSPECIALARGSDEF")
+                        if (node[2][0] != null && node[2][0].Text == "ASTSPECIALARGSDEF")  //f(<date %t1, date %t2>)
                         {
                             foreach (ASTNode child in node[2][0].ChildrenIterator())
                             {
@@ -632,8 +632,9 @@ namespace Gekko.Parser.Gek
                         {
                             if (child.Text == "ASTSPECIALARGSDEF")
                             {
-                                continue;
+                                continue;  //<date %t1, date %t2> has been done above
                             }
+                            //here we need to take into account default values, like function 
                             FunctionHelper4(node, functionName, child);
                         }
                         string ftype = null;
@@ -6354,8 +6355,6 @@ namespace Gekko.Parser.Gek
 
             s += name;
 
-            s = G.AddSigil(s, type);  //see also #980753275
-
             CheckTypeInFunctionDefProcedureDefForDef(functionName, type, s);
 
             if (node.functionDefAnchor == null) node.functionDefAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -6632,9 +6631,7 @@ namespace Gekko.Parser.Gek
                     G.Writeln2("*** ERROR: At present, only scalar variables (%) are allowed as FOR loop variablse");
                     throw new GekkoException();
                 }
-
-                varname = G.AddSigil(varname, EVariableType.Val);  //will add % to VAL/STRING/DATE if missing.
-                                
+                
                 rv.Add(varname);
             }
             return rv;

@@ -1661,30 +1661,6 @@ namespace Gekko
             return !(x != null && x != "");
         }
 
-        public static string AddSigil(string varnameWithFreq, string type)
-        {
-            return G.AddSigil(varnameWithFreq, G.GetVariableType(type));
-        }
-
-        public static string AddSigil(string varnameWithFreq, EVariableType type)
-        {
-            if (Globals.autoSigils == false) return varnameWithFreq;
-
-            //just adds a % or # if it is not there, depending on type
-            //no other checks are performed, so the adding is quite simple. A more rigorous name check
-            //is performed when variables are added to a databank or map.
-            //See G.CheckIVariableNameAndType() and G.CheckIVariableName()
-            //
-            if (!G.StartsWithSigil(varnameWithFreq))
-            {
-                //VAL v = 100 ---> %v = 100
-                //LIST m = ('a', 'b') --> #m = ('a', 'b') 
-                if (type == EVariableType.Val || type == EVariableType.String || type == EVariableType.Date) varnameWithFreq = Globals.symbolScalar + varnameWithFreq;
-                else if (type == EVariableType.List || type == EVariableType.Matrix || type == EVariableType.Map) varnameWithFreq = Globals.symbolCollection + varnameWithFreq;
-            }
-            return varnameWithFreq;
-        }
-
         public static bool IsLetterOrUnderscore(char c)
         {
             if (G.IsEnglishLetter(c) || c == '_')

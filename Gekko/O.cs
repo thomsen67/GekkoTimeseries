@@ -2430,6 +2430,86 @@ namespace Gekko
         //    return iv;
         //}
 
+        public static string AcceptHelper2(string type, IVariable iv)
+        {
+            string s = null;
+            if (G.Equal(type, "val"))
+            {
+                s = ((ScalarVal)iv).val.ToString();
+            }
+            else if (G.Equal(type, "date"))
+            {
+                s = ((ScalarDate)iv).date.ToString();
+            }
+            else if (G.Equal(type, "string"))
+            {
+                s = "'" + iv.ConvertToString() + "'";
+            }
+
+            return s;
+        }
+
+        public static IVariable ProcedureAccept(string type, string message)
+        {
+            string inputtedValue = null;
+            IVariable iv2 = null;
+            if (Program.InputBox("Input", message, ref inputtedValue) == DialogResult.OK)
+            {
+                iv2 = O.AcceptHelper1(type, inputtedValue);
+                string s = O.AcceptHelper2(type, iv2);  //send back to gui, s is = inputtedValue?
+            }
+            return iv2;
+        }
+
+        public static IVariable AcceptHelper1(string type, string value)
+        {
+            IVariable iv = null;
+
+            if (G.Equal(type, "val"))
+            {
+                try
+                {
+                    double v = G.ParseIntoDouble(value.Trim());
+                    iv = new ScalarVal(v);
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: Could not convert '" + value + "' into a VAL");
+                    throw new GekkoException();
+                }
+            }
+            else if (G.Equal(type, "string"))
+            {
+                try
+                {
+                    string v = value.Trim();
+                    v = G.StripQuotes(v);
+                    iv = new ScalarString(v);
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: Could not convert '" + value + "' into a STRING");
+                    throw new GekkoException();
+                }
+            }
+            else if (G.Equal(type, "date"))
+            {
+                try
+                {
+                    GekkoTime gt = G.FromStringToDate(value.Trim());
+                    iv = new ScalarDate(gt);
+
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: Could not convert '" + value + "' into a DATE");
+                    throw new GekkoException();
+                }
+            }
+
+            return iv;
+        }
+
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes, bool reportError)
         {
             string nameWithFreq = G.AddFreqToName(varName, freq);
@@ -2820,9 +2900,7 @@ namespace Gekko
 
             bool isArraySubSeries = false;
             if (arraySubSeries != null) isArraySubSeries = true;
-
-            varnameWithFreq = G.AddSigil(varnameWithFreq, lhsType);
-
+            
             if (varnameWithFreq != null && varnameWithFreq.StartsWith(Globals.symbolCollection + Globals.listfile + "___"))
             {
                 WriteListFile(varnameWithFreq, rhs);
@@ -8609,60 +8687,21 @@ namespace Gekko
             public IVariable message = null;
             public void Exe()
             {
-                string value = "";
+                string inputValue = "";
                 string msg = O.ConvertToString(message);
                 msg = Program.HandleNewlines(msg);
-                if (Program.InputBox("Accept", msg, ref value) == DialogResult.OK)
+                string varname = name.ConvertToString();
+                
+                string txt = null;
+
+                if (Program.InputBox("Accept", msg, ref inputValue) == DialogResult.OK)
                 {
-                    string varname = name.ConvertToString();
-
-                    varname = G.AddSigil(varname, this.type);  //see also #980753275
-
-                    if (G.Equal(type, "val"))
-                    {
-                        try
-                        {
-                            double v = G.ParseIntoDouble(value.Trim());
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarVal(v));
-                            G.Writeln2("VAL " + varname + " = " + v);
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Could not convert '" + value + "' into a VAL");
-                            throw new GekkoException();
-                        }
-                    }
-                    else if (G.Equal(type, "string"))
-                    {
-                        try
-                        {
-                            string v = value.Trim();
-                            v = G.StripQuotes(v);
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarString(v));
-                            G.Writeln2("STRING " + varname + " = '" + v + "'");
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Could not convert '" + value + "' into a STRING");
-                            throw new GekkoException();
-                        }
-                    }
-                    else if (G.Equal(type, "date"))
-                    {
-                        try
-                        {
-                            GekkoTime gt = G.FromStringToDate(value.Trim());
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, new ScalarDate(gt));
-                            G.Writeln2("DATE " + varname + " = " + gt.ToString());
-                        }
-                        catch
-                        {
-                            G.Writeln2("*** ERROR: Could not convert '" + value + "' into a DATE");
-                            throw new GekkoException();
-                        }
-                    }
+                    IVariable iv = O.AcceptHelper1(this.type, inputValue);
+                    string s = O.AcceptHelper2(this.type, iv);
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite(varname, iv);
+                    G.Writeln2(this.type.ToString().ToUpper() + " " + varname + " = " + s);
                 }
-            }
+            }            
         }
 
         public class Analyze
