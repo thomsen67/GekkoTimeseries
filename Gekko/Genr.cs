@@ -41,6 +41,7 @@ namespace Gekko
             Globals.ufunctionsNew5.Add("f", (GekkoSmpl smpl, P p, GekkoArg functionarg_xf7dke8cj_11_func, GekkoArg functionarg_xf7dke8cj_12_func, GekkoArg functionarg_xf7dke8cj_13_func, GekkoArg functionarg_xf7dke8cj_14_func, GekkoArg functionarg_xf7dke8cj_15_func) =>
             {
                 //function val f(val % x1, val % x2, val % x3); tell'{%1} {%3} {%3}'; return 5; end;
+                //calling %v = f(1, 2, 3);
 
                 IVariable functionarg_xf7dke8cj_11 = O.TypeCheck_date(functionarg_xf7dke8cj_11_func, smpl, 1);
                 IVariable functionarg_xf7dke8cj_12 = O.TypeCheck_date(functionarg_xf7dke8cj_12_func, smpl, 2);
@@ -68,24 +69,37 @@ namespace Gekko
                 bool question = true;
 
                 //drops 2
+                //instead of calling %v = f(1, 2, 3);
+                //--> calling %v = f(1); which becomes f(1, 11, 22).
+                //if called with %v = f?(1), it will ask.
 
                 IVariable iv2 = null;
                 IVariable iv3 = null;
 
+                IVariable iv2Default = new ScalarVal(111d);
+                IVariable iv3Default = new ScalarVal(222d);
+
                 if (question)
                 {
                     string type2 = "val";
-                    string message2 = "Tast2";
+                    string d2 = null;
+                    string s2 = O.AcceptHelper2(type2, iv2Default);
+                    if (s2 != null) d2 = " (default = " + s2 + ")";
+                    string message2 = "Tast2" + d2;
                     iv2 = O.ProcedureAccept(type2, message2);
 
                     string type3 = "val";
-                    string message3 = "Tast3";
+                    string d3 = null;
+                    string s3 = O.AcceptHelper2(type3, iv3Default);
+                    if (s3 != null) d3 = " (default = " + s3 + ")";
+                    string message3 = "Tast3" + d3;
                     iv3 = O.ProcedureAccept(type3, message3);
+
                 }
                 else
                 {
-                    iv2 = new ScalarVal(111d);
-                    iv3 = new ScalarVal(222d);
+                    iv2 = iv2Default;
+                    iv3 = iv3Default;
                 }
 
                 GekkoArg ga2 = new GekkoArg((smpl777) => iv2, null);
@@ -102,9 +116,6 @@ namespace Gekko
                 O.AdjustT0(smpl, 2);
 
                 return ivTmpvar11;
-                ;
-
-                return null;
 
             });
 

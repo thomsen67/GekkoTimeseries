@@ -2433,19 +2433,25 @@ namespace Gekko
         public static string AcceptHelper2(string type, IVariable iv)
         {
             string s = null;
-            if (G.Equal(type, "val"))
+            if (iv == null)
             {
-                s = ((ScalarVal)iv).val.ToString();
+                //do nothing, null is returned
             }
-            else if (G.Equal(type, "date"))
+            else
             {
-                s = ((ScalarDate)iv).date.ToString();
+                if (G.Equal(type, "val"))
+                {
+                    s = ((ScalarVal)iv).val.ToString();
+                }
+                else if (G.Equal(type, "date"))
+                {
+                    s = ((ScalarDate)iv).date.ToString();
+                }
+                else if (G.Equal(type, "string"))
+                {
+                    s = "'" + iv.ConvertToString() + "'";
+                }
             }
-            else if (G.Equal(type, "string"))
-            {
-                s = "'" + iv.ConvertToString() + "'";
-            }
-
             return s;
         }
 
