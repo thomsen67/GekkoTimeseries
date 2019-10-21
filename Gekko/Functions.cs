@@ -2713,6 +2713,29 @@ namespace Gekko
             Program.WriteFile(file1, x1);            
         }
 
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
+        {
+            return split(smpl, _t1, _t2, x1, x2, new ScalarString("all"));
+        }
+
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
+        {
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
+            string s3 = O.ConvertToString(x3);
+            string[] ss = null;
+            if (G.Equal(s3, "noempty"))
+            {
+                ss = s1.Split(new string[] { s2 }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            else
+            {
+                ss = s1.Split(new string[] { s2 }, StringSplitOptions.None);
+            }
+            List m = O.CreateListFromStrings(ss);
+            return m;
+        }
+
         //OBSOLETE
         //OBSOLETE
         //OBSOLETE

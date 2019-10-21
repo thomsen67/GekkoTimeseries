@@ -65,17 +65,18 @@ namespace Gekko
 
             O.PrepareUfunction(3, "f");
             Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, GekkoArg functionarg_xf7dke8cj_11_func, GekkoArg functionarg_xf7dke8cj_12_func, GekkoArg functionarg_xf7dke8cj_13_func) =>
-            {
-                bool question = true;
+            {                
+                //Optional parameters must be used to create overloads and potential questions.
 
                 //drops 2
                 //instead of calling %v = f(1, 2, 3);
                 //--> calling %v = f(1); which becomes f(1, 11, 22).
-                //if called with %v = f?(1), it will ask.
+                //if called with %v = f?(1), it will ask.                
 
                 IVariable iv2 = null;
                 IVariable iv3 = null;
 
+                bool question = true;
                 IVariable iv2Default = new ScalarVal(111d);
                 IVariable iv3Default = new ScalarVal(222d);
 
