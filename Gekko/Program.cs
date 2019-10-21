@@ -17605,6 +17605,12 @@ namespace Gekko
                 IVariable iv = O.GetIVariableFromString(output.s1, O.ECreatePossibilities.NoneReportError);  //no search
                 if (type != EVariableType.Var && type !=  iv.Type()) continue; //skip it                
                 O.RemoveIVariableFromString(output.s1, true);  //get it out of dictionary
+                Series iv_series = iv as Series;
+                if (iv_series != null)
+                {
+                    //replaces the name, keeps freq. For instance, 
+                    iv_series.name = G.Chop_GetName(output.s2) + Globals.freqIndicator + G.GetFreq(iv_series.freq);
+                }
                 O.AddIVariableWithOverwriteFromString(output.s2, iv); //get it into dictionary
             }
 

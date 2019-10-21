@@ -3430,8 +3430,6 @@ namespace Gekko
                                     throw new GekkoException();
                                 }
 
-
-
                                 switch (rhs_series_beware.type)
                                 {
 
@@ -3476,10 +3474,8 @@ namespace Gekko
                                             }
                                             else
                                             {
-                                                //not so fast running, could be improved                                            
-
+                                                //not so fast running, could be improved
                                                 OperatorHelperSeries(smpl, lhs_series, rhs_series_beware, operatorType);
-
                                             }
                                             G.ServiceMessage("SERIES " + G.GetNameAndFreqPretty(varnameWithFreq, false) + " updated " + smpl.t1 + "-" + smpl.t2 + " ", smpl.p);
                                         }
@@ -3492,8 +3488,9 @@ namespace Gekko
                                             // stuff below also handles array-timeseries just fine  
                                             
                                             if (create)
-                                            {
-                                                lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too
+                                            {                                                
+                                                lhs_series = rhs_series_beware.DeepClone(null) as Series;  //so that it becomes timeless, too                                                
+                                                lhs_series.name = varnameWithFreq; ;
                                                 double[] temp = lhs_series.GetDataSequenceUnsafePointerAlterBEWARE();  //sets dirty, but it *is* dirty
                                                 if (Series.MissingZero(rhs_series_beware) && G.isNumericalError(temp[0]))
                                                 {
