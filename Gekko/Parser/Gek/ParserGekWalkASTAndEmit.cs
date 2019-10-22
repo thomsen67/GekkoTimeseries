@@ -1686,7 +1686,7 @@ namespace Gekko.Parser.Gek
 
                             if(node.Text == "ASTDATES_BLOCK")
                             {
-                                node.Code.A(s1).A("¤").A(s2);  //will be splitted up later on
+                                node.Code.A(s1).A(Globals.blockHelper).A(s2); //will be splitted up later on
                             }
                             else
                             {
@@ -2221,7 +2221,7 @@ namespace Gekko.Parser.Gek
                                     string ss = child.Code.ToString();
                                     if (ss != null)
                                     {
-                                        string[] sss = ss.Split('¤');
+                                        string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
                                         if (sss[0] == "" && sss[1] == "")
                                         {
                                             //do nothing, not time is given

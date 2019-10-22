@@ -88,6 +88,8 @@ namespace Gekko
 
         public static bool fixFOr = true;
 
+        public static string blockHelper = "<[time]>";
+
         //The following call a procedure or function: astprocedure, astfunctionnaked, astfunction, astobjectfunction        
         public static Dictionary<string, string> special = new Dictionary<string, string>() { { "ASTEXIT", "" }, { "ASTFOR", "" }, { "ASTFUNCTIONDEF2", "" }, { "ASTGOTO", "" }, { "ASTIF", "" }, { "ASTPROCEDUREDEF", "" }, { "ASTRETURN", "" }, { "ASTSTOP", "" }, { "ASTTARGET", "" }, { "ASTDOTORINDEXER", "" }};
 
