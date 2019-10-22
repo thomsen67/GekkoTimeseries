@@ -65,7 +65,10 @@ namespace Gekko
 
             O.PrepareUfunction(3, "f");
             Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, GekkoArg functionarg_xf7dke8cj_11_func, GekkoArg functionarg_xf7dke8cj_12_func, GekkoArg functionarg_xf7dke8cj_13_func) =>
-            {                
+            {
+
+                // f(val %x1, val %x2, val %o1
+
                 //Optional parameters must be used to create overloads and potential questions.
 
                 //drops 2
