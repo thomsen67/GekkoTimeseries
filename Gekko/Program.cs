@@ -34117,7 +34117,16 @@ namespace Gekko
                         }
                         else
                         {
-                            xAdjustment = "" + (iii + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                            if (Globals.gnuplotfix)
+                            {
+                                double d = -0.5;
+                                xAdjustment = "($" + (iii + 1) + " +(" + d + "))" + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                            }
+                            else
+                            {
+
+                                xAdjustment = "" + (iii + 1) + ":(" + ss + ")" + ":(" + d_width3 + ")";
+                            }
                         }
                     }
                     else
@@ -34130,19 +34139,13 @@ namespace Gekko
                             if (!isInside) d = d - 0.5;
                         }
 
-                        string minus = "+"; ;
-                        if (d < 0)
-                        {
-                            d = Math.Abs(d);
-                            minus = "-";
-                        }
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }
                         else
                         {
-                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }                        
                     }
                 }

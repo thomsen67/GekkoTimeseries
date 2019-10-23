@@ -13083,6 +13083,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Mute()
         {
+            Globals.unitTestScreenOutput.Clear();
             I("RESET;");
             I("tell 'a1';");
             I("option interface mute = yes;");
