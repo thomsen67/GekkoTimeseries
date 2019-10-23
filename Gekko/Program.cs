@@ -9987,7 +9987,7 @@ namespace Gekko
             if (Globals.workerThread != null)
             {
                 string ss2 = f + " " + start + "-" + end + banks + "    |    " + workingFolder;
-                WorkerThreadHelper1 wh = new WorkerThreadHelper1();
+                WorkerThreadHelper1 wh = new WorkerThreadHelper1();                
                 wh.statusField = ss2;
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
             }
@@ -34053,7 +34053,6 @@ namespace Gekko
                 }
                 catch { };
 
-
                 if (!G.NullOrBlanks(dashtype)) s += " dashtype " + dashtype;
                 if (!G.NullOrBlanks(linewidth)) s += " linewidth " + linewidth;
                 if (!G.NullOrBlanks(linecolor)) s += " linecolor rgb \"" + linecolor + "\"";
@@ -34114,7 +34113,7 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")(" + ss + ")" + ":(" + d_width3 + ")";
+                            xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):(" + ss + ")" + ":(" + d_width3 + ")";
                         }
                         else
                         {
@@ -34125,6 +34124,12 @@ namespace Gekko
                     {
                         //adjusting horizontal position for clustered boxes
                         double d = (boxesYCounter + boxesY2Counter - 1) * d_width - left;
+
+                        if (Globals.gnuplotfix)
+                        {
+                            if (!isInside) d = d - 0.5;
+                        }
+
                         string minus = "+"; ;
                         if (d < 0)
                         {
@@ -34133,7 +34138,7 @@ namespace Gekko
                         }
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " " + minus + d + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
                         }
                         else
                         {
@@ -34182,7 +34187,7 @@ namespace Gekko
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):(" + ss + ")";
+                            xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):(" + ss + ")";
                         }
                         else
                         {
@@ -34193,7 +34198,7 @@ namespace Gekko
                     {
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2);  //just normal positioning
                         }
                         else
                         {
@@ -34210,7 +34215,7 @@ namespace Gekko
                     }
                     //if (isInside)
                     //{                        
-                        xAdjustment = "($" + (iii + 1) + "+" + GetXAdjustmentForInsideTics(isInside, highestFreq) + "):" + (i + quarterFix + 2);
+                        xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2);
                     //}
                     //else
                     //{
@@ -34395,8 +34400,11 @@ namespace Gekko
                         s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
                     }
                 }
-                if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
-                ticsTxt = "set xtics (" + s3 + ")" + G.NL;
+                if (s3 != null)
+                {
+                    if (s3.EndsWith(", ")) s3 = s3.Substring(0, s3.Length - 2);
+                    ticsTxt = "set xtics (" + s3 + ")" + G.NL;
+                }
             }
 
             return mxtics;
@@ -34637,122 +34645,7 @@ namespace Gekko
                 else throw new GekkoException();
             }
             return d;
-        }
-
-        private static void CallGnuplot(List<string> graphVars, List<string> graphVarsNames, String file1, String file2, String file3, String currentDir, TextWriter tw, int count, int numberOfObs, string heading, string pplotType)
-        {
-            bool histo = false;
-            if (Globals.runningOnTTComputer) histo = false;
-
-            //tw.WriteLine("set terminal emf size 300 ,200");
-
-            tw.WriteLine("set encoding iso_8859_1");
-
-            heading = EncodeDanish(heading);
-
-            tw.WriteLine("set title \"" + heading + "\"");
-            tw.WriteLine("set datafile missing \"NaN\"");
-            tw.WriteLine("set terminal " + pplotType);
-            tw.WriteLine("set terminal emf");
-            tw.WriteLine("set output \"" + file2 + "\"");
-            //tw.WriteLine("set data style linespoints"); //probably superfluous
-            //tw.WriteLine("set title \"Graph\"");
-            //tw.WriteLine("set xlabel \"År\"");
-            //tw.WriteLine("set ylabel \"Var1\"");
-
-            if (!(Program.options.freq == EFreq.A || Program.options.freq == EFreq.U))  //ttfreq
-            {
-                tw.WriteLine("set xdata time");
-                tw.WriteLine(@"set timefmt ""%Y/%m/%d""");
-                tw.WriteLine(@"set format x ""%Y/%m""");
-            }
-            else
-            {
-                if (numberOfObs > 70)
-                {
-                    tw.WriteLine("set xtics 10");
-                    tw.WriteLine("set mxtics 10");
-                }
-                else
-                {
-                    tw.WriteLine("set xtics 5");
-                    tw.WriteLine("set mxtics 5");
-                }
-            }
-
-            tw.WriteLine("set ticscale 1.4 0.7");
-            //tw.WriteLine("set key outside top");
-            //tw.WriteLine("set key 100, 100");
-            tw.WriteLine("set border 3");
-            tw.WriteLine("set xtics nomirror");
-            tw.WriteLine("set ytics nomirror");
-            tw.WriteLine("set xzeroaxis lt -1");
-            tw.WriteLine("set yzeroaxis");
-            //tw.WriteLine("set grid");
-            //tw.WriteLine("set size 0.5,0.5");
-            //tw.WriteLine("set size ratio 0.2"); does not work
-
-            if (histo)
-            {
-                if (false)  //not really working (labels)
-                {
-                    tw.WriteLine("set size ratio 0.5");
-                    tw.WriteLine("set key outside top");
-                }
-
-                tw.WriteLine("set style fill solid 1.000000 border -1");
-                tw.WriteLine("set boxwidth 0.3");
-
-
-                //tw.WriteLine("set style line 1 lt 1 lw 3 lc rgb \"black\" ");
-                tw.WriteLine("set style line 1 lt 1 lw 4.0");
-                tw.WriteLine("set style line 2 lt 2 lw 2.0");
-                tw.WriteLine("set style line 3 lt 3 lw 2.0");
-
-            }
-
-            tw.Write("plot ");
-            for (int i = 0; i < count; i++)
-            {
-                string label = EncodeDanish(graphVarsNames[i]);
-
-                if (!histo)
-                {
-                    string lineType = "with lines ";
-                    if (Program.options.plot_lines_points)
-                    {
-                        lineType = "with linespoints ";
-                    }
-                    tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " " + lineType + "lw 2.0 " + " title \"  " + label + "\" ");
-                }
-                else
-                {
-                    if (i == 0) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 1 " + " title \"  " + label + "\" ");  //obs
-                    else if (i == 1) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 2 " + " title \"  " + label + "\" ");  //fitted
-                    else if (i == 2) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints ls 3 " + " title \"  " + label + "\" ");  //wanted
-                    else if (i == 3) tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with boxes lw 2.0 " + " title \"  " + label + "\" ");  //residual
-                    else tw.Write("\"" + file1 + "\" using 1:" + (i + 2) + " with linespoints lw 2.0 " + " title \"  " + label + "\" ");
-                }
-
-
-
-                if (i < count - 1) tw.Write(",");
-            }
-            tw.WriteLine();
-            tw.Flush();
-            tw.Close();
-
-            Process p = new Process();
-            //p.MainWindowTitle = title;
-            p.StartInfo.FileName = Application.StartupPath + "\\gnuplot\\wgnuplot.exe";
-            //p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            p.StartInfo.Arguments = file3;
-            p.Start();
-            p.WaitForExit();
-            p.Close();
-            //resets current dir to previous location
-            Directory.SetCurrentDirectory(currentDir);
-        }
+        }        
 
         private static string EncodeDanish(string txt)
         {
