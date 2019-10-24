@@ -2191,7 +2191,8 @@ mapItem:                    assignmentMap2 -> ^(ASTMAPITEM assignmentMap2);
 //listFile:                   HASH leftParenGlue LISTFILE name RIGHTPAREN -> ^(ASTLISTFILE name);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
-function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs);
+function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs)
+						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs);
 objectFunction:             ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs);
 specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
 						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
@@ -3165,7 +3166,8 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-procedure:					identWithoutCommand fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand fargs_proc);  
+procedure:					procedureNameWithQ fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} procedureNameWithQ fargs_proc);  
+procedureNameWithQ:         identWithoutCommand questionGlueLeft? -> identWithoutCommand;
 functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident fargs);
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
