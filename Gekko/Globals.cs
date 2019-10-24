@@ -53,12 +53,13 @@ namespace Gekko
         public static StreamWriter sw = null; 
         
         public static bool gnuplotfix = true;
+        public static bool procedurefix = true;
 
 
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------
-        
+
         //public static bool gradientSolve = false;
         //public static double naiveGradient = double.NaN; // 0.000002d;  //NaN to switch off
         //public static double naiveMomentum = double.NaN; // 0.9d;  //NaN to switch off
