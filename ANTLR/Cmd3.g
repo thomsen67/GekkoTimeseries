@@ -64,6 +64,7 @@ tokens {
 	ASTCURLYALONE;
 	ASTNUMBERLIST;
 	ASTOBJECTFUNCTION;
+	ASTOBJECTFUNCTION_Q;
 	ASTLEFTSIDE;
 	ASTASSIGNMENT;
 	ASTCNAME;
@@ -104,6 +105,7 @@ tokens {
 	ASTPLACEHOLDER;
 	ASTDOT;
 	ASTFUNCTION;
+	ASTFUNCTION_Q;
 	ASTLOGICALIN;
 	ASTDATE2;
 	ASTSTRINGINQUOTES;
@@ -135,6 +137,7 @@ tokens {
 	ASTFLEXIBLELIST;
 	ASTNAMESLIST;
 	ASTPROCEDURE;
+	ASTPROCEDURE_Q;
 ASTNAME;
 ASTIDENT;
 ASTCURLYSIMPLE;
@@ -157,6 +160,7 @@ ASTIDENTDIGIT;
 	ASTLISTDEF;
 	ASTLISTDEFITEM;
 	ASTOBJECTFUNCTIONNAKED;
+	ASTOBJECTFUNCTIONNAKED_Q;
 ASTOR;
 ASTAND;
 ASTNOT;
@@ -802,6 +806,7 @@ ASTOPT_STRING_Y2;
     ASTTIMEFILTERPERIOD;
     ASTTIMEFILTERPERIODS;
 	ASTFUNCTIONNAKED;
+	ASTFUNCTIONNAKED_Q;
     ASTTIMEOPTIONFIELD;
     ASTTIMEPERIOD;
     ASTTIMEQUESTION;
@@ -2192,8 +2197,10 @@ mapItem:                    assignmentMap2 -> ^(ASTMAPITEM assignmentMap2);
 listFile:                   HASH leftParenGlue LISTFILE fileName RIGHTPAREN -> ^(ASTBANKVARNAME2 ASTPLACEHOLDER ^(ASTVARNAME ^(ASTPLACEHOLDER ASTHASH)  ^(ASTHANDLEFILENAME fileName) ASTPLACEHOLDER) );
 
 function:                   ident leftParenGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs)
-						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTFUNCTION ident fargs);
-objectFunction:             ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs);
+						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTFUNCTION_Q ident fargs);
+objectFunction:             ident leftParenGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION ident fargs)
+						  | ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTOBJECTFUNCTION_Q ident fargs)
+						    ;
 specialArg: 			    ISNOTQUAL -> ^(ASTSPECIALARGS)						  					
 						  | leftAngleNo2 dates? RIGHTANGLE -> ^(ASTSPECIALARGS dates?)
 						    ;
@@ -2966,8 +2973,9 @@ typeRv: 				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | VOID;
 typeArg:				    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX | NAME;
 type:					    VAL | STRING2 | DATE | SERIES | LIST | MAP | MATRIX;
 
-objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident fargs)));
-
+objectFunctionNaked:        bankvarname GLUEDOT DOT ident leftParenGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED  ident fargs)))
+						  |	bankvarname GLUEDOT DOT ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^(ASTDOTORINDEXER bankvarname ^(ASTDOT ^(ASTOBJECTFUNCTIONNAKED_Q ident fargs)))
+							;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // GOTO
@@ -3166,9 +3174,13 @@ pipeOpt1h:                  HTML (EQUAL yesNo)? -> ^(ASTOPT_STRING_HTML yesNo?)
 // PROCEDURE CALL
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-procedure:					procedureNameWithQ fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} procedureNameWithQ fargs_proc);  
-procedureNameWithQ:         identWithoutCommand questionGlueLeft? -> identWithoutCommand;
-functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident fargs);
+procedure:					identWithoutCommand fargs_proc -> ^({token("ASTPROCEDURE", ASTPROCEDURE, input.LT(1).Line)} identWithoutCommand fargs_proc)
+						  | identWithoutCommand questionGlueLeft fargs_proc -> ^({token("ASTPROCEDURE_Q", ASTPROCEDURE_Q, input.LT(1).Line)} identWithoutCommand fargs_proc)
+						    ;
+
+functionNaked:              ident leftParenGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED", ASTFUNCTIONNAKED, input.LT(1).Line)} ident fargs)
+						  |	ident questionGlueLeft leftParenNoGlue fargs RIGHTPAREN -> ^({token("ASTFUNCTIONNAKED_Q", ASTFUNCTIONNAKED_Q, input.LT(1).Line)} ident fargs)
+						    ;
 
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 // PROCEDURE DEFINITION

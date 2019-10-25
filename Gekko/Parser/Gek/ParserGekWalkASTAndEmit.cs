@@ -189,7 +189,7 @@ namespace Gekko.Parser.Gek
 
         public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
         {
-            if (node.Text == "ASTFUNCTION")
+            if (node.Text == "ASTFUNCTION" || node.Text == "ASTFUNCTION_Q")
             {                
                 string functionName = GetFunctionName(node);
                 if (!functions.ContainsKey(functionName)) functions.Add(functionName, 1);  //1 just arbitrary            
@@ -339,7 +339,7 @@ namespace Gekko.Parser.Gek
                         while (true)
                         {
                             if (node2 == null || node2.Text == null) break;
-                            if (node2.Text == "ASTFUNCTION" && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
+                            if ((node2.Text == "ASTFUNCTION" || node2.Text == "ASTFUNCTION_Q") && (G.Equal(node2[0][0].Text, "sum") || G.Equal(node2[0][0].Text, "unfold")))
                             {
                                 if (node2[2].Text == "ASTBANKVARNAME")
                                 {
@@ -644,10 +644,9 @@ namespace Gekko.Parser.Gek
 
                     }
                     break;
+                case "ASTFUNCTION_Q":
                 case "ASTFUNCTION":  //kind of like ASTFUNCTIONDEF, but the difference is that these sum() functions may be nested, so the nodes themselves need to keep the anchor info
                     {
-
-
                         string functionName = GetFunctionName(node);
                         string[] listNames = IsGamsSumFunctionOrUnfoldFunction(node, functionName);
 
@@ -2316,20 +2315,14 @@ namespace Gekko.Parser.Gek
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
                                     //ASTNode child = 
-                                    if (Globals.functionFuncArguments)
-                                    {
+                                    
                                         vars += ",  GekkoArg " + node.functionDef[i].Item2 + "_func"; //type is checked later on
-                                    }
-                                    else
-                                    {
-                                        vars += ", IVariable " + node.functionDef[i].Item2; //type is checked later on
-                                    }
+                                    
                                 }
 
                                 for (int i = 0; i < node.functionDef.Count; i++)
                                 {
-                                    if (Globals.functionFuncArguments)
-                                    {
+                                    
                                         string f = "f1";
                                         if (node.functionDef[i].Item1.ToLower() == "name") f = "f2";
 
@@ -2342,19 +2335,15 @@ namespace Gekko.Parser.Gek
                                         {
                                             typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(" + Globals.smpl + ")" + ", " + (i + 1) + ");" + G.NL;
                                         }
-                                    }
-                                    else
-                                    {
-                                        typeChecks += node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + ", " + (i + 1) + ");" + G.NL;
-                                    }
+                                    
                                 }
                             }
 
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);                            
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
                             string ss = null;
-                            if (Globals.functionFuncArguments) ss = "New";
-                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p" + vars + ") => " + G.NL);
+                            ss = "New";
+                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + vars + ") => " + G.NL);
 
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
                             //w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
@@ -2513,15 +2502,26 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
+                    case "ASTFUNCTION_Q":
+                    case "ASTFUNCTIONNAKED_Q":
+                    case "ASTOBJECTFUNCTION_Q":
+                    case "ASTOBJECTFUNCTIONNAKED_Q":
+                    case "ASTPROCEDURE_Q":
                     case "ASTFUNCTION":
                     case "ASTFUNCTIONNAKED":
                     case "ASTOBJECTFUNCTION":
                     case "ASTOBJECTFUNCTIONNAKED":
                     case "ASTPROCEDURE":
                         {
+                            bool isQuestion = false;
+                            if (node.Text.EndsWith("_Q"))
+                            {
+                                isQuestion = true;
+                            }
+
                             string functionNameLower = GetFunctionName(node);
 
-                            if (node.Text == "ASTPROCEDURE")
+                            if (node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                             {
                                 functionNameLower = Globals.procedure + functionNameLower;
                             }
@@ -2531,6 +2531,8 @@ namespace Gekko.Parser.Gek
 
                             if (listNames != null && listNames.Length > 0 && listNames[0] != null)
                             {
+                                //We do not expect this to be called with sum?(...), but it will work if so
+                                
                                 //GAMS-like sum function, for instance sum(#i, x[#i]+1),
                                 //or unfold()-function, for instance unfold(#i, x[#i]+1)
 
@@ -2754,12 +2756,12 @@ namespace Gekko.Parser.Gek
                                     string aa1, aa2;
                                     FunctionHelper10(args, out aa1, out aa2);
 
-                                    if (node.Text == "ASTOBJECTFUNCTION")
+                                    if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(args).A("" + Globals.objFunctionPlaceholder + "").A(")");
                                     }
-                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
+                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
                                         //same as the other???                                        
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
@@ -2770,7 +2772,7 @@ namespace Gekko.Parser.Gek
                                         //node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + "").A(", " + G.GetListWithCommas(args)).A(")");
                                         node.Code.A("Functions." + functionNameLower).A("(" + extra + Globals.functionT1Cs + ", ").A(aa1 + aa2).A(")");
                                     }
-                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED")
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
@@ -2817,23 +2819,25 @@ namespace Gekko.Parser.Gek
                                     FunctionHelper10(args, out aa1, out aa2);
 
                                     string fl = "O.FunctionLookup";
-                                    if (Globals.functionFuncArguments) fl = "O.FunctionLookupNew";
+                                    fl = "O.FunctionLookupNew";
 
-                                    if (node.Text == "ASTOBJECTFUNCTION")
+                                    string q = "false";
+
+                                    if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
-                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED")
+                                    else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {                                        
                                         //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
-                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else
                                     {
-                                        node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + aa1 + aa2).A(")");
+                                        node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
                                     }
                                     
-                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTPROCEDURE")
+                                    if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q" || node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                                     {
                                         node.Code.A(";" + G.NL);
                                     }
@@ -3373,7 +3377,7 @@ namespace Gekko.Parser.Gek
                             {
                                 if (indexesReport == null) indexesReport = indexes;                                
 
-                                if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED")
+                                if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTION_Q" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                 {
                                     string functionNameLower = node[1][0][0][0].Text.ToLower();
 
@@ -3390,7 +3394,7 @@ namespace Gekko.Parser.Gek
                                     }
 
                                     string s2 = null;
-                                    if (Globals.functionFuncArguments && !isInbuilt)
+                                    if (!isInbuilt)
                                     {
                                         string code = GetFuncArgumentCode(node, 0);
                                         s2 = s.Replace(Globals.objFunctionPlaceholder, code);                                        
@@ -6055,74 +6059,74 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
-                    case "ASTTUPLE":
-                        {
-                            string rhsCode = node[1].Code.ToString();
+                    //case "ASTTUPLE":
+                    //    {
+                    //        string rhsCode = node[1].Code.ToString();
 
-                            if (node[1].Text == "ASTFUNCTION" && (G.Equal(node[1][0].Text.ToLower(), "laspchain") || G.Equal(node[1][0].Text.ToLower(), "laspfixed")))
-                            {
-                                //hack to make it work. Problem is that method cannot run year-by-year.
-                                if (node[0].ChildrenCount() != 2)
-                                {
-                                    G.Writeln2("laspchain() and laspfixed() must be called with (series x, series y) on left side");
-                                    throw new GekkoException();
-                                }
-                                //string cs1 = "IVariable p" + Num(node) + "= " + node[0][0][2].Code + ";";
-                                //string cs2 = "IVariable q" + Num(node) + " = " + node[0][1][2].Code + ";";
-                                //string cs3 = "GekkoTuple.Tuple2 temp = " + rhsCode + ";";
-                                node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
-                            }
-                            else
-                            {
+                    //        if (node[1].Text == "ASTFUNCTION" && (G.Equal(node[1][0].Text.ToLower(), "laspchain") || G.Equal(node[1][0].Text.ToLower(), "laspfixed")))
+                    //        {
+                    //            //hack to make it work. Problem is that method cannot run year-by-year.
+                    //            if (node[0].ChildrenCount() != 2)
+                    //            {
+                    //                G.Writeln2("laspchain() and laspfixed() must be called with (series x, series y) on left side");
+                    //                throw new GekkoException();
+                    //            }
+                    //            //string cs1 = "IVariable p" + Num(node) + "= " + node[0][0][2].Code + ";";
+                    //            //string cs2 = "IVariable q" + Num(node) + " = " + node[0][1][2].Code + ";";
+                    //            //string cs3 = "GekkoTuple.Tuple2 temp = " + rhsCode + ";";
+                    //            node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
+                    //        }
+                    //        else
+                    //        {
 
 
-                                string tempName = "temp" + ++Globals.counter;
-                                string nodeCodeTemp = null;
-                                int number = 0;
-                                foreach (ASTNode child in node[0].ChildrenIterator())
-                                {
-                                    if (child.Text != "ASTTUPLEITEM")
-                                    {
-                                        G.Writeln2("*** ERROR #74343641");
-                                        throw new GekkoException();
-                                    }
-                                    number++;
+                    //            string tempName = "temp" + ++Globals.counter;
+                    //            string nodeCodeTemp = null;
+                    //            int number = 0;
+                    //            foreach (ASTNode child in node[0].ChildrenIterator())
+                    //            {
+                    //                if (child.Text != "ASTTUPLEITEM")
+                    //                {
+                    //                    G.Writeln2("*** ERROR #74343641");
+                    //                    throw new GekkoException();
+                    //                }
+                    //                number++;
 
-                                    if (child[0].Text == "val")
-                                    {
-                                        nodeCodeTemp += HandleVal(child[1], tempName + ".tuple" + (number - 1), w);
-                                    }
-                                    else if (child[0].Text == "date")
-                                    {
-                                        nodeCodeTemp += HandleDate(child[1], tempName + ".tuple" + (number - 1));
-                                    }
-                                    else if (child[0].Text == "name")
-                                    {
-                                        nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), true);
-                                    }
-                                    else if (child[0].Text == "string")
-                                    {
-                                        nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), false);
-                                    }
-                                    else if (child[0].Text == "series")
-                                    {
-                                        ClearLocalStatementCache(w);
-                                        nodeCodeTemp += HandleGenr(child, Num(child), child[1].Code.ToString(), child[2].Code.ToString(), tempName + ".tuple" + (number - 1), w, null);
-                                    }
-                                    else if (child[0].Text == "list")
-                                    {
-                                        string s = "o" + Num(child[1]) + ".listItems.AddRange(O.GetList(" + tempName + ".tuple" + (number - 1) + "));" + G.NL;
-                                        nodeCodeTemp += HandleList(child[1], s);
-                                    }
-                                }
+                    //                if (child[0].Text == "val")
+                    //                {
+                    //                    nodeCodeTemp += HandleVal(child[1], tempName + ".tuple" + (number - 1), w);
+                    //                }
+                    //                else if (child[0].Text == "date")
+                    //                {
+                    //                    nodeCodeTemp += HandleDate(child[1], tempName + ".tuple" + (number - 1));
+                    //                }
+                    //                else if (child[0].Text == "name")
+                    //                {
+                    //                    nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), true);
+                    //                }
+                    //                else if (child[0].Text == "string")
+                    //                {
+                    //                    nodeCodeTemp += HandleString(child[1], tempName + ".tuple" + (number - 1), false);
+                    //                }
+                    //                else if (child[0].Text == "series")
+                    //                {
+                    //                    ClearLocalStatementCache(w);
+                    //                    nodeCodeTemp += HandleGenr(child, Num(child), child[1].Code.ToString(), child[2].Code.ToString(), tempName + ".tuple" + (number - 1), w, null);
+                    //                }
+                    //                else if (child[0].Text == "list")
+                    //                {
+                    //                    string s = "o" + Num(child[1]) + ".listItems.AddRange(O.GetList(" + tempName + ".tuple" + (number - 1) + "));" + G.NL;
+                    //                    nodeCodeTemp += HandleList(child[1], s);
+                    //                }
+                    //            }
 
-                                string className = G.GetVariableType(number);
-                                node.Code.A(className + " " + tempName + " = " + rhsCode + ";" + G.NL);  //for instance "ScalarVal_ScalarVal temp117 = f()"                            
-                                node.Code.A(nodeCodeTemp);
-                            }
+                    //            string className = G.GetVariableType(number);
+                    //            node.Code.A(className + " " + tempName + " = " + rhsCode + ";" + G.NL);  //for instance "ScalarVal_ScalarVal temp117 = f()"                            
+                    //            node.Code.A(nodeCodeTemp);
+                    //        }
                             
-                        }
-                        break;
+                    //    }
+                    //    break;
                     case "ASTYES":
                         {
                             node.Code.A("new ScalarString(`yes`)");
@@ -6329,16 +6333,12 @@ namespace Gekko.Parser.Gek
 
         private static void FunctionHelper2(ASTNode node, List<string> args, int i)
         {
-            if (Globals.functionFuncArguments)
-            {
+            
                 string result = GetFuncArgumentCode(node, i);
                 args.Add(result);
                 //args += ", " + result;
-            }
-            else
-            {
-                args.Add(node[i].Code.ToString());
-            }
+            
+            
 
             //return args;
         }
@@ -6678,7 +6678,7 @@ namespace Gekko.Parser.Gek
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName, bool onlySum)
         {
-            if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTIONNAKED") return null;
+            if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q") return null;
             //returns null if it is NOT a GAMS-like sum() function
             string[] rv = null;
             if (onlySum)
@@ -6953,7 +6953,7 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 //if(IsGamsSumFunction(node, ))
-                if (tmp.Text == "ASTFUNCTION")
+                if (tmp.Text == "ASTFUNCTION" || tmp.Text == "ASTFUNCTION_Q")
                 {
                     string functionName = GetFunctionName(tmp);
                     if (IsGamsSumFunction(tmp, functionName) != null)
@@ -6975,7 +6975,7 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 //if(IsGamsSumFunction(node, ))
-                if (tmp.Text == "ASTFUNCTION")
+                if (tmp.Text == "ASTFUNCTION" || tmp.Text == "ASTFUNCTION_Q")
                 {
                     string functionName = GetFunctionName(tmp);
                     if (IsGamsSumFunction(tmp, functionName) != null)

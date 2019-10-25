@@ -26386,38 +26386,22 @@ namespace Gekko
 
         public static void InitUfunctionsAndArithmeticsAndMore()
         {
-            Globals.ufunctions0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions1 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions2 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions3 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions4 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions5 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions6 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions7 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions8 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions9 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions10 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions11 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions12 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions13 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctions14 = new Dictionary<string, Func<GekkoSmpl, P, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable, IVariable>>(StringComparer.OrdinalIgnoreCase);
-
-            Globals.ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-            Globals.ufunctionsNew14 = new Dictionary<string, Func<GekkoSmpl, P, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
-
+            
+            Globals.ufunctionsNew0 = new Dictionary<string, Func<GekkoSmpl, P, bool, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew1 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew2 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew3 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew4 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew5 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew6 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew7 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew8 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew9 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew10 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew11 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew12 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            Globals.ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>(StringComparer.OrdinalIgnoreCase);
+            
             Globals.arithmentics[0] = (x1, x2) => x1 + x2;
             Globals.arithmentics[1] = (x1, x2) => x2 + x1;
             Globals.arithmentics[2] = (x1, x2) => x1 - x2;
