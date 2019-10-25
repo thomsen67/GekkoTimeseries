@@ -2822,6 +2822,7 @@ namespace Gekko.Parser.Gek
                                     fl = "O.FunctionLookupNew";
 
                                     string q = "false";
+                                    if (isQuestion) q = "true";
 
                                     if (node.Text == "ASTOBJECTFUNCTION" || node.Text == "ASTOBJECTFUNCTION_Q")
                                     {
