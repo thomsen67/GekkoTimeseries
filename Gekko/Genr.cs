@@ -153,28 +153,34 @@ namespace Gekko
 
             O.PrepareUfunction(3, "f");
 
-            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool b, GekkoArg functionarg_xf7dke8cj_20_func, GekkoArg functionarg_xf7dke8cj_21_func, GekkoArg functionarg_xf7dke8cj_22_func) =>
-
-
+            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool q, GekkoArg functionarg_xf7dke8cj_20_func, GekkoArg functionarg_xf7dke8cj_21_func, GekkoArg functionarg_xf7dke8cj_22_func) =>
             {
-                IVariable functionarg_xf7dke8cj_20 = O.TypeCheck_date(functionarg_xf7dke8cj_20_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_21 = O.TypeCheck_date(functionarg_xf7dke8cj_21_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_22 = O.TypeCheck_val(functionarg_xf7dke8cj_22_func.f1(smpl), 3);
-                
-                string inputtedValue = null;
-                IVariable d = null;                
-                if (Program.InputBox("Input", "Tast!", ref inputtedValue) == DialogResult.OK)
+
+
+                List<bool> question = new List<bool> { true };
+                List<string> inputtedValue = new List<string> { "100" };
+                List<string> type = new List<string> { "val" };
+                List<string> txt = new List<string> { "Tast!" };
+                List<IVariable> d = new List<IVariable> { null };
+
+                for (int i = 0; i < 1; i++)
                 {
-                    d = O.AcceptHelper1("val", inputtedValue);                    
-                }               
+                    if (question[i])
+                    {
+                        string tmp = inputtedValue[i];
+                        Program.InputBox("Input", txt[i], ref tmp);
+                        inputtedValue[i] = tmp;
+                    }
+                    d[i] = O.AcceptHelper1(type[i], inputtedValue[i]);
+                }
 
-                return O.TypeCheck_val(O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_20_func, functionarg_xf7dke8cj_21_func, functionarg_xf7dke8cj_22_func, new GekkoArg((spml25) => d, (spml25) => null)), 0);
-
-                //return O.TypeCheck_val(O.FunctionLookupNew4("f")(smpl, p, false, null, null, new GekkoArg((spml24) => functionarg_xf7dke8cj_22, (spml24) => null), new GekkoArg((spml25) => d, (spml25) => null)), 0);
+                return O.TypeCheck_val(O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_20_func, functionarg_xf7dke8cj_21_func, functionarg_xf7dke8cj_22_func, new GekkoArg((spml25) => d[0], (spml25) => null)), 0);
 
             });
 
         }
+
+        
 
         public static readonly ScalarVal i30 = new ScalarVal(2d, 0);
         public static void FunctionDef31()

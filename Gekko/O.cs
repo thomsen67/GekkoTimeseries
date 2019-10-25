@@ -2467,6 +2467,8 @@ namespace Gekko
             return iv2;
         }
 
+        
+
         public static IVariable AcceptHelper1(string type, string value)
         {
             IVariable iv = null;
