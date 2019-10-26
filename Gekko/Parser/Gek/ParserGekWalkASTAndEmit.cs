@@ -2380,14 +2380,21 @@ namespace Gekko.Parser.Gek
 
                                 int numberOfParametersCutOff = numberOfParameters - numberOfParametersOverload;
 
+                                string questionsName = "questions" + ++Globals.counter;
+                                string defaultValueCodesName = "defaultValueCodes" + ++Globals.counter;
+                                string typesName = "types" + ++Globals.counter;
+                                string labelCodesName = "labelCodes" + ++Globals.counter;
+                                string promptResultsName = "promptResults" + ++Globals.counter;
 
                                 string defaultValueCodes = null;
                                 string labelCodes = null;
                                 string types = null;
                                 string questions = null;
+                                string prompts = null;
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
-                                    //j will run 0 first time, and then 0, 1.
+                                    //j will run 0 first time, and then 0, 1.                                                                      
+
                                     string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
                                     string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
                                     string type = node.functionDef[numberOfParameters - j - 1].type;
@@ -2403,13 +2410,10 @@ namespace Gekko.Parser.Gek
                                     labelCodes += "`" + labelCode.Replace("`", "\\`") + "`";
                                     types += "`" + type.Replace("`", "\\`") + "`";
                                     questions += question;
-                                }
 
-                                string questionsName = "questions" + ++Globals.counter;
-                                string defaultValueCodesName = "defaultValueCodes" + ++Globals.counter;
-                                string typesName = "types" + ++Globals.counter;
-                                string labelCodesName = "labelCodes" + ++Globals.counter;
-                                string promptResultsName = "promptResults" + ++Globals.counter;
+                                    int n = ++Globals.counter;
+                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + i + "], (spml" + n + ") => null)";
+                                }                                
                                                                 
                                 string defaultValues = null;
 
@@ -2423,7 +2427,8 @@ namespace Gekko.Parser.Gek
                                 w.headerCs.AppendLine("List<string> " + labelCodesName + " = new List<string> { " + labelCodes + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
 
-                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + ", new GekkoArg((spml25) => " + promptResultsName + "[0], (spml25) => null));");
+                                //w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + ", new GekkoArg((spml25) => " + promptResultsName + "[0], (spml25) => null));");
+                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + " " + prompts + ");");
 
                                 w.headerCs.AppendLine(G.NL + " return null; });" + G.NL);
 
