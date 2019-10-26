@@ -2467,10 +2467,11 @@ namespace Gekko
             return iv2;
         }
 
-        public static List<IVariable> Prompt(List<bool> question, List<string> defaultValue, List<string> type, List<string> txt)
+        public static List<IVariable> PromptOLD(List<bool> question, List<string> defaultValue, List<string> type, List<string> txt)
         {
-            List<IVariable> promptResults = new List<IVariable> { null };
-            for (int i = 0; i < 1; i++)
+            List<IVariable> promptResults = new List<IVariable>();
+
+            for (int i = 0; i < type.Count; i++)
             {
                 if (question[i])
                 {
@@ -2483,7 +2484,30 @@ namespace Gekko
                         break;  //all the following will attain their default values, similar to putting a ";" in AREMOS.
                     }
                 }
-                promptResults[i] = O.AcceptHelper1(type[i], defaultValue[i]);
+                promptResults.Add(O.AcceptHelper1(type[i], defaultValue[i]));
+            }
+
+            return promptResults;
+        }
+
+        public static List<IVariable> Prompt(List<bool> question, List<IVariable> defaultValue, List<string> type, List<IVariable> txt)
+        {
+            List<IVariable> promptResults = new List<IVariable>();
+
+            for (int i = 0; i < type.Count; i++)
+            {
+                if (question[i])
+                {
+                    IVariable tmp = defaultValue[i];
+                    //DialogResult result = Program.InputBox("Input", txt[i].ConvertToString(), ref tmp);
+                    if (false) //result == DialogResult.OK)
+                    {
+                        //not if cancel button or escape key
+                        defaultValue[i] = tmp;
+                        break;  //all the following will attain their default values, similar to putting a ";" in AREMOS.
+                    }
+                }
+                promptResults.Add(defaultValue[i]);
             }
 
             return promptResults;
@@ -2538,6 +2562,8 @@ namespace Gekko
 
             return iv;
         }
+
+        
 
         public static IVariable RemoveIVariableFromString(string dbName, string varName, string freq, string[] indexes, bool reportError)
         {

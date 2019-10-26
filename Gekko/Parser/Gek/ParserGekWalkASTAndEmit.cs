@@ -2412,7 +2412,7 @@ namespace Gekko.Parser.Gek
                                     questions += question;
 
                                     int n = ++Globals.counter;
-                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + i + "], (spml" + n + ") => null)";
+                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
                                 }                                
                                                                 
                                 string defaultValues = null;
