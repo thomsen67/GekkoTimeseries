@@ -2334,16 +2334,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         numberOfOptionalParameters++;
                                     }
-                                }
-
-                                //for instance, f(x1, x2, x3, x4=..., x5=...)
-                                //here we have 5 parameters, of which 2 are optional
-                                //Then we need to create all in all 2+1 functions:
-                                //f(x1, x2, x3, x4, x5)
-                                //f(x1, x2, x3, x4)
-                                //f(x1, x2, x3)
-                                //The last two call the first one. If for instance f(..., ..., ...) exists already, it will
-                                //be overwritten.
+                                }                                
 
                                 for (int i = 0; i < numberOfParameters; i++)
                                 {
@@ -2370,13 +2361,39 @@ namespace Gekko.Parser.Gek
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
                             w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParameters) + ") => " + G.NL);
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
-                                                        
-                            for (int i = 0; i < numberOfOptionalParameters; i++)
-                            {
+
+                            //for instance, f(x1, x2, x3, x4=..., x5=...)
+                            //here we have 5 parameters, of which 2 are optional
+                            //Then we need to create all in all 2+1 functions:
+                            //f(x1, x2, x3, x4, x5)
+                            //f(x1, x2, x3, x4) -> with default for x5
+                            //f(x1, x2, x3)     -> with default for x4 and x5
+                            //The last two call the first one. If for instance f(..., ..., ...) exists already, it will
+                            //be overwritten.
+
+                            for (int i = 0; i < numberOfOptionalParameters; i++)  //i = 0, 1 in example
+                            {                                
+                                // numberOfParametersOverload = 4, 3 in the example
                                 int numberOfParametersOverload = numberOfParameters - i - 1;
+
+                                // so first time, we cut off 1 optional parameter and use default for x5
+                                // second time, we cut off 2 optional parameter2 and use default for x4 and x5
+
+                                int numberOfParametersCutOff = numberOfParameters - numberOfParametersOverload;
+
+                                for (int j = 0; j < numberOfParametersCutOff; j++)
+                                {
+                                    //j will run 0 first time, and then 0, 1.
+                                    string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
+                                    string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
+                                    string type = node.functionDef[numberOfParameters - j - 1].type;
+                                }
+
+                                string defaultValues = null;
+
                                 w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
                                 w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload) + ") => " + G.NL);
-                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return null; " + G.NL + "});" + G.NL);
+                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return new ScalarVal(123d); " + G.NL + "});" + G.NL);
                             }
                             w.headerCs.AppendLine("}" + G.NL);                            
                             
