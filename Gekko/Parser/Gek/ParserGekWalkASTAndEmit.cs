@@ -2306,7 +2306,6 @@ namespace Gekko.Parser.Gek
                             
                             string typeChecks = null;
 
-
                             int numberOfOptionalParameters = 0;
                             if (node.functionDef == null)
                             {
@@ -2359,7 +2358,7 @@ namespace Gekko.Parser.Gek
 
                             //Version with all parameters, also optional parameters
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParameters) + ") => " + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
 
                             //for instance, f(x1, x2, x3, x4=..., x5=...)
@@ -2392,7 +2391,7 @@ namespace Gekko.Parser.Gek
                                     string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
                                     string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
                                     string type = node.functionDef[numberOfParameters - j - 1].type;
-                                    string question = "true";
+                                    string question = "false";
                                     if (j > 0)
                                     {
                                         defaultValueCodes += ", ";
@@ -2411,19 +2410,24 @@ namespace Gekko.Parser.Gek
                                 string typesName = "types" + ++Globals.counter;
                                 string labelCodesName = "labelCodes" + ++Globals.counter;
                                 string promptResultsName = "promptResults" + ++Globals.counter;
+                                                                
+                                string defaultValues = null;
+
+                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
+                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload, 0) + ") => " + G.NL);
+                                w.headerCs.AppendLine(G.NL + "{ " + G.NL);
 
                                 w.headerCs.AppendLine("List<bool> " + questionsName + " = new List<bool> { " + questions + " };");
                                 w.headerCs.AppendLine("List<string> " + defaultValueCodesName + " = new List<string> { " + defaultValueCodes + " };");
                                 w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
                                 w.headerCs.AppendLine("List<string> " + labelCodesName + " = new List<string> { " + labelCodes + " };");
-
                                 w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
 
-                                string defaultValues = null;
+                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + ", new GekkoArg((spml25) => " + promptResultsName + "[0], (spml25) => null));");
 
-                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
-                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload) + ") => " + G.NL);
-                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return null; " + G.NL + "});" + G.NL);
+                                w.headerCs.AppendLine(G.NL + " return null; });" + G.NL);
+
+
                             }
                             w.headerCs.AppendLine("}" + G.NL);                            
                             
@@ -6322,12 +6326,13 @@ namespace Gekko.Parser.Gek
             }
         }
 
-        private static string GetParametersInAList(ASTNode node, int numberOfParameters)
+        private static string GetParametersInAList(ASTNode node, int numberOfParameters, int j)
         {
             string vars = null;
             for (int i = 0; i < numberOfParameters; i++)
             {
-                vars += ",  GekkoArg " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
+                if (j == 0) vars += ", GekkoArg " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
+                else vars += ", " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
             }
             return vars;
         }
