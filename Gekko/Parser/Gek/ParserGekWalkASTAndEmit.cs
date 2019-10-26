@@ -2381,19 +2381,49 @@ namespace Gekko.Parser.Gek
 
                                 int numberOfParametersCutOff = numberOfParameters - numberOfParametersOverload;
 
+
+                                string defaultValueCodes = null;
+                                string labelCodes = null;
+                                string types = null;
+                                string questions = null;
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
                                     //j will run 0 first time, and then 0, 1.
                                     string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
                                     string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
                                     string type = node.functionDef[numberOfParameters - j - 1].type;
+                                    string question = "true";
+                                    if (j > 0)
+                                    {
+                                        defaultValueCodes += ", ";
+                                        labelCodes += ", ";
+                                        types += ", ";
+                                        questions += ", ";
+                                    }
+                                    defaultValueCodes += "`" + defaultValueCode.Replace("`", "\\`") + "`";
+                                    labelCodes += "`" + labelCode.Replace("`", "\\`") + "`";
+                                    types += "`" + type.Replace("`", "\\`") + "`";
+                                    questions += question;
                                 }
+
+                                string questionsName = "questions" + ++Globals.counter;
+                                string defaultValueCodesName = "defaultValueCodes" + ++Globals.counter;
+                                string typesName = "types" + ++Globals.counter;
+                                string labelCodesName = "labelCodes" + ++Globals.counter;
+                                string promptResultsName = "promptResults" + ++Globals.counter;
+
+                                w.headerCs.AppendLine("List<bool> " + questionsName + " = new List<bool> { " + questions + " };");
+                                w.headerCs.AppendLine("List<string> " + defaultValueCodesName + " = new List<string> { " + defaultValueCodes + " };");
+                                w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
+                                w.headerCs.AppendLine("List<string> " + labelCodesName + " = new List<string> { " + labelCodes + " };");
+
+                                w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
 
                                 string defaultValues = null;
 
                                 w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
                                 w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload) + ") => " + G.NL);
-                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return new ScalarVal(123d); " + G.NL + "});" + G.NL);
+                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return null; " + G.NL + "});" + G.NL);
                             }
                             w.headerCs.AppendLine("}" + G.NL);                            
                             
