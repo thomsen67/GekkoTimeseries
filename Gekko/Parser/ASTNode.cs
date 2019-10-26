@@ -6,7 +6,23 @@ using System.Collections;
 
 namespace Gekko.Parser
 {
-    
+
+    public class ArgHelper
+    {
+        public string type = null;
+        public string internalName = null;
+        public string labelCode = null;
+        public string defaultValueCode = null;
+
+        public ArgHelper(string type, string internalName, string label, string defaultValue)
+        {
+            this.type = type;
+            this.internalName = internalName;
+            this.labelCode = label;
+            this.defaultValueCode = defaultValue;
+        }
+    }
+
     public class ASTNode
     {
         /// <summary>
@@ -60,7 +76,7 @@ namespace Gekko.Parser
         public GekkoDictionary<string, TwoStrings> listLoopAnchor = null;
         public string listLoopAnchor2 = null;  //lookups that need to be moved outside listloop, like sum(#i, x[#i]) where the lookup of x can be moved out
         public GekkoDictionary<string, string> functionDefAnchor = null;
-        public List<Tuple<string, string>> functionDef = null;
+        public List<ArgHelper> functionDef = null;  //1: , 2: , 3: label, 4: def.value
         public string functionType = null;
         public GekkoDictionary<string, string> forLoopAnchor = null;
         public GekkoDictionary<string, string> freeIndexedLists = null; //like x[#m], need to unfold for PRT/PLOT

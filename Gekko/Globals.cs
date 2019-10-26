@@ -53,9 +53,9 @@ namespace Gekko
         public static StreamWriter sw = null; 
         
         public static bool gnuplotfix = true;
-        public static bool procedurefix = true;
 
-
+        public static bool prompting = true;
+        
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------

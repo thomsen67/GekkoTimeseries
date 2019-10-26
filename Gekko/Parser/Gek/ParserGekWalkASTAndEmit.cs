@@ -623,9 +623,9 @@ namespace Gekko.Parser.Gek
                         }
                         else
                         {
-                            if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
-                            node.functionDef.Add(new Tuple<string, string>("date", Globals.functionArgName + ++Globals.counter));
-                            node.functionDef.Add(new Tuple<string, string>("date", Globals.functionArgName + ++Globals.counter));
+                            if (node.functionDef == null) node.functionDef = new List<ArgHelper>();
+                            node.functionDef.Add(new ArgHelper("date", Globals.functionArgName + ++Globals.counter, null, null));
+                            node.functionDef.Add(new ArgHelper("date", Globals.functionArgName + ++Globals.counter, null, null));
                         }
 
                         foreach (ASTNode child in node[2].ChildrenIterator())
@@ -2283,6 +2283,8 @@ namespace Gekko.Parser.Gek
                         {
                             StringBuilder sb = new StringBuilder();
 
+                            int numberOfDates = 2;
+
                             string returnTypeLower = node[0].Text.ToLower();
                             string functionNameLower = node[1][0].Text.ToLower();
 
@@ -2292,9 +2294,8 @@ namespace Gekko.Parser.Gek
                             }
 
                             //int numberOfArguments = node[2][0].ChildrenCount() + node[2].ChildrenCount() - 1;
-                            int numberOfArguments = node.functionDef.Count;
-
-
+                            int numberOfParameters = node.functionDef.Count;
+                            
                             string internalName = "FunctionDef" + ++Globals.counter;
 
                             GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
@@ -2302,132 +2303,87 @@ namespace Gekko.Parser.Gek
                             sb.AppendLine(internalName + "();" + G.NL);
 
                             //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
-                            string vars = null;
-
+                            
                             string typeChecks = null;
 
+
+                            int numberOfOptionalParameters = 0;
                             if (node.functionDef == null)
                             {
                                 //do nothing
                             }
                             else
                             {
-                                for (int i = 0; i < node.functionDef.Count; i++)
+                                for (int i = 2; i < numberOfParameters; i++)
                                 {
-                                    //ASTNode child = 
-                                    
-                                        vars += ",  GekkoArg " + node.functionDef[i].Item2 + "_func"; //type is checked later on
-                                    
+                                    if (node[2]?[i - numberOfDates]?[2]?[0] != null) node.functionDef[i].labelCode = node[2][i - numberOfDates][2][0].Code.ToString();
+                                    if (node[2]?[i - numberOfDates]?[3]?[0] != null) node.functionDef[i].defaultValueCode = node[2][i - numberOfDates][3][0].Code.ToString();
                                 }
 
-                                for (int i = 0; i < node.functionDef.Count; i++)
+                                for (int i = numberOfDates; i < numberOfParameters; i++)
                                 {
-                                    
-                                        string f = "f1";
-                                        if (node.functionDef[i].Item1.ToLower() == "name") f = "f2";
+                                    if (node.functionDef[i].defaultValueCode == null)
+                                    {
+                                        if (numberOfOptionalParameters > 0)
+                                        {
+                                            G.Writeln2("*** ERROR: Required parameters cannot be stated after optional parameters");
+                                            throw new GekkoException();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        numberOfOptionalParameters++;
+                                    }
+                                }
 
-                                        if (i < 2)
-                                        {
-                                            //special <%t1 %t2> arguments
-                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func, " + Globals.smpl + ", " + (i + 1) + ");" + G.NL;
-                                        }
-                                        else
-                                        {
-                                            typeChecks += "IVariable " + node.functionDef[i].Item2 + " = " + "O.TypeCheck_" + node.functionDef[i].Item1.ToLower() + "(" + node.functionDef[i].Item2 + "_func." + f + "(" + Globals.smpl + ")" + ", " + (i + 1) + ");" + G.NL;
-                                        }
-                                    
+                                //for instance, f(x1, x2, x3, x4=..., x5=...)
+                                //here we have 5 parameters, of which 2 are optional
+                                //Then we need to create all in all 2+1 functions:
+                                //f(x1, x2, x3, x4, x5)
+                                //f(x1, x2, x3, x4)
+                                //f(x1, x2, x3)
+                                //The last two call the first one. If for instance f(..., ..., ...) exists already, it will
+                                //be overwritten.
+
+                                for (int i = 0; i < numberOfParameters; i++)
+                                {
+
+                                    string f = "f1";
+                                    if (node.functionDef[i].type.ToLower() == "name") f = "f2";
+
+                                    if (i < 2)
+                                    {
+                                        //special <%t1 %t2> arguments
+                                        typeChecks += "IVariable " + node.functionDef[i].internalName + " = " + "O.TypeCheck_" + node.functionDef[i].type.ToLower() + "(" + node.functionDef[i].internalName + "_func, " + Globals.smpl + ", " + (i + 1) + ");" + G.NL;
+                                    }
+                                    else
+                                    {
+                                        typeChecks += "IVariable " + node.functionDef[i].internalName + " = " + "O.TypeCheck_" + node.functionDef[i].type.ToLower() + "(" + node.functionDef[i].internalName + "_func." + f + "(" + Globals.smpl + ")" + ", " + (i + 1) + ");" + G.NL;
+                                    }
+
                                 }
                             }
 
-                            w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);                            
-                            w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfArguments + ", `" + functionNameLower + "`);" + G.NL);
-                            string ss = null;
-                            ss = "New";
-                            w.headerCs.AppendLine("Globals.ufunctions" + ss + numberOfArguments + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + vars + ") => " + G.NL);
+                            w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
 
+                            //Version with all parameters, also optional parameters
+                            w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParameters) + ") => " + G.NL);
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
-                            //w.headerCs.AppendLine("{ " + LocalCode1(Num(node), functionNameLower) + typeChecks + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
-
-                            w.headerCs.AppendLine("}" + G.NL);
+                                                        
+                            for (int i = 0; i < numberOfOptionalParameters; i++)
+                            {
+                                int numberOfParametersOverload = numberOfParameters - i - 1;
+                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
+                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload) + ") => " + G.NL);
+                                w.headerCs.AppendLine(G.NL + "{ " + "G.Writeln(`Hej " + numberOfParametersOverload + "`);" + G.NL + "return null; " + G.NL + "});" + G.NL);
+                            }
+                            w.headerCs.AppendLine("}" + G.NL);                            
                             
                             node.Code.A(sb.ToString());                            
 
                         }
                         break;
-
-
-                    //case "ASTFUNCTIONDEF":
-                    //    {
-                    //        //NOTE: Splitting
-                    //        //      All content is put into the header, w.headerCs, so it will not be split
-                    //        //      in the split method, no matter if there are split markers or not
-                    //        //      So node.Code will not be changed here, everything is piped to w.headeCs
-                    //        //      As of now, we do not split the content of such user-defined methods into
-                    //        //      Ci-blocks. If so, we would have to add markers to headerCs, put headerCs
-                    //        //      through the splitting machine, and beware of "params_" lines (these should not
-                    //        //      be put into Ci-methods).
-
-                    //        w.uHeaderCs = new StringBuilder();
-
-                    //        if (Globals.uFunctionStorageCs.ContainsKey(w.uFunctionsHelper.functionName))
-                    //        {
-                    //            //For now, we just overwrite the function, even if it has different overload signature
-                    //            Globals.uFunctionStorageCs.Remove(w.uFunctionsHelper.functionName);
-                    //            ////TODO: allow overloads
-                    //            //G.Writeln2("*** ERROR: User function with name '" + w.uFunctionsHelper.functionName + "' has already been defined");
-                    //            //throw new GekkoException();
-                    //        }                            
-
-                    //        //We use ToLower(), since user functions are not distinguished by means of capitalization
-                    //        string lhsClassNameCode = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
-
-                    //        if (w.uFunctionsHelper.lhsTypes.Count > 1)
-                    //        {
-                    //            //Create the class corresponding to the return tuple (lhs)
-                    //            string tupleClassName = G.GetVariableType(w.uFunctionsHelper.lhsTypes.Count);
-                    //            //CreateTupleClass(w.uHeaderCs, w.uFunctionsHelper.lhsTypes.Count, tupleClassName, w.tupleClasses);
-                    //        }
-
-                    //        string method = null; // Globals.splitSTOP;
-                    //        method += "public static " + lhsClassNameCode + " " + w.uFunctionsHelper.functionName.ToLower() + "(" + Globals.functionP2Cs + ", " + Globals.functionTP2Cs + ", ";
-
-                    //        for (int i = 0; i < w.uFunctionsHelper.storage.Count; i++)
-                    //        {
-                    //            FunctionArgumentsHelperElements fah = w.uFunctionsHelper.storage[i];
-                    //            //method += G.GetVariableType(fah.type) + " " + fah.parameterCode;                                
-                    //            //TODO type checks...
-                    //            if (fah.tupleCount > 1)
-                    //            {
-                    //                //Create the class corresponding to the input tuple (in rhs params)
-                    //                string tupleClassName = G.GetVariableType(fah.tupleCount);
-                    //                //CreateTupleClass(w.uHeaderCs, fah.tupleCount, tupleClassName, w.tupleClasses);
-                    //                //this is a tuple
-                    //                method += tupleClassName + " " + fah.tupleNameCode;
-                    //                i = i + (fah.tupleCount - 1);  //we skip the rest of these tuples here!
-                    //            }
-                    //            else
-                    //            {
-                    //                method += "IVariable" + " " + fah.parameterCode;
-                    //            }
-                    //            method += ", ";
-                    //        }
-                    //        if (method.EndsWith(", ")) method = method.Substring(0, method.Length - 2);  //we remove the last ", "
-                    //        method += ") {" + G.NL;
-
-                    //        method += node[3].Code + G.NL;  //expressions, should always be subnode #4                            
-
-                    //        method += "}" + G.NL;
-
-                    //        w.uHeaderCs.AppendLine(w.uFunctionsHelper.headerCs.ToString());
-
-                    //        w.uHeaderCs.AppendLine(method);
-
-                    //        Globals.uFunctionStorageCs.Add(w.uFunctionsHelper.functionName, w.uHeaderCs.ToString());
-
-                    //        ResetUFunctionHelpers(w);
-
-                    //    }
-                    //    break;
 
 
                     // ================= INDENTATION CODE END ==================
@@ -6319,6 +6275,16 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static string GetParametersInAList(ASTNode node, int numberOfParameters)
+        {
+            string vars = null;
+            for (int i = 0; i < numberOfParameters; i++)
+            {
+                vars += ",  GekkoArg " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
+            }
+            return vars;
+        }
+
         private static void FunctionHelper10(List<string> args, out string aa1, out string aa2)
         {
             aa1 = G.GetListWithCommas(args.GetRange(0, 2));
@@ -6365,8 +6331,8 @@ namespace Gekko.Parser.Gek
                 throw new GekkoException();
             }
             node.functionDefAnchor.Add(s, Globals.functionArgName + ++Globals.counter);
-            if (node.functionDef == null) node.functionDef = new List<Tuple<string, string>>();
-            node.functionDef.Add(new Tuple<string, string>(type.ToLower(), Globals.functionArgName + Globals.counter));
+            if (node.functionDef == null) node.functionDef = new List<ArgHelper>();
+            node.functionDef.Add(new ArgHelper(type.ToLower(), Globals.functionArgName + Globals.counter, null, null));
         }
 
         private static void StashIntoLocalFuncs(W w, string c, string s0, bool isLoop)

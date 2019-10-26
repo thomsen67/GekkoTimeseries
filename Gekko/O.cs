@@ -2467,7 +2467,28 @@ namespace Gekko
             return iv2;
         }
 
-        
+        public static List<IVariable> Prompt(List<bool> question, List<string> defaultValue, List<string> type, List<string> txt)
+        {
+            List<IVariable> promptResults = new List<IVariable> { null };
+            for (int i = 0; i < 1; i++)
+            {
+                if (question[i])
+                {
+                    string tmp = defaultValue[i];
+                    DialogResult result = Program.InputBox("Input", txt[i], ref tmp);
+                    if (result == DialogResult.OK)
+                    {
+                        //not if cancel button or escape key
+                        defaultValue[i] = tmp;
+                        break;  //all the following will attain their default values, similar to putting a ";" in AREMOS.
+                    }
+                }
+                promptResults[i] = O.AcceptHelper1(type[i], defaultValue[i]);
+            }
+
+            return promptResults;
+        }
+
 
         public static IVariable AcceptHelper1(string type, string value)
         {
