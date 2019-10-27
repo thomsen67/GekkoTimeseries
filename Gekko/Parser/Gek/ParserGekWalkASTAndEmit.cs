@@ -2406,8 +2406,10 @@ namespace Gekko.Parser.Gek
                                         types += ", ";
                                         questions += ", ";
                                     }
-                                    defaultValueCodes += "`" + defaultValueCode.Replace("`", "\\`") + "`";
-                                    labelCodes += "`" + labelCode.Replace("`", "\\`") + "`";
+                                    //defaultValueCodes += "`" + defaultValueCode.Replace("`", "\\`") + "`";
+                                    //labelCodes += "`" + labelCode.Replace("`", "\\`") + "`";
+                                    defaultValueCodes += defaultValueCode;
+                                    labelCodes += labelCode;
                                     types += "`" + type.Replace("`", "\\`") + "`";
                                     questions += question;
 
@@ -2422,9 +2424,9 @@ namespace Gekko.Parser.Gek
                                 w.headerCs.AppendLine(G.NL + "{ " + G.NL);
 
                                 w.headerCs.AppendLine("List<bool> " + questionsName + " = new List<bool> { " + questions + " };");
-                                w.headerCs.AppendLine("List<string> " + defaultValueCodesName + " = new List<string> { " + defaultValueCodes + " };");
+                                w.headerCs.AppendLine("List<IVariable> " + defaultValueCodesName + " = new List<IVariable> { " + defaultValueCodes + " };");
                                 w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
-                                w.headerCs.AppendLine("List<string> " + labelCodesName + " = new List<string> { " + labelCodes + " };");
+                                w.headerCs.AppendLine("List<IVariable> " + labelCodesName + " = new List<IVariable> { " + labelCodes + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
 
                                 //w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + ", new GekkoArg((spml25) => " + promptResultsName + "[0], (spml25) => null));");
