@@ -55,6 +55,7 @@ namespace Gekko
         public static bool gnuplotfix = true;
 
         public static bool prompting = true;
+        public static List<string> unitTestsPromtingHelper = null;
         
         // ----------------------------------------------------------------
         // GRADIENT

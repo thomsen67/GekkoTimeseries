@@ -2354,11 +2354,13 @@ namespace Gekko.Parser.Gek
                                 }
                             }
 
+                            string qName = "q" + ++Globals.counter;
+
                             w.headerCs.AppendLine("public static void " + internalName + "() {" + G.NL);
 
                             //Version with all parameters, also optional parameters
                             w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParameters + ", `" + functionNameLower + "`);" + G.NL);
-                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
+                            w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParameters + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParameters, 0) + ") => " + G.NL);
                             w.headerCs.AppendLine(G.NL + "{ " + typeChecks + G.NL + LocalCode1(Num(node), functionNameLower) + G.NL + node[3].Code.ToString() + G.NL + "return null; " + G.NL + LocalCode2(Num(node), functionNameLower) + "});" + G.NL);
 
                             //for instance, f(x1, x2, x3, x4=..., x5=...)
@@ -2391,6 +2393,7 @@ namespace Gekko.Parser.Gek
                                 string types = null;
                                 string questions = null;
                                 string prompts = null;
+                                string prompts2 = null;
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
                                     //j will run 0 first time, and then 0, 1.                                                                      
@@ -2411,26 +2414,34 @@ namespace Gekko.Parser.Gek
                                     defaultValueCodes += defaultValueCode;
                                     labelCodes += labelCode;
                                     types += "`" + type.Replace("`", "\\`") + "`";
-                                    questions += question;
+                                    questions += qName;  //the q parameter tells if the is a question sign on the function
 
                                     int n = ++Globals.counter;
-                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
+                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (numberOfParametersCutOff - j - 1) + "], (spml" + n + ") => null)";
+                                    prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode + ", (spml" + n + ") => null)";
                                 }                                
                                                                 
                                 string defaultValues = null;
 
-                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);                                                                
-                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool b" + GetParametersInAList(node, numberOfParametersOverload, 0) + ") => " + G.NL);
+                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);
+                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParametersOverload, 0) + ") => " + G.NL);
                                 w.headerCs.AppendLine(G.NL + "{ " + G.NL);
 
+                                w.headerCs.AppendLine("if(" + qName + ") {" + G.NL);
                                 w.headerCs.AppendLine("List<bool> " + questionsName + " = new List<bool> { " + questions + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + defaultValueCodesName + " = new List<IVariable> { " + defaultValueCodes + " };");
                                 w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + labelCodesName + " = new List<IVariable> { " + labelCodes + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
-
-                                //w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + ", new GekkoArg((spml25) => " + promptResultsName + "[0], (spml25) => null));");
                                 w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + " " + prompts + ");");
+                                w.headerCs.AppendLine("}" + G.NL);
+                                w.headerCs.AppendLine("else" + G.NL);
+                                w.headerCs.AppendLine("{" + G.NL);
+                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + " " + prompts2 + ");");
+                                w.headerCs.AppendLine("}" + G.NL);
+
+                                
+                                
 
                                 w.headerCs.AppendLine(G.NL + " return null; });" + G.NL);
 

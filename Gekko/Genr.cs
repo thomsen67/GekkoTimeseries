@@ -10,198 +10,106 @@ namespace Gekko
     {
         public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
         public static int labelCounter;
-        public static void C0(GekkoSmpl smpl, P p) {
-            //[[commandStart]]0
-            p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
 
-            O.Reset o0 = new O.Reset();
-            o0.p = p; o0.Exe(smpl);
-
-            //[[commandEnd]]0
-        }
-        public static void C1(GekkoSmpl smpl, P p) {
-            //[[commandStart]]3
-            p.SetText(@"¤6"); O.InitSmpl(smpl, p);
-
-            O.Assignment o3 = new O.Assignment();
-            o3.opt_source = @"<[code]>%y1 = f(3, 4)";
-
-
-            Action assign_26 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar21 = O.FunctionLookupNew4("f")(smpl, p, false, null, null, new GekkoArg((spml24) => i22, (spml24) => null), new GekkoArg((spml25) => i23, (spml25) => null));
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "%y1", null, ivTmpvar21, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
-                ;
-            };
-            Func<bool> check_26 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar21 = O.FunctionLookupNew4("f")(smpl, p, false, null, null, new GekkoArg((spml24) => i22, (spml24) => null), new GekkoArg((spml25) => i23, (spml25) => null));
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar21.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "%y1", null, ivTmpvar21, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o3)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_26, check_26, o3);
-
-            //[[commandEnd]]3
-
-
-            //[[commandStart]]4
-            p.SetText(@"¤7"); O.InitSmpl(smpl, p);
-
-            O.Assignment o4 = new O.Assignment();
-            o4.opt_source = @"<[code]>%y2 = f(3)";
-
-
-            Action assign_30 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar27 = O.FunctionLookupNew3("f")(smpl, p, false, null, null, new GekkoArg((spml29) => i28, (spml29) => null));
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "%y2", null, ivTmpvar27, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
-                ;
-            };
-            Func<bool> check_30 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar27 = O.FunctionLookupNew3("f")(smpl, p, false, null, null, new GekkoArg((spml29) => i28, (spml29) => null));
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar27.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "%y2", null, ivTmpvar27, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o4)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_30, check_30, o4);
-
-            //[[commandEnd]]4
-
-
-            //[[commandStart]]5
-            p.SetText(@"¤8"); O.InitSmpl(smpl, p);
-
-            O.Assignment o5 = new O.Assignment();
-            o5.opt_source = @"<[code]>%y3 = f()";
-
-
-            Action assign_32 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar31 = O.FunctionLookupNew2("f")(smpl, p, false, null, null);
-                O.AdjustT0(smpl, 2);
-                O.Lookup(smpl, null, null, "%y3", null, ivTmpvar31, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o5)
-                ;
-            };
-            Func<bool> check_32 = () => {
-                O.AdjustT0(smpl, -2);
-                IVariable ivTmpvar31 = O.FunctionLookupNew2("f")(smpl, p, false, null, null);
-                O.AdjustT0(smpl, 2);
-                if (ivTmpvar31.Type() != EVariableType.Series) return false;
-                O.Dynamic1(smpl);
-                O.Lookup(smpl, null, null, "%y3", null, ivTmpvar31, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o5)
-                ;
-                return O.Dynamic2(smpl);
-            };
-            O.RunAssigmentMaybeDynamic(smpl, assign_32, check_32, o5);
-
-            //[[commandEnd]]5
-
-
-            //[[commandStart]]6
-            p.SetText(@"¤12"); O.InitSmpl(smpl, p);
-
-
-            Program.Mem(null);
-
-            //[[commandEnd]]6
-        }
-
-
-        public static readonly ScalarVal i5 = new ScalarVal(666d, 0);
-        public static readonly ScalarVal i6 = new ScalarVal(777d, 0);
-        public static void FunctionDef7() {
+        public static readonly ScalarVal i38 = new ScalarVal(1d, 0);
+        public static readonly ScalarVal i39 = new ScalarVal(2d, 0);
+        public static readonly ScalarVal i40 = new ScalarVal(100d, 0);
+        public static void FunctionDef41() {
 
             O.PrepareUfunction(4, "f");
 
-            Globals.ufunctionsNew4.Add("f", (GekkoSmpl smpl, P p, bool b, GekkoArg functionarg_xf7dke8cj_1_func, GekkoArg functionarg_xf7dke8cj_2_func, GekkoArg functionarg_xf7dke8cj_3_func, GekkoArg functionarg_xf7dke8cj_4_func) =>
+            Globals.ufunctionsNew4.Add("f", (GekkoSmpl smpl, P p, bool q42, GekkoArg functionarg_xf7dke8cj_34_func, GekkoArg functionarg_xf7dke8cj_35_func, GekkoArg functionarg_xf7dke8cj_36_func, GekkoArg functionarg_xf7dke8cj_37_func) =>
 
 
-            { IVariable functionarg_xf7dke8cj_1 = O.TypeCheck_date(functionarg_xf7dke8cj_1_func, smpl, 1);
-                IVariable functionarg_xf7dke8cj_2 = O.TypeCheck_date(functionarg_xf7dke8cj_2_func, smpl, 2);
-                IVariable functionarg_xf7dke8cj_3 = O.TypeCheck_val(functionarg_xf7dke8cj_3_func.f1(smpl), 3);
-                IVariable functionarg_xf7dke8cj_4 = O.TypeCheck_val(functionarg_xf7dke8cj_4_func.f1(smpl), 4);
+            { IVariable functionarg_xf7dke8cj_34 = O.TypeCheck_date(functionarg_xf7dke8cj_34_func, smpl, 1);
+                IVariable functionarg_xf7dke8cj_35 = O.TypeCheck_date(functionarg_xf7dke8cj_35_func, smpl, 2);
+                IVariable functionarg_xf7dke8cj_36 = O.TypeCheck_val(functionarg_xf7dke8cj_36_func.f1(smpl), 3);
+                IVariable functionarg_xf7dke8cj_37 = O.TypeCheck_val(functionarg_xf7dke8cj_37_func.f1(smpl), 4);
 
-                Databank local1 = Program.databanks.local;
-                Program.databanks.local = new Databank("Local"); LocalGlobal lg1 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
+                Databank local0 = Program.databanks.local;
+                Program.databanks.local = new Databank("Local"); LocalGlobal lg0 = Program.databanks.localGlobal; Program.databanks.localGlobal = new LocalGlobal(); p.lastFileSentToANTLR = O.LastText("f"); p.SetLastFileSentToANTLR(O.LastText("f")); p.Deeper();
                 try {
 
 
-        //[[commandSpecial]]2
-        return O.TypeCheck_val(O.Add(smpl, functionarg_xf7dke8cj_3, functionarg_xf7dke8cj_4), 0);
+        //[[commandSpecial]]1
+        return O.TypeCheck_val(O.Add(smpl, O.Multiply(smpl, i40, functionarg_xf7dke8cj_36), functionarg_xf7dke8cj_37), 0);
 
-        //[[commandEnd]]2
+        //[[commandEnd]]1
 
 
         return null;
                 }
                 catch { p.Deeper(); throw; }
                 finally {
-                    Program.databanks.local = local1; Program.databanks.localGlobal = lg1; p.RemoveLast(); ;
+                    Program.databanks.local = local0; Program.databanks.localGlobal = lg0; p.RemoveLast(); ;
                 }
             });
 
             O.PrepareUfunction(3, "f");
 
-            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool b, GekkoArg functionarg_xf7dke8cj_1_func, GekkoArg functionarg_xf7dke8cj_2_func, GekkoArg functionarg_xf7dke8cj_3_func) =>
+            Globals.ufunctionsNew3.Add("f", (GekkoSmpl smpl, P p, bool q42, GekkoArg functionarg_xf7dke8cj_34_func, GekkoArg functionarg_xf7dke8cj_35_func, GekkoArg functionarg_xf7dke8cj_36_func) =>
 
 
             {
 
-                List<bool> questions8 = new List<bool> { false };
-                List<IVariable> defaultValueCodes9 = new List<IVariable> { };
-                List<string> types10 = new List<string> { "val" };
-                List<IVariable> labelCodes11 = new List<IVariable> { };
-                List<IVariable> promptResults12 = O.Prompt(questions8, defaultValueCodes9, types10, labelCodes11);
-                return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_1_func, functionarg_xf7dke8cj_2_func, functionarg_xf7dke8cj_3_func, new GekkoArg((spml13) => promptResults12[0], (spml13) => null));
+                if (q42) {
+
+                    List<bool> questions43 = new List<bool> { q42 };
+                    List<IVariable> defaultValueCodes44 = new List<IVariable> { i39 };
+                    List<string> types45 = new List<string> { "val" };
+                    List<IVariable> labelCodes46 = new List<IVariable> { O.HandleString(new ScalarString(@"add")) };
+                    List<IVariable> promptResults47 = O.Prompt(questions43, defaultValueCodes44, types45, labelCodes46);
+                    return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_34_func, functionarg_xf7dke8cj_35_func, functionarg_xf7dke8cj_36_func, new GekkoArg((spml48) => promptResults47[0], (spml48) => null));
+                }
+
+                else
+
+                {
+
+                    //return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_34_func, functionarg_xf7dke8cj_35_func, functionarg_xf7dke8cj_36_func i39);
+                }
+
 
                 return null; });
 
             O.PrepareUfunction(2, "f");
 
-            Globals.ufunctionsNew2.Add("f", (GekkoSmpl smpl, P p, bool b, GekkoArg functionarg_xf7dke8cj_1_func, GekkoArg functionarg_xf7dke8cj_2_func) =>
+            Globals.ufunctionsNew2.Add("f", (GekkoSmpl smpl, P p, bool q42, GekkoArg functionarg_xf7dke8cj_34_func, GekkoArg functionarg_xf7dke8cj_35_func) =>
 
 
             {
 
-                List<bool> questions14 = new List<bool> { false, false };
-                List<IVariable> defaultValueCodes15 = new List<IVariable> {  };
-                List<string> types16 = new List<string> { "val", "val" };
-                List<IVariable> labelCodes17 = new List<IVariable> {  };
-                List<IVariable> promptResults18 = O.Prompt(questions14, defaultValueCodes15, types16, labelCodes17);
-                return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_1_func, functionarg_xf7dke8cj_2_func, new GekkoArg((spml19) => promptResults18[0], (spml19) => null), new GekkoArg((spml20) => promptResults18[1], (spml20) => null));
+                if (q42) {
+
+                    List<bool> questions49 = new List<bool> { q42, q42 };
+                    List<IVariable> defaultValueCodes50 = new List<IVariable> { i39, i38 };
+                    List<string> types51 = new List<string> { "val", "val" };
+                    List<IVariable> labelCodes52 = new List<IVariable> { O.HandleString(new ScalarString(@"add")), O.HandleString(new ScalarString(@"x")) };
+                    List<IVariable> promptResults53 = O.Prompt(questions49, defaultValueCodes50, types51, labelCodes52);
+                    return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_34_func, functionarg_xf7dke8cj_35_func, new GekkoArg((spml54) => promptResults53[1], (spml54) => null), new GekkoArg((spml55) => promptResults53[0], (spml55) => null));
+                }
+
+                else
+
+                {
+
+                    return O.FunctionLookupNew4("f")(smpl, p, false, functionarg_xf7dke8cj_34_func, functionarg_xf7dke8cj_35_func, new GekkoArg((spml55) => i38, (spml55) => null), new GekkoArg((spml55) => i38, (spml55) => null));
+                }
+
 
                 return null; });
 
         }
 
-        public static readonly ScalarVal i22 = new ScalarVal(3d, 0);
-        public static readonly ScalarVal i23 = new ScalarVal(4d, 0);
-        public static readonly ScalarVal i28 = new ScalarVal(3d, 0);
 
         public static void CodeLines(P p)
         {
             GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-
-            C0(smpl, p);
-
-            FunctionDef7();
+            FunctionDef41();
 
 
-            //[[commandEnd]]1
-
-
-            C1(smpl, p);
+            //[[commandEnd]]0
 
 
 

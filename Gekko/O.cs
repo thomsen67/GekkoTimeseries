@@ -2499,12 +2499,29 @@ namespace Gekko
                 if (question[i])
                 {
                     IVariable tmp = defaultValue[i];
-                    //DialogResult result = Program.InputBox("Input", txt[i].ConvertToString(), ref tmp);
-                    if (false) //result == DialogResult.OK)
+                    string rv = null;
+
+                    DialogResult result = DialogResult.OK;
+                    if (G.IsUnitTesting())
                     {
-                        //not if cancel button or escape key
-                        defaultValue[i] = tmp;
-                        break;  //all the following will attain their default values, similar to putting a ";" in AREMOS.
+                        rv = Globals.unitTestsPromtingHelper[i];
+                    }
+                    else
+                    {
+                        result = Program.InputBox("Input", txt[i].ConvertToString(), ref rv);
+                    }
+
+                    if (result == DialogResult.OK)
+                    {
+                        string rvTrim = rv.Trim();
+                        if (rvTrim == ";")
+                        {
+                            break; //this and all the following will attain their default values, similar to AREMOS.
+                        }
+                        else
+                        {                            
+                            defaultValue[i] = AcceptHelper1(type[i], rvTrim);
+                        }                        
                     }
                 }
                 promptResults.Add(defaultValue[i]);
