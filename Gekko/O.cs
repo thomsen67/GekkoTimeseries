@@ -2518,7 +2518,7 @@ namespace Gekko
                         {
                             for (int j = i; j < type.Count; j++)
                             {
-                                promptResults.Add(defaultValue[type.Count - j - 1]);
+                                promptResults.Add(defaultValue[j]);
                             }
                             break; //this and all the following will attain their default values, similar to AREMOS.
                         }

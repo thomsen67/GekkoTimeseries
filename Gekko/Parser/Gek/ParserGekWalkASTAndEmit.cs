@@ -2400,14 +2400,17 @@ namespace Gekko.Parser.Gek
 
                                     //j=0 -->add 1
                                     //j=1 -->add 0
-                                    
-                                    string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
+
+                                    //int xxx = numberOfParameters - j - 1;
+                                    int xxx = numberOfParameters - (numberOfParametersCutOff - j - 1) - 1;
+
+                                    string defaultValueCode = node.functionDef[xxx].defaultValueCode;
                                     
                                     int jjj = numberOfParameters - i - 1 + j;
 
                                     string defaultValueCode2 = node.functionDef[jjj].defaultValueCode;
-                                    string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
-                                    string type = node.functionDef[numberOfParameters - j - 1].type;
+                                    string labelCode = node.functionDef[xxx].labelCode;
+                                    string type = node.functionDef[xxx].type;
                                     string question = "false";
                                     if (j > 0)
                                     {
