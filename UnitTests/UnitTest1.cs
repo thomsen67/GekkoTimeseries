@@ -11000,6 +11000,27 @@ namespace UnitTests
             //pC * qY[#s] skal være samme som pC[tot] * qY[#s]
         }
 
+        [TestMethod]
+        public void _TestOverloadAndPrompt()
+        {
+            I("RESET;");
+            I("function val f(val %x1 'x' = 1, val %x2 'add' = 2); return 100 * %x1 + %x2; end;");
+            I("%y1 = f(3, 4);"); //--> 304
+            I("%y2 = f(3);");    //--> 302
+            I("%y3 = f();");     //--> 102
+            _AssertScalarVal(First(), "%y1", 304d);
+            _AssertScalarVal(First(), "%y2", 302);
+            _AssertScalarVal(First(), "%y3", 102d);
+            I("%y4 = f?(3, 4);"); //--> 304
+            Globals.unitTestsPromtingHelper = new List<string> { "5" };
+            I("%y5 = f?(3);");    //--> 307 (inputs 5)
+            Globals.unitTestsPromtingHelper = new List<string> { "6", "7" };
+            I("%y6 = f?();");     //--> 607 (inputs 6 and 7)
+            _AssertScalarVal(First(), "%y4", 304d);
+            _AssertScalarVal(First(), "%y5", 305);
+            _AssertScalarVal(First(), "%y6", 607d);
+
+        }
 
         [TestMethod]
         public void _Test_FunctionsInBuilt()
