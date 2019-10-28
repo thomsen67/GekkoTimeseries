@@ -2432,6 +2432,7 @@ namespace Gekko
 
         public static string AcceptHelper2(string type, IVariable iv)
         {
+            
             string s = null;
             if (iv == null)
             {
@@ -2494,8 +2495,26 @@ namespace Gekko
         {
             List<IVariable> promptResults = new List<IVariable>();
 
+            if (type.Count != txt.Count)
+            {
+                G.Writeln2("*** ERROR: Prompting: one or more of the optional parameters have no labels");
+                throw new GekkoException();
+            }
+
             for (int i = 0; i < type.Count; i++)
             {
+                if (G.Equal(type[i], "val") || G.Equal(type[i], "date") || G.Equal(type[i], "string"))
+                {
+                    //good
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Promting is only allowed for types val, date or string at the moment.");
+                    G.Writeln("    This restriction may be removed in a future Gekko version.", Color.Red);
+                    G.Writeln("    The type '" + type[i] + "' is not valid for prompting.", Color.Red);                    
+                    throw new GekkoException();
+                }
+
                 if (question[i])
                 {
                     IVariable tmp = defaultValue[i];

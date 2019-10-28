@@ -11003,13 +11003,11 @@ namespace UnitTests
         [TestMethod]
         public void _TestOverloadAndPrompt()
         {
-
-
-
+            
             // -------- 0 required, 2 optional
 
             I("RESET;");
-            I("function val f(val %x1 'x' = 1, val %x2 'add' = 2); return 100 * %x1 + %x2; end;");
+            I("function val f(val %x1 'x1' = 1, val %x2 'x2' = 2); return 100 * %x1 + %x2; end;");
             I("%y1 = f(3, 4);"); //--> 304
             I("%y2 = f(3);");    //--> 302
             I("%y3 = f();");     //--> 102
@@ -11028,7 +11026,7 @@ namespace UnitTests
             // -------- 1 required, 2 optional
 
             I("RESET;");
-            I("function val f(val %x0, val %x1 'x' = 1, val %x2 'add' = 2); return 10000 * %x0 + 100 * %x1 + %x2; end;");
+            I("function val f(val %x0, val %x1 'x1' = 1, val %x2 'x2' = 2); return 10000 * %x0 + 100 * %x1 + %x2; end;");
             I("%y1 = f(9, 3, 4);"); //--> 90304
             I("%y2 = f(9, 3);");    //--> 90302
             I("%y3 = f(9);");     //--> 90102
@@ -11045,6 +11043,27 @@ namespace UnitTests
             _AssertScalarVal(First(), "%y4", 90304d);
             _AssertScalarVal(First(), "%y5", 90305);
             _AssertScalarVal(First(), "%y6", 90607d);
+
+            // -------- 1 required, 2 optional, PROCEDURE version
+
+            I("RESET;");
+            I("procedure f val %x0, val %x1 'x1' = 1, val %x2 'x2' = 2; %y = 10000 * %x0 + 100 * %x1 + %x2; end;");
+            I("f 9 3 4;"); //--> 90304
+            _AssertScalarVal(First(), "%y", 90304d);
+            I("f 9 3;");    //--> 90302
+            _AssertScalarVal(First(), "%y", 90302);
+            I("f 9;");     //--> 90102
+            _AssertScalarVal(First(), "%y", 90102d);
+            FAIL("f;");
+            I("f? 9 3 4;"); //--> 90304
+            _AssertScalarVal(First(), "%y", 90304d);
+            Globals.unitTestsPromtingHelper = new List<string> { "5" };
+            I("f? 9 3;"); //--> 90305 (inputs 5)
+            _AssertScalarVal(First(), "%y", 90305);
+            Globals.unitTestsPromtingHelper = new List<string> { "6", "7" };
+            I("f? 9;");     //--> 90607 (inputs 6 and 7)
+            _AssertScalarVal(First(), "%y", 90607d);
+            FAIL("f?;");
 
             // -------- 1 required, 2 optional, stopping prompts with ";"
 
@@ -11094,6 +11113,19 @@ namespace UnitTests
             Globals.unitTestsPromtingHelper = new List<string> { ";" };
             I("%y1 = f?(8, 7, 6, 5);"); //--> 8765567
             _AssertScalarVal(First(), "%y1", 8765567d);
+
+            // -------- series type
+
+            I("RESET; TIME 2001 2001;");
+            I("function series f(series x = y + 1); return x + 100; end;");  //y does not need to be defined yet            
+            I("w = 7;");
+            I("z1 = f(w);");
+            I("y = 5;");
+            I("z2 = f();");  //y is used here, not used in function definition            
+            _AssertSeries(First(), "z1!a", 2001, 107d, sharedDelta);
+            _AssertSeries(First(), "z2!a", 2001, 106d, sharedDelta);
+
+            FAIL("z3 = f?();");  //prompting only allowed for val, date, string types (not even name)
 
         }
 
