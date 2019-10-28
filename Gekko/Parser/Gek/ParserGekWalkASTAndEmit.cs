@@ -2396,9 +2396,10 @@ namespace Gekko.Parser.Gek
                                 string prompts2 = null;
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
-                                    //j will run 0 first time, and then 0, 1.                                                                      
-
+                                    //j will run 0 first time, and then 0, 1. 
+                                    
                                     string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
+                                    string defaultValueCode2 = node.functionDef[(numberOfParametersCutOff - j - 1) + numberOfParameters - numberOfOptionalParameters].defaultValueCode;
                                     string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
                                     string type = node.functionDef[numberOfParameters - j - 1].type;
                                     string question = "false";
@@ -2417,8 +2418,9 @@ namespace Gekko.Parser.Gek
                                     questions += qName;  //the q parameter tells if the is a question sign on the function
 
                                     int n = ++Globals.counter;
-                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (numberOfParametersCutOff - j - 1) + "], (spml" + n + ") => null)";
-                                    prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode + ", (spml" + n + ") => null)";
+                                    //prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (numberOfParametersCutOff - j - 1) + "], (spml" + n + ") => null)";
+                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (j) + "], (spml" + n + ") => null)";
+                                    prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";
                                 }                                
                                                                 
                                 string defaultValues = null;
