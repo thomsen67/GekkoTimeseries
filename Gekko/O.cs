@@ -2508,6 +2508,12 @@ namespace Gekko
                     }
                     else
                     {
+                        try
+                        {                            
+                            rv = AcceptHelper2(type[i], tmp);                            
+                        }
+                        catch { }
+
                         result = Program.InputBox("Input", txt[i].ConvertToString(), ref rv);
                     }
 
