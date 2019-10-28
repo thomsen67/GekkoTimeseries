@@ -2375,12 +2375,12 @@ namespace Gekko.Parser.Gek
                             for (int i = 0; i < numberOfOptionalParameters; i++)  //i = 0, 1 in example
                             {                                
                                 // numberOfParametersOverload = 4, 3 in the example
-                                int numberOfParametersOverload = numberOfParameters - i - 1;
+                                int numberOfParametersOverloadedVersion = numberOfParameters - i - 1;
 
                                 // so first time, we cut off 1 optional parameter and use default for x5
                                 // second time, we cut off 2 optional parameter2 and use default for x4 and x5
 
-                                int numberOfParametersCutOff = numberOfParameters - numberOfParametersOverload;
+                                int numberOfParametersCutOff = numberOfParameters - numberOfParametersOverloadedVersion;
 
                                 string questionsName = "questions" + ++Globals.counter;
                                 string defaultValueCodesName = "defaultValueCodes" + ++Globals.counter;
@@ -2397,9 +2397,15 @@ namespace Gekko.Parser.Gek
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
                                     //j will run 0 first time, and then 0, 1. 
+
+                                    //j=0 -->add 1
+                                    //j=1 -->add 0
                                     
                                     string defaultValueCode = node.functionDef[numberOfParameters - j - 1].defaultValueCode;
-                                    string defaultValueCode2 = node.functionDef[(numberOfParametersCutOff - j - 1) + numberOfParameters - numberOfOptionalParameters].defaultValueCode;
+                                    
+                                    int jjj = numberOfParameters - i - 1 + j;
+
+                                    string defaultValueCode2 = node.functionDef[jjj].defaultValueCode;
                                     string labelCode = node.functionDef[numberOfParameters - j - 1].labelCode;
                                     string type = node.functionDef[numberOfParameters - j - 1].type;
                                     string question = "false";
@@ -2410,23 +2416,22 @@ namespace Gekko.Parser.Gek
                                         types += ", ";
                                         questions += ", ";
                                     }
-                                    //defaultValueCodes += "`" + defaultValueCode.Replace("`", "\\`") + "`";
-                                    //labelCodes += "`" + labelCode.Replace("`", "\\`") + "`";
+                                    
                                     defaultValueCodes += defaultValueCode;
                                     labelCodes += labelCode;
                                     types += "`" + type.Replace("`", "\\`") + "`";
                                     questions += qName;  //the q parameter tells if the is a question sign on the function
 
                                     int n = ++Globals.counter;
-                                    //prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (numberOfParametersCutOff - j - 1) + "], (spml" + n + ") => null)";
-                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + (j) + "], (spml" + n + ") => null)";
+                                    
+                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
                                     prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";
                                 }                                
                                                                 
                                 string defaultValues = null;
 
-                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverload + ", `" + functionNameLower + "`);" + G.NL);
-                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverload + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParametersOverload, 0) + ") => " + G.NL);
+                                w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverloadedVersion + ", `" + functionNameLower + "`);" + G.NL);
+                                w.headerCs.AppendLine("Globals.ufunctionsNew" + numberOfParametersOverloadedVersion + ".Add(`" + functionNameLower + "`, (GekkoSmpl " + Globals.smpl + ", P p, bool " + qName + "" + GetParametersInAList(node, numberOfParametersOverloadedVersion, 0) + ") => " + G.NL);
                                 w.headerCs.AppendLine(G.NL + "{ " + G.NL);
 
                                 w.headerCs.AppendLine("if(" + qName + ") {" + G.NL);
@@ -2435,11 +2440,11 @@ namespace Gekko.Parser.Gek
                                 w.headerCs.AppendLine("List<string> " + typesName + " = new List<string> { " + types + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + labelCodesName + " = new List<IVariable> { " + labelCodes + " };");
                                 w.headerCs.AppendLine("List<IVariable> " + promptResultsName + " = O.Prompt(" + questionsName + ", " + defaultValueCodesName + ", " + typesName + ", " + labelCodesName + ");");
-                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + " " + prompts + ");");
+                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts + ");");
                                 w.headerCs.AppendLine("}" + G.NL);
                                 w.headerCs.AppendLine("else" + G.NL);
                                 w.headerCs.AppendLine("{" + G.NL);
-                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverload, 1) + " " + prompts2 + ");");
+                                w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts2 + ");");
                                 w.headerCs.AppendLine("}" + G.NL);
 
                                 

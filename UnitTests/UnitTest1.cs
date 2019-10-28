@@ -11003,23 +11003,66 @@ namespace UnitTests
         [TestMethod]
         public void _TestOverloadAndPrompt()
         {
-            I("RESET;");
-            I("function val f(val %x1 'x' = 1, val %x2 'add' = 2); return 100 * %x1 + %x2; end;");
-            I("%y1 = f(3, 4);"); //--> 304
-            I("%y2 = f(3);");    //--> 302
-            I("%y3 = f();");     //--> 102
-            _AssertScalarVal(First(), "%y1", 304d);
-            _AssertScalarVal(First(), "%y2", 302);
-            _AssertScalarVal(First(), "%y3", 102d);
-            I("%y4 = f?(3, 4);"); //--> 304
-            Globals.unitTestsPromtingHelper = new List<string> { "5" };
-            I("%y5 = f?(3);");    //--> 307 (inputs 5)
-            Globals.unitTestsPromtingHelper = new List<string> { "6", "7" };
-            I("%y6 = f?();");     //--> 607 (inputs 6 and 7)
-            _AssertScalarVal(First(), "%y4", 304d);
-            _AssertScalarVal(First(), "%y5", 305);
-            _AssertScalarVal(First(), "%y6", 607d);
 
+            // -------- 1 required, 2 optional, stopping prompts with ";"
+
+            if (false)
+            {
+                I("RESET;");
+                I("function val f(val %x0, val %x1 'x' = 1, val %x2 'add' = 2); return 10000 * %x0 + 100 * %x1 + %x2; end;");
+                Globals.unitTestsPromtingHelper = new List<string> { ";" };
+                //I("%y1 = f?(9, 3);");    //--> 90302 (inputs ';' = 2)
+                Globals.unitTestsPromtingHelper = new List<string> { "6", ";" };
+                I("%y2 = f?(9);");     //--> 90602 (inputs 6 and ';')            
+                Globals.unitTestsPromtingHelper = new List<string> { ";" };
+                I("%y3 = f?(9);");     //--> 90102 (inputs ';')            
+                                       //_AssertScalarVal(First(), "%y1", 90302);
+                _AssertScalarVal(First(), "%y2", 90602d);
+                _AssertScalarVal(First(), "%y3", 90102d);
+            }
+
+            // -------- 0 required, 2 optional
+            
+                I("RESET;");
+                I("function val f(val %x1 'x' = 1, val %x2 'add' = 2); return 100 * %x1 + %x2; end;");
+                I("%y1 = f(3, 4);"); //--> 304
+                I("%y2 = f(3);");    //--> 302
+                I("%y3 = f();");     //--> 102
+                _AssertScalarVal(First(), "%y1", 304d);
+                _AssertScalarVal(First(), "%y2", 302);
+                _AssertScalarVal(First(), "%y3", 102d);
+                I("%y4 = f?(3, 4);"); //--> 304
+                Globals.unitTestsPromtingHelper = new List<string> { "5" };
+                I("%y5 = f?(3);");    //--> 305 (inputs 5)
+                Globals.unitTestsPromtingHelper = new List<string> { "6", "7" };
+                I("%y6 = f?();");     //--> 607 (inputs 6 and 7)
+                _AssertScalarVal(First(), "%y4", 304d);
+                _AssertScalarVal(First(), "%y5", 305);
+                _AssertScalarVal(First(), "%y6", 607d);
+            
+
+            // -------- 1 required, 2 optional
+
+            I("RESET;");
+            I("function val f(val %x0, val %x1 'x' = 1, val %x2 'add' = 2); return 10000 * %x0 + 100 * %x1 + %x2; end;");
+            I("%y1 = f(9, 3, 4);"); //--> 90304
+            I("%y2 = f(9, 3);");    //--> 90302
+            I("%y3 = f(9);");     //--> 90102
+            FAIL("%slet = f();");
+            _AssertScalarVal(First(), "%y1", 90304d);
+            _AssertScalarVal(First(), "%y2", 90302);
+            _AssertScalarVal(First(), "%y3", 90102d);
+            I("%y4 = f?(9, 3, 4);"); //--> 90304
+            Globals.unitTestsPromtingHelper = new List<string> { "5" };
+            I("%y5 = f?(9, 3);");    //--> 90305 (inputs 5)
+            Globals.unitTestsPromtingHelper = new List<string> { "6", "7" };
+            I("%y6 = f?(9);");     //--> 90607 (inputs 6 and 7)
+            FAIL("%slet = f?();");
+            _AssertScalarVal(First(), "%y4", 90304d);
+            _AssertScalarVal(First(), "%y5", 90305);
+            _AssertScalarVal(First(), "%y6", 90607d);
+
+            
         }
 
         [TestMethod]
