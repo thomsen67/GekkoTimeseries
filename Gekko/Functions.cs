@@ -2721,7 +2721,65 @@ namespace Gekko
 
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            return split(smpl, _t1, _t2, x1, x2, new ScalarString("all"));
+            return split(smpl, _t1, _t2, x1, x2, new ScalarString("yes"), new ScalarString("yes"));  //removeempty = yes, stripblanks = yes
+        }
+
+        
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable empty, IVariable removeEmpty)
+        {
+            string s1 = O.ConvertToString(x1);
+            string s2 = O.ConvertToString(x2);
+            string removeEmpty_string = O.ConvertToString(empty);
+            string strip_string = O.ConvertToString(removeEmpty);
+            string[] ss = null;
+            if (G.Equal(removeEmpty_string, "yes"))
+            {
+                ss = s1.Split(new string[] { s2 }, StringSplitOptions.RemoveEmptyEntries);
+            }
+            else if (G.Equal(removeEmpty_string, "no"))
+            {
+                ss = s1.Split(new string[] { s2 }, StringSplitOptions.None);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: removeempty must be yes or no");
+                throw new GekkoException();
+            }
+
+            if (G.Equal( strip_string, "yes"))
+            {
+                for (int i = 0; i < ss.Length; i++)
+                {
+                    ss[i] = ss[i].Trim();
+                }
+            }
+            else if (G.Equal(strip_string, "no"))
+            {
+                //do nothing
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: strip must be yes or no");
+                throw new GekkoException();
+            }
+
+            List m = null;
+            if (G.Equal(removeEmpty_string, "yes"))
+            {
+                List<string> ss2 = new List<string>();
+                for (int i = 0; i < ss.Length; i++)
+                {
+                    if (ss[i] == "") continue;
+                    ss2.Add(ss[i]);
+                }
+                m = O.CreateListFromStrings(ss2.ToArray());
+            }
+            else
+            {
+                m = O.CreateListFromStrings(ss);
+            }
+            
+            return m;
         }
 
         public static IVariable type(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
@@ -2768,23 +2826,6 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
-        {
-            string s1 = O.ConvertToString(x1);
-            string s2 = O.ConvertToString(x2);
-            string s3 = O.ConvertToString(x3);
-            string[] ss = null;
-            if (G.Equal(s3, "noempty"))
-            {
-                ss = s1.Split(new string[] { s2 }, StringSplitOptions.RemoveEmptyEntries);
-            }
-            else
-            {
-                ss = s1.Split(new string[] { s2 }, StringSplitOptions.None);
-            }
-            List m = O.CreateListFromStrings(ss);
-            return m;
-        }
 
         //OBSOLETE
         //OBSOLETE

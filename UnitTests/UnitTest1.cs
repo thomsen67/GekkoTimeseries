@@ -16133,6 +16133,24 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_Split()
+        {
+            I("reset;");
+            I("%s = 'a, b,c,,d, , e';");
+            I("#m = %s.split(',');");  //yes, yes
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));            
+            I("#m = %s.split(',', 'yes', 'yes');");
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));
+            I("#m = %s.split(',', 'no', 'yes');");
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "", "d", "", "e" }));
+            I("#m = %s.split(',', 'yes', 'no');");
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c",  "d", " ", " e" }));
+            I("#m = %s.split(',', 'no', 'no');");
+            _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c", "", "d", " ", " e" }));
+        }
+
+
+        [TestMethod]
         public void _Test_PxFormat()
         {
             //Just running the files checks that the number of found data values corresponds to

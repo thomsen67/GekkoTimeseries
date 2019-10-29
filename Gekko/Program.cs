@@ -2986,7 +2986,7 @@ namespace Gekko
                                 //A string like #I/T has isNaNText = true and is handled above
                                 //but we may have a M or NA here, which will just become a string
                                 //later on: maybe option for M and NA strings...?
-                                iv = new ScalarString(cell.text);
+                                iv = new ScalarString(cell.text.Trim());                                
                             }
                             else if (cell.type == ECellLightType.None)
                             {
