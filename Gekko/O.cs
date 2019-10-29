@@ -2568,7 +2568,7 @@ namespace Gekko
             {
                 try
                 {
-                    double v = G.ParseIntoDouble(value.Trim());
+                    double v = G.ParseIntoDouble(value.Trim(), true);
                     iv = new ScalarVal(v);
                 }
                 catch

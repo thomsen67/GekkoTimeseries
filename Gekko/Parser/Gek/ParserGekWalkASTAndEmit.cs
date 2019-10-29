@@ -2555,6 +2555,7 @@ namespace Gekko.Parser.Gek
                             }
 
                             string functionNameLower = GetFunctionName(node);
+                            if (functionNameLower == "null") functionNameLower = "null2";  //cannot have the name Functions.null(...)
 
                             if (node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                             {

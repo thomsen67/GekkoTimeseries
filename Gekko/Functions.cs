@@ -1279,6 +1279,12 @@ namespace Gekko
             return SumHelper(smpl, _t1, _t2, x, ESumDim.Rows, ESumType.Max);
         }
 
+        public static IVariable null2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            //alias
+            return GekkoNull.gekkoNull;
+        }
+
         public static IVariable m(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             //alias
@@ -2716,6 +2722,50 @@ namespace Gekko
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
             return split(smpl, _t1, _t2, x1, x2, new ScalarString("all"));
+        }
+
+        public static IVariable type(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            string t = null;
+            if (x.Type() == EVariableType.Val)
+            {
+                t = "val";
+            }
+            else if (x.Type() == EVariableType.Date)
+            {
+                t = "date";
+            }
+            else if (x.Type() == EVariableType.String)
+            {
+                t = "string";
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                t = "series";
+            }
+            else if (x.Type() == EVariableType.List)
+            {
+                t = "list";
+            }
+            else if (x.Type() == EVariableType.Map)
+            {
+                t = "map";
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                t = "matrix";
+            }
+            else if (x.Type() == EVariableType.Null)
+            {
+                t = "null";
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Unknown type");
+                throw new GekkoException();
+            }
+            ScalarString rv = new ScalarString(t);
+            return rv;
         }
 
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable x3)
