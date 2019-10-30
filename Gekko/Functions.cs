@@ -2721,22 +2721,22 @@ namespace Gekko
 
         public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2)
         {
-            return split(smpl, _t1, _t2, x1, x2, new ScalarString("yes"), new ScalarString("yes"));  //removeempty = yes, stripblanks = yes
+            return split(smpl, _t1, _t2, x1, x2, new ScalarVal(1), new ScalarVal(1));  //removeempty = yes, stripblanks = yes
         }
 
         
-        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable empty, IVariable removeEmpty)
+        public static IVariable split(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x1, IVariable x2, IVariable removeEmpty, IVariable strip)
         {
             string s1 = O.ConvertToString(x1);
             string s2 = O.ConvertToString(x2);
-            string removeEmpty_string = O.ConvertToString(empty);
-            string strip_string = O.ConvertToString(removeEmpty);
+            int removeEmpty_int = O.ConvertToInt(removeEmpty);
+            int strip_int = O.ConvertToInt(strip);
             string[] ss = null;
-            if (G.Equal(removeEmpty_string, "yes"))
+            if (removeEmpty_int == 1)
             {
                 ss = s1.Split(new string[] { s2 }, StringSplitOptions.RemoveEmptyEntries);
             }
-            else if (G.Equal(removeEmpty_string, "no"))
+            else if (removeEmpty_int == 0)
             {
                 ss = s1.Split(new string[] { s2 }, StringSplitOptions.None);
             }
@@ -2746,14 +2746,14 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (G.Equal( strip_string, "yes"))
+            if (strip_int == 1)
             {
                 for (int i = 0; i < ss.Length; i++)
                 {
                     ss[i] = ss[i].Trim();
                 }
             }
-            else if (G.Equal(strip_string, "no"))
+            else if (strip_int == 0)
             {
                 //do nothing
             }
@@ -2764,7 +2764,7 @@ namespace Gekko
             }
 
             List m = null;
-            if (G.Equal(removeEmpty_string, "yes"))
+            if (removeEmpty_int == 1)
             {
                 List<string> ss2 = new List<string>();
                 for (int i = 0; i < ss.Length; i++)

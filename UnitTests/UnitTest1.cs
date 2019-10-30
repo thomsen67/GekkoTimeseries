@@ -16139,13 +16139,13 @@ namespace UnitTests
             I("%s = 'a, b,c,,d, , e';");
             I("#m = %s.split(',');");  //yes, yes
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));            
-            I("#m = %s.split(',', 'yes', 'yes');");
+            I("#m = %s.split(',', 1, 1);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "d", "e" }));
-            I("#m = %s.split(',', 'no', 'yes');");
+            I("#m = %s.split(',', 0, 1);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", "b", "c", "", "d", "", "e" }));
-            I("#m = %s.split(',', 'yes', 'no');");
+            I("#m = %s.split(',', 1, 0);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c",  "d", " ", " e" }));
-            I("#m = %s.split(',', 'no', 'no');");
+            I("#m = %s.split(',', 0, 0);");
             _AssertListString(First(), "#m", new StringOrList(new string[] { "a", " b", "c", "", "d", " ", " e" }));
         }
 
