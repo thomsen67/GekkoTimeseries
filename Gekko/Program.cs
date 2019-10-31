@@ -143,14 +143,14 @@ namespace Gekko
 
         public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2)
         {
-            this.f1 = f1; //original
-            this.f2 = f2; //alternative code, used for what??
+            this.f1 = f1; //original, for instance f('y')
+            this.f2 = f2; //alternative code, used for name type, for instance f(y), where y is treated like 'y'
             this.type = EGekkoArg.Normal;
         }
         public GekkoArg(Func<GekkoSmpl, IVariable> f1, Func<GekkoSmpl, IVariable> f2, EGekkoArg type)
         {
-            this.f1 = f1; //original
-            this.f2 = f2; //alternative code, used for what??
+            this.f1 = f1; //original, for instance f('y')
+            this.f2 = f2; //alternative code, used for name type, for instance f(y), where y is treated like 'y'
             this.type = type;
         }
     }

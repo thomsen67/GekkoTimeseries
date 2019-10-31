@@ -2426,9 +2426,20 @@ namespace Gekko.Parser.Gek
                                     questions += qName;  //the q parameter tells if the is a question sign on the function
 
                                     int n = ++Globals.counter;
-                                    
-                                    prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
-                                    prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";
+
+                                    if (true)
+                                    {
+                                        if (G.Equal(type, "name"))
+                                        {
+                                            prompts += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " +promptResultsName + "[" + j + "])";
+                                            prompts2 += ", new GekkoArg((spml" + n + ") => null, (spml" + n + ") => " + defaultValueCode2 + ")";  //simple version, just normal overload
+                                        }
+                                        else
+                                        {
+                                            prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
+                                            prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";  //simple version, just normal overload
+                                        }
+                                    }                                    
                                 }                                
                                                                 
                                 string defaultValues = null;

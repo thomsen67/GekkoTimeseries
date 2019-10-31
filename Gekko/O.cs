@@ -2452,6 +2452,10 @@ namespace Gekko
                 {
                     s = "'" + iv.ConvertToString() + "'";
                 }
+                else if (G.Equal(type, "name"))
+                {
+                    s = iv.ConvertToString(); //no quotes
+                }
             }
             return s;
         }
@@ -2503,13 +2507,13 @@ namespace Gekko
 
             for (int i = 0; i < type.Count; i++)
             {
-                if (G.Equal(type[i], "val") || G.Equal(type[i], "date") || G.Equal(type[i], "string"))
+                if (G.Equal(type[i], "val") || G.Equal(type[i], "date") || G.Equal(type[i], "string") || G.Equal(type[i], "name"))
                 {
                     //good
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: Promting is only allowed for types val, date or string at the moment.");
+                    G.Writeln2("*** ERROR: Promting is only allowed for types val, date, string or name at the moment.");
                     G.Writeln("    This restriction may be removed in a future Gekko version.", Color.Red);
                     G.Writeln("    The type '" + type[i] + "' is not valid for prompting.", Color.Red);                    
                     throw new GekkoException();
@@ -2588,6 +2592,20 @@ namespace Gekko
                 catch
                 {
                     G.Writeln2("*** ERROR: Could not convert '" + value + "' into a STRING");
+                    throw new GekkoException();
+                }
+            }
+            else if (G.Equal(type, "name"))
+            {
+                try
+                {
+                    string v = value.Trim();
+                    v = G.StripQuotes(v);
+                    iv = new ScalarString(v);
+                }
+                catch
+                {
+                    G.Writeln2("*** ERROR: Could not convert '" + value + "' into a NAME");
                     throw new GekkoException();
                 }
             }

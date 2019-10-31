@@ -8949,7 +8949,6 @@ namespace UnitTests
             //this one and the superlink above yield the exact same effects.
             I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
 
-
             // ===============================================
             // ===============================================
             // Test of old style ADAM
@@ -11126,6 +11125,25 @@ namespace UnitTests
             _AssertSeries(First(), "z2!a", 2001, 106d, sharedDelta);
 
             FAIL("z3 = f?();");  //prompting only allowed for val, date, string types (not even name)
+            
+            // -------- test of NAME type
+
+            I("RESET;");
+            I("function string f(name %x0, string %x1 'x1' = 'm', name %x2 'x2' = 'n'); return %x0 + %x1 + %x2; end;");
+            I("%y1 = f(a, 'b', c);"); //--> abc
+            I("%y2 = f(a, 'b');");    //--> abn
+            I("%y3 = f(a);");     //--> amn           
+            _AssertScalarString(First(), "%y1", "abc");
+            _AssertScalarString(First(), "%y2", "abn");
+            _AssertScalarString(First(), "%y3", "amn");
+            I("%y4 = f?(a, 'b', c);"); //--> abc
+            Globals.unitTestsPromtingHelper = new List<string> { "o" };
+            I("%y5 = f?(a, 'b');");    //--> abo (inputs o)
+            Globals.unitTestsPromtingHelper = new List<string> { "o", "p" };
+            I("%y6 = f?(a);");     //--> aop (inputs o and p)                        
+            _AssertScalarString(First(), "%y4", "abc");
+            _AssertScalarString(First(), "%y5", "abo");
+            _AssertScalarString(First(), "%y6", "aop");
 
         }
 
