@@ -1277,11 +1277,12 @@ namespace Gekko
                 int counter2 = -1;
                 foreach (Link link in this.decompOptions2.link)
                 {
-                    counter2++;
+                    counter2++;                    
+
                     string residualName = Program.GetDecompExpressionName(counter2);
                     List<DecompData> temp = new List<DecompData>();
                     foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
-                    {
+                    {                        
                         temp.Add(Program.Decompose2(per1, per2, expression, DecompBanks(operator1), residualName));
                     }
                     decompDatas.Add(temp);
@@ -1310,26 +1311,41 @@ namespace Gekko
                 //linking
                 //linking
                 //linking
+                
+                //------------------------
+                //Example: e1: y = c + i + g  --> y - (c + i + g)
+                //         e2: c = 0.8 * y    --> c - 0.8 * y
+                //------------------------
 
                 //Takes the link equations, skipping the first one (which is the "normal" equation)
+                //Example: decomp y in e1 link c in e2
+                //the link equation is e2
                 for (int i = 1; i < this.decompOptions2.link.Count; i++)
                 {
-                    //For each variable name in the link equation
+                    //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
                     {
 
+                        if (Globals.fixDecomp != null)
+                        {
+                            if (!decompOptions2.link[i].varnames[n].Contains(Globals.fixDecomp)) continue;
+                        }
+                        
                         //adjust the table according to link variable, so it fits with the destination table
                         string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
                         if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
 
-                        int j = FindLinkJ(decompDatas, i, linkVariable);
+                        int j = FindLinkJ(decompDatas, i, linkVariable);  //Example: find row with c in table corresponding to e2
 
-                        Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable);                        
-                        Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable);
+                        Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable); //Example: decomposed c from e1                       
+                        Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable); //Example: decomposed c from e2
 
                         List<double> factors = new List<double>();
                         foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                         {
+                            //Example: the factor is -(-1/1) = 1, so that adding the two tables would eliminate c in e1 equation.
+                            // y - (c + i + g) + 1*(c - 0.8 * y) = y + i + g - 0.8 * y =  0.2 * y + i + g
+                            // when showing this for y, the result must be multiplied by 5.
                             double dLinkParent = linkParent.GetDataSimple(t);
                             double dLinkChild = linkChild.GetDataSimple(t);
                             double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much

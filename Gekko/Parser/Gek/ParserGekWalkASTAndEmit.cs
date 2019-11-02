@@ -5474,63 +5474,42 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTEVAL":
-                        {                            
+                        {
 
-                            bool isLoop = Globals.fix && node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
-                            isLoop = Globals.fix;
-
-                            //List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();
-                            //foreach (IVariable listloop_a553 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, null)))
-                            //{
-                            //    Evalcode555.Add((smpl556) =>
-                            //    {                            
-                            //        return O.Subtract(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Add(smpl556, O.Multiply(smpl556, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "k", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.IndexerLag, O.Negate(smpl556, i554)
-                            //        ), smpl556, O.EIndexerType.IndexerLag, O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "y", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553), O.Negate(smpl556, i554)
-                            //        )), O.Indexer(O.Indexer2(smpl556, O.EIndexerType.None, listloop_a553), smpl556, O.EIndexerType.None, O.Lookup(smpl556, null, null, "z", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a553)));                            
-                            //    });
-                            //    //Evalcode555[0](null);
-                            //}
-
+                            bool isLoop = node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
 
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
-                                                        
+
                             string methodName = "Evalcode" + ++Globals.counter;
 
                             StringBuilder code = new StringBuilder();
                             string codeNew = null;
-                            if (isLoop)  //#p24234oi35
+
+                            StringBuilder before = new StringBuilder();
+                            StringBuilder after = new StringBuilder();
+                            if (node.listLoopAnchor != null)
                             {
-                                StringBuilder before = new StringBuilder();
-                                StringBuilder after = new StringBuilder();
-                                if (node.listLoopAnchor != null)
+                                foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
                                 {
-                                    foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
-                                    {                                        
-                                        before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.GetIVariableFromString(`" + Globals.symbolCollection + kvp.Key + "`, O.ECreatePossibilities.NoneReportError, true))) {" + G.NL);
-                                        after.Append("}");
-                                    }
+                                    before.Append("foreach (IVariable " + kvp.Value.s1 + " in new O.GekkoListIterator(O.DecompLooper(`" + Globals.symbolCollection + kvp.Key + "`))) {" + G.NL);
+                                    after.Append("}");
                                 }
-
-                                ////List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();                                
-                                code.Append("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
-                                code.Append(before);
-
-                                code.Append("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
-                                code.Append("return " + node[0].Code.ToString() + " ;");
-                                code.Append("  });");
-                                code.Append(after);
-                                string smplLocal; ReplaceSmpl(code.ToString(), out smplLocal, out codeNew);
-
                             }
-                            else
-                            {
-                                code.Append(node[0].Code.ToString());
-                                codeNew = code.ToString();
-                            }
+
+                            ////List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();                                
+                            code.Append("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
+                            code.Append(before);
+
+                            code.Append("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
+                            code.Append("return " + node[0].Code.ToString() + " ;");
+                            code.Append("  });");
+                            code.Append(after);
+                            string smplLocal; ReplaceSmpl(code.ToString(), out smplLocal, out codeNew);
                             
+
                             StashIntoLocalFuncs(w, methodName, codeNew, isLoop);
 
-                            if(isLoop)
+                            if (isLoop)
                             {
                                 node.Code.A("Globals.expressions = " + methodName + ";" + G.NL);
                             }
@@ -5538,9 +5517,9 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("Globals.expression = " + methodName + ";" + G.NL);
                             }
-                            
+
                             //node.Code.A("Globals.freeIndexedListsDecomp = null;" + G.NL);  //clearing it just in case
-                                                        
+
                         }
                         break;
                     case "ASTDECOMP":

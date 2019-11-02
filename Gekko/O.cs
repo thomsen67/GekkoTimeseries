@@ -2249,6 +2249,18 @@ namespace Gekko
             return rv;
         }
 
+        public static IVariable DecompLooper(string fullname)
+        {
+            IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);
+            if (G.Equal(fullname, Globals.chooseDecomp[0]))
+            {
+                //TODO: check that chooseDecomp[1] is part of iv list
+                List<string> temp = new List<string>() { Globals.chooseDecomp[1] };
+                iv = new List(temp);
+            }            
+            return iv;
+        }
+
         public static IVariable GetIVariableFromString(string fullname, ECreatePossibilities type)
         {            
             return GetIVariableFromString(fullname, type, false);  //no searching per default
@@ -8793,14 +8805,16 @@ namespace Gekko
                 //Calls: Program.Decomp2();
                 //       CrossThreadStuff.Decomp2(decompOptions2) --> may use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
                 //                                                    DecompEvalGams() finds the equation, translates to Gekko, and returns a 
-                //                                                    ModelGamsEquation object with element .expressions containing the expression
+                //                                                    ModelGamsEquation object with element .expressions containing the expression(s).
+                //                                                    In an eq like y[#i] = 2*x[#i], n expressions are returned corresponding to the elements of #i
                 //       WindowDecomp.RecalcCellsWithNewType();
-                //       Program.Decompose2()                     --> actual calculation of data, expression is argument
+                //       Program.Decompose2()                     --> actual calculation of data, expression(s) is argument
                 //       Program.DecomposePutIntoTable2()         --> putting the data into a table
                 //       WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
                 //
                 //CLICKING: Mouse_Down(), cf. #98732498724
-                //                
+                //        
+                
 
                 Globals.lastDecompTable = null;                
                 G.CheckLegalPeriod(this.t1, this.t2);

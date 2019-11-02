@@ -10014,187 +10014,7 @@ namespace Gekko
             return fileName;
         }
 
-        //public static void RunCmd(ConvertHelper ch, P p)
-        //{
-        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RunCmd start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-        //    CompilerParameters compilerParams = new CompilerParameters();
-        //    compilerParams.CompilerOptions = Globals.compilerOptions;  //has no effect
-
-        //    compilerParams.GenerateInMemory = true;
-        //    //compilerParams.GenerateExecutable = true;
-
-        //    compilerParams.IncludeDebugInformation = false;
-        //    compilerParams.ReferencedAssemblies.Add("system.dll");
-        //    compilerParams.ReferencedAssemblies.Add("system.windows.forms.dll");
-        //    compilerParams.ReferencedAssemblies.Add("system.drawing.dll");
-
-        //    if (G.IsUnitTesting())
-        //    {
-        //        //if running test cases, use this absolute path
-        //        compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\ANTLR.dll");
-        //        compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\gekko.exe");
-        //    }
-        //    else
-        //    {
-        //        compilerParams.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll"));
-        //        compilerParams.ReferencedAssemblies.Add(Application.ExecutablePath);
-        //    }
-
-
-        //    compilerParams.GenerateExecutable = false;
-        //    CSharpCodeProvider csCompiler = new CSharpCodeProvider();
-
-        //    string code = ch.code;
-        //    string code2 = code + " ";
-
-        //    CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
-        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-        //    CompilerResults compilerResults = provider.CompileAssemblyFromSource(compilerParams, code2);
-        //    if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-
-        //    if (compilerResults.Errors.HasErrors)
-        //    {
-        //        p.hasBeenCompilationError = true;
-        //        Globals.lastDynamicCsCode = code2;  //would be nicer to have this in the P object.
-        //        string text = "*** ERROR: Internal Gekko error regarding file: " + p.lastFileSentToANTLR;
-        //        if (p.lastFileSentToANTLR == "") text = "*** ERROR: Internal Gekko error regarding user input";
-        //        WriteCompileErrorMessage(text, p.lastFileSentToANTLR);
-        //        throw new GekkoException();
-        //    }
-
-        //    // Load the generated assembly into the ApplicationDomain
-
-        //    Object[] args = new Object[1];
-        //    args[0] = p;
-
-        //    try
-        //    {
-
-        //        if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-        //        p.Deeper();
-
-        //        //This only only takes time to JIT the first time it is invoked
-        //        //But cmd files are typically only run 1 time and not called
-        //        //again and again (like model SIM for instance). So the JIT overhead
-        //        //is always there. But just to say that if the below line was multiplied,
-        //        //only the first instance would takte time to JIT.
-        //        //Seems NGEN can avoid the JIT if the image is cached, but is it really worth it?
-        //        //This issues is worst for large cmd files full of simple lines like UPD or
-        //        //GENR, and no loops etc. But hey, why not use a databank and a model for that
-        //        //kind of stuff? For more normal kinds of programs, especially when we go the
-        //        //AREMOS way with loops etc., the parsing/compiling/JITting would probably be
-        //        //less visible.
-        //        //On a .cmd file with 1000 GENRs, the JITting is unreasonably slow (50 sec.), and
-        //        //it probably has to do with the stack getting full of stuff. Splitting it into
-        //        //for instance 200 methods each with 5 GENRs speeds the JIT up to about 4 sec.
-        //        //So splitting large cmd files seems to help a lot.
-
-        //        if (Globals.runningOnTTComputer)
-        //        {
-        //            //G.Writeln("--> Calling InvokeMember()");
-        //        }
-        //        DateTime t0 = DateTime.Now;
-
-        //        string usedCode = ch.code;
-        //        Type assembly = compilerResults.CompiledAssembly.GetType("Gekko.TranslatedCode");
-        //        assembly.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);
-
-        //        if (Globals.runningOnTTComputer)
-        //        {
-        //            //G.Writeln("--> Finished InvokeMember() in " + (DateTime.Now - t0).TotalMilliseconds / 1000d);
-        //        }
-
-        //        int ii = 2;
-        //        if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Running dll end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        if (Globals.threadIsInProcessOfAborting)
-        //        {
-        //            throw e;
-        //        }
-        //        string exception = "";
-        //        if (e.InnerException != null) exception = e.InnerException.Message;
-        //        if (exception.Length > 0)
-        //        {
-        //            {
-        //                string originalFileName;
-        //                int lineNumber;
-        //                string problemLine;
-        //                List<string> commandLines;
-
-        //                GetErrorLineAndText(p, p.GetDepth(), out lineNumber, out originalFileName, out commandLines);
-
-        //                if (lineNumber <= 0)
-        //                {
-        //                    problemLine = "";
-        //                }
-        //                else
-        //                {
-        //                    problemLine = commandLines[lineNumber - 1];
-        //                }
-
-        //                bool lexer = false;
-
-        //                if (p.hasShownErrorHandling == EHasShownErrorHandling.False)
-        //                {
-        //                    if (exception.Contains("¤Model lexer error:"))
-        //                    {
-        //                        lexer = true;
-        //                        List<string> temp = new List<string>();
-        //                        temp.Add(exception);
-        //                        ParserOLD.PrintModelLexerErrors(temp, Globals.modelFileLines, new ParseHelper());
-        //                    }
-        //                    if (exception.Contains("¤Cmd lexer error:"))
-        //                    {
-        //                        lexer = true;
-        //                        List<string> temp = new List<string>();
-        //                        temp.Add(exception);
-        //                        ParserOLD.PrintModelLexerErrors(temp, Globals.cmdFileLines, new ParseHelper());
-        //                    }
-
-        //                    if (originalFileName == "" && commandLines.Count == 1)  //more-liners get file-type error messages
-        //                    {
-        //                        if (lexer == true) G.Writeln("*** ERROR: Problem parsing/lexing command line:");
-        //                        else G.Writeln("*** ERROR: Running user input line:");
-        //                        G.Writeln("              " + G.ReplaceGlueNew(problemLine), Color.Blue);
-        //                    }
-        //                    else
-        //                    {
-        //                        //file or text block user input (>1 line)
-        //                        string xx = "Running";
-        //                        if (lexer == true) xx = "Problem parsing/lexing";
-        //                        string text = null;
-        //                        string lineNumber3 = "" + lineNumber;
-        //                        if (lineNumber == 0) lineNumber3 = "[unknown]";
-
-        //                        if (originalFileName == null || originalFileName == "")
-        //                        {
-        //                            //text block user input
-        //                            text = "*** ERROR: User input block, line " + lineNumber3 + ":";
-        //                        }
-        //                        else
-        //                        {
-        //                            //file
-        //                            text = "*** ERROR: " + xx + " file: " + originalFileName + " line " + lineNumber3;
-        //                        }
-        //                        WriteErrorMessage(lineNumber, problemLine, text, originalFileName);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        throw e;
-        //    }
-        //    finally
-        //    {
-        //        //always remove any _tmptmp-variables in banks if present
-        //        p.RemoveLast();
-        //    }
-
-        //    return;
-        //}
-
+        
         public static void WriteErrorMessage(int lineNumber, string problemLine, string text, string fileName)
         {
             if (Globals.threadIsInProcessOfAborting) return;
@@ -12816,8 +12636,7 @@ namespace Gekko
                     }
 
                     EquationHelper found = DecompEval(decompOptions.variable);
-                    if(Globals.fix) decompOptions.expression = Globals.expressions[0];
-                    else decompOptions.expression = Globals.expression;
+                    decompOptions.expression = Globals.expressions[0];
                     decompOptions.expressionOld = found.equationText;
                 }
             }
@@ -13004,8 +12823,7 @@ namespace Gekko
                 string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
                 if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
                 Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-                if (Globals.fix) found.expressions.AddRange(Globals.expressions);
-                else found.expressions.Add(Globals.expression);
+                found.expressions.AddRange(Globals.expressions);                
             }
             catch (Exception e)
             {

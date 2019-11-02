@@ -82,8 +82,7 @@ namespace Gekko
                         }
 
                         EquationHelper found = Program.DecompEval(decompOptions.variable);
-                        if(Globals.fix) decompOptions.expression = Globals.expressions[0];
-                        else decompOptions.expression = Globals.expression;
+                        decompOptions.expression = Globals.expressions[0];
                         decompOptions.expressionOld = found.equationText;
                     }
                 }
@@ -98,7 +97,10 @@ namespace Gekko
                 }
                 w.Tag = decompOptions;
 
+                w.isInitializing = false;  //so we don't get a recalc here because of setting radio buttons
                 w.SetRadioButtons();
+                w.isInitializing = true;
+
                 w.RecalcCellsWithNewType();
                 decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
