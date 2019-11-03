@@ -12821,7 +12821,7 @@ namespace Gekko
             try
             {
                 string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
+                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);                
                 Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
                 found.expressions.AddRange(Globals.expressions);                
             }

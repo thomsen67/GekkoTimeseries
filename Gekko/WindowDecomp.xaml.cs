@@ -1288,7 +1288,35 @@ namespace Gekko
                     decompDatas.Add(temp);
                 }
 
+                if (false)
+                {
+                    int c1 = -1;
+                    foreach (List<DecompData> dd in decompDatas)
+                    {
+                        c1++;
+                        int c2 = -1;
+                        foreach (DecompData d in dd)
+                        {
+                            c2++;
+                            DecompDict dict = d.cellsContribD;
+                            foreach (KeyValuePair<string, Series> kvp in dict.storage)
+                            {
+                                string nme = kvp.Key;
+                                Series ts = kvp.Value;
+                                for (int i = 2001; i <= 2002; i++)
+                                {
+                                    double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
+                                    G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
+                                }
+                            }
+                        }                        
+                    }                 
+                }
+
                 int parentI = 0;
+                //HMMMMMMMM
+                //HMMMMMMMM
+                //HMMMMMMMM
                 List<string> varnamesFirstLink = decompOptions2.link[parentI].varnames;
                 string name = null;
                 if (varnamesFirstLink != null)
@@ -1337,6 +1365,10 @@ namespace Gekko
 
                         int j = FindLinkJ(decompDatas, i, linkVariable);  //Example: find row with c in table corresponding to e2
 
+                        //in y = c + i + g // c = 0.8 y
+                        //DECOMP y in eq1 link c in eq2.
+                        //linkparent would be c from eq1, and linkchild would be c from eq2.
+                        //linkparent is always from first equation
                         Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable); //Example: decomposed c from e1                       
                         Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable); //Example: decomposed c from e2
 

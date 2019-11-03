@@ -8876,8 +8876,15 @@ namespace UnitTests
             Table table = null;
                         
 
-            if (false)
+            if (true)
             {
+                // See description here: #9807532957234
+                //           e1     y[#a] = x1[#a] + x2[#a] + z;
+                //           e2     x1[#a] = b1 * u[#a];
+                //           e3     x2[#a] = b2 * u[#a-1];
+                //           e4     z = sum(#a, u[#a]):
+                //decomp2<d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;
+                                
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("OPTION model type = gams;");
@@ -8906,8 +8913,11 @@ namespace UnitTests
                 I("#a = 20, 21;");
                 I("#a = #a.strings();");
                 Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                                                 //I("decomp2 <d> x[20] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
-                I("decomp2 <d> z in e4;");
+                I("decomp2 <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
+                //I("decomp2 <d> y[20] in e1 ;");
+                //I("decomp2 <d> z in e4;");
+                MessageBox.Show("STOPPING");
+                Assert.IsFalse(true);
                 return;
             }
 

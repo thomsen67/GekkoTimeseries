@@ -2252,7 +2252,7 @@ namespace Gekko
         public static IVariable DecompLooper(string fullname)
         {
             IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);
-            if (G.Equal(fullname, Globals.chooseDecomp[0]))
+            if (G.Equal(fullname, Globals.chooseDecomp[0]) && Globals.chooseDecomp[1] != null)
             {
                 //TODO: check that chooseDecomp[1] is part of iv list
                 List<string> temp = new List<string>() { Globals.chooseDecomp[1] };
@@ -8814,24 +8814,28 @@ namespace Gekko
                 //
                 //CLICKING: Mouse_Down(), cf. #98732498724
                 //        
-                // Consider this: y[#a] = x1[#a] + x2[#a] + z;
+                // Consider this: y[#a] = x1[#a] + x2[#a] + z;    #9807532957234
                 //                x1[#a] = b1 * u[#a];
                 //                x2[#a] = b2 * u[#a-1];
                 //                z = sum(#a, u[#a]):
                 //
+                //decomp <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;                
+                //
                 // with #a = 20, 21, we have:
                 //
-                //                y[20] = x1[20] + x2[20] + z; 
-                //                y[21] = x1[21] + x2[21] + z;
-                //                x1[20] = b1 * u[20]; 
-                //                x1[21] = b1 * u[21];
-                //                x2[20] = b2 * u[19]; 
-                //                x2[21] = b2 * u[20]; 
-                //                z = u[20] + u[21];
+                //        e1        y[20] = x1[20] + x2[20] + z; 
+                //        e1        y[21] = x1[21] + x2[21] + z;
+                //        e2        x1[20] = b1 * u[20]; 
+                //        e2        x1[21] = b1 * u[21];
+                //        e3        x2[20] = b2 * u[19]; 
+                //        e3        x2[21] = b2 * u[20]; 
+                //        e4        z = u[20] + u[21];
                 //
-                // Here we can choose to show y[20] or y[21]. If we link with x1[#a] and x2[#], we get this for [20]:
+                //decomp <d> y[20],y[21] in e1 link x1[20],x1[21] in e2, x2[20],x2[21] in e3, z in e4;
+                //
+                // Here we can choose to show y[20] or y[21]. If we link with x1[#a] and x2[#a], we get this for [20]:
                 //                y[20] = b1 * u[20] + b2 * u[19] + u[20] + u[21];
-                // So we do not need to compute for #a = 21 at all (would be waste of effort). So all uncontrolledd #a used, should
+                // So we do not need to compute for #a = 21 at all (would be waste of effort). So all uncontrolled #a should
                 //   only use #a = 20, whereas the controlled sum(#a, ...) is not truncated.
                 // With lags/leads on #a, like u[#a-1], it is difficult to link on u[#a] maybe u[#a-1] should be possible to link on.
                 //   therefore #m = u[#a-1] should be possible as name.
