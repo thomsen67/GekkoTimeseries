@@ -5477,6 +5477,7 @@ namespace Gekko.Parser.Gek
                         {
 
                             bool isLoop = node.listLoopAnchor != null && node.listLoopAnchor.Count > 0;
+                            isLoop = true;
 
                             node.Code.A("Globals.expressionText = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
 

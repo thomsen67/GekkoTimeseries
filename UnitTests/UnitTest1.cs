@@ -8874,15 +8874,50 @@ namespace UnitTests
         public void _Test_Decomp1()
         {
             Table table = null;
-
-            // ===============================================
-            // ===============================================
-            // Test with UADAM, linking etc.
-            // ===============================================
-            // ===============================================
+                        
 
             if (false)
             {
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("OPTION model type = gams;");
+                I("model <gms> simpleage;");
+                I("time 2001 2002;");
+                I("y = series(1);");
+                I("x1 = series(1);");
+                I("x2 = series(1);");
+                I("x1 = series(1);");
+                I("u = series(1);");
+                I("y[19] = 99, 97;");
+                I("y[20] = 100, 102;");
+                I("y[21] = 101, 98;");
+                I("x1[19] = 110, 111;");
+                I("x1[20] = 102, 95;");
+                I("x1[21] = 103, 100;");
+                I("x2[19] = 113, 115;");
+                I("x2[20] = 107, 101;");
+                I("x2[21] = 103, 111;");
+                I("u[19] = 113, 111;");
+                I("u[20] = 111, 100;");
+                I("u[21] = 108, 105;");
+                I("b1 = 100, 111;");
+                I("b2 = 100, 101;");
+                I("z = 100, 102;");
+                I("#a = 20, 21;");
+                I("#a = #a.strings();");
+                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                                                 //I("decomp2 <d> x[20] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
+                I("decomp2 <d> z in e4;");
+                return;
+            }
+
+            if (false)
+            {
+                // ===============================================
+                // ===============================================
+                // Test with UADAM, linking etc.
+                // ===============================================
+                // ===============================================
 
                 I("RESET;");
                 Globals.showDecompTable = true;  //will show the following decomp table and then abort
@@ -8955,16 +8990,19 @@ namespace UnitTests
             // ===============================================
             // ===============================================
 
-            I("RESET; TIME 2006 2006;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-            I("READ <tsd> jul05;");
-            I("MODEL jul05;");
-            I("DECOMP <d> fy;");
-            table = Globals.lastDecompTable;
-            Assert.AreEqual(table.Get(1, 2).date, "2006");
-            Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
-            Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
-            Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
+            if (true)
+            {
+                I("RESET; TIME 2006 2006;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("READ <tsd> jul05;");
+                I("MODEL jul05;");
+                I("DECOMP <d> fy;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).date, "2006");
+                Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
+                Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
+                Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
+            }
 
             //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 

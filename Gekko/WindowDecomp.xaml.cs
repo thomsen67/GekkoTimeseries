@@ -1395,14 +1395,9 @@ namespace Gekko
 
                 string lhsName = null;
                 if (varnamesFirstLink != null) lhsName = varnamesFirstLink[0];
-
-                //if (false)
-                //{
-                //    Table table2 = Program.DecomposePutIntoTable2_OLDDELETE(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore));
-                //}
+                                
                 Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore), decompOptions2);
-                //List<string> ss = table.Print(); foreach (string s2 in ss) G.Writeln(s2);               
-
+                
                 this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
                 if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)

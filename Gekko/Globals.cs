@@ -55,8 +55,9 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
-        public static string fixDecomp = "50";
-        public static List<string> chooseDecomp = new List<string>() { "#a", "50" };
+        public static string fixDecomp = null;
+        //public static string fixDecomp = "51";
+        public static List<string> chooseDecomp = new List<string>() { "#a", Globals.fixDecomp };
         
         // ----------------------------------------------------------------
         // GRADIENT

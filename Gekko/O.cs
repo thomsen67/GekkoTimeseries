@@ -8814,7 +8814,28 @@ namespace Gekko
                 //
                 //CLICKING: Mouse_Down(), cf. #98732498724
                 //        
-                
+                // Consider this: y[#a] = x1[#a] + x2[#a] + z;
+                //                x1[#a] = b1 * u[#a];
+                //                x2[#a] = b2 * u[#a-1];
+                //                z = sum(#a, u[#a]):
+                //
+                // with #a = 20, 21, we have:
+                //
+                //                y[20] = x1[20] + x2[20] + z; 
+                //                y[21] = x1[21] + x2[21] + z;
+                //                x1[20] = b1 * u[20]; 
+                //                x1[21] = b1 * u[21];
+                //                x2[20] = b2 * u[19]; 
+                //                x2[21] = b2 * u[20]; 
+                //                z = u[20] + u[21];
+                //
+                // Here we can choose to show y[20] or y[21]. If we link with x1[#a] and x2[#], we get this for [20]:
+                //                y[20] = b1 * u[20] + b2 * u[19] + u[20] + u[21];
+                // So we do not need to compute for #a = 21 at all (would be waste of effort). So all uncontrolledd #a used, should
+                //   only use #a = 20, whereas the controlled sum(#a, ...) is not truncated.
+                // With lags/leads on #a, like u[#a-1], it is difficult to link on u[#a] maybe u[#a-1] should be possible to link on.
+                //   therefore #m = u[#a-1] should be possible as name.
+                //
 
                 Globals.lastDecompTable = null;                
                 G.CheckLegalPeriod(this.t1, this.t2);

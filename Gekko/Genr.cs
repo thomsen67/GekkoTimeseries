@@ -35,15 +35,26 @@ namespace Gekko
 
 
 
+            var Evalcode41 = new List<Func<GekkoSmpl, IVariable>>();
+            var xxx = new List<TwoStrings>();
+            foreach (IVariable listloop_a40 in new O.GekkoListIterator(O.DecompLooper("#a")))
+            {
+
+                Evalcode41.Add((smpl42) =>
+                {
+                    return O.Subtract(smpl42, O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrs", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40), O.Add(smpl42, O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrss", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40), O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrsm", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40)));
+                }
+                );
 
 
 
 
-            o0.Exe();
 
-            //[[commandEnd]]0
+                o0.Exe();
+
+                //[[commandEnd]]0
+            }
         }
-
 
 
         public static void CodeLines(P p)
