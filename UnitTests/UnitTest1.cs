@@ -8873,10 +8873,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp1()
         {
-            Table table = null;
-                        
+            Table table = null;                        
 
-            if (false)
+            if (true)
             {
                 // See description here: #9807532957234
                 //           e1     y[#a] = x1[#a] + x2[#a] + z;
@@ -8912,13 +8911,18 @@ namespace UnitTests
                 I("z = 100, 102;");
                 I("#a = 20, 21;");
                 I("#a = #a.strings();");
-                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                Globals.superFilter = 0;
                 I("decomp2 <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
-                //I("decomp2 <d> y[20] in e1 ;");
-                //I("decomp2 <d> z in e4;");
-                MessageBox.Show("STOPPING");
-                Assert.IsFalse(true);
-                return;
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 3).date, "2002");
+                Assert.AreEqual(table.Get(9, 3).number, 200d, 0.0001);
+                Globals.superFilter = 1;
+                I("decomp2 <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 3).date, "2002");
+                Assert.AreEqual(table.Get(9, 3).number, 1111d, 0.0001);
+                Globals.superFilter = 0;
             }
 
             if (false)
