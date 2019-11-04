@@ -183,11 +183,11 @@ namespace Gekko
         {
             
             this.decompOptions2 = decompOptions;
-            
-            isInitializing = true;
-            InitializeComponent();
-            isInitializing = false;
 
+            this.isInitializing = true; //so that radiobuttons etc do not fire right now
+            InitializeComponent();
+            this.isInitializing = false;  //ready for clicking
+            
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
             Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidth);
             this.gridUpperLeft.Width = Globals.guiTableCellWidth;
@@ -1167,26 +1167,32 @@ namespace Gekko
                 flowText.Opacity = 0.5;
                 flowText.Visibility = Visibility.Visible;
 
-                string transformationCodeAugmented = this.decompOptions2.guiDecompTransformationCode;
-
-                if (this.decompOptions2.guiDecompIsRaw && this.decompOptions2.guiDecompIsShares)
+                string transformationCodeAugmented = null;
+                if (this.decompOptions2.guiDecompTransformationCode == null)
                 {
-                    G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
-                    throw new GekkoException();
+                    //has never been set before, fresh decomp window with <option>.
+                    transformationCodeAugmented = this.decompOptions2.prtOptionLower;
+                }
+                else
+                {
+                    //There are 4 showing options: operator, isBaseline, isRaw, isShares.
+                    transformationCodeAugmented = this.decompOptions2.guiDecompTransformationCode;
+                    if (this.decompOptions2.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
+                    if (this.decompOptions2.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
+                    if (this.decompOptions2.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
+                    if (this.decompOptions2.guiDecompIsRaw && this.decompOptions2.guiDecompIsShares)
+                    {
+                        G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
+                        throw new GekkoException();
+                    }
                 }
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
-
-                //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used
-
-                if (this.decompOptions2.guiDecompIsBaseline) transformationCodeAugmented = "r" + transformationCodeAugmented;
-                if (this.decompOptions2.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
-                if (this.decompOptions2.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
+                //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
 
                 if (this.decompOptions2.isSubst) subst.IsChecked = true;
                 if (this.decompOptions2.isSort) sort.IsChecked = true;
                 if (this.decompOptions2.isPool) pool.IsChecked = true;
-
 
                 if (this.decompOptions2.guiDecompIsBaseline)
                 {
@@ -1243,15 +1249,15 @@ namespace Gekko
                 this.decompOptions2.prtOptionLower = transformationCodeAugmented;
 
                 string operator1 = this.decompOptions2.prtOptionLower;
-                string code2 = null;
+                string isShares = null;
                 if (operator1.StartsWith("s"))
                 {
                     operator1 = operator1.Substring(1);
-                    code2 = "s";
+                    isShares = "s";
                 }
 
                 this.decompOptions2.decompTablesFormat.isPercentageType = false;
-                if (operator1.Contains("p") || operator1.Contains("q") || code2 == "s")
+                if (operator1.Contains("p") || operator1.Contains("q") || isShares == "s")
                 {
                     this.decompOptions2.decompTablesFormat.isPercentageType = true;
                 }
@@ -1445,7 +1451,7 @@ namespace Gekko
                     string lhsName = null;
                     if (varnamesFirstLink != null) lhsName = varnamesFirstLink[super];
 
-                    Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, code2, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore), decompOptions2);
+                    Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore), decompOptions2);
 
                     this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
@@ -2230,7 +2236,7 @@ namespace Gekko
         public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
 
         //-------- tranformation start --------------
-        public string guiDecompTransformationCode = "n";
+        public string guiDecompTransformationCode = null;  //used to be "n"
         public bool guiDecompIsShares = false;
         public bool guiDecompIsRaw = true;
         public bool guiDecompIsBaseline = false;

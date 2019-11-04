@@ -36880,7 +36880,7 @@ namespace Gekko
             return vars2;
         }
 
-        public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string code2, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2, DecompOptions2 decompOptions2)
+        public static Table DecomposePutIntoTable2(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2, DecompOptions2 decompOptions2)
         {
             DataTable dt = new DataTable();
 
@@ -37079,7 +37079,7 @@ namespace Gekko
                             tab.Get(i + 1, j + 1).number *= factor;
                         }
                     }
-                    if (code2 == "s")
+                    if (isShares == "s")
                     {
                         //just take raw cell numbers and make them sum to 100
                         tab.Get(1 + 1, j + 1).number *= 100d / tab.Get(1 + 1, j + 1).number;  //variable 1, table row 2

@@ -51,7 +51,9 @@ namespace Gekko
 
                 DecompOptions2 decompOptions = (DecompOptions2)o;
                 WindowDecomp w = null;
+                
                 w = new WindowDecomp(decompOptions);
+                
                 Globals.windowsDecomp2.Add(w);
 
                 int count = -1;
@@ -97,9 +99,9 @@ namespace Gekko
                 }
                 w.Tag = decompOptions;
 
-                w.isInitializing = false;  //so we don't get a recalc here because of setting radio buttons
+                w.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
                 w.SetRadioButtons();
-                w.isInitializing = true;
+                w.isInitializing = false;
 
                 w.RecalcCellsWithNewType();
                 decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
