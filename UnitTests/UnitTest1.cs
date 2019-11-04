@@ -8883,7 +8883,10 @@ namespace UnitTests
                 //           e3     x2[#a] = b2 * u[#a-1];
                 //           e4     z = sum(#a, u[#a]):
                 //decomp2<d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;
-                                
+
+                string[] ss0 = new string[3] { "y[#a]", "x1[#a]", "x2[#a]" };
+                string[] ss1 = new string[3] { "y[20], y[21]", "x1[20], x1[21]", "x2[20], x2[21]" };
+
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("OPTION model type = gams;");
@@ -8911,18 +8914,26 @@ namespace UnitTests
                 I("z = 100, 102;");
                 I("#a = 20, 21;");
                 I("#a = #a.strings();");
-                //Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                Globals.superFilter = 0;
-                I("decomp2 <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
-                table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 3).date, "2002");
-                Assert.AreEqual(table.Get(9, 3).number, 200d, 0.0001);
-                Globals.superFilter = 1;
-                I("decomp2 <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;");
-                table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 3).date, "2002");
-                Assert.AreEqual(table.Get(9, 3).number, 1111d, 0.0001);
-                Globals.superFilter = 0;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    string[] ss = null;
+                    if (i == 0) ss = ss0;
+                    else ss = ss1;
+                    
+                    //Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                    Globals.superFilter = 0;
+                    I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 3).date, "2002");
+                    Assert.AreEqual(table.Get(9, 3).number, 200d, 0.0001);
+                    Globals.superFilter = 1;
+                    I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 3).date, "2002");
+                    Assert.AreEqual(table.Get(9, 3).number, 1111d, 0.0001);
+                    Globals.superFilter = 0;
+                }
             }
 
             if (false)

@@ -8814,31 +8814,50 @@ namespace Gekko
                 //
                 //CLICKING: Mouse_Down(), cf. #98732498724
                 //        
-                // Consider this: y[#a] = x1[#a] + x2[#a] + z;    #9807532957234
-                //                x1[#a] = b1 * u[#a];
-                //                x2[#a] = b2 * u[#a-1];
-                //                z = sum(#a, u[#a]):
+                // Consider this: e1   y[#a] = x1[#a] + x2[#a] + z;    #9807532957234
+                //                e2   x1[#a] = b1 * u[#a];
+                //                e3   x2[#a] = b2 * u[#a-1];
+                //                e4   z = sum(#a, u[#a]):
                 //
                 //decomp <d> y[#a] in e1 link x1[#a] in e2, x2[#a] in e3, z in e4;                
                 //
                 // with #a = 20, 21, we have:
                 //
-                //        e1        y[20] = x1[20] + x2[20] + z; 
-                //        e1        y[21] = x1[21] + x2[21] + z;
-                //        e2        x1[20] = b1 * u[20]; 
-                //        e2        x1[21] = b1 * u[21];
-                //        e3        x2[20] = b2 * u[19]; 
-                //        e3        x2[21] = b2 * u[20]; 
-                //        e4        z = u[20] + u[21];
+                //        e1a       y[20] = x1[20] + x2[20] + z; <----+----------+   z goes into both
+                //        e1b       y[21] = x1[21] + x2[21] + z; <----|----+-----+  
+                //        e2a       x1[20] = b1 * u[20]; ---->--------+    |     |
+                //        e2b       x1[21] = b1 * u[21]; ---->--------|----+     |
+                //        e3a       x2[20] = b2 * u[19]; ---->--------+    |     |
+                //        e3b       x2[21] = b2 * u[20]; ---->-------------+     |
+                //        e4        z = u[20] + u[21];   ---->-------------------+
                 //
                 //decomp <d> y[20],y[21] in e1 link x1[20],x1[21] in e2, x2[20],x2[21] in e3, z in e4;
                 //
-                // Here we can choose to show y[20] or y[21]. If we link with x1[#a] and x2[#a], we get this for [20]:
-                //                y[20] = b1 * u[20] + b2 * u[19] + u[20] + u[21];
-                // So we do not need to compute for #a = 21 at all (would be waste of effort). So all uncontrolled #a should
-                //   only use #a = 20, whereas the controlled sum(#a, ...) is not truncated.
-                // With lags/leads on #a, like u[#a-1], it is difficult to link on u[#a] maybe u[#a-1] should be possible to link on.
-                //   therefore #m = u[#a-1] should be possible as name.
+                //When linking, we do not link the sub-equations together, we only link into the primary equation
+                //one by one (so link order can be important). In the above example, if we only want to look at
+                //y[20], calculating e1b, e2b and e3b is a waste of time. If lazy eval was used, these would
+                //never be calculated, and can they be omitted? That is probably hard, for instance the e2a equation
+                //could depend on x2[21], and then we need the decomposed e3b equation. For instance this:
+                //
+                //                e1   y[#a] = x1[#a] + x2[#a];   links with x1[#a] and x2[#a]
+                //                e2   x1[#a] = b1 * x2[#a+1];
+                //                e3   x2[#a] = b2 * u[#a];       
+                //
+                //                e1a   y[20] = x1[20] + x2[20];
+                //                e1b   y[21] = x1[21] + x2[21];
+                //                e2a   x1[20] = b1 * x2[21]; -------- points to this one --------+
+                //                e2b   x1[21] = b1 * x2[22];                                     |
+                //                e3a   x2[20] = b2 * u[20];                                      |
+                //                e3b   x2[21] = b2 * u[21];  <-----------------------------------+
+                //
+                // When e1 is linked with e2, we get a #a-lead in e1, and therefore we need e3b in the 
+                // calculation. So it seems this problem is "hard", because we never really know the sets
+                // (could in principle depend on a function, like x1[#a] = b1 * x2[randomlead(#a)], so
+                // it seems a bit similar to the lag problem.
+                // Also, e2 might be x1[#a2] = b1 * x2[#a2], where #a2 is an unknown set. In that case, how
+                // to know which of the equations e2a or e2b is relevant, if #a2 = 21, 22...?
+                // If we are calculating everything (all 7 unfolded eqs in the original example), the good thing
+                // is that it will be switch between looking at e1a or e1b since everything is pre-calculated.
                 //
 
                 Globals.lastDecompTable = null;                
