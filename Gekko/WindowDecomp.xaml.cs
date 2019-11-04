@@ -1314,17 +1314,16 @@ namespace Gekko
                 }
 
                 int parentI = 0;
-                //HMMMMMMMM
-                //HMMMMMMMM
-                //HMMMMMMMM
-
-
+                
                 List<string> varnamesFirstLink = decompOptions2.link[parentI].varnames;
                 int nnn = -12345;
                 if (varnamesFirstLink != null) nnn = varnamesFirstLink.Count;
                 else nnn = 1;  //expression?
 
-                for (int super = 0; super < nnn; super++)
+                bool[] used = new bool[decompDatas.Count];  //number of link-equations (including primary eq)
+                used[0] = true;  //primary equation
+
+                for (int super = 0; super < nnn; super++)  //number of variables like decomp x[20], x[21] in e0 link ...
                 {
                     if (super != Globals.superFilter) continue;
                     string name = null;
@@ -1380,7 +1379,14 @@ namespace Gekko
                             //linkparent is always from first equation
                             Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable); //Example: decomposed c from e1                       
                             //maybe check that all link equations are used, and report if they are not.
-                            if (linkParent == null) continue;
+                            if (linkParent == null)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                used[i] = true; //this link equation is somehow used, for some of its variables and one or more of the primary variables that are going to be decomposed (= super)
+                            }
                             Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable); //Example: decomposed c from e2
 
                             List<double> factors = new List<double>();
@@ -1443,23 +1449,23 @@ namespace Gekko
 
                     this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
-                    if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
-                    {
-                        //foreach (string var in this.decompOptions2.subst)
-                        //{
-                        //    table = DecompSubstitute(table.Item2, var);
-                        //}
-                    }
+                    //if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
+                    //{
+                    //    //foreach (string var in this.decompOptions2.subst)
+                    //    //{
+                    //    //    table = DecompSubstitute(table.Item2, var);
+                    //    //}
+                    //}
 
-                    if (this.decompOptions2.isSort)
-                    {
-                        //table = TableSort(table);
-                    }
+                    //if (this.decompOptions2.isSort)
+                    //{
+                    //    //table = TableSort(table);
+                    //}
 
-                    if (this.decompOptions2.isPool)
-                    {
-                        //table = TablePool(table);
-                    }
+                    //if (this.decompOptions2.isPool)
+                    //{
+                    //    //table = TablePool(table);
+                    //}
 
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;
@@ -1479,6 +1485,14 @@ namespace Gekko
                     {
                         ClearGrid();
                         MakeGuiTable2(table, this.decompOptions2);
+                    }
+                }
+
+                for (int i = 0; i < decompDatas.Count; i++)
+                {
+                    if (used[i] != true)
+                    {
+                        G.Writeln2("+++ WARNING: did not use link-equation #" + i + " of " + (decompDatas.Count - 1) + " (is it superfluous?)");
                     }
                 }
 
@@ -1523,7 +1537,9 @@ namespace Gekko
 
             if (parentJ == -12345)
             {
-                G.Writeln2("*** ERROR: Could not find link variable " + linkVariable);
+                string name = linkVariable;
+                if (linkVariable.EndsWith("¤[0]")) name = linkVariable.Substring(0, linkVariable.Length - "¤[0]".Length);
+                G.Writeln2("*** ERROR: Could not find variable " + name + " in linked equation #" + i + " of " + (decompDatas.Count - 1));
                 throw new GekkoException();
             }
 

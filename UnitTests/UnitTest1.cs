@@ -8912,6 +8912,7 @@ namespace UnitTests
                 I("b1 = 100, 111;");
                 I("b2 = 100, 101;");
                 I("z = 100, 102;");
+                I("w = 500, 502;");
                 I("#a = 20, 21;");
                 I("#a = #a.strings();");
 
@@ -8920,10 +8921,10 @@ namespace UnitTests
                     string[] ss = null;
                     if (i == 0) ss = ss0;
                     else ss = ss1;
-                    
+
                     //Globals.showDecompTable = true;  //will show the following decomp table and then abort
                     Globals.superFilter = 0;
-                    I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4;");
+                    I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4, w in e5;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 3).date, "2002");
                     Assert.AreEqual(table.Get(9, 3).number, 200d, 0.0001);
