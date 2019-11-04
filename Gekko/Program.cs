@@ -17341,7 +17341,7 @@ namespace Gekko
                
 
         public static void Tell(string text, bool nocr)
-        {
+        {            
             if (Globals.runningOnTTComputer && text == "python")
             {
                 string s = Python();
@@ -26239,6 +26239,9 @@ namespace Gekko
             Globals.arithmentics1[2] = (x1) => Math.Log(x1);
             Globals.arithmentics1[3] = (x1) => Math.Exp(x1);
             Globals.arithmentics1[4] = (x1) => Math.Sqrt(x1);
+            Globals.arithmentics1[5] = (x1) => Math.Truncate(x1); //same as (int)x1, but handles larger numbers 
+            Globals.arithmentics1[6] = (x1) => Math.Floor(x1); //floor(-1.5) = -2, truncate(-1.5) = -1
+            Globals.arithmentics1[7] = (x1) => Math.Ceiling(x1); //see above.
 
             Globals.timeStrings = new string[Globals.timeStringsEnd - Globals.timeStringsStart + 1];
             for (int i = Globals.timeStringsStart; i <= Globals.timeStringsEnd; i++)

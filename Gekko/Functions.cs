@@ -2661,6 +2661,108 @@ namespace Gekko
             }
         }
 
+        public static IVariable int2(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            if (G.IsGekkoNull(x)) return x;
+            
+            if (x.Type() == EVariableType.Val)
+            {
+                double d = O.ConvertToVal(x);
+                return new ScalarVal(Math.Truncate(d));
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeries(smpl, x as Series, Globals.arithmentics1[5]); //(x) => Math.Truncate(x1);                
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(x);
+                Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
+                for (int i = 0; i < m.data.GetLength(0); i++)
+                {
+                    for (int j = 0; j < m.data.GetLength(1); j++)
+                    {
+                        m2.data[i, j] = Math.Truncate(m.data[i, j]);
+                    }
+                }
+                return m2;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: int() does not support type " + x.Type().ToString());
+                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
+                throw new GekkoException();
+            }
+        }
+
+        public static IVariable floor(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            if (G.IsGekkoNull(x)) return x;
+
+            if (x.Type() == EVariableType.Val)
+            {
+                double d = O.ConvertToVal(x);
+                return new ScalarVal(Math.Floor(d));
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeries(smpl, x as Series, Globals.arithmentics1[6]); //(x) => Math.Floor(x1);                
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(x);
+                Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
+                for (int i = 0; i < m.data.GetLength(0); i++)
+                {
+                    for (int j = 0; j < m.data.GetLength(1); j++)
+                    {
+                        m2.data[i, j] = Math.Floor(m.data[i, j]);
+                    }
+                }
+                return m2;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: floor() does not support type " + x.Type().ToString());
+                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
+                throw new GekkoException();
+            }
+        }
+
+        public static IVariable ceiling(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            if (G.IsGekkoNull(x)) return x;
+
+            if (x.Type() == EVariableType.Val)
+            {
+                double d = O.ConvertToVal(x);
+                return new ScalarVal(Math.Ceiling(d));
+            }
+            else if (x.Type() == EVariableType.Series)
+            {
+                return Series.ArithmeticsSeries(smpl, x as Series, Globals.arithmentics1[7]); //(x) => Math.Ceiling(x1);                
+            }
+            else if (x.Type() == EVariableType.Matrix)
+            {
+                Matrix m = O.ConvertToMatrix(x);
+                Matrix m2 = new Matrix(m.data.GetLength(0), m.data.GetLength(1));
+                for (int i = 0; i < m.data.GetLength(0); i++)
+                {
+                    for (int j = 0; j < m.data.GetLength(1); j++)
+                    {
+                        m2.data[i, j] = Math.Ceiling(m.data[i, j]);
+                    }
+                }
+                return m2;
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: ceiling() does not support type " + x.Type().ToString());
+                if (x.Type() == EVariableType.String) G.Writeln(Globals.stringConversionNote);
+                throw new GekkoException();
+            }
+        }
+
         //OBSOLETE
         //OBSOLETE
         //OBSOLETE
