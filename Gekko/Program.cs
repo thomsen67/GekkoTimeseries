@@ -36939,7 +36939,6 @@ namespace Gekko
                         //there is some repeated work done here, but not really bad
                         //problem is we prefer to do one period at a time, to sum up, adjust etc.
 
-
                         string[] ss = colname.Split('¤');
                         string fullName = ss[0];
                         lag = ss[1];
@@ -37338,126 +37337,7 @@ namespace Gekko
 
 
 
-        public static DataTable GetInversedDataTableSLET(DataTable table, string columnX, string columnY, string columnZ, string nullValue, bool sumValues)
-        {
-            //Create a DataTable to Return
-            DataTable returnTable = new DataTable();
-
-            DataTable tempTable = table.Clone();
-
-            if (string.IsNullOrEmpty(columnX))
-            {
-                columnX = table.Columns[0].ColumnName;
-            }
-
-            tempTable.Columns.Remove(columnX);
-
-            //Add a Column at the beginning of the table
-            //returnTable.Columns.Add(columnY);
-
-            returnTable = tempTable.Clone();
-
-            //Read all DISTINCT values from columnX Column in the provided DataTale
-            List<string> columnXValues = new List<string>();
-
-            foreach (DataRow dr in table.Rows)
-            {
-                string columnXTemp = dr[columnX].ToString();
-                if (!columnXValues.Contains(columnXTemp))
-                {
-                    //Read each row value, if it's different from others provided, add to the list of values and creates a new Column with its value.
-                    columnXValues.Add(columnXTemp);
-                    returnTable.Columns.Add(columnXTemp);
-                }
-            }
-
-            //Verify if Y and Z Axis columns are provided
-            if (!string.IsNullOrEmpty(columnY) && !string.IsNullOrEmpty(columnZ))
-            {
-                //Read DISTINCT Values for Y Axis Column
-                List<string> columnYValues = new List<string>();
-
-                foreach (DataRow dr in table.Rows)
-                {
-                    if (!columnYValues.Contains(dr[columnY].ToString()))
-                    {
-                        columnYValues.Add(dr[columnY].ToString());
-                    }
-                }
-
-                //Loop all Column Y Distinct Value
-                foreach (string columnYValue in columnYValues)
-                {
-                    //Creates a new Row
-                    DataRow drReturn = returnTable.NewRow();
-                    drReturn[0] = columnYValue;
-                    //foreach column Y value, The rows are selected distincted
-                    DataRow[] rows = table.Select((columnY + "='") + columnYValue + "'");
-
-                    //Read each row to fill the DataTable
-                    foreach (DataRow dr in rows)
-                    {
-                        string rowColumnTitle = dr[columnX].ToString();
-
-                        //Read each column to fill the DataTable
-                        foreach (DataColumn dc in returnTable.Columns)
-                        {
-                            if (dc.ColumnName == rowColumnTitle)
-                            {
-                                //If Sum of Values is True it will try to perform a Sum
-                                //If sum is not possible due to value types, the value displayed is the last one read
-                                if (sumValues)
-                                {
-                                    try
-                                    {
-                                        drReturn[rowColumnTitle] = Convert.ToDecimal(drReturn[rowColumnTitle]) + Convert.ToDecimal(dr[columnZ]);
-                                    }
-                                    catch
-                                    {
-                                        drReturn[rowColumnTitle] = dr[columnZ];
-                                    }
-                                }
-                                else
-                                {
-                                    drReturn[rowColumnTitle] = dr[columnZ];
-
-                                }
-                            }
-                        }
-                    }
-
-                    returnTable.Rows.Add(drReturn);
-
-                }
-            }
-            else
-            {
-                throw new Exception("The columns to perform inversion are not provided");
-            }
-
-            //if a nullValue is provided, fill the datable with it
-            if (!string.IsNullOrEmpty(nullValue))
-            {
-                foreach (DataRow dr in returnTable.Rows)
-                {
-                    foreach (DataColumn dc in returnTable.Columns)
-                    {
-                        if (string.IsNullOrEmpty(dr[dc.ColumnName].ToString()))
-                        {
-                            dr[dc.ColumnName] = nullValue;
-                        }
-                    }
-                }
-            }
-
-            return returnTable;
-        }
-
         
-
-
-
-
 
         private static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
         {

@@ -8831,8 +8831,23 @@ namespace Gekko
                 //        e3b       x2[21] = b2 * u[20]; ---->-------------+     |
                 //        e4        z = u[20] + u[21];   ---->-------------------+
                 //
-                //decomp <d> y[20],y[21] in e1 link x1[20],x1[21] in e2, x2[20],x2[21] in e3, z in e4;
-                //
+                //decomp <d> y[20],y[21] in e1 link x1[20],x1[21] in e2, x2[20],x2[21] in e3, z in e4;                
+
+                //In this: x[#a] = x1[#a] + x2[#a], #a = 20, 21, there is the uncontrolled set #a. We cannot be sure 
+                //that all indexes [20] is the first equation, since there may be lags #a-1, or even single equations like
+                //x1[20] = y[21]... . So in reality we have the equation x[20] = y[21] ... , and effects do not sum to
+                //zero over each age. We may also have x[#i, #j] = ... where #i and #j are uncontrolled, for instance producing
+                //the equations x[i1, j1], x[i1, j3], x[i2, j1], x[i2, j2]. So we could do "eq x[i1, j1]" to identify one of
+                //the equations. In a lot of cases, like x[#a] = b[#a]*u[#a], the equations would match a set, so that in the
+                //raw datatable, the column with eq and #a would correlate 100%. In that case, we could just eliminate the "eq...".
+                //Perhaps also "eq x[i1, j1]", ... would sometimes correlate 100% with #i and #j, and in that case we could eliminate
+                //the "eq..." too.
+                //                    eq              #i            #j
+                //                  -----------------------------------------
+                //              eq x[i1, j1]          i1            j1
+                //              eq x[i1, j2]          i1            j2
+                //              eq x[i2, j1]          i2            j1
+
                 //When linking, we do not link the sub-equations together, we only link into the primary equation
                 //one by one (so link order can be important). In the above example, if we only want to look at
                 //y[20], calculating e1b, e2b and e3b is a waste of time. If lazy eval was used, these would

@@ -273,10 +273,14 @@
                 <Button Grid.Column="11" Grid.Row="4" Margin="73.542,1.625,0,1.875" Name="button2" ToolTip="More decimals" Click="button2_Click" FontSize="10" AllowDrop="False" HorizontalAlignment="Left" Width="18.875" Opacity="0.7">.00</Button>
                 <Button Grid.Column="11" Grid.Row="4" HorizontalAlignment="Right" Margin="0,1.625,19.125,1.875" Name="button3" Width="18" ToolTip="Fewer decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
                 <Button Name="button1" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Opacity="0.8" Content="Refresh"></Button>
+                
+                <!--
                 <CheckBox x:Name="subst" Content="Subst.&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" Margin="130,3,-82,0" Grid.Row="1" VerticalAlignment="Top" Grid.ColumnSpan="2" Unchecked="Subst_Unchecked" Checked="Subst_Checked"/>
                 <CheckBox x:Name="sort" Content="Sort&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" HorizontalAlignment="Left" Margin="131,3,-42.667,0" Grid.Row="2" VerticalAlignment="Top" Width="59" Grid.ColumnSpan="2" Unchecked="Sort_Unchecked" Checked="Sort_Checked"/>
-                <CheckBox x:Name="pool" Content="Pool&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" HorizontalAlignment="Left" Margin="131,3,-41,0" Grid.Row="3" VerticalAlignment="Top" Width="58" Grid.ColumnSpan="2" Unchecked="Pool_Unchecked" Checked="Pool_Checked" />
+                <CheckBox x:Name="pool" Content="Pool&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" HorizontalAlignment="Left" Margin="131,3,-41,0" Grid.Row="3" VerticalAlignment="Top" Width="58" Grid.ColumnSpan="2" Unchecked="Pool_Unchecked" Checked="Pool_Checked" />                
                 <TextBox x:Name="limit" Grid.Column="11" HorizontalAlignment="Left" Height="18" Margin="131,2,-26,0" Grid.Row="4" TextWrapping="Wrap" Text="limit&#xD;&#xA;" VerticalAlignment="Top" Width="43" Grid.ColumnSpan="2" />
+                -->
+                
             </Grid>
 
             <Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>

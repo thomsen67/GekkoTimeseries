@@ -965,17 +965,17 @@ namespace Gekko
                                 
                 DecompOptions2 d = this.decompOptions2.Clone();                                
 
-                if (d.isSubst)
-                {
-                    //d.variable is the same
-                    d.subst.Add(var2);
-                    d.isSubWindow = true;
-                }
-                else
-                {
+                //if (d.isSubst)
+                //{
+                //    //d.variable is the same
+                //    d.subst.Add(var2);
+                //    d.isSubWindow = true;
+                //}
+                //else
+                //{
                     d.variable = var2;
                     d.isSubWindow = true;
-                }
+                //}
                                 
                 CrossThreadStuff.Decomp2(d);
             }
@@ -1129,54 +1129,13 @@ namespace Gekko
                     if (equation == null) return;  //Happens during first rendering, when isChecked is set by C# on top-left radio-button (ignore it)
                 }
 
-                //Setting defaults
-                radioButton21.IsEnabled = true;
-                radioButton21.Opacity = 1.0;
-                radioButton22.IsEnabled = true;
-                radioButton22.Opacity = 1.0;
-                radioButton24.IsEnabled = true;
-                radioButton24.Opacity = 1.0;
-                radioButton29.IsEnabled = true;
-                radioButton29.Opacity = 1.0;
-                radioButton26.IsEnabled = true;
-                radioButton26.Opacity = 1.0;
-                radioButton28.IsEnabled = true;
-                radioButton28.Opacity = 1.0;
-                radioButton30.IsEnabled = true;
-                radioButton30.Opacity = 1.0;
-                //---
-                radioButton1.IsEnabled = true;
-                radioButton1.Opacity = 1.0;
-                radioButton2.IsEnabled = true;
-                radioButton2.Opacity = 1.0;
-                radioButton4.IsEnabled = true;
-                radioButton4.Opacity = 1.0;
-                radioButton9.IsEnabled = true;
-                radioButton9.Opacity = 1.0;
-                radioButton6.IsEnabled = true;
-                radioButton6.Opacity = 1.0;
-                radioButton8.IsEnabled = true;
-                radioButton8.Opacity = 1.0;
-                radioButton10.IsEnabled = true;
-                radioButton10.Opacity = 1.0;
-                //---
-                checkBox1.IsEnabled = true;
-                checkBox1.Opacity = 1.0;
-                checkBox2.IsEnabled = true;
-                checkBox2.Opacity = 1.0;
-                flowText.Opacity = 0.5;
-                flowText.Visibility = Visibility.Visible;
+                SetRadioButtonDefaults();
 
-                string transformationCodeAugmented = null;
-                if (this.decompOptions2.operatorHelper.guiDecompOperator == null)
-                {
-                    //has never been set before, fresh decomp window with <option>.
-                    transformationCodeAugmented = this.decompOptions2.prtOptionLower;
-                }
-                else
+                //string transformationCodeAugmented = null;
+                if (this.decompOptions2.operatorHelper.guiDecompOperator != null)
                 {
                     //There are 4 showing options: operator, isBaseline, isRaw, isShares.
-                    transformationCodeAugmented = this.decompOptions2.operatorHelper.guiDecompOperator;
+                    string transformationCodeAugmented = this.decompOptions2.operatorHelper.guiDecompOperator;
                     if (this.decompOptions2.operatorHelper.guiDecompIsRef) transformationCodeAugmented = "r" + transformationCodeAugmented;
                     if (this.decompOptions2.operatorHelper.guiDecompIsRaw) transformationCodeAugmented = "x" + transformationCodeAugmented;
                     if (this.decompOptions2.operatorHelper.guiDecompIsShares) transformationCodeAugmented = "s" + transformationCodeAugmented;  //is put on last
@@ -1185,82 +1144,20 @@ namespace Gekko
                         G.Writeln2("*** ERROR: Cannot show decomposition with both 'raw' and 'shares' option at the same time");
                         throw new GekkoException();
                     }
+                    this.decompOptions2.prtOptionLower = transformationCodeAugmented;
                 }
+
+                
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
 
-                if (this.decompOptions2.isSubst) subst.IsChecked = true;
-                if (this.decompOptions2.isSort) sort.IsChecked = true;
-                if (this.decompOptions2.isPool) pool.IsChecked = true;
-
-                if (this.decompOptions2.operatorHelper.guiDecompIsRef)
-                {
-                    radioButton22.IsEnabled = false;
-                    radioButton22.Opacity = 0.5;
-                    radioButton24.IsEnabled = false;
-                    radioButton24.Opacity = 0.5;
-                    radioButton29.IsEnabled = false;
-                    radioButton29.Opacity = 0.5;
-                    radioButton26.IsEnabled = false;
-                    radioButton26.Opacity = 0.5;
-                    radioButton28.IsEnabled = false;
-                    radioButton28.Opacity = 0.5;
-                    radioButton30.IsEnabled = false;
-                    radioButton30.Opacity = 0.5;
-                }
-
-                if (this.decompOptions2.operatorHelper.guiDecompIsShares)
-                {
-                    radioButton21.IsEnabled = false;
-                    radioButton21.Opacity = 0.5;
-                    radioButton22.IsEnabled = false;
-                    radioButton22.Opacity = 0.5;
-                    radioButton24.IsEnabled = false;
-                    radioButton24.Opacity = 0.5;
-                    radioButton29.IsEnabled = false;
-                    radioButton29.Opacity = 0.5;
-                    //---
-                    radioButton1.IsEnabled = false;
-                    radioButton1.Opacity = 0.5;
-                    radioButton2.IsEnabled = false;
-                    radioButton2.Opacity = 0.5;
-                    radioButton4.IsEnabled = false;
-                    radioButton4.Opacity = 0.5;
-                    radioButton9.IsEnabled = false;
-                    radioButton9.Opacity = 0.5;
-                }
-
-                if (this.decompOptions2.operatorHelper.guiDecompIsRaw)
-                {
-                    checkBox1.IsEnabled = false;  //shares
-                    checkBox1.Opacity = 0.5;
-                    flowText.Visibility = Visibility.Collapsed;
-                }
-
-                if (G.Equal(transformationCodeAugmented, "m") || G.Equal(transformationCodeAugmented, "xm") || G.Equal(transformationCodeAugmented, "q") || G.Equal(transformationCodeAugmented, "xq") || G.Equal(transformationCodeAugmented, "mp") || G.Equal(transformationCodeAugmented, "xmp"))
-                {
-                    checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
-                    checkBox2.Opacity = 0.5;
-                }
+                SetRadioButtonsDefaults();
 
                 _statusText.Text = "";
 
-                this.decompOptions2.prtOptionLower = transformationCodeAugmented;
-
-                string operator1 = this.decompOptions2.prtOptionLower;
-                string isShares = null;
-                if (operator1.StartsWith("s"))
-                {
-                    operator1 = operator1.Substring(1);
-                    isShares = "s";
-                }
-
-                this.decompOptions2.decompTablesFormat.isPercentageType = false;
-                if (operator1.Contains("p") || operator1.Contains("q") || isShares == "s")
-                {
-                    this.decompOptions2.decompTablesFormat.isPercentageType = true;
-                }
+                string operator1, isShares;
+                DecompIsSharesOrPercentageType(out operator1, out isShares);
 
                 GekkoTime per1 = this.decompOptions2.t1;
                 GekkoTime per2 = this.decompOptions2.t2;
@@ -1283,12 +1180,11 @@ namespace Gekko
                 int counter2 = -1;
                 foreach (Link link in this.decompOptions2.link)
                 {
-                    counter2++;                    
-
+                    counter2++;
                     string residualName = Program.GetDecompExpressionName(counter2);
                     List<DecompData> temp = new List<DecompData>();
                     foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
-                    {                        
+                    {
                         temp.Add(Program.Decompose2(per1, per2, expression, DecompBanks(operator1), residualName));
                     }
                     decompDatas.Add(temp);
@@ -1315,12 +1211,12 @@ namespace Gekko
                                     G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
                                 }
                             }
-                        }                        
-                    }                 
+                        }
+                    }
                 }
 
                 int parentI = 0;
-                
+
                 List<string> varnamesFirstLink = decompOptions2.link[parentI].varnames;
                 int nnn = -12345;
                 if (varnamesFirstLink != null) nnn = varnamesFirstLink.Count;
@@ -1513,6 +1409,126 @@ namespace Gekko
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
                 }
             }
+        }
+
+        private void DecompIsSharesOrPercentageType(out string operator1, out string isShares)
+        {
+            operator1 = this.decompOptions2.prtOptionLower;
+            isShares = null;
+            if (operator1.StartsWith("s"))
+            {
+                operator1 = operator1.Substring(1);
+                isShares = "s";
+            }
+
+            this.decompOptions2.decompTablesFormat.isPercentageType = false;
+            if (operator1.Contains("p") || operator1.Contains("q") || isShares == "s")
+            {
+                this.decompOptions2.decompTablesFormat.isPercentageType = true;
+            }
+        }
+
+        private void SetRadioButtonsDefaults()
+        {
+            //if (this.decompOptions2.isSubst) subst.IsChecked = true;
+            //if (this.decompOptions2.isSort) sort.IsChecked = true;
+            //if (this.decompOptions2.isPool) pool.IsChecked = true;
+
+            if (this.decompOptions2.operatorHelper.guiDecompIsRef)
+            {
+                radioButton22.IsEnabled = false;
+                radioButton22.Opacity = 0.5;
+                radioButton24.IsEnabled = false;
+                radioButton24.Opacity = 0.5;
+                radioButton29.IsEnabled = false;
+                radioButton29.Opacity = 0.5;
+                radioButton26.IsEnabled = false;
+                radioButton26.Opacity = 0.5;
+                radioButton28.IsEnabled = false;
+                radioButton28.Opacity = 0.5;
+                radioButton30.IsEnabled = false;
+                radioButton30.Opacity = 0.5;
+            }
+
+            if (this.decompOptions2.operatorHelper.guiDecompIsShares)
+            {
+                radioButton21.IsEnabled = false;
+                radioButton21.Opacity = 0.5;
+                radioButton22.IsEnabled = false;
+                radioButton22.Opacity = 0.5;
+                radioButton24.IsEnabled = false;
+                radioButton24.Opacity = 0.5;
+                radioButton29.IsEnabled = false;
+                radioButton29.Opacity = 0.5;
+                //---
+                radioButton1.IsEnabled = false;
+                radioButton1.Opacity = 0.5;
+                radioButton2.IsEnabled = false;
+                radioButton2.Opacity = 0.5;
+                radioButton4.IsEnabled = false;
+                radioButton4.Opacity = 0.5;
+                radioButton9.IsEnabled = false;
+                radioButton9.Opacity = 0.5;
+            }
+
+            if (this.decompOptions2.operatorHelper.guiDecompIsRaw)
+            {
+                checkBox1.IsEnabled = false;  //shares
+                checkBox1.Opacity = 0.5;
+                flowText.Visibility = Visibility.Collapsed;
+            }
+
+            //hmmm but prtOptionLower cannot have x etc....??
+            //hmmm but prtOptionLower cannot have x etc....??
+            //hmmm but prtOptionLower cannot have x etc....??
+            //hmmm but prtOptionLower cannot have x etc....??
+            //hmmm but prtOptionLower cannot have x etc....??
+            if (G.Equal(this.decompOptions2.prtOptionLower, "m") || G.Equal(this.decompOptions2.prtOptionLower, "xm") || G.Equal(this.decompOptions2.prtOptionLower, "q") || G.Equal(this.decompOptions2.prtOptionLower, "xq") || G.Equal(this.decompOptions2.prtOptionLower, "mp") || G.Equal(this.decompOptions2.prtOptionLower, "xmp"))
+            {
+                checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
+                checkBox2.Opacity = 0.5;
+            }
+        }
+
+        private void SetRadioButtonDefaults()
+        {
+            //Setting defaults
+            radioButton21.IsEnabled = true;
+            radioButton21.Opacity = 1.0;
+            radioButton22.IsEnabled = true;
+            radioButton22.Opacity = 1.0;
+            radioButton24.IsEnabled = true;
+            radioButton24.Opacity = 1.0;
+            radioButton29.IsEnabled = true;
+            radioButton29.Opacity = 1.0;
+            radioButton26.IsEnabled = true;
+            radioButton26.Opacity = 1.0;
+            radioButton28.IsEnabled = true;
+            radioButton28.Opacity = 1.0;
+            radioButton30.IsEnabled = true;
+            radioButton30.Opacity = 1.0;
+            //---
+            radioButton1.IsEnabled = true;
+            radioButton1.Opacity = 1.0;
+            radioButton2.IsEnabled = true;
+            radioButton2.Opacity = 1.0;
+            radioButton4.IsEnabled = true;
+            radioButton4.Opacity = 1.0;
+            radioButton9.IsEnabled = true;
+            radioButton9.Opacity = 1.0;
+            radioButton6.IsEnabled = true;
+            radioButton6.Opacity = 1.0;
+            radioButton8.IsEnabled = true;
+            radioButton8.Opacity = 1.0;
+            radioButton10.IsEnabled = true;
+            radioButton10.Opacity = 1.0;
+            //---
+            checkBox1.IsEnabled = true;
+            checkBox1.Opacity = 1.0;
+            checkBox2.IsEnabled = true;
+            checkBox2.Opacity = 1.0;
+            flowText.Opacity = 0.5;
+            flowText.Visibility = Visibility.Visible;
         }
 
         private static Series FindLinkSeries(List<List<DecompData>> decompDatas, int i, int j, string linkVariable)
@@ -2157,41 +2173,41 @@ namespace Gekko
             }
         }
 
-        private void Sort_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions2.isSort = true;
-        }
+        //private void Sort_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isSort = false;
+        //    if (sort.IsChecked == true) this.decompOptions2.isSort = true;
+        //}
 
-        private void Pool_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions2.isPool = true;
-        }
+        //private void Pool_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isPool = false;
+        //    if (pool.IsChecked == true) this.decompOptions2.isPool = true;
+        //}
 
-        private void Subst_Checked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
-        }
+        //private void Subst_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isSubst = false;
+        //    if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
+        //}
 
-        private void Sort_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isSort = false;
-            if (sort.IsChecked == true) this.decompOptions2.isSort = true;
-        }
+        //private void Sort_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isSort = false;
+        //    if (sort.IsChecked == true) this.decompOptions2.isSort = true;
+        //}
 
-        private void Pool_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isPool = false;
-            if (pool.IsChecked == true) this.decompOptions2.isPool = true;
-        }
+        //private void Pool_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isPool = false;
+        //    if (pool.IsChecked == true) this.decompOptions2.isPool = true;
+        //}
 
-        private void Subst_Unchecked(object sender, RoutedEventArgs e)
-        {
-            this.decompOptions2.isSubst = false;
-            if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
-        }
+        //private void Subst_Unchecked(object sender, RoutedEventArgs e)
+        //{
+        //    this.decompOptions2.isSubst = false;
+        //    if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
+        //}
     }
 
     public class GekkoDockPanel2 : DockPanel
@@ -2202,6 +2218,8 @@ namespace Gekko
 
     public class DecompOperatorHelper
     {
+        //this object contains the important operators regarding how
+        //the cells are shown.
         public string guiDecompOperator = null;  //used to be "n"
         public bool guiDecompIsShares = false;
         public bool guiDecompIsRaw = true;
@@ -2217,9 +2235,9 @@ namespace Gekko
 
         public bool isNew = false;
 
-        public bool isSubst = false;
-        public bool isPool = false;
-        public bool isSort = false;
+        //public bool isSubst = false;
+        //public bool isPool = false;
+        //public bool isSort = false;
 
         //public bool onlyTable = false;
         //public Table table = null;
@@ -2310,9 +2328,9 @@ namespace Gekko
             
             d.dream = this.dream;
 
-            d.isSort = this.isSort;
-            d.isSubst = this.isSubst;
-            d.isPool = this.isPool;
+            //d.isSort = this.isSort;
+            //d.isSubst = this.isSubst;
+            //d.isPool = this.isPool;
             foreach (string s in this.subst)
             {
                 d.subst.Add(s);
