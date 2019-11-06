@@ -36900,12 +36900,14 @@ namespace Gekko
             string col_universe = internalColumnIdentifyer + "universe";
             string col_value = internalColumnIdentifyer + "value";
             string gekko_null = "null";
+            string col_equ = internalColumnIdentifyer + "equ";
 
             dt.Columns.Add(col_t, typeof(string));
             dt.Columns.Add(col_value, typeof(double));
             dt.Columns.Add(col_variable, typeof(string));
             dt.Columns.Add(col_lag, typeof(string));
             dt.Columns.Add(col_universe, typeof(string));
+            if(Globals.fixDecomp3) dt.Columns.Add(col_equ, typeof(string));
 
             Table tab = new Table();
             int iOffset = 0;
@@ -37115,11 +37117,27 @@ namespace Gekko
             else if (decompOptions2.type == "ASTDECOMP3") type = 2;
             //type = 1; //set this for raw table
 
-            if (type == 1)
+            if (G.IsUnitTesting() && Globals.decompUnitPivot)
             {
-                tab = DecomposePutIntoTableHelper2(dt, col_value, false);
+                //tab = DecomposePutIntoTableHelper2(dt, col_value, false);
+                StringBuilder sb = new StringBuilder();
+                List<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList<string>();
+                for (int i = 0; i < columnNames.Count; i++)
+                {
+                    columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
+                    columnNames[i] = columnNames[i].Replace(internalSetIdentifyer, "#");
+                    if (columnNames[i] == "universe") columnNames[i] = "#uni";
+                }
+                sb.AppendLine(string.Join(";", columnNames));
+                foreach (DataRow row in dt.Rows)
+                {
+                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                    sb.AppendLine(string.Join(";", fields));
+                }
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\pivot.csv", sb.ToString());
             }
-            else if (type == 2)
+
+            if (type == 2)
             {
                 if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
                 {
@@ -37135,6 +37153,7 @@ namespace Gekko
                     if (G.Equal(rc[i], "vars")) rc[i] = col_variable;
                     if (G.Equal(rc[i], "lags")) rc[i] = col_lag;
                     if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
+                    if(Globals.fixDecomp3 && G.Equal(rc[i], "equ")) rc[i] = col_equ;
                     if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
                 }
 

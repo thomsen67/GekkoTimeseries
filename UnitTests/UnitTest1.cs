@@ -8937,29 +8937,100 @@ namespace UnitTests
                 }
             }
 
-            if (false)
+            if (true)
             {
                 // ===============================================
                 // ===============================================
-                // Test with UADAM, linking etc.
+                // Test with UADAM, linking, pivoting
                 // ===============================================
                 // ===============================================
-
+                
                 I("RESET;");
-                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp\UADAM';");
                 I("OPTION model type = gams;");
-                I("model <gms> uadam18;");
-                I("read ua1118;");
-                //I("decomp2 <d> ub0099 in ub0099 link x[#a] in e_x;");            
-                I("U = series(1);");
-                I("#a0014 = seq(0, 9).strings().prefix('0') + seq(10, 14).strings();");
-                I("#i = #a0014;");
-                I("#i += 0014, 1570, 7199;");
-                I("u[#i] = u{#i};");
-                I("u0014 = sum(#a0014, u[#a0014]);");
-                I("decomp2 <d> u0099 in ub0099;");
-                //I("decomp2 <d> u0014 in u0014;");
+                I("model <gms> uadam18;");  //small subset
+                I("read uarray;");  //is uadam18.gbk, but with pre-cooked array-series
+
+                /*
+                    //converts UADAM to array-series
+                    read ua1118;                    
+                    index <mute> * to #m;
+                    open <edit> uarray; clear uarray;
+                    time 66 2049;
+                    for string %s = #m;
+                      for val %i = 1 to %s.length();
+                        if(%s[%i].isnumeric());
+                          %s1 = %s[1..%i-1];
+                          %s2 = %s[%i..%s.length()];
+                          if(not exist('uarray:{%s1}'));
+                            uarray:{%s1} = series(1);
+                          end;
+                          {%s1}[%s2] = {%s};
+                          goto skip;
+                        end;
+                      end;
+                      target skip;
+                    end;
+                    close uarray;
+                */
+                                
+                I("time 2009 2012;");
+                I("#a = 50, 51, 52; #a = #a.strings();  //only 3 ages");
+                I("qrs[tot] = sum(#a, qrs[#a]);");
+                //I("p qrs[tot] < n d >;");
+                I("bqrsm.setdomains(('#a',));");
+                I("bqrss.setdomains(('#a',));");
+                I("u.setdomains(('#a',));");
+                I("time 2010 2012;");
+                try
+                {
+                    Globals.decompUnitPivot = true; //!!! remember to switch it of
+                    I("decomp3<d> qrs[tot] in qrs_tot link qrs[#a] in qrs,  qrss[#a] in qrss,  qrsm[#a] in qrsm  rows vars cols #a;");
+                }
+                finally
+                {
+                    Globals.decompUnitPivot = false; //switch off
+                }
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "null");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "50");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "51");
+                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "52");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "Qrs");
+                Assert.AreEqual(table.Get(2, 2).number, 562d, 0.0001);
+                Assert.AreEqual(table.Get(2, 3).number, 0d, 0.0001);
+                Assert.AreEqual(table.Get(2, 4).number, 0d, 0.0001);
+                Assert.AreEqual(table.Get(2, 5).number, 0d, 0.0001);
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "aa__expr__");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "bqrsm");
+                Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
+                Assert.AreEqual(table.Get(7, 3).number, 14.4824d, 0.0001);
+                Assert.AreEqual(table.Get(7, 4).number, 0.1727d, 0.0001);
+                Assert.AreEqual(table.Get(7, 5).number, 16.9358d, 0.0001);
+                Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "bqrss");
+                Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "U");
+
+                I("decomp3<d> qrs[tot] in qrs_tot link qrs[#a] in qrs,  qrss[#a] in qrss,  qrsm[#a] in qrsm  rows time cols #a;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "null");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "50");                
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "51");
+                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "52");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "2010");
+                Assert.AreEqual(table.Get(2, 2).number, 142.7499d, 0.0001);
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2011");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2012");
+
 
             }
 

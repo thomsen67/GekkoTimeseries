@@ -1351,24 +1351,6 @@ namespace Gekko
 
                     this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
-                    //if (this.decompOptions2.isSubst && this.decompOptions2.subst.Count > 0)
-                    //{
-                    //    //foreach (string var in this.decompOptions2.subst)
-                    //    //{
-                    //    //    table = DecompSubstitute(table.Item2, var);
-                    //    //}
-                    //}
-
-                    //if (this.decompOptions2.isSort)
-                    //{
-                    //    //table = TableSort(table);
-                    //}
-
-                    //if (this.decompOptions2.isPool)
-                    //{
-                    //    //table = TablePool(table);
-                    //}
-
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;
 
