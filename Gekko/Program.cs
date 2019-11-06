@@ -37134,7 +37134,7 @@ namespace Gekko
                     IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
                     sb.AppendLine(string.Join(";", fields));
                 }
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\pivot.csv", sb.ToString());
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
             }
 
             if (type == 2)

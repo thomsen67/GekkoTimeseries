@@ -1172,8 +1172,9 @@ namespace Gekko
                 int perLag = -2;
                 string lhsString = "Expression value";
 
-                //decompDatas, first dimension corresponds to a link, whereas the next dimension
-                //corresponds to uncontrolled lists like x[#i] or x[#i, #j]
+                //decompDatas
+                //1. dimension corresponds to a link, 
+                //2. dimension corresponds to uncontrolled lists like x[#i] or x[#i, #j]
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>();
 
                 List<string> expressionTexts = new List<string>();
@@ -1347,7 +1348,8 @@ namespace Gekko
                     string lhsName = null;
                     if (varnamesFirstLink != null) lhsName = varnamesFirstLink[super];
 
-                    Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore), decompOptions2);
+                    List<string> decompVars = Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore);
+                    Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
 
                     this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 

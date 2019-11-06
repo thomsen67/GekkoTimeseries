@@ -8873,7 +8873,66 @@ namespace UnitTests
         [TestMethod]
         public void _Test_Decomp1()
         {
-            Table table = null;                        
+            Table table = null;
+
+            if (true)
+            {
+                // Consider this model, run over t = 2021, 2022
+                // over the ages #a = 18, 19
+                //
+                // c[#a] = 0.40 * (y[#a] + y[#a+1][+1])
+                // y[#a] = c[#a] + g[#a]                
+                //
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("OPTION model type = gams;");
+                I("model <gms> ageandlead;");
+                I("#a = seq(18, 19).strings();");                                
+                I("c = series(1);");
+                I("y = series(1);");
+                I("g = series(1);");
+                I("c.setdomains(('#a',));");
+                I("y.setdomains(('#a',));");
+                I("g.setdomains(('#a',));");
+
+                I("time 2021 2023;");
+                //---
+                I("g[18] = 10, 14, 20;");
+                I("g[19] = 12, 17, 24;");
+                I("g[20] = 15, 14, 19;");
+                //---
+                I("c[18] = 114.4444, 142.6667, 100;");
+                I("c[19] = 141.3333, 144.6667, 100;");
+                I("c[20] = 100, 100, 100;");
+                //---
+                I("y[18] = 124.4444, 156.6667, 200;");
+                I("y[19] = 153.3333, 161.6667, 200;");
+                I("y[20] = 200, 200, 200;");
+                //---
+                //The numbers for y and c for ages 18 and 19 and dates 2021-22 are consistent
+                I("time 2021 2022;");
+                I("prt c[#a] -(0.40 * (y[#a] + y[#a+1][+1]));");  //--> 0
+                I("prt y[#a] -(c[#a] + g[#a]);");                 //--> 0
+
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                try
+                {
+                    Globals.decompUnitPivot = true; //!!! remember to switch it of
+                    I("decomp3<d> y[18] in e1 rows vars cols #a;");
+                }
+                finally
+                {
+                    Globals.decompUnitPivot = false; //switch off
+                }
+
+
+
+            }
 
             if (true)
             {
