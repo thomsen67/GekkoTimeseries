@@ -1172,9 +1172,18 @@ namespace Gekko
                 int perLag = -2;
                 string lhsString = "Expression value";
 
-                //decompDatas
-                //1. dimension corresponds to a link, 
-                //2. dimension corresponds to uncontrolled lists like x[#i] or x[#i, #j]
+                // decompDatas
+                // Example: DECOMP x[#a] in e1 link y[#a] in e2
+                // 1. dimension corresponds to main chosen decomp variables (x[#a], could be stated like x[18], x[19]).
+                //    This dimension corresponds to super = 0, 1 here.
+                // 2. dimension is the folded raw link equations (including main equation with number 0). The folded link
+                //    equations are e1 and e2.
+                // 3. dimension corresponds to uncontrolled lists like x[#a] or x[#a, #i] in each link equation (including the main equation)
+                //    So 3. dimension unfolds the folded equations, for instance x[#a] in e1 and y[#a] in e2.
+                // The 1. dimension (super) is kind of like link variables, but where the x[#a] variables have no "mother" equation
+                // to be put into. Each super element is adjusted on its own, and stuff sums to 0. In reporting, this is
+                // shown as "equ" to choose/pivot from.
+
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>();
 
                 List<string> expressionTexts = new List<string>();
