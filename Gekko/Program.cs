@@ -37168,6 +37168,208 @@ namespace Gekko
             return tab;
         }
 
+        public static DataTable DecomposePutIntoTable3(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2, DecompOptions2 decompOptions2)
+        {
+            DataTable dt = new DataTable();
+            
+
+            //The DataTable dt will get the following colums:
+            //<t>:         time
+            //<variable>:  variable name, like fy or pop
+            //<lag>:       lag or lead
+            //<#universe>: universal set for elements without domain info
+            //#i:          set names, like #age, #sector, etc.
+            //<value>:     data value
+
+            string internalColumnIdentifyer = "gekkopivot__";
+            string internalSetIdentifyer = "gekkoset__";
+            string col_t = internalColumnIdentifyer + "t";
+            string col_variable = internalColumnIdentifyer + "variable";
+            string col_lag = internalColumnIdentifyer + "lag";
+            string col_universe = internalColumnIdentifyer + "universe";
+            string col_value = internalColumnIdentifyer + "value";
+            string gekko_null = "null";
+            string col_equ = internalColumnIdentifyer + "equ";
+
+            dt.Columns.Add(col_t, typeof(string));
+            dt.Columns.Add(col_value, typeof(double));
+            dt.Columns.Add(col_variable, typeof(string));
+            dt.Columns.Add(col_lag, typeof(string));
+            dt.Columns.Add(col_universe, typeof(string));
+            if (Globals.fixDecomp3) dt.Columns.Add(col_equ, typeof(string));
+
+            int j = 0;
+            foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+            {
+                j++;
+                int i = 0;
+                double lhsSum = 0d;
+                double rhsSum = 0d;
+                foreach (string colname in vars2)
+                {
+                    i++;
+
+                    string dbName = null; string varName = null; string freq = null; string[] indexes = null;
+                    string[] domains = null;
+
+                    //See #876435924365
+
+                    string lag = null;
+
+                    if (true)
+                    {
+                        //there is some repeated work done here, but not really bad
+                        //problem is we prefer to do one period at a time, to sum up, adjust etc.
+
+                        string[] ss = colname.Split('¤');
+                        string fullName = ss[0];
+                        lag = ss[1];
+                        if (lag == "[0]")
+                        {
+                            lag = null;
+                        }
+
+                        char firstChar;
+                        O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+
+                        if (indexes != null) domains = new string[indexes.Length];
+
+                        if (domains != null)
+                        {
+                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                            //So in this case, #a and #sector would be added as columns
+                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                            if (iv != null)
+                            {
+                                Series ts = iv as Series;
+                                if (ts?.mmi?.parent?.meta?.domains != null)
+                                {
+                                    for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
+                                    {
+                                        domains[ii] = ConvertSetname(internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
+                                    }
+                                }
+                            }
+
+                            foreach (string domain in domains)
+                            {
+                                string setname = domain;
+                                if (setname == null) setname = col_universe;
+                                if (!dt.Columns.Contains(setname)) dt.Columns.Add(setname, typeof(string));
+                            }
+                        }
+
+                        //See #876435924365              
+                        string bank2 = dbName;
+                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                        string name2 = O.UnChop(null, varName, null, indexes);                        
+                    }                    
+
+                    double d = DecomposePutIntoTable2HelperOperators(decompTables, code1, smpl, lhs, t2, colname);
+
+                    if (i == 1)
+                    {
+                        lhsSum = d;
+                    }
+                    else
+                    {
+                        rhsSum += d;
+                    }                    
+
+                    DataRow dr = dt.NewRow();
+                    DecomposeAddToRow(dr, col_t, t2.ToString());
+                    DecomposeAddToRow(dr, col_variable, varName);
+
+                    string lag2 = null;
+                    if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                    DecomposeAddToRow(dr, col_lag, lag2);
+
+                    if (indexes != null)
+                    {
+                        for (int ii = 0; ii < indexes.Length; ii++)
+                        {
+                            if (domains != null)
+                            {
+                                string domain = domains[ii];
+                                string index = indexes[ii];
+                                if (domain != null)
+                                {
+                                    dr[domain] = index;
+                                    DecomposeAddToRow(dr, domain, index);
+                                }
+                                else
+                                {
+                                    dr[col_universe] = index;  //column <#universe>, the universal set (that is, no domain)
+                                    DecomposeAddToRow(dr, col_universe, index);
+                                }
+                            }
+                        }
+                    }
+                    dr[col_value] = d;
+                    dt.Rows.Add(dr);                   
+                }                
+            }
+
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    if (col.ColumnName != col_value)
+                    {
+                        if (string.IsNullOrEmpty(row[col] as string))
+                        {
+                            string s = gekko_null;
+                            row[col] = s;
+                        }
+                    }
+                }
+            }            
+
+            if (G.IsUnitTesting() && Globals.decompUnitPivot)
+            {
+                //tab = DecomposePutIntoTableHelper2(dt, col_value, false);
+                StringBuilder sb = new StringBuilder();
+                List<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList<string>();
+                for (int i = 0; i < columnNames.Count; i++)
+                {
+                    columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
+                    columnNames[i] = columnNames[i].Replace(internalSetIdentifyer, "#");
+                    if (columnNames[i] == "universe") columnNames[i] = "#uni";
+                }
+                sb.AppendLine(string.Join(";", columnNames));
+                foreach (DataRow row in dt.Rows)
+                {
+                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                    sb.AppendLine(string.Join(";", fields));
+                }
+                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
+            }
+
+            if (true)
+            {
+                if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: rows and cols must be stated");
+                    throw new GekkoException();
+                }
+                List<string> rc = new List<string>();
+                rc.Add(decompOptions2.rows[0]);
+                rc.Add(decompOptions2.cols[0]);
+                for (int i = 0; i < 2; i++)
+                {
+                    if (G.Equal(rc[i], "time")) rc[i] = col_t;
+                    if (G.Equal(rc[i], "vars")) rc[i] = col_variable;
+                    if (G.Equal(rc[i], "lags")) rc[i] = col_lag;
+                    if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
+                    if (Globals.fixDecomp3 && G.Equal(rc[i], "equ")) rc[i] = col_equ;
+                    if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
+                }                
+            }
+            
+            return dt;
+        }
+
+
         private static string ConvertSetname(string internalSetIdentifyer, string col_universe, string domain)
         {
             string domain2 = domain;
@@ -37184,7 +37386,7 @@ namespace Gekko
             dr[col_variable] = varName;
         }
 
-        private static Table DecomposePutIntoTableHelper2(DataTable tab2, string col_value, bool isValues)
+        public static Table DecomposePutIntoTableHelper2(DataTable tab2, string col_value, bool isValues)
         {
             Table tab = new Table();
             for (int jj = 1; jj < tab2.Columns.Count; jj++)  //1: skip (1, 1) element

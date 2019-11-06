@@ -8930,8 +8930,6 @@ namespace UnitTests
                     Globals.decompUnitPivot = false; //switch off
                 }
 
-
-
             }
 
             if (true)

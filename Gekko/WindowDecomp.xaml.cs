@@ -1171,6 +1171,12 @@ namespace Gekko
 
                 int perLag = -2;
                 string lhsString = "Expression value";
+                int parentI = 0;
+
+                List<string> varnamesFirstLink = decompOptions2.link[parentI].varnames;
+                int nnn = -12345;
+                if (varnamesFirstLink != null) nnn = varnamesFirstLink.Count;
+                else nnn = 1;  //expression?
 
                 // decompDatas
                 // Example: DECOMP x[#a] in e1 link y[#a] in e2
@@ -1184,6 +1190,7 @@ namespace Gekko
                 // to be put into. Each super element is adjusted on its own, and stuff sums to 0. In reporting, this is
                 // shown as "equ" to choose/pivot from.
 
+                List<List<List<DecompData>>> decompDatasSuper = new List<List<List<DecompData>>>();
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>();
 
                 List<string> expressionTexts = new List<string>();
@@ -1202,35 +1209,9 @@ namespace Gekko
 
                 if (false)
                 {
-                    int c1 = -1;
-                    foreach (List<DecompData> dd in decompDatas)
-                    {
-                        c1++;
-                        int c2 = -1;
-                        foreach (DecompData d in dd)
-                        {
-                            c2++;
-                            DecompDict dict = d.cellsContribD;
-                            foreach (KeyValuePair<string, Series> kvp in dict.storage)
-                            {
-                                string nme = kvp.Key;
-                                Series ts = kvp.Value;
-                                for (int i = 2001; i <= 2002; i++)
-                                {
-                                    double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
-                                    G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
-                                }
-                            }
-                        }
-                    }
+                    DecompPrintDatas(decompDatas);
+                    return;
                 }
-
-                int parentI = 0;
-
-                List<string> varnamesFirstLink = decompOptions2.link[parentI].varnames;
-                int nnn = -12345;
-                if (varnamesFirstLink != null) nnn = varnamesFirstLink.Count;
-                else nnn = 1;  //expression?
 
                 bool[] used = new bool[decompDatas.Count];  //number of link-equations (including primary eq)
                 used[0] = true;  //primary equation
@@ -1354,13 +1335,23 @@ namespace Gekko
                         }
                     }
 
+                    //decompDatasSuper.Add(decompDatas);
+
                     string lhsName = null;
                     if (varnamesFirstLink != null) lhsName = varnamesFirstLink[super];
-
                     List<string> decompVars = Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore);
-                    Table table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
 
-                    this.decompOptions2.decompData = decompDatas[parentI][parentJ];
+                    Table table = null;
+                    if (false && decompOptions2.type == "ASTDECOMP3")
+                    {
+                        
+                    }
+                    else
+                    {
+                        table = Program.DecomposePutIntoTable2(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
+                    }                                        
+
+                    //this.decompOptions2.decompData = decompDatas[parentI][parentJ];
 
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;
@@ -1400,6 +1391,31 @@ namespace Gekko
                 {
                     this.isClosing = true;
                     MessageBox.Show("*** ERROR: Decomp update failed: maybe some variables or databanks are non-available?");
+                }
+            }
+        }
+
+        private static void DecompPrintDatas(List<List<DecompData>> decompDatas)
+        {
+            int c1 = -1;
+            foreach (List<DecompData> dd in decompDatas)
+            {
+                c1++;
+                int c2 = -1;
+                foreach (DecompData d in dd)
+                {
+                    c2++;
+                    DecompDict dict = d.cellsContribD;
+                    foreach (KeyValuePair<string, Series> kvp in dict.storage)
+                    {
+                        string nme = kvp.Key;
+                        Series ts = kvp.Value;
+                        for (int i = 2001; i <= 2002; i++)
+                        {
+                            double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
+                            G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
+                        }
+                    }
                 }
             }
         }
@@ -2277,7 +2293,7 @@ namespace Gekko
         
         public string dream = null;  //experimental
 
-        public DecompData decompData = null;
+        //public DecompData decompData = null;
         public bool hasCalculatedQuo = false;
         public bool hasCalculatedRef = false;
 
