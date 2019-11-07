@@ -1342,9 +1342,9 @@ namespace Gekko
                     List<string> decompVars = Program.DecompGetVars(decompDatas[parentI][parentJ], lhsName, decompOptions2.link[parentI].expressionText, ignore);
 
                     Table table = null;
-                    if (false && decompOptions2.type == "ASTDECOMP3")
+                    if (decompOptions2.type == "ASTDECOMP3")
                     {
-                        
+                        table = Program.DecomposePutIntoTable3(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
                     }
                     else
                     {

@@ -37168,10 +37168,12 @@ namespace Gekko
             return tab;
         }
 
-        public static DataTable DecomposePutIntoTable3(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2, DecompOptions2 decompOptions2)
+        
+        public static Table DecomposePutIntoTable3(GekkoTime per1, GekkoTime per2, DecompData decompTables, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, List<string> vars2, DecompOptions2 decompOptions2)
         {
             DataTable dt = new DataTable();
-            
+
+            Table tab = null;
 
             //The DataTable dt will get the following colums:
             //<t>:         time
@@ -37197,7 +37199,7 @@ namespace Gekko
             dt.Columns.Add(col_lag, typeof(string));
             dt.Columns.Add(col_universe, typeof(string));
             if (Globals.fixDecomp3) dt.Columns.Add(col_equ, typeof(string));
-
+                    
             int j = 0;
             foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
             {
@@ -37263,7 +37265,7 @@ namespace Gekko
                         string bank2 = dbName;
                         if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
                         string name2 = O.UnChop(null, varName, null, indexes);                        
-                    }                    
+                    }
 
                     double d = DecomposePutIntoTable2HelperOperators(decompTables, code1, smpl, lhs, t2, colname);
 
@@ -37306,8 +37308,10 @@ namespace Gekko
                         }
                     }
                     dr[col_value] = d;
-                    dt.Rows.Add(dr);                   
-                }                
+
+                    dt.Rows.Add(dr);                    
+                }
+                
             }
 
             foreach (DataRow row in dt.Rows)
@@ -37363,12 +37367,20 @@ namespace Gekko
                     if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
                     if (Globals.fixDecomp3 && G.Equal(rc[i], "equ")) rc[i] = col_equ;
                     if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
-                }                
+                }
+
+                DataTable tab2 = GetInversedDataTable(dt, rc[0], rc[1], col_value, "-", true);
+                tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
-            
-            return dt;
+            else
+            {
+                //do nothing
+            }
+
+            return tab;
         }
 
+        
 
         private static string ConvertSetname(string internalSetIdentifyer, string col_universe, string domain)
         {
