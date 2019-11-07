@@ -1173,7 +1173,7 @@ namespace Gekko
                 string lhsString = "Expression value";
                 int parentI = 0;
 
-                
+
 
                 // decompDatas
                 // Example: DECOMP x[#a] in e1 link y[#a] in e2
@@ -1186,9 +1186,9 @@ namespace Gekko
                 // The 1. dimension (super) is kind of like link variables, but where the x[#a] variables have no "mother" equation
                 // to be put into. Each super element is adjusted on its own, and stuff sums to 0. In reporting, this is
                 // shown as "equ" to choose/pivot from.
-                                
+
                 List<List<DecompData>> decompDatas = new List<List<DecompData>>(); //first dim is folded raw link eqs, next is uncontrolled lists
-                
+
                 List<string> expressionTexts = new List<string>();
                 int counter2 = -1;
                 foreach (Link link in this.decompOptions2.link)
@@ -1248,10 +1248,11 @@ namespace Gekko
                 //         e2: c = 0.8 * y    --> c - 0.8 * y
                 //------------------------
 
+
                 //Takes the link equations, skipping the first one (which is the "normal" equation)
                 //Example: decomp y in e1 link c in e2
                 //the link equation is e2
-                for (int i = 1; i < this.decompOptions2.link.Count; i++)
+                for (int i = 1; i < this.decompOptions2.link.Count; i++)  //skips the MAIN equation
                 {
                     //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
@@ -1261,6 +1262,10 @@ namespace Gekko
                         string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
                         if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
 
+                        //TODO TODO
+                        //TODO TODO if there > 1 hit here, error or warning should be issued
+                        //TODO TODO
+                        //looks in the uncontrolled eqs in link # i to find a match
                         int j = FindLinkJ(decompDatas, i, linkVariable);  //Example: find row with c in table corresponding to e2
 
                         //in y = c + i + g // c = 0.8 y
@@ -1316,6 +1321,9 @@ namespace Gekko
                         }
                     }
                 }
+
+
+
 
                 if (lhsClone != null)
                 {

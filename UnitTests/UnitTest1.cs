@@ -8875,7 +8875,7 @@ namespace UnitTests
         {
             Table table = null;
 
-            if (true)
+            if (false)
             {
                 // Consider this model, run over t = 2021, 2022
                 // over the ages #a = 18, 19
@@ -8891,6 +8891,8 @@ namespace UnitTests
                 I("c = series(1);");
                 I("y = series(1);");
                 I("g = series(1);");
+                I("demand = series(1);");
+                I("supply = series(1);");
                 I("c.setdomains(('#a',));");
                 I("y.setdomains(('#a',));");
                 I("g.setdomains(('#a',));");
@@ -8908,6 +8910,10 @@ namespace UnitTests
                 I("y[18] = 124.4444, 156.6667, 200;");
                 I("y[19] = 153.3333, 161.6667, 200;");
                 I("y[20] = 200, 200, 200;");
+
+                I("demand[#a] = c[#a] + g[#a];");
+                I("supply[#a] = y[#a];");
+
                 //---
                 //The numbers for y and c for ages 18 and 19 and dates 2021-22 are consistent
                 I("time 2021 2022;");
@@ -8923,7 +8929,15 @@ namespace UnitTests
                 try
                 {
                     Globals.decompUnitPivot = true; //!!! remember to switch it of
-                    I("decomp3<d> y[18] in e1 rows vars cols #a;");
+                    //I("decomp3<d> y[18] in e1 rows vars cols #a;");
+                    I("decomp3<d> y[18] in e1a link demand[18] in e1b, supply[18] in e1c rows vars cols #a;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "18");
+                    Assert.AreEqual(table.Get(2, 2).number, 32.2223d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 2).number, 0d, 0.0001);
+                    Assert.AreEqual(table.Get(4, 2).number, -28.2223d, 0.0001);
+                    Assert.AreEqual(table.Get(5, 2).number, -4d, 0.0001);
                 }
                 finally
                 {
