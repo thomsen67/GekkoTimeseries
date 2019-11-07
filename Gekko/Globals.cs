@@ -56,6 +56,7 @@ namespace Gekko
         public static List<string> unitTestsPromtingHelper = null;
 
         public static bool decompUnitPivot = false;
+        public static bool decompFix777 = false;
         public static bool fixDecomp3 = true;
         public static int superFilter = 0;
         public static bool fixDecomp2 = true;

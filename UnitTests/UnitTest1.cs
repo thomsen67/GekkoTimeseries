@@ -8875,7 +8875,7 @@ namespace UnitTests
         {
             Table table = null;
 
-            if (false)
+            if (true)
             {
                 // Consider this model, run over t = 2021, 2022
                 // over the ages #a = 18, 19
@@ -8929,19 +8929,20 @@ namespace UnitTests
                 try
                 {
                     Globals.decompUnitPivot = true; //!!! remember to switch it of
+                    Globals.decompFix777 = true; //!!! remember to switch it of
                     //I("decomp3<d> y[18] in e1 rows vars cols #a;");
                     I("decomp3<d> y[18] in e1a link demand[18] in e1b, supply[18] in e1c rows vars cols #a;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "18");
-                    Assert.AreEqual(table.Get(2, 2).number, 32.2223d, 0.0001);
-                    Assert.AreEqual(table.Get(3, 2).number, 0d, 0.0001);
-                    Assert.AreEqual(table.Get(4, 2).number, -28.2223d, 0.0001);
-                    Assert.AreEqual(table.Get(5, 2).number, -4d, 0.0001);
+                    Assert.AreEqual(table.Get(2, 2).number, -32.2223d, 0.0001);                    
+                    Assert.AreEqual(table.Get(6, 2).number, 28.2223d, 0.0001);
+                    Assert.AreEqual(table.Get(8, 2).number, 4d, 0.0001);
                 }
                 finally
                 {
                     Globals.decompUnitPivot = false; //switch off
+                    Globals.decompFix777 = false; //!!! remember to switch it of
                 }
 
             }
