@@ -8985,12 +8985,12 @@ namespace UnitTests
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 3).date, "2002");
                     Assert.AreEqual(table.Get(9, 3).number, 200d, 0.0001);
-                    Globals.superFilter = 1;
-                    I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4;");
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 3).date, "2002");
-                    Assert.AreEqual(table.Get(9, 3).number, 1111d, 0.0001);
-                    Globals.superFilter = 0;
+                    //Globals.superFilter = 1;
+                    //I("decomp2 <d> " + ss[0] + " in e1 link " + ss[1] + " in e2, " + ss[2] + " in e3, z in e4;");
+                    //table = Globals.lastDecompTable;
+                    //Assert.AreEqual(table.Get(1, 3).date, "2002");
+                    //Assert.AreEqual(table.Get(9, 3).number, 1111d, 0.0001);
+                    //Globals.superFilter = 0;
                 }
             }
 

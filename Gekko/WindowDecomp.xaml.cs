@@ -1216,9 +1216,10 @@ namespace Gekko
                 bool[] used = new bool[decompDatas.Count];  //number of link-equations (including primary eq)
                 used[0] = true;  //primary equation
 
-                for (int super = 0; super < nnn; super++)  //number of variables like decomp x[20], x[21] in e0 link ...
+                int super = 0;
+                //for (int super = 0; super < nnn; super++)  //number of variables like decomp x[20], x[21] in e0 link ...
                 {
-                    if (super != Globals.superFilter) continue;
+                    //if (super != Globals.superFilter) continue;
                     string name = null;
                     if (varnamesFirstLink != null)
                     {
