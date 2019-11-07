@@ -1349,7 +1349,7 @@ namespace Gekko
                     //string lhsName = null;
                     //if (MAIN_varnames != null) lhsName = MAIN_varnames[super];
                     
-                    Table table = Program.DecomposePutIntoTable3NEW(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+                    Table table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
                     
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;
@@ -1514,7 +1514,7 @@ namespace Gekko
                     Table table = null;
                     if (decompOptions2.type == "ASTDECOMP3")
                     {
-                        table = Program.DecomposePutIntoTable3(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
+                        table = Program.DecomposePutIntoTable3OLD(per1, per2, decompDatas[parentI][parentJ], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompVars, decompOptions2);
                     }
                     else
                     {
