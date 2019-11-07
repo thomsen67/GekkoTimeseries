@@ -8931,7 +8931,7 @@ namespace UnitTests
                     Globals.decompUnitPivot = true; //!!! remember to switch it of
                     Globals.decompFix777 = true; //!!! remember to switch it of
                     //I("decomp3<d> y[18] in e1 rows vars cols #a;");
-                    I("decomp3<d> y[18] in e1a link demand[18] in e1b, supply[18] in e1c rows vars cols #a;");
+                    I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c rows vars cols #a;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "18");
@@ -9063,12 +9063,12 @@ namespace UnitTests
                 I("time 2010 2012;");
                 try
                 {
-                    Globals.decompUnitPivot = true; //!!! remember to switch it of
+                    //Globals.decompUnitPivot = true; //!!! remember to switch it of
                     I("decomp3<d> qrs[tot] in qrs_tot link qrs[#a] in qrs,  qrss[#a] in qrss,  qrsm[#a] in qrsm  rows vars cols #a;");
                 }
                 finally
                 {
-                    Globals.decompUnitPivot = false; //switch off
+                    //Globals.decompUnitPivot = false; //switch off
                 }
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "null");
