@@ -1210,10 +1210,9 @@ namespace Gekko
                 if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
                 else nnn = 1;  //expression?
 
-                if (false)
+                if (true)
                 {
-                    DecompPrintDatas(decompDatas);
-                    return;
+                    DecompPrintDatas(decompDatas);                    
                 }
 
                 bool[] used = new bool[decompDatas.Count];  //number of link-equations (including primary eq)
@@ -1380,6 +1379,12 @@ namespace Gekko
                         {
                             G.Writeln2("+++ WARNING: did not use link-equation #" + i + " of " + (decompDatas.Count - 1) + " (is it superfluous?)");
                         }
+                    }
+
+                    if (true)
+                    {
+                        DecompPrintDatas(decompDatas);
+                        throw new GekkoException();
                     }
                 }
                 else
@@ -1582,7 +1587,7 @@ namespace Gekko
                     {
                         string nme = kvp.Key;
                         Series ts = kvp.Value;
-                        for (int i = 2001; i <= 2002; i++)
+                        for (int i = 2022; i <= 2022; i++)
                         {
                             double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
                             G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);

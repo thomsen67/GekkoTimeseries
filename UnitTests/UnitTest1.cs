@@ -8896,20 +8896,22 @@ namespace UnitTests
                 I("c.setdomains(('#a',));");
                 I("y.setdomains(('#a',));");
                 I("g.setdomains(('#a',));");
+                //I("demand.setdomains(('#a',));");
+                //I("supply.setdomains(('#a',));");
 
-                I("time 2021 2023;");
+                I("time 2020 2023;");
                 //---
-                I("g[18] = 10, 14, 20;");
-                I("g[19] = 12, 17, 24;");
-                I("g[20] = 15, 14, 19;");
+                I("g[18] = 8, 10, 14, 20;");
+                I("g[19] = 10, 12, 17, 24;");
+                I("g[20] = 13, 15, 14, 19;");
                 //---
-                I("c[18] = 114.4444, 142.6667, 100;");
-                I("c[19] = 141.3333, 144.6667, 100;");
-                I("c[20] = 100, 100, 100;");
+                I("c[18] = 110, 114.4444, 142.6667, 100;");
+                I("c[19] = 139, 141.3333, 144.6667, 100;");
+                I("c[20] = 100, 100, 100, 100;");
                 //---
-                I("y[18] = 124.4444, 156.6667, 200;");
-                I("y[19] = 153.3333, 161.6667, 200;");
-                I("y[20] = 200, 200, 200;");
+                I("y[18] = 112, 124.4444, 156.6667, 200;");
+                I("y[19] = 150, 153.3333, 161.6667, 200;");
+                I("y[20] = 200, 200, 200, 200;");
 
                 I("demand[#a] = c[#a] + g[#a];");
                 I("supply[#a] = y[#a];");
@@ -8920,12 +8922,33 @@ namespace UnitTests
                 I("prt c[#a] -(0.40 * (y[#a] + y[#a+1][+1]));");  //--> 0
                 I("prt y[#a] -(c[#a] + g[#a]);");                 //--> 0
 
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                //if(Globals.decompTest888) Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // Equations:
+                // e1a(a, t) .. demand(a, t) = E = supply(a, t);
+                // e1b(a, t) .. demand(a, t) = E = c(a, t) + g(a, t);
+                // e1c(a, t) .. supply(a, t) = E = y(a, t);                
+                // e2(a, t) .. c(a, t) = E = 0.40 * (y(a, t) + y(a + 1, t + 1));
+                //
+                // boils down to c[#a] + g[#a] = y[#a]
+                //            or 0.40 * y[#a] + 0.40 * y[#a+1][+1] + g[#a] = y[#a]
+                //            or y[#a] = 1/0.60 * (0.40 * y[#a+1][+1] + g[#a])
+                //
+                // Differences
+                // y[18] = 32.2223 in 2022
+                // g[18] =  4.0000 in 2022
+                // c[18] = 28.2223 in 2022
+                // y[19] = 38.3333 in 2023
+                // 
+                // 32.2223
+                // --------------
+                //  6.6667 for g[#a]              --> 4/0.6
+                // 25.5556 for y[#a+1][+1]        --> 0.4/0.6 * 38.3333
 
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                if (Globals.decompTest888) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                
                 try
                 {
                     //Globals.decompTest888 = true runs free, set to false for unit tests.
@@ -8945,9 +8968,9 @@ namespace UnitTests
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "18");
-                    Assert.AreEqual(table.Get(2, 2).number, -32.2223d, 0.0001);                    
-                    Assert.AreEqual(table.Get(6, 2).number, 28.2223d, 0.0001);
-                    Assert.AreEqual(table.Get(8, 2).number, 4d, 0.0001);
+                    //Assert.AreEqual(table.Get(2, 2).number, -32.2223d, 0.0001);                    
+                    //Assert.AreEqual(table.Get(6, 2).number, 28.2223d, 0.0001);
+                    //Assert.AreEqual(table.Get(8, 2).number, 4d, 0.0001);
                 }
                 finally
                 {

@@ -37049,7 +37049,8 @@ namespace Gekko
                     DecomposeAddToRow(dr, col_variable, varName);
 
                     string lag2 = null;
-                    if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                    if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);             
+                    
                     DecomposeAddToRow(dr, col_lag, lag2);                    
 
                     if (indexes != null)
@@ -37446,13 +37447,9 @@ namespace Gekko
             dt.Columns.Add(col_universe, typeof(string));
             if (Globals.fixDecomp3) dt.Columns.Add(col_equ, typeof(string));
 
-            int superN = decompDatas.Count;
-
-            //FOR UNIT TESTS:
-            //FOR UNIT TESTS:
-            //FOR UNIT TESTS:
-            superN = 1;
-
+            int superN = 1;
+            if (Globals.decompTest888) superN = decompDatas.Count;
+            
             for (int super = 0; super < superN; super++)
             {
 
@@ -37542,8 +37539,22 @@ namespace Gekko
                         DecomposeAddToRow(dr, col_t, t2.ToString());
                         DecomposeAddToRow(dr, col_variable, varName);
 
+                        //string lag2 = null;
+                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+
                         string lag2 = null;
-                        if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                        if (true)
+                        {
+                            if (lag != null) lag2 = lag;
+                            else lag2 = "[0]";
+                        }
+                        else
+                        {
+                            if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                        }
+
+                        //string lag2 = null;
+                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
                         DecomposeAddToRow(dr, col_lag, lag2);
 
                         if (indexes != null)
