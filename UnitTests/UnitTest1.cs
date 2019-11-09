@@ -8973,8 +8973,8 @@ namespace UnitTests
                     }
 
                     table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "18");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__,[0]");
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
                     //Assert.AreEqual(table.Get(2, 2).number, -32.2223d, 0.0001);                    
                     //Assert.AreEqual(table.Get(6, 2).number, 28.2223d, 0.0001);
                     //Assert.AreEqual(table.Get(8, 2).number, 4d, 0.0001);

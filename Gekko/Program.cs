@@ -37195,8 +37195,12 @@ namespace Gekko
                     if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
                 }
 
-                DataTable tab2 = GetInversedDataTable(dt, rc[0], rc[1], col_value, "-", true);
-                tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
+                if (true)
+                {
+                    DataTable tab2 = GetInversedDataTableOLD(dt, rc[0], rc[1], col_value, "-", true);
+                    tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
+                }
+                
             }
             else
             {
@@ -37407,7 +37411,7 @@ namespace Gekko
                     if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
                 }
 
-                DataTable tab2 = GetInversedDataTable(dt, rc[0], rc[1], col_value, "-", true);
+                DataTable tab2 = GetInversedDataTableOLD(dt, rc[0], rc[1], col_value, "-", true);
                 tab = DecomposePutIntoTableHelper2(tab2, col_value, true);
             }
             else
@@ -37420,6 +37424,342 @@ namespace Gekko
 
         public static Table DecomposePutIntoTable3(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
         {
+            FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
+            DataTable dt_OLD = new DataTable();  //to be removed
+
+            List<string> select_rowvars = new List<string>() { "vars", "lags" };
+            List<string> select_colvars = new List<string>() { "time" };
+
+            FrameFilter filter1 = new FrameFilter();
+            filter1.active = true;
+            filter1.name = "t";
+            filter1.selected = new List<string>() { "2022" };
+            List<FrameFilter> filters = new List<FrameFilter>() { filter1 };
+            
+            //The DataTable dt will get the following colums:
+            //<t>:         time
+            //<variable>:  variable name, like fy or pop
+            //<lag>:       lag or lead
+            //<#universe>: universal set for elements without domain info
+            //#i:          set names, like #age, #sector, etc.
+            //<value>:     data value
+
+            string internalColumnIdentifyer = "gekkopivot__";
+            string internalSetIdentifyer = "gekkoset__";
+            string col_t = internalColumnIdentifyer + "t";
+            string col_variable = internalColumnIdentifyer + "variable";
+            string col_lag = internalColumnIdentifyer + "lag";
+            string col_universe = internalColumnIdentifyer + "universe";
+            string col_value = internalColumnIdentifyer + "value";
+            string gekko_null = "null";
+            string col_equ = internalColumnIdentifyer + "equ";
+
+            dt_OLD.Columns.Add(col_t, typeof(string));
+            dt_OLD.Columns.Add(col_value, typeof(double));
+            dt_OLD.Columns.Add(col_variable, typeof(string));
+            dt_OLD.Columns.Add(col_lag, typeof(string));
+            dt_OLD.Columns.Add(col_universe, typeof(string));
+            if (Globals.fixDecomp3) dt_OLD.Columns.Add(col_equ, typeof(string));
+
+            frame.AddColName(col_t);
+            frame.AddColName(col_value);
+            frame.AddColName(col_variable);
+            frame.AddColName(col_lag);
+            frame.AddColName(col_universe);
+            frame.AddColName(col_equ);          
+
+            int superN = 1;
+            if (Globals.decompTest888) superN = decompDatas.Count;
+            
+            for (int super = 0; super < superN; super++)
+            {
+
+                int parentI = 0;
+                List<string> vars2 = Program.DecompGetVars3(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
+
+                int j = 0;
+                foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
+                {
+                    j++;
+                    int i = 0;
+                    double lhsSum = 0d;
+                    double rhsSum = 0d;
+                    foreach (string colname in vars2)
+                    {
+                        i++;
+
+                        string dbName = null; string varName = null; string freq = null; string[] indexes = null;
+                        string[] domains = null;
+
+                        //See #876435924365
+
+                        string lag = null;
+
+                        if (true)
+                        {
+                            //there is some repeated work done here, but not really bad
+                            //problem is we prefer to do one period at a time, to sum up, adjust etc.
+
+                            string[] ss = colname.Split('¤');
+                            string fullName = ss[0];
+                            lag = ss[1];
+                            if (lag == "[0]")
+                            {
+                                lag = null;
+                            }
+
+                            char firstChar;
+                            O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+
+                            if (indexes != null) domains = new string[indexes.Length];
+
+                            if (domains != null)
+                            {
+                                //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                                //So in this case, #a and #sector would be added as columns
+                                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                                if (iv != null)
+                                {
+                                    Series ts = iv as Series;
+                                    if (ts?.mmi?.parent?.meta?.domains != null)
+                                    {
+                                        for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
+                                        {
+                                            domains[ii] = ConvertSetname(internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
+                                        }
+                                    }
+                                }
+
+                                foreach (string domain in domains)
+                                {
+                                    string setname = domain.ToLower();
+                                    if (setname == null) setname = col_universe;
+                                    if (!dt_OLD.Columns.Contains(setname)) dt_OLD.Columns.Add(setname, typeof(string));
+                                    frame.AddColName(setname);  //will .tolower() and ignore dublets
+                                }
+                            }
+
+                            //See #876435924365              
+                            string bank2 = dbName;
+                            if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                            string name2 = O.UnChop(null, varName, null, indexes);
+                        }
+
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatas[super], code1, smpl, lhs, t2, colname);
+
+                        if (i == 1)
+                        {
+                            lhsSum = d;
+                        }
+                        else
+                        {
+                            rhsSum += d;
+                        }
+
+                        DataRow dr_OLD = dt_OLD.NewRow();
+                        DecomposeAddToRow(dr_OLD, col_equ, super.ToString());
+                        DecomposeAddToRow(dr_OLD, col_t, t2.ToString());
+                        DecomposeAddToRow(dr_OLD, col_variable, varName);
+
+                        FrameLightRow dr = new FrameLightRow(frame);
+                        dr.Set(frame, col_equ, new CellLight(super.ToString()));
+                        dr.Set(frame, col_t, new CellLight(t2.ToString()));
+                        dr.Set(frame, col_variable, new CellLight(varName));
+
+                        //string lag2 = null;
+                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+
+                        string lag2 = null;
+                        if (true)
+                        {
+                            if (lag != null) lag2 = lag;
+                            else lag2 = "[0]";
+                        }
+                        else
+                        {
+                            if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                        }
+
+                        //string lag2 = null;
+                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
+                        DecomposeAddToRow(dr_OLD, col_lag, lag2);
+                        dr.Set(frame, col_lag, new CellLight(lag2));
+
+                        if (indexes != null)
+                        {
+                            for (int ii = 0; ii < indexes.Length; ii++)
+                            {
+                                if (domains != null)
+                                {
+                                    string domain = domains[ii];
+                                    string index = indexes[ii];
+                                    if (domain != null)
+                                    {
+                                        dr_OLD[domain] = index;
+                                        DecomposeAddToRow(dr_OLD, domain, index);
+                                        dr.Set(frame, domain, new CellLight(index));
+                                    }
+                                    else
+                                    {
+                                        dr_OLD[col_universe] = index;  //column <#universe>, the universal set (that is, no domain)
+                                        DecomposeAddToRow(dr_OLD, col_universe, index);
+                                        dr.Set(frame, col_universe, new CellLight(index));
+                                    }
+                                }
+                            }
+                        }
+                        dr_OLD[col_value] = d;
+                        dr.Set(frame, col_value, new CellLight(d));
+                        
+                        dt_OLD.Rows.Add(dr_OLD);
+                        frame.rows.Add(dr);
+                    }
+                }
+
+                foreach (DataRow row in dt_OLD.Rows)
+                {
+                    foreach (DataColumn col in dt_OLD.Columns)
+                    {
+                        if (col.ColumnName != col_value)
+                        {
+                            if (string.IsNullOrEmpty(row[col] as string))
+                            {
+                                string s = gekko_null;
+                                row[col] = s;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (G.IsUnitTesting() && Globals.decompUnitPivot)
+            {
+                WriteDatatableTocsv(dt_OLD, internalColumnIdentifyer, internalSetIdentifyer);                
+            }
+
+            if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
+            {
+                G.Writeln2("*** ERROR: rows and cols must be stated");
+                throw new GekkoException();
+            }
+            List<string> rc = new List<string>();
+            rc.Add(decompOptions2.rows[0]);
+            rc.Add(decompOptions2.cols[0]);
+            for (int i = 0; i < 2; i++)
+            {
+                if (G.Equal(rc[i], "time")) rc[i] = col_t;
+                if (G.Equal(rc[i], "vars")) rc[i] = col_variable;
+                if (G.Equal(rc[i], "lags")) rc[i] = col_lag;
+                if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
+                if (Globals.fixDecomp3 && G.Equal(rc[i], "equ")) rc[i] = col_equ;
+                if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
+            }
+
+            Table tab = null;
+
+            if (true)
+            {
+                tab = new Table();
+                tab.writeOnce = true;
+
+                for (int i = 0; i < select_rowvars.Count; i++)
+                {
+                    if (G.Equal(select_rowvars[i], "time")) select_rowvars[i] = col_t;
+                    if (G.Equal(select_rowvars[i], "vars")) select_rowvars[i] = col_variable;
+                    if (G.Equal(select_rowvars[i], "lags")) select_rowvars[i] = col_lag;
+                    if (G.Equal(select_rowvars[i], "#uni")) select_rowvars[i] = col_universe;
+                    if (Globals.fixDecomp3 && G.Equal(select_rowvars[i], "equ")) select_rowvars[i] = col_equ;
+                    if (select_rowvars[i].StartsWith("#")) select_rowvars[i] = internalSetIdentifyer + select_rowvars[i].Substring(1);
+                }
+
+                for (int i = 0; i < select_colvars.Count; i++)
+                {
+                    if (G.Equal(select_colvars[i], "time")) select_colvars[i] = col_t;
+                    if (G.Equal(select_colvars[i], "vars")) select_colvars[i] = col_variable;
+                    if (G.Equal(select_colvars[i], "lags")) select_colvars[i] = col_lag;
+                    if (G.Equal(select_colvars[i], "#uni")) select_colvars[i] = col_universe;
+                    if (Globals.fixDecomp3 && G.Equal(select_colvars[i], "equ")) select_colvars[i] = col_equ;
+                    if (select_colvars[i].StartsWith("#")) select_colvars[i] = internalSetIdentifyer + select_colvars[i].Substring(1);
+                }
+
+                List<string> rownames = new List<string>();
+                List<string> colnames = new List<string>();
+                GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+                foreach (FrameLightRow row in frame.rows)
+                {
+                    string s1 = null;
+                    foreach (string s in select_rowvars)
+                    {
+                        CellLight c = row.Get(frame, s);
+                        if (c.type != ECellLightType.String) throw new GekkoException();
+                        s1 += "," + c.text;
+                    }
+                    if (s1 != null) s1 = s1.Substring(1);
+
+                    string s2 = null;
+                    foreach (string s in select_colvars)
+                    {
+                        CellLight c = row.Get(frame, s);
+                        if (c.type != ECellLightType.String) throw new GekkoException();
+                        s2 += "," + c.text;
+                    }
+                    if (s2 != null) s2 = s2.Substring(1);
+                    string key = s1 + "¤" + s2;
+                    
+                    if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
+                    if (!colnames.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames.Add(s2);
+
+                    CellLight c3 = row.Get(frame, col_value);
+                    double d = c3.data;
+                    
+                    if(!agg.ContainsKey(key))
+                    {
+                        agg.Add(key, d);
+                    }
+                    else
+                    {
+                        agg[key] += d;
+                    }
+
+                }
+                rownames.Sort(StringComparer.OrdinalIgnoreCase);
+                colnames.Sort(StringComparer.OrdinalIgnoreCase);
+
+                for (int i = 0; i < rownames.Count; i++)
+                {
+                    for (int j = 0; j < colnames.Count; j++)
+                    {
+                        string key = rownames[i] + "¤" + colnames[j];
+                        double d = 0d;
+                        agg.TryGetValue(key, out d);
+                        tab.SetNumber(i + 2, j + 2, d, "f10.4");
+                    }
+                }
+
+                for (int i = 0; i < rownames.Count; i++)
+                {
+                    tab.Set(i + 2, 1, rownames[i]);
+                }
+
+                for (int j = 0; j < colnames.Count; j++)
+                {
+                    tab.Set(1, j + 2, colnames[j]);
+                }
+            }
+
+            else
+            {
+                DataTable dt2 = GetInversedDataTableOLD(dt_OLD, rc[0], rc[1], col_value, "-", true);
+                tab = DecomposePutIntoTableHelper2(dt2, col_value, true);
+            }
+
+            return tab;
+        }
+
+        public static Table DecomposePutIntoTable3OLD(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
+        {
+            CellLight c = new CellLight();
+
             DataTable dt = new DataTable();
 
             //The DataTable dt will get the following colums:
@@ -37449,7 +37789,7 @@ namespace Gekko
 
             int superN = 1;
             if (Globals.decompTest888) superN = decompDatas.Count;
-            
+
             for (int super = 0; super < superN; super++)
             {
 
@@ -37602,7 +37942,7 @@ namespace Gekko
 
             if (G.IsUnitTesting() && Globals.decompUnitPivot)
             {
-                WriteDatatableTocsv(dt, internalColumnIdentifyer, internalSetIdentifyer);                
+                WriteDatatableTocsv(dt, internalColumnIdentifyer, internalSetIdentifyer);
             }
 
             if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
@@ -37623,7 +37963,7 @@ namespace Gekko
                 if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
             }
 
-            DataTable dt2 = GetInversedDataTable(dt, rc[0], rc[1], col_value, "-", true);
+            DataTable dt2 = GetInversedDataTableOLD(dt, rc[0], rc[1], col_value, "-", true);
             Table tab = DecomposePutIntoTableHelper2(dt2, col_value, true);
 
             return tab;
@@ -37724,7 +38064,7 @@ namespace Gekko
             tab.Set(new Coord(i, j), null, d, CellType.Number, "f13.4");
         }
         
-        public static DataTable GetInversedDataTable(DataTable table, string rowVariable, string colVariable, string valuesVariable, string nullValue, bool sumValues)
+        public static DataTable GetInversedDataTableOLD(DataTable table, string rowVariable, string colVariable, string valuesVariable, string nullValue, bool sumValues)
         {
             //https://www.codeproject.com/Articles/22008/C-Pivot-Table
 
@@ -37835,8 +38175,6 @@ namespace Gekko
 
             return returnTable;
         }
-
-
 
         
 
@@ -44695,8 +45033,81 @@ namespace Gekko
             hasQuotes = hasQuotes2;
         }
 
+        public string ToString()
+        {
+            string rv = "---null---";
+            if (this.type==ECellLightType.DateTime)
+            {
+                rv = "a date";
+            }
+            else if (this.type == ECellLightType.Double)
+            {
+                rv = this.data.ToString();
+            }
+            else if (this.type == ECellLightType.String)
+            {
+                rv = this.text;
+            }
+            return rv;
+        }
     }
 
+    public class FrameLightRow
+    {
+        public List<CellLight> storage = null;
+
+        public FrameLightRow(FrameLight frame)
+        {
+            this.storage = new List<CellLight>(new CellLight[frame.colnames.Count]); //fills it with "null"-objects  t);            
+        }
+
+        public void Set(FrameLight frame, string colname, CellLight cell)
+        {
+            int i = FindColumn(frame, colname);
+            this.storage[i] = cell;
+        }
+
+        public CellLight Get(FrameLight frame, string colname)
+        {
+            int i = FindColumn(frame, colname);
+            return this.storage[i];
+        }
+
+        private static int FindColumn(FrameLight frame, string colname)
+        {            
+            int j = -12345;
+            for (int i = 0; i < frame.colnames.Count; i++)
+            {
+                if (G.Equal(frame.colnames[i], colname)) j = i;
+            }
+            return j;
+        }
+    }
+
+    public class FrameFilter
+    {
+        public string name = null;
+        public List<string> selected = null;
+        public bool active = false;
+    }
+
+    public class FrameLight
+    {
+        public List<FrameLightRow> rows = new List<FrameLightRow>();
+        public List<string> colnames = new List<string>(); //must be lowercase
+        
+        public void AddColName(string colname)
+        {            
+            if (!this.colnames.Contains(colname, StringComparer.OrdinalIgnoreCase))
+            {
+                this.colnames.Add(colname);
+                for (int i = 0; i < this.rows.Count; i++)
+                {
+                    this.rows[i].storage.Add(new CellLight());
+                }
+            }
+        }                
+    }
 
     public class TableLight
     {

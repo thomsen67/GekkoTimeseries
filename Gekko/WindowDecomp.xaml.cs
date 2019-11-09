@@ -1328,6 +1328,10 @@ namespace Gekko
                         //      in the decompDatas, and report error if not.
                         //      To do this, FindLinkJ() and FindLinkSeries() need adjustments
 
+                        //correct if the lhs variable is not stated with an implicit 1, like
+                        //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
+                        //the last one must be multiplied with 5.
+
                         foreach (string name in MAIN_varnames)
                         {
                             string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
@@ -1356,7 +1360,15 @@ namespace Gekko
                     //At this point, all linked equations i = 1, 2, ... have been merged into
                     //the MAIN equation i = 0.
 
-                    Table table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+                    Table table = null;
+                    if (true)
+                    {
+                        table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+                    }
+                    else
+                    {
+                        table = Program.DecomposePutIntoTable3OLD(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+                    }                    
 
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;
@@ -1389,7 +1401,7 @@ namespace Gekko
                         }
                     }
 
-                    if (true)
+                    if (false)
                     {
                         DecompPrintDatas(decompDatas);
                         throw new GekkoException();
