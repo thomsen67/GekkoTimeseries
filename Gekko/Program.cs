@@ -37427,8 +37427,11 @@ namespace Gekko
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
             DataTable dt_OLD = new DataTable();  //to be removed
 
-            List<string> select_rowvars = new List<string>() { "vars", "lags" };
-            List<string> select_colvars = new List<string>() { "time" };
+            //List<string> select_rowvars = new List<string>() { "vars", "lags" };
+            //List<string> select_colvars = new List<string>() { "time" };
+
+            List<string> select_rowvars = decompOptions2.rows;
+            List<string> select_colvars = decompOptions2.cols;
 
             List<FrameFilter> filters = new List<FrameFilter>();
             if (decompOptions2.where != null)
@@ -37695,18 +37698,13 @@ namespace Gekko
                     string s1 = null;
                     foreach (string s in select_rowvars)
                     {
-                        CellLight c = row.Get(frame, s);
-                        if (c.type != ECellLightType.String) throw new GekkoException();
-                        s1 += "," + c.text;
+                        s1 = DecompAddText(frame, row, s1, s);
                     }
                     if (s1 != null) s1 = s1.Substring(1);
-
                     string s2 = null;
                     foreach (string s in select_colvars)
-                    {
-                        CellLight c = row.Get(frame, s);
-                        if (c.type != ECellLightType.String) throw new GekkoException();
-                        s2 += "," + c.text;
+                    {                        
+                        s2 = DecompAddText(frame, row, s2, s);
                     }
                     if (s2 != null) s2 = s2.Substring(1);
                     string key = s1 + "¤" + s2;
@@ -37758,6 +37756,24 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        private static string DecompAddText(FrameLight frame, FrameLightRow row, string s1, string s)
+        {
+            CellLight c = row.Get(frame, s);
+            if (c.type == ECellLightType.None)
+            {
+                s1 += "," + "null";
+            }
+            else if (c.type == ECellLightType.String)
+            {
+                s1 += "," + c.text;
+            }
+            else
+            {
+                throw new GekkoException();
+            }            
+            return s1;
         }
 
         private static void DecomposeReplaceVars(List<string> vars, string internalSetIdentifyer, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
@@ -45109,6 +45125,10 @@ namespace Gekko
             for (int i = 0; i < frame.colnames.Count; i++)
             {
                 if (G.Equal(frame.colnames[i], colname)) j = i;
+            }
+            if (j == -12345)
+            {
+                G.Writeln2("*** ERROR: Could not find name '" + colname + "'");
             }
             return j;
         }

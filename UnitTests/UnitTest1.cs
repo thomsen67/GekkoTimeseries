@@ -8965,19 +8965,37 @@ namespace UnitTests
                     //I("decomp3<d> y[18] in e1 rows vars cols #a;");
                     if (Globals.decompTest888)
                     {
-                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars cols #a;");
+                        //I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars cols #a;");
+                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
                     }
                     else
                     {
-                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c rows vars cols #a;");
+                        //I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c rows vars cols #a;");
+                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
                     }
 
                     table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__,[0]");
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                    //Assert.AreEqual(table.Get(2, 2).number, -32.2223d, 0.0001);                    
-                    //Assert.AreEqual(table.Get(6, 2).number, 28.2223d, 0.0001);
-                    //Assert.AreEqual(table.Get(8, 2).number, 4d, 0.0001);
+                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+                    //TODO: aa___expr names row 2-5
+                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "c,18,[0]");
+                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "demand,18,[0]");
+                    Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "g,18,[0]");
+                    Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "supply,18,[0]");
+                    Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "y,18,[0]");
+                    Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "y,19,[+1]");
+
+                    Assert.AreEqual(table.Get(2, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(4, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(5, 3).number, -0.0001d, 0.0001);
+                    Assert.AreEqual(table.Get(6, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(7, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(8, 3).number, -6.6667d, 0.0001);
+                    Assert.AreEqual(table.Get(9, 3).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(10, 3).number, 32.2223d, 0.0001);
+                    Assert.AreEqual(table.Get(11, 3).number, -25.5555d, 0.0001);
+                    
                 }
                 finally
                 {
