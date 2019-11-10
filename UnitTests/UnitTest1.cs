@@ -9101,7 +9101,7 @@ namespace UnitTests
 
                     // =========== differences, decomposed =========================                
 
-                    if (true)
+                    if (false)
                     {
                         Globals.showDecompTable = true;
                         Globals.decompFix777 = true; //!!! remember to switch it of   
