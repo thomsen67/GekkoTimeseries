@@ -37430,11 +37430,18 @@ namespace Gekko
             List<string> select_rowvars = new List<string>() { "vars", "lags" };
             List<string> select_colvars = new List<string>() { "time" };
 
-            FrameFilter filter1 = new FrameFilter();
-            filter1.active = true;
-            filter1.name = "t";
-            filter1.selected = new List<string>() { "2022" };
-            List<FrameFilter> filters = new List<FrameFilter>() { filter1 };
+            List<FrameFilter> filters = new List<FrameFilter>();
+            if (decompOptions2.where != null)
+            {
+                foreach (List<string> filter in decompOptions2.where)
+                {
+                    FrameFilter filter1 = new FrameFilter();
+                    filter1.active = true;
+                    filter1.name = filter[filter.Count - 1];
+                    filter1.selected = filter.GetRange(0, filter.Count - 1);
+                    filters.Add(filter1);
+                }
+            }
             
             //The DataTable dt will get the following colums:
             //<t>:         time
@@ -37662,31 +37669,29 @@ namespace Gekko
                 tab = new Table();
                 tab.writeOnce = true;
 
-                for (int i = 0; i < select_rowvars.Count; i++)
-                {
-                    if (G.Equal(select_rowvars[i], "time")) select_rowvars[i] = col_t;
-                    if (G.Equal(select_rowvars[i], "vars")) select_rowvars[i] = col_variable;
-                    if (G.Equal(select_rowvars[i], "lags")) select_rowvars[i] = col_lag;
-                    if (G.Equal(select_rowvars[i], "#uni")) select_rowvars[i] = col_universe;
-                    if (Globals.fixDecomp3 && G.Equal(select_rowvars[i], "equ")) select_rowvars[i] = col_equ;
-                    if (select_rowvars[i].StartsWith("#")) select_rowvars[i] = internalSetIdentifyer + select_rowvars[i].Substring(1);
-                }
-
-                for (int i = 0; i < select_colvars.Count; i++)
-                {
-                    if (G.Equal(select_colvars[i], "time")) select_colvars[i] = col_t;
-                    if (G.Equal(select_colvars[i], "vars")) select_colvars[i] = col_variable;
-                    if (G.Equal(select_colvars[i], "lags")) select_colvars[i] = col_lag;
-                    if (G.Equal(select_colvars[i], "#uni")) select_colvars[i] = col_universe;
-                    if (Globals.fixDecomp3 && G.Equal(select_colvars[i], "equ")) select_colvars[i] = col_equ;
-                    if (select_colvars[i].StartsWith("#")) select_colvars[i] = internalSetIdentifyer + select_colvars[i].Substring(1);
-                }
+                DecomposeReplaceVars(select_rowvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+                DecomposeReplaceVars(select_colvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+                DecomposeReplaceVars(filters, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
 
                 List<string> rownames = new List<string>();
                 List<string> colnames = new List<string>();
                 GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
                 foreach (FrameLightRow row in frame.rows)
                 {
+                    bool skip = false;
+                    foreach (FrameFilter filter in filters)
+                    {
+                        CellLight c = row.Get(frame, filter.name);
+                        if (c.type != ECellLightType.String) throw new GekkoException();
+                        string ss = c.text;
+                        if (!filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip) continue;
+
                     string s1 = null;
                     foreach (string s in select_rowvars)
                     {
@@ -37705,14 +37710,14 @@ namespace Gekko
                     }
                     if (s2 != null) s2 = s2.Substring(1);
                     string key = s1 + "¤" + s2;
-                    
+
                     if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
                     if (!colnames.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames.Add(s2);
 
                     CellLight c3 = row.Get(frame, col_value);
                     double d = c3.data;
-                    
-                    if(!agg.ContainsKey(key))
+
+                    if (!agg.ContainsKey(key))
                     {
                         agg.Add(key, d);
                     }
@@ -37720,7 +37725,6 @@ namespace Gekko
                     {
                         agg[key] += d;
                     }
-
                 }
                 rownames.Sort(StringComparer.OrdinalIgnoreCase);
                 colnames.Sort(StringComparer.OrdinalIgnoreCase);
@@ -37754,6 +37758,32 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        private static void DecomposeReplaceVars(List<string> vars, string internalSetIdentifyer, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
+        {
+            for (int i = 0; i < vars.Count; i++)
+            {
+                if (G.Equal(vars[i], "time")) vars[i] = col_t;
+                if (G.Equal(vars[i], "vars")) vars[i] = col_variable;
+                if (G.Equal(vars[i], "lags")) vars[i] = col_lag;
+                if (G.Equal(vars[i], "#uni")) vars[i] = col_universe;
+                if (Globals.fixDecomp3 && G.Equal(vars[i], "equ")) vars[i] = col_equ;
+                if (vars[i].StartsWith("#")) vars[i] = internalSetIdentifyer + vars[i].Substring(1);
+            }
+        }
+
+        private static void DecomposeReplaceVars(List<FrameFilter> vars, string internalSetIdentifyer, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
+        {
+            for (int i = 0; i < vars.Count; i++)
+            {
+                if (G.Equal(vars[i].name, "time")) vars[i].name = col_t;
+                if (G.Equal(vars[i].name, "vars")) vars[i].name = col_variable;
+                if (G.Equal(vars[i].name, "lags")) vars[i].name = col_lag;
+                if (G.Equal(vars[i].name, "#uni")) vars[i].name = col_universe;
+                if (Globals.fixDecomp3 && G.Equal(vars[i].name, "equ")) vars[i].name = col_equ;
+                if (vars[i].name.StartsWith("#")) vars[i].name = internalSetIdentifyer + vars[i].name.Substring(1);
+            }
         }
 
         public static Table DecomposePutIntoTable3OLD(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
