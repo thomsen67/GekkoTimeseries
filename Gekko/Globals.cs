@@ -58,8 +58,7 @@ namespace Gekko
         public static bool decompTest888 = false;
         public static bool decompUnitPivot = false;
         public static bool decompFix777 = false;
-        public static bool fixDecomp3 = true;
-        public static int superFilter = 0;
+        public static bool fixDecomp3 = true;        
         public static bool fixDecomp2 = true;
         public static string fixDecomp = null;
         //public static string fixDecomp = "51";

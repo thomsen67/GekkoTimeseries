@@ -12821,9 +12821,10 @@ namespace Gekko
             try
             {
                 string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);                
+                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
+                if (Globals.expressions != null) Globals.expressions.Clear();
                 Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-                found.expressions.AddRange(Globals.expressions);                
+                found.expressions.AddRange(Globals.expressions);
             }
             catch (Exception e)
             {
@@ -37155,26 +37156,7 @@ namespace Gekko
             else if (decompOptions2.type == "ASTDECOMP3") type = 2;
             //type = 1; //set this for raw table
 
-            if (G.IsUnitTesting() && Globals.decompUnitPivot)
-            {
-                //tab = DecomposePutIntoTableHelper2(dt, col_value, false);
-                StringBuilder sb = new StringBuilder();
-                List<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList<string>();
-                for (int i = 0; i < columnNames.Count; i++)
-                {
-                    columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
-                    columnNames[i] = columnNames[i].Replace(internalSetIdentifyer, "#");
-                    if (columnNames[i] == "universe") columnNames[i] = "#uni";
-                }
-                sb.AppendLine(string.Join(";", columnNames));
-                foreach (DataRow row in dt.Rows)
-                {
-                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                    sb.AppendLine(string.Join(";", fields));
-                }
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
-            }
-
+            
             if (type == 2)
             {
                 if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
@@ -37371,26 +37353,7 @@ namespace Gekko
                 }
             }            
 
-            if (G.IsUnitTesting() && Globals.decompUnitPivot)
-            {
-                //tab = DecomposePutIntoTableHelper2(dt, col_value, false);
-                StringBuilder sb = new StringBuilder();
-                List<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList<string>();
-                for (int i = 0; i < columnNames.Count; i++)
-                {
-                    columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
-                    columnNames[i] = columnNames[i].Replace(internalSetIdentifyer, "#");
-                    if (columnNames[i] == "universe") columnNames[i] = "#uni";
-                }
-                sb.AppendLine(string.Join(";", columnNames));
-                foreach (DataRow row in dt.Rows)
-                {
-                    IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                    sb.AppendLine(string.Join(";", fields));
-                }
-                File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
-            }
-
+            
             if (true)
             {
                 if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
@@ -37529,9 +37492,12 @@ namespace Gekko
 
                                 foreach (string domain in domains)
                                 {
-                                    string setname = domain.ToLower();
-                                    if (setname == null) setname = col_universe;
-                                    frame.AddColName(setname);  //will .tolower() and ignore dublets
+                                    if (domain != null)
+                                    {
+                                        string setname = domain.ToLower();
+                                        if (setname == null) setname = col_universe;
+                                        frame.AddColName(setname);  //will .tolower() and ignore dublets
+                                    }
                                 }
                             }
 
@@ -37596,7 +37562,7 @@ namespace Gekko
                 }
             }
 
-            if (G.IsUnitTesting() && Globals.decompUnitPivot)
+            if (Globals.decompUnitPivot)
             {
                 WriteDatatableTocsv(frame, internalColumnIdentifyer, internalSetIdentifyer);
             }
@@ -37915,11 +37881,6 @@ namespace Gekko
                         }
                     }
                 }
-            }
-
-            if (G.IsUnitTesting() && Globals.decompUnitPivot)
-            {
-                //WriteDatatableTocsv(dt, internalColumnIdentifyer, internalSetIdentifyer);
             }
 
             if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
