@@ -1361,14 +1361,8 @@ namespace Gekko
                     //the MAIN equation i = 0.
 
                     Table table = null;
-                    if (true)
-                    {
-                        table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
-                    }
-                    else
-                    {
-                        table = Program.DecomposePutIntoTable3OLD(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
-                    }                    
+                    table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+                    
 
                     string s = FindEquationText2(this.decompOptions2);
                     equation.Text = s;

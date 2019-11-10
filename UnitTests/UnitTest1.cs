@@ -8920,11 +8920,25 @@ namespace UnitTests
 
                 I("option model type = gams;");
                 I("model <gms> link;");
-                I("decomp2 <d> xtot_a in e_xtot_a;");
-                I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot;");
-                //this one and the superlink above yield the exact same effects.
-                I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
 
+                if (false)
+                {
+                    Globals.decompFix777 = true; //!!! remember to switch it of   
+                    
+                    I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok
+                    Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                    I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
+                    I("decomp2 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
+
+                    Globals.decompFix777 = false; //!!! remember to switch it of   
+                }
+                else
+                {
+                    I("decomp2 <d> xtot_a in e_xtot_a;");
+                    I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot;");
+                    //this one and the superlink above yield the exact same effects.
+                    I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
+                }
 
                 //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 
