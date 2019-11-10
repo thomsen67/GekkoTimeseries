@@ -8952,7 +8952,7 @@ namespace UnitTests
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                if (Globals.decompTest888) Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 
@@ -8962,18 +8962,9 @@ namespace UnitTests
 
                     Globals.decompUnitPivot = true; //!!! remember to switch it of
                     Globals.decompFix777 = true; //!!! remember to switch it of                    
-                    //I("decomp3<d> y[18] in e1 rows vars cols #a;");
-                    if (Globals.decompTest888)
-                    {
-                        //I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars cols #a;");
-                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
-                    }
-                    else
-                    {
-                        //I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c rows vars cols #a;");
-                        I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
-                    }
-
+                    //I("decomp3<d> y[18] in e1 rows vars cols #a;");                    
+                    I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
+                    
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
                     Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");

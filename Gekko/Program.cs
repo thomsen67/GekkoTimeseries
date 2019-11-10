@@ -37425,11 +37425,6 @@ namespace Gekko
         public static Table DecomposePutIntoTable3(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
         {
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
-            DataTable dt_OLD = new DataTable();  //to be removed
-
-            //List<string> select_rowvars = new List<string>() { "vars", "lags" };
-            //List<string> select_colvars = new List<string>() { "time" };
-
             List<string> select_rowvars = decompOptions2.rows;
             List<string> select_colvars = decompOptions2.cols;
 
@@ -37445,7 +37440,7 @@ namespace Gekko
                     filters.Add(filter1);
                 }
             }
-            
+
             //The DataTable dt will get the following colums:
             //<t>:         time
             //<variable>:  variable name, like fy or pop
@@ -37464,23 +37459,15 @@ namespace Gekko
             string gekko_null = "null";
             string col_equ = internalColumnIdentifyer + "equ";
 
-            dt_OLD.Columns.Add(col_t, typeof(string));
-            dt_OLD.Columns.Add(col_value, typeof(double));
-            dt_OLD.Columns.Add(col_variable, typeof(string));
-            dt_OLD.Columns.Add(col_lag, typeof(string));
-            dt_OLD.Columns.Add(col_universe, typeof(string));
-            if (Globals.fixDecomp3) dt_OLD.Columns.Add(col_equ, typeof(string));
-
             frame.AddColName(col_t);
             frame.AddColName(col_value);
             frame.AddColName(col_variable);
             frame.AddColName(col_lag);
             frame.AddColName(col_universe);
-            frame.AddColName(col_equ);          
+            frame.AddColName(col_equ);
 
-            int superN = 1;
-            if (Globals.decompTest888) superN = decompDatas.Count;
-            
+            int superN = decompDatas.Count;
+
             for (int super = 0; super < superN; super++)
             {
 
@@ -37544,7 +37531,6 @@ namespace Gekko
                                 {
                                     string setname = domain.ToLower();
                                     if (setname == null) setname = col_universe;
-                                    if (!dt_OLD.Columns.Contains(setname)) dt_OLD.Columns.Add(setname, typeof(string));
                                     frame.AddColName(setname);  //will .tolower() and ignore dublets
                                 }
                             }
@@ -37566,18 +37552,10 @@ namespace Gekko
                             rhsSum += d;
                         }
 
-                        DataRow dr_OLD = dt_OLD.NewRow();
-                        DecomposeAddToRow(dr_OLD, col_equ, super.ToString());
-                        DecomposeAddToRow(dr_OLD, col_t, t2.ToString());
-                        DecomposeAddToRow(dr_OLD, col_variable, varName);
-
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
                         dr.Set(frame, col_t, new CellLight(t2.ToString()));
                         dr.Set(frame, col_variable, new CellLight(varName));
-
-                        //string lag2 = null;
-                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
 
                         string lag2 = null;
                         if (true)
@@ -37590,9 +37568,6 @@ namespace Gekko
                             if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
                         }
 
-                        //string lag2 = null;
-                        //if (lag != null) lag2 = lag.Trim().Substring(1, lag.Trim().Length - 2);
-                        DecomposeAddToRow(dr_OLD, col_lag, lag2);
                         dr.Set(frame, col_lag, new CellLight(lag2));
 
                         if (indexes != null)
@@ -37605,154 +37580,110 @@ namespace Gekko
                                     string index = indexes[ii];
                                     if (domain != null)
                                     {
-                                        dr_OLD[domain] = index;
-                                        DecomposeAddToRow(dr_OLD, domain, index);
                                         dr.Set(frame, domain, new CellLight(index));
                                     }
                                     else
                                     {
-                                        dr_OLD[col_universe] = index;  //column <#universe>, the universal set (that is, no domain)
-                                        DecomposeAddToRow(dr_OLD, col_universe, index);
                                         dr.Set(frame, col_universe, new CellLight(index));
                                     }
                                 }
                             }
                         }
-                        dr_OLD[col_value] = d;
-                        dr.Set(frame, col_value, new CellLight(d));
-                        
-                        dt_OLD.Rows.Add(dr_OLD);
-                        frame.rows.Add(dr);
-                    }
-                }
 
-                foreach (DataRow row in dt_OLD.Rows)
-                {
-                    foreach (DataColumn col in dt_OLD.Columns)
-                    {
-                        if (col.ColumnName != col_value)
-                        {
-                            if (string.IsNullOrEmpty(row[col] as string))
-                            {
-                                string s = gekko_null;
-                                row[col] = s;
-                            }
-                        }
+                        dr.Set(frame, col_value, new CellLight(d));
+                        frame.rows.Add(dr);
                     }
                 }
             }
 
             if (G.IsUnitTesting() && Globals.decompUnitPivot)
             {
-                WriteDatatableTocsv(dt_OLD, internalColumnIdentifyer, internalSetIdentifyer);                
+                WriteDatatableTocsv(frame, internalColumnIdentifyer, internalSetIdentifyer);
             }
 
             if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
             {
                 G.Writeln2("*** ERROR: rows and cols must be stated");
                 throw new GekkoException();
-            }
-            List<string> rc = new List<string>();
-            rc.Add(decompOptions2.rows[0]);
-            rc.Add(decompOptions2.cols[0]);
-            for (int i = 0; i < 2; i++)
+            }            
+
+            Table tab = new Table();
+            tab.writeOnce = true;
+
+            DecomposeReplaceVars(select_rowvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(select_colvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(filters, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+
+            List<string> rownames = new List<string>();
+            List<string> colnames = new List<string>();
+            GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            foreach (FrameLightRow row in frame.rows)
             {
-                if (G.Equal(rc[i], "time")) rc[i] = col_t;
-                if (G.Equal(rc[i], "vars")) rc[i] = col_variable;
-                if (G.Equal(rc[i], "lags")) rc[i] = col_lag;
-                if (G.Equal(rc[i], "#uni")) rc[i] = col_universe;
-                if (Globals.fixDecomp3 && G.Equal(rc[i], "equ")) rc[i] = col_equ;
-                if (rc[i].StartsWith("#")) rc[i] = internalSetIdentifyer + rc[i].Substring(1);
+                bool skip = false;
+                foreach (FrameFilter filter in filters)
+                {
+                    CellLight c = row.Get(frame, filter.name);
+                    if (c.type != ECellLightType.String) throw new GekkoException();
+                    string ss = c.text;
+                    if (!filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
+                    {
+                        skip = true;
+                        break;
+                    }
+                }
+                if (skip) continue;
+
+                string s1 = null;
+                foreach (string s in select_rowvars)
+                {
+                    s1 = DecompAddText(frame, row, s1, s);
+                }
+                if (s1 != null) s1 = s1.Substring(1);
+                string s2 = null;
+                foreach (string s in select_colvars)
+                {
+                    s2 = DecompAddText(frame, row, s2, s);
+                }
+                if (s2 != null) s2 = s2.Substring(1);
+                string key = s1 + "¤" + s2;
+
+                if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
+                if (!colnames.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames.Add(s2);
+
+                CellLight c3 = row.Get(frame, col_value);
+                double d = c3.data;
+
+                if (!agg.ContainsKey(key))
+                {
+                    agg.Add(key, d);
+                }
+                else
+                {
+                    agg[key] += d;
+                }
             }
+            rownames.Sort(StringComparer.OrdinalIgnoreCase);
+            colnames.Sort(StringComparer.OrdinalIgnoreCase);
 
-            Table tab = null;
-
-            if (true)
+            for (int i = 0; i < rownames.Count; i++)
             {
-                tab = new Table();
-                tab.writeOnce = true;
-
-                DecomposeReplaceVars(select_rowvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-                DecomposeReplaceVars(select_colvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-                DecomposeReplaceVars(filters, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-
-                List<string> rownames = new List<string>();
-                List<string> colnames = new List<string>();
-                GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
-                foreach (FrameLightRow row in frame.rows)
-                {
-                    bool skip = false;
-                    foreach (FrameFilter filter in filters)
-                    {
-                        CellLight c = row.Get(frame, filter.name);
-                        if (c.type != ECellLightType.String) throw new GekkoException();
-                        string ss = c.text;
-                        if (!filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-                    if (skip) continue;
-
-                    string s1 = null;
-                    foreach (string s in select_rowvars)
-                    {
-                        s1 = DecompAddText(frame, row, s1, s);
-                    }
-                    if (s1 != null) s1 = s1.Substring(1);
-                    string s2 = null;
-                    foreach (string s in select_colvars)
-                    {                        
-                        s2 = DecompAddText(frame, row, s2, s);
-                    }
-                    if (s2 != null) s2 = s2.Substring(1);
-                    string key = s1 + "¤" + s2;
-
-                    if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
-                    if (!colnames.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames.Add(s2);
-
-                    CellLight c3 = row.Get(frame, col_value);
-                    double d = c3.data;
-
-                    if (!agg.ContainsKey(key))
-                    {
-                        agg.Add(key, d);
-                    }
-                    else
-                    {
-                        agg[key] += d;
-                    }
-                }
-                rownames.Sort(StringComparer.OrdinalIgnoreCase);
-                colnames.Sort(StringComparer.OrdinalIgnoreCase);
-
-                for (int i = 0; i < rownames.Count; i++)
-                {
-                    for (int j = 0; j < colnames.Count; j++)
-                    {
-                        string key = rownames[i] + "¤" + colnames[j];
-                        double d = 0d;
-                        agg.TryGetValue(key, out d);
-                        tab.SetNumber(i + 2, j + 2, d, "f10.4");
-                    }
-                }
-
-                for (int i = 0; i < rownames.Count; i++)
-                {
-                    tab.Set(i + 2, 1, rownames[i]);
-                }
-
                 for (int j = 0; j < colnames.Count; j++)
                 {
-                    tab.Set(1, j + 2, colnames[j]);
+                    string key = rownames[i] + "¤" + colnames[j];
+                    double d = 0d;
+                    agg.TryGetValue(key, out d);
+                    tab.SetNumber(i + 2, j + 2, d, "f10.4");
                 }
             }
 
-            else
+            for (int i = 0; i < rownames.Count; i++)
             {
-                DataTable dt2 = GetInversedDataTableOLD(dt_OLD, rc[0], rc[1], col_value, "-", true);
-                tab = DecomposePutIntoTableHelper2(dt2, col_value, true);
+                tab.Set(i + 2, 1, rownames[i]);
+            }
+
+            for (int j = 0; j < colnames.Count; j++)
+            {
+                tab.Set(1, j + 2, colnames[j]);
             }
 
             return tab;
@@ -37988,7 +37919,7 @@ namespace Gekko
 
             if (G.IsUnitTesting() && Globals.decompUnitPivot)
             {
-                WriteDatatableTocsv(dt, internalColumnIdentifyer, internalSetIdentifyer);
+                //WriteDatatableTocsv(dt, internalColumnIdentifyer, internalSetIdentifyer);
             }
 
             if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
@@ -38015,11 +37946,10 @@ namespace Gekko
             return tab;
         }
 
-        private static void WriteDatatableTocsv(DataTable dt, string internalColumnIdentifyer, string internalSetIdentifyer)
-        {
-            //tab = DecomposePutIntoTableHelper2(dt, col_value, false);
+        private static void WriteDatatableTocsv(FrameLight dt, string internalColumnIdentifyer, string internalSetIdentifyer)
+        {            
             StringBuilder sb = new StringBuilder();
-            List<string> columnNames = dt.Columns.Cast<DataColumn>().Select(column => column.ColumnName).ToList<string>();
+            List<string> columnNames = new List<string>(dt.colnames);
             for (int i = 0; i < columnNames.Count; i++)
             {
                 columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
@@ -38027,10 +37957,15 @@ namespace Gekko
                 if (columnNames[i] == "universe") columnNames[i] = "#uni";
             }
             sb.AppendLine(string.Join(";", columnNames));
-            foreach (DataRow row in dt.Rows)
+            foreach (FrameLightRow row in dt.rows)
             {
-                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
-                sb.AppendLine(string.Join(";", fields));
+                string s = null;
+                foreach (CellLight c in row.storage)
+                {
+                    s += c.ToString() + "; ";
+                }
+                if (s != null) s = s.Substring(0, s.Length - "; ".Length);
+                sb.AppendLine(s);
             }
             File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
         }
