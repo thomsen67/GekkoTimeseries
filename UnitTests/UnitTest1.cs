@@ -2447,7 +2447,7 @@ namespace UnitTests
 
         }
 
-        
+
 
         [TestMethod]
         public void _Test_PrintSumMultiplier()
@@ -2544,13 +2544,13 @@ namespace UnitTests
             I("#deleteme = zz, xx;");
 
             I("p <n> zz, xx;");
-            table = Globals.lastPrtOrMulprtTable;            
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "zz");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "xx[b, x]");
             Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
-                        
+
             I("p <n> {#deleteme};");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "zz");
@@ -2560,7 +2560,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 6).CellText.TextData[0], "xx[b, y]");
 
             I("p <n> xx, zz;");
-            table = Globals.lastPrtOrMulprtTable;            
+            table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "xx[a, x]");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "xx[b, x]");
@@ -2588,7 +2588,7 @@ namespace UnitTests
             Assert.AreEqual(table.Get(1, 9).CellText.TextData[0], "xx[a, y]");
             Assert.AreEqual(table.Get(1, 10).CellText.TextData[0], "xx[b, x]");
             Assert.AreEqual(table.Get(1, 11).CellText.TextData[0], "xx[b, y]");
-                                 
+
             // ---------- simple stupid test end
 
 
@@ -8726,7 +8726,7 @@ namespace UnitTests
                                         if (datetype == 1) s_datetype = "excel";
 
                                         string s_dateformat = "gekko";
-                                        if (dateformat == 1) s_dateformat = "yyyy-mm-dd";                                        
+                                        if (dateformat == 1) s_dateformat = "yyyy-mm-dd";
                                         if (datefirstLast == 0) s_dateformat += " first";
                                         else if (datefirstLast == 1) s_dateformat += " last";
 
@@ -8818,7 +8818,7 @@ namespace UnitTests
 
             I("x2 = x1;");
             I("x2.setdomains(('#a2',));");
-            I("#i2 = x2[a].getparent().getdomains();");            
+            I("#i2 = x2[a].getparent().getdomains();");
             _AssertListSize(First(), "#i2", 1); _AssertListString(First(), "#i2", 1, "#a2");
 
             I("RESET; TIME 2001 2003;");
@@ -8830,18 +8830,18 @@ namespace UnitTests
             I("RESET; TIME 2001 2003;");
             I("READ x1bank;");
             I("x1.setdomains(('#a4',));");
-            I("#i4 = x1[a].getparent().getdomains();");            
+            I("#i4 = x1[a].getparent().getdomains();");
             _AssertListString(First(), "#i4", 1, "#a4");
 
-            
+
 
             return;
 
             // --------- x1 has no domains to begin withns ----
-                        
+
             I("RESET; TIME 2001 2003;");
             I("x1 = series(1);");
-            I("x1[a] = 2;");            
+            I("x1[a] = 2;");
             I("WRITE x1bank;");
 
             I("x2 = x1;");
@@ -8875,114 +8875,30 @@ namespace UnitTests
         {
             Table table = null;
 
+            //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
+
+            if(true)
+            {
+                // ===============================================
+                // ===============================================
+                // Test of old style ADAM
+                // ===============================================
+                // ===============================================
+
+                I("RESET; TIME 2006 2006;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("READ <tsd> jul05;");
+                I("MODEL jul05;");
+                I("DECOMP <d> fy;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).date, "2006");
+                Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
+                Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
+                Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
+            }
+
             if (true)
             {
-
-                // ===============================================
-                // ===============================================
-                // Test of linking etc. with equations
-                // ===============================================
-                // ===============================================
-
-                //Below, xtot could be total income, where x[#a] is per capita income per age group, and n[#a] is population
-                //  Per capita income depends on normal income y[#a] corrected by correction factor k[#a] -- could be taxes --
-                //  and with a subsidy z[#a] added.
-                //xtot = sum(#a, x[#a] * n[#a]);
-                //x[#a] = k[#a] * y[#a] + z[#a];
-                //
-                // Aggregates:
-                // The idea is that we have this sum: xtot = x1 * n1 + x2 * n2            
-                // We have x1 = k1 * y1 + z1
-                //
-                // So: xtot = (k1 * y1 + z1) * n1 + (k2 * y2 + z2) * n2
-                //          = (ktot * yavg + zavg) * n
-                //     zavg = (z1 * n1 + z2 * n2) / n
-                //     yavg = (y1 * n1 + y2 * n2) / n
-                //     ktot = (k1 * y1 * n1 + k2 * y2 * n2) / (y1 * n1 + y2 * n2)
-                //
-                //    (k y n / y n * y n / n + z n / n ) * n
-
-                //
-                I("RESET;");
-                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                I("OPTION model type = gams;");
-                I("RUN link;");
-                //               xtot         %         xtot_a         %
-                //2001      2597.3163      0.10      2597.3163      0.10
-                //2002      2599.9354      0.10      2599.9354      0.10
-                //2003      2602.5572      0.10      2602.5572      0.10
-                _AssertSeries(First(), "xtot", 2001, 2597.3163d, 0.001d);
-                _AssertSeries(First(), "xtot_a", 2001, 2597.3163d, 0.001d);
-                _AssertSeries(First(), "xtot", 2002, 2599.9354d, 0.001d);
-                _AssertSeries(First(), "xtot_a", 2002, 2599.9354d, 0.001d);
-                _AssertSeries(First(), "xtot", 2003, 2602.5572d, 0.001d);
-                _AssertSeries(First(), "xtot_a", 2003, 2602.5572d, 0.001d);
-
-                I("option model type = gams;");
-                I("model <gms> link;");
-
-                if (true)
-                {
-                    I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok  
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
-                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "ktot");
-                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "ntot");
-                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "xtot_a");
-                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "yavg");
-                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "zavg");
-
-
-                    I("decomp3 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
-                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
-                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
-                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
-                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "aa__expr___link4");
-                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "k");
-                    Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "ktot");
-                    Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "n");
-                    Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "ntot");
-                    Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "xtot_a");
-                    Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "y");
-                    Assert.AreEqual(table.Get(13, 1).CellText.TextData[0], "yavg");
-                    Assert.AreEqual(table.Get(14, 1).CellText.TextData[0], "z");
-                    Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "zavg");
-
-
-                    I("decomp3 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
-                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
-                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "k");
-                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "n");
-                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "x");
-                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "xtot");
-                    Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "y");
-                    Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "z");
-
-                }
-                else
-                {
-                    Globals.decompFix777 = false; //!!! remember to switch it of                    
-                    I("decomp2 <d> xtot_a in e_xtot_a;");
-                    I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot;");
-                    //this one and the superlink above yield the exact same effects.
-                    I("decomp2 <d> xtot in e_xtot link x[#a] in e_x;");
-                    Globals.decompFix777 = true; //!!! remember to switch it of                    
-                }
-
-                //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 
                 // ===============================================
                 // ===============================================
@@ -8992,7 +8908,7 @@ namespace UnitTests
 
                 for (int j = 0; j < 3; j++)  //either direct expression, or using an equation from file
                 {
-
+                    
                     // j==0 and j==1
                     //             2009             2010             2011             2012             2013
                     // -------+--------------------------------------------------------------------------------
@@ -9084,94 +9000,10 @@ namespace UnitTests
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
-                    // =========== levels =========================  
-                    Globals.decompFix777 = false; //!!! remember to switch it of                    
-                    I("decomp2 <2011 2012 xn> " + lhs + " LINK v[c] in e_c   WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'          COLS #a, #o;");  //, i in e_i
-                    Globals.decompFix777 = true; //!!! remember to switch it of                    
-
-                    table = Globals.lastDecompTable;
-                    double ylevel2011 = 499d; double ylevel2012 = 504d;
-                    double ylevel2011b = 502d; double ylevel2012b = 501d;
-
-                    i = 1;
-                    Assert.AreEqual(table.Get(i, 2).date, "2011");
-                    Assert.AreEqual(table.Get(i, 3).date, "2012");
-                    // -------------------------------------------------------------                
-                    if (j != 2)
-                    {
-                        i++;
-                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[y]");
-                        Assert.AreEqual(table.Get(i, 2).number, ylevel2011, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, ylevel2012, 0.0001);
-                    }
-                    // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1");
-                    if (j != 2)
-                    {
-                        Assert.IsTrue(G.isNumericalError(table.Get(i, 2).number));
-                        Assert.IsTrue(G.isNumericalError(table.Get(i, 3).number));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(G.isNumericalError(table.Get(i, 2).number));  //res
-                        Assert.IsTrue(G.isNumericalError(table.Get(i, 3).number));  //res
-                    }
-                    // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
-                    if (j != 2)
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, -3.0000d, 0.0001);  //res
-                        Assert.AreEqual(table.Get(i, 3).number, 3.0000d, 0.0001);  //res
-                    }
-                    else
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, -ylevel2011b, 0.0001);  //res
-                        Assert.AreEqual(table.Get(i, 3).number, -ylevel2012b, 0.0001);  //res
-                    }
-                    // -------------------------------------------------------------   
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
-                    Assert.AreEqual(table.Get(i, 2).number, 11.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 13.0000d, 0.0001);
-                    // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2[-1]");
-                    Assert.AreEqual(table.Get(i, 2).number, 11.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 13.0000d, 0.0001);
-                    // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
-                    Assert.AreEqual(table.Get(i, 2).number, 89.0000d, 0.0001);
-                    Assert.AreEqual(table.Get(i, 3).number, 91.0000d, 0.0001);
-                    // -------------------------------------------------------------                
-                    //i++;
-                    //Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
-                    //Assert.AreEqual(table.Get(i, 2).number, 2 * 402.0000d, 0.0001);
-                    //Assert.AreEqual(table.Get(i, 3).number, 2 * 397.0000d, 0.0001);
-
-                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    //if (j == 0) Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
                     // =========== differences, decomposed =========================                
-
-                    if (false)
-                    {
-                        Globals.showDecompTable = true;
-                        I("decomp3 <2011 2012 d> " + lhs + " LINK v[c] in e_c     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   rows vars, lags        COLS time;");   //, i in e_i                        
-                    }
-                    else
-                    {
-                        Globals.decompFix777 = false; //!!! remember to switch it of                    
-                        I("decomp2 <2011 2012 d> " + lhs + " LINK v[c] in e_c     WHERE 'se' in #o, 'se' in #o     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'           COLS #a, #o;");   //, i in e_i
-                        Globals.decompFix777 = true; //!!! remember to switch it of                    
-                    }
-
+                                                                
+                    I("decomp3 <2011 2012 d> " + lhs + " LINK v[c] in e_c     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   rows vars, #uni, lags        COLS time;");   //, i in e_i                        
+                    
                     table = Globals.lastDecompTable;
 
                     double ydif2011 = -0.44d; double ydif2012 = 1.1d;
@@ -9179,32 +9011,12 @@ namespace UnitTests
                     double reduce = 2d / 0.44d;
 
                     i = 1;
-                    Assert.AreEqual(table.Get(i, 2).date, "2011");
-                    Assert.AreEqual(table.Get(i, 3).date, "2012");
-                    // -------------------------------------------------------------                                
-                    if (j != 2)
-                    {
-                        i++;
-                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[y]");
-                        Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);
-                    }
+                    
+                    Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2011");
+                    Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2012");
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1");
-                    if (j != 2)
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, -reduce * 3.66d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, reduce * 9.1d, 0.0001);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
-                    }
-                    // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName);
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + ",null,[0]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, reduce * 4d, 0.0001);
@@ -9217,7 +9029,20 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1[+1]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1,null,[0]");
+                    if (j != 2)
+                    {
+                        Assert.AreEqual(table.Get(i, 2).number, -reduce * 3.66d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, reduce * 9.1d, 0.0001);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
+                    }
+                    // -------------------------------------------------------------                
+                    i++;
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1,null,[+1]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.2d * 1.0000d, 0.0001);
@@ -9230,7 +9055,7 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2[-1]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2,null,[-1]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.8d * 1.0000d, 0.0001);
@@ -9241,10 +9066,9 @@ namespace UnitTests
                         Assert.AreEqual(table.Get(i, 2).number, -0.8d * 1.0000d, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, -0.8d * 2.0000d, 0.0001);
                     }
-
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i,null,[0]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, reduce * 1.0000d, 0.0001);
@@ -9255,37 +9079,128 @@ namespace UnitTests
                         Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, -2.0000d, 0.0001);
                     }
-                    // -------------------------------------------------------------                
-                    //i++;
-                    //Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v[c]");
-                    //Assert.AreEqual(table.Get(i, 2).number, 0.0000d, 0.0001);
-                    //Assert.AreEqual(table.Get(i, 3).number, 0.0000d, 0.0001);
+                    // -------------------------------------------------------------                                
+                    i++;
+                    if (j != 2)
+                    {                        
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,c,[0]");
+                        Assert.AreEqual(table.Get(i, 2).number, 0d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, 0d, 0.0001);
+                    }
+                    // -------------------------------------------------------------                                
+                    i++;
+                    if (j != 2)
+                    {                        
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,y,[0]");
+                        Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);
+                    }
+                    // -------------------------------------------------------------                                
+                    i++;
+                    if (j != 2)
+                    {                        
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "w,null,[0]");
+                        // is -2? we just omit it here
+                    }
                 }
             }
 
             if (true)
             {
+
                 // ===============================================
                 // ===============================================
-                // Test of old style ADAM
+                // Test of linking etc. with equations
                 // ===============================================
                 // ===============================================
 
-                if (true)
-                {
-                    I("RESET; TIME 2006 2006;");
-                    I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
-                    I("READ <tsd> jul05;");
-                    I("MODEL jul05;");
-                    I("DECOMP <d> fy;");
-                    table = Globals.lastDecompTable;
-                    Assert.AreEqual(table.Get(1, 2).date, "2006");
-                    Assert.AreEqual(table.Get(2, 2).number, 15465.4976, 0.0001);
-                    Assert.AreEqual(table.Get(3, 2).number, 2468.9997, 0.0001);
-                    Assert.AreEqual(table.Get(10, 2).number, -24172.9968, 0.0001);
-                }
+                //Below, xtot could be total income, where x[#a] is per capita income per age group, and n[#a] is population
+                //  Per capita income depends on normal income y[#a] corrected by correction factor k[#a] -- could be taxes --
+                //  and with a subsidy z[#a] added.
+                //xtot = sum(#a, x[#a] * n[#a]);
+                //x[#a] = k[#a] * y[#a] + z[#a];
+                //
+                // Aggregates:
+                // The idea is that we have this sum: xtot = x1 * n1 + x2 * n2            
+                // We have x1 = k1 * y1 + z1
+                //
+                // So: xtot = (k1 * y1 + z1) * n1 + (k2 * y2 + z2) * n2
+                //          = (ktot * yavg + zavg) * n
+                //     zavg = (z1 * n1 + z2 * n2) / n
+                //     yavg = (y1 * n1 + y2 * n2) / n
+                //     ktot = (k1 * y1 * n1 + k2 * y2 * n2) / (y1 * n1 + y2 * n2)
+                //
+                //    (k y n / y n * y n / n + z n / n ) * n
 
+                //
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("OPTION model type = gams;");
+                I("RUN link;");
+                //               xtot         %         xtot_a         %
+                //2001      2597.3163      0.10      2597.3163      0.10
+                //2002      2599.9354      0.10      2599.9354      0.10
+                //2003      2602.5572      0.10      2602.5572      0.10
+                _AssertSeries(First(), "xtot", 2001, 2597.3163d, 0.001d);
+                _AssertSeries(First(), "xtot_a", 2001, 2597.3163d, 0.001d);
+                _AssertSeries(First(), "xtot", 2002, 2599.9354d, 0.001d);
+                _AssertSeries(First(), "xtot_a", 2002, 2599.9354d, 0.001d);
+                _AssertSeries(First(), "xtot", 2003, 2602.5572d, 0.001d);
+                _AssertSeries(First(), "xtot_a", 2003, 2602.5572d, 0.001d);
 
+                I("option model type = gams;");
+                I("model <gms> link;");
+
+                I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok  
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "ktot");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "ntot");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "xtot_a");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "yavg");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "zavg");
+
+                I("decomp3 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "aa__expr___link4");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "k");
+                Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "ktot");
+                Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "n");
+                Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "ntot");
+                Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "xtot_a");
+                Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(13, 1).CellText.TextData[0], "yavg");
+                Assert.AreEqual(table.Get(14, 1).CellText.TextData[0], "z");
+                Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "zavg");
+
+                I("decomp3 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
+                table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "k");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "n");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "x");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "xtot");
+                Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "z");
+            }            
+
+            if (true)
+            {               
+                
                 // ===============================================
                 // ===============================================
                 // Test with UADAM, linking, pivoting
@@ -9441,8 +9356,7 @@ namespace UnitTests
                 // Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-
+                
                 I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
                 table = Globals.lastDecompTable;

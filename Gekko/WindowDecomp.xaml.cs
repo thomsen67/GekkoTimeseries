@@ -1204,8 +1204,13 @@ namespace Gekko
                 }
 
                 List<DecompData> MAIN_decompData = decompDatas[0];  //this is where all the linking ends up. Clone it??
-                List<string> MAIN_varnames = decompOptions2.link[parentI].varnames;
 
+                if(decompOptions2.link[parentI].varnames==null)
+                {
+                    decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompExpressionName };
+                }
+                List<string> MAIN_varnames = decompOptions2.link[parentI].varnames;
+                
                 int nnn = -12345;
                 if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
                 else nnn = 1;  //expression?
@@ -1338,14 +1343,45 @@ namespace Gekko
                             string name2 = Program.databanks.GetFirst().name + ":" + name;
                             int j = FindLinkJ(decompDatas, parentI, name1);
                             Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
-                            Series lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+
+                            Series lhsReal = null;
+                            if (name == Globals.decompExpressionName)
+                            {
+                                //just keep lhsReal = null
+                            }
+                            else
+                            {
+                                lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                            }
 
                             DecompData d = decompDatas[parentI][j];
                             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                             {
                                 double d1 = lhs.GetDataSimple(t);
-                                double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                                double factor = d2 / d1;
+                                double factor = 1d;
+                                                                
+                                if (lhsReal == null)
+                                {
+                                    //keep factor = 1
+                                }
+                                else
+                                {
+                                    
+                                    // --------------------------------------------
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators, this is <d>
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                                    // ----------------------------------------------
+
+                                    factor = d2 / d1;
+                                }
+                                
+                                                                
                                 if (factor != 1d)
                                 {
                                     foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
