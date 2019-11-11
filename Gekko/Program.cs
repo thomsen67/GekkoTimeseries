@@ -24393,8 +24393,20 @@ namespace Gekko
                 G.Writeln2("Writing Excel file containing matrix");
 
                 eo.excelData = new double[ni, nj];
-                eo.colors = "no";  
-                
+                eo.colors = "no";
+
+                if (m.rownames != null)
+                {                    
+                    eo.excelRowLabels = new string[m.rownames.Count, 1];
+                    for (int i = 0; i < m.rownames.Count; i++) eo.excelRowLabels[i, 0] = m.rownames[i];
+                }
+
+                if (m.colnames != null)
+                {
+                    eo.excelColumnLabels = new string[1, m.colnames.Count];
+                    for (int i = 0; i < m.colnames.Count; i++) eo.excelColumnLabels[0, i] = m.colnames[i];
+                }
+
                 for (int i = 0; i < ni; i++)
                 {
                     for (int j = 0; j < nj; j++)
@@ -39606,9 +39618,17 @@ namespace Gekko
                     if (isMatrix)
                     {
                         isStamp = false;
-                        isDates = false;
-                        isNames = false;
                         isColors = false;
+                        isNames = false;
+                        isDates = false;
+                        if (eo.excelRowLabels != null)
+                        {                            
+                            isNames = true;
+                        }
+                        if (eo.excelColumnLabels != null)
+                        {
+                            isDates = true;  //not really dates for matrices... but oh well                            
+                        }
                     }
 
                     string sheet = null; if (oPrt != null) sheet = oPrt.opt_sheet;
@@ -39727,7 +39747,7 @@ namespace Gekko
 
                     int[,] excelColumnLabelsAnnual = new int[1, dataCols];
 
-                    if (eo.excelColumnLabels != null && options.freq == EFreq.A)
+                    if (!isMatrix && eo.excelColumnLabels != null && options.freq == EFreq.A)
                     {
                         for (int i = 0; i < eo.excelColumnLabels.Length; i++)
                         {
@@ -39837,7 +39857,7 @@ namespace Gekko
                             {
                                 //text based without format --> 2010, 2010q3, 2010m3
 
-                                if (options.freq == EFreq.A)
+                                if (!isMatrix && options.freq == EFreq.A)
                                 {
                                     //else the cells are left-justified and with a green triangle (warning)
                                     int[,] datesData2 = null;

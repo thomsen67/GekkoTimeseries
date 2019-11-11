@@ -917,6 +917,8 @@ namespace Gekko
                         y.data[j, i] = x.data[i, j];
                     }
                 }
+                if (x.colnames != null) y.rownames = new List<string>(x.colnames);  //better to clone
+                if (x.rownames != null) y.colnames = new List<string>(x.rownames);  //better to clone
                 return y;
             }
             else if (x1.Type() == EVariableType.List)
