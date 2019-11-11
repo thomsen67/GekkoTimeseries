@@ -9002,7 +9002,7 @@ namespace UnitTests
 
                     // =========== differences, decomposed =========================                
                                                                 
-                    I("decomp3 <2011 2012 d> " + lhs + " LINK v[c] in e_c     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   rows vars, #uni, lags        COLS time;");   //, i in e_i                        
+                    I("decomp2 <2011 2012 d> " + lhs + " LINK v[c] in e_c     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   rows vars, #uni, lags        COLS time;");   //, i in e_i                        
                     
                     table = Globals.lastDecompTable;
 
@@ -9151,7 +9151,7 @@ namespace UnitTests
                 I("option model type = gams;");
                 I("model <gms> link;");
 
-                I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok  
+                I("decomp2 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok  
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -9163,7 +9163,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "yavg");
                 Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "zavg");
 
-                I("decomp3 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
+                I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -9183,7 +9183,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(14, 1).CellText.TextData[0], "z");
                 Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "zavg");
 
-                I("decomp3 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
+                I("decomp2 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
@@ -9252,7 +9252,7 @@ namespace UnitTests
                 I("u.setdomains(('#a',));");
                 I("time 2010 2012;");
 
-                I("decomp3<d> qrs[tot] in qrs_tot link qrs[#a] in qrs,  qrss[#a] in qrss,  qrsm[#a] in qrsm  rows vars cols #a;");
+                I("decomp2<d> qrs[tot] in qrs_tot link qrs[#a] in qrs,  qrss[#a] in qrss,  qrsm[#a] in qrsm  rows vars cols #a;");
 
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "50");
@@ -9357,7 +9357,7 @@ namespace UnitTests
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 
-                I("decomp3<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
+                I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
