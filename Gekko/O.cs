@@ -2251,13 +2251,7 @@ namespace Gekko
 
         public static IVariable DecompLooper(string fullname)
         {
-            IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);
-            if (G.Equal(fullname, Globals.chooseDecomp[0]) && Globals.chooseDecomp[1] != null)
-            {
-                //TODO: check that chooseDecomp[1] is part of iv list
-                List<string> temp = new List<string>() { Globals.chooseDecomp[1] };
-                iv = new List(temp);
-            }            
+            IVariable iv = GetIVariableFromString(fullname, ECreatePossibilities.NoneReportError, true);            
             return iv;
         }
 

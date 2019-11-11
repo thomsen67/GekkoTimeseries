@@ -37,7 +37,7 @@ namespace Gekko
 
             var Evalcode41 = new List<Func<GekkoSmpl, IVariable>>();
             var xxx = new List<TwoStrings>();
-            foreach (IVariable listloop_a40 in new O.GekkoListIterator(O.DecompLooper("#a")))
+            foreach (IVariable listloop_a40 in new O.GekkoListIterator(null))
             {
 
                 Evalcode41.Add((smpl42) =>

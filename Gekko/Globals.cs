@@ -53,18 +53,10 @@ namespace Gekko
         public static bool gnuplotfix = true;
 
         public static bool prompting = true;
-        public static List<string> unitTestsPromtingHelper = null;
-
-        public static bool decompFix999 = true;
-        public static bool decompTest888 = false;
-        public static bool decompUnitPivot = false;
-        public static bool decompFix777 = true;
-        public static bool fixDecomp3 = true;        
-        public static bool fixDecomp2 = true;
-        public static string fixDecomp = null;
-        //public static string fixDecomp = "51";
-        public static List<string> chooseDecomp = new List<string>() { "#a", Globals.fixDecomp };
+        public static List<string> unitTestsPromtingHelper = null;                
         
+        public static bool decompUnitPivot = false;  //can activate xlsx pivot writing        
+                
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------
