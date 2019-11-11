@@ -3567,6 +3567,8 @@ namespace Gekko
             return new ScalarString(Program.GetDateStamp());
         }
 
+        //The following are val-based, not string based --------
+
         public static IVariable currentyear(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {
             return new ScalarVal((double)DateTime.Now.Year);
@@ -3596,6 +3598,32 @@ namespace Gekko
         {
             return new ScalarVal((double)DateTime.Now.Second);
         }
+
+        public static IVariable toexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable y, IVariable m, IVariable d)
+        {
+            int iy = O.ConvertToInt(y, true);
+            int im = O.ConvertToInt(m, true);
+            int id = O.ConvertToInt(d, true);
+            DateTime dt = new DateTime(iy, im, id);
+            double ed = dt.ToOADate();
+            return new ScalarVal(ed);
+        }
+
+        public static IVariable fromexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable x)
+        {
+            double xx = O.ConvertToVal(x);
+            DateTime dt = DateTime.FromOADate(xx);
+            ScalarVal y = new ScalarVal(dt.Year);
+            ScalarVal m = new ScalarVal(dt.Month);
+            ScalarVal d = new ScalarVal(dt.Day);
+            Map rv = new Map();
+            rv.storage.Add("%y", y);
+            rv.storage.Add("%m", m);
+            rv.storage.Add("%d", d);
+            return rv;
+        }
+
+        // --------------------------------
 
         public static IVariable currentfolder(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
         {

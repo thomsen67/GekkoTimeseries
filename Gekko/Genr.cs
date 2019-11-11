@@ -6,65 +6,53 @@ using System.Drawing;
 using Gekko.Parser;
 namespace Gekko
 {
-    public class TranslatedCode
-    {
-        public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
-        public static int labelCounter;
-        public static void C0(GekkoSmpl smpl, P p)
-        {
-            //[[commandStart]]0
-            p.SetText(@"¤3"); O.InitSmpl(smpl, p);
+public class TranslatedCode
+{
+public static GekkoTime globalGekkoTimeIterator = GekkoTime.tNull;
+public static int labelCounter;
+public static void C0(GekkoSmpl smpl, P p) {
+//[[commandStart]]0
+p.SetText(@"¤1"); O.InitSmpl(smpl, p);
+
+O.Assignment o0 = new O.Assignment();
+o0.opt_source = @"<[code]>%v = toExcelDate(1, 2, 3)";
 
 
-            O.Decomp2 o0 = new O.Decomp2();
-            o0.type = @"ASTDECOMP2";
-            o0.label = @"qrs[#a] in qrs";
-            o0.t1 = Globals.globalPeriodStart;
-            o0.t2 = Globals.globalPeriodEnd;
+Action assign_29 = () => {
+O.AdjustT0(smpl, -2);
+IVariable ivTmpvar25 = Functions.toexceldate(smpl, null, null, i26, i27, i28);
+O.AdjustT0(smpl, 2);
+O.Lookup(smpl, null, null, "%v", null, ivTmpvar25, new  LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+;
+};
+Func<bool> check_29 = () => {
+O.AdjustT0(smpl, -2);
+IVariable ivTmpvar25 = Functions.toexceldate(smpl, null, null, i26, i27, i28);
+O.AdjustT0(smpl, 2);
+if (ivTmpvar25.Type() != EVariableType.Series) return false;
+O.Dynamic1(smpl);
+O.Lookup(smpl, null, null, "%v", null, ivTmpvar25, new  LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, o0)
+;
+return O.Dynamic2(smpl);
+};
+O.RunAssigmentMaybeDynamic(smpl, assign_29, check_29, o0);
 
-            o0.opt_prtcode = O.ConvertToString((new ScalarString("d")));
-
-
-
-            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrs").Concat(null, new ScalarString("[").Concat(null, O.Lookup(smpl, null, null, "#a", null, null, new LookupSettings(), EVariableType.Var, null)).Concat(null, new ScalarString("]"))) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrs") }))));
-
-            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrss").Concat(null, new ScalarString("[").Concat(null, O.Lookup(smpl, null, null, "#a", null, null, new LookupSettings(), EVariableType.Var, null)).Concat(null, new ScalarString("]"))) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrss") }))));
-
-
-            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrsm").Concat(null, new ScalarString("[").Concat(null, O.Lookup(smpl, null, null, "#a", null, null, new LookupSettings(), EVariableType.Var, null)).Concat(null, new ScalarString("]"))) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qrsm") }))));
-
-
-
-            var Evalcode41 = new List<Func<GekkoSmpl, IVariable>>();
-            var xxx = new List<TwoStrings>();
-            foreach (IVariable listloop_a40 in new O.GekkoListIterator(null))
-            {
-
-                Evalcode41.Add((smpl42) =>
-                {
-                    return O.Subtract(smpl42, O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrs", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40), O.Add(smpl42, O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrss", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40), O.Indexer(O.Indexer2(smpl42, O.EIndexerType.None, listloop_a40), smpl42, O.EIndexerType.None, O.Lookup(smpl42, null, null, "Qrsm", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a40)));
-                }
-                );
+//[[commandEnd]]0
+}
 
 
+public static readonly ScalarVal i26 = new ScalarVal(1d, 0);
+public static readonly ScalarVal i27 = new ScalarVal(2d, 0);
+public static readonly ScalarVal i28 = new ScalarVal(3d, 0);
 
+public static void CodeLines(P p)
+{
+GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
 
-
-                o0.Exe();
-
-                //[[commandEnd]]0
-            }
-        }
-
-
-        public static void CodeLines(P p)
-        {
-            GekkoSmpl smpl = new GekkoSmpl(); O.InitSmpl(smpl, p);
-
-            C0(smpl, p);
+C0(smpl, p);
 
 
 
-        }
-    }
+}
+}
 }
