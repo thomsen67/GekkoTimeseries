@@ -17908,6 +17908,14 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ExcelDate()
+        {
+            I("%v = toExcelDate(2019, 11, 12);");
+            I("#x = fromExcelDate(%v);");  //test this when it returns a date
+            _AssertScalarVal(First(), "%v", 43781d, sharedDelta);
+        }
+
+        [TestMethod]
         public void _Test_SlicingNestList()
         {
             //This is also mentioned in the help system
