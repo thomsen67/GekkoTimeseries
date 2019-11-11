@@ -8921,14 +8921,58 @@ namespace UnitTests
                 I("option model type = gams;");
                 I("model <gms> link;");
 
-                if (false)
-                {
-                    Globals.decompFix777 = true; //!!! remember to switch it of   
+                if (true)
+                {                    
+                    Globals.decompFix777 = true; //!!! remember to switch it of                    
+
+
+                    I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok  
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");                    
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "ktot");
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "ntot");
+                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "xtot_a");
+                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "yavg");
+                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "zavg");
+
                     
-                    I("decomp3 <d> xtot_a in e_xtot_a rows vars cols time;");  //this is ok
-                    Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                    I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
-                    I("decomp2 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
+                    I("decomp3 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
+                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
+                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "aa__expr___link4");
+                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "k");
+                    Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "ktot");
+                    Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "n");
+                    Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "ntot");
+                    Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "xtot_a");
+                    Assert.AreEqual(table.Get(12, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(13, 1).CellText.TextData[0], "yavg");
+                    Assert.AreEqual(table.Get(14, 1).CellText.TextData[0], "z");
+                    Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "zavg");
+
+                                        
+                    I("decomp3 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
+                    table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
+                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
+                    Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");                    
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "k");
+                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "n");
+                    Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "x");
+                    Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "xtot");
+                    Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "y");
+                    Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "z");
 
                     Globals.decompFix777 = false; //!!! remember to switch it of   
                 }

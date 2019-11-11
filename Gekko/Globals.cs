@@ -55,6 +55,7 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
+        public static bool decompFix999 = true;
         public static bool decompTest888 = false;
         public static bool decompUnitPivot = false;
         public static bool decompFix777 = false;

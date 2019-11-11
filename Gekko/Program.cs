@@ -12798,7 +12798,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Internal error #809735208375");
                 }
-                found = eqs[0];  //pick the first one
+                found = eqs[0];  //pick the first one, probably alway only one here, cf. #820948324: 
             }
             else
             {
@@ -12812,28 +12812,42 @@ namespace Gekko
                 {
                     G.Writeln2("+++ WARNING: Variable '" + varname + "' appears in several equations, first one is picked");
                 }
-                found = eqs[0];  //pick the first one
-            }           
+                found = eqs[0];  //#820948324: pick the first one, a variable name may point to several equations, for instance if y is present on the lhs in several equations.
+            }
 
             string rhs = found.rhs.Trim();
             string lhs = found.lhs.Trim();
 
-            try
-            {
-                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
-                if (Globals.expressions != null) Globals.expressions.Clear();
-                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
-                found.expressions.AddRange(Globals.expressions);
-            }
-            catch (Exception e)
-            {
+            string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
 
-            }            
+            if (Globals.decompFix999)
+            {
+                if (found.expressions == null || found.expressions.Count == 0)
+                {
+                    Globals.expressions = null;  //maybe not necessary
+                    Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression                 
+                    found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                    Globals.expressions = null;  //maybe not necessary
+                }                
+                else
+                {
+                    //has already been done
+                }
+            }
+            else
+            {
+                if (Globals.printAST) G.Writeln2("AST: ---> " + s1);
+                //if (Globals.expressions != null) Globals.expressions.Clear();
+                Globals.expressions = null;
+                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression
+                                                                         //found.expressions.AddRange(Globals.expressions);
+                found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);
+                Globals.expressions = null;
+            }
 
             return found;
         }
-
+    
         public static string EquationLhsRhs(string lhs, string rhs, bool simple)
         {
             //This method is just so that we keep the two ways of decomposing together,
