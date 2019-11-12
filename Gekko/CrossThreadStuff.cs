@@ -49,7 +49,7 @@ namespace Gekko
             {
                 // It's on the same thread, no need for Invoke
 
-                Decomp.Decomp2Helper(o);
+                Decomp.DecompGetFuncExpressions(o);
             }
         }        
 

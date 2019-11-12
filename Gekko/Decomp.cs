@@ -11,14 +11,15 @@ namespace Gekko
     {
         public static void DecompStart(O.Decomp2 o)
         {
-            //This is the starting point
-            //  O.Decomp2.Decomp2Helper                  --> may use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
+            //DecompStart()                              --> This is the starting point
+            //  DecompGetFuncExpressions()               --> May use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
             //                                               DecompEvalGams() finds the equation, translates to Gekko, and returns a 
             //                                               ModelGamsEquation object with element.expressions containing the expression(s).
             //                                               In an eq like y[#i] = 2*x[#i], n expressions are returned corresponding to the elements of #i
-            //  WindowDecomp.RecalcCellsWithNewType();
-            //  O.Decomp2.Decompose2()                   --> actual calculation of data, expression(s) is argument
-            //  Program.DecomposePutIntoTable2()         --> putting the data into a table
+            //  WindowDecomp.RecalcCellsWithNewType();   --> Can also be called when clicking
+            //    DecompMain()                           --> Main calculation, calls lowLevel, Pivot and makeGui.
+            //      DecompLowLevel()                     --> actual calculation of data, expression(s) is argument
+            //      DecompPivotToTable()                 --> putting the data into a table
             //  WindowDecomp.MakeGuiTable2()             --> shows the table in GUI
             //
             //CLICKING: Mouse_Down(), cf. #98732498724
@@ -155,7 +156,7 @@ namespace Gekko
             }
         }
 
-        public static void Decomp2Helper(DecompOptions2 o)
+        public static void DecompGetFuncExpressions(DecompOptions2 o)
         {
             DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp w = null;
@@ -242,7 +243,7 @@ namespace Gekko
             }
         }
 
-        public static DecompData Decompose2(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName)
+        public static DecompData DecompLowLevel(GekkoTime tt1, GekkoTime tt2, Func<GekkoSmpl, IVariable> expression, EDecompBanks workOrRefOrBoth, string residualName)
         {
             //
             //
@@ -668,7 +669,7 @@ namespace Gekko
 
         }
 
-        public static Gekko.Table DecomposePutIntoTable3(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
+        public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
         {
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
             List<string> select_rowvars = decompOptions2.rows;
