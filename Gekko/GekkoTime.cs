@@ -75,6 +75,10 @@ namespace Gekko
 
         private void FreqCheck()
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //Sanity checks to follow
             //Problem is that TIME 2010m13 2012m0 can probably parse. If not, the check below is not necessary.            
             if (sub < 1)
@@ -106,6 +110,26 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+            else if (freq == EFreq.D)
+            {
+                if (sub > 12)
+                {
+                    G.Writeln2("*** ERROR: freq 'd' cannot have month > 12");
+                    throw new GekkoException();
+                }
+                if (subsub < 1)
+                {
+                    G.Writeln2("*** ERROR: freq 'd' cannot have day < 1");
+                    throw new GekkoException();
+                }
+                int maxDays = G.DaysInMonth(super, sub);  //see also #9832453429857
+                if (subsub > maxDays)
+                {
+                    G.Writeln2("*** ERROR: freq 'd' has an illegal day (" + this.ToString() + ")");
+                    throw new GekkoException();
+                }
+
+            }
             else if (freq == EFreq.U)
             {
                 if (sub > 1)
@@ -135,6 +159,10 @@ namespace Gekko
 
         public static int Observations(GekkoTime t1, GekkoTime t2)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //BEWARE: Can return 0 or a negative number!
             //Also checks that freqs are the same
             if (t1.freq != t2.freq)
@@ -143,27 +171,38 @@ namespace Gekko
                 throw new GekkoException();
             }
             EFreq efreq = t1.freq;
-            int subPeriods = 1;
-            if (efreq == EFreq.A)
+
+            if (efreq == EFreq.D)
             {
-                //fast return
-                return t2.super - t1.super + 1;  //Subpers are ignored. It is tacitly assumed that the subperiods are = 1 here, else this is nonsense
+                //see also #98032743029847
+                DateTime dt1 = new DateTime(t1.super, t1.sub, t1.subsub);
+                DateTime dt2 = new DateTime(t2.super, t2.sub, t2.subsub);
+                return (dt2 - dt1).Days + 1;
             }
-            else if (efreq == EFreq.Q) subPeriods = 4;
-            else if (efreq == EFreq.M) subPeriods = 12;
-            else if (efreq == EFreq.U) subPeriods = 1;  //ttfreq
             else
             {
-                G.Writeln2("*** ERROR: Error regarding frequency");
-                throw new GekkoException();
-            }
+                int subPeriods = 1;
+                if (efreq == EFreq.A)
+                {
+                    //fast return
+                    return t2.super - t1.super + 1;  //Subpers are ignored. It is tacitly assumed that the subperiods are = 1 here, else this is nonsense
+                }
+                else if (efreq == EFreq.Q) subPeriods = 4;
+                else if (efreq == EFreq.M) subPeriods = 12;
+                else if (efreq == EFreq.U) subPeriods = 1;
+                else
+                {
+                    G.Writeln2("*** ERROR: Error regarding frequency");
+                    throw new GekkoException();
+                }
 
-            int obs = subPeriods * (t2.super - t1.super) + t2.sub - t1.sub + 1;
-            if (obs < 0)
-            {
-                //This should not normally be possible, maybe with PRT<2010 2009> or the like?
+                int obs = subPeriods * (t2.super - t1.super) + t2.sub - t1.sub + 1;
+                if (obs < 0)
+                {
+                    //This should not normally be possible, maybe with PRT<2010 2009> or the like?
+                }
+                return obs;
             }
-            return obs;
         }
 
         public static void ConvertFreqs(EFreq freq, GekkoTime t1, GekkoTime t2, ref GekkoTime tt1, ref GekkoTime tt2)
@@ -254,12 +293,12 @@ namespace Gekko
                     else if (t2.freq == EFreq.Q)
                     {
                         //from Q to D sets last day of quarter
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub), DateTime.DaysInMonth(t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub)));
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub), G.DaysInMonth(t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub)));
                     }
                     else if (t2.freq == EFreq.M)
                     {
                         //from M to D sets last day of month                        
-                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, DateTime.DaysInMonth(t2.super, t2.sub));
+                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, G.DaysInMonth(t2.super, t2.sub));
                     }
                     else if (t2.freq == EFreq.U)
                     {
@@ -480,34 +519,50 @@ namespace Gekko
 
             if (addedPeriods == 0) return this;
 
-            int subPeriods = 1;
-
-            if (this.freq == EFreq.A)
+            if (this.freq == EFreq.D)
             {
-                //Simple: make it run fast!                
-                return new GekkoTime(this.freq, this.super + addedPeriods, this.sub, false);  //call the fast constructor
+                //see also #98032743029847
+                DateTime dt1 = new DateTime(this.super, this.sub, this.subsub);  
+                DateTime dt2 = dt1.AddDays(addedPeriods);
+                GekkoTime gt = new GekkoTime(EFreq.D, dt2.Year, dt2.Month, dt2.Day);
+                return gt;
             }
-            else if (this.freq == EFreq.Q) subPeriods = 4;
-            else if (this.freq == EFreq.M) subPeriods = 12;
-            else if (this.freq == EFreq.U) subPeriods = 1;  //ttfreq
-            else throw new GekkoException("Error regarding frequencies");
-
-            int subs = (this.sub - 1) + addedPeriods; //a lot easier if first converting from quarters 1,2,3,4 into 0,1,2,3
-            int supers = subs / subPeriods;  //divisor
-            int subs2 = subs % subPeriods;  //modulo
-
-            if (subs2 < 0)
+            else
             {
-                //the C# modulo is a bit strange, since it allows negative modulo's
-                //well, if so: it is corrected into a positive modulo (subtracting 1 from the divisor)
-                supers--;
-                subs2 += subPeriods;
+
+                int subPeriods = 1;
+
+                if (this.freq == EFreq.A)
+                {
+                    //Simple: make it run fast!                
+                    return new GekkoTime(this.freq, this.super + addedPeriods, this.sub, false);  //call the fast constructor
+                }
+                else if (this.freq == EFreq.Q) subPeriods = 4;
+                else if (this.freq == EFreq.M) subPeriods = 12;
+                else if (this.freq == EFreq.U) subPeriods = 1;  //ttfreq
+                else throw new GekkoException("Error regarding frequencies");
+
+                int subs = (this.sub - 1) + addedPeriods; //a lot easier if first converting from quarters 1,2,3,4 into 0,1,2,3
+                int supers = subs / subPeriods;  //divisor
+                int subs2 = subs % subPeriods;  //modulo
+
+                if (subs2 < 0)
+                {
+                    //the C# modulo is a bit strange, since it allows negative modulo's
+                    //well, if so: it is corrected into a positive modulo (subtracting 1 from the divisor)
+                    supers--;
+                    subs2 += subPeriods;
+                }
+                return new GekkoTime(this.freq, this.super + supers, subs2 + 1, false);  //+1: just the same one that was subtracted at the start. 'false': call the fast constructor.
             }
-            return new GekkoTime(this.freq, this.super + supers, subs2 + 1, false);  //+1: just the same one that was subtracted at the start. 'false': call the fast constructor.
         }
 
         public override string ToString()  //can just as well implement it, better than nasty surprises with object ToString()
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             if (this.IsNull()) return "[unknown]";
             if (this.freq == EFreq.A)
             {
@@ -524,6 +579,10 @@ namespace Gekko
             else if (this.freq == EFreq.M)
             {
                 return super + "m" + sub;
+            }
+            else if (this.freq == EFreq.D)
+            {
+                return super + "m" + sub + "d" + subsub;
             }
             else if (this.freq == EFreq.U)  //ttfreq
             {

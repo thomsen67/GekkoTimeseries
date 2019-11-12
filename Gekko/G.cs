@@ -716,6 +716,9 @@ namespace Gekko
 
         public static string GetFreq(EFreq eFreq)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
             string freq = "a";
             if (eFreq == EFreq.A)
             {
@@ -728,6 +731,10 @@ namespace Gekko
             else if (eFreq == EFreq.M)
             {
                 freq = "m";
+            }
+            else if (eFreq == EFreq.D)
+            {
+                freq = "d";
             }
             else if (eFreq == EFreq.U)
             {
@@ -1721,10 +1728,15 @@ namespace Gekko
 
         public static GekkoTime FromStringToDate(string s, bool allowKForQuarters, bool reportError)
         {
-            //To do the reverse: see G.FromDateToString()            
+            //To do the reverse: see G.FromDateToString()     
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
 
             GekkoTime t = GekkoTime.tNull;
 
+            if (true)
             {
                 int i = -12345;
                 bool b = int.TryParse(s, out i);
@@ -1772,6 +1784,7 @@ namespace Gekko
                 }
             }
 
+
             if (s.Contains("q") || s.Contains("Q"))
             {
                 try
@@ -1817,6 +1830,42 @@ namespace Gekko
                         else return GekkoTime.tNull;
                     }
                     t = new GekkoTime(EFreq.Q, y1, q1);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (s.Contains("d") || s.Contains("d"))  //must be before 'm'
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
+                    string[] temp2 = temp1[1].Split(new char[] { 'd', 'd' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int m1 = int.Parse(temp2[0]);
+                    if (m1 < 1 || m1 > 12)
+                    {
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
+                    }
+                    int d = int.Parse(temp2[1]);
+                    int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
+                    if (d < 1 || d > maxDays)
+                    {
+                        G.Writeln("*** ERROR: illegal day in daily date");
+                        throw new GekkoException();
+                    }
+                    t = new GekkoTime(EFreq.D, y1, m1, d);
                 }
                 catch (Exception e)
                 {
@@ -1921,22 +1970,22 @@ namespace Gekko
                 if (gt.sub == 1)
                 {
                     if (first) { m = 1; d = 1; }
-                    else { m = 3; d = DateTime.DaysInMonth(y, m); }
+                    else { m = 3; d = G.DaysInMonth(y, m); }
                 }
                 else if (gt.sub == 2)
                 {
                     if (first) { m = 4; d = 1; }
-                    else { m = 6; d = DateTime.DaysInMonth(y, m); }
+                    else { m = 6; d = G.DaysInMonth(y, m); }
                 }
                 else if (gt.sub == 3)
                 {
                     if (first) { m = 7; d = 1; }
-                    else { m = 9; d = DateTime.DaysInMonth(y, m); }
+                    else { m = 9; d = G.DaysInMonth(y, m); }
                 }
                 else
                 {
                     if (first) { m = 10; d = 1; }
-                    else { m = 12; d = DateTime.DaysInMonth(y, m); }
+                    else { m = 12; d = G.DaysInMonth(y, m); }
                 }
             }
             else if (gt.freq == EFreq.M)
@@ -1944,7 +1993,7 @@ namespace Gekko
                 if (format == null) f = "yyyy"; f = "yyyy-mm";
                 m = gt.sub;
                 if (first) d = 1;
-                else d = DateTime.DaysInMonth(y, m);
+                else d = G.DaysInMonth(y, m);
             }
             else if (gt.freq == EFreq.U)
             {
@@ -1978,6 +2027,11 @@ namespace Gekko
             {
                 date_as_string = G.DateHelper3(format, dt); //lowercase 'm' is understood as minutes in C#
             }
+        }
+
+        public static int DaysInMonth(int y, int m)
+        {
+            return DateTime.DaysInMonth(y, m);
         }
 
         public static DateTime DateHelper2(double data)
@@ -2635,6 +2689,9 @@ namespace Gekko
 
         public static string GetSubPeriodString(GekkoTime gt)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
             string subend = "";
             if (gt.freq == EFreq.A)
             {
@@ -2646,6 +2703,10 @@ namespace Gekko
             else if (gt.freq == EFreq.M)
             {
                 subend = "m" + gt.sub;
+            }
+            else if (gt.freq == EFreq.D)
+            {
+                subend = "m" + gt.sub + "d" + gt.subsub;
             }
             else if (gt.freq == EFreq.U)  //ttfreq
             {
