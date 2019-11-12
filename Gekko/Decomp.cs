@@ -393,9 +393,7 @@ namespace Gekko
         {
             DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp w = null;
-
             w = new WindowDecomp(decompOptions);
-
             Globals.windowsDecomp2.Add(w);
 
             int count = -1;
@@ -404,7 +402,6 @@ namespace Gekko
                 count++;
                 if (Program.modelGams != null)
                 {
-
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
                         ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varnames[0]);
@@ -418,16 +415,31 @@ namespace Gekko
                 }
                 else
                 {
-
                     if (Program.model == null)
                     {
                         G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
                         throw new GekkoException();
                     }
-
-                    EquationHelper found = Program.DecompEval(decompOptions.variable);
-                    decompOptions.expression = Globals.expressions[0];
-                    decompOptions.expressionOld = found.equationText;
+                    if (true)
+                    {
+                        if (link.expressions.Count == 1 && link.expressions[0] == null)
+                        {
+                            EquationHelper found = DecompEvalGekko(link.varnames[0]);
+                            //decompOptions.expression = Globals.expressions[0];
+                            link.expressions = found.expressions;
+                            decompOptions.expressionOld = found.equationText;
+                        }
+                        else
+                        {
+                            //fix this...
+                        }
+                    }
+                    else
+                    {
+                        EquationHelper found = Program.DecompEval(decompOptions.variable);
+                        decompOptions.expression = Globals.expressions[0];
+                        decompOptions.expressionOld = found.equationText;
+                    }
                 }
             }
 
@@ -905,8 +917,12 @@ namespace Gekko
         public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
         {
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
-            List<string> select_rowvars = decompOptions2.rows;
-            List<string> select_colvars = decompOptions2.cols;
+
+            if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
+            {
+                decompOptions2.rows = new List<string>() { "vars", "lags" };
+                decompOptions2.cols = new List<string>() { "time" };
+            }
 
             List<FrameFilter> filters = new List<FrameFilter>();
             if (decompOptions2.where != null)
@@ -1083,18 +1099,12 @@ namespace Gekko
             {
                 WriteDatatableTocsv(frame, internalColumnIdentifyer, internalSetIdentifyer);
             }
-
-            if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
-            {
-                G.Writeln2("*** ERROR: rows and cols must be stated");
-                throw new GekkoException();
-            }
-
-            Gekko.Table tab = new Gekko.Table();
+            
+            Table tab = new Table();
             tab.writeOnce = true;
 
-            DecomposeReplaceVars(select_rowvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(select_colvars, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.rows, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(filters, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
 
             List<string> rownames = new List<string>();
@@ -1117,13 +1127,13 @@ namespace Gekko
                 if (skip) continue;
 
                 string s1 = null;
-                foreach (string s in select_rowvars)
+                foreach (string s in decompOptions2.rows)
                 {
                     s1 = DecompAddText(frame, row, s1, s);
                 }
                 if (s1 != null) s1 = s1.Substring(1);
                 string s2 = null;
-                foreach (string s in select_colvars)
+                foreach (string s in decompOptions2.cols)
                 {
                     s2 = DecompAddText(frame, row, s2, s);
                 }
@@ -1451,6 +1461,119 @@ namespace Gekko
             }
             Series linkParent = decompDatas[i][j].cellsContribD[linkVariable];
             return linkParent;
+        }
+
+        public static EquationHelper DecompEvalGekko(string variable)
+        {
+            EquationHelper found = Program.FindEquationByMeansOfVariableName(variable);
+            if (found == null)
+            {
+                G.Writeln2("*** ERROR: DECOMP: Could not find variable '" + variable + "' as left-hand side in model");
+                throw new GekkoException();
+            }
+            string[] ss = found.equationText.Split('=');
+
+            string rhs = ss[1].Trim();
+
+            string lhsText = ss[0].Trim();
+            string[] ss0 = lhsText.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (!G.Equal(ss0[0], "frml"))
+            {
+                G.Writeln2("*** ERROR: Model equation '" + variable + "': Equation does not start with 'frml'");
+                throw new GekkoException();
+            }
+
+            string lhs = null;
+            for (int i = 2; i < ss0.Length; i++)
+            {
+                lhs += ss0[i];
+            }
+            lhs = lhs.Trim();  //trimmed with no blanks                                                              
+
+            if (rhs.EndsWith("$")) rhs = rhs.Substring(0, rhs.Length - 1) + ";";  //only replace last $, not other $
+
+            rhs = rhs.Trim();
+            if (rhs.EndsWith(";")) rhs = rhs.Substring(0, rhs.Length - 1);
+
+            for (int i = 1; i < 20; i++)
+            {
+                rhs = rhs.Replace("(-" + i + ")", "[-" + i + "]");
+                rhs = rhs.Replace("(+" + i + ")", "[+" + i + "]");
+            }
+
+            string type = "none";  //dlog, dif, diff, log
+            if (lhs.StartsWith("dlog(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "dlog";
+                rhs = found.lhs + "[-1] * exp(" + rhs + ")";
+            }
+            else if (lhs.StartsWith("dif(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "dif";
+                rhs = found.lhs + "[-1] + (" + rhs + ")";
+            }
+            else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "diff";
+                rhs = found.lhs + "[-1] + (" + rhs + ")";
+            }
+            else if (lhs.StartsWith("diff(", StringComparison.OrdinalIgnoreCase))
+            {
+                type = "log";
+                rhs = "exp(" + rhs + ")";
+            }
+
+            if (found.equationCodeJ != "" && found.equationCodeJ != "_" && found.equationCodeJ != "__")
+            {
+                if (found.equationCodeJadditive)
+                {
+                    rhs = rhs + " + " + found.Jname;
+                }
+                else if (found.equationCodeJmultiplicative)
+                {
+                    rhs = "(" + rhs + ") * (1 + " + found.Jname + ")";
+                }
+                else
+                {
+                    //should not happen
+                    G.Writeln2("*** ERROR: Problem with J-factors in equation " + found.lhs);
+                    throw new GekkoException();
+                }
+            }
+
+            if (found.equationCodeD != "" && found.equationCodeD != "_")
+            {
+                rhs = "(1 - " + found.Dname + ") * (" + rhs + ") + " + found.Dname + " * " + found.Zname;
+            }
+
+            string temp2 = found.lhs + "-(" + rhs + ");";
+            //rhs = found.lhs + " = " + rhs + ";";
+            rhs = rhs + ";";
+            //string tmp = rhs;
+            string tmp = temp2;
+
+            try
+            {
+                if (Globals.printAST)
+                {
+                    G.Writeln2("-------------- EVAL ---------------");
+                    G.Writeln2("EVAL " + G.ReplaceGlueNew(tmp));
+                    G.Writeln2("-----------------------------------");
+                }
+
+                Globals.expressions = null;  //maybe not necessary
+                Program.obeyCommandCalledFromGUI("EVAL " + tmp, new P());  //produces Func<> Globals.expression with the expression
+                found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                Globals.expressions = null;  //maybe not necessary
+                
+
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return found;
         }
 
 
