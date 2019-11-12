@@ -6,13 +6,18 @@ using System.Text;
 
 namespace Gekko
 {
+    
     public enum EFreq  //search for 'ttfreq' to see places with freq that should be enumerated
     {
+        //========================================================================================================
+        //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+        //========================================================================================================
         A,
         Q,
         M,
-        U,      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
-        None          //used to signal non-freq variable, for instance a VAL   
+        D,        //daily
+        U,        //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
+        None      //used to signal non-freq variable, for instance a VAL   
     }  
 
     public enum ESeriesMissing
@@ -46,15 +51,30 @@ namespace Gekko
         public readonly EFreq freq;
 
         public static GekkoTime tNull = new GekkoTime(EFreq.A, -12345, 1);  //think of it as a 'null' object (but it is a struct)
-
+                
         //Note: using "new GekkoTime()" without arguments is not intended to be used, even
         //      though it is valid to do. Such a struct cannot have its fields changed anyway, so
         //      it will be unusable.
+        public GekkoTime(EFreq freq2, int super2, int sub2, int subsub2)
+        {
+            freq = freq2;
+            super = (short)super2;
+            sub = (short)sub2;
+            subsub = (short)subsub2;
+            FreqCheck();
+        }
+
         public GekkoTime(EFreq freq2, int super2, int sub2)
         {
             freq = freq2;
             super = (short)super2;
             sub = (short)sub2;
+            subsub = (short)0;
+            FreqCheck();
+        }
+
+        private void FreqCheck()
+        {
             //Sanity checks to follow
             //Problem is that TIME 2010m13 2012m0 can probably parse. If not, the check below is not necessary.            
             if (sub < 1)
@@ -94,7 +114,6 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-            subsub = 0;
         }
 
         private GekkoTime(EFreq freq2, int super2, int sub2, bool check)
@@ -155,6 +174,10 @@ namespace Gekko
 
         public static GekkoTime ConvertFreqs2(EFreq freq, GekkoTime t2)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            
             GekkoTime tt2 = t2;
 
             if (freq == t2.freq)
@@ -172,7 +195,7 @@ namespace Gekko
                     {
                         tt2 = new GekkoTime(EFreq.A, t2.super, 1);
                     }
-                    else if (t2.freq == EFreq.M)
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
                     {
                         tt2 = new GekkoTime(EFreq.A, t2.super, 1);
                     }
@@ -189,11 +212,11 @@ namespace Gekko
                         //from A to Q sets q1 for start year and q4 for end year                        
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
                     }
-                    else if (t2.freq == EFreq.M)
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
                     {
                         //from M to Q finds corresponding Q                        
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
-                    }
+                    }                    
                     else if (t2.freq == EFreq.U)
                     {
                         tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
@@ -211,14 +234,42 @@ namespace Gekko
                         //from Q to M sets mx for start q, and my for end q                        
                         tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
                     }
+                    else if (t2.freq == EFreq.D)
+                    {
+                        //from D to M sets month directly
+                        tt2 = new GekkoTime(EFreq.M, t2.super, t2.sub);
+                    }
                     else if (t2.freq == EFreq.U)
                     {
                         tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
                     }
                 }
+                else if (freq == EFreq.D)
+                {
+                    if (t2.freq == EFreq.A)
+                    {
+                        //from A to D sets last day of year
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                    }
+                    else if (t2.freq == EFreq.Q)
+                    {
+                        //from Q to D sets last day of quarter
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub), DateTime.DaysInMonth(t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub)));
+                    }
+                    else if (t2.freq == EFreq.M)
+                    {
+                        //from M to D sets last day of month                        
+                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, DateTime.DaysInMonth(t2.super, t2.sub));
+                    }
+                    else if (t2.freq == EFreq.U)
+                    {
+                        //from U to D sets last day of year
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                    }
+                }
                 else if (freq == EFreq.U)
                 {
-                    //From Q or M to U freq is just the annual part of the date
+                    //From Q or M or D to U freq is just the annual part of the date
 
                     if (t2.freq == EFreq.A)
                     {
@@ -228,7 +279,7 @@ namespace Gekko
                     {
                         tt2 = new GekkoTime(EFreq.U, t2.super, 1);
                     }
-                    else if (t2.freq == EFreq.M)
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
                     {
                         tt2 = new GekkoTime(EFreq.U, t2.super, 1);
                     }
@@ -240,6 +291,10 @@ namespace Gekko
 
         public static GekkoTime ConvertFreqs1(EFreq freq, GekkoTime t1)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             GekkoTime tt1 = t1;
             if (freq == t1.freq)
             {
@@ -250,13 +305,13 @@ namespace Gekko
 
                 if (freq == EFreq.A)
                 {
-                    //From Q or M to A freq is just the annual part of the date
+                    //From Q or M or D to A freq is just the annual part of the date
 
                     if (t1.freq == EFreq.Q)
                     {
                         tt1 = new GekkoTime(EFreq.A, t1.super, 1);
                     }
-                    else if (t1.freq == EFreq.M)
+                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
                     {
                         tt1 = new GekkoTime(EFreq.A, t1.super, 1);
                     }
@@ -273,11 +328,11 @@ namespace Gekko
                         //from A to Q sets q1 for start year and q4 for end year
                         tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
                     }
-                    else if (t1.freq == EFreq.M)
+                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
                     {
-                        //from M to Q finds corresponding Q
+                        //from M or D to Q finds corresponding Q
                         tt1 = new GekkoTime(EFreq.Q, t1.super, GekkoTime.FromMonthToQuarter(t1.sub));  //first m                        
-                    }
+                    }                    
                     else if (t1.freq == EFreq.U)
                     {
                         tt1 = new GekkoTime(EFreq.Q, t1.super, 1);
@@ -295,9 +350,36 @@ namespace Gekko
                         //from Q to M sets mx for start q, and my for end q
                         tt1 = new GekkoTime(EFreq.M, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub));
                     }
+                    else if (t1.freq == EFreq.D)
+                    {
+                        //from D to M sets month directly
+                        tt1 = new GekkoTime(EFreq.M, t1.super, t1.sub);
+                    }
                     else if (t1.freq == EFreq.U)
                     {
                         tt1 = new GekkoTime(EFreq.M, t1.super, 1);
+                    }
+                }
+                else if (freq == EFreq.D)
+                {
+                    if (t1.freq == EFreq.A)
+                    {
+                        //from A to D sets first day
+                        tt1 = new GekkoTime(EFreq.D, t1.super, 1, 1);
+                    }
+                    else if (t1.freq == EFreq.Q)
+                    {
+                        //from Q to D sets first day
+                        tt1 = new GekkoTime(EFreq.D, t1.super, GekkoTime.FromQuarterToMonthStart(t1.sub), 1);
+                    }
+                    else if (t1.freq == EFreq.M)
+                    {
+                        //from M to D sets first day
+                        tt1 = new GekkoTime(EFreq.D, t1.super, t1.sub, 1);
+                    }                    
+                    else if (t1.freq == EFreq.U)
+                    {
+                        tt1 = new GekkoTime(EFreq.D, t1.super, 1, 1);
                     }
                 }
                 else if (freq == EFreq.U)
@@ -312,7 +394,7 @@ namespace Gekko
                     {
                         tt1 = new GekkoTime(EFreq.U, t1.super, 1);
                     }
-                    else if (t1.freq == EFreq.M)
+                    else if (t1.freq == EFreq.M || t1.freq == EFreq.D)
                     {
                         tt1 = new GekkoTime(EFreq.U, t1.super, 1);
                     }
@@ -518,6 +600,8 @@ namespace Gekko
         public GekkoTime t2Quarterly;
         public GekkoTime t1Monthly;
         public GekkoTime t2Monthly;
+        public GekkoTime t1Daily;
+        public GekkoTime t2Daily;
         public GekkoTime t1Undated;
         public GekkoTime t2Undated;
     }

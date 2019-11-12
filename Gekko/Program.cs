@@ -9982,6 +9982,10 @@ namespace Gekko
                 workingFolder = Program.options.folder_working;
 
             }
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
             string ss = "Period: " + f + " " + start + "-" + end + G.NL + "First: " + GetDatabankFileNameWithPath(Program.databanks.GetFirst()) + G.NL + "" + Globals.Ref + ": " + GetDatabankFileNameWithPath(Program.databanks.GetRef()) + G.NL + "Working folder: " + Program.options.folder_working + G.NL + "Mode: " + Program.options.interface_mode;
 
             if (ss != Gui.gui.toolStripStatusLabel1.ToolTipText) Gui.gui.toolStripStatusLabel1.ToolTipText = ss;
@@ -15997,6 +16001,10 @@ namespace Gekko
         {
             //hash #980432
 
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             Tuple<GekkoTime, GekkoTime> freqs = ConvertFreqs(Globals.globalPeriodStart, Globals.globalPeriodEnd, Program.options.freq);
 
             if (Program.options.freq == EFreq.A)
@@ -16016,6 +16024,12 @@ namespace Gekko
                 G.Writeln("Freq changed to monthly (M) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
                 Globals.globalPeriodStart = freqs.Item1;
                 Globals.globalPeriodEnd = freqs.Item2;                
+            }
+            else if (Program.options.freq == EFreq.D)
+            {
+                G.Writeln("Freq changed to daily (D) -- note that start/end months have been translated from " + Globals.globalPeriodStart.freq.ToString() + " freq");
+                Globals.globalPeriodStart = freqs.Item1;
+                Globals.globalPeriodEnd = freqs.Item2;
             }
             else if (Program.options.freq == EFreq.U)
             {
@@ -41092,6 +41106,10 @@ namespace Gekko
 
         public static Tuple<GekkoTime, GekkoTime> ConvertFreqs(GekkoTime tStart, GekkoTime tEnd, EFreq tsFreq)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             AllFreqsHelper dates = G.ConvertDateFreqsToAllFreqs(tStart, tEnd);
             GekkoTime tStart2 = GekkoTime.tNull;
             GekkoTime tEnd2 = GekkoTime.tNull;
@@ -41109,6 +41127,11 @@ namespace Gekko
             {
                 tStart2 = dates.t1Monthly;
                 tEnd2 = dates.t2Monthly;
+            }
+            else if (tsFreq == EFreq.D)
+            {
+                tStart2 = dates.t1Daily;
+                tEnd2 = dates.t2Daily;
             }
             else if (tsFreq == EFreq.U)
             {

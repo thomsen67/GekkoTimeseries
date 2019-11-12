@@ -279,15 +279,13 @@ namespace Gekko
         {
             //Also see #345632473
 
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+            
             if (t1.IsNull()) return null;
 
             AllFreqsHelper allFreqsHelper = new Gekko.AllFreqsHelper();
-
-            //if (t1.freq != t2.freq)
-            //{
-            //    G.Writeln2("*** ERROR: The two date frequencies do not match");
-            //    throw new GekkoException();
-            //}                                    
 
             GekkoTime.ConvertFreqs(EFreq.A, t1, t2, ref allFreqsHelper.t1Annual, ref allFreqsHelper.t2Annual);
             if (GekkoTime.Observations(allFreqsHelper.t1Annual, allFreqsHelper.t2Annual) < 1)
@@ -303,6 +301,12 @@ namespace Gekko
             }
             GekkoTime.ConvertFreqs(EFreq.M, t1, t2, ref allFreqsHelper.t1Monthly, ref allFreqsHelper.t2Monthly);
             if (GekkoTime.Observations(allFreqsHelper.t1Monthly, allFreqsHelper.t2Monthly) < 1)
+            {
+                G.Writeln2("*** ERROR: Start period must be <= end period");
+                throw new GekkoException();
+            }
+            GekkoTime.ConvertFreqs(EFreq.D, t1, t2, ref allFreqsHelper.t1Daily, ref allFreqsHelper.t2Daily);
+            if (GekkoTime.Observations(allFreqsHelper.t1Daily, allFreqsHelper.t2Daily) < 1)
             {
                 G.Writeln2("*** ERROR: Start period must be <= end period");
                 throw new GekkoException();
@@ -363,6 +367,9 @@ namespace Gekko
 
         public static EFreq GetFreq(string freq, bool nullIsCurrent)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
             EFreq eFreq = EFreq.A;
             if (G.Equal(freq, "a"))
             {
@@ -375,6 +382,10 @@ namespace Gekko
             else if (G.Equal(freq, "m"))
             {
                 eFreq = EFreq.M;
+            }
+            else if (G.Equal(freq, "d"))
+            {
+                eFreq = EFreq.D;
             }
             else if (G.Equal(freq, "u"))
             {
@@ -2545,6 +2556,9 @@ namespace Gekko
 
         public static string GetFreqString(EFreq input)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
             string f = "";
             if ((input == EFreq.A))
             {
@@ -2554,9 +2568,13 @@ namespace Gekko
             {
                 f = "Quarterly";
             }
-            else if ((input == EFreq.M))  //ttfreq
+            else if ((input == EFreq.M)) 
             {
                 f = "Monthly";
+            }
+            else if ((input == EFreq.D))
+            {
+                f = "Daily";                
             }
             else if ((input == EFreq.U))
             {
