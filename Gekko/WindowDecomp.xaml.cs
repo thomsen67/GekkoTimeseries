@@ -777,13 +777,13 @@ namespace Gekko
         private static Window GetWindow(GekkoDockPanel2 dockPanel)
         {
             Grid p = (Grid)dockPanel.Parent;
-            Border pp = (Border)p.Parent;
-            Canvas ppp = (Canvas)pp.Parent;
-            Border pppp = (Border)ppp.Parent;
-            ScrollViewer ppppp = (ScrollViewer)pppp.Parent;
-            StackPanel pppppp = (StackPanel)ppppp.Parent;
-            DockPanel ppppppp = (DockPanel)pppppp.Parent;
-            Window ww = (Window)ppppppp.Parent;
+            Border p2 = (Border)p.Parent;
+            Canvas p3 = (Canvas)p2.Parent;
+            Border p4 = (Border)p3.Parent;
+            ScrollViewer p5 = (ScrollViewer)p4.Parent;
+            StackPanel p6 = (StackPanel)p5.Parent;
+            DockPanel p7 = (DockPanel)p6.Parent;
+            Window ww = (Window)p7.Parent;
             return ww;
         }
 
@@ -1145,9 +1145,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     this.decompOptions2.prtOptionLower = transformationCodeAugmented;
-                }
-
-
+                }                
 
                 //"x" and "s" are mutually exclusive: in raw mode shares are not meaningful
                 //so "sd", "sp", "sdp" + "sm", "sq", "smp" are used                
@@ -1207,10 +1205,7 @@ namespace Gekko
                 }
             }
         }
-
-        
-
-        
+         
         private void DecompIsSharesOrPercentageType(out string operator1, out string isShares)
         {
             operator1 = this.decompOptions2.prtOptionLower;
@@ -1331,278 +1326,6 @@ namespace Gekko
             flowText.Visibility = Visibility.Visible;
         }
 
-
-        
-
-
-        private Table DecompSubstitute(Table table, string var2)
-        {
-            //EquationHelper found = Program.DecompEval(var2);
-            //DecompOptions2 d3 = this.decompOptions2.Clone();
-            //d3.variable = var2;
-            //d3.expression = Globals.expression;
-            //d3.expressionOld = found.equationText;
-            //Table table2 = Program.Decompose(d3);
-            //Table table3 = TableSubstitute(table, var2, table2, true);
-            //return table3;
-            return null;
-        }
-
-        private static Table TableSubstitute(Table table1, string var, Table table2, bool scale)
-        {
-            //We have a table like (for x)
-            //        2020  2021
-            //  expr   500   600
-            //  x1     100   200
-            //  x2     400   400
-
-            //and a table like (for x1)
-
-            //        2020  2021
-            //  expr   100   100
-            //  x11     20    30
-            //  x12     80    70
-
-            //We insert:
-
-            //        2020  2021
-            //  expr   500   600
-            //  x11     20    30
-            //  x12     80    70
-            //  x2     400   400
-                        
-            Table rv = new Table();
-            rv.writeOnce = true;
-
-            var = var.Trim();
-
-            int irv = 0;
-
-            if (table1.GetColMaxNumber() != table2.GetColMaxNumber())
-            {
-                G.Writeln2("*** ERROR: Table merge problem");
-                throw new GekkoException();
-            }
-
-            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-            {
-                irv++;
-                
-                if (i > 1)
-                {
-                    //not first row
-                    Cell c1temp = table1.Get(i, 1);
-                    if (c1temp.CellText.TextData[0].Trim() == var)
-                    {
-                        int rowStart = 3;
-                        int colStart = 2;
-
-                        List<double> scalings = null;
-                        if (scale)
-                        {                            
-
-                            scalings = new List<double>();
-                            for (int jj = colStart; jj <= table2.GetColMaxNumber(); jj++)
-                            {
-                                Cell temp1 = table1.Get(i, jj);
-                                if (temp1 == null || temp1.cellType != CellType.Number)
-                                {
-                                    G.Writeln2("*** ERROR: Table merge problem");
-                                    throw new GekkoException();
-                                }
-                                double original = temp1.number;
-
-                                double rowsum = 0d;
-                                for (int ii = rowStart; ii <= table2.GetRowMaxNumber(); ii++)
-                                {
-                                    Cell temp2 = table2.Get(ii, jj);
-                                    if (temp2 == null || temp2.cellType != CellType.Number)
-                                    {
-                                        G.Writeln2("*** ERROR: Table merge problem");
-                                        throw new GekkoException();
-                                    }
-                                    rowsum += temp2.number;
-                                }
-                                scalings.Add(original / rowsum);
-                            }                            
-                        }
-                        
-                        //insert rows from table 2
-                        for (int ii = rowStart; ii <= table2.GetRowMaxNumber(); ii++)
-                        {                            
-                            irv++;
-                            for (int jj = 1; jj <= table2.GetColMaxNumber(); jj++)
-                            {
-                                Cell temp = table2.Get(ii, jj);
-                                if (jj == 1) temp.CellText.TextData[0] = "    " + temp.CellText.TextData[0];
-                                else
-                                {
-                                    if (temp != null)
-                                    {
-                                        if (scale) temp.number = temp.number * scalings[jj - 2];
-
-                                    }
-                                }
-                                rv.Set(new Coord(irv - 1, jj), temp);
-                            }
-                        }
-                        i++;  //skip this row in table1
-                    }
-                }
-
-                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                {
-                    Cell c1 = table1.Get(i, j);
-                    Cell c2 = table2.Get(i, j);                    
-
-                    if (i == 1 && j > 1)
-                    {
-                        //first row and not first column
-                        //test that dates conform, only row merging                        
-                        if (c1 == null || c2 == null || c1.cellType != CellType.Date || c2.cellType != CellType.Date || c1.date != c2.date)
-                        {
-                            G.Writeln2("*** ERROR: Table merge problem");
-                            throw new GekkoException();
-                        }
-                    }
-                    if (c1 != null) rv.Set(new Coord(irv, j), c1);
-                    
-                    
-                }
-            }
-
-            return rv;
-        }
-
-        private static Table TableSort(Table table1)
-        {
-            //We have a table like (for x)
-            //        2020  2021
-            //  a      500   600
-            //  c      100   200
-            //  b      400   400
-
-            //Sort:
-
-            //        2020  2021
-            //  a      500   600
-            //  b      400   400
-            //  c      100   200
-
-            //a¤2, c¤3, b¤4 --> a¤2, b¤4, c¤3
-            //tofrom: (2, 2), (3, 4), (4, 3)
-
-            Table rv = new Table();
-            rv.writeOnce = true;
-
-            List<string> names = new List<string>();
-
-            for (int i = 2; i <= table1.GetRowMaxNumber(); i++)
-            {
-                Cell c = table1.Get(i, 1);
-                names.Add(c.CellText.TextData[0].Trim() + "¤" + i);  //remove indentation here
-            }
-            names.Sort(StringComparer.OrdinalIgnoreCase);
-            //names.Reverse();
-
-            List<int> fromTo = new List<int>();
-
-
-            for (int i = 0; i < names.Count; i++)
-            {
-                fromTo.Add(-12345);
-            }
-            for (int i = 0; i < names.Count; i++)
-            {
-                string[] ss = names[i].Split('¤');
-                fromTo[int.Parse(ss[1]) - 2] = i + 2;
-            }
-
-
-            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-            {
-                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                {
-                    Cell c = table1.Get(i, j);
-
-                    if (c == null) continue;
-                    if (i == 1) rv.Set(new Coord(i, j), c);
-                    else
-                    {
-                        rv.Set(new Coord(fromTo[i - 2], j), c);
-                    }
-                }
-            }
-
-            return rv;
-        }
-
-        private static Table TablePool(Table table1)
-        {
-            //We have a table like (for x)
-            //        2020  2021
-            //  a1     500   600
-            //  a2     100   200
-
-            //Becomes
-            //        2020  2021
-            //  a      600   200
-
-            table1 = new Table();
-            table1.Set(new Coord(1, 2), null, double.NaN, CellType.Date, null);
-            table1.Set(new Coord(2, 1), "a", double.NaN, CellType.Text, null);
-            table1.Set(new Coord(2, 2), null, 500d, CellType.Number, null);
-            table1.Set(new Coord(3, 1), "a", double.NaN, CellType.Text, null);
-            table1.Set(new Coord(3, 2), null, 100d, CellType.Number, null);
-
-
-            Table rv = new Table();
-            rv.writeOnce = true;
-
-            List<string> names = new List<string>();
-
-            string current = "";
-            int iCurrent = 1;
-
-            for (int i = 1; i <= table1.GetRowMaxNumber(); i++)
-            {
-                string name = null;
-                Cell cc = table1.Get(i, 1);
-                if (cc != null) name = cc.CellText.TextData[0];
-                if (i > 1 && name != current)
-                {
-                    current = name;
-                    iCurrent++;
-                }
-                for (int j = 1; j <= table1.GetColMaxNumber(); j++)
-                {
-                    Cell c = table1.Get(i, j);
-                    if (i == 1)
-                    {
-                        if (c != null) rv.Set(new Coord(i, j), c);  //first line
-                    }
-                    else
-                    {
-                        if (name == current)
-                        {
-                            if(j>1)
-                            {
-                                Cell cellCurrent = table1.Get(iCurrent, j);
-                                double dd = c.number;
-                                cellCurrent.number += dd;
-                            }
-                        }
-                        else
-                        {                            
-                            rv.Set(new Coord(iCurrent, j), c);
-                        }
-                    }                    
-                }
-            }
-            
-            return rv;
-        }
-
         private void ClearGrid()
         {
             this.grid1.RowDefinitions.Clear();
@@ -1620,14 +1343,9 @@ namespace Gekko
         }
 
         private void MakeTable(Table table, DecompOptions decompOptions)
-        {                       
-            
-            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);
-            
-            //DateTime t0 = DateTime.Now;
-            PutTableIntoGrid(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);
-            //MessageBox.Show("Took " + (DateTime.Now - t0).TotalMilliseconds);
-            
+        {            
+            CreateGridRowsAndColumns(this.grid1, table, GekkoTableTypes.TableContent);            
+            PutTableIntoGrid(this.grid1, table, GekkoTableTypes.TableContent, decompOptions);            
             CreateGridRowsAndColumns(this.grid1Left, table, GekkoTableTypes.Left);
             PutTableIntoGrid(this.grid1Left, table, GekkoTableTypes.Left, decompOptions);
             CreateGridRowsAndColumns(this.grid1Top, table, GekkoTableTypes.Top);
