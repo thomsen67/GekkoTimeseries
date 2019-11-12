@@ -49,91 +49,9 @@ namespace Gekko
             {
                 // It's on the same thread, no need for Invoke
 
-                DecompOptions2 decompOptions = (DecompOptions2)o;
-                WindowDecomp w = null;
-                
-                w = new WindowDecomp(decompOptions);
-                
-                Globals.windowsDecomp2.Add(w);
-
-                int count = -1;
-                foreach (Link link in decompOptions.link)
-                {                    
-                    count++;
-                    if (Program.modelGams != null)
-                    {
-
-                        if (link.expressions.Count == 1 && link.expressions[0] == null)
-                        {
-                            ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varnames[0]);
-                            link.expressions = found.expressions;
-                            link.expressionText = found.lhs + " = " + found.rhs;
-                        }
-                        else
-                        {
-                            //fix this...
-                        }
-                    }
-                    else
-                    {
-
-                        if (Program.model == null)
-                        {
-                            G.Writeln2("*** ERROR: DECOMP: A model is not loaded, cf. the MODEL command.");
-                            throw new GekkoException();
-                        }
-
-                        EquationHelper found = Program.DecompEval(decompOptions.variable);
-                        decompOptions.expression = Globals.expressions[0];
-                        decompOptions.expressionOld = found.equationText;
-                    }
-                }
-
-                if (decompOptions.name == null)
-                {
-                    w.Title = "Decompose expression";
-                }
-                else
-                {
-                    w.Title = "Decompose " + decompOptions.variable + "";
-                }
-                w.Tag = decompOptions;
-
-                w.isInitializing = true;  //so we don't get a recalc here because of setting radio buttons
-                w.SetRadioButtons();
-                w.isInitializing = false;
-
-                w.RecalcCellsWithNewType();
-                decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
-
-                if (G.IsUnitTesting() && Globals.showDecompTable == false)
-                {
-                    Globals.windowsDecomp2.Clear();
-                    w = null;
-                }
-                else
-                {
-                    if (w.isClosing)  //if something goes wrong, .isClosing will be true
-                    {
-                        //The line below removes the window from the global list of active windows.
-                        //Without this line, this half-dead window will mess up automatic closing of windows (Window -> Close -> Close all...)
-                        if (Globals.windowsDecomp2.Count > 0) Globals.windowsDecomp2.RemoveAt(Globals.windowsDecomp2.Count - 1);
-                    }
-                    else
-                    {
-                        w.ShowDialog();
-                        w.Close();  //probably superfluous
-                        w = null;  //probably superfluous
-                        if (Globals.showDecompTable)
-                        {
-                            Globals.showDecompTable = false;
-                            G.Writeln2("*** ERROR: Debug, tables aborted. Set Globals.showDecompTable = false.");
-                            throw new GekkoException();
-                        }
-                    }
-                }
+                Decomp.Decomp2Helper(o);
             }
-        }
+        }        
 
         //weird delegate pattern, but it works!
         delegate void SetTextInputCallback(string text, string type2);

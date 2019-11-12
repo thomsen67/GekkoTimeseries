@@ -1173,8 +1173,6 @@ namespace Gekko
                 string lhsString = "Expression value";
                 int parentI = 0;
 
-
-
                 // decompDatas
                 // Example: DECOMP x[#a] in e1 link y[#a] in e2
                 // 1. dimension corresponds to main chosen decomp variables (x[#a], could be stated like x[18], x[19]).
@@ -1198,7 +1196,7 @@ namespace Gekko
                     List<DecompData> temp = new List<DecompData>();
                     foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
                     {
-                        temp.Add(Program.Decompose2(per1, per2, expression, DecompBanks(operator1), residualName));
+                        temp.Add(Decomp.Decompose2(per1, per2, expression, DecompBanks(operator1), residualName));
                     }
                     decompDatas.Add(temp);
                 }
@@ -1223,17 +1221,6 @@ namespace Gekko
                 bool[] used = new bool[decompDatas.Count];  //number of link-equations (including primary eq)
                 used[0] = true;  //primary equation
 
-
-                //NEW WAY TO LINK
-                //NEW WAY TO LINK
-                //NEW WAY TO LINK
-                //NEW WAY TO LINK
-                //NEW WAY TO LINK
-                //NEW WAY TO LINK
-
-
-                //int parentJ = FindLinkJ(decompDatas, parentI, name);                                        
-
                 GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
                 //linking
@@ -1248,6 +1235,7 @@ namespace Gekko
                 //Takes the link equations, skipping the first one (which is the "normal" equation)
                 //Example: decomp y in e1 link c in e2
                 //the link equation is e2
+
                 for (int i = 1; i < this.decompOptions2.link.Count; i++)  //skips the MAIN equation
                 {
                     //For each link variable (c) in the link equation (e2)
@@ -1269,7 +1257,6 @@ namespace Gekko
                             //The series below is the lhs series of the whole decomposition. If the rhs or a link contains the lhs variable,
                             //it will be altered, therefore the clone. For instance, in y = c + g and c = 0.8*y, a naive decomp for data where
                             //y changes with 1 each period will only show 0.2. This is corrected below, corresponding to y = 0.8*y + g --> 0.2 y = g --> y = 5*g.
-
 
                             //in y = c + i + g // c = 0.8 y
                             //DECOMP y in eq1 link c in eq2.
@@ -1326,78 +1313,76 @@ namespace Gekko
                     }
                 }
 
-                if (true)
+
+                //TODO: make sure that every lhs variable is found 1 and only 1 time
+                //      in the decompDatas, and report error if not.
+                //      To do this, FindLinkJ() and FindLinkSeries() need adjustments
+
+                //correct if the lhs variable is not stated with an implicit 1, like
+                //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
+                //the last one must be multiplied with 5.
+
+                foreach (string name in MAIN_varnames)
                 {
-                    //TODO: make sure that every lhs variable is found 1 and only 1 time
-                    //      in the decompDatas, and report error if not.
-                    //      To do this, FindLinkJ() and FindLinkSeries() need adjustments
+                    string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+                    string name2 = Program.databanks.GetFirst().name + ":" + name;
+                    int j = FindLinkJ(decompDatas, parentI, name1);
+                    Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
 
-                    //correct if the lhs variable is not stated with an implicit 1, like
-                    //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
-                    //the last one must be multiplied with 5.
-
-                    foreach (string name in MAIN_varnames)
+                    Series lhsReal = null;
+                    if (name == Globals.decompExpressionName)
                     {
-                        string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                        string name2 = Program.databanks.GetFirst().name + ":" + name;
-                        int j = FindLinkJ(decompDatas, parentI, name1);
-                        Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
+                        //just keep lhsReal = null
+                    }
+                    else
+                    {
+                        lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                    }
 
-                        Series lhsReal = null;
-                        if (name == Globals.decompExpressionName)
+                    DecompData d = decompDatas[parentI][j];
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                    {
+                        double d1 = lhs.GetDataSimple(t);
+                        double factor = 1d;
+
+                        if (lhsReal == null)
                         {
-                            //just keep lhsReal = null
+                            //keep factor = 1
                         }
                         else
                         {
-                            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+
+                            // --------------------------------------------
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators, this is <d>
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators
+                            double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                            // ----------------------------------------------
+
+                            factor = d2 / d1;
                         }
 
-                        DecompData d = decompDatas[parentI][j];
-                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+
+                        if (factor != 1d)
                         {
-                            double d1 = lhs.GetDataSimple(t);
-                            double factor = 1d;
-
-                            if (lhsReal == null)
+                            foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
                             {
-                                //keep factor = 1
-                            }
-                            else
-                            {
-
-                                // --------------------------------------------
-                                //TODO: other operators
-                                //TODO: other operators
-                                //TODO: other operators
-                                //TODO: other operators, this is <d>
-                                //TODO: other operators
-                                //TODO: other operators
-                                //TODO: other operators
-                                double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                                // ----------------------------------------------
-
-                                factor = d2 / d1;
-                            }
-
-
-                            if (factor != 1d)
-                            {
-                                foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
-                                {
-                                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                                }
+                                kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
                             }
                         }
                     }
                 }
 
+
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.
 
                 Table table = null;
-                table = Program.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
-
+                table = Decomp.DecomposePutIntoTable3(MAIN_varnames, per1, per2, decompDatas[parentI], this.decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
 
                 string s = FindEquationText2(this.decompOptions2);
                 equation.Text = s;

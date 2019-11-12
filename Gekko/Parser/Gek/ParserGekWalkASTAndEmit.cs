@@ -5526,7 +5526,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMP":
                         {
-                            node.Code.A("O.Decomp o" + Num(node) + " = new O.Decomp();" + G.NL);
+                            node.Code.A("O.Decomp1 o" + Num(node) + " = new O.Decomp1();" + G.NL);
                             node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
                             GetCodeFromAllChildren(node);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
