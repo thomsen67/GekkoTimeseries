@@ -1212,6 +1212,10 @@ namespace Gekko
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // ----------------------------------------------------------------------------
 
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //Static method not relying on the Series object
             //NO .dataOffsetLag here, must be added afterwards
 
@@ -1229,9 +1233,15 @@ namespace Gekko
                 //undated freq could return fast in the same way as this??
                 rv = anchorPeriodPositionInArray + gt.super - anchorPeriod.super;
             }
+            else if (anchorPeriod.freq == EFreq.D)
+            {
+                //this cannot be fast, converts implicitly to C# DateTime
+                int dif = GekkoTime.Observations(anchorPeriod, gt) - 1;
+                rv = anchorPeriodPositionInArray + dif;
+            }
             else
             {
-                //Non-annual                
+                //Non-annual and non-daily                
                 int subPeriods = 1;
                 if (anchorPeriod.freq == EFreq.Q) subPeriods = 4;
                 else if (anchorPeriod.freq == EFreq.M) subPeriods = 12;
