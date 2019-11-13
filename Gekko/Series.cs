@@ -1199,7 +1199,7 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
 
-            int rv = FromGekkoTimeToArrayIndexAbstract(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub), this.GetAnchorPeriodPositionInArray());
+            int rv = FromGekkoTimeToArrayIndexAbstract(gt, new GekkoTime(this.freq, this.data.anchorPeriod.super, this.data.anchorPeriod.sub, this.data.anchorPeriod.subsub), this.GetAnchorPeriodPositionInArray());
             return rv;
         }
 

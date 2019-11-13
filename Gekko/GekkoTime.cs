@@ -443,18 +443,6 @@ namespace Gekko
             return tt1;
         }
 
-        public bool StrictlyLargerThan(GekkoTime gt2)
-        {
-            CheckSameFreq(gt2);
-            if (gt2.IsNull()) return true;
-            if (this.super > gt2.super) return true;
-            else if (this.super == gt2.super)
-            {
-                if (this.sub > gt2.sub) return true;
-            }
-            return false;
-        }
-
         private void CheckSameFreq(GekkoTime gt2)
         {
             if (this.freq != gt2.freq)
@@ -467,52 +455,146 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Comparing two different frequencies");
                     throw new GekkoException();
-                }                
+                }
             }
+        }
+
+        public bool StrictlyLargerThan(GekkoTime gt2)
+        {
+            return StrictlyLargerThan(gt2, true);
+        }
+
+        public bool StrictlyLargerThan(GekkoTime gt2, bool check)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            if(check) CheckSameFreq(gt2);
+            if (gt2.IsNull()) return true;
+            if (this.super > gt2.super) return true; //gt1 har larger year
+            else if (this.super == gt2.super)
+            {
+                //same year
+                if (this.freq == EFreq.D)
+                {
+                    if (this.sub > gt2.sub) return true; //same year, gt1 has larger month
+                    else if (this.sub == gt2.sub)
+                    {
+                        //same year and same month -> gt1.day must be > gt2.day
+                        if (this.subsub > gt2.subsub) return true;
+                    }
+                }
+                else
+                {
+                    //same year, compare months/quarters
+                    if (this.sub > gt2.sub) return true;
+                }
+            }
+            return false;
         }
 
         public bool LargerThanOrEqual(GekkoTime gt2)
         {
-            CheckSameFreq(gt2);
+            return LargerThanOrEqual(gt2, true);
+        }
+
+        public bool LargerThanOrEqual(GekkoTime gt2, bool check)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            if (check) CheckSameFreq(gt2);
             if (gt2.IsNull()) return true;
-            if (this.super == gt2.super && this.sub == gt2.sub) return true;
-            if (StrictlyLargerThan(gt2)) return true;
+            if (IsSamePeriod(gt2, false)) return true;
+            if (StrictlyLargerThan(gt2, false)) return true;
             return false;
         }
 
         public bool SmallerThanOrEqual(GekkoTime gt2)
         {
-            CheckSameFreq(gt2);
+            return SmallerThanOrEqual(gt2, true);
+        }
+
+        public bool SmallerThanOrEqual(GekkoTime gt2, bool check)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            if (check) CheckSameFreq(gt2);
             if (gt2.IsNull()) return true;
-            if (this.super == gt2.super && this.sub == gt2.sub) return true;
-            if (StrictlySmallerThan(gt2)) return true;
+            if(IsSamePeriod(gt2, false)) return true;
+            if (StrictlySmallerThan(gt2, false)) return true;
             return false;
         }
 
         public bool StrictlySmallerThan(GekkoTime gt2)
         {
-            CheckSameFreq(gt2);
+            return StrictlySmallerThan(gt2, true);
+        }            
+
+        public bool StrictlySmallerThan(GekkoTime gt2, bool check)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            if (check) CheckSameFreq(gt2);
             if (gt2.IsNull()) return true;
-            if (this.super < gt2.super) return true;
+            if (this.super < gt2.super) return true; //gt1 har smaller year
             else if (this.super == gt2.super)
             {
-                if (this.sub < gt2.sub) return true;
+                //same year
+                if (this.freq == EFreq.D)
+                {
+                    if (this.sub < gt2.sub) return true; //same year, gt1 has smaller month
+                    else if (this.sub == gt2.sub)
+                    {
+                        //same year and same month -> gt1.day must be < gt2.day
+                        if (this.subsub < gt2.subsub) return true;
+                    }
+                }
+                else
+                {
+                    //same year, compare months/quarters
+                    if (this.sub < gt2.sub) return true;
+                }
             }
             return false;
         }
 
         public bool IsSamePeriod(GekkoTime gt2)
         {
+            return IsSamePeriod(gt2, true);
+        }
+
+        public bool IsSamePeriod(GekkoTime gt2, bool check)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //will handle null ok, two null --> true
-            CheckSameFreq(gt2);            
-            if (this.super == gt2.super)
-                if (this.sub == gt2.sub)
-                    return true;
+            if (check) CheckSameFreq(gt2);
+            if (this.freq == EFreq.D)
+            {
+                if (this.super == gt2.super && this.sub == gt2.sub && this.subsub == gt2.subsub) return true;                
+            }
+            else
+            {
+                if (this.super == gt2.super && this.sub == gt2.sub) return true;                
+            }
             return false;
         }
 
         public GekkoTime Add(int addedPeriods)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //seems to work for negative adds
             //see also GetPeriod()
             //Could probably use DateTime functions, but we like to keep it fast and simple
@@ -529,9 +611,7 @@ namespace Gekko
             }
             else
             {
-
                 int subPeriods = 1;
-
                 if (this.freq == EFreq.A)
                 {
                     //Simple: make it run fast!                
@@ -539,7 +619,7 @@ namespace Gekko
                 }
                 else if (this.freq == EFreq.Q) subPeriods = 4;
                 else if (this.freq == EFreq.M) subPeriods = 12;
-                else if (this.freq == EFreq.U) subPeriods = 1;  //ttfreq
+                else if (this.freq == EFreq.U) subPeriods = 1;  
                 else throw new GekkoException("Error regarding frequencies");
 
                 int subs = (this.sub - 1) + addedPeriods; //a lot easier if first converting from quarters 1,2,3,4 into 0,1,2,3
