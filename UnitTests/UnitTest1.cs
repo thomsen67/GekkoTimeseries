@@ -18988,7 +18988,25 @@ namespace UnitTests
 
 
         }
-        
+
+        [TestMethod]
+        public void _Test_PlotCombo()
+        {
+            //!!!!!!!
+            //!!!!!!!
+            //!!!!!!!
+            //for some reason this yields a stackoverflow error when run as a unit test, but runs fine normally.
+            //so the test must be done manually, and the stackoverflow does not yield an error
+
+            //-----------------------------------------------------------
+            //----------------- this must be compared manually ----------
+            //----------------- look in the \truth subfolder ------------
+            //-----------------------------------------------------------
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\plotcombo\';");            
+            I("RUN combo;"); 
+        }
 
         [TestMethod]
         public void _Test_Res()
