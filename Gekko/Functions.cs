@@ -2033,6 +2033,10 @@ namespace Gekko
 
         public static IVariable helper_time(GekkoTime t)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             if (t.freq == EFreq.A || t.freq == EFreq.U)
             {
                 return new ScalarVal(t.super);
@@ -2044,6 +2048,16 @@ namespace Gekko
             else if (t.freq == EFreq.M)
             {
                 return new ScalarVal(t.super + 1d / 12d / 2d + 1d / 12d * (t.sub - 1));
+            }
+            else if (t.freq == EFreq.D)
+            {
+                int year = t.super;
+                int month = t.sub;
+                int day = t.subsub;
+                int daysInMonth = G.DaysInMonth(year, month);
+                double positionInMonth = 1d / daysInMonth / 2d + 1d / daysInMonth * (day - 1d);
+                double positionInYear = (month - 1d + positionInMonth) / 12d;
+                return new ScalarVal(year + positionInYear);
             }
             throw new GekkoException();
         }

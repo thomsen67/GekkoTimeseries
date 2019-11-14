@@ -2033,7 +2033,7 @@ namespace Gekko
         {
             return DateTime.DaysInMonth(y, m);
         }
-
+        
         public static DateTime DateHelper2(double data)
         {
             return DateTime.FromOADate(data);

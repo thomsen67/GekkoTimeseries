@@ -15441,6 +15441,10 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TimeSeries()
         {
+            //Test of daily frequency
+
+
+            
             //Chreates long timeseries running from 1500 to 3000 yers (a, q or m, so many periods for q and m).
             //For putting data in: testing both SetData() and GetDataSequence() and setting the array value.
             //Testing that the data reads out correctly, both with GetData() and GetDataSequence()

@@ -29523,7 +29523,41 @@ namespace Gekko
 
                 bool showRowWithYear = pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A);
 
-                if (freqs[4])  //day: pure day or day and month
+                if (type == EPrintTypes.Plot)
+                {
+                    if (j > 1)
+                    {
+                        EFreq freqHere = EFreq.None;
+                        if (tsWork != null) freqHere = tsWork.freq;
+                        else if (tsRef != null) freqHere = tsRef.freq;
+
+                        int n = containerExplode.Count + 2;
+
+                        foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
+                        {
+                            int sumOver = 0;
+                            double d = double.NaN;
+                            if (tsWork == null && tsRef == null)  //not series
+                            {
+                                d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                            }
+                            else
+                            {
+                                d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                            }
+                            i++;
+                            double tt = ((ScalarVal)Functions.helper_time(t)).val;
+                            //table.Set(i, j, t.ToString());  
+                            table.Set(i, j, tt.ToString());
+                            table.Get(i, j).date_hack = t;
+                            table.SetNumber(i, j + n, d, format);
+
+                            //G.Writeln2(i + " " + j + " " + t.ToString());
+
+                        }
+                    }
+                }
+                else if (freqs[4])  //day: pure day or day and month
                 {
                     //              x!d              x!m
                     // 2019m1                        100
@@ -29576,7 +29610,7 @@ namespace Gekko
                         i++;
 
                         if (j == 1)
-                        {                            
+                        {
                             table.Set(i, j, "d" + t.subsub); if (rows) table.SetAlign(i, j, Align.Right);
                         }
                         else
@@ -29595,7 +29629,7 @@ namespace Gekko
                                 {
                                     d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
                                 }
-                                
+
                                 table.SetNumber(i, j, d, format);
                             }
                         }
@@ -29638,7 +29672,7 @@ namespace Gekko
                         string uglyYear = null; if (!pretty) uglyYear = year.ToString();
 
                         if (type != EPrintTypes.Plot) // ------------------------------------------------------------- (1)
-                        {                            
+                        {
 
                             if (pretty || year == y1 || (sameFreq == EFreq.U || sameFreq == EFreq.A))
                             {
