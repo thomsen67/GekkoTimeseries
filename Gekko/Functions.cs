@@ -41,6 +41,7 @@ namespace Gekko
         {
             if (iv1.Type() == EVariableType.Val)
             {
+                //%d = date(2020, 'q', 2); //2020q2
                 int yy = O.ConvertToInt(iv1);
                 string ff = O.ConvertToString(iv2);
                 int ss = O.ConvertToInt(iv3);
@@ -49,11 +50,43 @@ namespace Gekko
             }
             else
             {
+                //%d.date('m', 'start');
                 GekkoTime dd = O.ConvertToDate(iv1);
                 string ff = O.ConvertToString(iv2);
                 string startEnd2 = O.ConvertToString(iv3);
                 GekkoTime gt = Program.ConvertFreq(dd, G.GetFreq(ff), startEnd2);
                 return new ScalarDate(gt);
+            }
+        }
+
+        public static IVariable date(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable year, IVariable m, IVariable month, IVariable d, IVariable day)
+        {
+            if (year.Type() == EVariableType.Val)
+            {
+                //%d = date(2020, 'm', 2, 'd', 4); //2020m2d4
+                int year_int = O.ConvertToInt(year);
+                string m_string = O.ConvertToString(m);
+                if (!G.Equal(m_string, "m"))
+                {
+                    G.Writeln2("*** ERROR: date(): expected year, month and day");
+                    throw new GekkoException();
+                }
+                int month_int = O.ConvertToInt(month);
+
+                string day_string = O.ConvertToString(d);
+                if (!G.Equal(day_string, "d"))
+                {
+                    G.Writeln2("*** ERROR: date(): expected year, month and day");
+                    throw new GekkoException();
+                }
+                int day_int = O.ConvertToInt(d);
+                GekkoTime gt = new GekkoTime(EFreq.D, year_int, month_int, day_int);
+                return new ScalarDate(gt);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: date(): expected year, month and day");
+                throw new GekkoException();
             }
         }
 
@@ -71,6 +104,7 @@ namespace Gekko
 
         public static IVariable getsubper(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
+            //returns month for daily freq
             if (ths.Type() != EVariableType.Date)
             {
                 G.Writeln2("*** ERROR: getsubper() expects date input");
@@ -107,9 +141,9 @@ namespace Gekko
             }
 
             GekkoTime gt = (ths as ScalarDate).date;
-            if (gt.freq != EFreq.M)
+            if (gt.freq != EFreq.M && gt.freq != EFreq.D)
             {
-                G.Writeln2("*** ERROR: getmonth() expects monthly date");
+                G.Writeln2("*** ERROR: getmonth() expects monthly or daily date");
                 throw new GekkoException();
             }
             return new ScalarVal(gt.sub);

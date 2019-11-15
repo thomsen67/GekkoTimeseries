@@ -29523,7 +29523,7 @@ namespace Gekko
 
                 bool showRowWithYear = pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A);
 
-                if (type == EPrintTypes.Plot)
+                if (Globals.runningOnTTComputer && true && type == EPrintTypes.Plot)
                 {
                     if (j > 1)
                     {
@@ -30397,7 +30397,7 @@ namespace Gekko
 
             if (type == EPrintTypes.Plot)
             {
-                CallGnuplotNew2(table, o, containerExplode, freqs);
+                CallGnuplot(table, o, containerExplode, freqs);
             }
             else if (type == EPrintTypes.Sheet)
             {
@@ -32902,17 +32902,22 @@ namespace Gekko
         }
 
         
-        private static void CallGnuplotNew2(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
+        private static void CallGnuplot(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
 
             EFreq highestFreq = EFreq.A;
             if (freqs[0]) highestFreq = EFreq.U;
             if (freqs[1]) highestFreq = EFreq.A;
             if (freqs[2]) highestFreq = EFreq.Q;
             if (freqs[3]) highestFreq = EFreq.M;
-                        
+            if (freqs[4]) highestFreq = EFreq.D;
+
             string extension = "emf";
             if (o.opt_filename != null)
             {
@@ -32953,10 +32958,7 @@ namespace Gekko
             double fontfactor = 1d;
             
             //make as wpf window, detect dpi on screen at set size accordingly (http://stackoverflow.com/questions/5977445/how-to-get-windows-display-settings)
-
-            //int quarterFix = 0;
-            //if (Program.options.freq == EFreq.Q || Program.options.freq == EFreq.M) quarterFix = 1;
-
+            
             if (count == 0)
             {
                 G.Writeln2("*** ERROR: PLOT called with 0 variables");
@@ -33369,16 +33371,7 @@ namespace Gekko
             if (set_y2range.Trim() != ":") txt.AppendLine("set y2range [" + set_y2range + "]");
 
             
-                if (!(highestFreq == EFreq.A || highestFreq == EFreq.U))  //ttfreq
-                {
-                    //if (quarterFix == 0)
-                    //{
-                    //    txt.AppendLine("set xdata time");
-                    //    txt.AppendLine(@"set timefmt ""%Y/%m/%d""");
-                    //    txt.AppendLine(@"set format x ""%Y/%m""");
-                    //}
-                }
-                else
+                if ((highestFreq == EFreq.A || highestFreq == EFreq.U))                
                 {
                     //annual or undated
                     if (numberOfObs > 140)
@@ -33521,111 +33514,13 @@ namespace Gekko
 
             if (isInside)
             {
-
-                //TODO: if there are too many minor tics, turn them off
-                //TODO: if years get too cramped, show every second (even)
-                //TODO: if years get too cramped, show only 15, 16, 17, not 2015, 2016, 2017
-                //TODO: if years are still very cramped, switch to isInside = false!
-
-                //??? what about mixed freqs?? They can either be (a) only annual at-tics, and q and m are without tics
-                //                                             or (b) between-tics, showing highest freq if not too many minor, else next-highest.
-                //    with mixed freqs we treat is as highest frequency plot, and sneak in the lower freqs.
-                //OPTION plot xlabels nonannual = at | between | auto ;  //auto will start with between and then jump to at
-                //OPTION plot xlabels annual    = at | between | auto ;  //auto will start with between and then jump to at
-                //OPTION plot xlabels between truncate = digits | skip | both | auto ; 
-
-                double extra = 0;
-
-                int t1 = o.t1.super;
-                int t2 = o.t2.super;
-                //txt.AppendLine("set xtics " + (t1 - 1) + ",1," + (t2 + 0) + "");
-                int sub = 1;
-                if (highestFreq == EFreq.Q)
-                {
-                    sub = 4;
-                    extra = (double)o.t2.sub / (double)sub;
-                }
-                else if (highestFreq == EFreq.M)
-                {
-                    sub = 12;
-                    extra = (double)o.t2.sub / (double)sub;
-                }
-                else
-                {
-                    sub = 1;
-                    extra = 1;
-                }
-
-                bool deduct = false;
-                if (extra <= 0.40) deduct = true;            
-
-                if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
-                {
-                    G.Writeln2("*** ERROR: 'OPTION plot xlabels digits' should be either 4 or 2");
-                    throw new GekkoException();
-                }
-
-                string ss = null;
-                for (int t = t1; t <= t2; t++)
-                {
-                    int years = t2 - t1 + 1;
-                    bool twoDigits = false;
-                    if (Program.options.plot_xlabels_digits == 2) twoDigits = true;
-
-                    int skip = 1;
-                    if (twoDigits)
-                    {
-                        if (years > 2 * 48) skip = 10;
-                        else if (years > 48) skip = 5;
-                        else if (years > 24) skip = 2;                        
-                    }
-                    else
-                    {
-                        //4 digits
-                        if (years > 2 * 24) skip = 10;
-                        else if (years > 24) skip = 5;
-                        else if (years > 12) skip = 2;                        
-                    }
-
-                    string tx = t.ToString();
-                    if (twoDigits) tx = (t % 100).ToString().PadLeft(2, '0');
-
-                    if (skip > 1 && t % skip != 0) tx = null;  //all uneven are zapped
-
-                    if (deduct && t == t2) tx = null;
-
-                    string tlabel = "\"" + tx + "\"";
-                    
-                    ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
-                    if ((highestFreq == EFreq.M && years <= 25) || (highestFreq == EFreq.Q && years <= 75))
-                    {
-                        for (int tt = 1; tt < sub; tt++)  //is skipped if sub = 1
-                        {
-                            double d = (double)tt / (double)sub;
-                            ss += (t + d) + " " + "1, ";  //1 is minor tic
-                        }
-                    }
-                }
-
-                //txt.AppendLine("set mxtics " + sub);
-
-                txt.AppendLine("set xtics (" + ss + ")");
-                txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
-                if (firstXLabelFix)
-                {
-                    if ((highestFreq == EFreq.M && o.t1.freq == EFreq.M && o.t1.sub <= 1) || (highestFreq == EFreq.Q && o.t1.freq == EFreq.Q && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
-                    {
-                        //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
-                        double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
-                        txt.AppendLine("set xrange [" + tStart.ToString() + ":]");      //see above
-                    }                    
-                }
+                HandleXTicsInside(o, highestFreq, firstXLabelFix, txt);
             }
             else
             {
                 int mxtics = -12345;
                 string ticsTxt = null;
-                mxtics = HandleXTics(labels1, labels2, ref ticsTxt, mxtics, highestFreq);
+                mxtics = HandleXTicsAt(labels1, labels2, ref ticsTxt, mxtics, highestFreq);
                 if (ticsTxt != null) txt.AppendLine(ticsTxt);
             }
 
@@ -33638,34 +33533,36 @@ namespace Gekko
 
             //string plotline = null;
 
-            double dx = 1d;
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            double widthForBoxes = 1d;
             if (highestFreq == EFreq.Q)
             {
-                dx = 1d / 4d;
+                widthForBoxes = 1d / 4d;
             }
             else if (highestFreq == EFreq.M)
             {
-                dx = 1d / 12d;
+                widthForBoxes = 1d / 12d;
+            }
+            else if (highestFreq == EFreq.D)
+            {
+                widthForBoxes = 1d / 366d;
             }
 
             histoGap = (int)ParseIntoDouble(boxgap);
             if (boxesY.Count + boxesY2.Count == 1) histoGap = 0;
-            d_width = dx / (double)(boxesY.Count + boxesY2.Count + histoGap);
+            d_width = widthForBoxes / (double)(boxesY.Count + boxesY2.Count + histoGap);
             d_width2 = boxwidth * d_width;
-            d_width3 = boxwidth * dx;
+            d_width3 = boxwidth * widthForBoxes;
             left = d_width * (double)(boxesY.Count + boxesY2.Count - 1) / 2d;
 
             if (boxesY.Count + boxesY2.Count + areasY.Count + areasY2.Count > 0)
             {
                 txt.AppendLine("f(x) = (sgn(x+1.2345e-30) + 1)/2");  //1 if x > 0, else 0. 1.2345e-30 added to avoid 0 becoming 0.5
-            }
+            }            
             
-            //int boxesCounter = 0;    
-            //boxesY = new List<int>();
-            //boxesY2 = new List<int>();
-            //areasY = new List<int>();
-            //areasY2 = new List<int>();
-            //numberOfY2s = 0;
             // ---------------------------------------
             // ---------------------------------------
             //          SECOND PASS
@@ -33675,7 +33572,6 @@ namespace Gekko
 
             txt.AppendLine(plotline);
 
-
             using (FileStream fs = WaitForFileStream(fileGp, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
@@ -33683,7 +33579,6 @@ namespace Gekko
                 tw.Flush(); //probably not necessary
                 tw.Close(); //probably not necessary
             }
-
 
             if (G.Equal(o.opt_dump, "yes"))
             {
@@ -33850,6 +33745,120 @@ namespace Gekko
             }
         }
 
+        private static void HandleXTicsInside(O.Prt o, EFreq highestFreq, bool firstXLabelFix, StringBuilder txt)
+        {
+            //TODO: if there are too many minor tics, turn them off
+            //TODO: if years get too cramped, show every second (even)
+            //TODO: if years get too cramped, show only 15, 16, 17, not 2015, 2016, 2017
+            //TODO: if years are still very cramped, switch to isInside = false!
+
+            //??? what about mixed freqs?? They can either be (a) only annual at-tics, and q and m are without tics
+            //                                             or (b) between-tics, showing highest freq if not too many minor, else next-highest.
+            //    with mixed freqs we treat is as highest frequency plot, and sneak in the lower freqs.
+            //OPTION plot xlabels nonannual = at | between | auto ;  //auto will start with between and then jump to at
+            //OPTION plot xlabels annual    = at | between | auto ;  //auto will start with between and then jump to at
+            //OPTION plot xlabels between truncate = digits | skip | both | auto ; 
+
+            double extra = 0;
+
+            int t1 = o.t1.super;
+            int t2 = o.t2.super;
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            int numberOfMinorTics = 1;
+            if (highestFreq == EFreq.Q)
+            {
+                numberOfMinorTics = 4;
+                extra = (double)o.t2.sub / (double)numberOfMinorTics;
+            }
+            else if (highestFreq == EFreq.M)
+            {
+                numberOfMinorTics = 12;
+                extra = (double)o.t2.sub / (double)numberOfMinorTics;
+            }
+            else if (highestFreq == EFreq.D)
+            {
+                numberOfMinorTics = 12; //we show month minor tics                    
+                extra = (double)o.t2.sub / (double)numberOfMinorTics;  //approximate, which is ok (sub will be months here)
+            }
+            else
+            {
+                numberOfMinorTics = 1;
+                extra = 1;
+            }
+
+            bool deduct = false;
+            if (extra <= 0.40) deduct = true;
+
+            if (Program.options.plot_xlabels_digits != 4 && Program.options.plot_xlabels_digits != 2)
+            {
+                G.Writeln2("*** ERROR: 'OPTION plot xlabels digits' should be either 4 or 2");
+                throw new GekkoException();
+            }
+
+            string ss = null;
+            for (int t = t1; t <= t2; t++)
+            {
+                int years = t2 - t1 + 1;
+                bool twoDigits = false;
+                if (Program.options.plot_xlabels_digits == 2) twoDigits = true;
+
+                int skip = 1;
+                if (twoDigits)
+                {
+                    if (years > 2 * 48) skip = 10;
+                    else if (years > 48) skip = 5;
+                    else if (years > 24) skip = 2;
+                }
+                else
+                {
+                    //4 digits
+                    if (years > 2 * 24) skip = 10;
+                    else if (years > 24) skip = 5;
+                    else if (years > 12) skip = 2;
+                }
+
+                string tx = t.ToString();
+                if (twoDigits) tx = (t % 100).ToString().PadLeft(2, '0');
+
+                if (skip > 1 && t % skip != 0) tx = null;  //all uneven are zapped
+
+                if (deduct && t == t2) tx = null;
+
+                string tlabel = "\"" + tx + "\"";
+
+                ss += tlabel + " " + t + " " + "0, ";  //0 is major tic
+
+                //========================================================================================================
+                //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                //========================================================================================================
+
+                if ((highestFreq == EFreq.M && years <= 25) || (highestFreq == EFreq.Q && years <= 75) || highestFreq == EFreq.D)
+                {
+                    for (int tt = 1; tt < numberOfMinorTics; tt++)  //is skipped if sub = 1
+                    {
+                        double d = (double)tt / (double)numberOfMinorTics;
+                        ss += (t + d) + " " + "1, ";  //1 is minor tic
+                    }
+                }
+            }
+
+            txt.AppendLine("set xtics (" + ss + ")");
+            txt.AppendLine("set xtics offset first 0.5, first 0");  //moves xtic labels a half year to the right, but not the tic itself
+            if (firstXLabelFix)
+            {
+                if ((highestFreq == EFreq.M && o.t1.freq == EFreq.M && o.t1.sub <= 1) || (highestFreq == EFreq.Q && o.t1.freq == EFreq.Q && o.t1.sub <= 1))  //these could perhaps be <=4 and <=2 respectively. Often the plot starts in first subperiod anyway.
+                {
+                    //only show whole first year if monthly and m1-m4 or quarterly and q1-q2
+                    double tStart = (double)t1 - 0.000000001d;                      //deducts a small number to activate the first x-axis label
+                    txt.AppendLine("set xrange [" + tStart.ToString() + ":]");      //see above
+                }
+            }
+        }
+
         private static bool SetYAxisText(string ytitle, StringBuilder txt, string font, bool isLeft)
         {
             bool setTitlePlaceholder;
@@ -33861,8 +33870,7 @@ namespace Gekko
 
         private static string PlotHandleLines(bool firstPass, ref int numberOfY2s, double[] minMax, double[] dataMin, double[] dataMax, O.Prt o, int count, List<string> labelsNonBroken, string file1, XmlNodeList lines3, List<int> boxesY, List<int> boxesY2, List<int> areasY, List<int> areasY2, XmlNode linetypeMain, XmlNode dashtypeMain, XmlNode linewidthMain, XmlNode linecolorMain, XmlNode pointtypeMain, XmlNode pointsizeMain, XmlNode fillstyleMain, bool stacked, List<string> palette2, bool isSeparated, double d_width, double d_width2, double d_width3, double left, List<O.Prt.Element> co, double linewidthCorrection, double pointsizeCorrection, bool isInside, EFreq highestFreq)
         {
-            int manyXValues = 0;  //0 or 1
-            int quarterFix = count - 1;
+            int manyXValues = 0;  //0 or 1            
 
             string plotline = "plot ";
 
@@ -34021,7 +34029,7 @@ namespace Gekko
                             for (int k = boxesYCounter - 1; k < boxesY.Count; k++)
                             {
                                 //see similar code below
-                                ss += "f($" + (boxesY[k] + quarterFix + 2) + "*$" + (boxesY[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY[k] + quarterFix + 2) + "+";
+                                ss += "f($" + (boxesY[k] + (count + 1)) + "*$" + (boxesY[boxesYCounter - 1] + (count + 1)) + ")*$" + (boxesY[k] + (count + 1)) + "+";
                             }
                         }
                         else
@@ -34030,7 +34038,7 @@ namespace Gekko
                             for (int k = boxesY2Counter - 1; k < boxesY2.Count; k++)
                             {
                                 //see similar code above
-                                ss += "f($" + (boxesY2[k] + quarterFix + 2) + "*$" + (boxesY2[boxesYCounter - 1] + quarterFix + 2) + ")*$" + (boxesY2[k] + quarterFix + 2) + "+";
+                                ss += "f($" + (boxesY2[k] + (count + 1)) + "*$" + (boxesY2[boxesYCounter - 1] + (count + 1)) + ")*$" + (boxesY2[k] + (count + 1)) + "+";
                             }
                         }
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1); //remove last '+'                       
@@ -34064,11 +34072,11 @@ namespace Gekko
 
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + (count + 1)) + ":(" + d_width2 + ")";
                         }
                         else
                         {
-                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")):" + (i + quarterFix + 2) + ":(" + d_width2 + ")";
+                            xAdjustment = "($" + (iii + 1) + " +(" + d + ")):" + (i + (count + 1)) + ":(" + d_width2 + ")";
                         }                        
                     }
                 }
@@ -34099,7 +34107,7 @@ namespace Gekko
                             for (int k = areasYCounter - 1; k < areasY.Count; k++)
                             {
                                 //see similar code below
-                                ss += "f($" + (areasY[k] + quarterFix + 2) + "*$" + (areasY[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY[k] + quarterFix + 2) + "+";
+                                ss += "f($" + (areasY[k] + (count + 1)) + "*$" + (areasY[areasYCounter - 1] + (count + 1)) + ")*$" + (areasY[k] + (count + 1)) + "+";
                             }
                         }
                         else
@@ -34107,7 +34115,7 @@ namespace Gekko
                             for (int k = areasY2Counter - 1; k < areasY2.Count; k++)
                             {
                                 //see similar code above
-                                ss += "f($" + (areasY2[k] + quarterFix + 2) + "*$" + (areasY2[areasYCounter - 1] + quarterFix + 2) + ")*$" + (areasY2[k] + quarterFix + 2) + "+";
+                                ss += "f($" + (areasY2[k] + (count + 1)) + "*$" + (areasY2[areasYCounter - 1] + (count + 1)) + ")*$" + (areasY2[k] + (count + 1)) + "+";
                             }
                         }
                         if (ss != null && ss.EndsWith("+")) ss = ss.Substring(0, ss.Length - 1);  //remove last '+'                       
@@ -34124,11 +34132,11 @@ namespace Gekko
                     {
                         if (isInside)
                         {
-                            xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + (count + 1));  //just normal positioning
                         }
                         else
                         {
-                            xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);  //just normal positioning
+                            xAdjustment = "" + (iii + 1) + ":" + (i + (count + 1));  //just normal positioning
                         }
                     }
                 }
@@ -34139,15 +34147,9 @@ namespace Gekko
                         minMax[4] = Math.Min(minMax[4], dataMin[i]);
                         minMax[5] = Math.Max(minMax[5], dataMax[i]);
                     }
-                    //if (isInside)
-                    //{                        
-                        xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + quarterFix + 2);
-                    //}
-                    //else
-                    //{
-                    //    xAdjustment = "" + (iii + 1) + ":" + (i + quarterFix + 2);
-                    //}
-                    //xAdjustment = "" + (quarterFix + 1) + ":" + (i + quarterFix + 2);
+                                
+                    xAdjustment = "($" + (iii + 1) + "+(" + GetXAdjustmentForInsideTics(isInside, highestFreq) + ")):" + (i + (count + 1));
+                    
                 }
 
                 //string xlabel = GnuplotText(label);
@@ -34291,7 +34293,7 @@ namespace Gekko
             return s2;            
         }
 
-        private static int HandleXTics(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics, EFreq highestFreq)
+        private static int HandleXTicsAt(List<string> labels1, List<string> labels2, ref string ticsTxt, int mxtics, EFreq highestFreq)
         {
             if (highestFreq == EFreq.A || highestFreq == EFreq.U)
             {
@@ -34302,7 +34304,7 @@ namespace Gekko
             {
                 List<int> subperiods;
                 int onlyYears;
-                mxtics = GnuplotHandleXAxisLabels(labels1, mxtics, out subperiods, out onlyYears);
+                mxtics = GnuplotHandleXAxisLabelsAt(labels1, mxtics, out subperiods, out onlyYears);
 
                 string s3 = null;
                 int c = -1;
@@ -34315,14 +34317,7 @@ namespace Gekko
                     if (onlyYears != -12345 && int.Parse(split[0]) % onlyYears != 0) continue;
                     if (subperiods.Contains(int.Parse(split[1])))
                     {
-                        string xx = labels2[i];
-                        //if (quarterFix == 1)
-                        //{
-                        //    if (Program.options.freq == EFreq.Q || Program.options.freq == EFreq.M)
-                        //    {
-                        //        xx = FromGnuplotDateToFloatingValue(split);
-                        //    }
-                        //}
+                        string xx = labels2[i];                        
                         s3 += "\"" + labels1[i] + "\" \"" + xx + "\", ";
                     }
                 }
@@ -34341,7 +34336,7 @@ namespace Gekko
             return ((double)int.Parse(split[0]) + ((double)int.Parse(split[1]) - 1d) / 12d).ToString();
         }
 
-        private static int GnuplotHandleXAxisLabels(List<string> labels1, int mxtics, out List<int> subperiods, out int onlyYears)
+        private static int GnuplotHandleXAxisLabelsAt(List<string> labels1, int mxtics, out List<int> subperiods, out int onlyYears)
         {
             subperiods = new List<int>();
             onlyYears = -12345;
