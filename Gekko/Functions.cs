@@ -79,7 +79,7 @@ namespace Gekko
                     G.Writeln2("*** ERROR: date(): expected year, month and day");
                     throw new GekkoException();
                 }
-                int day_int = O.ConvertToInt(d);
+                int day_int = O.ConvertToInt(day);
                 GekkoTime gt = new GekkoTime(EFreq.D, year_int, month_int, day_int);
                 return new ScalarDate(gt);
             }
