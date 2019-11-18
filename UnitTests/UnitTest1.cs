@@ -12115,40 +12115,45 @@ namespace UnitTests
 
         private static void _AssertSeries(IBank db, string s, int year, double x, double delta)
         {
-            _AssertSeries(db, s, null, EFreq.A, year, 1, year, 1, x, delta);
+            _AssertSeries(db, s, null, EFreq.A, year, 1, 1, year, 1, 1, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s, int year1, int year2, double x, double delta)
         {
-            _AssertSeries(db, s, null, EFreq.A, year1, 1, year2, 1, x, delta);
+            _AssertSeries(db, s, null, EFreq.A, year1, 1, 1, year2, 1, 1, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s, EFreq freq, int year, int subper, double x, double delta)
         {
-            _AssertSeries(db, s, null, freq, year, subper, year, subper, x, delta);
+            _AssertSeries(db, s, null, freq, year, subper, 1, year, subper, 1, x, delta);
+        }
+
+        private static void _AssertSeries(IBank db, string s, EFreq freq, int year, int subper, int subsubper, double x, double delta)
+        {
+            _AssertSeries(db, s, null, freq, year, subper, subsubper, year, subper, subsubper, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s, string[] indexes, int year, double x, double delta)
         {
-            _AssertSeries(db, s, indexes, EFreq.A, year, 1, year, 1, x, delta);
+            _AssertSeries(db, s, indexes, EFreq.A, year, 1, 1, year, 1, 1, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s, string[] indexes, int year1, int year2, double x, double delta)
         {
-            _AssertSeries(db, s, indexes, EFreq.A, year1, 1, year2, 1, x, delta);
+            _AssertSeries(db, s, indexes, EFreq.A, year1, 1, 1, year2, 1, 1, x, delta);
         }
 
         private static void _AssertSeries(IBank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
         {
-            _AssertSeries(db, s, indexes, freq, year, subper, year, subper, x, delta);
+            _AssertSeries(db, s, indexes, freq, year, subper, 1, year, subper, 1, x, delta);
         }
 
-        private static void _AssertSeries(IBank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
+        private static void _AssertSeries(IBank db, string s2, string[] indexes, EFreq freq, int year1, int sub1, int subsub1, int year2, int sub2, int subsub2, double x, double delta)
         {
             string s = G.Chop_FreqAdd(s2, Program.options.freq);
 
-            GekkoTime t1 = new GekkoTime(freq, year1, sub1);
-            GekkoTime t2 = new GekkoTime(freq, year2, sub2);
+            GekkoTime t1 = new GekkoTime(freq, year1, sub1, subsub1);
+            GekkoTime t2 = new GekkoTime(freq, year2, sub2, subsub2);
 
             if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
 
@@ -12178,65 +12183,6 @@ namespace UnitTests
             }
         }
 
-
-        //private static void AssertHelper(Databank db, string s, int year, double x, double delta)
-        //{
-        //    AssertHelper(db, s, null, EFreq.A, year, 1, year, 1, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, int year1, int year2, double x, double delta)
-        //{
-        //    AssertHelper(db, s, null, EFreq.A, year1, 1, year2, 1, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, EFreq freq, int year, int subper, double x, double delta)
-        //{
-        //    AssertHelper(db, s, null, freq, year, subper, year, subper, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, string[] indexes, int year, double x, double delta)
-        //{
-        //    AssertHelper(db, s, indexes, EFreq.A, year, 1, year, 1, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, string[] indexes, int year1, int year2, double x, double delta)
-        //{
-        //    AssertHelper(db, s, indexes, EFreq.A, year1, 1, year2, 1, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year, int subper, double x, double delta)
-        //{
-        //    AssertHelper(db, s, indexes, freq, year, subper, year, subper, x, delta);
-        //}
-
-        //private static void AssertHelper(Databank db, string s, string[] indexes, EFreq freq, int year1, int sub1, int year2, int sub2, double x, double delta)
-        //{
-        //    GekkoTime t1 = new GekkoTime(freq, year1, sub1);
-        //    GekkoTime t2 = new GekkoTime(freq, year2, sub2);
-
-        //    if (t1.StrictlyLargerThan(t2)) throw new GekkoException();
-
-        //    IVariable[] indexes2 = null;
-
-        //    string name = null;
-
-        //    if (indexes != null)
-        //    {
-        //        name = s + Globals.symbolTurtle + Series.GetHashCodeFromIvariables(indexes);
-        //    }
-        //    else
-        //    {
-        //        name = s;
-        //    }
-
-        //    Series ts = db.GetVariable(freq, name);
-
-        //    foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-        //    {
-        //        double y = ts.GetDataNonLight(t);
-        //        _AssertHelperTwoDoubles(x, y, delta);
-        //    }
-        //}
 
         private static void _AssertHelperTwoDoubles(double x, double y, double delta)
         {
@@ -13969,6 +13915,100 @@ namespace UnitTests
 
         }
 
+        [TestMethod]
+        public void _Test_DateConversions()
+        {
+            //Note: O.GetDateChoices.Strict only works for D freq
+
+
+            //ConvertFreqs() is not tested, but we assume it is ok (has been used a long time)
+
+            // ------------- converting from GekkoTime to DateTime
+
+            //From Gekko A to DateTime
+            GekkoTime gt = new GekkoTime(EFreq.A, 2001, 1);
+            DateTime dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 1); Assert.AreEqual(dt.Day, 1);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleEnd);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 12); Assert.AreEqual(dt.Day, 31);
+
+            //From Gekko Q to DateTime
+            gt = new GekkoTime(EFreq.Q, 2001, 3);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 7); Assert.AreEqual(dt.Day, 1);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleEnd);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 9); Assert.AreEqual(dt.Day, 30);
+
+            //From Gekko M to DateTime
+            gt = new GekkoTime(EFreq.M, 2001, 3);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 3); Assert.AreEqual(dt.Day, 1);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleEnd);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 3); Assert.AreEqual(dt.Day, 31);
+
+            //From Gekko D to DateTime
+            gt = new GekkoTime(EFreq.D, 2001, 3, 10);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleStart);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 3); Assert.AreEqual(dt.Day, 10);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.FlexibleEnd);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 3); Assert.AreEqual(dt.Day, 10);
+            dt = GekkoTime.FromGekkoTimeToDateTime(gt, O.GetDateChoices.Strict);
+            Assert.AreEqual(dt.Year, 2001); Assert.AreEqual(dt.Month, 3); Assert.AreEqual(dt.Day, 10);
+
+            // ------------- converting from DateTime to GekkoTime
+
+            //from DateTime to GekkoTime A
+            dt = new DateTime(2001, 4, 15);
+            gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.A, dt);
+            Assert.AreEqual(gt.super, dt.Year, gt.super); Assert.AreEqual(gt.sub, 1); Assert.AreEqual(gt.subsub, 1);
+
+            //from DateTime to GekkoTime Q
+            gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.Q, dt);
+            Assert.AreEqual(gt.super, dt.Year, gt.super); Assert.AreEqual(gt.sub, GekkoTime.FromMonthToQuarter(dt.Month)); Assert.AreEqual(gt.subsub, 1);
+
+            //from DateTime to GekkoTime M
+            gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.M, dt);
+            Assert.AreEqual(gt.super, dt.Year, gt.super); Assert.AreEqual(gt.sub, dt.Month); Assert.AreEqual(gt.subsub, 1);
+
+            //from DateTime to GekkoTime D
+            gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, dt);
+            Assert.AreEqual(gt.super, dt.Year, gt.super); Assert.AreEqual(gt.sub, dt.Month); Assert.AreEqual(gt.subsub, dt.Day);
+                                          
+        }
+
+        //[TestMethod]
+        //public void _Test_ImportDailyFromXlsx()
+        //{
+        //    for (int e = 0; e < 2; e++)
+        //    { //engine
+
+        //        for (int j = 0; j < 2; j++)
+        //        {
+
+        //            string filename = "datapoints";
+        //            if (j == 1) filename = "datapoints2";
+        //            string extra = null;
+        //            if (j == 1) extra = " sheet='data2' cols cell='d5'  namecell='d2'  datecell='b5' ";
+
+        //            I("RESET;");
+        //            if (e == 0) I("OPTION sheet engine = excel;");
+        //            else I("OPTION sheet engine = internal;");
+
+        //            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+        //            I("OPTION freq d;");
+        //            I("IMPORT<xlsx " + extra + " datetype='excel'>" + filename + ";");
+        //            for (int i = 1; i <= 2; i++)
+        //            {
+        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, sharedDelta);
+        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, 1d);
+        //                //_AssertSeries(First(), "ts1!d", EFreq.M, 2017, 11, double.NaN, 1d);
+        //            }
+        //        }
+        //    }
+        //}
+    
+
+        // =================== COLLAPSE METHOD        
 
         [TestMethod]
         public void _Test_Collapse()
@@ -15441,11 +15481,26 @@ namespace UnitTests
         [TestMethod]
         public void _Test_TimeSeries()
         {
-            //Test of daily frequency
+            //Test of daily frequency. We assume that the resizing and using arrays just works, is tested thoroughly 
+            //for A, Q, M freqs.
+            Series tsD1 = new Series(EFreq.D, "test!d");
+            GekkoTime t1 = new GekkoTime(EFreq.D, 2010, 1, 1);
+            GekkoTime t2 = new GekkoTime(EFreq.D, 2020, 1, 1);  //10 years, 3650 obs
+            tsD1.SetData(t1.Add(500), 0d);  //just to be mean, around 2011m5, so that array must resize two ways
+            int c5 = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                c5++;
+                tsD1.SetData(t, c5);
+            }
+            c5 = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {                
+                c5++;                
+                Assert.AreEqual(tsD1.GetDataSimple(t), (double)c5);  //we are not reading from a bank, keep it fast!               
+            }
 
-
-            
-            //Chreates long timeseries running from 1500 to 3000 yers (a, q or m, so many periods for q and m).
+            //Chreates long timeseries running from 1500 to 3000 years (a, q or m, so many periods for q and m).
             //For putting data in: testing both SetData() and GetDataSequence() and setting the array value.
             //Testing that the data reads out correctly, both with GetData() and GetDataSequence()
             //Puts in 1500 / 1501 etc. for 'a', 1500.01 / 1500.02 / 1500.03 / 1500.04 / 1501.01 etc. for 'q'
@@ -16732,30 +16787,30 @@ namespace UnitTests
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2011, 1, 1d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2012, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 1, 2011, 4, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 1, 1, 2011, 4, 1, 2d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2012, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2010, 12, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 1, 2011, 12, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 1, 1, 2011, 12, 1, 3d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2012, 1, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011q2 2011q3>mixed;");
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2010, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2011, 1, 1d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2012, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2011, 1, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 2, 2011, 3, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 2, 1, 2011, 3, 1, 2d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2011, 4, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2011, 3, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 4, 2011, 9, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 4, 1, 2011, 9, 1, 3d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2011, 10, double.NaN, sharedDelta);
                     I("RESET; IMPORT<2011m2 2011m4>mixed;");
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2010, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2011, 1, 1d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx1!a", EFreq.A, 2012, 1, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2010, 4, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 1, 2011, 2, 2d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx2!q", null, EFreq.Q, 2011, 1, 1, 2011, 2, 1, 2d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx2!q", EFreq.Q, 2011, 3, double.NaN, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2011, 1, double.NaN, sharedDelta);
-                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 2, 2011, 4, 3d, sharedDelta);
+                    _AssertSeries(Program.databanks.GetFirst(), "xx3!m", null, EFreq.M, 2011, 2, 1, 2011, 4, 1, 3d, sharedDelta);
                     _AssertSeries(Program.databanks.GetFirst(), "xx3!m", EFreq.M, 2011, 5, double.NaN, sharedDelta);
                     FAIL("IMPORT<2011u1 2011u1>mixed;");
                     FAIL("IMPORT<2011 2011q1>mixed;");
@@ -18283,12 +18338,14 @@ namespace UnitTests
             // testing on annual
 
             List<string> other = new List<string>();
-            other.Add(null);
-            //if (Globals.UNITTESTFOLLOWUP_important) other.Add("other:");
+            other.Add(null);            
             other.Add("other:");
 
             foreach (string bank in other)
             {
+
+
+                // testing annual
 
                 I("RESET;");
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
@@ -18624,19 +18681,16 @@ namespace UnitTests
 
                     // ------ xlsx cells with SHEET and SHEET<import>
                     {
-                        if (Globals.UNITTESTFOLLOWUP_important)
-                        {
-                            I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
-                            if (i == 0) I("OPTION sheet engine = internal;");
-                            else I("OPTION sheet engine = excel;");
-                            if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
-                            I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
-                            I("RESET; OPTION freq q;");  //must tell Gekko what freq
-                            I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
-                            ReadFormatsHelper("q", bank);
+                        I("RESET; OPTION freq q; TIME 2001q1 2001q2; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("SHEET <2001q1 2001q2 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET; OPTION freq q;");  //must tell Gekko what freq
+                        I("SHEET <2001q1 2001q2 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                        ReadFormatsHelper("q", bank);
 
-                            //TODO: <cols>
-                        }
+                        //TODO: <cols>
                     }
                 }
                 // ------ gnuplot (not actually testing the file)
@@ -18661,42 +18715,185 @@ namespace UnitTests
                     I("READ<flat>temp;");
                     ReadFormatsHelper("q", bank);                    
                 }
+
+                // ---------- Testing on days
+                // ---------- Testing on days
+                // ---------- Testing on days
+                // ---------- Testing on days
+                // ---------- Testing on days
+                // ---------- Testing on days
+
+                I("RESET;");
+                Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\temp';");
+                I("OPTION freq d;");
+                // ------ gbk
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    I("WRITE<" + Globals.extensionDatabank + ">temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ gbk, selection
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = 1001, 1002; SER xx3 = 3001, 3002;");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = 4001, 4002; CLOSE other; OPEN other;");
+                    I("WRITE<" + Globals.extensionDatabank + ">xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<" + Globals.extensionDatabank + ">temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ tsd
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<tsd>temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ tsd, selection
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<tsd>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET;");
+                    I("READ<tsd>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ csv
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 csv>temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("d", bank);
+
+                    //cols
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 csv cols>temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<csv cols>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ csv, selection
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2001m4d30 2001m5d1 csv>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<csv>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ prn
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 prn>temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("d", bank);
+
+                    //cols
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 prn cols>temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<prn cols>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                // ------ prn, selection
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2001m4d30 2001m5d1 prn>xx1, " + bank + "xx3 file=temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<prn>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+                if (Globals.UNITTESTFOLLOWUP)
+                {
+                    //removed PIA interop xlsx checks below
+                    //cannot get xlsx writing to work on new pc.
+                    //and it is bad anyway.
+                }
+                // ------ xlsx
+                for (int i = 0; i < 1; i++)  //was: 2
+                {
+                    if (bank == null)
+                    {
+                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx>temp;");
+                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("d", bank);
+
+                        //cols
+                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        I("WRITE<xlsx cols>temp;");
+                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                        I("READ<xlsx cols>temp;");
+                        ReadFormatsHelper("d", bank);
+                    }
+                    // ------ xlsx, selection
+                    {
+                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("WRITE<xlsx>xx1, " + bank + "xx3 file=temp;");
+                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                        I("READ<xlsx>temp;");
+                        ReadFormatsHelper("d", bank);
+                    }
+
+                    // ------ xlsx cells with SHEET and SHEET<import>
+                    {
+
+                        I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                        if (i == 0) I("OPTION sheet engine = internal;");
+                        else I("OPTION sheet engine = excel;");
+                        if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                        I("SHEET <2001m4d30 2001m5d1 SHEET='test' CELL='C5' DATES=no NAMES=no COLORS=no> xx1, " + bank + "xx3 file=temp;");  //export
+                        I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                        I("SHEET <2001m4d30 2001m5d1 IMPORT SHEET='test' CELL='C5'> xx1, xx3 file=temp;");  //import            
+                        ReadFormatsHelper("d", bank);
+
+                        //TODO: <cols>
+
+                    }
+                }
+                // ------ gnuplot (not actually testing the file)
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 gnuplot>temp;");
+                }
+                // ------ gnuplot, selection  (not actually testing the file)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    if (bank != null) I("OPEN <edit> other; CLEAR other;  SER xx3 = (4001, 4002); CLOSE other; OPEN other;");
+                    I("WRITE<2001m4d30 2001m5d1 gnuplot>xx1, " + bank + "xx3 file=temp;");
+                }
+
+                // ------ flat
+                if (bank == null)
+                {
+                    I("RESET; OPTION freq d; TIME 2001m4d30 2001m5d1; SER xx1 = (1001, 1002); SER xx3 = (3001, 3002);");
+                    I("WRITE<2001m4d30 2001m5d1 flat>temp;");
+                    I("RESET; OPTION freq d;");  //must tell Gekko what freq
+                    I("READ<flat>temp;");
+                    ReadFormatsHelper("d", bank);
+                }
+
+
             }
-
-
-            // ----------------------------- testing px reading ---------------------
-            // this downloads the px:             //I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
-            // Note varegruppe instead of VAREGR
-
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("IMPORT <px all> data;");
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
-                        
-            //Truncated time period
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");            
-            I("IMPORT <2000m2 2001m3 px> data;");
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, double.NaN, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 2, 97.8, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 2, 98.7, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 4, double.NaN, sharedDelta);
-            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 4, double.NaN, sharedDelta);
-
-            //Another px-file, with blanks and parentheses in stub
-            I("RESET;");
-            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
-            I("IMPORT <px all> prod01;");            
-            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC!m", EFreq.M, 2017, 3, 119.9d, sharedDelta);
-            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001!m", EFreq.M, 2017, 3, 106.5d, sharedDelta);
-            
-
         }
 
         private static void ReadFormatsHelper(string freq, string bank)
@@ -18725,6 +18922,17 @@ namespace UnitTests
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 3002, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
+                else if (freq == "d")
+                {
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 4, 29, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 4, 30, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 5, 1, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 5, 2, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 4, 29, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 4, 30, 3001, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 5, 1, 3002, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 5, 2, double.NaN, sharedDelta);
+                }
                 else throw new GekkoException();
             }
             else
@@ -18751,10 +18959,61 @@ namespace UnitTests
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 2, 4002, sharedDelta);
                     _AssertSeries(First(), "xx3!q", EFreq.Q, 2001, 3, double.NaN, sharedDelta);
                 }
+                else if (freq == "d")
+                {
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 4, 29, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 4, 30, 1001, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 5, 1, 1002, sharedDelta);
+                    _AssertSeries(First(), "xx1!d", EFreq.D, 2001, 5, 2, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 4, 29, double.NaN, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 4, 30, 4001, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 5, 1, 4002, sharedDelta);
+                    _AssertSeries(First(), "xx3!d", EFreq.D, 2001, 5, 2, double.NaN, sharedDelta);
+                }
                 else throw new GekkoException();
             }
+        }
+
+        [TestMethod]
+        public void _Test_PxRead()
+        {
+
+
+            // ----------------------------- testing px reading ---------------------
+            // this downloads the px:             //I("DOWNLOAD http://api.statbank.dk/v1/data statbank.json dump = data;");
+            // Note varegruppe instead of VAREGR
+
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("IMPORT <px all> data;");
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, 98.1d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, 98.3d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+
+            //Truncated time period
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("IMPORT <2000m2 2001m3 px> data;");
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 1, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2000, 2, 97.8, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2000, 2, 98.7, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 3, 102.9d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 3, 103.1d, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011200_enhed_100!m", EFreq.M, 2001, 4, double.NaN, sharedDelta);
+            _AssertSeries(First(), "pris6_VAREGRuppe_011100_enhed_100!m", EFreq.M, 2001, 4, double.NaN, sharedDelta);
+
+            //Another px-file, with blanks and parentheses in stub
+            I("RESET;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Databanks\';");
+            I("IMPORT <px all> prod01;");
+            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_BC!m", EFreq.M, 2017, 3, 119.9d, sharedDelta);
+            _AssertSeries(First(), "PROD01_saesonkorrigering_EJSAESON_brancheDB07_10001!m", EFreq.M, 2017, 3, 106.5d, sharedDelta);
 
         }
+
+
 
         [TestMethod]
         public void _Test_ExportR()
@@ -18996,6 +19255,9 @@ namespace UnitTests
         [TestMethod]
         public void _Test_PlotCombo()
         {
+            Assert.Inconclusive(Globals.unitTestIntegrationMessage);
+            return;
+
             //!!!!!!!
             //!!!!!!!
             //!!!!!!!
@@ -19006,6 +19268,7 @@ namespace UnitTests
             //----------------- this must be compared manually ----------
             //----------------- look in the \truth subfolder ------------
             //-----------------------------------------------------------
+
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\plotcombo\';");            

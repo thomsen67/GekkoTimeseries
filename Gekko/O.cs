@@ -2619,7 +2619,7 @@ namespace Gekko
             {
                 try
                 {
-                    GekkoTime gt = G.FromStringToDate(value.Trim());
+                    GekkoTime gt = GekkoTime.FromStringToGekkoTime(value.Trim());
                     iv = new ScalarDate(gt);
 
                 }
@@ -10284,11 +10284,7 @@ namespace Gekko
         }
 
         public class Collapse
-        {
-            //public string b0 = null;
-            //public string b1 = null;
-            //public string v0 = null;
-            //public string v1 = null;
+        {            
             public List lhs = null;
             public List rhs = null;
             public string type = null;

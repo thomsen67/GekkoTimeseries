@@ -436,7 +436,7 @@ namespace Gekko
         {
             G.Writeln2("*** ERROR: Could not convert the string '" + this.string2 + "' directly into a date.");
             G.Writeln("           You may try the date() conversion function.");
-            GekkoTime gt = G.FromStringToDate(this.string2);            
+            GekkoTime gt = GekkoTime.FromStringToGekkoTime(this.string2);            
             if (this.isFromNakedList && !gt.IsNull())
             {
                 G.Writeln("           Note that the " + G.GetTypeString(this) + " '" + this.string2 + "' origins from a");

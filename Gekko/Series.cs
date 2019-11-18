@@ -1157,23 +1157,31 @@ namespace Gekko
             else if (this.freq == EFreq.M) subPeriods = 12;
             else if (this.freq == EFreq.U) subPeriods = 1;
 
-            //Calculates the period by means of using the anchor. Uses integer division, so there is an
-            //implicit modulo calculation here.
-            int sub1 = this.data.anchorPeriod.sub + (indexInDataArray - this.GetAnchorPeriodPositionInArray());
-            int addPer = (sub1 - 1) / subPeriods;
-            int addSub = (indexInDataArray - this.GetAnchorPeriodPositionInArray()) - subPeriods * addPer;
-
-            int resultSuperPer = this.data.anchorPeriod.super + addPer;
-            int resultSubPer = this.data.anchorPeriod.sub + addSub;
-
-            //This code below fixes a bug (1.4 suffers from it: only affects non-annual timeseries), bug fixed in 1.5.8
-            if (resultSubPer < 1)  //this may happen, probaby because of "/" on integer not behaving as expected
+            if (this.freq == EFreq.D)
             {
-                resultSuperPer -= 1;
-                resultSubPer += subPeriods;
+                int offset = indexInDataArray - this.GetAnchorPeriodPositionInArray();
+                return this.data.anchorPeriod.Add(offset);
             }
-            GekkoTime t = new GekkoTime(this.freq, resultSuperPer, resultSubPer);
-            return t;
+            else
+            {
+                //Calculates the period by means of using the anchor. Uses integer division, so there is an
+                //implicit modulo calculation here.
+                int sub1 = this.data.anchorPeriod.sub + (indexInDataArray - this.GetAnchorPeriodPositionInArray());
+                int addPer = (sub1 - 1) / subPeriods;
+                int addSub = (indexInDataArray - this.GetAnchorPeriodPositionInArray()) - subPeriods * addPer;
+
+                int resultSuperPer = this.data.anchorPeriod.super + addPer;
+                int resultSubPer = this.data.anchorPeriod.sub + addSub;
+
+                //This code below fixes a bug (1.4 suffers from it: only affects non-annual timeseries), bug fixed in 1.5.8
+                if (resultSubPer < 1)  //this may happen, probaby because of "/" on integer not behaving as expected
+                {
+                    resultSuperPer -= 1;
+                    resultSubPer += subPeriods;
+                }
+                return new GekkoTime(this.freq, resultSuperPer, resultSubPer);
+            }
+            
         }
 
         // -----------------------------------------------------------------------------

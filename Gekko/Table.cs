@@ -1636,8 +1636,8 @@ namespace Gekko
         public void SetDates(int col, string date1, string date2)
         {
             //Is probably obsolete, see method below
-            GekkoTime gt1 = G.FromStringToDate(date1);
-            GekkoTime gt2 = G.FromStringToDate(date2);
+            GekkoTime gt1 = GekkoTime.FromStringToGekkoTime(date1);
+            GekkoTime gt2 = GekkoTime.FromStringToGekkoTime(date2);
             _table.SetDates(_row, col, gt1, gt2);
         }
         public void SetDates(int col, GekkoTime gt1, GekkoTime gt2)
@@ -1646,8 +1646,8 @@ namespace Gekko
         }
         public void SetValues(int col, string name, string date1, string date2, string printcodes, double scale, string format)
         {
-            GekkoTime gt1 = G.FromStringToDate(date1);
-            GekkoTime gt2 = G.FromStringToDate(date2);
+            GekkoTime gt1 = GekkoTime.FromStringToGekkoTime(date1);
+            GekkoTime gt2 = GekkoTime.FromStringToGekkoTime(date2);
             _table.Set(_row, col, name, gt1, gt2, printcodes, scale, format);
         }
         public void SetValues(int col, Series tsWork, Series tsBase, string varName, GekkoTime gt1, GekkoTime gt2, string tableGlobalPrintCode, string printcode, double scale, string format)

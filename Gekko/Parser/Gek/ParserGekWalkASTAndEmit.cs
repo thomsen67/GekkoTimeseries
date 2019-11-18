@@ -1651,7 +1651,7 @@ namespace Gekko.Parser.Gek
                             //TODO: FromStringToDate() depends upon current freq -- fix that!
                             //TODO:
                             //TODO:
-                            node.Code.A("new ScalarDate(G.FromStringToDate(`" + node[0].Text + "`))");
+                            node.Code.A("new ScalarDate(GekkoTime.FromStringToGekkoTime(`" + node[0].Text + "`))");
                         }
                         break;
                     case "ASTDATES":

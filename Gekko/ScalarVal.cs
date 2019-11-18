@@ -68,6 +68,10 @@ namespace Gekko
 
         public GekkoTime ConvertToDate(O.GetDateChoices c)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             GekkoTime gt = GekkoTime.tNull;
             int intValue = O.ConvertToInt(this);  //will issue error if the VAL is not an integer            
             if (c == O.GetDateChoices.Strict || (c != O.GetDateChoices.Strict && (Program.options.freq == EFreq.A || Program.options.freq == EFreq.U)))
@@ -103,6 +107,19 @@ namespace Gekko
                     if (c == O.GetDateChoices.FlexibleStart) sub = 1;
                     else if (c == O.GetDateChoices.FlexibleEnd) sub = 12;
                     gt = new GekkoTime(EFreq.M, year, sub);
+                }
+                else if (Program.options.freq == EFreq.D)
+                {
+                    int sub = 1;
+                    if (c == O.GetDateChoices.FlexibleStart)
+                    {                        
+                        gt = new GekkoTime(EFreq.D, year, 1, 1);
+                    }
+                    else if (c == O.GetDateChoices.FlexibleEnd)
+                    {                        
+                        gt = new GekkoTime(EFreq.D, year, 12, 31);
+                    }
+                    
                 }
             }            
             return gt;

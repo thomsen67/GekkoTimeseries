@@ -3429,7 +3429,7 @@ namespace Gekko
                     }
                     else
                     {
-                        GekkoTime t = G.FromStringToDate(absoluteTime);
+                        GekkoTime t = GekkoTime.FromStringToGekkoTime(absoluteTime);
                         //wh2.rightHandSideCsCode.Append(bank + ".GetVariable(Program.SubstituteAssignVars(" + Globals.QT + variableSubst + Globals.QT + ")).GetData(new GekkoTime(" + t.year + ", " + t.sub + "))");
                         wh2.rightHandSideCsCode.Append("Program.GetData(`" + variableSubst + "`, " + bank + ", new GekkoTime(" + t.super + ", " + t.sub + "))");
                     }

@@ -3361,7 +3361,7 @@ namespace Gekko
             else if (x.Type() == EVariableType.String)
             {
                 string s = ((ScalarString)x).string2;
-                d = G.FromStringToDate(s);
+                d = GekkoTime.FromStringToGekkoTime(s);
             }
             else if (x.Type() == EVariableType.List)
             {

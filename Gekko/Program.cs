@@ -1595,6 +1595,11 @@ namespace Gekko
                         //DATES ROW
                         //---------------------
 
+                        //========================================================================================================
+                        //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                        //========================================================================================================
+                        // There is a lot of date stuff below
+
                         string cellText = null;
                         if (cell.type != ECellLightType.None)
                         {
@@ -1625,9 +1630,8 @@ namespace Gekko
                         date = date.Trim();  //removes blanks at start and end
                         date = date.ToLower();  //if q or m (or y)
 
-                        int per = -12345;
-                        int subPer = -12345;
-
+                        GekkoTime gt = new GekkoTime(0, 0, 0); //will not activate .IsNull() == true
+                        
                         if (G.Equal(datetype, "excel"))
                         {
                             if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
@@ -1656,7 +1660,7 @@ namespace Gekko
                             //TODO
                             //TODO
 
-                            per = FromDateTimeToGekkoTime(freqHere, ref subPer, dt);
+                            gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);                            
                         }
                         else
                         {
@@ -1666,89 +1670,64 @@ namespace Gekko
                             {
                                 //no format given, Gekko date format expected
 
+                                bool error = false;
+
                                 if ((freqHere == EFreq.A))
                                 {
-                                    if (date.EndsWith(annualIndicator1, true, null))
+                                    if (date.Length == 5 && date.EndsWith(annualIndicator1, true, null))
                                     {
                                         //remove 'Y' if it is there
                                         date = date.Remove(date.Length - 1);
-                                    }
-                                    else if (date.EndsWith(annualIndicator2, true, null))
-                                    {
-                                        //remove 'A1' if it is there
-                                        date = date.Remove(date.Length - 2);
-                                    }
+                                    }                                    
                                 }
 
-                                int per777 = -12345;
-                                int subPer777 = -12345;
-
-                                string perTemp = "";
-                                string subPerTemp = "";
-                                if ((freqHere == EFreq.A) || (freqHere == EFreq.U))  //ttfreq
+                                if (G.IsInteger(date) && date.Length > 5)
                                 {
-                                    perTemp = date;
-                                    subPerTemp = "1";
-                                }
-                                else
-                                {
-                                    bool success = false;
-                                    string[] temp = date.Split(new string[] { G.GetFreq(freqHere) }, StringSplitOptions.None);
-                                    if (temp.Length != 2)
+                                    if (date.Length == 6)
                                     {
-                                        if (date.Length == 6 && G.IsInteger(date))
-                                        {
-                                            //It might be a date like 199503, that is, 1995q3 or 1995m3
-                                            perTemp = date.Substring(0, 4);
-                                            subPerTemp = date.Substring(4, 2);
-                                            success = true;
-                                        }
+                                        //It might be a date like 199503, that is, 1995q3 or 1995m3
+                                        //We have to use the global freq here, how else to know the freq??
+                                        gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
+                                    }
+                                    else if (date.Length == 8)
+                                    {
+                                        //It might be a date like 19950302, that is, 1995m3d2
+                                        gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
                                     }
                                     else
                                     {
-                                        perTemp = temp[0];
-                                        subPerTemp = temp[1];
-                                        success = true;
-                                    }
-                                    if (!success)
-                                    {
-                                        G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
-                                        G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-                                        throw new GekkoException();
+                                        error = true;
                                     }
                                 }
-                                try
+                                else
                                 {
-                                    per777 = int.Parse(perTemp);
-                                    subPer777 = int.Parse(subPerTemp);
+                                    gt = GekkoTime.FromStringToGekkoTime(date, true, false);
+                                    if (gt.IsNull()) error = true;
                                 }
-                                catch
+                                                                                             
+                                if (error)
                                 {
-                                    G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not understand this date: '" + date + "'");
+                                    G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
                                     G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
                                     throw new GekkoException();
                                 }
-                                per = per777;
-                                subPer = subPer777;
+
                             }
                             else
                             {
                                 //non-Gekko date format
-
-                                //we have a yyyy-mm-dd-like format that we need to look inot
+                                //we have a yyyy-mm-dd-like format that we need to look into
                                 DateTime dt = G.DateHelper4(format, date);
-                                per = FromDateTimeToGekkoTime(freqHere, ref subPer, dt);
+                                gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
                             }
                         }
 
-                        if (readInfo.startPerInFile == -12345) readInfo.startPerInFile = per;
-                        if (readInfo.endPerInFile == -12345) readInfo.endPerInFile = per;
+                        if (readInfo.startPerInFile == -12345) readInfo.startPerInFile = gt.super;
+                        if (readInfo.endPerInFile == -12345) readInfo.endPerInFile = gt.super;
                         else
                         {
-                            if (per > readInfo.endPerInFile) readInfo.endPerInFile = per;
-                        }
-
-                        GekkoTime gt = new GekkoTime((Program.options.freq), per, subPer);
+                            if (gt.super > readInfo.endPerInFile) readInfo.endPerInFile = gt.super;
+                        }                        
 
                         if (col - colOffset == 2)
                         {
@@ -1902,29 +1881,7 @@ namespace Gekko
             return format == null || G.Equal(format, "gekko");
         }
 
-        private static int FromDateTimeToGekkoTime(EFreq freqHere, ref int subPer, DateTime dt)
-        {
-            int per = dt.Year;
-            if (freqHere == EFreq.A)
-            {
-                subPer = 1;
-            }
-            else if (freqHere == EFreq.Q)
-            {
-                subPer = GekkoTime.FromMonthToQuarter(dt.Month);
-            }
-            else if (freqHere == EFreq.M)
-            {
-                subPer = dt.Month;
-            }
-            else if (freqHere == EFreq.U)
-            {
-                G.Writeln2("*** ERROR: Cannot convert date to undated frequency");
-                throw new GekkoException();
-            }
-
-            return per;
-        }
+        
 
         private static bool IsNonAvailableText(string text)
         {
@@ -2974,7 +2931,11 @@ namespace Gekko
                             {
                                 int sub = -12345;
                                 EFreq freq = Program.options.freq;
-                                int super = Program.FromDateTimeToGekkoTime(freq, ref sub, cell.dateTime);  //uses current freq                                
+                                //uses current freq 
+                                GekkoTime gt5 = GekkoTime.FromDateTimeToGekkoTime(freq, cell.dateTime);
+                                int super = gt5.super;
+                                sub = gt5.sub;
+
                                 iv = new ScalarDate(new GekkoTime(freq, super, sub));
                             }
                             else if (cell.type == ECellLightType.Double)
@@ -3760,7 +3721,7 @@ namespace Gekko
                 int ii = 0;
                 int d1min = int.MaxValue;
                 int d2max = int.MinValue;
-                int d1 = 0, d1sub = 0, d2 = 0, d2sub = 0;
+                int d1 = 0, d1sub = 0, d2 = 0, d2sub = 0; int d1subsub = 0; int d2subsub = 0;
                 int countdata = 0;
                 int obs = 0;
                 int obsLeft = 0;
@@ -3793,28 +3754,16 @@ namespace Gekko
 
                             //read stamp
                             string stamp = line.Substring(32, 8).Trim();
-                            //if (stamp.Length > 0)  //catcing is timeconsuming, and it does not work properly anyway
-                            //{
-                            //    try
-                            //    {
-                            //        // #80927435209843
-                            //        int i1 = int.Parse(stamp.Substring(0, 2)); //month
-                            //        int i2 = int.Parse(stamp.Substring(3, 2)); //day
-                            //        int i3 = int.Parse(stamp.Substring(6, 2)); //year
-                            //        if (i3 > 80) i3 = 1900 + i3;  //will work until 2080!
-                            //        else i3 = 2000 + i3;
-                            //        stamp = stamp.Substring(3, 2) + "-" + stamp.Substring(0, 2) + "-" + i3;
-                            //    }
-                            //    catch { };
-
-                            //}
-
+                            
                             //read date
                             int iiStart = 37;
                             string date1 = line.Substring(iiStart + 7, 4);
                             string date1sub = line.Substring(iiStart + 11, 2);
+                            string date1subsub = line.Substring(iiStart + 13, 2);
                             string date2 = line.Substring(iiStart + 15, 4);
                             string date2sub = line.Substring(iiStart + 19, 2);
+                            string date2subsub = line.Substring(iiStart + 21, 2);
+                            frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m or d
                             try
                             {
                                 d1 = int.Parse(date1);
@@ -3832,6 +3781,18 @@ namespace Gekko
                             {
                                 G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1sub + "' as an int (start sub-period)");
                                 throw new GekkoException();
+                            }
+                            if (frequency == "d")
+                            {
+                                try
+                                {
+                                    d1subsub = int.Parse(date1subsub);
+                                }
+                                catch
+                                {
+                                    G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date1subsub + "' as an int (start day)");
+                                    throw new GekkoException();
+                                }
                             }
                             try
                             {
@@ -3851,7 +3812,18 @@ namespace Gekko
                                 G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2sub + "' as an int (end sub-period)");
                                 throw new GekkoException();
                             }
-                            frequency = line.Substring(iiStart + 23, 1).ToLower(); //a or q or m
+                            if (frequency == "d")
+                            {
+                                try
+                                {
+                                    d2subsub = int.Parse(date2subsub);
+                                }
+                                catch
+                                {
+                                    G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2subsub + "' as an int (end day)");
+                                    throw new GekkoException();
+                                }
+                            }                            
 
                             d1min = G.GekkoMin(d1, d1min);  //finding min and max years
                             d2max = G.GekkoMax(d2, d2max);
@@ -3894,7 +3866,9 @@ namespace Gekko
 
                                 countdata = 0;
                                 freq = G.GetFreq(frequency);
-                                obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub), new GekkoTime(freq, d2, d2sub));
+                                
+                                obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub, d1subsub), new GekkoTime(freq, d2, d2sub, d2subsub));
+                                
                                 obsLeft = obs;
                                 ts = null;
                                 if (IsNonsenseVariableName(varName))
@@ -3967,20 +3941,11 @@ namespace Gekko
 
                             if (obsLeft == 0)
                             {
-                                GekkoTime gt1 = new GekkoTime(freq, d1, d1sub);
-                                GekkoTime gt2 = new GekkoTime(freq, d2, d2sub);
+                                GekkoTime gt1 = new GekkoTime(freq, d1, d1sub, d1subsub);
+                                GekkoTime gt2 = new GekkoTime(freq, d2, d2sub, d2subsub);
 
                                 int offset = 0;
-
-                                ////See similar code in px reader
-                                //if (dates != null)
-                                //{
-                                //    var tuple = GetFirstLastDates(dates, gt1, gt2);
-                                //    gt1 = tuple.Item1;
-                                //    gt2 = tuple.Item2;
-                                //    offset = tuple.Item3;
-                                //}
-
+                                
                                 int nob = GekkoTime.Observations(gt1, gt2);
                                 if (nob > 0)
                                 {
@@ -4046,11 +4011,11 @@ namespace Gekko
                     }
 
                     string per1 = linesplit[1];
-                    GekkoTime gt1 = G.FromStringToDate(per1, true);
+                    GekkoTime gt1 = GekkoTime.FromStringToGekkoTime(per1, true);
                     year1 = Math.Min(year1, gt1.super);
 
                     string per2 = linesplit[2];
-                    GekkoTime gt2 = G.FromStringToDate(per2, true);
+                    GekkoTime gt2 = GekkoTime.FromStringToGekkoTime(per2, true);
                     year2 = Math.Max(year2, gt2.super);
 
                     if (gt1.freq != gt2.freq)
@@ -4273,16 +4238,16 @@ namespace Gekko
                     {
                         offset = 2;
                         string t1 = tokens[i + 3].s + tokens[i + 4].s;
-                        gt1 = G.FromStringToDate(t1);
+                        gt1 = GekkoTime.FromStringToGekkoTime(t1);
                         string t2 = tokens[i + 5].s + tokens[i + 6].s;
-                        gt2 = G.FromStringToDate(t2);
+                        gt2 = GekkoTime.FromStringToGekkoTime(t2);
                     }
                     else
                     {
                         string t1 = tokens[i + 3].s;
-                        gt1 = G.FromStringToDate(t1);
+                        gt1 = GekkoTime.FromStringToGekkoTime(t1);
                         string t2 = tokens[i + 4].s;
-                        gt2 = G.FromStringToDate(t2);
+                        gt2 = GekkoTime.FromStringToGekkoTime(t2);
                     }
 
                     year1 = Math.Min(year1, gt1.super);
@@ -5073,8 +5038,8 @@ namespace Gekko
                     ts.meta.stamp = Globals.dateStamp;                    
                     ts.SetDirty(true);
 
-                    GekkoTime gt_start = G.FromStringToDate(dates[0], true);
-                    GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
+                    GekkoTime gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
+                    GekkoTime gt_end = GekkoTime.FromStringToGekkoTime(dates[dates.Count - 1], true);
 
                     if (gt_start.freq != gt_end.freq)
                     {
@@ -5137,8 +5102,8 @@ namespace Gekko
                     if (true)  //can be switched off
                     {
 
-                        GekkoTime gt_start = G.FromStringToDate(dates[0], true);
-                        GekkoTime gt_end = G.FromStringToDate(dates[dates.Count - 1], true);
+                        GekkoTime gt_start = GekkoTime.FromStringToGekkoTime(dates[0], true);
+                        GekkoTime gt_end = GekkoTime.FromStringToGekkoTime(dates[dates.Count - 1], true);
 
                         if (gt_start.freq != gt_end.freq)
                         {
@@ -6617,6 +6582,11 @@ namespace Gekko
             string varName = ts.name;
             if (isCaps) varName = varName.ToUpper();  //for use with AREMOS
 
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             string sub1 = "";
             string sub2 = "";
             string freq = "A";
@@ -6625,27 +6595,19 @@ namespace Gekko
                 sub1 = "0101";
                 sub2 = "0101";
             }
-            else
+            else if (ts.freq == EFreq.Q || ts.freq == EFreq.M)
             {
                 freq = G.GetFreq(ts.freq).ToUpper();
-                sub1 = "" + per1.sub;
-                if (sub1.Length == 1) sub1 = "0" + sub1;
-                if (sub1.Length == 0 || sub1.Length >= 3)
-                {
-                    G.Writeln2("*** ERROR: Problem writing subperiod info in tsd file");
-                    throw new GekkoException();
-                }
-                sub1 = sub1 + "01";
-                sub2 = "" + per2.sub;
-                if (sub2.Length == 1) sub2 = "0" + sub2;
-                if (sub2.Length == 0 || sub2.Length >= 3)
-                {
-                    G.Writeln2("*** ERROR: Problem writing subperiod info in tsd file");
-                    throw new GekkoException();
-                }
-                sub2 = sub2 + "01";
+                sub1 = per1.sub.ToString("D2") + "01";
+                sub2 = per2.sub.ToString("D2") + "01";
             }
-
+            else if (ts.freq == EFreq.D)
+            {
+                freq = G.GetFreq(ts.freq).ToUpper();
+                sub1 = per1.sub.ToString("D2") + per1.subsub.ToString("D2");
+                sub2 = per2.sub.ToString("D2") + per2.subsub.ToString("D2");
+            }
+            else throw new GekkoException();
 
             string varName2 = G.Chop_RemoveFreq(varName);
             if (varName.Length <= 16 && ts.meta.label != null && ts.meta.label.Length > 0)
@@ -6679,7 +6641,14 @@ namespace Gekko
             if (src.Length > 16) src = src.Substring(0, 16);
             else src = src + G.Blanks(16 - src.Length);
 
-            res.WriteLine("                " + src + stmp + "0000" + per1.super + sub1 + per2.super + sub2 + freq + "  0"); //time is set to 0000
+            string nul = "  0";
+            if (ts.freq == EFreq.D)
+            {
+                //necessary for AREMOS, otherwise the program crashes completely!
+                nul = "  0         1111111";  //weekdays sun, mon, tue, wed, thu, fri, sat --> are active
+            }
+
+            res.WriteLine("                " + src + stmp + "0000" + per1.super + sub1 + per2.super + sub2 + freq + nul); //time is set to 0000
 
             for (int index = index1; index <= index2; index++)
             {
@@ -10891,6 +10860,10 @@ namespace Gekko
             else if (freq == EFreq.M)
             {
                 per = "12";
+            }
+            else if (freq == EFreq.D)
+            {
+                per = "365";
             }
             return per;
         }
@@ -15861,7 +15834,9 @@ namespace Gekko
                     CellLight c = matrix.Get(i, j);
                     double v = Program.GetValueFromSpreadsheetCell(isTranspose, i, j, c);
                     int subPer = -12345;
-                    int per = Program.FromDateTimeToGekkoTime(freq, ref subPer, dt);
+                    GekkoTime gt5 = GekkoTime.FromDateTimeToGekkoTime(freq, dt);
+                    int per = gt5.super;
+                    subPer = gt5.sub;
                     GekkoTime gt = new GekkoTime(freq, per, subPer);
                     HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);                    
                 }
@@ -16537,7 +16512,7 @@ namespace Gekko
                     }
                     else
                     {
-                        G.Writeln(freq + " data from " + first.super + G.GetFreq(ts.freq) + first.sub + " to " + last.super + G.GetFreq(ts.freq) + last.sub + stamp);
+                        G.Writeln(freq + " data from " + first.ToString() + " to " + last.ToString() + stamp);
                     }
                 }
 
@@ -24761,12 +24736,7 @@ namespace Gekko
             {
                 foreach (ToFrom var in list)
                 {
-                    //Databank db = GetBankFromBankNameVersion(var.bank);                    
-                    //IVariable iv = db.GetIVariable(var.name);
-
                     IVariable iv = O.GetIVariableFromString(var.s1, O.ECreatePossibilities.NoneReportError, true);
-
-                    //IVariable iv = O.Lookup(null, null, var.bank, var.name, var.freq, null, false, EVariableType.Var, true);
 
                     Series ts = iv as Series;
                     {
@@ -25728,6 +25698,10 @@ namespace Gekko
 
         private static void GetQuartersOrMonthsFromYears(ref GekkoTime per1, ref GekkoTime per2, int yearStart, int yearEnd)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //see also #980432
             if ((Program.options.freq == EFreq.A))
             {
@@ -25743,6 +25717,11 @@ namespace Gekko
             {
                 per1 = new GekkoTime((Program.options.freq), yearStart, 1);
                 per2 = new GekkoTime((Program.options.freq), yearEnd, 12);
+            }
+            else if ((Program.options.freq == EFreq.D))
+            {
+                per1 = new GekkoTime((Program.options.freq), yearStart, 1, 1);
+                per2 = new GekkoTime((Program.options.freq), yearEnd, 12, 31);
             }
         }
 
@@ -27730,12 +27709,7 @@ namespace Gekko
 
                 Series ts_lhs = O.GetIVariableFromString(yLhs, O.ECreatePossibilities.Must) as Series;
                 Series ts_rhs = O.GetIVariableFromString(yRhs, O.ECreatePossibilities.NoneReportError, true) as Series;  //can search
-
-                //if (ts_lhs == null)
-                //{
-                //    G.Writeln2("*** ERROR: Cannot find: " + yRhs);
-                //}
-                                
+                                                
                 if (method == null) method = "total";
                                 
                 EFreq eFreq0 = ts_rhs.freq;
@@ -27838,13 +27812,41 @@ namespace Gekko
                             if (t.sub % mPerQ == 0) ts_lhs.SetData(ttemp, value);
                         }
                     }
+                    else if (eFreq1 == EFreq.M && eFreq0 == EFreq.D)
+                    {
+                        //Conversion from D to M
+                        if (t.subsub == 1) vsum = 0d;
+                        GekkoTime ttemp = new GekkoTime(eFreq1, t.super, t.sub);
+                        if (G.Equal(method, "total"))
+                        {
+                            vsum += value;
+                            if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(ttemp, vsum);
+                        }
+                        else if (G.Equal(method, "avg"))
+                        {
+                            vsum += value;                            
+                            if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(ttemp, vsum / G.DaysInMonth(t.super, t.sub));
+                        }
+                        else if (G.Equal(method, "first"))
+                        {                            
+                            if (t.subsub == 1) ts_lhs.SetData(ttemp, value);
+                        }
+                        else if (G.Equal(method, "last"))
+                        {
+                            if (t.subsub == G.DaysInMonth(t.super, t.sub)) ts_lhs.SetData(ttemp, value);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: wrong method in COLLAPSE: " + method + "'");
+                            throw new GekkoException();
+                        }
+                    }
                     else
                     {
                         G.Writeln2("*** ERROR: Cannot COLLAPSE frequency '" + eFreq0 + "' to frequency '" + eFreq1 + "'");
                         throw new GekkoException();
                     }
-                }
-                //G.Writeln2("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")");
+                }                
                 G.ServiceMessage("Collapsed '" + yLhs + "' (" + eFreq1.ToString() + ") from '" + yRhs + "' (" + eFreq0.ToString() + ")", p);
 
             }
@@ -29581,43 +29583,81 @@ namespace Gekko
                     i = PutLabelIntoTable(table, i, j, label, labelMaxLine);  //augments i
                     i--; //else a blank line too much at start                    
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
+                    if (pretty)  //sheet is non-pretty
                     {
-                        //TODO: allow prt x!d, x!m, but not other freqs.
-
-                        if (t.Equals(smpl.t1) || t.subsub == 1)
+                        foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
                         {
+                            //TODO: allow prt x!d, x!m, but not other freqs.
+
+                            if (t.Equals(smpl.t1) || t.subsub == 1)
+                            {
+                                if (j == 1)
+                                {
+                                    i++;
+                                    i++;
+                                    table.Set(i, j, t.super + "m" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
+                                }
+                                else
+                                {
+                                    i++;
+                                    i++;
+                                    if (t.subsub == 1 && isMonthlyFreq)
+                                    {
+                                        int sumOver = 0;
+                                        GekkoTime tMonth = new GekkoTime(EFreq.M, t.super, t.sub);
+                                        double d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                                        table.SetNumber(i, j, d, format);
+                                    }
+                                }
+                            }
+
+                            i++;
+
                             if (j == 1)
                             {
-                                i++;
-                                i++;
-                                table.Set(i, j, t.super + "m" + t.sub); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Set(i, j, "d" + t.subsub); if (rows) table.SetAlign(i, j, Align.Right);
                             }
                             else
                             {
-                                i++;
-                                i++;
-                                if (t.subsub == 1 && isMonthlyFreq)
+                                //j > 1
+
+                                if (!isMonthlyFreq)
                                 {
                                     int sumOver = 0;
-                                    GekkoTime tMonth = new GekkoTime(EFreq.M, t.super, t.sub);
-                                    double d = PrintHelperTransform(smpl, tsWork, tsRef, tMonth, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                                    double d = double.NaN;
+                                    if (tsWork == null && tsRef == null)  //not series
+                                    {
+                                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                                    }
+                                    else
+                                    {
+                                        d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                                    }
+
                                     table.SetNumber(i, j, d, format);
                                 }
                             }
                         }
-
-                        i++;
-
-                        if (j == 1)
+                    }
+                    else
+                    {
+                        if (isMonthlyFreq)
                         {
-                            table.Set(i, j, "d" + t.subsub); if (rows) table.SetAlign(i, j, Align.Right);
+                            G.Writeln2("*** ERROR: Cannot use D and M freq at the same time");
+                            throw new GekkoException();
                         }
-                        else
+                        i++;
+                        foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
                         {
-                            //j > 1
+                            //TODO: allow prt x!d, x!m, but not other freqs.
 
-                            if (!isMonthlyFreq)
+                            i++;
+
+                            if (j == 1)
+                            {
+                                table.Set(i, j, t.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                            }
+                            else
                             {
                                 int sumOver = 0;
                                 double d = double.NaN;
@@ -29629,7 +29669,6 @@ namespace Gekko
                                 {
                                     d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
                                 }
-
                                 table.SetNumber(i, j, d, format);
                             }
                         }
@@ -31749,33 +31788,7 @@ namespace Gekko
                 phe.operators = phe.operators.ConvertAll(d => d.ToLower());
             }
         }
-
-        private static void PrintInsertTimeseriesData(bool doAremosStuff, GekkoTime gt, int virtualCols, Table tab, int numberOfLabelsLinesMax, bool transpose, int width, int dec, ref int virtualRows, double var1, List<double> collapseFreqsValues, string operator2, O.Prt o)
-        {
-            int ii = virtualRows + numberOfLabelsLinesMax;
-            int jj = virtualCols + 1;
-            if (transpose)
-            {
-                ii = virtualCols + 1;
-                jj = virtualRows + numberOfLabelsLinesMax;
-            }
-            tab.Set(new Coord(ii, jj), "", var1, CellType.Number, "f" + width + "." + dec);
-            EPrtCollapseTypes collapse = GetCollapseType(o, EPrintTypes.Print);
-            if (doAremosStuff && collapse != EPrtCollapseTypes.None)
-            {
-                if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
-                {
-                    int n = 4;
-                    if (gt.freq == EFreq.M) n = 12;
-                    double x = CalculateAveragesForPrint(operator2, collapseFreqsValues, collapse, n);
-                    if (!G.isNumericalError(x))
-                    {
-                        tab.Set(new Coord(ii + 1, jj), "", x, CellType.Number, "f" + width + "." + dec);
-                    }
-                    virtualRows++;  //The row containing the collapsed value
-                }
-            }
-        }
+               
 
         private static EPrtCollapseTypes GetCollapseType(O.Prt o, EPrintTypes type)
         {
@@ -31849,60 +31862,7 @@ namespace Gekko
             if (!nonExistenceErrors.Contains(ss)) nonExistenceErrors.Add(ss);
         }
 
-        private static void PrintInsertDate(bool doAremosStuff, int virtualCol, string date, GekkoTime gt, GekkoTime gtStart, Table tab, int numberOfLabelsLinesMax, bool transpose, ref int virtualRows, O.Prt o)
-        {
-            //date and gt correspond here
-            bool doPrint = false; if (virtualCol == 1) doPrint = true;
-
-            if (doAremosStuff)
-            {
-                if (gt.sub == 1 || (gt.sub > 1 && (gt.IsSamePeriod(gtStart))))
-                {
-                    //first quarter or month, or if not do it anyway if it is the first date printed
-                    if (doPrint) tab.Set(virtualRows + numberOfLabelsLinesMax, 1, gt.super.ToString());
-                    virtualRows++;
-                }
-            }
-
-            //insert dates
-            string line = "";
-            if (doAremosStuff)
-            {
-                if (gt.freq == EFreq.Q) line += "  " + "q" + gt.sub;
-                else if (gt.freq == EFreq.M) line += "  " + "m" + gt.sub;
-                else
-                {
-                    G.Writeln2("*** ERROR: Internal error #7523943");
-                    throw new GekkoException();
-                }
-            }
-            else
-            {
-                line += date;
-            }
-            int iii = virtualRows + numberOfLabelsLinesMax;
-            int jjj = 1;
-            if (transpose)
-            {
-                iii = 1;
-                jjj = virtualRows + numberOfLabelsLinesMax;
-            }
-            if (doPrint) tab.Set(iii, jjj, line);
-            if (transpose)
-            {
-                tab.SetAlign(iii, jjj, Align.Right);
-            }
-
-            if (doAremosStuff && GetCollapseType(o, EPrintTypes.Print) != EPrtCollapseTypes.None)
-            {
-                if ((gt.freq == EFreq.Q && gt.sub == 4) || (gt.freq == EFreq.M && gt.sub == 12))
-                {
-                    //virtualRows++;  //The row containing the collapsed value
-                }
-            }
-            return;
-        }
-
+        
         private static List<string> PrintGetOperatorsOLD(bool isMulprt, List<string> operators, bool isGraph, bool isSheet)
         {
             bool mul_lev = false;
@@ -33461,21 +33421,21 @@ namespace Gekko
 
             foreach (string s in xlines)
             {
-                GekkoTime gt = G.FromStringToDate(s);
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = G.FromDateToFloating(gt) + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);                
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlinebefores)
             {
-                GekkoTime gt = G.FromStringToDate(s);
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(-1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
 
             foreach (string s in xlineafters)
             {
-                GekkoTime gt = G.FromStringToDate(s);
+                GekkoTime gt = GekkoTime.FromStringToGekkoTime(s);
                 double d = (G.FromDateToFloating(gt) + G.FromDateToFloating(gt.Add(1))) / 2d + 0.5d + GetXAdjustmentForInsideTics(isInside, highestFreq);
                 txt.AppendLine("set arrow from " + d + ", graph 0 to " + d + ", graph 1 nohead");
             }
@@ -41296,11 +41256,11 @@ namespace Gekko
         {            
             if (G.Equal(startEnd, "start"))
             {
-                return GekkoTime.ConvertFreqs1(tsFreq, t);
+                return GekkoTime.ConvertFreqsFirst(tsFreq, t);
             }
             else if (G.Equal(startEnd, "end"))
             {
-                return GekkoTime.ConvertFreqs2(tsFreq, t);
+                return GekkoTime.ConvertFreqsLast(tsFreq, t);
             }
             else
             {

@@ -69,9 +69,9 @@ namespace Gekko
             freq = freq2;
             super = (short)super2;
             sub = (short)sub2;
-            subsub = (short)0;
+            subsub = (short)1;
             FreqCheck();
-        }
+        }        
 
         private void FreqCheck()
         {
@@ -81,14 +81,11 @@ namespace Gekko
 
             //Sanity checks to follow
             //Problem is that TIME 2010m13 2012m0 can probably parse. If not, the check below is not necessary.            
-            if (sub < 1)
-            {
-                G.Writeln2("*** ERROR: subperiod < 1");
-                throw new GekkoException();
-            }
+            
             if (freq == EFreq.A)
             {
-                if (sub > 1)
+                //sub and subsub can be anything <= 1
+                if (sub > 1 || subsub > 1)
                 {
                     G.Writeln2("*** ERROR: freq 'a' cannot have subperiod > 1");
                     throw new GekkoException();
@@ -96,43 +93,37 @@ namespace Gekko
             }
             else if (freq == EFreq.Q)
             {
-                if (sub > 4)
+                if (sub < 1 || sub > 4 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'q' cannot have subperiod > 4");
+                    G.Writeln2("*** ERROR: freq 'q' wrong quarter: " + sub);
                     throw new GekkoException();
                 }
             }
             else if (freq == EFreq.M)
             {
-                if (sub > 12)
+                if (sub < 1 || sub > 12 || subsub > 1)
                 {
-                    G.Writeln2("*** ERROR: freq 'm' cannot have subperiod > 12");
+                    G.Writeln2("*** ERROR: freq 'm' wrong month: " + sub);
                     throw new GekkoException();
                 }
             }
             else if (freq == EFreq.D)
             {
-                if (sub > 12)
+                if (sub < 1 || sub > 12)
                 {
-                    G.Writeln2("*** ERROR: freq 'd' cannot have month > 12");
-                    throw new GekkoException();
-                }
-                if (subsub < 1)
-                {
-                    G.Writeln2("*** ERROR: freq 'd' cannot have day < 1");
+                    G.Writeln2("*** ERROR: freq 'd' wrong month: " + sub);
                     throw new GekkoException();
                 }
                 int maxDays = G.DaysInMonth(super, sub);  //see also #9832453429857
-                if (subsub > maxDays)
+                if (subsub < 1 || subsub > maxDays)
                 {
-                    G.Writeln2("*** ERROR: freq 'd' has an illegal day (" + this.ToString() + ")");
+                    G.Writeln2("*** ERROR: freq 'd' wrong day: " + subsub);
                     throw new GekkoException();
                 }
-
             }
             else if (freq == EFreq.U)
             {
-                if (sub > 1)
+                if (sub > 1 || subsub > 1)
                 {
                     G.Writeln2("*** ERROR: freq 'u' cannot have subperiod > 1");
                     throw new GekkoException();
@@ -148,13 +139,339 @@ namespace Gekko
             freq = freq2;
             super = (short)super2;
             sub = (short)sub2;
-            subsub = 0;
+            subsub = (short)1;
         }
 
         public bool IsNull()
         {
             if (this.super == -12345) return true;
             return false;
+        }
+
+        public static GekkoTime FromDateTimeToGekkoTime(EFreq freq, DateTime dt)
+        {
+            int sub = 1;
+            int subsub = 1;
+            int super = dt.Year;
+            if (freq == EFreq.A)
+            {                
+            }
+            else if (freq == EFreq.Q)
+            {
+                sub = GekkoTime.FromMonthToQuarter(dt.Month);
+            }
+            else if (freq == EFreq.M)
+            {
+                sub = dt.Month;
+            }
+            else if (freq == EFreq.D)
+            {
+                sub = dt.Month;
+                subsub = dt.Day;
+            }
+            else if (freq == EFreq.U)
+            {
+                G.Writeln2("*** ERROR: Cannot convert date to undated frequency");
+                throw new GekkoException();
+            }
+
+            return new GekkoTime(freq, super, sub, subsub);
+        }
+
+        public static GekkoTime FromStringToGekkoTime(string s)
+        {
+            return FromStringToGekkoTime(s, false);
+        }
+
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters)
+        {
+            return FromStringToGekkoTime(s, allowKForQuarters, true);
+        }
+
+        public static GekkoTime FromStringToGekkoTime(string s, bool allowKForQuarters, bool reportError)
+        {
+            //To do the reverse: see G.FromDateToString()   
+
+            //trailing a or a1 accepted: 2001a, 2001a1
+            //trailing u or u1 accepted: 2001u, 2001u1
+            //k may be accepted for dates (allowK...)
+            //else: 2001, 2001q1, 2001m1, 2001m1d15
+
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            GekkoTime t = GekkoTime.tNull;
+
+            if (true)
+            {
+                int i = -12345;
+                bool b = int.TryParse(s, out i);
+                if (b)
+                {
+                    //happens often, so we do it fast
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                }
+            }
+
+            if (s.EndsWith("a1", StringComparison.OrdinalIgnoreCase))
+            {
+                int i = -12345;
+                bool b = int.TryParse(s.Substring(0, s.Length - 2), out i);
+                if (b)
+                {
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                }
+                else
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (s.EndsWith("a", StringComparison.OrdinalIgnoreCase))
+            {
+                int i = -12345;
+                bool b = int.TryParse(s.Substring(0, s.Length - 1), out i);
+                if (b)
+                {
+                    return new GekkoTime(EFreq.A, G.findYear(i), 1);
+                }
+                else
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+
+
+            if (s.Contains("q") || s.Contains("Q"))
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'q', 'Q' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int q1 = int.Parse(temp1[1]);
+                    if (q1 < 1 || q1 > 4)
+                    {
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
+                    }
+                    t = new GekkoTime(EFreq.Q, y1, q1);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (allowKForQuarters && (s.Contains("k") || s.Contains("K")))
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'k', 'K' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int q1 = int.Parse(temp1[1]);
+                    if (q1 < 1 || q1 > 4)
+                    {
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have quarters from 1 to and including 4");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
+                    }
+                    t = new GekkoTime(EFreq.Q, y1, q1);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (s.Contains("d") || s.Contains("d"))  //must be before 'm'
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'm', 'M' });  //2019m12d24
+                    string[] temp2 = temp1[1].Split(new char[] { 'd', 'd' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int m1 = int.Parse(temp2[0]);
+                    if (m1 < 1 || m1 > 12)
+                    {
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
+                    }
+                    int d = int.Parse(temp2[1]);
+                    int maxDays = G.DaysInMonth(y1, m1); //see also #9832453429857
+                    if (d < 1 || d > maxDays)
+                    {
+                        G.Writeln("*** ERROR: illegal day in daily date");
+                        throw new GekkoException();
+                    }
+                    t = new GekkoTime(EFreq.D, y1, m1, d);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (s.Contains("m") || s.Contains("M"))
+            {
+                try
+                {
+                    string[] temp1 = s.Split(new char[] { 'm', 'M' });
+                    int y1 = G.findYear(int.Parse(temp1[0]));
+                    int m1 = int.Parse(temp1[1]);
+                    if (m1 < 1 || m1 > 12)
+                    {
+                        if (reportError)
+                        {
+                            G.Writeln("*** ERROR: should have months from 1 to and including 12");
+                            throw new GekkoException();
+                        }
+                        else return GekkoTime.tNull;
+                    }
+                    t = new GekkoTime(EFreq.M, y1, m1);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else if (s.Contains("u") || s.Contains("U"))  //ttfreq
+            {
+                string s2 = s;
+                if (s.EndsWith("u1", StringComparison.OrdinalIgnoreCase))
+                {
+                    s2 = s.Substring(0, s.Length - 2);
+                }
+                else if (s.EndsWith("u", StringComparison.OrdinalIgnoreCase))
+                {
+                    s2 = s.Substring(0, s.Length - 1);
+                }
+
+                try
+                {
+                    t = new GekkoTime(EFreq.U, int.Parse(s2), 1);
+                }
+                catch (Exception e)
+                {
+                    if (reportError)
+                    {
+                        G.Writeln("*** ERROR: timeperiod " + s + " not valid");
+                        throw new GekkoException();
+                    }
+                    else return GekkoTime.tNull;
+                }
+            }
+            else
+            {
+                if (reportError)
+                {
+                    G.Writeln2("*** ERROR: Could not understand the timeperiod: " + s);
+                    throw new GekkoException();
+                }
+                else return GekkoTime.tNull;
+            }
+            return t;
+        }
+
+        public static DateTime FromGekkoTimeToDateTime(GekkoTime gt, O.GetDateChoices firstLast)
+        {
+            //See also #09834753425, converting from GekkoTime to GekkoTime
+
+            if (gt.freq == EFreq.A)
+            {
+                if (firstLast == O.GetDateChoices.FlexibleStart)
+                {
+                    return new DateTime(gt.super, 1, 1);
+                }
+                else if (firstLast == O.GetDateChoices.FlexibleEnd)
+                {
+                    return new DateTime(gt.super, 12, 31);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Freq convertion problem");
+                    throw new GekkoException();
+                }
+            }
+            else if (gt.freq == EFreq.Q)
+            {
+                if (firstLast == O.GetDateChoices.FlexibleStart)
+                {
+                    return new DateTime(gt.super, GekkoTime.FromQuarterToMonthStart(gt.sub), 1);
+                }
+                else if (firstLast == O.GetDateChoices.FlexibleEnd)
+                {
+                    int month = GekkoTime.FromQuarterToMonthEnd(gt.sub);
+                    return new DateTime(gt.super, month, G.DaysInMonth(gt.super, month));
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Freq convertion problem");
+                    throw new GekkoException();
+                }
+            }
+            else if (gt.freq == EFreq.M)
+            {
+                if (firstLast == O.GetDateChoices.FlexibleStart)
+                {
+                    return new DateTime(gt.super, gt.sub, 1);
+                }
+                else if (firstLast == O.GetDateChoices.FlexibleEnd)
+                {
+                    return new DateTime(gt.super, gt.sub, G.DaysInMonth(gt.super, gt.sub));
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Freq convertion problem");
+                    throw new GekkoException();
+                }
+            }
+            else if (gt.freq == EFreq.D)
+            {
+                return new DateTime(gt.super, gt.sub, gt.subsub);
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Freq convertion problem");
+                throw new GekkoException();
+            }
         }
 
         public static int Observations(GekkoTime t1, GekkoTime t2)
@@ -206,133 +523,18 @@ namespace Gekko
         }
 
         public static void ConvertFreqs(EFreq freq, GekkoTime t1, GekkoTime t2, ref GekkoTime tt1, ref GekkoTime tt2)
-        {            
-            tt1 = ConvertFreqs1(freq, t1);
-            tt2 = ConvertFreqs2(freq, t2);
+        {
+            tt1 = ConvertFreqsFirst(freq, t1);
+            tt2 = ConvertFreqsLast(freq, t2);
         }
 
-        public static GekkoTime ConvertFreqs2(EFreq freq, GekkoTime t2)
+        public static GekkoTime ConvertFreqsFirst(EFreq freq, GekkoTime t1)
         {
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-            
-            GekkoTime tt2 = t2;
 
-            if (freq == t2.freq)
-            {
-                //do nothing
-            }
-            else
-            {
-
-                if (freq == EFreq.A)
-                {
-                    //From Q or M to A freq is just the annual part of the date
-
-                    if (t2.freq == EFreq.Q)
-                    {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
-                    }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
-                    {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
-                    }
-                    else if (t2.freq == EFreq.U)
-                    {
-                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
-                    }
-
-                }
-                else if (freq == EFreq.Q)
-                {
-                    if (t2.freq == EFreq.A)
-                    {
-                        //from A to Q sets q1 for start year and q4 for end year                        
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
-                    }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
-                    {
-                        //from M to Q finds corresponding Q                        
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
-                    }                    
-                    else if (t2.freq == EFreq.U)
-                    {
-                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
-                    }
-                }
-                else if (freq == EFreq.M)
-                {
-                    if (t2.freq == EFreq.A)
-                    {
-                        //from A to M sets m1 for start year, and m12 for end year                        
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
-                    }
-                    else if (t2.freq == EFreq.Q)
-                    {
-                        //from Q to M sets mx for start q, and my for end q                        
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
-                    }
-                    else if (t2.freq == EFreq.D)
-                    {
-                        //from D to M sets month directly
-                        tt2 = new GekkoTime(EFreq.M, t2.super, t2.sub);
-                    }
-                    else if (t2.freq == EFreq.U)
-                    {
-                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
-                    }
-                }
-                else if (freq == EFreq.D)
-                {
-                    if (t2.freq == EFreq.A)
-                    {
-                        //from A to D sets last day of year
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
-                    }
-                    else if (t2.freq == EFreq.Q)
-                    {
-                        //from Q to D sets last day of quarter
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub), G.DaysInMonth(t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub)));
-                    }
-                    else if (t2.freq == EFreq.M)
-                    {
-                        //from M to D sets last day of month                        
-                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, G.DaysInMonth(t2.super, t2.sub));
-                    }
-                    else if (t2.freq == EFreq.U)
-                    {
-                        //from U to D sets last day of year
-                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
-                    }
-                }
-                else if (freq == EFreq.U)
-                {
-                    //From Q or M or D to U freq is just the annual part of the date
-
-                    if (t2.freq == EFreq.A)
-                    {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
-                    }
-                    else if (t2.freq == EFreq.Q)
-                    {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
-                    }
-                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
-                    {
-                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
-                    }
-                }
-            }
-
-            return tt2;
-        }
-
-        public static GekkoTime ConvertFreqs1(EFreq freq, GekkoTime t1)
-        {
-            //========================================================================================================
-            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-            //========================================================================================================
+            //See also #09834753425, converting from GekkoTime to DateTime
 
             GekkoTime tt1 = t1;
             if (freq == t1.freq)
@@ -441,6 +643,124 @@ namespace Gekko
             }
 
             return tt1;
+        }
+
+        public static GekkoTime ConvertFreqsLast(EFreq freq, GekkoTime t2)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            GekkoTime tt2 = t2;
+
+            if (freq == t2.freq)
+            {
+                //do nothing
+            }
+            else
+            {
+
+                if (freq == EFreq.A)
+                {
+                    //From Q or M to A freq is just the annual part of the date
+
+                    if (t2.freq == EFreq.Q)
+                    {
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                    }
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    {
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                    }
+                    else if (t2.freq == EFreq.U)
+                    {
+                        tt2 = new GekkoTime(EFreq.A, t2.super, 1);
+                    }
+
+                }
+                else if (freq == EFreq.Q)
+                {
+                    if (t2.freq == EFreq.A)
+                    {
+                        //from A to Q sets q1 for start year and q4 for end year                        
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
+                    }
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    {
+                        //from M to Q finds corresponding Q                        
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTime.FromMonthToQuarter(t2.sub));  //last m                 
+                    }
+                    else if (t2.freq == EFreq.U)
+                    {
+                        tt2 = new GekkoTime(EFreq.Q, t2.super, GekkoTimeStuff.numberOfQuarters);
+                    }
+                }
+                else if (freq == EFreq.M)
+                {
+                    if (t2.freq == EFreq.A)
+                    {
+                        //from A to M sets m1 for start year, and m12 for end year                        
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
+                    }
+                    else if (t2.freq == EFreq.Q)
+                    {
+                        //from Q to M sets mx for start q, and my for end q                        
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTime.FromQuarterToMonthEnd(t2.sub));
+                    }
+                    else if (t2.freq == EFreq.D)
+                    {
+                        //from D to M sets month directly
+                        tt2 = new GekkoTime(EFreq.M, t2.super, t2.sub);
+                    }
+                    else if (t2.freq == EFreq.U)
+                    {
+                        tt2 = new GekkoTime(EFreq.M, t2.super, GekkoTimeStuff.numberOfMonths);
+                    }
+                }
+                else if (freq == EFreq.D)
+                {
+                    if (t2.freq == EFreq.A)
+                    {
+                        //from A to D sets last day of year
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                    }
+                    else if (t2.freq == EFreq.Q)
+                    {
+                        //from Q to D sets last day of quarter
+                        int month = GekkoTime.FromQuarterToMonthEnd(t2.sub);
+                        tt2 = new GekkoTime(EFreq.D, t2.super, month, G.DaysInMonth(t2.super, month));
+                    }
+                    else if (t2.freq == EFreq.M)
+                    {
+                        //from M to D sets last day of month                        
+                        tt2 = new GekkoTime(EFreq.D, t2.super, t2.sub, G.DaysInMonth(t2.super, t2.sub));
+                    }
+                    else if (t2.freq == EFreq.U)
+                    {
+                        //from U to D sets last day of year
+                        tt2 = new GekkoTime(EFreq.D, t2.super, GekkoTimeStuff.numberOfMonths, 31);
+                    }
+                }
+                else if (freq == EFreq.U)
+                {
+                    //From Q or M or D to U freq is just the annual part of the date
+
+                    if (t2.freq == EFreq.A)
+                    {
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                    }
+                    else if (t2.freq == EFreq.Q)
+                    {
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                    }
+                    else if (t2.freq == EFreq.M || t2.freq == EFreq.D)
+                    {
+                        tt2 = new GekkoTime(EFreq.U, t2.super, 1);
+                    }
+                }
+            }
+
+            return tt2;
         }
 
         private void CheckSameFreq(GekkoTime gt2)
@@ -606,7 +926,7 @@ namespace Gekko
                 //see also #98032743029847
                 DateTime dt1 = new DateTime(this.super, this.sub, this.subsub);  
                 DateTime dt2 = dt1.AddDays(addedPeriods);
-                GekkoTime gt = new GekkoTime(EFreq.D, dt2.Year, dt2.Month, dt2.Day);
+                GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(this.freq, dt2);
                 return gt;
             }
             else
@@ -664,9 +984,9 @@ namespace Gekko
             {
                 return super + "m" + sub + "d" + subsub;
             }
-            else if (this.freq == EFreq.U)  //ttfreq
+            else if (this.freq == EFreq.U)  
             {
-                return "" + super;  //ttfreq
+                return "" + super;  
             }
             else
             {

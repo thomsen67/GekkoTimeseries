@@ -728,7 +728,7 @@ namespace Gekko
                     {
                         try
                         {
-                            Program.FlowChart(s, code, G.FromStringToDate(s2));
+                            Program.FlowChart(s, code, GekkoTime.FromStringToGekkoTime(s2));
                         }
                         catch (Exception err)
                         {
