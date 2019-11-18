@@ -1631,11 +1631,13 @@ namespace Gekko
                         date = date.ToLower();  //if q or m (or y)
 
                         GekkoTime gt = new GekkoTime(0, 0, 0); //will not activate .IsNull() == true
-                        
+                                                
                         if (G.Equal(datetype, "excel"))
                         {
                             if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
                             {
+                                //Excel-dates are converted to yyyy-mm-dd when a xlsx is exported to csv.
+                                //So this restriction seems sensibl.
                                 G.Writeln2("*** ERROR: You cannot use <datetype='excel'> for .csv or .prn file types");
                                 throw new GekkoException();
                             }
@@ -1651,7 +1653,7 @@ namespace Gekko
                                 G.Writeln("           convert it to a value.", Color.Red);
                                 throw new GekkoException();
                             }
-                            DateTime dt = G.DateHelper2(d);
+                            DateTime dt = GekkoTime.FromExcelDateToDateTime(d);
 
                             //TODO
                             //TODO
@@ -1670,7 +1672,15 @@ namespace Gekko
                             {
                                 //no format given, Gekko date format expected
 
+                                //if freq=a and 2001y, this is treated as integer 2001
+                                //if freq=a and 98, this is treated as 1998 (logic of GekkoTime.FromStringToGekkoTime()).
+                                //if freq=q and 200102, this is treated as 2001q2
+                                //if freq=m and 200102, this is treated as 2001m2
+                                //if 20010230, this is always treated as 2001m2d30 (we do not expect undated freq with 8 digits)
+                                //data with freq U MUST have "option freq u" set.
+
                                 bool error = false;
+                                bool done = false;
 
                                 if ((freqHere == EFreq.A))
                                 {
@@ -1681,23 +1691,40 @@ namespace Gekko
                                     }                                    
                                 }
 
-                                if (G.IsInteger(date) && date.Length > 5)
+                                if (G.IsInteger(date))
                                 {
-                                    if (date.Length == 6)
+
+
+                                    // 200102 --> q or m (if Q or M is set)
+                                    // 20010230 --> daily (always)
+                                    // undated must have freq U
+                                    //
+
+                                    if (freqHere == EFreq.U)
+                                    {
+                                        gt = new GekkoTime(freqHere, int.Parse(date), 1);
+                                        done = true;
+                                    }
+                                    else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M))
                                     {
                                         //It might be a date like 199503, that is, 1995q3 or 1995m3
                                         //We have to use the global freq here, how else to know the freq??
+                                        //Only with freq Q or M
                                         gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
+                                        done = true;
                                     }
                                     else if (date.Length == 8)
                                     {
                                         //It might be a date like 19950302, that is, 1995m3d2
+                                        //Always, regardless of global freq, we do not expect U freq data this large
                                         gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
-                                    }
-                                    else
-                                    {
-                                        error = true;
-                                    }
+                                        done = true;
+                                    }                                    
+                                }
+
+                                if (done)
+                                {
+                                    error = false;
                                 }
                                 else
                                 {
@@ -1717,7 +1744,7 @@ namespace Gekko
                             {
                                 //non-Gekko date format
                                 //we have a yyyy-mm-dd-like format that we need to look into
-                                DateTime dt = G.DateHelper4(format, date);
+                                DateTime dt = GekkoTime.FromYYYYMMDDToDateTime(format, date);
                                 gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
                             }
                         }
@@ -15776,7 +15803,7 @@ namespace Gekko
                     DateTime temp = DateTime.MinValue;
                     try
                     {
-                        temp = G.DateHelper2(c.data);
+                        temp = GekkoTime.FromExcelDateToDateTime(c.data);
                     }
                     catch
                     {
@@ -25384,7 +25411,7 @@ namespace Gekko
                         }
                         else
                         {
-                            DateTime dt; string f; G.DateHelper1(t, isFirst, format, out dt, out f, out dateStringCsv);
+                            DateTime dt; string f; GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(t, isFirst, format, out dt, out f, out dateStringCsv);
                         }
                         tab.Add(i, j, new CellLight(dateStringCsv)); j++;
                     }
@@ -38741,7 +38768,7 @@ namespace Gekko
                                     for (int j = d2 - 1; j <= d2 - 1 + eo.excelColumnLabelsGekkoTime.GetLength(0) - 1; j++)
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[j - (d2 - 1), i - d1];
-                                        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
+                                        DateTime dt; string f; string discard; GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -38754,7 +38781,7 @@ namespace Gekko
                                     for (int j = d2; j <= d2 + eo.excelColumnLabelsGekkoTime.GetLength(1) - 1; j++)
                                     {
                                         GekkoTime gt = eo.excelColumnLabelsGekkoTime[i - (d1 - 1), j - d2];
-                                        DateTime dt; string f; string discard; G.DateHelper1(gt, isFirst, format, out dt, out f, out discard);
+                                        DateTime dt; string f; string discard; GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(gt, isFirst, format, out dt, out f, out discard);
                                         ws.SetValue(i, j, dt);
                                         ws.Cells[i, j].Style.Numberformat.Format = f;
                                     }
@@ -38799,7 +38826,7 @@ namespace Gekko
                                     for (int j = 0; j < eo.excelColumnLabelsGekkoTime.GetLength(1); j++)
                                     {
                                         DateTime dt; string f; string date_as_string;
-                                        G.DateHelper1(eo.excelColumnLabelsGekkoTime[i, j], isFirst, format, out dt, out f, out date_as_string);
+                                        GekkoTime.FromGekkoTimeToDifferentFormatsForWriting(eo.excelColumnLabelsGekkoTime[i, j], isFirst, format, out dt, out f, out date_as_string);
                                         tmp[i, j] = date_as_string;                                        
                                     }
                                 }

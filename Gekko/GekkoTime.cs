@@ -178,6 +178,122 @@ namespace Gekko
             return new GekkoTime(freq, super, sub, subsub);
         }
 
+        public static DateTime FromExcelDateToDateTime(double data)
+        {
+            return DateTime.FromOADate(data);
+        }
+
+        public static void FromGekkoTimeToDifferentFormatsForWriting(GekkoTime gt, bool first, string format, out DateTime dt, out string f, out string date_as_string)
+        {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
+            //format can be null, 'gekko' or 'yyyy-dd-mm'-style
+
+            dt = new DateTime();
+
+            f = null;
+            //f = format;
+
+            date_as_string = null;
+
+            int y = gt.super;
+            int m = -12345;
+            int d = -12345;
+
+            if (gt.freq == EFreq.A)
+            {
+                if (format == null) f = "yyyy";
+                if (first) { m = 1; d = 1; }
+                else { m = 12; d = 31; }
+            }
+            else if (gt.freq == EFreq.Q)
+            {
+                if (format == null) f = "yyyy-mm";
+                if (gt.sub == 1)
+                {
+                    if (first) { m = 1; d = 1; }
+                    else { m = 3; d = G.DaysInMonth(y, m); }
+                }
+                else if (gt.sub == 2)
+                {
+                    if (first) { m = 4; d = 1; }
+                    else { m = 6; d = G.DaysInMonth(y, m); }
+                }
+                else if (gt.sub == 3)
+                {
+                    if (first) { m = 7; d = 1; }
+                    else { m = 9; d = G.DaysInMonth(y, m); }
+                }
+                else
+                {
+                    if (first) { m = 10; d = 1; }
+                    else { m = 12; d = G.DaysInMonth(y, m); }
+                }
+            }
+            else if (gt.freq == EFreq.M)
+            {
+                if (format == null) f = "yyyy-mm";
+                m = gt.sub;
+                if (first) d = 1;
+                else d = G.DaysInMonth(y, m);
+            }
+            else if (gt.freq == EFreq.D)
+            {
+                if (format == null) f = "yyyy-mm-dd";
+                m = gt.sub;
+                d = gt.subsub;
+            }
+            else if (gt.freq == EFreq.U)
+            {
+                G.Writeln2("*** ERROR: You cannot use dateformat together with an undated frequency");
+                throw new GekkoException();
+            }
+
+            //Now: three possibilities regarding format:
+            //format == null                   --> f has 'yyyy-mm-dd'-style value (custom)
+            //format == 'gekko'                --> f = null
+            //format == 'yyyy-mm-dd'-style     --> f = null
+
+            if (format != null && !G.Equal(format, "gekko")) f = format;
+
+            //Now: three possibilities regarding format:
+            //format == null                   --> f = 'yyyy-mm-dd'-style value (custom)
+            //format == 'gekko'                --> f = null
+            //format == 'yyyy-mm-dd'-style     --> f = 'yyyy-mm-dd'-style
+
+            dt = new DateTime(y, m, d);
+            if (format == null)
+            {
+                //Not sure if this is right, using f?? Probably ok.
+                date_as_string = G.DateHelper3(f, dt); //lowercase 'm' is understood as minutes in C#
+            }
+            else if (G.Equal(format, "gekko"))
+            {
+                date_as_string = gt.ToString();
+            }
+            else
+            {
+                date_as_string = G.DateHelper3(format, dt); //lowercase 'm' is understood as minutes in C#
+            }
+        }
+
+        public static DateTime FromYYYYMMDDToDateTime(string format, string s)
+        {
+            DateTime dt = new DateTime();
+            try
+            {
+                dt = DateTime.ParseExact(s, format.ToLower().Replace("m", "M"), null);
+            }
+            catch (Exception e)
+            {
+                G.Writeln2("*** ERROR: The date '" + s + "' does not comply with the format '" + format + "'");
+                throw new GekkoException();
+            }
+            return dt;
+        }
+
         public static GekkoTime FromStringToGekkoTime(string s)
         {
             return FromStringToGekkoTime(s, false);
@@ -195,6 +311,7 @@ namespace Gekko
             //trailing a or a1 accepted: 2001a, 2001a1
             //trailing u or u1 accepted: 2001u, 2001u1
             //k may be accepted for dates (allowK...)
+            //two digits like 98 are understood as annual 1998
             //else: 2001, 2001q1, 2001m1, 2001m1d15
 
             //========================================================================================================

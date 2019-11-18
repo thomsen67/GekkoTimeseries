@@ -8676,7 +8676,7 @@ namespace UnitTests
             int counter = 0;
             for (int i = 0; i < 2; i++)  //cols or not
             {
-                for (int f = 0; f < 4; f++)  //freq
+                for (int f = 0; f < 4; f++)  //freq: a, q, m, u, d
                 {
                     for (int k = 0; k < 2; k++) //use SHEET or EXPORT<xlsx>
                     {
@@ -8684,7 +8684,7 @@ namespace UnitTests
                         {
                             for (int datetype = 0; datetype < 2; datetype++) //text or excel
                             {
-                                for (int dateformat = 0; dateformat < 2; dateformat++) //gekko or yyyy-mm-dd
+                                for (int dateformat = 0; dateformat < 2; dateformat++) //gekko or yyyy-mm-dd (only for datetype=text)
                                 {
                                     for (int datefirstLast = 0; datefirstLast < 2; datefirstLast++) //first or last
                                     {
@@ -8752,6 +8752,9 @@ namespace UnitTests
                                         if (f == 1) { freq = "q"; time = "2010q1 2010q3"; }
                                         else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
                                         else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
+                                        else if (f == 4) {
+                                            freq = "d"; time = "2010m12d30 2011m1d2";
+                                        }
 
                                         I("reset;");
                                         I("option freq " + freq + ";");
@@ -8790,6 +8793,13 @@ namespace UnitTests
                                             _AssertSeries(First(), "x!u", EFreq.U, 1, 1, 2d, sharedDelta);
                                             _AssertSeries(First(), "x!u", EFreq.U, 2, 1, 1d, sharedDelta);
                                             _AssertSeries(First(), "x!u", EFreq.U, 3, 1, -1d, sharedDelta);
+                                        }
+                                        else if (freq == "d")
+                                        {
+                                            _AssertSeries(First(), "x!d", EFreq.D, 2010, 12, 30, 2d, sharedDelta);
+                                            _AssertSeries(First(), "x!d", EFreq.D, 2010, 12, 31, 1d, sharedDelta);
+                                            _AssertSeries(First(), "x!d", EFreq.D, 2011, 1, 1, -1d, sharedDelta);
+
                                         }
                                     }
                                 }
@@ -18716,12 +18726,12 @@ namespace UnitTests
                     ReadFormatsHelper("q", bank);                    
                 }
 
-                // ---------- Testing on days
-                // ---------- Testing on days
-                // ---------- Testing on days
-                // ---------- Testing on days
-                // ---------- Testing on days
-                // ---------- Testing on days
+                // ---------- Testing on daily
+                // ---------- Testing on daily
+                // ---------- Testing on daily
+                // ---------- Testing on daily
+                // ---------- Testing on daily
+                // ---------- Testing on daily
 
                 I("RESET;");
                 Program.DeleteFolder(Globals.ttPath2 + @"\regres\Databanks\temp");

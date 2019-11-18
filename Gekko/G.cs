@@ -1714,105 +1714,13 @@ namespace Gekko
             if (special) s = s.Replace("\"", "\\\"");  //inside js in html
             else s = s.Replace("\"", "\"\"");
             return s;
-        }
-
-                
-
-        public static void DateHelper1(GekkoTime gt, bool first, string format, out DateTime dt, out string f, out string date_as_string)
-        {
-            //format can be null, 'gekko' or 'yyyy-dd-mm'-style
-
-            dt = new DateTime();
-
-            f = null;
-            //f = format;
-
-            date_as_string = null;
-
-            int y = gt.super;
-            int m = -12345;
-            int d = -12345;
-
-            if (gt.freq == EFreq.A)
-            {
-                if (format == null) f = "yyyy";
-                if (first) { m = 1; d = 1; }
-                else { m = 12; d = 31; }
-            }
-            else if (gt.freq == EFreq.Q)
-            {
-                if (format == null) f = "yyyy-mm";
-                if (gt.sub == 1)
-                {
-                    if (first) { m = 1; d = 1; }
-                    else { m = 3; d = G.DaysInMonth(y, m); }
-                }
-                else if (gt.sub == 2)
-                {
-                    if (first) { m = 4; d = 1; }
-                    else { m = 6; d = G.DaysInMonth(y, m); }
-                }
-                else if (gt.sub == 3)
-                {
-                    if (first) { m = 7; d = 1; }
-                    else { m = 9; d = G.DaysInMonth(y, m); }
-                }
-                else
-                {
-                    if (first) { m = 10; d = 1; }
-                    else { m = 12; d = G.DaysInMonth(y, m); }
-                }
-            }
-            else if (gt.freq == EFreq.M)
-            {
-                if (format == null) f = "yyyy"; f = "yyyy-mm";
-                m = gt.sub;
-                if (first) d = 1;
-                else d = G.DaysInMonth(y, m);
-            }
-            else if (gt.freq == EFreq.U)
-            {
-                G.Writeln2("*** ERROR: You cannot use dateformat together with an undated frequency");
-                throw new GekkoException();
-            }
-
-            //Now: three possibilities regarding format:
-            //format == null                   --> f has 'yyyy-mm-dd'-style value (custom)
-            //format == 'gekko'                --> f = null
-            //format == 'yyyy-mm-dd'-style     --> f = null
-
-            if (format != null && !G.Equal(format, "gekko")) f = format;
-
-            //Now: three possibilities regarding format:
-            //format == null                   --> f = 'yyyy-mm-dd'-style value (custom)
-            //format == 'gekko'                --> f = null
-            //format == 'yyyy-mm-dd'-style     --> f = 'yyyy-mm-dd'-style
-
-            dt = new DateTime(y, m, d);
-            if (format == null)
-            {
-                //Not sure if this is right, using f?? Probably ok.
-                date_as_string = G.DateHelper3(f, dt); //lowercase 'm' is understood as minutes in C#
-            }
-            else if (G.Equal(format, "gekko"))
-            {
-                date_as_string = gt.ToString();
-            }
-            else
-            {
-                date_as_string = G.DateHelper3(format, dt); //lowercase 'm' is understood as minutes in C#
-            }
-        }
+        }        
 
         public static int DaysInMonth(int y, int m)
         {
             return DateTime.DaysInMonth(y, m);
         }
         
-        public static DateTime DateHelper2(double data)
-        {
-            return DateTime.FromOADate(data);
-        }
 
         public static string DateHelper3(string format, DateTime dt)
         {
@@ -1820,20 +1728,7 @@ namespace Gekko
             return s;
         }
 
-        public static DateTime DateHelper4(string format, string s)
-        {
-            DateTime dt = new DateTime();
-            try
-            {
-                dt = DateTime.ParseExact(s, format.ToLower().Replace("m", "M"), null);
-            }
-            catch (Exception e)
-            {
-                G.Writeln2("*** ERROR: The date '" + s + "' does not comply with the format '" + format + "'");
-                throw new GekkoException();
-            }
-            return dt;
-        }
+        
 
         public static int GekkoMin(int i1, int i2) {
             //if both are missing, a missing is returned
