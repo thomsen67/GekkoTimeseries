@@ -149,6 +149,23 @@ namespace Gekko
             return new ScalarVal(gt.sub);
         }
 
+        public static IVariable getday(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
+        {
+            if (ths.Type() != EVariableType.Date)
+            {
+                G.Writeln2("*** ERROR: getday() expects date input");
+                throw new GekkoException();
+            }
+
+            GekkoTime gt = (ths as ScalarDate).date;
+            if (gt.freq != EFreq.D)
+            {
+                G.Writeln2("*** ERROR: getday() expects daily date");
+                throw new GekkoException();
+            }
+            return new ScalarVal(gt.subsub);
+        }
+
         public static IVariable getparent(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable ths)
         {
             if (ths.Type() != EVariableType.Series)
@@ -3647,11 +3664,17 @@ namespace Gekko
             return new ScalarVal((double)DateTime.Now.Second);
         }
 
-        public static IVariable toexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable y, IVariable m, IVariable d)
+        public static IVariable toexceldate(GekkoSmpl smpl, IVariable _t1, IVariable _t2, IVariable d)
         {
-            int iy = O.ConvertToInt(y, true);
-            int im = O.ConvertToInt(m, true);
-            int id = O.ConvertToInt(d, true);
+            GekkoTime gt = O.ConvertToDate(d);
+            if (gt.freq != EFreq.D)
+            {
+                G.Writeln2("*** ERROR: toExcelDate() expects a daily date as input");
+                throw new GekkoException();
+            }
+            int iy = gt.super;
+            int im = gt.sub;
+            int id = gt.subsub;
             DateTime dt = new DateTime(iy, im, id);
             double ed = dt.ToOADate();
             return new ScalarVal(ed);
@@ -3661,13 +3684,8 @@ namespace Gekko
         {
             double xx = O.ConvertToVal(x);
             DateTime dt = DateTime.FromOADate(xx);
-            ScalarVal y = new ScalarVal(dt.Year);
-            ScalarVal m = new ScalarVal(dt.Month);
-            ScalarVal d = new ScalarVal(dt.Day);
-            Map rv = new Map();
-            rv.storage.Add("%y", y);
-            rv.storage.Add("%m", m);
-            rv.storage.Add("%d", d);
+            GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, dt);
+            IVariable rv = new ScalarDate(gt);            
             return rv;
         }
 

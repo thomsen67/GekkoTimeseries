@@ -83,6 +83,15 @@ namespace Gekko
         OneNonSeries
     }
 
+    public enum EPrtPlotSheet
+    {
+        Unknown,
+        PrintMixedAQMPretty,
+        PrintMixedMDPretty,
+        PrintNonmixedUgly,  //also for sheet
+        Plot
+    }
+
     public enum EDecompBanks
     {
         Work,
@@ -29552,18 +29561,27 @@ namespace Gekko
 
                 bool showRowWithYear = pretty || (sameFreq == EFreq.U || sameFreq == EFreq.A);
 
-                if (Globals.runningOnTTComputer && true && type == EPrintTypes.Plot)
+                EPrtPlotSheet tabletype = EPrtPlotSheet.Unknown;
+                if (type == EPrintTypes.Plot) tabletype = EPrtPlotSheet.Plot;
+                else
                 {
+                    if (freqs[4]) tabletype = EPrtPlotSheet.PrintMixedMDPretty;
+                }
+
+
+                if (tabletype == EPrtPlotSheet.Plot)
+                {
+                    int n = containerExplode.Count;
+
                     if (j > 1)
                     {
                         EFreq freqHere = EFreq.None;
                         if (tsWork != null) freqHere = tsWork.freq;
                         else if (tsRef != null) freqHere = tsRef.freq;
 
-                        int n = containerExplode.Count + 2;
-
                         foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
                         {
+
                             int sumOver = 0;
                             double d = double.NaN;
                             if (tsWork == null && tsRef == null)  //not series
@@ -29576,20 +29594,22 @@ namespace Gekko
                             }
                             i++;
                             double tt = ((ScalarVal)Functions.helper_time(t)).val;
-                            //table.Set(i, j, t.ToString());  
-                            table.Set(i, j, tt.ToString());
-                            table.Get(i, j).date_hack = t;
+
+                            //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
+                            //We skip the j=1 column, so the following logic applies, if there are n variables
+                            //j=1 --> skip
+                            //j=2 --> 1 and 1+n
+                            //j=3 --> 2 and 2+n
+
+                            table.Set(i, j - 1, tt.ToString()); table.Get(i, j - 1).date_hack = t;
                             table.SetNumber(i, j + n, d, format);
-
-                            //G.Writeln2(i + " " + j + " " + t.ToString());
-
                         }
                     }
                 }
-                else if (freqs[4])  //day: pure day or day and month
+                else if (freqs[4])  //daily freq, will also accept d + m freq at same time
                 {
-                    //              x!d              x!m
-                    // 2019m1                        100
+                    //              x!d      x!m
+                    // 2019m1                100
                     //     d1        22
                     //     d2        23
                     //     d3        42
@@ -29610,7 +29630,7 @@ namespace Gekko
                     i = PutLabelIntoTable(table, i, j, label, labelMaxLine);  //augments i
                     i--; //else a blank line too much at start                    
 
-                    if (pretty)  //sheet is non-pretty
+                    if (pretty)  //pretty printing (sheet is non-pretty)
                     {
                         foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, EFreq.D)))  //handles if the freq given is not daily
                         {
@@ -29668,6 +29688,7 @@ namespace Gekko
                     }
                     else
                     {
+                        //sheet or non-pretty printing
                         if (isMonthlyFreq)
                         {
                             G.Writeln2("*** ERROR: Cannot use D and M freq at the same time");
@@ -29702,7 +29723,6 @@ namespace Gekko
                         }
                     }
                 }
-
                 else
                 {
 
