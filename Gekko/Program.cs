@@ -29683,6 +29683,7 @@ namespace Gekko
                             if (j == 1)
                             {
                                 table.Set(i, j, t.ToString()); if (rows) table.SetAlign(i, j, Align.Right);
+                                table.Get(i, j).date_hack = t;
                             }
                             else
                             {

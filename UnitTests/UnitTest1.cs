@@ -8676,7 +8676,7 @@ namespace UnitTests
             int counter = 0;
             for (int i = 0; i < 2; i++)  //cols or not
             {
-                for (int f = 0; f < 4; f++)  //freq: a, q, m, u, d
+                for (int f = 0; f < 5; f++)  //freq: 0:a, 1:q, 2:m, 3:u, 4:d
                 {
                     for (int k = 0; k < 2; k++) //use SHEET or EXPORT<xlsx>
                     {
@@ -8702,6 +8702,11 @@ namespace UnitTests
                                         if (dateformat == 0 && datefirstLast == 1)
                                         {
                                             continue;  //dateformat=gekko ignores dateday, so we skip one of them to not waste time
+                                        }
+
+                                        if (f == 4 && datefirstLast == 1)
+                                        {
+                                            continue;  //for daily date there is no first/last
                                         }
 
                                         if (f == 3 && dateformat == 1)
@@ -8753,7 +8758,7 @@ namespace UnitTests
                                         else if (f == 2) { freq = "m"; time = "2010m1 2010m3"; }
                                         else if (f == 3) { freq = "u"; time = "1u 3u"; }  //stange but possible
                                         else if (f == 4) {
-                                            freq = "d"; time = "2010m12d30 2011m1d2";
+                                            freq = "d"; time = "2010m12d30 2011m1d1";
                                         }
 
                                         I("reset;");
@@ -8809,7 +8814,7 @@ namespace UnitTests
                 }
             }
 
-            Assert.AreEqual(counter, 96);  //counting them so we are sure all are done!
+            Assert.AreEqual(counter, 116);  //counting them so we are sure all are done!
         }
 
         [TestMethod]
