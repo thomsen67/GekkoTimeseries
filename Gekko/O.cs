@@ -7181,7 +7181,12 @@ namespace Gekko
 
                     hlp.array = this.opt_array;
 
-                    Program.OpenOrRead(wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
+                    CellOffset offset = new CellOffset();
+                    offset.cell = this.opt_cell;
+                    offset.namecell = this.opt_namecell;
+                    offset.datecell = this.opt_datecell;
+
+                    Program.OpenOrRead(offset, wipeDatabankBeforeInsertingData, hlp, open, readInfos, false);
                     Program.ReadInfo readInfo = readInfos[0];
                     readInfo.shouldMerge = hlp.Merge;
 
@@ -8409,9 +8414,10 @@ namespace Gekko
                     }
                 }
 
-                List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
-                Program.OpenOrRead(false, hlp, true, readInfos, create);
+                CellOffset offset = new CellOffset();
 
+                List<Program.ReadInfo> readInfos = new List<Program.ReadInfo>();
+                Program.OpenOrRead(offset, false, hlp, true, readInfos, create);
 
                 foreach (Program.ReadInfo readInfo in readInfos)
                 {

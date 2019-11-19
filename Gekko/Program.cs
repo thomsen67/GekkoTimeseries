@@ -113,7 +113,13 @@ namespace Gekko
         Special
     }
 
-    
+    public class CellOffset
+    {
+        public string cell = null;
+        public string datecell = null;
+        public string namecell = null;
+    }
+
     public class CGSolverOutput
     {
         public int iterations = -12345;
@@ -1550,7 +1556,7 @@ namespace Gekko
             return matrix;
         }
 
-        private static void GetTimeseriesFromWorkbookMatrix(ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
+        private static void GetTimeseriesFromWorkbookMatrix(CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
         {
 
             //TODO: gaps, READ<gap>
@@ -1583,251 +1589,246 @@ namespace Gekko
             string[] start = new string[2];
             string[] end = new string[2];
 
+            int i_data, j_data, i_names, j_names, i_dates, j_dates;
+            HandleRectangularFileFormatCellOffset(offset, transpose, out i_data, out j_data, out i_names, out j_names, out i_dates, out j_dates);
+
             int matrixMaxRow = matrix.GetRowMaxNumber();
             int matrixMaxCol = matrix.GetColMaxNumber();
-            for (int row = 1 + rowOffset; row <= matrixMaxRow; row++)
+
+            //Series are running in rows per default, else data is transposed
+            //There may be gaps, like this:
+            // ..   ..  ..   2001   2002   2003
+            // ..   ..  ..    ..     ..     ..
+            // ..   x1  ..   100     200    161
+            // ..   x2  ..   200     100    132
+
+            // Here, datecell=d1, namecell=b3, cell=d3
+
+            for (int col = j_dates; col <= matrixMaxCol; col++)
             {
-                Series ts = null;
-                for (int col = 1 + colOffset; col <= matrixMaxCol; col++)
+                int row = i_dates;
+
+                CellLight cell = matrix.Get(row, col);
+
+                //if (row - rowOffset == 1 && col - colOffset >= 2)
+                if (true)
                 {
-                    if (row - rowOffset == 1 && col - colOffset == 1)
+                    //---------------------
+                    //DATES ROW
+                    //---------------------
+
+                    //========================================================================================================
+                    //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+                    //========================================================================================================
+                    // There is a lot of date stuff below
+
+                    string cellText = null;
+                    if (cell.type != ECellLightType.None)
                     {
-                        //--> this cell is just ignored now
-                        continue;
+                        if (cell.type == ECellLightType.String) cellText = cell.text;
+                        else if (cell.type == ECellLightType.Double) cellText = cell.data.ToString();
                     }
 
-                    CellLight cell = matrix.Get(row, col);
-
-                    if (row - rowOffset == 1 && col - colOffset >= 2)
+                    if (cellText == null)
                     {
-                        //---------------------
-                        //DATES ROW
-                        //---------------------
+                        G.Writeln2("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ".");
+                        G.Writeln2("    This cell should contain a date and not be empty.", Color.Red);
+                        throw new GekkoException();
+                    }
 
-                        //========================================================================================================
-                        //                          FREQUENCY LOCATION, indicates where to implement more frequencies
-                        //========================================================================================================
-                        // There is a lot of date stuff below
+                    if (col - colOffset == 2)
+                    {
+                        start[0] = cellText;
+                        start[1] = GetExcelCell(row, col, transpose);
+                    }
 
-                        string cellText = null;
-                        if (cell.type != ECellLightType.None)
+                    if (true)  //made for each date
+                    {
+                        end[0] = cellText;
+                        end[1] = GetExcelCell(row, col, transpose);
+                    }
+
+                    string date = cellText;
+                    date = date.Trim();  //removes blanks at start and end
+                    date = date.ToLower();  //if q or m (or y)
+
+                    GekkoTime gt = new GekkoTime(0, 0, 0); //will not activate .IsNull() == true
+
+                    if (G.Equal(datetype, "excel"))
+                    {
+                        if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
                         {
-                            if (cell.type == ECellLightType.String) cellText = cell.text;
-                            else if (cell.type == ECellLightType.Double) cellText = cell.data.ToString();
-                        }
-
-                        if (cellText == null)
-                        {
-                            G.Writeln2("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ".");
-                            G.Writeln2("    This cell should contain a date and not be empty.", Color.Red);
+                            //Excel-dates are converted to yyyy-mm-dd when a xlsx is exported to csv.
+                            //So this restriction seems sensibl.
+                            G.Writeln2("*** ERROR: You cannot use <datetype='excel'> for .csv or .prn file types");
                             throw new GekkoException();
                         }
 
-                        if (col - colOffset == 2)
+                        //this is quite easy, since there is no formatting to worry about.
+                        //any dateformat is just ignored, is not relevant since the internal number is exact
+
+                        double d = double.NaN; double.TryParse(date, out d);
+                        if (G.isNumericalError(d))
                         {
-                            start[0] = cellText;
-                            start[1] = GetExcelCell(row, col, transpose);
+                            G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'");
+                            G.Writeln("           It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot", Color.Red);
+                            G.Writeln("           convert it to a value.", Color.Red);
+                            throw new GekkoException();
                         }
+                        DateTime dt = GekkoTime.FromExcelDateToDateTime(d);
 
-                        if (true)  //made for each date
+                        //TODO
+                        //TODO
+                        //TODO: make sure that dates follow acceptable pattern.
+                        //TODO: days must be first or last in the period, here we just drop that convention.
+                        //TODO
+                        //TODO
+
+                        gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
+                    }
+                    else
+                    {
+                        //datetype = text
+
+                        if (IsGekkoDateFormat(format))
                         {
-                            end[0] = cellText;
-                            end[1] = GetExcelCell(row, col, transpose);
-                        }
+                            //no format given, Gekko date format expected
 
-                        string date = cellText;
-                        date = date.Trim();  //removes blanks at start and end
-                        date = date.ToLower();  //if q or m (or y)
+                            //if freq=a and 2001y, this is treated as integer 2001
+                            //if freq=a and 98, this is treated as 1998 (logic of GekkoTime.FromStringToGekkoTime()).
+                            //if freq=q and 200102, this is treated as 2001q2
+                            //if freq=m and 200102, this is treated as 2001m2
+                            //if 20010230, this is always treated as 2001m2d30 (we do not expect undated freq with 8 digits)
+                            //data with freq U MUST have "option freq u" set.
 
-                        GekkoTime gt = new GekkoTime(0, 0, 0); //will not activate .IsNull() == true
-                                                
-                        if (G.Equal(datetype, "excel"))
-                        {
-                            if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn)
+                            bool error = false;
+                            bool done = false;
+
+                            if ((freqHere == EFreq.A))
                             {
-                                //Excel-dates are converted to yyyy-mm-dd when a xlsx is exported to csv.
-                                //So this restriction seems sensibl.
-                                G.Writeln2("*** ERROR: You cannot use <datetype='excel'> for .csv or .prn file types");
-                                throw new GekkoException();
+                                if (date.Length == 5 && date.EndsWith(annualIndicator1, true, null))
+                                {
+                                    //remove 'Y' if it is there
+                                    date = date.Remove(date.Length - 1);
+                                }
                             }
-                            
-                            //this is quite easy, since there is no formatting to worry about.
-                            //any dateformat is just ignored, is not relevant since the internal number is exact
 
-                            double d = double.NaN; double.TryParse(date, out d);
-                            if (G.isNumericalError(d))
+                            if (G.IsInteger(date))
                             {
-                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not interpret this date: '" + date + "'");
-                                G.Writeln("           It is supposed to be an Excel date, counting days since January 1, 1900. But Gekko cannot", Color.Red);
-                                G.Writeln("           convert it to a value.", Color.Red);
-                                throw new GekkoException();
+
+
+                                // 200102 --> q or m (if Q or M is set)
+                                // 20010230 --> daily (always)
+                                // undated must have freq U
+                                //
+
+                                if (freqHere == EFreq.U)
+                                {
+                                    gt = new GekkoTime(freqHere, int.Parse(date), 1);
+                                    done = true;
+                                }
+                                else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M))
+                                {
+                                    //It might be a date like 199503, that is, 1995q3 or 1995m3
+                                    //We have to use the global freq here, how else to know the freq??
+                                    //Only with freq Q or M
+                                    gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
+                                    done = true;
+                                }
+                                else if (date.Length == 8)
+                                {
+                                    //It might be a date like 19950302, that is, 1995m3d2
+                                    //Always, regardless of global freq, we do not expect U freq data this large
+                                    gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
+                                    done = true;
+                                }
                             }
-                            DateTime dt = GekkoTime.FromExcelDateToDateTime(d);
 
-                            //TODO
-                            //TODO
-                            //TODO: make sure that dates follow acceptable pattern.
-                            //TODO: days must be first or last in the period, here we just drop that convention.
-                            //TODO
-                            //TODO
-
-                            gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);                            
-                        }
-                        else
-                        {
-                            //datetype = text
-
-                            if (IsGekkoDateFormat(format))
+                            if (done)
                             {
-                                //no format given, Gekko date format expected
-
-                                //if freq=a and 2001y, this is treated as integer 2001
-                                //if freq=a and 98, this is treated as 1998 (logic of GekkoTime.FromStringToGekkoTime()).
-                                //if freq=q and 200102, this is treated as 2001q2
-                                //if freq=m and 200102, this is treated as 2001m2
-                                //if 20010230, this is always treated as 2001m2d30 (we do not expect undated freq with 8 digits)
-                                //data with freq U MUST have "option freq u" set.
-
-                                bool error = false;
-                                bool done = false;
-
-                                if ((freqHere == EFreq.A))
-                                {
-                                    if (date.Length == 5 && date.EndsWith(annualIndicator1, true, null))
-                                    {
-                                        //remove 'Y' if it is there
-                                        date = date.Remove(date.Length - 1);
-                                    }                                    
-                                }
-
-                                if (G.IsInteger(date))
-                                {
-
-
-                                    // 200102 --> q or m (if Q or M is set)
-                                    // 20010230 --> daily (always)
-                                    // undated must have freq U
-                                    //
-
-                                    if (freqHere == EFreq.U)
-                                    {
-                                        gt = new GekkoTime(freqHere, int.Parse(date), 1);
-                                        done = true;
-                                    }
-                                    else if (date.Length == 6 && (freqHere == EFreq.Q || freqHere == EFreq.M))
-                                    {
-                                        //It might be a date like 199503, that is, 1995q3 or 1995m3
-                                        //We have to use the global freq here, how else to know the freq??
-                                        //Only with freq Q or M
-                                        gt = new GekkoTime(freqHere, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), 1);
-                                        done = true;
-                                    }
-                                    else if (date.Length == 8)
-                                    {
-                                        //It might be a date like 19950302, that is, 1995m3d2
-                                        //Always, regardless of global freq, we do not expect U freq data this large
-                                        gt = new GekkoTime(EFreq.D, int.Parse(date.Substring(0, 4)), int.Parse(date.Substring(4, 2)), int.Parse(date.Substring(6, 2)));
-                                        done = true;
-                                    }                                    
-                                }
-
-                                if (done)
-                                {
-                                    error = false;
-                                }
-                                else
-                                {
-                                    gt = GekkoTime.FromStringToGekkoTime(date, true, false);
-                                    if (gt.IsNull()) error = true;
-                                }
-                                                                                             
-                                if (error)
-                                {
-                                    G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
-                                    G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
-                                    throw new GekkoException();
-                                }
-
+                                error = false;
                             }
                             else
                             {
-                                //non-Gekko date format
-                                //we have a yyyy-mm-dd-like format that we need to look into
-                                DateTime dt = GekkoTime.FromYYYYMMDDToDateTime(format, date);
-                                gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
+                                gt = GekkoTime.FromStringToGekkoTime(date, true, false);
+                                if (gt.IsNull()) error = true;
                             }
-                        }
 
-                        if (readInfo.startPerInFile == -12345) readInfo.startPerInFile = gt.super;
-                        if (readInfo.endPerInFile == -12345) readInfo.endPerInFile = gt.super;
-                        else
-                        {
-                            if (gt.super > readInfo.endPerInFile) readInfo.endPerInFile = gt.super;
-                        }                        
-
-                        if (col - colOffset == 2)
-                        {
-                            per1 = gt;
-                        }
-                        if (true)  //tested for each observation
-                        {
-                            per2 = gt;
-                            int expectedPeriods = GekkoTime.Observations(per1, gt);
-                            if (expectedPeriods != (col - (2 + colOffset) + 1))
+                            if (error)
                             {
-                                G.Writeln2("*** ERROR: Expected to find " + expectedPeriods + " observations between the periods");
-                                G.Writeln("           '" + start[0] + "' (cell " + start[1] + ")" + " and '" + end[0] + "' (cell " + end[1] + ").", Color.Red);
+                                G.Writeln2("*** ERROR: Cell " + GetExcelCell(row, col, transpose) + ". Could not find frequency data in this date: '" + date + "'");
+                                G.Writeln("           You may want to change the frequency: OPTION freq = ...", Color.Red);
                                 throw new GekkoException();
                             }
+
+                        }
+                        else
+                        {
+                            //non-Gekko date format
+                            //we have a yyyy-mm-dd-like format that we need to look into
+                            DateTime dt = GekkoTime.FromYYYYMMDDToDateTime(format, date);
+                            gt = GekkoTime.FromDateTimeToGekkoTime(freqHere, dt);
                         }
                     }
-                    else if (row - rowOffset >= 2)  //data row
+
+                    if (readInfo.startPerInFile == -12345) readInfo.startPerInFile = gt.super;
+                    if (readInfo.endPerInFile == -12345) readInfo.endPerInFile = gt.super;
+                    else
+                    {
+                        if (gt.super > readInfo.endPerInFile) readInfo.endPerInFile = gt.super;
+                    }
+
+                    if (col == j_dates)
+                    {
+                        per1 = gt;
+                    }
+                    if (true)  //tested for each observation
+                    {
+                        per2 = gt;
+                        int expectedPeriods = GekkoTime.Observations(per1, gt);
+                        if (expectedPeriods != (col - j_dates + 1))
+                        {
+                            G.Writeln2("*** ERROR: Expected to find " + expectedPeriods + " observations between the periods");
+                            G.Writeln("           '" + start[0] + "' (cell " + start[1] + ")" + " and '" + end[0] + "' (cell " + end[1] + ").", Color.Red);
+                            throw new GekkoException();
+                        }
+                    }
+                }
+            }
+
+            for (int row = i_data; row <= matrixMaxRow; row++)
+            //for (int row = 1 + rowOffset; row <= matrixMaxRow; row++)
+            {
+                
+
+                for (int col = j_data; col <= matrixMaxCol; col++)
+                //for (int col = 1 + colOffset; col <= matrixMaxCol; col++)
+                {
+                    //if (row - rowOffset == 1 && col - colOffset == 1)
+
+                    
+
+                    CellLight cell = matrix.Get(row, col);
+
+
+                    if (true)  //data row
                     {
                         //---------------------
                         //DATA ROW
                         //---------------------
-                        //First column
-                        if (col - colOffset == 1)
+                        //`do this only for first data column
+
+                        Series ts = null;
+                        if (col == j_data)
                         {
                             //-----------------------
                             //VARIABLE NAME
                             //-----------------------
 
-                            string cellText = null;
-                            if (cell.type != ECellLightType.None)
-                            {
-                                if (cell.type == ECellLightType.String) cellText = cell.text;
-                                else if (cell.type == ECellLightType.Double)
-                                {
-                                    G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ".");
-                                    G.Writeln("    This cell is a value: expected a variable name.", Color.Red);
-                                    throw new GekkoException();
-                                }
-                            }
-
-                            if (cellText == null)
-                            {
-                                G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ".");
-                                G.Writeln("    This cell should contain a variable name and not be empty.", Color.Red);
-                                throw new GekkoException();
-                            }
-
-                            string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
-                            varName = G.Chop_FreqAdd(varName, Program.options.freq);
-                            variableCounter++;
-                            if (!databank.ContainsIVariable(varName))
-                            {
-                                Series data2 = new Series(freqHere, varName);
-                                databank.AddIVariable(varName, data2);
-                                ts = data2;
-                            }
-                            else
-                            {
-                                ts = databank.GetIVariable(varName) as Series;
-                            }
+                            ts = GetTimeseriesFromWorkbookMatrixHelper(databank, freqHere, transpose, ref variableCounter, row, col, matrix, j_names);
                         }
 
-                        else
+                        if(true)
                         {
                             //-----------------------
                             //NUMERIC DATA (rest of row)
@@ -1887,13 +1888,14 @@ namespace Gekko
                                 {
                                     ss = double.NaN;
                                 }
-                                GekkoTime gt2 = per1.Add((col - colOffset) - 2);  //col 2 is the start col for data   
-                                ts.SetData(gt2, ss);                                
+                                GekkoTime gt2 = per1.Add(col - j_data);
+                                ts.SetData(gt2, ss);
                             }
                         }
+                        if (ts != null) ts.Trim(); //to save ram
                     }
-                }
-                if (ts != null) ts.Trim(); //to save ram, for the first row ts is = null
+                    
+                }                
             }
             //See almost identical code in readTsd and readPcim and readTsp...
             readInfo.variables = variableCounter;
@@ -1910,6 +1912,49 @@ namespace Gekko
             //Databank currentBank = Program.databanks.GetDatabank(databank.name);
             //currentBank.yearStart = readInfo.startPerResultingBank;
             //currentBank.yearEnd = readInfo.endPerResultingBank;
+        }
+
+        private static Series GetTimeseriesFromWorkbookMatrixHelper(Databank databank, EFreq freqHere, bool transpose, ref int variableCounter, int row, int col, TableLight matrix, int j_cellnames)
+        {
+            Series ts;
+
+            CellLight cell = matrix.Get(row, j_cellnames);
+
+            string cellText = null;
+
+            if (cell.type != ECellLightType.None)
+            {
+                if (cell.type == ECellLightType.String) cellText = cell.text;
+                else if (cell.type == ECellLightType.Double)
+                {
+                    G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ".");
+                    G.Writeln("    This cell is a value: expected a variable name.", Color.Red);
+                    throw new GekkoException();
+                }
+            }
+
+            if (cellText == null)
+            {
+                G.Writeln2("*** ERROR in spreadsheet cell " + GetExcelCell(row, col, transpose) + ".");
+                G.Writeln("    This cell should contain a variable name and not be empty.", Color.Red);
+                throw new GekkoException();
+            }
+
+            string varName = cellText.Trim();  //the name may contain blanks like 'elveff '
+            varName = G.Chop_FreqAdd(varName, Program.options.freq);
+            variableCounter++;
+            if (!databank.ContainsIVariable(varName))
+            {
+                Series data2 = new Series(freqHere, varName);
+                databank.AddIVariable(varName, data2);
+                ts = data2;
+            }
+            else
+            {
+                ts = databank.GetIVariable(varName) as Series;
+            }
+
+            return ts;
         }
 
         private static bool IsGekkoDateFormat(string format)
@@ -2010,7 +2055,7 @@ namespace Gekko
             return found;
         }
 
-        public static void OpenOrRead(bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
+        public static void OpenOrRead(CellOffset offset, bool wipeDatabankBeforeInsertingData, ReadOpenMulbkHelper oRead, bool open, List<ReadInfo> readInfos, bool create)
         {
             //open = true if called with OPEN command                      
 
@@ -2279,7 +2324,7 @@ namespace Gekko
                         G.WritelnGray("Local copying: " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds));
                         file = localFileThatShouldBeDeletedPathAndFilename;
                     }
-                    databankTemp = GetDatabankFromFile(oRead, readInfo, file, originalFilePath, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    databankTemp = GetDatabankFromFile(offset, oRead, readInfo, file, originalFilePath, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                     if (open)
                     {
                         if (!file.Contains(Globals.isAProto))  //probably does not happen anymore
@@ -2621,7 +2666,7 @@ namespace Gekko
             return;
         }
 
-        private static Databank GetDatabankFromFile(ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        private static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
 
@@ -2633,7 +2678,7 @@ namespace Gekko
             }
             else if (oRead.Type == EDataFormat.Csv || oRead.Type == EDataFormat.Prn || oRead.Type == EDataFormat.Xls || oRead.Type == EDataFormat.Xlsx)
             {
-                ReadSheet(oRead, readInfo, file, databankTemp, originalFilePath, dateformat, datetype);
+                ReadSheet(offset, oRead, readInfo, file, databankTemp, originalFilePath, dateformat, datetype);
             }
             else if (oRead.Type == EDataFormat.Tsd)
             {
@@ -2750,7 +2795,7 @@ namespace Gekko
             }
         }
 
-        private static void ReadSheet(ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
+        private static void ReadSheet(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, Databank databank, string originalFilePath, string dateformat, string datetype)
         {
             //TODO:
             //For speedup:
@@ -2775,7 +2820,7 @@ namespace Gekko
             {
                 matrix = ReadExcelWorkbook(file, null);
             }
-            GetTimeseriesFromWorkbookMatrix(oRead, databank, matrix, readInfo, dateformat, datetype);
+            GetTimeseriesFromWorkbookMatrix(offset, oRead, databank, matrix, readInfo, dateformat, datetype);
         }
 
         public static int ExcelColumnNameToNumber(string columnName)
@@ -15755,52 +15800,13 @@ namespace Gekko
 
             //Expects series to run row-wise (first col is names, first row is dates)
 
-            if (o.opt_cell == null)
-            {
-                o.opt_cell = "b2";
-            }
+            CellOffset offset = new CellOffset();
+            offset.cell = o.opt_cell;
+            offset.namecell = o.opt_namecell;
+            offset.datecell = o.opt_datecell;
 
-            int i_data, j_data; Program.FromXls1Based(o.opt_cell, out i_data, out j_data, isTranspose);
-
-            if (i_data < 2 || j_data < 2)
-            {
-                G.Writeln2("*** ERROR: <cell=...> has an illegal value (cannot be first row or column)");
-                throw new GekkoException();
-            }
-
-            int i_names, j_names;
-            if (o.opt_namecell == null)
-            {
-                i_names = i_data;
-                j_names = j_data - 1;
-            }
-            else
-            {
-                Program.FromXls1Based(o.opt_namecell, out i_names, out j_names, isTranspose);
-            }
-
-            int i_dates, j_dates;
-            if (o.opt_datecell == null)
-            {
-                i_dates = i_data - 1;
-                j_dates = j_data;
-            }
-            else
-            {
-                Program.FromXls1Based(o.opt_datecell, out i_dates, out j_dates, isTranspose);
-            }
-
-            if (i_data != i_names)
-            {
-                G.Writeln2("*** ERROR: Positions " + o.opt_namecell + " for names and " + o.opt_cell + " for data do not correspond");
-                throw new GekkoException();
-            }
-
-            if (j_data != j_dates)
-            {
-                G.Writeln2("*** ERROR: Positions " + o.opt_datecell + " for names and " + o.opt_cell + " for data do not correspond");
-                throw new GekkoException();
-            }
+            int i_data, j_data, i_names, j_names, i_dates, j_dates;
+            HandleRectangularFileFormatCellOffset(offset, isTranspose, out i_data, out j_data, out i_names, out j_names, out i_dates, out j_dates);
 
             //expects dates to run i a row
             List<DateTime> dateList = new List<DateTime>();
@@ -15874,7 +15880,7 @@ namespace Gekko
                     int per = gt5.super;
                     subPer = gt5.sub;
                     GekkoTime gt = new GekkoTime(freq, per, subPer);
-                    HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);                    
+                    HandleCollapseData(ts, counter, v, gt, emethod, ref gt_min, ref gt_max);
                 }
 
                 if (emethod == ECollapseMethod.Avg)
@@ -15928,7 +15934,52 @@ namespace Gekko
             G.Writeln("Imported " + vars + " timeseries from " + obs + " data points");
             G.Writeln("The collapsed series (" + G.GetFreqString(freq) + ") span the timeperiod " + gt_min.ToString() + " to " + gt_max.ToString());
         }
-        
+
+        private static void HandleRectangularFileFormatCellOffset(CellOffset o, bool isTranspose, out int i_data, out int j_data, out int i_names, out int j_names, out int i_dates, out int j_dates)
+        {
+            if (o.cell == null)
+            {
+                o.cell = "b2";
+            }
+            Program.FromXls1Based(o.cell, out i_data, out j_data, isTranspose);
+
+            if (i_data < 2 || j_data < 2)
+            {
+                G.Writeln2("*** ERROR: <cell=...> has an illegal value (cannot be first row or column)");
+                throw new GekkoException();
+            }
+            if (o.namecell == null)
+            {
+                i_names = i_data;
+                j_names = j_data - 1;
+            }
+            else
+            {
+                Program.FromXls1Based(o.namecell, out i_names, out j_names, isTranspose);
+            }
+            if (o.datecell == null)
+            {
+                i_dates = i_data - 1;
+                j_dates = j_data;
+            }
+            else
+            {
+                Program.FromXls1Based(o.datecell, out i_dates, out j_dates, isTranspose);
+            }
+
+            if (i_data != i_names)
+            {
+                G.Writeln2("*** ERROR: Positions " + o.namecell + " for names and " + o.cell + " for data do not correspond");
+                throw new GekkoException();
+            }
+
+            if (j_data != j_dates)
+            {
+                G.Writeln2("*** ERROR: Positions " + o.datecell + " for names and " + o.cell + " for data do not correspond");
+                throw new GekkoException();
+            }
+        }
+
         public static void FromXls(string s, out int rowOffset, out int colOffset, bool transpose)
         {
             //0-based
@@ -29387,12 +29438,6 @@ namespace Gekko
                 throw new GekkoException();
             }
 
-            if (freqs[4] && (freqs[0] || freqs[1] || freqs[2]))
-            {
-                G.Writeln2("*** ERROR: You cannot mix Daily and Annual, Quarterly or Undated frequencies for PRT/PLOT");
-                throw new GekkoException();
-            }
-
             EFreq sameFreq = EFreq.None;
             if (freqs[0] && !freqs[1] && !freqs[2] && !freqs[3] && !freqs[4]) sameFreq = EFreq.U;
             else if (!freqs[0] && freqs[1] && !freqs[2] && !freqs[3] && !freqs[4]) sameFreq = EFreq.A;
@@ -29486,17 +29531,16 @@ namespace Gekko
             Table table = null;
             if (tabletype == EPrtPlotSheet.Plot)
             {
-                table = PlotNonmixed(smpl, type, containerExplode, n, o);
+                table = PlotMixed(smpl, type, containerExplode, n, o);
             }
             else if (freqs[4])  //daily freq, will also accept d + m freq at same time
             {
-                table = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, o);
+                table = PrintMixedMD(smpl, type, rows, containerExplode, labelMaxLine, n, pretty, freqs, o);
             }
             else
             {
                 table = PrintMixedAQM(smpl, type, rows, containerExplode, labelMaxLine, freqs, n, sameFreq, y1, y2, pretty, collapse, showRowWithYear, iPlot, o);
             }
-
             
             //bool filter = ShouldFilterPeriod(new GekkoTime());
 
@@ -29607,7 +29651,7 @@ namespace Gekko
             }
         }
 
-        private static Table PlotNonmixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o)
+        private static Table PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o)
         {
             Table table = new Table();
             table.writeOnce = true;
@@ -29646,6 +29690,7 @@ namespace Gekko
                     }
                     i++;
                     double tt = ((ScalarVal)Functions.helper_time(t)).val;
+                    if (freqHere == EFreq.A) tt += 0.5d;  //annual years should be 2020.5 to be centered correctly
 
                     //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
                     //We skip the j=1 column, so the following logic applies, if there are n variables
@@ -29680,10 +29725,16 @@ namespace Gekko
             return table;
         }
 
-        private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, O.Prt o)
+        private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, bool[] freqs, O.Prt o)
         {
             Table table = new Table();
             table.writeOnce = true;
+
+            if (freqs[0] || freqs[1] || freqs[2])
+            {
+                G.Writeln2("*** ERROR: You cannot mix Daily and Annual/Quarterly/Undated frequencies for PRT/PLOT");
+                throw new GekkoException();
+            }
 
             for (int j = 1; j < n + 2; j++)
             {
@@ -29821,6 +29872,7 @@ namespace Gekko
         {
             Table table = new Table();
             table.writeOnce = true;
+
 
             for (int j = 1; j < n + 2; j++)
             {
