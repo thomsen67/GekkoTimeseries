@@ -29614,66 +29614,65 @@ namespace Gekko
 
             int[] colCounter = new int[n];
 
-            for (int j = 1; j < n + 2; j++)
+            for (int j = 2; j < n + 2; j++)  //cols/variables starts at j=2
             {
                 int[] skipCounter = new int[4];
-                int i;
+                
                 O.Prt.Element cc;
                 string operator2, format;
                 List<string> label;
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out i, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                
+                EFreq freqHere = EFreq.None;
+                if (tsWork != null) freqHere = tsWork.freq;
+                else if (tsRef != null) freqHere = tsRef.freq;
 
-                if (j > 1)
+                int i = 0;
+                foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
                 {
-                    EFreq freqHere = EFreq.None;
-                    if (tsWork != null) freqHere = tsWork.freq;
-                    else if (tsRef != null) freqHere = tsRef.freq;
 
-                    foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
+                    int sumOver = 0;
+                    double d = double.NaN;
+                    if (tsWork == null && tsRef == null)  //not series
                     {
-
-                        int sumOver = 0;
-                        double d = double.NaN;
-                        if (tsWork == null && tsRef == null)  //not series
-                        {
-                            d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
-                        }
-                        else
-                        {
-                            d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
-                        }
-                        i++;
-                        double tt = ((ScalarVal)Functions.helper_time(t)).val;
-
-                        //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
-                        //We skip the j=1 column, so the following logic applies, if there are n variables
-                        //j=1 --> skip
-                        //j=2 --> 1 and 1+n
-                        //j=3 --> 2 and 2+n
-
-                        table.Set(i, j - 1, tt.ToString()); table.Get(i, j - 1).date_hack = t;
-                        table.SetNumber(i, j + n, d, format);
+                        d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
                     }
-                }
+                    else
+                    {
+                        d = PrintHelperTransform(smpl, tsWork, tsRef, t, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
+                    }
+                    i++;
+                    double tt = ((ScalarVal)Functions.helper_time(t)).val;
 
+                    //The columns (variables) are counted with j=1 for date column, and variables following for j=2, j=3, ...
+                    //We skip the j=1 column, so the following logic applies, if there are n variables
+                    //j=1 --> skip
+                    //j=2 --> 1 and 1+n
+                    //j=3 --> 2 and 2+n
+
+                    int col = j - 1;
+                    table.Set(i, col, tt.ToString()); table.Get(i, col).date_hack = t;
+                    table.SetNumber(i, col + n, d, format);
+                    colCounter[j - 2] = i;
+                }
             }
 
             int max = int.MinValue;
-            for (int jj = 0; jj < n; jj++)
+            for (int j2 = 0; j2 < n; j2++)
             {
-                max = Math.Max(max, colCounter[jj]);
+                max = Math.Max(max, colCounter[j2]);
             }
-            for (int jj = 0; jj < n; jj++)
+            for (int j2 = 0; j2 < n; j2++)
             {
-                for (int jjj = colCounter[jj]; jjj < max; jjj++)
+                for (int i2 = colCounter[j2]; i2 < max; i2++)
                 {
-                    table.Set(jjj, jj + 1, "M");
-                    table.SetAlign(jjj, jj + 1, Align.Right);
-                    table.Set(jjj, n + jj + 1, "M", CellType.Text);
-                    table.SetAlign(jjj, n + jj + 1, Align.Right);
+                    table.Set(i2 + 1, j2 + 1, "M");
+                    table.SetAlign(i2 + 1, j2 + 1, Align.Right);
+                    table.Set(i2 + 1, n + j2 + 1, "M", CellType.Text);
+                    table.SetAlign(i2 + 1, n + j2 + 1, Align.Right);
                 }
             }
 
@@ -29689,14 +29688,17 @@ namespace Gekko
             for (int j = 1; j < n + 2; j++)
             {
                 int[] skipCounter = new int[4];
-                int i;
+                
                 O.Prt.Element cc;
                 string operator2, format;
                 List<string> label;
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out i, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+
+                int i = 0;
+
                 //              x!d      x!m
                 // 2019m1                100
                 //     d1        22
@@ -29823,14 +29825,17 @@ namespace Gekko
             for (int j = 1; j < n + 2; j++)
             {
                 int[] skipCounter = new int[4];
-                int i;
+                
                 O.Prt.Element cc;
                 string operator2, format;
                 List<string> label;
                 EFreq freqColumn;
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
-                PrintPrepareColumn(type, containerExplode, j, out i, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+                PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
+
+                int i = 0;
+
                 // 1. 2003 (label)       
                 // 2. 2003q1            Q         
                 // 3. 2003m1                 M
@@ -30568,11 +30573,8 @@ namespace Gekko
             return table;
         }
 
-        private static void PrintPrepareColumn(EPrintTypes type, List<O.Prt.Element> containerExplode, int j, out int i, out O.Prt.Element cc, out string operator2, out List<string> label, out string format, out EFreq freqColumn, out double scalarValueWork, out Series tsWork, out double scalarValueRef, out Series tsRef)
+        private static void PrintPrepareColumn(EPrintTypes type, List<O.Prt.Element> containerExplode, int j, out O.Prt.Element cc, out string operator2, out List<string> label, out string format, out EFreq freqColumn, out double scalarValueWork, out Series tsWork, out double scalarValueRef, out Series tsRef)
         {
-            i = 0;
-            if (type == EPrintTypes.Plot) i++;
-
             cc = null;
             IVariable ivWork = null;
             IVariable ivRef = null;
