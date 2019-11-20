@@ -1559,8 +1559,6 @@ namespace Gekko
         private static void GetTimeseriesFromWorkbookMatrix(CellOffset offset, ReadOpenMulbkHelper oRead, Databank databank, TableLight matrix2, ReadInfo readInfo, string dateformat, string datetype)
         {
 
-            //TODO: gaps, READ<gap>
-
             //We could 'taste' the file, but how to distinguish A and U for instance?
             //Perhaps augment READ/IMPORT with freq indication for such files?
             EFreq freqHere = Program.options.freq;
@@ -1636,7 +1634,7 @@ namespace Gekko
                         throw new GekkoException();
                     }
 
-                    if (col - colOffset == 2)
+                    if (col == j_dates)
                     {
                         start[0] = cellText;
                         start[1] = GetExcelCell(row, col, transpose);
@@ -1799,7 +1797,8 @@ namespace Gekko
             for (int row = i_data; row <= matrixMaxRow; row++)
             //for (int row = 1 + rowOffset; row <= matrixMaxRow; row++)
             {
-                
+
+                Series ts = null;
 
                 for (int col = j_data; col <= matrixMaxCol; col++)
                 //for (int col = 1 + colOffset; col <= matrixMaxCol; col++)
@@ -1818,7 +1817,7 @@ namespace Gekko
                         //---------------------
                         //`do this only for first data column
 
-                        Series ts = null;
+                        
                         if (col == j_data)
                         {
                             //-----------------------
