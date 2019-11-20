@@ -6997,6 +6997,7 @@ namespace Gekko
                     }
                     hlp.dateformat = this.opt_dateformat;
                     hlp.datetype = this.opt_datetype;
+                    hlp.sheet = this.opt_sheet;
 
                     bool isRead = false; if (G.Equal(this.type, "read")) isRead = true;
 

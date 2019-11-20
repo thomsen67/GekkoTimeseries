@@ -3632,6 +3632,14 @@ namespace Gekko
             return new ScalarString(Program.GetDateStamp());
         }
 
+        public static IVariable currentdate2(GekkoSmpl smpl, IVariable _t1, IVariable _t2)
+        {
+            //See also #80927435209843
+            DateTime dt = DateTime.Now;
+            GekkoTime gt = GekkoTime.FromDateTimeToGekkoTime(EFreq.D, dt);            
+            return new ScalarDate(gt);
+        }
+
         //The following are val-based, not string based --------
 
         public static IVariable currentyear(GekkoSmpl smpl, IVariable _t1, IVariable _t2)

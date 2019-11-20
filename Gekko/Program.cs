@@ -1631,6 +1631,7 @@ namespace Gekko
                     {
                         G.Writeln2("*** ERROR in cell " + GetExcelCell(row, col, transpose) + ".");
                         G.Writeln2("    This cell should contain a date and not be empty.", Color.Red);
+                        
                         throw new GekkoException();
                     }
 
@@ -2817,7 +2818,7 @@ namespace Gekko
             }
             else
             {
-                matrix = ReadExcelWorkbook(file, null);
+                matrix = ReadExcelWorkbook(file, oRead.sheet);
             }
             GetTimeseriesFromWorkbookMatrix(offset, oRead, databank, matrix, readInfo, dateformat, datetype);
         }
@@ -42588,6 +42589,7 @@ namespace Gekko
         public string array = null;
         public string dateformat = null;
         public string datetype = null;
+        public string sheet = null;
 
         public string FileName
         {

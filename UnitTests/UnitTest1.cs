@@ -12127,6 +12127,14 @@ namespace UnitTests
             Assert.AreEqual(sd.date.sub, sub);
         }
 
+        private static void _AssertScalarDate(IBank db, string s, EFreq freq, int super, int sub, int subsub)
+        {
+            ScalarDate sd = db.GetIVariable(s) as ScalarDate;
+            Assert.AreEqual(sd.date.freq, freq);
+            Assert.AreEqual(sd.date.super, super);
+            Assert.AreEqual(sd.date.sub, sub);
+            Assert.AreEqual(sd.date.subsub, subsub);
+        }
 
         private static void _AssertSeries(IBank db, string s, int year, double x, double delta)
         {
@@ -17984,9 +17992,11 @@ namespace UnitTests
         [TestMethod]
         public void _Test_ExcelDate()
         {
-            I("%v = toExcelDate(2019, 11, 12);");
-            I("#x = fromExcelDate(%v);");  //test this when it returns a date
+            I("%v = toExcelDate(2019m11d12);");
+            I("%d = fromExcelDate(%v);");
             _AssertScalarVal(First(), "%v", 43781d, sharedDelta);
+            _AssertScalarDate(First(), "%d",EFreq.D, 2019, 11, 12);
+            
         }
 
         [TestMethod]
