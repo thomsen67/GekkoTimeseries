@@ -352,6 +352,10 @@ namespace Gekko
 
         public void Truncate(AllFreqsHelper dates)
         {
+            //========================================================================================================
+            //                          FREQUENCY LOCATION, indicates where to implement more frequencies
+            //========================================================================================================
+
             //Also see #345632473
             if (dates == null) return;
             if (this.freq == EFreq.A)
@@ -365,6 +369,10 @@ namespace Gekko
             else if (this.freq == EFreq.M)
             {
                 this.Truncate(dates.t1Monthly, dates.t2Monthly);
+            }
+            else if (this.freq == EFreq.D)
+            {
+                this.Truncate(dates.t1Daily, dates.t2Daily);
             }
             else
             {
