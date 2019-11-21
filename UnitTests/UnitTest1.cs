@@ -14037,6 +14037,81 @@ namespace UnitTests
         public void _Test_Collapse()
         {
 
+            //Testing collapse from days to months
+
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d30 99m2d2;");  //4 days
+            I("CREATE x;");
+            I("SERIES x =   1, 2, 3, 4;");    // 1  2  <>  3, 4
+            I("COLLAPSE x1!m = x!d total;");
+            I("COLLAPSE x2!m = x!d avg;");
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                I("COLLAPSE x3!m = x!d first;");
+                I("COLLAPSE x4!m = x!d last;");
+            }
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
+            if (Globals.UNITTESTFOLLOWUP)
+            {
+                _AssertSeries(First(), "x3!m", EFreq.M, 1999, 1, double.NaN, sharedDelta);
+                _AssertSeries(First(), "x3!m", EFreq.M, 1999, 2, 2d, sharedDelta);
+                _AssertSeries(First(), "x4!m", EFreq.M, 1999, 1, 3d, sharedDelta);
+                _AssertSeries(First(), "x4!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
+            }
+
+
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d29 99m2d2;");  //4 days
+            I("CREATE x;");
+            I("SERIES x =   1, 2, m(), 3, 4;");    // 1  2  M  <>  3, 4
+            I("COLLAPSE x1!m = x!d total;");
+            I("COLLAPSE x2!m = x!d avg;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
+
+
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d30 99m2d3;");  //4 days
+            I("CREATE x;");
+            I("SERIES x =   1, 2, m(), 3, 4;");    // 1  2  <>  M, 3, 4
+            I("COLLAPSE x1!m = x!d total;");
+            I("COLLAPSE x2!m = x!d avg;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 1, 3d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, 7d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 3d / 2d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, 7d / 2d, sharedDelta);
+
+
+            I("RESET;");
+            I("OPTION freq d;");
+            I("TIME 1999m1d27 99m1d31;");  //4 days
+            I("CREATE x;");
+            I("SERIES x =   1, 2, m(), 3, 4;");    // 1  2  M  3  4 <>  ... nothing
+            I("COLLAPSE x1!m = x!d total;");
+            I("COLLAPSE x2!m = x!d avg;");
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 1, 10d, sharedDelta);
+            _AssertSeries(First(), "x1!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 1, 10d / 4d, sharedDelta);
+            _AssertSeries(First(), "x2!m", EFreq.M, 1999, 2, double.NaN, sharedDelta);
+
+
+
+
+
+
+
+
+            //TODO: do an import<collapse> from days to months, and also do it
+            //      with normal collapse x!m = x!d, and compare
+
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
             // --------- import<collapse> from Excel data points ----------------
@@ -14497,6 +14572,17 @@ namespace UnitTests
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 3, 9d, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2000, 4, 12d, sharedDelta);
             _AssertSeries(First(), "x5!q", EFreq.Q, 2001, 1, double.NaN, sharedDelta);
+
+            
+
+
+
+
+
+
+
+
+
 
 
 
