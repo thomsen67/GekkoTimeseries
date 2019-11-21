@@ -19383,7 +19383,17 @@ namespace UnitTests
 
             I("RESET;");
             I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\plotcombo\';");            
-            I("RUN combo;"); 
+            I("RUN combo;");
+
+            //Do this manually with:
+
+            //reset;
+            //option folder working = 'c:\thomas\gekko\regres\plotcombo\';
+            //run combo; //-> inspect combo.html
+
+            //reset;
+            //option folder working = 'c:\thomas\gekko\regres\plotcombo2\';
+            //run g; //--> inspect g.html
         }
 
         [TestMethod]

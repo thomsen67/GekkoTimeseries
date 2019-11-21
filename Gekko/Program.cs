@@ -113,6 +113,12 @@ namespace Gekko
         Special
     }
 
+    public class PlotTable
+    {
+        public List<List<double>> dates = null;
+        public List<List<double>> values = null;
+    }
+
     public class CellOffset
     {
         public string cell = null;
@@ -29584,9 +29590,11 @@ namespace Gekko
             int iPlot = 0;
 
             Table table = null;
+            PlotTable plotTable = null; //more lightweight than Table
+
             if (tabletype == EPrtPlotSheet.Plot)
             {
-                table = PlotMixed(smpl, type, containerExplode, n, o);
+                plotTable = PlotMixed(smpl, type, containerExplode, n, o);
             }
             else if (freqs[4])  //daily freq, will also accept d + m freq at same time
             {
@@ -29602,7 +29610,7 @@ namespace Gekko
             if (type == EPrintTypes.Plot)
             {
                 //G.Writeln("Calling gnuplot1");
-                CallGnuplot(table, o, containerExplode, freqs);
+                CallGnuplot(plotTable, o, containerExplode, freqs);
             }
             else if (type == EPrintTypes.Sheet)
             {
@@ -29707,14 +29715,18 @@ namespace Gekko
             }
         }
 
-        private static Table PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o)
-        {
-            Table table = new Table();
-            table.writeOnce = true;
+        private static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o)
+        {            
+            PlotTable plotTable = new PlotTable();
+            plotTable.dates = new List<List<double>>();
+            plotTable.values = new List<List<double>>();
+            for (int j = 0; j < n; j++)
+            {
+                plotTable.dates.Add(new List<double>());
+                plotTable.values.Add(new List<double>());
+            }
 
-            int[] colCounter = new int[n];
-
-            for (int j = 2; j < n + 2; j++)  //cols/variables starts at j=2
+            for (int j = 2; j < n + 2; j++)  //cols/variables starts at j=2. So for 3 variables we have 2, 3, 4.
             {
                 int[] skipCounter = new int[4];
                 
@@ -29754,31 +29766,34 @@ namespace Gekko
                     //j=2 --> 1 and 1+n
                     //j=3 --> 2 and 2+n
 
-                    int col = j - 1;
-                    table.Set(i, col, tt.ToString()); table.Get(i, col).date_hack = t;
-                    table.SetNumber(i, col + n, d, format);
-                    colCounter[j - 2] = i;
+                    //int col = j - 1;
+                    //table.Set(i, col, tt.ToString()); table.Get(i, col).date_hack = t;
+                    //table.SetNumber(i, col + n, d, format);
+
+                    plotTable.dates[j - 2].Add(tt);
+                    plotTable.values[j - 2].Add(d);
+                    
                 }
             }
 
-            int max = int.MinValue;
-            for (int j2 = 0; j2 < n; j2++)
-            {
-                max = Math.Max(max, colCounter[j2]);
-            }
-            for (int j2 = 0; j2 < n; j2++)
-            {
-                for (int i2 = colCounter[j2]; i2 < max; i2++)
-                {
-                    table.Set(i2 + 1, j2 + 1, "M");
-                    table.SetAlign(i2 + 1, j2 + 1, Align.Right);
-                    table.Set(i2 + 1, n + j2 + 1, "M", CellType.Text);
-                    table.SetAlign(i2 + 1, n + j2 + 1, Align.Right);
-                }
-            }
+            //int max = int.MinValue;
+            //for (int j2 = 0; j2 < n; j2++)
+            //{
+            //    max = Math.Max(max, colCounter[j2]);
+            //}
+            //for (int j2 = 0; j2 < n; j2++)
+            //{
+            //    for (int i2 = colCounter[j2]; i2 < max; i2++)
+            //    {
+            //        table.Set(i2 + 1, j2 + 1, "M");
+            //        table.SetAlign(i2 + 1, j2 + 1, Align.Right);
+            //        table.Set(i2 + 1, n + j2 + 1, "M", CellType.Text);
+            //        table.SetAlign(i2 + 1, n + j2 + 1, Align.Right);
+            //    }
+            //}
 
 
-            return table;
+            return plotTable;
         }
 
         private static Table PrintMixedMD(GekkoSmpl smpl, EPrintTypes type, bool rows, List<O.Prt.Element> containerExplode, int labelMaxLine, int n, bool pretty, bool[] freqs, O.Prt o)
@@ -33076,7 +33091,7 @@ namespace Gekko
         }
 
         
-        private static void CallGnuplot(Table data, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
+        private static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -33252,13 +33267,63 @@ namespace Gekko
             //double[] dataMax = new double[count]; for (int i = 0; i < count; i++) dataMax[i] = double.MinValue;
             //double[] dataMin = new double[count]; for (int i = 0; i < count; i++) dataMin[i] = double.MaxValue;
 
-            
-            List<string> tabLines = data.Print();
+            //List<string> tabLines = data.Print();
+
+            //structure of plotTable is (0 has 6 points, 1 has 3, 2 has 4).
+            //                dates[0]   dates[1]   dates[2]     values[0]   values[1]   values[2]
+            // i = 0             .          .         .              .          .            .
+            // i = 1             .          .         .              .          .            .
+            // i = 2             .          .         .              .          .            .
+            // i = 3             .                    .              .                       .
+            // i = 4             .                                   .                        
+
+            int max = int.MinValue;
+            for (int j = 0; j < plotTable.dates.Count; j++)
+            {
+                max = Math.Max(max, plotTable.dates[j].Count);
+            }
 
             using (FileStream fs = WaitForFileStream(fileData, GekkoFileReadOrWrite.Write))
             using (StreamWriter tw = G.GekkoStreamWriter(fs))
             {
-                foreach (string s in tabLines) tw.WriteLine(s);               
+                //TODO:
+                //In the middle of mixed freq data, there can be a lot of lines like these. Perhaps detect and remove.
+                //Perhaps same problem with smpl set too wide on non-mixed freqs.
+                //Also, daily data points could be aggregated with min/max for a range on the x axis, if this range corresponds
+                //to < 1 pixel on the screen. Still, gnuplot is pretty fast at plotting.
+                //1984.44861 M M M M M M M
+                //1984.45139 M M M M M M M
+                //1984.45417 M M M M M M M
+                //1984.45694 M M M M M M M
+                //1984.45972 M M M M M M M
+
+                for (int i = 0; i < max; i++)
+                {
+                    //foreach (string s in tabLines) tw.WriteLine(s);                         
+                    for (int j = 0; j < plotTable.dates.Count; j++)
+                    {
+                        if (i < plotTable.dates[j].Count)
+                        {
+                            tw.Write(string.Format("{0:0.#####}", plotTable.dates[j][i]) + " "); //width of 1 day is about 0.003 of a year. So 0.00001 is precise compared to that
+                        }
+                        else
+                        {
+                            tw.Write("M ");
+                        }
+                    }
+                    for (int j = 0; j < plotTable.values.Count; j++)
+                    {
+                        if (i < plotTable.values[j].Count && !G.isNumericalError(plotTable.values[j][i]))
+                        {
+                            tw.Write(plotTable.values[j][i].ToString() + " ");
+                        }
+                        else
+                        {
+                            tw.Write("M ");
+                        }
+                    }
+                    tw.WriteLine();
+                }
             }
             
             XmlNodeList lines3 = doc.SelectNodes("gekkoplot/lines/line");
@@ -33343,31 +33408,9 @@ namespace Gekko
                 G.Writeln2("*** ERROR: PLOT gpt palette is empty");
                 throw new GekkoException();
             }
-
             
             bool isSeparated = NotNullAndNotNo(separate);  //#23475432985
-
-            //List<string> linetypes = new List<string>();
-            //List<string> dashtypes = new List<string>();
-            //List<double> linewidths = new List<double>();
-            //List<string> linecolors = new List<string>();
-            //List<string> pointtypes = new List<string>();
-            //List<double> pointsizes = new List<double>();
-            //List<string> fillstyles = new List<string>();
-            //List<string> y2s = new List<string>();
-
-            //foreach (O.Prt.Element pe in o.prtElements)  //varI 0-based
-            //{
-            //    linetypes.Add(pe.linetype);
-            //    dashtypes.Add(pe.dashtype);
-            //    linewidths.Add(pe.linewidth);
-            //    linecolors.Add(pe.linecolor);
-            //    pointtypes.Add(pe.pointtype);
-            //    pointsizes.Add(pe.pointsize);
-            //    fillstyles.Add(pe.fillstyle);
-            //    y2s.Add(pe.y2);
-            //}
-
+                        
             double linewidthCorrection = 1d;
             double pointsizeCorrection = 1d;
             if (G.Equal(extension, "svg") || G.Equal(extension, "png"))
@@ -33404,16 +33447,36 @@ namespace Gekko
             // ---------------------------------------
             // ---------------------------------------
 
+            //double[] dataMin = new double[containerExplode.Count];
+            //double[] dataMax = new double[containerExplode.Count];
+            List<string> labelsNonBroken = new List<string>();
+            for (int j = 0; j < count; j++)
+            {                
+                //dataMin[i] = containerExplode[i].min;
+                //dataMax[i] = containerExplode[i].max;
+                string label = "";
+                if (containerExplode[j].labelOLD[0] != null) label = containerExplode[j].labelOLD[0];
+                labelsNonBroken.Add(label);
+            }
+
             double[] dataMin = new double[containerExplode.Count];
             double[] dataMax = new double[containerExplode.Count];
-            List<string> labelsNonBroken = new List<string>();
-            for (int i = 0; i < count; i++)
-            {                
-                dataMin[i] = containerExplode[i].min;
-                dataMax[i] = containerExplode[i].max;
-                string label = "";
-                if (containerExplode[i].labelOLD[0] != null) label = containerExplode[i].labelOLD[0];
-                labelsNonBroken.Add(label);
+            //List<string> labelsNonBroken = new List<string>();
+            for (int j = 0; j < count; j++)
+            {
+                double min2 = double.MaxValue;
+                double max2 = double.MinValue;
+                foreach (double d in plotTable.values[j])
+                {
+                    if (!G.isNumericalError(d))
+                    {
+                        min2 = Math.Min(min2, d);
+                        max2 = Math.Max(max2, d);
+                    }
+                }
+
+                dataMin[j] = min2;
+                dataMax[j] = max2;
             }
 
             string discard = PlotHandleLines(true, ref numberOfY2s, minMax, dataMin, dataMax, o, count, labelsNonBroken, file1, lines3, boxesY, boxesY2, areasY, areasY2, linetypeMain, dashtypeMain, linewidthMain, linecolorMain, pointtypeMain, pointsizeMain, fillstyleMain, stacked, palette2, isSeparated, d_width, d_width2, d_width3, left, containerExplode, linewidthCorrection, pointsizeCorrection, isInside, highestFreq);
