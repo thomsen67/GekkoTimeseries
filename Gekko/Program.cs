@@ -33812,7 +33812,10 @@ namespace Gekko
                 if (!G.NullOrBlanks(pointtype)) s += " pointtype " + pointtype;
                 if (!G.NullOrBlanks(pointtype)) s += " pointsize " + pointsize;
                 if (!G.NullOrBlanks(fillstyle)) s += " fillstyle " + fillstyle;
-                if (!G.NullOrBlanks(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
+                
+                string label2 = label;
+                if (label != null && label != "") label2 = label + "   "; //blanks added to separate items in the legend                    
+                s += " title " + Globals.QT + label2 + Globals.QT;
 
                 //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                 //linetype is the same, just permanent
