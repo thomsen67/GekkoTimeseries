@@ -31648,8 +31648,8 @@ namespace Gekko
             }
             if (d != null)
             {                
-                cc.min = Math.Min(cc.min, (double)d);
-                cc.max = Math.Max(cc.max, (double)d);
+                //cc.min = Math.Min(cc.min, (double)d);
+                //cc.max = Math.Max(cc.max, (double)d);
                 if (type != EPrintTypes.Plot)
                 {
                     double dd = dd = (double)d;
@@ -33264,9 +33264,7 @@ namespace Gekko
             string fileGp = path + "\\" + file3;
 
             string fileData = path + "\\" + file1;
-            //double[] dataMax = new double[count]; for (int i = 0; i < count; i++) dataMax[i] = double.MinValue;
-            //double[] dataMin = new double[count]; for (int i = 0; i < count; i++) dataMin[i] = double.MaxValue;
-
+            
             //List<string> tabLines = data.Print();
 
             //structure of plotTable is (0 has 6 points, 1 has 3, 2 has 4).
@@ -33452,8 +33450,6 @@ namespace Gekko
             List<string> labelsNonBroken = new List<string>();
             for (int j = 0; j < count; j++)
             {                
-                //dataMin[i] = containerExplode[i].min;
-                //dataMax[i] = containerExplode[i].max;
                 string label = "";
                 if (containerExplode[j].labelOLD[0] != null) label = containerExplode[j].labelOLD[0];
                 labelsNonBroken.Add(label);
@@ -34228,8 +34224,11 @@ namespace Gekko
                 if (!G.NullOrBlanks(pointtype)) s += " pointtype " + pointtype;
                 if (!G.NullOrBlanks(pointtype)) s += " pointsize " + pointsize;
                 if (!G.NullOrBlanks(fillstyle)) s += " fillstyle " + fillstyle;
-                if (!G.NullOrBlanks(label)) s += " title " + Globals.QT + label + "   " + Globals.QT;  //blanks added to separate items in the legend                    
 
+                string label2 = label;
+                if (label != null && label != "") label2 = label + "   "; //blanks added to separate items in the legend                    
+                s += " title " + Globals.QT + label2 + Globals.QT;
+                
                 //linestyle is an association of linecolor, linewidth, dashtype, pointtype
                 //linetype is the same, just permanent
                 //box: fillstyle empty|solid|pattern, border|noborder

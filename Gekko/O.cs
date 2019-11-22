@@ -10119,8 +10119,8 @@ namespace Gekko
                 //--- errors
                 public List<string> errors = new List<string>();
 
-                public double min = double.MaxValue;
-                public double max = double.MinValue;
+                //public double min = double.MaxValue;
+                //public double max = double.MinValue;
                                 
             }
 
