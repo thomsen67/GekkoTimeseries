@@ -2842,6 +2842,7 @@ write datatest;
                     int nList = 0;
                     int nMap = 0;
                     int nMatrix = 0;
+                    int nFreq = 0;
 
                     int minYearInProtobufFile = int.MaxValue;
                     int maxYearInProtobufFile = int.MinValue;
@@ -2860,6 +2861,15 @@ write datatest;
                             else if (xGekko3.freq == EFreq_1_2.M) freq2 = EFreq.Monthly;
                             else if (xGekko3.freq == EFreq_1_2.U) freq2 = EFreq.Undated;
                             string[] ss = kvp.Key.Split('!');
+                            if (G.equal(ss[1], "a") || G.equal(ss[1], "q") || G.equal(ss[1], "m") || G.equal(ss[1], "u"))
+                            {
+                                //good
+                            }
+                            else
+                            {
+                                nFreq++;
+                                continue; // (skip it, for instance x!d)
+                            }
                             TimeSeries xGekko2 = new TimeSeries(freq2, ss[0]);
                             xGekko2.stamp = xGekko3.meta.stamp;
                             xGekko2.source = xGekko3.meta.source;
@@ -2967,6 +2977,7 @@ write datatest;
                         else if (kvp.Value is List_1_2) nList++;
                         else if (kvp.Value is Map_1_2) nMap++;
                         else if (kvp.Value is Matrix_1_2) nMatrix++;
+
                     }
                     
                     if (nVal > 0) lines.Add(nVal + " VALs were skipped");
@@ -2975,7 +2986,9 @@ write datatest;
                     if (nList > 0) lines.Add(nList + " LISTs were skipped");
                     if (nMap > 0) lines.Add(nMap + " MAPs were skipped");
                     if (nMatrix > 0) lines.Add(nMatrix + " MATRIXs were skipped");
-                    
+                    if (nFreq > 0) lines.Add(nFreq + " series with unknown frequency were skipped");
+
+
                     if (nVal + nDate + nString + nList + nMatrix > 0)
                     {
                         lines.Add("+++ NOTE: Such variables could be extracted to the current Gekko version.");
