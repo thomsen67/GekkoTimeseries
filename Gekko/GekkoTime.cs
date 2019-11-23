@@ -14,10 +14,10 @@ namespace Gekko
         //========================================================================================================
         A,
         Q,
-        M,
-        D,        //daily
+        M,        
         U,        //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
-        None      //used to signal non-freq variable, for instance a VAL   
+        None,     //used to signal non-freq variable, for instance a VAL   
+        D         //daily
     }  
 
     public enum ESeriesMissing
