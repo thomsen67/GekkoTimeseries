@@ -2378,7 +2378,7 @@ namespace Gekko
             {
                 subend = "m" + gt.sub + "d" + gt.subsub;
             }
-            else if (gt.freq == EFreq.U)  //ttfreq
+            else if (gt.freq == EFreq.U) 
             {
             }
             else throw new GekkoException();

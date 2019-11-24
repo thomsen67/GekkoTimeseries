@@ -7,7 +7,7 @@ using System.Text;
 namespace Gekko
 {
     
-    public enum EFreq  //search for 'ttfreq' to see places with freq that should be enumerated
+    public enum EFreq 
     {
         //========================================================================================================
         //                          FREQUENCY LOCATION, indicates where to implement more frequencies
@@ -17,8 +17,27 @@ namespace Gekko
         M,        
         U,        //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
         None,     //used to signal non-freq variable, for instance a VAL   
-        D         //daily
-    }  
+        D,        //daily        
+        Empty2,   // --------> this and the following can be filled/changed
+        Empty3,
+        Empty4,
+        Empty5,
+        Empty6,
+        Empty7,
+        Empty8,
+        Empty9,
+        Empty10,
+        Empty11,
+        Empty12,
+        Empty13,
+        Empty14,
+        Empty15,
+        Empty16,
+        Empty17,
+        Empty18,
+        Empty19,
+        Empty20
+    }
 
     public enum ESeriesMissing
     {
@@ -489,7 +508,7 @@ namespace Gekko
                     else return GekkoTime.tNull;
                 }
             }
-            else if (s.Contains("u") || s.Contains("U"))  //ttfreq
+            else if (s.Contains("u") || s.Contains("U")) 
             {
                 string s2 = s;
                 if (s.EndsWith("u1", StringComparison.OrdinalIgnoreCase))
