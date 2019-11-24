@@ -17,6 +17,20 @@ namespace Gekko
     [ProtoInclude(6, typeof(Matrix_1_2))]
     [ProtoInclude(7, typeof(List_1_2))]
     [ProtoInclude(8, typeof(Range_1_2))]
+    [ProtoInclude(9, typeof(GekkoNull_1_2))]        //---> this is a real reference to NULL, do not change!!
+    [ProtoInclude(10, typeof(GekkoNull_1_2))]       //---> the following are for backwards compatibility, can be changed
+    [ProtoInclude(11, typeof(GekkoNull_1_2))]
+    [ProtoInclude(12, typeof(GekkoNull_1_2))]
+    [ProtoInclude(13, typeof(GekkoNull_1_2))]
+    [ProtoInclude(14, typeof(GekkoNull_1_2))]
+    [ProtoInclude(15, typeof(GekkoNull_1_2))]
+    [ProtoInclude(16, typeof(GekkoNull_1_2))]
+    [ProtoInclude(17, typeof(GekkoNull_1_2))]
+    [ProtoInclude(18, typeof(GekkoNull_1_2))]
+    [ProtoInclude(19, typeof(GekkoNull_1_2))]
+    [ProtoInclude(20, typeof(GekkoNull_1_2))]
+
+
     public interface IVariable_1_2
     {
 
@@ -42,7 +56,10 @@ namespace Gekko
 
     [ProtoContract]
     public class Range_1_2 : IVariable_1_2 { private Range_1_2() { } }
-    
+
+    [ProtoContract]
+    public class GekkoNull_1_2 : IVariable_1_2 { private GekkoNull_1_2() { } }
+
     public enum EFixedType
     {
         None, //no fixing or parameter (that is: endogenous)
