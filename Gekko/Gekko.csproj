@@ -183,6 +183,7 @@
       <DependentUpon>CompareUtilityEquations.cs</DependentUpon>
     </Compile>
     <Compile Include="Databank_1_1.cs" />
+    <Compile Include="DataFrame.cs" />
     <Compile Include="Decomp.cs" />
     <Compile Include="DragAdorner.cs" />
     <Compile Include="Functions.cs" />

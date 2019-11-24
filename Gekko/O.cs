@@ -10585,7 +10585,13 @@ namespace Gekko
                 {
                     this.t1 = truncate.t1;
                     this.t2 = truncate.t2;
-                }                
+                }
+
+                if (false && Globals.runningOnTTComputer)
+                {
+                    DataFrame f = new DataFrame(123d);
+                    Program.databanks.GetFirst().AddIVariable("#df", f);
+                }
                 
                 Program.Write(this);
             }

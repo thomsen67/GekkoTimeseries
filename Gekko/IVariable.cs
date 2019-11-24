@@ -52,6 +52,7 @@ namespace Gekko
     [ProtoInclude(6, typeof(Matrix))]
     [ProtoInclude(7, typeof(List))]
     [ProtoInclude(8, typeof(Range))]            //HMMM is an IVariable, but could never be protobuffed
+    [ProtoInclude(9, typeof(DataFrame))]
 
     public interface IVariable
     {
