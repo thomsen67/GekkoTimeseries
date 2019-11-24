@@ -3218,7 +3218,7 @@ namespace Gekko
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
                         }
                         readInfo.variables = deserializedDatabank.storage.Count;
-                        G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));
+                        G.WritelnGray("Protobuf deserialize took: " + G.Seconds(dt3));                        
                     }
                     catch (Exception e)
                     {

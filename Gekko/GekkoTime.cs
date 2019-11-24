@@ -12,7 +12,27 @@ namespace Gekko
         Q,
         M,
         U,      //also called 'u' in Eviews, called 'n' in TSP, but undated has no name in AREMOS (uses 'periodic')     
-        None          //used to signal non-freq variable, for instance a VAL   
+        None,          //used to signal non-freq variable, for instance a VAL   
+        Empty1,
+        Empty2,
+        Empty3,
+        Empty4,
+        Empty5,
+        Empty6,
+        Empty7,
+        Empty8,
+        Empty9,
+        Empty10,
+        Empty11,
+        Empty12,
+        Empty13,
+        Empty14,
+        Empty15,
+        Empty16,
+        Empty17,
+        Empty18,
+        Empty19,
+        Empty20
     }  
 
     public enum ESeriesMissing
