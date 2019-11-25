@@ -24,15 +24,14 @@ namespace Deploy
     public partial class MainWindow : Window
     {
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+        //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll";
+        //public static string zip = @"c:\Tools\7z\7z.dll";
         public static string zip = @"c:\Program Files\7-Zip\7z.dll";
 
         public MainWindow()
         {
             InitializeComponent();
         }
-
-        
-
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
@@ -45,10 +44,10 @@ namespace Deploy
             try
             {
                 FileInfo fi = new FileInfo(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");
-                double min = (DateTime.Now - fi.CreationTime).TotalMinutes;
-                if (min > 60)
+                double min = (DateTime.Now - fi.LastWriteTime).TotalMinutes;
+                if (min > 15)
                 {
-                    MessageBox.Show("ERROR: the .msi file seems too old");
+                    MessageBox.Show("ERROR: the .msi file seems too old (> 15 minutes)");
                     return;
                 }
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi");
@@ -63,10 +62,9 @@ namespace Deploy
         private void button2_Click(object sender, RoutedEventArgs e)
         {
             try
-            {
-                string version = GetVersion();
+            {                
                 
-                System.IO.DirectoryInfo di = new DirectoryInfo(@"c:\tmp\Gekko_files\");
+                System.IO.DirectoryInfo di = new DirectoryInfo(@"c:\tools\tmp\Gekko_files\");
                 foreach (FileInfo file in di.GetFiles())
                 {
                     file.Delete();
@@ -76,9 +74,9 @@ namespace Deploy
                     dir.Delete(true);
                 }
                 
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", @"c:\tmp\Gekko_files\InstallerForGekko.msi", true);
-                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", @"c:\tmp\Gekko_files\Setup.exe", true);
-                MessageBox.Show("Copying files ok -- now manually FTP them to " + version + @" from C:\tmp\Gekko_files");
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\InstallerForGekko.msi", @"c:\tools\tmp\Gekko_files\InstallerForGekko.msi", true);
+                File.Copy(@"c:\Thomas\Gekko\GekkoCS\InstallerForGekko\Release32bit\Setup.exe", @"c:\tools\tmp\Gekko_files\Setup.exe", true);
+                MessageBox.Show("Copying files ok");
             }
             catch
             {
@@ -157,7 +155,7 @@ namespace Deploy
             }
             catch (Exception error)
             {
-                MessageBox.Show(" * ** ERROR: RAM aware failed");
+                MessageBox.Show(" *** ERROR: RAM aware failed");
             }
         }
 
@@ -170,7 +168,7 @@ namespace Deploy
                 SevenZipCompressor tmp = new SevenZipCompressor();
                 tmp.ArchiveFormat = OutArchiveFormat.Zip;
                 tmp.CompressionLevel = CompressionLevel.Normal;                
-                tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tmp\Gekko_files\Gekko.zip", true);
+                tmp.CompressDirectory(@"c:\Program Files (x86)\Gekko\", @"c:\tools\tmp\Gekko_files\Gekko.zip", true);
                 MessageBox.Show("Zipping of Gekko program dir ok");
             }
             catch (Exception e2)
@@ -183,9 +181,9 @@ namespace Deploy
         {
             try
             {
-                File.Copy(@"c:\tmp\Gekko_files\InstallerForGekko.msi", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi", true);
-                File.Copy(@"c:\tmp\Gekko_files\Setup.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Setup.exe", true);
-                File.Copy(@"c:\tmp\Gekko_files\Gekko.zip", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip", true);
+                File.Copy(@"c:\tools\tmp\Gekko_files\InstallerForGekko.msi", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\InstallerForGekko.msi", true);
+                File.Copy(@"c:\tools\tmp\Gekko_files\Setup.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Setup.exe", true);
+                File.Copy(@"c:\tools\tmp\Gekko_files\Gekko.zip", @"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\Gekko.zip", true);
 
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\SHA1\sha.bat");
 
@@ -221,8 +219,8 @@ namespace Deploy
                 txt += "  <li>" + t3 + "</li>" + "\r\n";
                 txt += "</ul>" + "\r\n";
 
-                System.IO.File.WriteAllText(@"c:\tmp\Gekko_files\sha.txt", txt);
-                MessageBox.Show(@"SHA ok, copied to c:\tmp\Gekko_files");
+                System.IO.File.WriteAllText(@"c:\tools\tmp\Gekko_files\sha.txt", txt);
+                MessageBox.Show(@"SHA ok, copied to c:\tools\tmp\Gekko_files");
             }
             catch (Exception exception)
             {
@@ -270,7 +268,7 @@ namespace Deploy
             List<string> output1 = new List<string>();
             List<string> output2 = new List<string>();
             List<string> output3 = new List<string>();
-            string file = @"c:\Thomas\Gekko\GekkoCS\ANTLR\Cmd2.g";
+            string file = @"c:\Thomas\Gekko\GekkoCS\ANTLR\Cmd3.g";
             string[] txt2 = File.ReadAllLines(file, Encoding.GetEncoding(1252));  //why 1252, but otherwise ¤ and æøå go wrong. Do not write with 1252 though...
 
             List<string> txt = new List<string>(txt2);
