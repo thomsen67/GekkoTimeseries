@@ -25,7 +25,8 @@ namespace Deploy
     {
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
         //public static string zip = @"c:\Thomas\Gekko\GekkoCS\Diverse\FilesUsedForDeployment\7z.dll";
-        //public static string zip = @"c:\Tools\7z\7z.dll";
+        //For some reason, the full 7z files need to be present in the folder, whereas for the Gekko installation, this
+        //is not necessary. A mistory ... so we had to install z-zip to make it work. Never mind.
         public static string zip = @"c:\Program Files\7-Zip\7z.dll";
 
         public MainWindow()
@@ -138,25 +139,56 @@ namespace Deploy
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             try
-            {
-                //c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\   c:\Program Files (x86)\Gekko\
+            {                
                 File.Copy(@"c:\Program Files (x86)\Gekko\Gekko.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", true);
-                //System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\xx.bat");
-
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\editbin.exe", @"/LARGEADDRESSAWARE c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe");
 
-                System.Diagnostics.Process.Start(@"c:\Tools\ramaware.lnk");
+                if (true)
+                {
+                    System.Security.Principal.WindowsPrincipal pricipal = new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent());
+                    bool hasAdministrativeRight = pricipal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
 
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
+                    if (!hasAdministrativeRight)
+                    {
+                        RunElevated(@"c:\tools\ramaware.lnk");                                                
+                    }
+                    else
+                    {
+                        MessageBox.Show("*** ERROR: ram aware failed");
+                    }
+                }
+                else
+                {
+                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
+                }
+
                 
-                //File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
-                                
+
                 MessageBox.Show(@"RAM aware ok -- has copied from c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe   TO c:\Program Files (x86)\Gekko\Gekko.exe");
             }
             catch (Exception error)
             {
                 MessageBox.Show(" *** ERROR: RAM aware failed");
             }
+        }
+
+        private static bool RunElevated(string fileName)
+        {
+            //MessageBox.Show("Run: " + fileName);
+            System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
+            processInfo.Verb = "runas";
+            processInfo.FileName = fileName;
+            try
+            {
+                System.Diagnostics.Process.Start(processInfo);
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(" *** ERROR: RAM aware failed");
+                //Do nothing. Probably the user canceled the UAC window
+            }
+            return false;
         }
 
         private void button4_Click(object sender, RoutedEventArgs e)

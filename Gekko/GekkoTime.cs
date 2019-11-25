@@ -35,7 +35,7 @@ namespace Gekko
         Empty16,
         Empty17,
         Empty18,
-        Empty19,
+        Empty19, 
         Empty20
     }
 
