@@ -31236,9 +31236,13 @@ namespace Gekko
                         G.Writeln("be printed like for instance #m.%s, #m.x, etc.");
                     }
                 }
+                else if (x.Type() == EVariableType.Null)
+                {
+                    G.Writeln2("[null]");
+                }
                 else
                 {
-                    G.Writeln2("*** ERROR: Internal error #483489872423");
+                    G.Writeln2("*** ERROR: Unkonwn variable type");
                     //SERIES: should not be possible
                 }
             }

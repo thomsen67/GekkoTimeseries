@@ -742,8 +742,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln2("*** ERROR regarding frequency: '" + eFreq.ToString() + "' not recognized");
-                throw new GekkoException();
+                G.Writeln("*** ERROR: strange error regarding freq");
             }
             return freq;
         }
