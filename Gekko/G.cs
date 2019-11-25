@@ -2564,7 +2564,7 @@ namespace Gekko
             }
             else
             {
-                G.Writeln("*** ERROR: strange error regarding freq");
+                f = "[unknown frequency]";
             }
 
             return f;
