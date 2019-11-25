@@ -29589,12 +29589,19 @@ namespace Gekko
 
             int iPlot = 0;
 
+            EFreq highestFreq = EFreq.A;
+            if (freqs[0]) highestFreq = EFreq.U;
+            if (freqs[1]) highestFreq = EFreq.A;
+            if (freqs[2]) highestFreq = EFreq.Q;
+            if (freqs[3]) highestFreq = EFreq.M;
+            if (freqs[4]) highestFreq = EFreq.D;
+
             Table table = null;
             PlotTable plotTable = null; //more lightweight than Table
 
             if (tabletype == EPrtPlotSheet.Plot)
             {
-                plotTable = PlotMixed(smpl, type, containerExplode, n, o);
+                plotTable = PlotMixed(smpl, type, containerExplode, n, o, highestFreq);
             }
             else if (freqs[4])  //daily freq, will also accept d + m freq at same time
             {
@@ -29610,7 +29617,7 @@ namespace Gekko
             if (type == EPrintTypes.Plot)
             {
                 //G.Writeln("Calling gnuplot1");
-                CallGnuplot(plotTable, o, containerExplode, freqs);
+                CallGnuplot(plotTable, o, containerExplode, highestFreq);
             }
             else if (type == EPrintTypes.Sheet)
             {
@@ -29715,7 +29722,7 @@ namespace Gekko
             }
         }
 
-        private static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o)
+        private static PlotTable PlotMixed(GekkoSmpl smpl, EPrintTypes type, List<O.Prt.Element> containerExplode, int n, O.Prt o, EFreq highestFreq)
         {            
             PlotTable plotTable = new PlotTable();
             plotTable.dates = new List<List<double>>();
@@ -29737,10 +29744,19 @@ namespace Gekko
                 double scalarValueWork, scalarValueRef;
                 Series tsWork, tsRef;
                 PrintPrepareColumn(type, containerExplode, j, out cc, out operator2, out label, out format, out freqColumn, out scalarValueWork, out tsWork, out scalarValueRef, out tsRef);
-                
-                EFreq freqHere = EFreq.None;
-                if (tsWork != null) freqHere = tsWork.freq;
-                else if (tsRef != null) freqHere = tsRef.freq;
+
+                bool isScalar = tsWork == null && tsRef == null;
+
+                EFreq freqHere = highestFreq;
+                if (isScalar)
+                {
+                    //will become highestFreq
+                }
+                else
+                {
+                    if (tsWork != null) freqHere = tsWork.freq;
+                    else if (tsRef != null) freqHere = tsRef.freq;
+                }
 
                 int i = 0;
                 foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
@@ -29748,7 +29764,7 @@ namespace Gekko
 
                     int sumOver = 0;
                     double d = double.NaN;
-                    if (tsWork == null && tsRef == null)  //not series
+                    if (isScalar)  //not series
                     {
                         d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
                     }
@@ -29765,10 +29781,6 @@ namespace Gekko
                     //j=1 --> skip
                     //j=2 --> 1 and 1+n
                     //j=3 --> 2 and 2+n
-
-                    //int col = j - 1;
-                    //table.Set(i, col, tt.ToString()); table.Get(i, col).date_hack = t;
-                    //table.SetNumber(i, col + n, d, format);
 
                     plotTable.dates[j - 2].Add(tt);
                     plotTable.values[j - 2].Add(d);
@@ -33091,7 +33103,7 @@ namespace Gekko
         }
 
         
-        private static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, bool[] freqs)
+        private static void CallGnuplot(PlotTable plotTable, O.Prt o, List<O.Prt.Element> containerExplode, EFreq highestFreq)
         {
             //Måske en SYS gnuplot til at starte et vindue op.
             //See #23475432985 regarding options that default = no, and are activated with empty node like <boxstack/>
@@ -33099,14 +33111,7 @@ namespace Gekko
             //========================================================================================================
             //                          FREQUENCY LOCATION, indicates where to implement more frequencies
             //========================================================================================================
-
-            EFreq highestFreq = EFreq.A;
-            if (freqs[0]) highestFreq = EFreq.U;
-            if (freqs[1]) highestFreq = EFreq.A;
-            if (freqs[2]) highestFreq = EFreq.Q;
-            if (freqs[3]) highestFreq = EFreq.M;
-            if (freqs[4]) highestFreq = EFreq.D;
-
+            
             string extension = "emf";
             if (o.opt_filename != null)
             {
