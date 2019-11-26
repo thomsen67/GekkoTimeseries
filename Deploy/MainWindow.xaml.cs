@@ -139,30 +139,21 @@ namespace Deploy
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             try
-            {                
+            {
                 File.Copy(@"c:\Program Files (x86)\Gekko\Gekko.exe", @"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", true);
                 System.Diagnostics.Process.Start(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\editbin.exe", @"/LARGEADDRESSAWARE c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe");
-
-                if (true)
+                                             
+                System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
+                processInfo.Verb = "runas";
+                processInfo.FileName = @"c:\tools\ramaware.bat";
+                try
                 {
-                    System.Security.Principal.WindowsPrincipal pricipal = new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent());
-                    bool hasAdministrativeRight = pricipal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
-
-                    if (!hasAdministrativeRight)
-                    {
-                        RunElevated(@"c:\tools\ramaware.lnk");                                                
-                    }
-                    else
-                    {
-                        MessageBox.Show("*** ERROR: ram aware failed");
-                    }
+                    System.Diagnostics.Process.Start(processInfo);
                 }
-                else
+                catch (Exception ex)
                 {
-                    File.Copy(@"c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe", @"c:\Program Files (x86)\Gekko\Gekko.exe", true);
+                    MessageBox.Show("*** ERROR: RAM aware failed");
                 }
-
-                
 
                 MessageBox.Show(@"RAM aware ok -- has copied from c:\Thomas\Gekko\GekkoCS\Diverse\RAMLargeAware\Gekko.exe   TO c:\Program Files (x86)\Gekko\Gekko.exe");
             }
@@ -172,24 +163,6 @@ namespace Deploy
             }
         }
 
-        private static bool RunElevated(string fileName)
-        {
-            //MessageBox.Show("Run: " + fileName);
-            System.Diagnostics.ProcessStartInfo processInfo = new System.Diagnostics.ProcessStartInfo();
-            processInfo.Verb = "runas";
-            processInfo.FileName = fileName;
-            try
-            {
-                System.Diagnostics.Process.Start(processInfo);
-                return true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(" *** ERROR: RAM aware failed");
-                //Do nothing. Probably the user canceled the UAC window
-            }
-            return false;
-        }
 
         private void button4_Click(object sender, RoutedEventArgs e)
         {

@@ -10,7 +10,7 @@
         <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="44" Margin="291,493,0,0" VerticalAlignment="Top" Width="254"/>
 
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10,15,0,0" TextWrapping="Wrap" Text="Deployment of Gekko" VerticalAlignment="Top" Width="317" FontWeight="Bold" BorderThickness="0"/>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="14,91,0,0" TextWrapping="Wrap" Text="Compile help files (Help+Manual)" VerticalAlignment="Top" Width="359" BorderThickness="0"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="14,91,0,0" TextWrapping="Wrap" Text="Compile help files (Help+Manual) -- NB: choose right version!" VerticalAlignment="Top" Width="359" BorderThickness="0"/>
         <Button x:Name="button" Content="Copy chm file" HorizontalAlignment="Left" Margin="392,93,0,0" VerticalAlignment="Top" Width="108" Click="button_Click"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="14,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="31" Width="364"><Run FontSize="12.6666666666667" Text="Set to Release 32 bit + x86 in Build -&gt; config manager. Open VCB"/><Run FontSize="12.6666666666667" Text=", mark all, to next version, "/><Run FontSize="12.6666666666667" FontFamily="Consolas" Text="rebuild all"/><Run FontSize="12.6666666666667" FontFamily="Consolas" Text=" "/></TextBlock>
         <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="23" Margin="394,364,0,0" TextWrapping="Wrap" Text="set version x.y.z" VerticalAlignment="Top" Width="151" BorderThickness="2" TextChanged="textBox2_TextChanged"/>
