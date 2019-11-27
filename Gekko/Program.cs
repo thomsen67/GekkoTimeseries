@@ -119,10 +119,19 @@ namespace Gekko
         public List<List<double>> values = null;
     }
 
+    public class OLSRekurInfo
+    {
+        public string type = null;  // 'r' (right), 'l' (left), 'e' (elevator)
+        public bool chow = true;
+        public bool grahphs = true;
+        public int df_min = 1;  //can be larger
+    }
+
+
     public class OLSResults
     {
-        public double[] beta, ypredict, residual;
-        public double rss, resMean, lhsMean, ssTot, dw, rmse, see;
+        public double[] beta, ypredict, residual, coeff, se, t;
+        public double rss, resMean, lhsMean, ssTot, dw, rmse, see, r2, r2cor;
         public double[,] usedCovar, usedCorr;
     }
 
@@ -28394,36 +28403,36 @@ namespace Gekko
                 }
             }
 
-            double[,] restrict = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
+            double[,] restrict_input = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
 
             int k = 0;
-            double[,] r = null;
+            double[,] restrict = null;
 
             if (o.impose != null)
             {
                 Matrix rr = O.ConvertToMatrix(o.impose);
                 k = rr.data.GetLength(0);
-                restrict = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
+                restrict_input = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
                 for (int i = 0; i < rr.data.GetLength(0); i++)
                 {
                     for (int j = 0; j < rr.data.GetLength(1) - 1; j++)
                     {
-                        restrict[i, j] = rr.data[i, j] / scaling[j];
+                        restrict_input[i, j] = rr.data[i, j] / scaling[j];
                     }
-                    restrict[i, rr.data.GetLength(1) - 1] = rr.data[i, rr.data.GetLength(1) - 1];
+                    restrict_input[i, rr.data.GetLength(1) - 1] = rr.data[i, rr.data.GetLength(1) - 1];
                 }
             }
 
-            r = new double[restrict.GetLength(0), restrict.GetLength(1) - 1];
-            for (int i = 0; i < restrict.GetLength(0); i++)
+            restrict = new double[restrict_input.GetLength(0), restrict_input.GetLength(1) - 1];
+            for (int i = 0; i < restrict_input.GetLength(0); i++)
             {
-                for (int j = 0; j < restrict.GetLength(1) - 1; j++)
+                for (int j = 0; j < restrict_input.GetLength(1) - 1; j++)
                 {
-                    r[i, j] = restrict[i, j];
+                    restrict[i, j] = restrict_input[i, j];
                 }
             }
 
-            int df = n - m + k; //degrees of freedom
+            int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
 
             if (df <= 0)
             {
@@ -28432,8 +28441,17 @@ namespace Gekko
                 G.Writeln2("*** ERROR: There are " + m + " variables " + s + "and " + k + " restrictions with only " + n + " observations");
                 throw new GekkoException();
             }
-            
-            OLSResults ols = OLSHelper(n, m, x, y, scaling, restrict, k, r, df);
+
+            OLSRekurInfo rekurInfo = new OLSRekurInfo();
+            rekurInfo.type = "r";
+
+            //!!calling the engine ------------------------------------------------
+            //!!calling the engine ------------------------------------------------
+            //!!calling the engine ------------------------------------------------
+            OLSResults ols = OLSHelper(y, x, restrict_input, restrict, scaling, n, m, k, df);
+            //---------------------------------------------------------------------
+            //---------------------------------------------------------------------
+            //---------------------------------------------------------------------
 
             for (int i = 0; i < n; i++)
             {
@@ -28451,8 +28469,6 @@ namespace Gekko
             tab.SetAlign(1, 2, 1, 4, Align.Right);
             for (int i = 0; i < m; i++)
             {
-                double coeff = 1d / scaling[i] * ols.beta[i];
-
                 string s = null;
                 if (i + 1 < o.expressionsText.Count)
                 {
@@ -28462,21 +28478,15 @@ namespace Gekko
                 tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
 
-                int digits = GetDigits(coeff, 6);
+                int digits = GetDigits(ols.coeff[i], 6);
 
-                double se = double.NaN;
-                double t = double.NaN;
+                tab.SetNumber(i + 2, 2, ols.coeff[i], "f16." + digits);
+                tab.SetNumber(i + 2, 3, ols.se[i], "f16." + digits);
+                tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
 
-                se = Math.Sqrt(ols.usedCovar[i, i]);
-                t = Math.Abs(coeff / Math.Sqrt(ols.usedCovar[i, i]));
-
-                tab.SetNumber(i + 2, 2, coeff, "f16." + digits);
-                tab.SetNumber(i + 2, 3, se, "f16." + digits);
-                tab.SetNumber(i + 2, 4, t, "f12.2");
-
-                name_param.data[i, 0] = coeff;
-                name_se.data[i, 0] = se;
-                name_t.data[i, 0] = t;
+                name_param.data[i, 0] = ols.coeff[i];
+                name_se.data[i, 0] = ols.se[i];
+                name_t.data[i, 0] = ols.t[i];
             }
 
             tab.SetBorder(1, 1, 1, 4, BorderType.Top);
@@ -28486,13 +28496,6 @@ namespace Gekko
             Globals.lastPrtOrMulprtTable = tab;
             CrossThreadStuff.CopyButtonEnabled(true);
 
-            double r2 = 1d - ols.rss / ols.ssTot;
-            //k is number of impose restrictions
-            //our m includes the constant term
-            //See this page: https://en.wikipedia.org/wiki/Coefficient_of_determination
-            //There the correction is (n-1)/(n-p-1), where p is number of regressors not counting the constant term.
-            double r2cor = 1d - (1 - r2) * (n - 1) / (double)df; //google "r2 adjusted formula". Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
-
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
@@ -28500,7 +28503,7 @@ namespace Gekko
             G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
             G.Writeln(G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
-            G.Writeln("R2: " + Math.Round(r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero));
+            G.Writeln(OLSFormatHelper(ols));
 
             if (Math.Abs(ols.resMean) > 0.000001d * ols.see)
             {
@@ -28512,8 +28515,8 @@ namespace Gekko
             name_stats.data[2 - 1, 0] = ols.see;
             name_stats.data[3 - 1, 0] = ols.resMean;
             name_stats.data[4 - 1, 0] = ols.rmse; // rep.rmserror;
-            name_stats.data[5 - 1, 0] = r2;
-            name_stats.data[6 - 1, 0] = r2cor;
+            name_stats.data[5 - 1, 0] = ols.r2;
+            name_stats.data[6 - 1, 0] = ols.r2cor;
             name_stats.data[8 - 1, 0] = ols.lhsMean;
             name_stats.data[9 - 1, 0] = ols.dw;
             name_covar.data = ols.usedCovar;
@@ -28527,6 +28530,11 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_se", name_se);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
+
+            if (rekurInfo.type == "r")
+            {
+                OLSRecursive(m, x, y, scaling, restrict_input, k, restrict, df);
+            }
 
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
@@ -28582,7 +28590,62 @@ namespace Gekko
             }
         }
 
-        private static OLSResults OLSHelper(int n, int m, double[,] x, double[] y, double[] scaling, double[,] restrict, int k, double[,] r, int df)
+        private static void OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, double[,] restrict, int df_original)
+        {
+            Table tab7 = new Table();
+            int row = 1;
+            tab7.Set(row, 1, "R2");
+            tab7.Set(row, 2, "SEE");
+            tab7.Set(row, 3, "DW");
+            row++;
+
+            G.Writeln2("---------------------------------------------------------------------------------");
+            G.Writeln("------------------------- recursive estimation (right) --------------------------");
+            G.Writeln("---------------------------------------------------------------------------------");
+            double rss0 = double.NaN;
+            for (int df7 = 1; df7 <= df_original; df7++)
+            {
+                //df = n - m + k, so n = df + m - k
+                int n7 = df7 + m - k;
+                //cut obs from the right
+                double[] y7 = new double[n7];
+                double[,] x7 = new double[n7, m];
+                for (int i = 0; i < n7; i++)
+                {
+                    y7[i] = y[i];
+                    for (int j = 0; j < m; j++)
+                    {
+                        x7[i, j] = x[i, j];
+                    }
+                }
+                OLSResults ols7 = OLSHelper(y7, x7, restrict_input, restrict, scaling, n7, m, k, df7);
+
+                //https://en.wikipedia.org/wiki/Chow_test
+                //splitter data i to grupper, 1 og 2
+                //test = (s - (s1+s2))/k   /     [(s1+s2)/(n1+n2-2k)]    hvor k er antal regressorer (vi kalder denne for m)
+                //vi ser 1 skridt frem, så 
+
+                double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // --> t dist: limit for df --> inf is 1.960.
+
+                double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
+
+                tab7.Set(row, 1, Math.Round(ols7.r2, 6, MidpointRounding.AwayFromZero).ToString());
+                tab7.Set(row, 2, RoundToSignificantDigits(ols7.see, 6).ToString());
+                tab7.Set(row, 3, Math.Round(ols7.dw, 4, MidpointRounding.AwayFromZero).ToString());
+                row++;
+                rss0 = ols7.rss;
+            }
+            List<string> ss = tab7.Print();
+            foreach (string s in ss) G.Writeln(s);
+            G.Writeln("---------------------------------------------------------------------------------");
+        }
+
+        private static string OLSFormatHelper(OLSResults ols)
+        {
+            return "R2: " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
+        }
+
+        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[,] restrict, double[] scaling, int n, int m, int k, int df)
         {
             OLSResults ols = new OLSResults();
 
@@ -28593,7 +28656,7 @@ namespace Gekko
             try
             {
                 int info2 = -12345;
-                alglib.lsfit.lsfitlinearc(y, x, restrict, n, m, k, ref info2, ref ols.beta, rep);
+                alglib.lsfit.lsfitlinearc(y, x, restrict_input, n, m, k, ref info2, ref ols.beta, rep);
             }
             catch (Exception e)
             {
@@ -28647,7 +28710,7 @@ namespace Gekko
             ols.see = Math.Sqrt(ols.rss / (double)df);
             ols.usedCovar = null;
             double[,] ixtx = InvertMatrix(XTransposeX(x));
-            if (r.GetLength(0) == 0)
+            if (restrict.GetLength(0) == 0)
             {
                 //covar = sigma^2 * inv(X'X)
                 ols.usedCovar = O.MultiplyMatrixScalar(ixtx, ols.see * ols.see, ixtx.GetLength(0), ixtx.GetLength(1));
@@ -28655,8 +28718,8 @@ namespace Gekko
             else
             {
                 //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
-                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
-                double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
+                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(restrict, ixtx), Transpose(restrict)));
+                double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(restrict)), inside), restrict), ixtx);
                 double[,] temp2 = O.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
                 ols.usedCovar = O.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
             }
@@ -28680,6 +28743,23 @@ namespace Gekko
                     ols.usedCorr[i, j] = ols.usedCovar[i, j] / Math.Sqrt(ols.usedCovar[i, i]) / Math.Sqrt(ols.usedCovar[j, j]);
                 }
             }
+
+            ols.coeff = new double[m];
+            ols.se = new double[m];
+            ols.t = new double[m];
+            for (int i = 0; i < m; i++)
+            {
+                ols.coeff[i] = 1d / scaling[i] * ols.beta[i];
+                ols.se[i] = Math.Sqrt(ols.usedCovar[i, i]);
+                ols.t[i] = Math.Abs(ols.coeff[i] / Math.Sqrt(ols.usedCovar[i, i]));
+            }
+
+            ols.r2 = 1d - ols.rss / ols.ssTot;
+            //k is number of impose restrictions
+            //our m includes the constant term
+            //See this page: https://en.wikipedia.org/wiki/Coefficient_of_determination
+            //There the correction is (n-1)/(n-p-1), where p is number of regressors not counting the constant term.
+            ols.r2cor = 1d - (1 - ols.r2) * (n - 1) / (double)df; //google "r2 adjusted formula". Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
 
             return ols;
 
