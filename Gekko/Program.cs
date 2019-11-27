@@ -119,6 +119,13 @@ namespace Gekko
         public List<List<double>> values = null;
     }
 
+    public class OLSResults
+    {
+        public double[] beta, ypredict, residual;
+        public double rss, resMean, lhsMean, ssTot, dw, rmse, see;
+        public double[,] usedCovar, usedCorr;
+    }
+
     public class CellOffset
     {
         public string cell = null;
@@ -28312,14 +28319,12 @@ namespace Gekko
 
             //Denne stemmer med Gekko.
 
-            //What about restrictions (IMPOSE)?
-            //Could do it using PRT syntax: OLS fy = fx, pcp/lna;
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
 
             IVariable lhs = o.expressions[0];
             List<IVariable> rhs = new List<IVariable>();
-            for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);            
+            for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
             List<Series> rhs_unfolded = UnfoldAsSeries(new GekkoSmpl(o.t1, o.t2), rhs);
 
             Series lhs_series = lhs as Series;
@@ -28344,8 +28349,8 @@ namespace Gekko
             if (G.Equal(o.opt_constant, "no")) constant = 0;
 
             int n = GekkoTime.Observations(t1, t2);
-            int m = rhs_unfolded.Count + constant;  //explanatory vars including constant     
-            
+            int m = rhs_unfolded.Count + constant;  //explanatory vars including constant = number of params estimated INCLUDING possible constant     
+
             double[,] x = new double[n, m];  //includes constant if it is there, does not include lhs
             double[] y = new double[n];
 
@@ -28354,7 +28359,7 @@ namespace Gekko
             {
                 int k_i = 0;
                 foreach (IVariable xx in rhs_unfolded)
-                {                    
+                {
                     x[n_i, k_i] = xx.GetVal(t);
                     k_i++;
                 }
@@ -28369,11 +28374,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));  
+            Series name_predict = new Series(t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));
             Series name_residual = new Series(t1.freq, G.Chop_FreqAdd(name + "_residual", lhs_series.freq));
-            
-            double[] beta = null;
-            int info = 0;
 
             double[] scaling = new double[x.GetLength(1)];
             for (int kk = 0; kk < x.GetLength(1); kk++)
@@ -28392,9 +28394,6 @@ namespace Gekko
                 }
             }
 
-            alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
-
-            int info2 = -12345;
             double[,] restrict = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
 
             int k = 0;
@@ -28424,118 +28423,26 @@ namespace Gekko
                 }
             }
 
-            int n_restrict = restrict.GetLength(0);
+            int df = n - m + k; //degrees of freedom
 
-            if (n <= m - n_restrict)
+            if (df <= 0)
             {
-                G.Writeln2("*** ERROR: There are " + m + " variables and " + n_restrict + " restrictions with only " + n + " observations");
+                string s = null;
+                if (constant == 1) s = "(including constant) ";
+                G.Writeln2("*** ERROR: There are " + m + " variables " + s + "and " + k + " restrictions with only " + n + " observations");
                 throw new GekkoException();
             }
-
-            //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
-            //if it detects k = 0, it just calls same procedure as alglib.lsfit.lsfitlinear()
-            try
-            {
-                alglib.lsfit.lsfitlinearc(y, x, restrict, n, m, k, ref info2, ref beta, rep);
-            }
-            catch (Exception e)
-            {
-                if (e.Message != null && e.Message != "")
-                {
-                    G.Writeln2("*** ERROR: " + e.Message);
-                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
-                }
-                if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
-                {
-                    G.Writeln2("*** ERROR: " + e.InnerException.Message);
-                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
-                }
-                throw;
-            }
-
-            double[] ypredict = new double[n];
-            double[] residual = new double[n];
-
-            double dw1 = 0d;
-            double rss = 0d;
-
-            double resMean = 0d;
-
-            double lhsMean = 0d;
-
-            double ySum = 0d;
-            for (int i = 0; i < n; i++)
-            {
-                ySum += y[i];
-            }
-            double yAvg = ySum / (double)n;
-
-            double ssTot = 0d;
+            
+            OLSResults ols = OLSHelper(n, m, x, y, scaling, restrict, k, r, df);
 
             for (int i = 0; i < n; i++)
             {
-                ypredict[i] = 0d;
-                for (int ik = 0; ik < m; ik++)
-                {
-                    ypredict[i] += beta[ik] * x[i, ik];
-                }
-                residual[i] = y[i] - ypredict[i];
-                resMean += residual[i];
-
-                lhsMean += y[i];
-                rss += residual[i] * residual[i];
-                ssTot += (y[i] - yAvg) * (y[i] - yAvg);
-                if (i > 0) dw1 += (residual[i] - residual[i - 1]) * (residual[i] - residual[i - 1]);
-
-                name_predict.SetData(t1.Add(i), ypredict[i]);
-                name_residual.SetData(t1.Add(i), residual[i]);
-            }
-            resMean = resMean / (double)n;
-            lhsMean = lhsMean / (double)n;
-
-            double dw = dw1 / rss;
-            double rmse = Math.Sqrt(rss / (double)(n));
-            double see = Math.Sqrt(rss / (double)(n - m + k));
-
-            double[,] usedCovar = null;
-
-            double[,] ixtx = InvertMatrix(XTransposeX(x));
-            if (r.GetLength(0) == 0)
-            {
-                //covar = sigma^2 * inv(X'X)
-                usedCovar = O.MultiplyMatrixScalar(ixtx, see * see, ixtx.GetLength(0), ixtx.GetLength(1));
-            }
-            else
-            {
-                //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )
-                double[,] mat1 = ixtx;
-                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
-                double[,] zz = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
-                double[,] zzz = O.SubtractMatrixMatrix(ixtx, zz, ixtx.GetLength(0), ixtx.GetLength(1));
-                usedCovar = O.MultiplyMatrixScalar(zzz, see * see, zzz.GetLength(0), zzz.GetLength(1));
-            }
-
-            //usedCovar = rep.covpar; --> this yields the same (without restrictions), also in the case without constant
-
-            for (int i = 0; i < usedCovar.GetLength(0); i++)
-            {
-                for (int j = 0; j < usedCovar.GetLength(1); j++)
-                {
-                    usedCovar[i, j] = usedCovar[i, j] / scaling[i] / scaling[j];
-                }
-            }
-
-            double[,] usedCorr = new double[usedCovar.GetLength(0), usedCovar.GetLength(1)];
-            for (int i = 0; i < usedCovar.GetLength(0); i++)
-            {
-                for (int j = 0; j < usedCovar.GetLength(1); j++)
-                {
-                    usedCorr[i, j] = usedCovar[i, j] / Math.Sqrt(usedCovar[i, i]) / Math.Sqrt(usedCovar[j, j]);
-                }
+                name_predict.SetData(t1.Add(i), ols.ypredict[i]);
+                name_residual.SetData(t1.Add(i), ols.residual[i]);
             }
 
             Table tab = new Table();
-            
+
             tab.Set(1, 1, "Variable");
             tab.Set(1, 2, "Estimate");
             tab.Set(1, 3, "Std error");
@@ -28544,7 +28451,7 @@ namespace Gekko
             tab.SetAlign(1, 2, 1, 4, Align.Right);
             for (int i = 0; i < m; i++)
             {
-                double coeff = 1d / scaling[i] * beta[i];
+                double coeff = 1d / scaling[i] * ols.beta[i];
 
                 string s = null;
                 if (i + 1 < o.expressionsText.Count)
@@ -28560,8 +28467,8 @@ namespace Gekko
                 double se = double.NaN;
                 double t = double.NaN;
 
-                se = Math.Sqrt(usedCovar[i, i]);
-                t = Math.Abs(coeff / Math.Sqrt(usedCovar[i, i]));
+                se = Math.Sqrt(ols.usedCovar[i, i]);
+                t = Math.Abs(coeff / Math.Sqrt(ols.usedCovar[i, i]));
 
                 tab.SetNumber(i + 2, 2, coeff, "f16." + digits);
                 tab.SetNumber(i + 2, 3, se, "f16." + digits);
@@ -28579,8 +28486,12 @@ namespace Gekko
             Globals.lastPrtOrMulprtTable = tab;
             CrossThreadStuff.CopyButtonEnabled(true);
 
-            double r2 = 1 - rss / ssTot;
-            double r2cor = 1 - (1 - r2) * (n - 1) / (n - (m - 1) - 1 + k);  //google "r2 adjusted formula". Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
+            double r2 = 1d - ols.rss / ols.ssTot;
+            //k is number of impose restrictions
+            //our m includes the constant term
+            //See this page: https://en.wikipedia.org/wiki/Coefficient_of_determination
+            //There the correction is (n-1)/(n-p-1), where p is number of regressors not counting the constant term.
+            double r2cor = 1d - (1 - r2) * (n - 1) / (double)df; //google "r2 adjusted formula". Our m includes the constant, usually regressors do not count the constant -> therefore (m-1). TT added k, must be so.
 
             int widthRemember = Program.options.print_width;
             int fileWidthRemember = Program.options.print_filewidth;
@@ -28589,24 +28500,24 @@ namespace Gekko
             G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
             G.Writeln(G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
-            G.Writeln("R2: " + Math.Round(r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(see, 6) + "    " + "DW: " + Math.Round(dw, 4, MidpointRounding.AwayFromZero));
+            G.Writeln("R2: " + Math.Round(r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero));
 
-            if (Math.Abs(resMean) > 0.000001d * see)
+            if (Math.Abs(ols.resMean) > 0.000001d * ols.see)
             {
                 G.Writeln2("+++ NOTE: The residuals do not seem to sum to zero. Did you omit a constant term?");
                 G.Writeln("          Note that R2 and other statistics may be misleading in this case.");
             }
 
-            name_stats.data[1 - 1, 0] = rss;
-            name_stats.data[2 - 1, 0] = see;
-            name_stats.data[3 - 1, 0] = resMean;
-            name_stats.data[4 - 1, 0] = rmse; // rep.rmserror;
+            name_stats.data[1 - 1, 0] = ols.rss;
+            name_stats.data[2 - 1, 0] = ols.see;
+            name_stats.data[3 - 1, 0] = ols.resMean;
+            name_stats.data[4 - 1, 0] = ols.rmse; // rep.rmserror;
             name_stats.data[5 - 1, 0] = r2;
             name_stats.data[6 - 1, 0] = r2cor;
-            name_stats.data[8 - 1, 0] = lhsMean;
-            name_stats.data[9 - 1, 0] = dw;
-            name_covar.data = usedCovar;
-            name_corr.data = usedCorr;
+            name_stats.data[8 - 1, 0] = ols.lhsMean;
+            name_stats.data[9 - 1, 0] = ols.dw;
+            name_covar.data = ols.usedCovar;
+            name_corr.data = ols.usedCorr;
 
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_predict);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(name_residual);
@@ -28616,7 +28527,7 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_se", name_se);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
-            
+
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
 
@@ -28624,7 +28535,7 @@ namespace Gekko
             {
                 string fileName = "ols.frm";
                 if (!G.Equal(o.opt_dump, "yes")) fileName = o.opt_dump;
-                
+
                 bool append = false;
                 if (G.Equal(o.opt_dumpoptions, "append")) append = true;
 
@@ -28659,7 +28570,7 @@ namespace Gekko
                     using (FileStream fs = WaitForFileStream(Program.CreateFullPathAndFileName(fileName), option))
                     using (StreamWriter sw = G.GekkoStreamWriter(fs))
                     {
-                        sw.WriteLine(s);                        
+                        sw.WriteLine(s);
                     }
                     G.Writeln2("Dumped OLS result as an equation inside the file '" + fileName + "'");
                 }
@@ -28669,6 +28580,109 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+        }
+
+        private static OLSResults OLSHelper(int n, int m, double[,] x, double[] y, double[] scaling, double[,] restrict, int k, double[,] r, int df)
+        {
+            OLSResults ols = new OLSResults();
+
+            alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
+            //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
+            //if it detects k = 0, it just calls same procedure as alglib.lsfit.lsfitlinear()
+            ols.beta = null;
+            try
+            {
+                int info2 = -12345;
+                alglib.lsfit.lsfitlinearc(y, x, restrict, n, m, k, ref info2, ref ols.beta, rep);
+            }
+            catch (Exception e)
+            {
+                if (e.Message != null && e.Message != "")
+                {
+                    G.Writeln2("*** ERROR: " + e.Message);
+                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                }
+                if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
+                {
+                    G.Writeln2("*** ERROR: " + e.InnerException.Message);
+                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                }
+                throw;
+            }
+
+            ols.ypredict = new double[n];
+            ols.residual = new double[n];
+            double dw1 = 0d;
+            ols.rss = 0d;
+            ols.resMean = 0d;
+            ols.lhsMean = 0d;
+            double ySum = 0d;
+            for (int i = 0; i < n; i++)
+            {
+                ySum += y[i];
+            }
+            double yAvg = ySum / (double)n;
+
+            ols.ssTot = 0d;
+            for (int i = 0; i < n; i++)
+            {
+                ols.ypredict[i] = 0d;
+                for (int ik = 0; ik < m; ik++)
+                {
+                    ols.ypredict[i] += ols.beta[ik] * x[i, ik];
+                }
+                ols.residual[i] = y[i] - ols.ypredict[i];
+                ols.resMean += ols.residual[i];
+
+                ols.lhsMean += y[i];
+                ols.rss += ols.residual[i] * ols.residual[i];
+                ols.ssTot += (y[i] - yAvg) * (y[i] - yAvg);
+                if (i > 0) dw1 += (ols.residual[i] - ols.residual[i - 1]) * (ols.residual[i] - ols.residual[i - 1]);
+            }
+            ols.resMean = ols.resMean / (double)n;
+            ols.lhsMean = ols.lhsMean / (double)n;
+
+            ols.dw = dw1 / ols.rss;
+            ols.rmse = Math.Sqrt(ols.rss / (double)n);
+            ols.see = Math.Sqrt(ols.rss / (double)df);
+            ols.usedCovar = null;
+            double[,] ixtx = InvertMatrix(XTransposeX(x));
+            if (r.GetLength(0) == 0)
+            {
+                //covar = sigma^2 * inv(X'X)
+                ols.usedCovar = O.MultiplyMatrixScalar(ixtx, ols.see * ols.see, ixtx.GetLength(0), ixtx.GetLength(1));
+            }
+            else
+            {
+                //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
+                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
+                double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
+                double[,] temp2 = O.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
+                ols.usedCovar = O.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
+            }
+
+            //usedCovar = rep.covpar; --> this yields the same (without restrictions), also in the case without constant
+
+            //unscale
+            for (int i = 0; i < ols.usedCovar.GetLength(0); i++)
+            {
+                for (int j = 0; j < ols.usedCovar.GetLength(1); j++)
+                {
+                    ols.usedCovar[i, j] = ols.usedCovar[i, j] / scaling[i] / scaling[j];
+                }
+            }
+
+            ols.usedCorr = new double[ols.usedCovar.GetLength(0), ols.usedCovar.GetLength(1)];
+            for (int i = 0; i < ols.usedCovar.GetLength(0); i++)
+            {
+                for (int j = 0; j < ols.usedCovar.GetLength(1); j++)
+                {
+                    ols.usedCorr[i, j] = ols.usedCovar[i, j] / Math.Sqrt(ols.usedCovar[i, i]) / Math.Sqrt(ols.usedCovar[j, j]);
+                }
+            }
+
+            return ols;
+
         }
 
         private static int GetDigits(double coeff, int i)
