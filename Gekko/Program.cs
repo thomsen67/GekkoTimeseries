@@ -31324,9 +31324,9 @@ namespace Gekko
                 scalarRef = Math.Log(scalarRef);
             }
 
-            if (G.Equal(operator2, "n")) return (sumOver * scalarWork);
-            else if (G.Equal(operator2, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
-            else if (G.Equal(operator2, "m")) return (sumOver * scalarWork) - (sumOver * scalarRef);
+            if (G.Equal(operator2, "n")) return (scalarWork);
+            else if (G.Equal(operator2, "q")) return ((scalarWork) / (scalarRef) - 1d) * 100d;
+            else if (G.Equal(operator2, "m")) return (scalarWork) - (scalarRef);
             else if (G.Equal(operator2, "d")) return 0d;
             else if (G.Equal(operator2, "p")) return 0d;
             else if (G.Equal(operator2, "dp")) return 0d;
