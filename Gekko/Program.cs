@@ -127,6 +127,34 @@ namespace Gekko
         public int df_min = 1;  //can be larger
     }
 
+    public class OLSRekurDatas
+    {
+        public List<OLSRekurData> datas = new List<OLSRekurData>();
+        public OLSRekurData data = null;
+
+        public OLSRekurDatas(int m, int n)
+        {
+            for (int i = 0; i < m; i++)
+            {
+                this.datas.Add(new OLSRekurData(n));
+            }
+
+            this.data = new OLSRekurData(n);
+        }        
+    }
+
+    public class OLSRekurData
+    {
+        public double[] coeff = null;
+        public double[] coeff_low = null;
+        public double[] coeff_high = null;
+        public OLSRekurData(int n)
+        {
+            this.coeff = new double[n];
+            this.coeff_low = new double[n];
+            this.coeff_high = new double[n];
+        }
+    }
 
     public class OLSResults
     {
@@ -28531,9 +28559,46 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
 
+            
             if (rekurInfo.type == "r")
             {
-                OLSRecursive(m, x, y, scaling, restrict_input, k, restrict, df);
+                OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, restrict_input, k, restrict, df);
+                EFreq freq = lhs_series.freq;
+                for (int i = 0; i < m; i++)
+                {
+                    {
+                        string nameWithFreq = G.Chop_AddFreq(name + "_vlow" + i, G.GetFreq(freq));
+                        Series z = new Series(freq, null);
+                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff_low);
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                    }
+
+                    {
+                        string nameWithFreq = G.Chop_AddFreq(name + "_v" + i, G.GetFreq(freq));
+                        Series z = new Series(freq, null);
+                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff);
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                    }
+
+                    {
+                        string nameWithFreq = G.Chop_AddFreq(name + "_vhigh" + i, G.GetFreq(freq));
+                        Series z = new Series(freq, null);
+                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff_high);
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                    }
+
+                    Program.obeyCommandCalledFromGUI("plot " + name + "_vlow" + i + " '', " + name + "_v" + i + ", " + name + "_vhigh" + i + " '';", new P());                    
+                }
+
+                {
+                    string nameWithFreq = G.Chop_AddFreq(name + "_chow", G.GetFreq(freq));
+                    Series z = new Series(freq, null);
+                    z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.data.coeff);
+                    Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                }
+                Program.obeyCommandCalledFromGUI("plot " + name + "_chow <type=boxes>, 1 '';" , new P());
+
+
             }
 
             Program.options.print_width = widthRemember;
@@ -28590,14 +28655,17 @@ namespace Gekko
             }
         }
 
-        private static void OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, double[,] restrict, int df_original)
+        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, double[,] restrict, int df_original)
         {
             Table tab7 = new Table();
             int row = 1;
             tab7.Set(row, 1, "R2");
             tab7.Set(row, 2, "SEE");
             tab7.Set(row, 3, "DW");
+            tab7.Set(row, 4, "Chow");
             row++;
+
+            OLSRekurDatas rekur = new OLSRekurDatas(m, df_original);
 
             G.Writeln2("---------------------------------------------------------------------------------");
             G.Writeln("------------------------- recursive estimation (right) --------------------------");
@@ -28620,24 +28688,30 @@ namespace Gekko
                 }
                 OLSResults ols7 = OLSHelper(y7, x7, restrict_input, restrict, scaling, n7, m, k, df7);
 
-                //https://en.wikipedia.org/wiki/Chow_test
-                //splitter data i to grupper, 1 og 2
-                //test = (s - (s1+s2))/k   /     [(s1+s2)/(n1+n2-2k)]    hvor k er antal regressorer (vi kalder denne for m)
-                //vi ser 1 skridt frem, så 
+                for (int i = 0; i < m; i++)
+                {
+                    rekur.datas[i].coeff_low[df7 - 1] = ols7.coeff[i] - 2d * ols7.se[i];
+                    rekur.datas[i].coeff[df7 - 1] = ols7.coeff[i];
+                    rekur.datas[i].coeff_high[df7 - 1] = ols7.coeff[i] + 2d * ols7.se[i];
+                }                
 
-                double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // --> t dist: limit for df --> inf is 1.960.
-
+                double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // limit for df --> inf = 1.960. The AREMOS version subtracts 1, maybe this is an error?
                 double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
+                rekur.data.coeff[df7 - 1] = chow;
 
                 tab7.Set(row, 1, Math.Round(ols7.r2, 6, MidpointRounding.AwayFromZero).ToString());
                 tab7.Set(row, 2, RoundToSignificantDigits(ols7.see, 6).ToString());
                 tab7.Set(row, 3, Math.Round(ols7.dw, 4, MidpointRounding.AwayFromZero).ToString());
+                if (!double.IsNaN(chow)) tab7.Set(row, 4, Math.Round(chow, 4, MidpointRounding.AwayFromZero).ToString());
                 row++;
                 rss0 = ols7.rss;
             }
             List<string> ss = tab7.Print();
             foreach (string s in ss) G.Writeln(s);
             G.Writeln("---------------------------------------------------------------------------------");
+
+            return rekur;
+
         }
 
         private static string OLSFormatHelper(OLSResults ols)
@@ -28647,6 +28721,8 @@ namespace Gekko
 
         private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[,] restrict, double[] scaling, int n, int m, int k, int df)
         {
+
+
             OLSResults ols = new OLSResults();
 
             alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
@@ -29266,18 +29342,7 @@ namespace Gekko
             //string format = "f14.4";
             //TODO: we could check if there is 1 object printed and it is of type=normal. If so, the label could be printed.
             //  if .meta is augmented with a pointer to the array-series, the label for x[a] could be taken via that pointer.
-
-            //foreach (var x in o.prtElements)
-            //{
-            //    G.Write("-=-->");
-            //    foreach (var y in x.labelRecordedPieces)
-            //    {
-            //        string s = y.iv.ConvertToString();
-            //        G.Write(s + ", ");
-            //    }
-            //    G.Writeln();
-            //}
-
+            
             EPrintTypes type = GetPrintType(o);
 
             if (IsGmulprt(o, type))
@@ -29856,10 +29921,10 @@ namespace Gekko
                 foreach (GekkoTime t in new GekkoTimeIterator(ConvertFreqs(smpl.t1, smpl.t2, freqHere)))  //handles if the freq given is different from the series freq
                 {
 
-                    int sumOver = 0;
+                    int sumOver = 0;  //what does this boolean do??
                     double d = double.NaN;
                     if (isScalar)  //not series
-                    {
+                    {                        
                         d = PrintHelperTransformScalar(scalarValueWork, scalarValueRef, operator2, o.guiGraphIsLogTransform, sumOver, skipCounter);
                     }
                     else
@@ -31868,9 +31933,9 @@ namespace Gekko
                 scalarRef = Math.Log(scalarRef);
             }
 
-            if (G.Equal(operator2, "n")) return (sumOver * scalarWork);
-            else if (G.Equal(operator2, "q")) return ((sumOver * scalarWork) / (sumOver * scalarRef) - 1d) * 100d;
-            else if (G.Equal(operator2, "m")) return (sumOver * scalarWork) - (sumOver * scalarRef);
+            if (G.Equal(operator2, "n")) return scalarWork;
+            else if (G.Equal(operator2, "q")) return (scalarWork / scalarRef - 1d) * 100d;
+            else if (G.Equal(operator2, "m")) return scalarWork - scalarRef;
             else if (G.Equal(operator2, "d")) return 0d;
             else if (G.Equal(operator2, "p")) return 0d;
             else if (G.Equal(operator2, "dp")) return 0d;
