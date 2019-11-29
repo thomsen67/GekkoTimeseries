@@ -2695,6 +2695,13 @@ namespace Gekko
             Globals.linkAction.Add(Globals.linkActionCounter, a);
         }
 
+        public static string GetLinkAction(string s, Action a)
+        {
+            string s2 = Globals.linkActionStart + s + Globals.linkActionDelimiter + ++Globals.linkActionCounter + Globals.linkActionEnd;
+            Globals.linkAction.Add(Globals.linkActionCounter, a);
+            return s2;
+        }
+
         /// <summary>
         /// For writing link to screen (without line feed)
         /// </summary>
@@ -2859,7 +2866,49 @@ namespace Gekko
             bool link = wh.link;
             ETabs tab = wh.tab;
             bool mustScrollToEnd = wh.mustScrollToEnd;
-            Action a = wh.a;
+
+            if (s.Contains(Globals.linkActionStart))
+            {                
+                for (int i = 0; i < s.Length; i++)
+                {
+                    if (s.Substring(i, Globals.linkActionStart.Length) == Globals.linkActionStart)
+                    {
+                        for (int j = 0; i + 1 < s.Length; j++)
+                        {
+                            if (s.Substring(j, Globals.linkActionEnd.Length) == Globals.linkActionEnd)
+                            {
+                                int start = i + Globals.linkActionStart.Length;
+                                int end = j;
+                                string chop1 = s.Substring(0, start - Globals.linkActionStart.Length);
+                                string chop2 = s.Substring(start, end - start);
+                                string chop3 = s.Substring(end + Globals.linkActionEnd.Length, s.Length - end - Globals.linkActionEnd.Length);
+                                string[] ss2 = chop2.Split(Globals.linkActionDelimiter);
+
+                                Program.WorkerThreadHelper2 wh1 = wh.Clone();
+                                wh1.s = chop1;
+                                wh1.newline = false;
+                                wh1.mustScrollToEnd = false;
+                                WriteAbstract2(wh1);
+
+                                Program.WorkerThreadHelper2 wh2 = wh.Clone();
+                                wh2.newline = false;
+                                wh2.link = true;
+                                wh2.linktype = "action:" + ss2[1];
+                                wh2.s = ss2[0];
+                                wh2.mustScrollToEnd = false;
+                                WriteAbstract2(wh2);
+
+                                Program.WorkerThreadHelper2 wh3 = wh.Clone();
+                                wh3.s = chop3;
+                                WriteAbstract2(wh3);
+
+                                return;
+                            }
+                        }
+                    }
+                }
+                return;
+            }
             
             RichTextBoxEx textBox = null;            
 

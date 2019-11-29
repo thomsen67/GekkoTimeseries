@@ -28515,19 +28515,19 @@ namespace Gekko
                 tab.SetNumber(i + 2, 3, ols.se[i], "f16." + digits);
                 tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
 
-                if (false)
+                if (true)
                 {
                     // ---------
                     Action a = () =>
                     {
-                        G.Writeln2("HEJSA");
+                        G.Writeln2("HEJSA1");
                     };
-                    Coord c = new Coord(i + 2, 5);
-                    Cell cell = new Cell();
-                    cell.cellType = CellType.Text;
-                    cell.CellText = new Text("hej");
-                    cell.a = a;
-                    tab.Set(c, cell);
+                    Action a2 = () =>
+                    {
+                        G.Writeln2("HEJSA2");
+                    };                    
+                    tab.Set(i + 2, 5, "you can " + G.GetLinkAction("click", a) + " here");                    
+                    tab.Set(i + 2, 6, "you can also " + G.GetLinkAction("click", a2) + " here");
                     // ---------
                 }
 
@@ -42531,14 +42531,27 @@ namespace Gekko
         {
             //For printing
             public string s;
-            public string linktype;
-            public Action a = null;
+            public string linktype;            
             public bool newline;
             public Color color;
             public bool link;
             public ETabs tab;
             public bool mustScrollToEnd;
             public bool mustAlsoPrintToScreen = false;
+
+            public WorkerThreadHelper2 Clone()
+            {
+                WorkerThreadHelper2 wh = new WorkerThreadHelper2();
+                wh.s = this.s;
+                wh.linktype = this.linktype;
+                wh.newline = this.newline;
+                wh.color = this.color;
+                wh.link = this.link;
+                wh.tab = this.tab;
+                wh.mustScrollToEnd = this.mustScrollToEnd;
+                wh.mustAlsoPrintToScreen = this.mustAlsoPrintToScreen;
+                return wh;
+            }
         }
 
         public class DecompHelper

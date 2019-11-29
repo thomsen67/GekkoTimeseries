@@ -792,8 +792,12 @@ namespace Gekko
         public static int guiErrorWindowTopDistance = 100;
         public static int guiErrorWindowLeftDistance = 150;
         public static int guiItershowWindowTopDistance = 50;
-        public static int guiItershowWindowLeftDistance = 100;        
-        
+        public static int guiItershowWindowLeftDistance = 100;
+
+        public const string linkActionStart = "{a{";
+        public const string linkActionEnd = "}a}";
+        public const char linkActionDelimiter = '¤';
+
         //Perhaps merge all this stuff in LinkContainer
         public static long linkContainerCounter = 0L;
         public static Dictionary<long, Program.LinkContainer> linkContainer = new Dictionary<long, Program.LinkContainer>();
