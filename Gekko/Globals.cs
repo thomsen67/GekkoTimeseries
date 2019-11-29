@@ -800,6 +800,9 @@ namespace Gekko
         public static long outputTabTextCounter = 0L;
         public static Dictionary<string, Program.ErrorContainer> outputTabTextContainer = new Dictionary<string, Program.ErrorContainer>(StringComparer.OrdinalIgnoreCase);
 
+        public static long linkActionCounter = 0L;
+        public static Dictionary<long, Action> linkAction = new Dictionary<long, Action>();
+
         public static string gekkoExeParameters = null;
         
         public static bool runningOnTTComputer = false;

@@ -17415,9 +17415,12 @@ namespace Gekko
                 string s = Python();
                 G.Writeln2(s);
             }
+
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
-        }               
+        }
+
+        
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
@@ -28512,6 +28515,22 @@ namespace Gekko
                 tab.SetNumber(i + 2, 3, ols.se[i], "f16." + digits);
                 tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
 
+                if (false)
+                {
+                    // ---------
+                    Action a = () =>
+                    {
+                        G.Writeln2("HEJSA");
+                    };
+                    Coord c = new Coord(i + 2, 5);
+                    Cell cell = new Cell();
+                    cell.cellType = CellType.Text;
+                    cell.CellText = new Text("hej");
+                    cell.a = a;
+                    tab.Set(c, cell);
+                    // ---------
+                }
+
                 name_param.data[i, 0] = ols.coeff[i];
                 name_se.data[i, 0] = ols.se[i];
                 name_t.data[i, 0] = ols.t[i];
@@ -28559,46 +28578,54 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
 
-            
-            if (rekurInfo.type == "r")
+            int dfStart = 5;
+            if (rekurInfo.type != null)
             {
-                OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, restrict_input, k, restrict, df);
+                string type = "r";
+                OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, restrict_input, k, restrict, df, dfStart, type);
                 EFreq freq = lhs_series.freq;
                 for (int i = 0; i < m; i++)
                 {
                     {
                         string nameWithFreq = G.Chop_AddFreq(name + "_vlow" + i, G.GetFreq(freq));
                         Series z = new Series(freq, null);
-                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff_low);
+                        z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff_low);
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                     }
 
                     {
                         string nameWithFreq = G.Chop_AddFreq(name + "_v" + i, G.GetFreq(freq));
                         Series z = new Series(freq, null);
-                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff);
+                        z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff);
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                     }
 
                     {
                         string nameWithFreq = G.Chop_AddFreq(name + "_vhigh" + i, G.GetFreq(freq));
                         Series z = new Series(freq, null);
-                        z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.datas[i].coeff_high);
+                        z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff_high);
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                     }
 
-                    Program.obeyCommandCalledFromGUI("plot " + name + "_vlow" + i + " '', " + name + "_v" + i + ", " + name + "_vhigh" + i + " '';", new P());                    
+                    int ii = i;  //necessay because of the closeure on the loop i. Crazy but true!
+                    Action a = () =>
+                    {
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vlow" + ii + " '' <type=lines linecolor='gray'>, " + name + "_v" + ii + " <linecolor='red'>, " + name + "_vhigh" + ii + " '' <type=lines linecolor='gray'>;", new P());
+                    };
+                    G.Writeln2("PLOT: ");
+                    G.WriteLinkAction("plot", a);
+
+                    Program.obeyCommandCalledFromGUI("plot " + name + "_vlow" + i + " '' <type=lines linecolor='gray'>, " + name + "_v" + i + " <linecolor='red'>, " + name + "_vhigh" + i + " '' <type=lines linecolor='gray'>;", new P());                    
                 }
 
                 {
                     string nameWithFreq = G.Chop_AddFreq(name + "_chow", G.GetFreq(freq));
                     Series z = new Series(freq, null);
-                    z.SetDataSequence(o.t2.Add(-df + 1), o.t2, rekur.data.coeff);
+                    z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.data.coeff);
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                 }
-                Program.obeyCommandCalledFromGUI("plot " + name + "_chow <type=boxes>, 1 '';" , new P());
-
-
+                //Program.obeyCommandCalledFromGUI("plot 1 '' <type=lines dashtype='3' linecolor='gray'>, " + name + "_chow <type=boxes >; " , new P());
+                Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
             }
 
             Program.options.print_width = widthRemember;
@@ -28655,8 +28682,15 @@ namespace Gekko
             }
         }
 
-        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, double[,] restrict, int df_original)
+        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, double[,] restrict, int df_original, int df_start, string type)
         {
+            if (df_start < 1)
+            {
+                G.Writeln2("*** ERROR: minimum degrees of freedom must be > 0");
+                throw new GekkoException();
+            }
+                
+
             Table tab7 = new Table();
             int row = 1;
             tab7.Set(row, 1, "R2");
@@ -28665,39 +28699,37 @@ namespace Gekko
             tab7.Set(row, 4, "Chow");
             row++;
 
-            OLSRekurDatas rekur = new OLSRekurDatas(m, df_original);
+            OLSRekurDatas rekur = new OLSRekurDatas(m, df_original - df_start + 1);  //if df_start == 1, this corresponds to index 0 in arrays
 
             G.Writeln2("---------------------------------------------------------------------------------");
             G.Writeln("------------------------- recursive estimation (right) --------------------------");
             G.Writeln("---------------------------------------------------------------------------------");
             double rss0 = double.NaN;
-            for (int df7 = 1; df7 <= df_original; df7++)
+            for (int df7 = df_start; df7 <= df_original; df7++)
             {
-                //df = n - m + k, so n = df + m - k
-                int n7 = df7 + m - k;
-                //cut obs from the right
-                double[] y7 = new double[n7];
-                double[,] x7 = new double[n7, m];
-                for (int i = 0; i < n7; i++)
+                int n7; double[] y7; double[,] x7;
+                if (type == "r")
                 {
-                    y7[i] = y[i];
-                    for (int j = 0; j < m; j++)
-                    {
-                        x7[i, j] = x[i, j];
-                    }
+                    OLSRecursiveHelperR(m, x, y, k, df7, 0, out n7, out y7, out x7);
+                }
+                else
+                {
+                    OLSRecursiveHelperR(m, x, y, k, df7, df7 - df_start, out n7, out y7, out x7);
                 }
                 OLSResults ols7 = OLSHelper(y7, x7, restrict_input, restrict, scaling, n7, m, k, df7);
 
+                int index = df7 - df_start;
+
                 for (int i = 0; i < m; i++)
                 {
-                    rekur.datas[i].coeff_low[df7 - 1] = ols7.coeff[i] - 2d * ols7.se[i];
-                    rekur.datas[i].coeff[df7 - 1] = ols7.coeff[i];
-                    rekur.datas[i].coeff_high[df7 - 1] = ols7.coeff[i] + 2d * ols7.se[i];
-                }                
+                    rekur.datas[i].coeff_low[index] = ols7.coeff[i] - 2d * ols7.se[i];
+                    rekur.datas[i].coeff[index] = ols7.coeff[i];
+                    rekur.datas[i].coeff_high[index] = ols7.coeff[i] + 2d * ols7.se[i];
+                }
 
                 double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // limit for df --> inf = 1.960. The AREMOS version subtracts 1, maybe this is an error?
                 double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
-                rekur.data.coeff[df7 - 1] = chow;
+                rekur.data.coeff[index] = chow;
 
                 tab7.Set(row, 1, Math.Round(ols7.r2, 6, MidpointRounding.AwayFromZero).ToString());
                 tab7.Set(row, 2, RoundToSignificantDigits(ols7.see, 6).ToString());
@@ -28707,11 +28739,45 @@ namespace Gekko
                 rss0 = ols7.rss;
             }
             List<string> ss = tab7.Print();
-            foreach (string s in ss) G.Writeln(s);
+            //foreach (string s in ss) G.Writeln(s);
             G.Writeln("---------------------------------------------------------------------------------");
 
             return rekur;
 
+        }
+
+        private static void OLSRecursiveHelperR(int m, double[,] x, double[] y, int k, int df7, int offsetLeft, out int n7, out double[] y7, out double[,] x7)
+        {
+            //df = n - m + k, so n = df + m - k
+            n7 = df7 + m - k - offsetLeft;
+            //cut obs from the right, and also from the left with offsetLeft
+            y7 = new double[n7];
+            x7 = new double[n7, m];
+            for (int i = 0; i < n7; i++)
+            {
+                y7[i] = y[i + offsetLeft];
+                for (int j = 0; j < m; j++)
+                {
+                    x7[i, j] = x[i + offsetLeft, j];
+                }
+            }
+        }
+
+        private static void OLSRecursiveHelperE(int m, double[,] x, double[] y, int k, int df7, out int n7, out double[] y7, out double[,] x7)
+        {
+            //df = n - m + k, so n = df + m - k
+            n7 = df7 + m - k;
+            //cut obs from the right and later on also from the left
+            y7 = new double[n7];
+            x7 = new double[n7, m];
+            for (int i = 0; i < n7; i++)
+            {
+                y7[i] = y[i];
+                for (int j = 0; j < m; j++)
+                {
+                    x7[i, j] = x[i, j];
+                }
+            }
         }
 
         private static string OLSFormatHelper(OLSResults ols)
@@ -33884,7 +33950,7 @@ namespace Gekko
             foreach (string s in ylines)
             {
                 double d = ParseIntoDouble(s);
-                if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");
+                if (!G.isNumericalError(d)) txt.AppendLine("set arrow from graph 0, first " + d + " to graph 1, first " + d + " nohead");               
             }
 
             foreach (string s in y2lines)
@@ -42466,6 +42532,7 @@ namespace Gekko
             //For printing
             public string s;
             public string linktype;
+            public Action a = null;
             public bool newline;
             public Color color;
             public bool link;

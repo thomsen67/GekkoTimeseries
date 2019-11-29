@@ -1480,7 +1480,7 @@ namespace Gekko
                     //StringBuilder sb = new StringBuilder();
 
                     List<string> lines = new List<string>();
-                    
+
 
                     foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in ts.dimensionsStorage.storage)
                     {
@@ -1509,7 +1509,13 @@ namespace Gekko
                     {
                         G.Writeln(line, ETabs.Output);
                     }
-                    
+
+                }
+                else if (type == "action")
+                {
+                    long n = long.Parse(input);
+                    Action a = Globals.linkAction[n];
+                    a();
                 }
                 else
                 {

@@ -1524,8 +1524,6 @@ namespace Gekko
         public double number;
         public bool numberShouldShowAsN = false;
         public string numberFormat = "F15.4";  //default, way too wide and precise in most cases
-        
-
         public string backgroundColor = "Transparent";
 
         public RenderingStuff renderingStuff = null; //if null, this cell is a "real" cell

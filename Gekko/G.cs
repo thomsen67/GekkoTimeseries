@@ -2688,7 +2688,13 @@ namespace Gekko
         {
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
         }
-                
+
+        public static void WriteLinkAction(string s, Action a)
+        {
+            G.WriteLink(s, "action:" + ++Globals.linkActionCounter);
+            Globals.linkAction.Add(Globals.linkActionCounter, a);
+        }
+
         /// <summary>
         /// For writing link to screen (without line feed)
         /// </summary>
@@ -2757,7 +2763,7 @@ namespace Gekko
 
         public static void Writeln(string s, Color color, bool mustAlsoWriteToScreen)
         {
-            WriteAbstractScroll(s, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
+            WriteAbstractScroll(s, null, null, true, color, false, ETabs.Main, false, mustAlsoWriteToScreen);
         }
 
         public static void Writeln(string s, Color color, ETabs tab)
@@ -2767,10 +2773,10 @@ namespace Gekko
 
         public static void WriteAbstract(string s, string linktype, bool newline, Color color, bool link, ETabs tab)
         {            
-            WriteAbstractScroll(s, linktype, newline, color, link, tab, false, false);
+            WriteAbstractScroll(s, linktype, null, newline, color, link, tab, false, false);
         }
 
-        public static void WriteAbstractScroll(string s, string linktype, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
+        public static void WriteAbstractScroll(string s, string linktype, Action a, bool newline, Color color, bool link, ETabs tab, bool mustScrollToEnd, bool mustAlsoPrintToScreen)
         {
             if (Globals.applicationIsInProcessOfDying)
             {
@@ -2853,6 +2859,7 @@ namespace Gekko
             bool link = wh.link;
             ETabs tab = wh.tab;
             bool mustScrollToEnd = wh.mustScrollToEnd;
+            Action a = wh.a;
             
             RichTextBoxEx textBox = null;            
 
