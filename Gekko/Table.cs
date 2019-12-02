@@ -1003,22 +1003,14 @@ namespace Gekko
                         if (cell2.mergeCellAnchorRow != -12345) continue;  //don't do maxWidth for merge-cells!!!
                         if (cell2.cellType == CellType.Text)
                         {
-                            int length = 0;
+                            
                             string s = cell2.CellText.TextData[0];
+                            int length = s.Length;
                             if (s.Contains(Globals.linkActionStart))
                             {
-                                List<LinkAction> actions = G.FindActions(s, false);
-                                foreach (LinkAction action in actions)
-                                {
-                                    length += action.chop1.Length;
-                                    length += action.ss2[0].Length;
-                                    length += action.chop3.Length;
-                                }
+                                length -= G.ExtraLinkLength(s);  //real length when link code is transformed to real link
                             }
-                            else
-                            {
-                                length = s.Length;
-                            }
+                            
                             if (length > maxWidth) maxWidth = length;
                         }
                         else if (cell2.cellType == CellType.RenderingArtificialForDoingBorders)
@@ -1703,15 +1695,33 @@ namespace Gekko
         public static string Align(string s, int width, int height, int alignment)
         {
             if (s == null) s = "";
-            string line1 = String.Format("{0," + width + "}", s);
-            string line2 = String.Format("{0,-" + width + "}", String.Format("{0," + ((width + s.Length) / 2).ToString() + "}", s));
-            string line3 = String.Format("{0,-" + width + "}", s);
+            int extra = 0;
+            if (s.Contains(Globals.linkActionStart))
+            {
+                extra = G.ExtraLinkLength(s);
+            }
+            int realWidth = s.Length - extra;
+            //string line1 = String.Format("{0," + width  + "}", s);
+            //string line2 = String.Format("{0,-" + width + "}", String.Format("{0," + ((width + s.Length) / 2).ToString() + "}", s));
+            //string line3 = String.Format("{0,-" + width + "}", s);  
+
+            int excess = width - realWidth;
+            int excess1 = excess / 2;
+            int excess2 = excess - excess1;
+                        
+            string line1 = G.Blanks(excess) + s;
+            string line2 = G.Blanks(excess1) + s + G.Blanks(excess2);
+            string line3 = s + G.Blanks(excess);
+
             string s2 = "";
             if (alignment == -1) s2 = line3;
             else if (alignment == 0) s2 = line2;
             else if (alignment == 1) s2 = line1;
             else throw new GekkoException();
-            if (s.Length > width) return new string('*', width);
+            if (s.Length > width && extra == 0)
+            {
+                return new string('*', width);
+            }
             return s2;
         }
     }

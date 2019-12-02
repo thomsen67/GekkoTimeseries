@@ -28628,8 +28628,9 @@ namespace Gekko
             tab.Set(1, 2, "Estimate");
             tab.Set(1, 3, "Std error");
             tab.Set(1, 4, "T-stat");
-            tab.Set(1, 5, "Recursive");
-            tab.Merge(1, 5, 1, 7);
+            tab.Set(1, 5, "     ");  //to create some space between main table and links
+            tab.Set(1, 6, "Recursive"); tab.SetAlign(1, 6, Align.Center);
+            tab.Merge(1, 6, 1, 8);
             tab.SetAlign(1, 1, 1, 1, Align.Left);
             tab.SetAlign(1, 2, 1, 4, Align.Right);
             for (int i = 0; i < m; i++)
@@ -28657,7 +28658,7 @@ namespace Gekko
                     {
                         Program.obeyCommandCalledFromGUI("plot " + name + "_vleft_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };
-                    tab.Set(i + 2, 5, G.GetLinkAction("Left", a));
+                    tab.Set(i + 2, 6, G.GetLinkAction("Left", a));
                     // ---------
                 }
 
@@ -28669,7 +28670,7 @@ namespace Gekko
                     {
                         Program.obeyCommandCalledFromGUI("plot " + name + "_velv_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_velv" + (ii + 1) + " <linecolor='red'>, " + name + "_velv_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };
-                    tab.Set(i + 2, 6, G.GetLinkAction("Elv", a));
+                    tab.Set(i + 2, 7, G.GetLinkAction("Elev", a));
                     // ---------
                 }
 
@@ -28681,7 +28682,7 @@ namespace Gekko
                     {
                         Program.obeyCommandCalledFromGUI("plot " + name + "_vright_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };                    
-                    tab.Set(i + 2, 7, G.GetLinkAction("Right", a));                    
+                    tab.Set(i + 2, 8, G.GetLinkAction("Right", a));                    
                     // ---------
                 }
 
@@ -28694,13 +28695,14 @@ namespace Gekko
             tab.SetBorder(1, 1, 1, 4, BorderType.Bottom);
             tab.SetBorder(m + 1, 1, m + 1, 4, BorderType.Bottom);
 
+            string line = null;
             if (true)
             {
                 Action a = () =>
                 {
                     Program.obeyCommandCalledFromGUI("plot<separate> " + name + "_predict+" + name + "_residual 'Obs', " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
-                };
-                tab.Set(m + 2, 1, G.GetLinkAction("Fit", a));
+                };                
+                line += G.GetLinkAction("Fit", a);
             }
 
             if (true)
@@ -28712,13 +28714,16 @@ namespace Gekko
                     {
                         if (i + 1 < o.expressionsText.Count)
                         {
-                            s += ", " + name + "_dek" + (i + 1);
+                            s += ", " + name + "_dek" + (i + 1) + "'" + o.expressionsText[i + 1] + "'";
                         }
-                    }                    
-                    Program.obeyCommandCalledFromGUI("plot " + name + "_dek 'lhs'" + s + ";", new P());
+                    }
+                    Program.obeyCommandCalledFromGUI("plot " + name + "_dek '" + o.expressionsText[0] + "'" + s + ";", new P());
                 };
-                tab.Set(m + 2, 2, G.GetLinkAction("Dek", a));
+                line += "  " +G.GetLinkAction("Dek", a);
             }
+
+            tab.Set(m + 2, 1, OLSFormatHelper(ols)); tab.SetAlign(m + 2, 1, Align.Left); tab.Merge(m + 2, 1, m + 2, 3);
+            tab.Set(m + 2, 4, line); tab.SetAlign(m + 2, 4, Align.Right);
 
             if (true)
             {
@@ -28726,7 +28731,7 @@ namespace Gekko
                 {
                     Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
                 };
-                tab.Set(m + 2, 5, G.GetLinkAction("Chow", a));
+                tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
             }
 
             if (true)
@@ -28744,8 +28749,9 @@ namespace Gekko
                 {
                     Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
                 };
-                tab.Set(m + 2, 7, G.GetLinkAction("Chow", a));
+                tab.Set(m + 2, 8, G.GetLinkAction("Chow", a));
             }
+
 
 
             List<string> temp = tab.Print();
@@ -28756,10 +28762,10 @@ namespace Gekko
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
-            G.Writeln2("OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
-            G.Writeln(G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
+            G.Writeln2(" OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
+            G.Writeln(" " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
-            G.Writeln(OLSFormatHelper(ols));
+            
 
             if (Math.Abs(ols.resMean) > 0.000001d * ols.see)
             {

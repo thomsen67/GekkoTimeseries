@@ -2864,10 +2864,7 @@ namespace Gekko
 
             if (s.Contains(Globals.linkActionStart))
             {
-                List<LinkAction> actions = FindActions(s, true);
-                LinkAction action = null;
-                if (actions.Count > 0) action = actions[0];
-
+                LinkAction action = FindAction(s);
                 if (action != null)
                 {
                     Program.WorkerThreadHelper2 wh1 = wh.Clone();
@@ -2890,7 +2887,6 @@ namespace Gekko
 
                     return;
                 }
-
 
                 for (int i = 0; i < s.Length; i++)
                 {
@@ -3084,9 +3080,29 @@ namespace Gekko
 
         }
 
-        public static List<LinkAction> FindActions(string s, bool onlyOne)
+        public static int ExtraLinkLength(string s)
         {
-            List<LinkAction> actions = new List<LinkAction>();
+            int extra = 0;
+            string sRest = s;
+
+            LinkAction action = FindAction(s);
+            if (action != null)
+            {
+                extra += Globals.linkActionStart.Length;
+                extra += 1; // Globals.linkActionDelimiter
+                extra += action.ss2[1].Length;
+                extra += Globals.linkActionEnd.Length;
+                
+                extra += ExtraLinkLength(action.chop3);
+            }         
+
+            return extra;
+        }
+
+        public static LinkAction FindAction(string s)
+        {
+            //Will only return the first link found
+            LinkAction action = null;
             for (int i = 0; i < s.Length - Globals.linkActionEnd.Length; i++)
             {
                 if (s.Substring(i, Globals.linkActionStart.Length) == Globals.linkActionStart)
@@ -3095,23 +3111,20 @@ namespace Gekko
                     {
                         if (s.Substring(j, Globals.linkActionEnd.Length) == Globals.linkActionEnd)
                         {
-                            LinkAction action = new LinkAction();
+                            action = new LinkAction();
                             action = new LinkAction();
                             action.start = i + Globals.linkActionStart.Length;
                             action.end = j;
                             action.chop1 = s.Substring(0, action.start - Globals.linkActionStart.Length);
                             action.chop2 = s.Substring(action.start, action.end - action.start);
                             action.chop3 = s.Substring(action.end + Globals.linkActionEnd.Length, s.Length - action.end - Globals.linkActionEnd.Length);
-                            action.ss2 = action.chop2.Split(Globals.linkActionDelimiter);
-                            actions.Add(action);
-                            if (onlyOne) return actions;
-                            i = j;
-                            break; //continue with i
+                            action.ss2 = action.chop2.Split(Globals.linkActionDelimiter);                            
+                            return action;
                         }
                     }
                 }
             }
-            return actions;
+            return action;  //will be null
         }
 
         private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)
