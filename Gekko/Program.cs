@@ -28645,7 +28645,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p " + name + "_vleft_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vleft_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 5, G.GetLinkAction("Left", a));
                     // ---------
@@ -28657,7 +28657,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p " + name + "_velv_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_velv" + (ii + 1) + " <linecolor='red'>, " + name + "_velv_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_velv_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_velv" + (ii + 1) + " <linecolor='red'>, " + name + "_velv_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Elv", a));
                     // ---------
@@ -28669,7 +28669,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p " + name + "_vright_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vright_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
                     };                    
                     tab.Set(i + 2, 7, G.GetLinkAction("Right", a));                    
                     // ---------
