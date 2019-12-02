@@ -2689,11 +2689,6 @@ namespace Gekko
             WriteAbstract(x.ToString(), null, false, Color.Empty, false, tab);
         }
 
-        public static void WriteLinkAction(string s, Action a)
-        {
-            G.WriteLink(s, "action:" + ++Globals.linkActionCounter);
-            Globals.linkAction.Add(Globals.linkActionCounter, a);
-        }
 
         public static string GetLinkAction(string s, Action a)
         {
