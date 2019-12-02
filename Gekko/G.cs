@@ -2863,7 +2863,35 @@ namespace Gekko
             bool mustScrollToEnd = wh.mustScrollToEnd;
 
             if (s.Contains(Globals.linkActionStart))
-            {                
+            {
+                List<LinkAction> actions = FindActions(s, true);
+                LinkAction action = null;
+                if (actions.Count > 0) action = actions[0];
+
+                if (action != null)
+                {
+                    Program.WorkerThreadHelper2 wh1 = wh.Clone();
+                    wh1.s = action.chop1;
+                    wh1.newline = false;
+                    wh1.mustScrollToEnd = false;
+                    WriteAbstract2(wh1);
+
+                    Program.WorkerThreadHelper2 wh2 = wh.Clone();
+                    wh2.newline = false;
+                    wh2.link = true;
+                    wh2.linktype = "action:" + action.ss2[1];
+                    wh2.s = action.ss2[0];
+                    wh2.mustScrollToEnd = false;
+                    WriteAbstract2(wh2);
+
+                    Program.WorkerThreadHelper2 wh3 = wh.Clone();
+                    wh3.s = action.chop3;
+                    WriteAbstract2(wh3);
+
+                    return;
+                }
+
+
                 for (int i = 0; i < s.Length; i++)
                 {
                     if (s.Substring(i, Globals.linkActionStart.Length) == Globals.linkActionStart)
@@ -2904,7 +2932,7 @@ namespace Gekko
                 }
                 return;
             }
-            
+
             RichTextBoxEx textBox = null;            
 
             bool mustAlsoPrintOnScreen = wh.mustAlsoPrintToScreen;            
@@ -3054,6 +3082,36 @@ namespace Gekko
                 }
             }
 
+        }
+
+        public static List<LinkAction> FindActions(string s, bool onlyOne)
+        {
+            List<LinkAction> actions = new List<LinkAction>();
+            for (int i = 0; i < s.Length - Globals.linkActionEnd.Length; i++)
+            {
+                if (s.Substring(i, Globals.linkActionStart.Length) == Globals.linkActionStart)
+                {
+                    for (int j = 0; i + 1 < s.Length; j++)
+                    {
+                        if (s.Substring(j, Globals.linkActionEnd.Length) == Globals.linkActionEnd)
+                        {
+                            LinkAction action = new LinkAction();
+                            action = new LinkAction();
+                            action.start = i + Globals.linkActionStart.Length;
+                            action.end = j;
+                            action.chop1 = s.Substring(0, action.start - Globals.linkActionStart.Length);
+                            action.chop2 = s.Substring(action.start, action.end - action.start);
+                            action.chop3 = s.Substring(action.end + Globals.linkActionEnd.Length, s.Length - action.end - Globals.linkActionEnd.Length);
+                            action.ss2 = action.chop2.Split(Globals.linkActionDelimiter);
+                            actions.Add(action);
+                            if (onlyOne) return actions;
+                            i = j;
+                            break; //continue with i
+                        }
+                    }
+                }
+            }
+            return actions;
         }
 
         private static void WriteAbstractClipHelper(string s, RichTextBoxEx textBox, bool newline)

@@ -113,6 +113,16 @@ namespace Gekko
         Special
     }
 
+    public class LinkAction
+    {
+        public int start = -12345;
+        public int end = -12345;
+        public string chop1 = null;
+        public string chop2 = null;
+        public string chop3 = null;
+        public string[] ss2 = null;
+    }
+
     public class PlotTable
     {
         public List<List<double>> dates = null;

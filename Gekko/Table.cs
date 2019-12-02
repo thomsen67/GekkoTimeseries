@@ -1003,7 +1003,23 @@ namespace Gekko
                         if (cell2.mergeCellAnchorRow != -12345) continue;  //don't do maxWidth for merge-cells!!!
                         if (cell2.cellType == CellType.Text)
                         {
-                            if (cell2.CellText.TextData[0].Length > maxWidth) maxWidth = cell2.CellText.TextData[0].Length;
+                            int length = 0;
+                            string s = cell2.CellText.TextData[0];
+                            if (s.Contains(Globals.linkActionStart))
+                            {
+                                List<LinkAction> actions = G.FindActions(s, false);
+                                foreach (LinkAction action in actions)
+                                {
+                                    length += action.chop1.Length;
+                                    length += action.ss2[0].Length;
+                                    length += action.chop3.Length;
+                                }
+                            }
+                            else
+                            {
+                                length = s.Length;
+                            }
+                            if (length > maxWidth) maxWidth = length;
                         }
                         else if (cell2.cellType == CellType.RenderingArtificialForDoingBorders)
                         {
