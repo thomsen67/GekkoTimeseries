@@ -1143,6 +1143,11 @@ namespace Gekko
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
 
+            if (indexInDataArray == int.MaxValue || indexInDataArray == int.MinValue)
+            {
+                return GekkoTime.tNull;  //int.Min or int.Max are the values in a series that has no data
+            }
+
             if (this.type == ESeriesType.Timeless)
             {
                 G.Writeln2("*** ERROR: Timeless variable error #7");
