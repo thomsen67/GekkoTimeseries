@@ -1,4 +1,5 @@
 /*
+/*
     Gekko Timeseries Software (www.t-t.dk/gekko)..
     Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
 
@@ -25487,8 +25488,7 @@ namespace Gekko
             bool isFirst = true;
             string format = SplitDateFormatInTwo(dateformat, ref isFirst);
 
-            int prnWidth = 18;
-            //Databank first = Program.databanks.GetFirst();
+            int prnWidth = 20;            
 
             int i = 1;
             int j = 1;
@@ -25606,42 +25606,71 @@ namespace Gekko
                         else
                         {
                             string s = null;
-                            if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+
+                            bool fixProblem = true;
+
+                            if (fixProblem)
                             {
-                                s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
-                            }
-                            else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
-                            {                                
-                                NumberFormatInfo nfi = new NumberFormatInfo();
-                                nfi.NumberDecimalSeparator = ",";                                
-                                s = string.Format(nfi, "{0:0.0000000000E+00}", data);
+                                s = data.ToString();
+                                if (Program.options.interface_csv_ndec < 20)
+                                {
+                                    s = Program.NumberFormat(data, "f" + Program.options.interface_csv_ndec);
+                                }
+                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+                                {
+                                    //ok                                        
+                                }
+                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                {
+                                    s = s.Replace(".", ",");
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
+                                    throw new GekkoException();
+                                }
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
-                                throw new GekkoException();
-                            }
-                            if (dateFormat == EdataFormat.Csv)
-                            {
-                                if (data < 0)
-                                {                                    
-                                    tab.Add(i, j, new CellLight(s)); j++;
+                                if (G.Equal(Program.options.interface_csv_decimalseparator, "period"))
+                                {
+
+                                    {
+                                        //The 0:... is alignment inside a field.
+                                        s = string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:0.0000000000E+00}", data);
+                                    }
+                                }
+                                else if (G.Equal(Program.options.interface_csv_decimalseparator, "comma"))
+                                {
+                                    NumberFormatInfo nfi = new NumberFormatInfo();
+                                    nfi.NumberDecimalSeparator = ",";
+
+                                    {
+                                        s = string.Format(nfi, "{0:0.0000000000E+00}", data);
+                                    }
                                 }
                                 else
-                                {                                    
-                                    tab.Add(i, j, new CellLight(" " + s)); j++;
+                                {
+                                    G.Writeln2("*** ERROR #8423824: Unknown decimalseparator");
+                                    throw new GekkoException();
                                 }
+                            }
+
+
+                            if (dateFormat == EdataFormat.Csv)
+                            {                                                         
+                                tab.Add(i, j, new CellLight(s)); j++;                                
                             }
                             else
                             {
                                 //prn and gnuplot
                                 if (data < 0)
                                 {                                    
-                                    tab.Add(i, j, new CellLight(G.varFormat(s, prnWidth))); j++;
+                                    tab.Add(i, j, new CellLight(G.varFormat(" " + s, prnWidth))); j++;
                                 }
                                 else
                                 {                                    
-                                    tab.Add(i, j, new CellLight(G.varFormat(" " + s, prnWidth))); j++;
+                                    tab.Add(i, j, new CellLight(G.varFormat("  " + s, prnWidth))); j++;
                                 }
                             }
                         }
@@ -28535,7 +28564,7 @@ namespace Gekko
 
                 for (int i = 0; i < m; i++) //vars
                 {
-                    string nameWithFreq = G.Chop_AddFreq(name + "_dek" + (i + 1), G.GetFreq(lhs_series.freq));
+                    string nameWithFreq = G.Chop_AddFreq(name + "_dec" + (i + 1), G.GetFreq(lhs_series.freq));
                     Series z = new Series(lhs_series.freq, nameWithFreq);
                     for (int t = 0; t < n; t++) //time
                     {
@@ -28546,7 +28575,7 @@ namespace Gekko
 
                 if (true)
                 {
-                    string nameWithFreq = G.Chop_AddFreq(name + "_dek", G.GetFreq(lhs_series.freq));
+                    string nameWithFreq = G.Chop_AddFreq(name + "_dec", G.GetFreq(lhs_series.freq));
                     Series z = new Series(lhs_series.freq, nameWithFreq);
                     for (int t = 0; t < n; t++) //time
                     {
@@ -28568,12 +28597,12 @@ namespace Gekko
                     OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, restrict_input, k, n, restrict, df, dfStart, type);
                     EFreq freq = lhs_series.freq;
                     string type2 = "left";
-                    if (type == "e") type2 = "elv";
+                    if (type == "e") type2 = "slide";
                     else if (type == "r") type2 = "right";
                     for (int i = 0; i < m; i++)
                     {
                         {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + "_low" + (i + 1), G.GetFreq(freq));
+                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_low", G.GetFreq(freq));
                             Series z = new Series(freq, nameWithFreq);
                             if (type == "l")
                                 z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.datas[i].coeff_low);
@@ -28593,7 +28622,7 @@ namespace Gekko
                         }
 
                         {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + "_high" + (i + 1), G.GetFreq(freq));
+                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_high", G.GetFreq(freq));
                             Series z = new Series(freq, nameWithFreq);
                             if (type == "l")
                                 z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.datas[i].coeff_high);
@@ -28656,7 +28685,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_vleft_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", a));
                     // ---------
@@ -28668,9 +28697,9 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_velv_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_velv" + (ii + 1) + " <linecolor='red'>, " + name + "_velv_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
-                    tab.Set(i + 2, 7, G.GetLinkAction("Elev", a));
+                    tab.Set(i + 2, 7, G.GetLinkAction("Slide", a));
                     // ---------
                 }
 
@@ -28680,7 +28709,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_vright_low" + (ii + 1) + " '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright_high" + (ii + 1) + " '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };                    
                     tab.Set(i + 2, 8, G.GetLinkAction("Right", a));                    
                     // ---------
@@ -28700,7 +28729,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot<separate> " + name + "_predict+" + name + "_residual 'Obs', " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
+                    Program.obeyCommandCalledFromGUI("plot<separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
                 };                
                 line += G.GetLinkAction("Fit", a);
             }
@@ -28714,12 +28743,12 @@ namespace Gekko
                     {
                         if (i + 1 < o.expressionsText.Count)
                         {
-                            s += ", " + name + "_dek" + (i + 1) + "'" + o.expressionsText[i + 1] + "'";
+                            s += ", " + name + "_dec" + (i + 1) + "'" + o.expressionsText[i + 1] + "'";
                         }
                     }
-                    Program.obeyCommandCalledFromGUI("plot " + name + "_dek '" + o.expressionsText[0] + "'" + s + ";", new P());
+                    Program.obeyCommandCalledFromGUI("plot " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
                 };
-                line += "  " +G.GetLinkAction("Dek", a);
+                line += "  " +G.GetLinkAction("Dec", a);
             }
 
             tab.Set(m + 2, 1, OLSFormatHelper(ols)); tab.SetAlign(m + 2, 1, Align.Left); tab.Merge(m + 2, 1, m + 2, 3);

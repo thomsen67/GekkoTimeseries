@@ -3812,6 +3812,9 @@ optionType:
              | INTERFACE CLIPBOARD DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CLIPBOARD DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DECIMALSEPARATOR '='? optionInterfaceExcelDecimalseparator -> INTERFACE CSV DECIMALSEPARATOR ^(ASTSTRINGSIMPLE optionInterfaceExcelDecimalseparator)
 			 | INTERFACE CSV DELIMITER '='? name -> INTERFACE CSV DELIMITER ^(ASTSTRINGSIMPLE name)
+			 | INTERFACE CSV NDEC '='? Integer -> INTERFACE CSV NDEC ^(ASTINTEGER Integer)
+			 | INTERFACE CSV PDEC '='? Integer -> INTERFACE CSV PDEC ^(ASTINTEGER Integer)
+
 			 | INTERFACE DATABANK SWAP '='? yesNoSimple -> INTERFACE DATABANK SWAP ^(ASTBOOL yesNoSimple)			
 			 | INTERFACE DEBUG '='? optionInterfaceDebug -> INTERFACE DEBUG ^(ASTSTRINGSIMPLE optionInterfaceDebug)
              | INTERFACE MODE '='? mode2 -> INTERFACE MODE ^(ASTSTRINGSIMPLE mode2)
