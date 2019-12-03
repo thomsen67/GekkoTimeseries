@@ -25861,17 +25861,7 @@ namespace Gekko
                 if (iv.Type() != EVariableType.Series) continue;  //should never happen                
                 Series ts = (Series)iv;
                 if (ts.type != ESeriesType.Normal) continue;
-
-                if (ts.name.Contains("AFIO1"))
-                {
-
-                }
-
-                //if (ts.GetPeriodFirst().super == -27849)
-                //{
-
-                //}
-
+                
                 start = G.GekkoMin(start, ts.GetPeriodFirst().super);
                 end = G.GekkoMax(end, ts.GetPeriodLast().super);                
             }
