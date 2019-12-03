@@ -25862,10 +25862,10 @@ namespace Gekko
                 Series ts = (Series)iv;
                 if (ts.type != ESeriesType.Normal) continue;
 
-                //if (ts.name.Contains("AFIO1"))
-                //{
+                if (ts.name.Contains("AFIO1"))
+                {
 
-                //}
+                }
 
                 //if (ts.GetPeriodFirst().super == -27849)
                 //{

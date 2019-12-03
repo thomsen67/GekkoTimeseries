@@ -1147,6 +1147,11 @@ namespace Gekko
         /// <returns>The period (GekkoTime).</returns>
         public GekkoTime GetPeriod(int indexInDataArray)
         {
+            if (indexInDataArray == int.MaxValue || indexInDataArray == int.MinValue)
+            {
+                return GekkoTime.tNull;  //int.Min or int.Max are the values in a series that has no data
+            }
+            
             // ----------------------------------------------------------------------------
             // OFFSET SAFE: dataOffsetLag is handled in GetAnchorPeriodPositionInArray()
             // ----------------------------------------------------------------------------
