@@ -1,5 +1,4 @@
 /*
-/*
     Gekko Timeseries Software (www.t-t.dk/gekko)..
     Copyright (C) 2016, Thomas Thomsen, T-T Analyse.
 
