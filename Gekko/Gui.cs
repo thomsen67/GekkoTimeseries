@@ -1283,6 +1283,9 @@ namespace Gekko
         {
             try
             {
+                //any abort from STOP or red atop button have probably finished when user
+                //clicks a link. If not reset, the link may throw an exception.
+                Program.AbortingReset();
 
                 string input0 = e.LinkText;
 
@@ -1512,7 +1515,7 @@ namespace Gekko
 
                 }
                 else if (type == "action")
-                {
+                {                    
                     long n = long.Parse(input);
                     Action a = Globals.linkAction[n];
                     a();
@@ -1691,8 +1694,7 @@ namespace Gekko
             Globals.numberOfErrors = 0;
             Globals.numberOfWarnings = 0;
             Globals.numberOfSkippedLines = 0;
-            Globals.threadIsInProcessOfAborting = false;  //clearing this
-            Globals.applicationIsInProcessOfAborting = false;  //clearing this
+            Program.AbortingReset();
             Globals.errorMemory = null;  //so that it is not recording all the time.            
 
             if (newUserInput)
@@ -1723,7 +1725,7 @@ namespace Gekko
             gui.threadWorkerThread.SetApartmentState(ApartmentState.STA);
             gui.threadWorkerThread.CurrentCulture = CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");  //gets . instead of , in doubles
             gui.threadWorkerThread.Start();
-        }
+        }       
 
         // Stop Thread button is pressed
         private void btnStopThread_Click(object sender, System.EventArgs e)

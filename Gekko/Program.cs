@@ -25292,6 +25292,12 @@ namespace Gekko
             return;
         }
 
+        public static void AbortingReset()
+        {
+            Globals.threadIsInProcessOfAborting = false;  //clearing this
+            Globals.applicationIsInProcessOfAborting = false;  //clearing this
+        }
+
         public static FileStream WaitForFileStream(string pathAndFilename, GekkoFileReadOrWrite type)
         {
             return WaitForFileStream(pathAndFilename, type, false);
@@ -28400,7 +28406,7 @@ namespace Gekko
 
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
-
+            
             IVariable lhs = o.expressions[0];
             List<IVariable> rhs = new List<IVariable>();
             for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
@@ -28685,7 +28691,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", a));
                     // ---------
@@ -28697,7 +28703,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 7, G.GetLinkAction("Slide", a));
                     // ---------
@@ -28709,7 +28715,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("plot " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };                    
                     tab.Set(i + 2, 8, G.GetLinkAction("Right", a));                    
                     // ---------
@@ -28729,7 +28735,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot<separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
                 };                
                 line += G.GetLinkAction("Fit", a);
             }
@@ -28746,7 +28752,7 @@ namespace Gekko
                             s += ", " + name + "_dec" + (i + 1) + "'" + o.expressionsText[i + 1] + "'";
                         }
                     }
-                    Program.obeyCommandCalledFromGUI("plot " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
                 };
                 line += "  " +G.GetLinkAction("Dec", a);
             }
@@ -28758,7 +28764,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
                 };
                 tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
             }
@@ -28767,7 +28773,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
                 };
                 //tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
             }
@@ -28776,7 +28782,7 @@ namespace Gekko
             {
                 Action a = () =>
                 {
-                    Program.obeyCommandCalledFromGUI("plot <yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
                 };
                 tab.Set(m + 2, 8, G.GetLinkAction("Chow", a));
             }
