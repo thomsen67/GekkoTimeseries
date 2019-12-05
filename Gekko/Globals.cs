@@ -805,7 +805,7 @@ namespace Gekko
         public static Dictionary<string, Program.ErrorContainer> outputTabTextContainer = new Dictionary<string, Program.ErrorContainer>(StringComparer.OrdinalIgnoreCase);
 
         public static long linkActionCounter = 0L;
-        public static Dictionary<long, Action> linkAction = new Dictionary<long, Action>();
+        public static Dictionary<long, GekkoAction> linkAction = new Dictionary<long, GekkoAction>();
 
         public static string gekkoExeParameters = null;
         

@@ -113,6 +113,25 @@ namespace Gekko
         Special
     }
 
+    public enum EGekkoActionTypes
+    {
+        Unknown,
+        Ols
+    }
+
+    public class GekkoAction
+    {
+        public Action action = null;
+        public EGekkoActionTypes type = EGekkoActionTypes.Unknown;
+        public string name = null;  //for instance the OLS name given
+        public GekkoAction(EGekkoActionTypes type, string name, Action action)
+        {
+            this.type = type;
+            this.name = name;
+            this.action = action;
+        }
+    }
+
     public class LinkAction
     {
         public int start = -12345;
@@ -28375,6 +28394,21 @@ namespace Gekko
             
         }
 
+        public static GekkoAction GetGekkoAction(long n)
+        {
+            GekkoAction ga = null;
+            Globals.linkAction.TryGetValue(n, out ga);
+            if (ga == null || ga.action == null)
+            {            
+                G.Writeln2("+++ WARNING: Link of type '" + ga.type.ToString() + "' has expired");
+                if (ga.type == EGekkoActionTypes.Ols)
+                {
+                    G.Writeln("             You may use different names for your OLS equations to avoid this", Globals.warningColor);
+                }
+            }
+            return Globals.linkAction[n];
+        }
+
         public static void Ols(O.Ols o)
         {
 
@@ -28406,7 +28440,7 @@ namespace Gekko
 
             //What about: http://christoph.ruegg.name/blog/linear-regression-mathnet-numerics.html ?
             //Also see: http://christoph.ruegg.name/blog/towards-mathnet-numerics-v3.html
-            
+
             IVariable lhs = o.expressions[0];
             List<IVariable> rhs = new List<IVariable>();
             for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
@@ -28523,6 +28557,8 @@ namespace Gekko
             OLSRekurInfo rekurInfo = new OLSRekurInfo();
             rekurInfo.type = "r";
 
+            DeleteGekkoActions(EGekkoActionTypes.Ols, name);
+
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
@@ -28551,11 +28587,11 @@ namespace Gekko
                 }
 
                 for (int t = 0; t < n; t++) //time
-                {                    
+                {
                     for (int i = 0; i < m; i++) //variable
-                    {                        
+                    {
                         sumx[i] += contribx[i, t];
-                    }                    
+                    }
                     sumy += ols.ypredict[t];
                 }
 
@@ -28688,12 +28724,12 @@ namespace Gekko
                 if (true)
                 {
                     // ---------
-                    int ii = i;  //because of closure, else i is wrong, since it is a loop variable
+                    int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
-                    };
-                    tab.Set(i + 2, 6, G.GetLinkAction("Left", a));
+                    };                    
+                    tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
                 }
 
@@ -28701,30 +28737,31 @@ namespace Gekko
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
-                    Action a = () =>
+                    
+                    Action a= () =>
                     {
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
-                    tab.Set(i + 2, 7, G.GetLinkAction("Slide", a));
+                    tab.Set(i + 2, 7, G.GetLinkAction("Slide", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
                 }
 
                 if (true)
                 {
                     // ---------
-                    int ii = i;  //because of closure, else i is wrong, since it is a loop variable
+                    int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
-                    };                    
-                    tab.Set(i + 2, 8, G.GetLinkAction("Right", a));                    
+                    };
+                    tab.Set(i + 2, 8, G.GetLinkAction("Right", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
                 }
 
                 name_param.data[i, 0] = ols.coeff[i];
                 name_se.data[i, 0] = ols.se[i];
                 name_t.data[i, 0] = ols.t[i];
-            }            
+            }
 
             tab.SetBorder(1, 1, 1, 4, BorderType.Top);
             tab.SetBorder(1, 1, 1, 4, BorderType.Bottom);
@@ -28732,16 +28769,18 @@ namespace Gekko
 
             string line = null;
             if (true)
-            {
+            {                
                 Action a = () =>
                 {
                     Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
-                };                
-                line += G.GetLinkAction("Fit", a);
+                };
+                line += "  " + G.GetLinkAction("Fit", new GekkoAction(EGekkoActionTypes.Ols, name, a));
+
             }
 
             if (true)
             {
+                
                 Action a = () =>
                 {
                     string s = null;
@@ -28753,41 +28792,40 @@ namespace Gekko
                         }
                     }
                     Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
-                };
-                line += "  " +G.GetLinkAction("Dec", a);
+                };                            
+                line += "  " + G.GetLinkAction("Dec", new GekkoAction(EGekkoActionTypes.Ols, name, a));
             }
 
             tab.Set(m + 2, 1, OLSFormatHelper(ols)); tab.SetAlign(m + 2, 1, Align.Left); tab.Merge(m + 2, 1, m + 2, 3);
             tab.Set(m + 2, 4, line); tab.SetAlign(m + 2, 4, Align.Right);
 
-            if (true)
-            {
-                Action a = () =>
-                {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
-                };
-                tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
-            }
+            //if (true)
+            //{
+                
+            //    Action a = () =>
+            //    {
+            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
+            //    };
+            //}
 
-            if (true)
-            {
-                Action a = () =>
-                {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
-                };
-                //tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
-            }
+            //if (true)
+            //{
+            //    Action a = () =>
+            //    {
+            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
+            //    };
+            //    //tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
+            //}
 
-            if (true)
-            {
-                Action a = () =>
-                {
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
-                };
-                tab.Set(m + 2, 8, G.GetLinkAction("Chow", a));
-            }
-
-
+            //if (true)
+            //{
+            //    GekkoAction a = new GekkoAction();
+            //    a.action = () =>
+            //    {
+            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
+            //    };
+            //    a.type = EGekkoActionTypes.Ols;
+            //}
 
             List<string> temp = tab.Print();
             Globals.lastPrtOrMulprtTable = tab;
@@ -28800,7 +28838,7 @@ namespace Gekko
             G.Writeln2(" OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
             G.Writeln(" " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
-            
+
 
             if (Math.Abs(ols.resMean) > 0.000001d * ols.see)
             {
@@ -28828,7 +28866,7 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_covar", name_covar);
             Program.databanks.GetFirst().AddIVariableWithOverwrite(Globals.symbolCollection + name + "_corr", name_corr);
 
-            
+
             Program.options.print_width = widthRemember;
             Program.options.print_filewidth = fileWidthRemember;
 
@@ -28879,6 +28917,22 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: OLS<dump> failed: is the file '" + fileName + "' blocked?");
                     throw new GekkoException();
+                }
+            }
+        }
+
+        public static void DeleteGekkoActions(EGekkoActionTypes type, string name)
+        {
+            foreach (GekkoAction ga in Globals.linkAction.Values)
+            {
+                if (ga.type == type)
+                {
+                    if (name == null || (name != null && G.Equal(ga.name, name)))
+                    {
+                        //expire all links that match the type and name
+                        //if no name given (=null), all links with that type are expired
+                        ga.action = null;
+                    }
                 }
             }
         }

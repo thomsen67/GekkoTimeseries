@@ -2690,7 +2690,7 @@ namespace Gekko
         }
 
 
-        public static string GetLinkAction(string s, Action a)
+        public static string GetLinkAction(string s, GekkoAction a)
         {
             string s2 = Globals.linkActionStart + s + Globals.linkActionDelimiter + ++Globals.linkActionCounter + Globals.linkActionEnd;
             Globals.linkAction.Add(Globals.linkActionCounter, a);

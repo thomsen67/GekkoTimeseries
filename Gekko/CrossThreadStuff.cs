@@ -261,7 +261,7 @@ namespace Gekko
                         Globals.outputTabTextCounter = 0L;
                         Globals.outputTabTextContainer = new Dictionary<string, Program.ErrorContainer>(StringComparer.OrdinalIgnoreCase);
                         Globals.linkActionCounter = 0L;
-                        Globals.linkAction = new Dictionary<long, Action>();
+                        Globals.linkAction = new Dictionary<long, GekkoAction>();
                     }
                     //G.Writeln("Output window cleared");
                 }

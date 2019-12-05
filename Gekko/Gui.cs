@@ -1515,10 +1515,10 @@ namespace Gekko
 
                 }
                 else if (type == "action")
-                {                    
+                {
                     long n = long.Parse(input);
-                    Action a = Globals.linkAction[n];
-                    a();
+                    GekkoAction a = Program.GetGekkoAction(n);
+                    a.action();
                 }
                 else
                 {
@@ -1534,6 +1534,7 @@ namespace Gekko
             }
         }
 
+        
 
         [STAThread]
         public void toolStripButton1_Click(object sender, EventArgs e)
