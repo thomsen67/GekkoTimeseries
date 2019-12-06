@@ -121,6 +121,9 @@ tokens {
 	ASTOPT_STRING_DATECELL;
 	ASTOPT_STRING_METHOD;
 
+	ASTOPT_LIST_XTREND;
+	ASTOPT_LIST_XTRENDFLAT;
+
 	ASTOPT_VAR_DEP;
 
 	ASTDOUBLE;
@@ -1017,6 +1020,8 @@ Y2                    = 'Y2'                       ;
     CLS              = 'CLS'             ;
     CODE = 'CODE';
     COLLAPSE         = 'COLLAPSE';
+	XTREND = 'XTREND';
+	XTRENDFLAT = 'XTRENDFLAT';
 	PX = 'PX';
 	ARRAY = 'ARRAY';
 	BUGFIX = 'BUGFIX';
@@ -1650,6 +1655,8 @@ d.Add("Y" ,Y);
 										d.Add("bugfix"  , BUGFIX );
 										d.Add("gcm"  , GCM );
                                         d.Add("collapse"  , COLLAPSE );										
+										d.Add("xtrend"  , XTREND );		
+										d.Add("xtrendflat"  , XTRENDFLAT );		
                                         d.Add("colors"  , COLORS );
 										d.Add("dateformat"  , DATEFORMAT );
 										d.Add("datetype"  , DATETYPE );
@@ -3108,6 +3115,8 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 						  | CONSTANT (EQUAL yesNo)? -> ^(ASTOPT_STRING_CONSTANT yesNo?)
 						  | DUMP (EQUAL fileName)? -> ^(ASTOPT_STRING_DUMP fileName?)
 						  | DUMPOPTIONS EQUAL expression -> ^(ASTOPT_STRING_DUMPOPTIONS expression)	
+						  | XTREND EQUAL seqOfBankvarnames -> ^(ASTOPT_LIST_XTREND seqOfBankvarnames)	
+						  | XTRENDFLAT EQUAL seqOfBankvarnames -> ^(ASTOPT_LIST_XTRENDFLAT seqOfBankvarnames)	
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4700,6 +4709,8 @@ ident2: 					Ident |
   XLS|
   XZEROAXIS|
   X|
+  XTREND|
+  XTRENDFLAT|
   Y2LINE|
   Y2MAXHARD|
   Y2MAXSOFT|
@@ -5145,6 +5156,8 @@ ident3: 					Ident |
   XLS|
   XZEROAXIS|
   X|
+  XTREND|
+  XTRENDFLAT|
   Y2LINE|
   Y2MAXHARD|
   Y2MAXSOFT|

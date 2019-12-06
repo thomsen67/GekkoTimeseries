@@ -28411,6 +28411,11 @@ namespace Gekko
 
         public static void Ols(O.Ols o)
         {
+            // ------------------------------------------
+            //n = number of obs
+            //m = number of params (including constant)
+            //k = number of restrictions
+            // ------------------------------------------
 
             //AREMOS:
             //close*;clear;
@@ -28446,6 +28451,26 @@ namespace Gekko
             for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
             List<Series> rhs_unfolded = UnfoldAsSeries(new GekkoSmpl(o.t1, o.t2), rhs);
 
+            List<string> xtrend = O.Restrict(o.opt_xtrend, false, false, false, false);
+            List<string> xtrendflat = O.Restrict(o.opt_xtrendflat, false, false, false, false);
+
+            List<int> flatStart = new List<int>();
+            List<int> flatEnd = new List<int>();
+
+            int constant = 1; if (G.Equal(o.opt_constant, "no")) constant = 0;            
+            int poly;  //0 if there is none, else > 1. Cf. also constant.
+            OLSGetTrendParameters(xtrend, xtrendflat, flatStart, flatEnd, out poly);            
+            int n = GekkoTime.Observations(o.t1, o.t2);
+            int m = rhs_unfolded.Count + poly + constant; //explanatory vars including poly and constant = number of params estimated INCLUDING possible poly and constant     
+            List<int> trendparams = new List<int>();
+            if (poly > 0)
+            {
+                for (int i = m - poly - constant; i < m - constant; i++)
+                {
+                    trendparams.Add(i);
+                }
+            }
+
             Series lhs_series = lhs as Series;
             if (lhs_series == null)
             {
@@ -28455,39 +28480,17 @@ namespace Gekko
 
             //bool useScale = false; //usually true
 
-            GekkoTime t1 = o.t1;
-            GekkoTime t2 = o.t2;
             string name = o.name;
             if (name == null) name = "ols";
 
-            //List<string> labels = new List<string>();
             double[,] tsData2 = null;
             int m2 = 0;
-
-            int constant = 1;
-            if (G.Equal(o.opt_constant, "no")) constant = 0;
-
-            int n = GekkoTime.Observations(t1, t2);
-            int m = rhs_unfolded.Count + constant;  //explanatory vars including constant = number of params estimated INCLUDING possible constant     
-
-            double[,] x = new double[n, m];  //includes constant if it is there, does not include lhs
-            double[,] xOriginal = new double[n, m];  //includes constant if it is there, does not include lhs
+                       
+            double[,] x = new double[n, m];  //includes poly and constant if it is there, does not include lhs
+            double[,] xOriginal = new double[n, m];  //includes poly and constant if it is there, does not include lhs
             double[] y = new double[n];
 
-            int n_i = 0;
-            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
-            {
-                int k_i = 0;
-                foreach (IVariable xx in rhs_unfolded)
-                {
-                    x[n_i, k_i] = xx.GetVal(t);
-                    xOriginal[n_i, k_i] = x[n_i, k_i];
-                    k_i++;
-                }
-                if (constant == 1) x[n_i, rhs_unfolded.Count] = 1d;
-                y[n_i] = lhs_series.GetVal(t);
-                n_i++;
-            }
+            OLSPackData(rhs_unfolded, constant, poly, lhs_series, o.t1, o.t2, n, x, xOriginal, y);
 
             Matrix name_param = new Matrix(m, 1, double.NaN);
             Matrix name_t = new Matrix(m, 1, double.NaN);
@@ -28495,8 +28498,8 @@ namespace Gekko
             Matrix name_stats = new Matrix(9, 1, double.NaN);
             Matrix name_covar = new Matrix(m, m, double.NaN);
             Matrix name_corr = new Matrix(m, m, double.NaN);
-            Series name_predict = new Series(t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));
-            Series name_residual = new Series(t1.freq, G.Chop_FreqAdd(name + "_residual", lhs_series.freq));
+            Series name_predict = new Series(o.t1.freq, G.Chop_FreqAdd(name + "_predict", lhs_series.freq));
+            Series name_residual = new Series(o.t1.freq, G.Chop_FreqAdd(name + "_residual", lhs_series.freq));
 
             double[] scaling = new double[x.GetLength(1)];
             for (int kk = 0; kk < x.GetLength(1); kk++)
@@ -28522,8 +28525,16 @@ namespace Gekko
 
             if (o.impose != null)
             {
-                Matrix rr = O.ConvertToMatrix(o.impose);
+                Matrix rr = O.ConvertToMatrix(o.impose); //a row for each of the k restriction, and it has m+1 cols (second-last col is const if present, and last is what the restrict sums up to)
                 k = rr.data.GetLength(0);
+                int cols = rr.data.GetLength(1);
+
+                if (cols != m + 1)
+                {
+                    G.Writeln2("*** ERROR: The impose matrix has " + cols + " cols, expected " + (m + 1));
+                    throw new GekkoException();
+                }
+
                 restrict_input = new double[rr.data.GetLength(0), rr.data.GetLength(1)];  //needs to be cloned, otherwise the IMPOSE matrix will be changed with scaling
                 for (int i = 0; i < rr.data.GetLength(0); i++)
                 {
@@ -28533,6 +28544,15 @@ namespace Gekko
                     }
                     restrict_input[i, rr.data.GetLength(1) - 1] = rr.data[i, rr.data.GetLength(1) - 1];
                 }
+            }
+
+            if (xtrendflat.Count != 0)
+            {
+                //do this properly
+                int extra = 2;
+                double[,] restrict_with_trend = new double[restrict_input.GetLength(0) + extra, restrict_input.GetLength(1)];
+
+
             }
 
             restrict = new double[restrict_input.GetLength(0), restrict_input.GetLength(1) - 1];
@@ -28550,7 +28570,7 @@ namespace Gekko
             {
                 string s = null;
                 if (constant == 1) s = "(including constant) ";
-                G.Writeln2("*** ERROR: There are " + m + " variables " + s + "and " + k + " restrictions with only " + n + " observations");
+                G.Writeln2("*** ERROR: There are " + m + " params " + s + "and " + k + " restrictions with only " + n + " observations");
                 throw new GekkoException();
             }
 
@@ -28570,9 +28590,9 @@ namespace Gekko
             //Decomp
             if (true)
             {
-
-                double[,] contribx = new double[m, n];
                 double[] contriby = new double[n];
+                double[,] contribx = new double[m, n];
+                double[] contribtrend = new double[n];                
                 double[,] levelx = new double[m, n];
                 double[] levely = new double[n];
                 double[] sumx = new double[m];
@@ -28601,6 +28621,10 @@ namespace Gekko
                     {
                         contribx[i, t] -= sumx[i] / (double)n;
                     }
+                    foreach (int i in trendparams)
+                    {
+                        contribtrend[t] += contribx[i, t];
+                    }
                     contriby[t] = ols.ypredict[t] - sumy / (double)n;
                 }
 
@@ -28624,6 +28648,16 @@ namespace Gekko
                         z.SetData(o.t1.Add(t), contriby[t]);
                     }
                     Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                    if (poly > 0)
+                    {
+                        string nameWithFreq2 = G.Chop_AddFreq(name + "_dec_trend", G.GetFreq(lhs_series.freq));
+                        Series z2 = new Series(lhs_series.freq, nameWithFreq2);
+                        for (int t = 0; t < n; t++) //time
+                        {
+                            z2.SetData(o.t1.Add(t), contribtrend[t]);
+                        }
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq2, z2);
+                    }
                 }
 
             }
@@ -28689,8 +28723,8 @@ namespace Gekko
 
             for (int j = 0; j < n; j++)
             {
-                name_predict.SetData(t1.Add(j), ols.ypredict[j]);
-                name_residual.SetData(t1.Add(j), ols.residual[j]);
+                name_predict.SetData(o.t1.Add(j), ols.ypredict[j]);
+                name_residual.SetData(o.t1.Add(j), ols.residual[j]);
             }
 
             Table tab = new Table();
@@ -28728,7 +28762,7 @@ namespace Gekko
                     Action a = () =>
                     {
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
-                    };                    
+                    };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
                 }
@@ -28737,8 +28771,8 @@ namespace Gekko
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
-                    
-                    Action a= () =>
+
+                    Action a = () =>
                     {
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
@@ -28769,7 +28803,7 @@ namespace Gekko
 
             string line = null;
             if (true)
-            {                
+            {
                 Action a = () =>
                 {
                     Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " separate> " + name + "_predict+" + name + "_residual 'Obs' <linewidth = 6>, " + name + "_predict 'Fit', " + name + "_residual 'Res' <type=boxes>;", new P());
@@ -28780,52 +28814,37 @@ namespace Gekko
 
             if (true)
             {
-                
+
                 Action a = () =>
                 {
                     string s = null;
-                    for (int i = 0; i < m; i++)
+
+                    if (poly == 0)
                     {
-                        if (i + 1 < o.expressionsText.Count)
-                        {
-                            s += ", " + name + "_dec" + (i + 1) + "'" + o.expressionsText[i + 1] + "'";
+                        for (int i = 0; i < m - constant; i++)
+                        {                            
+                            string label = o.expressionsText[i + 1];                            
+                            s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
                     }
-                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
-                };                            
+                    else
+                    {
+                        //poly > 0
+                        for (int i = 0; i < m - poly - constant; i++)
+                        {                            
+                            string label = o.expressionsText[i + 1];                            
+                            s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
+                        }
+                        s += ", " + name + "_dec_trend 'trend'";
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
+                    }                    
+                };
                 line += "  " + G.GetLinkAction("Dec", new GekkoAction(EGekkoActionTypes.Ols, name, a));
             }
 
             tab.Set(m + 2, 1, OLSFormatHelper(ols)); tab.SetAlign(m + 2, 1, Align.Left); tab.Merge(m + 2, 1, m + 2, 3);
             tab.Set(m + 2, 4, line); tab.SetAlign(m + 2, 4, Align.Right);
-
-            //if (true)
-            //{
-                
-            //    Action a = () =>
-            //    {
-            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_left <type=boxes >; ", new P());
-            //    };
-            //}
-
-            //if (true)
-            //{
-            //    Action a = () =>
-            //    {
-            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow <type=boxes >; ", new P());
-            //    };
-            //    //tab.Set(m + 2, 6, G.GetLinkAction("Chow", a));
-            //}
-
-            //if (true)
-            //{
-            //    GekkoAction a = new GekkoAction();
-            //    a.action = () =>
-            //    {
-            //        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1 ymaxsoft=1> " + name + "_chow_right <type=boxes >; ", new P());
-            //    };
-            //    a.type = EGekkoActionTypes.Ols;
-            //}
 
             List<string> temp = tab.Print();
             Globals.lastPrtOrMulprtTable = tab;
@@ -28835,8 +28854,8 @@ namespace Gekko
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
-            G.Writeln2(" OLS estimation " + t1 + "-" + t2 + " (n = " + n + ")");
-            G.Writeln(" " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
+            G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")");
+            G.Writeln(" Dep. variable = " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
 
 
@@ -28919,6 +28938,77 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
+        }
+
+        private static void OLSPackData(List<Series> rhs_unfolded, int constant, int poly, Series lhs_series, GekkoTime t1, GekkoTime t2, int n, double[,] x, double[,] xOriginal, double[] y)
+        {
+            int i = 0;
+            foreach (GekkoTime t in new GekkoTimeIterator(t1, t2))
+            {
+                int j = 0;
+                foreach (IVariable xx in rhs_unfolded)
+                {
+                    x[i, j] = xx.GetVal(t);
+                    xOriginal[i, j] = x[i, j];
+                    j++;
+                }
+                for (int p = 1; p <= poly; p++)
+                {
+                    x[i, j] = Math.Pow(i - n, p);
+                    xOriginal[i, j] = x[i, j];
+                    j++;
+                }
+                if (constant == 1)
+                {
+                    x[i, j] = 1d;
+                    xOriginal[i, j] = x[i, j];  //just for symmetry
+                    j++;  //just for symmetry
+                }
+                y[i] = lhs_series.GetVal(t);
+                i++;
+            }
+        }
+
+        private static void OLSGetTrendParameters(List<string> xtrend, List<string> xtrendflat, List<int> flatStart, List<int> flatEnd, out int polydf)
+        {
+            polydf = 0;
+            if (xtrend != null)
+            {
+                //xtrend = 0 will just be ignored (will not become a constant if no constant present)
+                if (xtrend.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: xtrend: only 1 element is allowed");
+                    throw new GekkoException();
+                }
+                polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
+                if ((polydf < 0))
+                {
+                    G.Writeln2("*** ERROR: xtrend: polynomium cannot be negative");
+                    throw new GekkoException();
+                }
+            }
+            
+            if (xtrendflat != null)
+            {
+                foreach (string s in xtrendflat)
+                {
+                    if (s.StartsWith("start", StringComparison.Ordinal))
+                    {
+                        string s2 = s.Substring("start".Length);
+                        flatStart.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
+                    }
+                    else if (s.StartsWith("end", StringComparison.Ordinal))
+                    {
+                        string s2 = s.Substring("end".Length);
+                        flatEnd.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: xtrendflat: syntax error");
+                        throw new GekkoException();
+                    }
+                }
+            }            
         }
 
         public static void DeleteGekkoActions(EGekkoActionTypes type, string name)

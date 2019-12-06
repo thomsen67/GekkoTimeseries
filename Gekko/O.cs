@@ -10163,6 +10163,8 @@ namespace Gekko
             public IVariable opt_rekur = null;  //List
             public List<IVariable> expressions = null;
             public List<string> expressionsText = null;
+            public List opt_xtrend = null;
+            public List opt_xtrendflat = null;
             public void Exe()
             {
                 G.CheckLegalPeriod(this.t1, this.t2);

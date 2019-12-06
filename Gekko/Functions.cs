@@ -3432,7 +3432,7 @@ namespace Gekko
             return new ScalarVal(v);
         }
 
-        private static double HelperValConvertFromString(string s)
+        public static double HelperValConvertFromString(string s)
         {
             double v;
             s = s.Trim();

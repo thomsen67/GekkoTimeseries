@@ -728,7 +728,7 @@ namespace Gekko.Parser.Gek
             }
             else
             {
-                //After sub-nodes                
+                //After sub-nodes  
 
                 switch (node.Text)
                 {
