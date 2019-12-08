@@ -28413,8 +28413,10 @@ namespace Gekko
         {
             // ------------------------------------------
             //n = number of obs
-            //m = number of params (including constant)
-            //k = number of restrictions
+            //m = number of params (including trends and constant, so poly and constant are part of this)
+            //k = number of restrictions (including Finnish trend restrictions)
+            //constant = 0 or 1
+            //poly = degree of trend poly
             // ------------------------------------------
 
             //AREMOS:
@@ -28546,13 +28548,40 @@ namespace Gekko
                 }
             }
 
-            if (xtrendflat.Count != 0)
+            if (true && xtrendflat != null && xtrendflat.Count != 0)
             {
+
                 //do this properly
-                int extra = 2;
+                int extra = xtrendflat.Count;
+                k += extra;
                 double[,] restrict_with_trend = new double[restrict_input.GetLength(0) + extra, restrict_input.GetLength(1)];
+                
+                int counter = -1;
 
+                if (false)
+                {
+                    restrict_with_trend[restrict_input.GetLength(0), trendparams[0]] = 1d / scaling[trendparams[0]];
+                }
+                else
+                {
+                    restrict_with_trend[restrict_input.GetLength(0), trendparams[1]] = 2d / scaling[trendparams[0]];
+                }
 
+                foreach (int i in trendparams)
+                {
+                    counter++;
+                    if (false)
+                    {
+                        //first order                         
+                        restrict_with_trend[restrict_input.GetLength(0) + 1, i] = ((counter + 1) * Math.Pow(-1, counter)) / scaling[i];
+                    }
+                    else
+                    {
+                        //second order                         
+                        restrict_with_trend[restrict_input.GetLength(0) + 1, i] = (counter * (counter + 1) * Math.Pow(-1, counter - 1))/ scaling[i];
+                    }
+                }
+                restrict_input = restrict_with_trend;
             }
 
             restrict = new double[restrict_input.GetLength(0), restrict_input.GetLength(1) - 1];
@@ -28954,7 +28983,8 @@ namespace Gekko
                 }
                 for (int p = 1; p <= poly; p++)
                 {
-                    x[i, j] = Math.Pow(i - n, p);
+                    //x[i, j] = Math.Pow(i - n + 1, p);
+                    x[i, j] = Math.Pow((double)(i - n + 1) / (double)(n - 1), p);
                     xOriginal[i, j] = x[i, j];
                     j++;
                 }
