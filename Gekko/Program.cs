@@ -28548,10 +28548,8 @@ namespace Gekko
                 }
             }
 
-            if (true && xtrendflat != null && xtrendflat.Count != 0)
-            {
-
-                //do this properly
+            if (xtrendflat != null && xtrendflat.Count != 0)
+            {                
                 int extra = xtrendflat.Count;
                 k += extra;
                 double[,] restrict_with_trend = new double[restrict_input.GetLength(0) + extra, restrict_input.GetLength(1)];
@@ -28561,18 +28559,7 @@ namespace Gekko
                 {
                     counter2++;
                     int j = restrict_input.GetLength(0) + counter2;
-                    if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
-                    {
-                        int d = -12345;
-                        int.TryParse(sflat.Substring("end".Length), out d);
-                        if (d == -12345 || d < 1)
-                        {
-                            G.Writeln2("*** ERROR: end... parameter must be >= 1");
-                            throw new GekkoException();
-                        }
-                        restrict_with_trend[j, trendparams[d - 1]] = 1d;
-                    }
-                    else if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
+                    if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
                     {
                         int d = -12345;
                         int.TryParse(sflat.Substring("start".Length), out d);
@@ -28581,77 +28568,39 @@ namespace Gekko
                             G.Writeln2("*** ERROR: start... parameter must be >= 1");
                             throw new GekkoException();
                         }
-
+                        OLSHelper2(trendparams, d, "start");
                         int counter = -1;
+                        int counterNonZero = -1;
                         int degree = trendparams.Count;
                         foreach (int i in trendparams)
                         {
                             counter++;
-
-                            if (true)
+                            double factor = 1d;
+                            for (int d2 = counter + 2 - d; d2 < counter + 2; d2++)
                             {
-
-                                double factor = 1d;
-                                for (int d2 = counter + 1; d2 < counter + 1 + d; d2++)
-                                {
-                                    factor *= (double)d2;
-                                }
-                                factor *= Math.Pow(-1d, counter);
-                                int i2 = i + d - 1;
-                                restrict_with_trend[j, i2] = factor / scaling[i2];
+                                factor *= (double)d2;
                             }
-                            else
+                            if (factor != 0d)
                             {
-
-                                if (G.Equal(sflat, "start1"))
-                                {
-                                    //first order                         
-                                    restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter - 0)) / scaling[i];
-                                }
-                                else if (G.Equal(sflat, "start2"))
-                                {
-                                    //second order   
-                                    int c = 1;
-                                    if (counter >= c)
-                                    {
-                                        restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                    }
-                                }
-                                else if (G.Equal(sflat, "start3"))
-                                {
-                                    //third order                         
-                                    int c = 2;
-                                    if (counter >= c)
-                                    {
-                                        restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                    }
-                                }
-                                else if (G.Equal(sflat, "start4"))
-                                {
-                                    //third order                         
-                                    int c = 3;
-                                    if (counter >= c)
-                                    {
-                                        restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                    }
-                                }
-                                else if (G.Equal(sflat, "start5"))
-                                {
-                                    //third order                         
-                                    int c = 4;
-                                    if (counter >= c)
-                                    {
-                                        restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                    }
-                                }
-                                else
-                                {
-                                    G.Writeln2("*** ERROR: Unsupported start... parameter");
-                                    throw new GekkoException();
-                                }
+                                counterNonZero++;
+                                factor *= Math.Pow(-1d, counterNonZero);
+                                restrict_with_trend[j, i] = factor / scaling[i];
                             }
                         }
                     }
+                    else if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int d = -12345;
+                        int.TryParse(sflat.Substring("end".Length), out d);
+                        if (d == -12345 || d < 1)
+                        {
+                            G.Writeln2("*** ERROR: end... parameter must be >= 1");
+                            throw new GekkoException();
+                        }
+                        OLSHelper2(trendparams, d, "end");
+                        restrict_with_trend[j, trendparams[d - 1]] = 1d;
+                    }
+                    
                     else
                     {
                         G.Writeln2("*** ERROR: Unsupported end... parameter");
@@ -28851,7 +28800,23 @@ namespace Gekko
                 {
                     s = TruncateTextWithDots(25, G.ReplaceGlueNew(o.expressionsText[i + 1]));
                 }
-                else s = "CONSTANT";
+                else
+                {
+                    if (trendparams.Contains(i))
+                    {
+                        for (int ii = 0; ii < trendparams.Count; ii++)
+                        {
+                            if (trendparams[ii] == i)
+                            {
+                                s = "TREND" + (ii + 1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        s = "CONSTANT";
+                    }
+                }
                 tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
 
@@ -29046,6 +29011,15 @@ namespace Gekko
             }
         }
 
+        private static void OLSHelper2(List<int> trendparams, int d, string s)
+        {            
+            if (d > trendparams.Count)
+            {
+                G.Writeln2("*** ERROR: " + s + "... parameter must be <= " + (trendparams.Count) + " (poly degree)");
+                throw new GekkoException();
+            }
+        }
+
         private static void OLSPackData(List<Series> rhs_unfolded, int constant, int poly, Series lhs_series, GekkoTime t1, GekkoTime t2, int n, double[,] x, double[,] xOriginal, double[] y)
         {
             int i = 0;
@@ -29077,24 +29051,7 @@ namespace Gekko
         }
 
         private static void OLSGetTrendParameters(List<string> xtrend, List<string> xtrendflat, List<int> flatStart, List<int> flatEnd, out int polydf)
-        {
-            polydf = 0;
-            if (xtrend != null)
-            {
-                //xtrend = 0 will just be ignored (will not become a constant if no constant present)
-                if (xtrend.Count > 1)
-                {
-                    G.Writeln2("*** ERROR: xtrend: only 1 element is allowed");
-                    throw new GekkoException();
-                }
-                polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
-                if ((polydf < 0))
-                {
-                    G.Writeln2("*** ERROR: xtrend: polynomium cannot be negative");
-                    throw new GekkoException();
-                }
-            }
-            
+        {   
             if (xtrendflat != null)
             {
                 foreach (string s in xtrendflat)
@@ -29115,7 +29072,30 @@ namespace Gekko
                         throw new GekkoException();
                     }
                 }
-            }            
+            }
+
+            polydf = 0;
+            if (xtrend != null)
+            {
+                //xtrend = 0 will just be ignored (will not become a constant if no constant present)
+                if (xtrend.Count > 1)
+                {
+                    G.Writeln2("*** ERROR: xtrend: only 1 element is allowed");
+                    throw new GekkoException();
+                }
+                polydf = G.ConvertToInt(Functions.HelperValConvertFromString(xtrend[0]));
+                if ((polydf < 0))
+                {
+                    G.Writeln2("*** ERROR: xtrend: polynomium cannot be negative");
+                    throw new GekkoException();
+                }
+            }
+
+            if (xtrendflat != null)
+            {
+                polydf += xtrendflat.Count;  //if xtrend=3 and there are two restrictions, Gekko treats poly as if it was degree 5
+            }
+
         }
 
         public static void DeleteGekkoActions(EGekkoActionTypes type, string name)
