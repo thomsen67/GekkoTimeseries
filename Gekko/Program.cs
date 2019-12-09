@@ -28555,30 +28555,94 @@ namespace Gekko
                 int extra = xtrendflat.Count;
                 k += extra;
                 double[,] restrict_with_trend = new double[restrict_input.GetLength(0) + extra, restrict_input.GetLength(1)];
-                
-                int counter = -1;
 
-                if (false)
+                int counter2 = -1;
+                foreach (string sflat in xtrendflat)
                 {
-                    restrict_with_trend[restrict_input.GetLength(0), trendparams[0]] = 1d / scaling[trendparams[0]];
-                }
-                else
-                {
-                    restrict_with_trend[restrict_input.GetLength(0), trendparams[1]] = 2d / scaling[trendparams[0]];
-                }
-
-                foreach (int i in trendparams)
-                {
-                    counter++;
-                    if (false)
+                    counter2++;
+                    int j = restrict_input.GetLength(0) + counter2;
+                    if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
                     {
-                        //first order                         
-                        restrict_with_trend[restrict_input.GetLength(0) + 1, i] = ((counter + 1) * Math.Pow(-1, counter)) / scaling[i];
+                        if (G.Equal(sflat, "end1"))
+                        {
+                            restrict_with_trend[j, trendparams[0]] = 1d / scaling[trendparams[0]];
+                        }
+                        else if (G.Equal(sflat, "end2"))
+                        {
+                            restrict_with_trend[j, trendparams[1]] = 2d / scaling[trendparams[1]];
+                        }
+                        else if (G.Equal(sflat, "end3"))
+                        {
+                            restrict_with_trend[j, trendparams[2]] = 2d * 3d / scaling[trendparams[2]];
+                        }
+                        else if (G.Equal(sflat, "end4"))
+                        {
+                            restrict_with_trend[j, trendparams[3]] = 2d * 3d * 4d / scaling[trendparams[3]];
+                        }
+                        else if (G.Equal(sflat, "end5"))
+                        {
+                            restrict_with_trend[j, trendparams[4]] = 2d * 3d * 4d * 5d / scaling[trendparams[4]];
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Unsupported end... parameter");
+                            throw new GekkoException();
+                        }
+                    }
+                    else if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
+                    {
+                        int counter = -1;
+                        foreach (int i in trendparams)
+                        {
+                            counter++;
+                            if (G.Equal(sflat, "start1"))
+                            {                             
+                                //first order                         
+                                restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter)) / scaling[i];
+                            }
+                            else if (G.Equal(sflat, "start2"))
+                            {
+                                //second order                         
+                                if (counter > 0)
+                                {
+                                    restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - 1)) / scaling[i];
+                                }
+                            }
+                            else if (G.Equal(sflat, "start3"))
+                            {
+                                //third order                         
+                                if (counter > 1)
+                                {
+                                    restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                }
+                            }
+                            else if (G.Equal(sflat, "start4"))
+                            {
+                                //third order                         
+                                if (counter > 2)
+                                {
+                                    restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                }
+                            }
+                            else if (G.Equal(sflat, "start5"))
+                            {
+                                //third order                         
+                                if (counter > 3)
+                                {
+                                    restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                }
+                            }
+                            else
+                            {
+                                G.Writeln2("*** ERROR: Unsupported start... parameter");
+                                throw new GekkoException();
+                            }
+                        }
                     }
                     else
                     {
-                        //second order                         
-                        restrict_with_trend[restrict_input.GetLength(0) + 1, i] = (counter * (counter + 1) * Math.Pow(-1, counter - 1))/ scaling[i];
+                        G.Writeln2("*** ERROR: Unsupported end... parameter");
+                        throw new GekkoException();
                     }
                 }
                 restrict_input = restrict_with_trend;
