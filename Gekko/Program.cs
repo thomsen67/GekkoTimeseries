@@ -28598,38 +28598,42 @@ namespace Gekko
                             if (G.Equal(sflat, "start1"))
                             {                             
                                 //first order                         
-                                restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter)) / scaling[i];
+                                restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter - 0)) / scaling[i];
                             }
                             else if (G.Equal(sflat, "start2"))
                             {
-                                //second order                         
-                                if (counter > 0)
+                                //second order   
+                                int c = 1;
+                                if (counter >= c)
                                 {
-                                    restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - 1)) / scaling[i];
+                                    restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
                                 }
                             }
                             else if (G.Equal(sflat, "start3"))
                             {
                                 //third order                         
-                                if (counter > 1)
+                                int c = 2;
+                                if (counter >= c)
                                 {
-                                    restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                    restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
                                 }
                             }
                             else if (G.Equal(sflat, "start4"))
                             {
                                 //third order                         
-                                if (counter > 2)
+                                int c = 3;
+                                if (counter >= c)
                                 {
-                                    restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                    restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
                                 }
                             }
                             else if (G.Equal(sflat, "start5"))
                             {
                                 //third order                         
-                                if (counter > 3)
+                                int c = 4;
+                                if (counter >= c)
                                 {
-                                    restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - 2)) / scaling[i];
+                                    restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
                                 }
                             }
                             else
