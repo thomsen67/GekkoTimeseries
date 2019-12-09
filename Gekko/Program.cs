@@ -28551,7 +28551,8 @@ namespace Gekko
             if (xtrendflat != null && xtrendflat.Count != 0)
             {
                 //note: this changes k (number of restrictions, where the trend restrictions are added)
-                OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, ref restrict, ref k);
+                restrict = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, false);
+                k += xtrendflat.Count;
             }
 
             int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
@@ -28659,8 +28660,8 @@ namespace Gekko
             if (rekurInfo.type != null)
             {
                 foreach (string type in new List<string>() { "l", "e", "r" })
-                {
-                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, restrict_input, k, n, restrict, df, dfStart, type);
+                {                    
+                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, xtrendflat, trendparams);
                     EFreq freq = lhs_series.freq;
                     string type2 = "left";
                     if (type == "e") type2 = "slide";
@@ -28954,12 +28955,12 @@ namespace Gekko
             }
         }
 
-        private static void OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, ref double[,] restrict_rv, ref int k)
+        private static double[,] OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, bool isRecursive)
         {
             int extra = xtrendflat.Count;
-            k += extra;
-            restrict_rv = new double[restrict_original.GetLength(0) + extra, restrict_original.GetLength(1)];
                         
+            double[,] restrict_rv = new double[restrict_original.GetLength(0) + extra, restrict_original.GetLength(1)];                       
+
             for (int i = 0; i < restrict_original.GetLength(0); i++)
             {
                 for (int j = 0; j < restrict_original.GetLength(1) - 1; j++)
@@ -29020,7 +29021,8 @@ namespace Gekko
                     G.Writeln2("*** ERROR: Unsupported end... parameter");
                     throw new GekkoException();
                 }
-            }            
+            }
+            return restrict_rv;
         }
 
         private static void OLSHelper2(List<int> trendparams, int d, string s)
@@ -29126,28 +29128,16 @@ namespace Gekko
             }
         }
 
-        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, double[,] restrict_input, int k, int n, double[,] restrict, int df_original, int df_start, string type)
+        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, int k, int n, double[,] restrict_input, int df_original, int df_start, string type, List<string>xtrendflat, List<int> trendparams)
         {
             if (df_start < 1)
             {
                 G.Writeln2("*** ERROR: minimum degrees of freedom must be > 0");
                 throw new GekkoException();
             }
-                
-
-            //Table tab7 = new Table();
-            //int row = 1;
-            //tab7.Set(row, 1, "R2");
-            //tab7.Set(row, 2, "SEE");
-            //tab7.Set(row, 3, "DW");
-            //tab7.Set(row, 4, "Chow");
-            //row++;
-
+            
             OLSRekurDatas rekur = new OLSRekurDatas(m, df_original - df_start + 1);  //if df_start == 1, this corresponds to index 0 in arrays
 
-            //G.Writeln2("---------------------------------------------------------------------------------");
-            //G.Writeln("------------------------- recursive estimation (right) --------------------------");
-            //G.Writeln("---------------------------------------------------------------------------------");
             double rss0 = double.NaN;
             for (int df7 = df_start; df7 <= df_original; df7++)
             {
@@ -29164,7 +29154,13 @@ namespace Gekko
                 {
                     OLSRecursiveHelperL(m, x, y, k, n, df7, out n7, out y7, out x7);
                 }
-                OLSResults ols7 = OLSHelper(y7, x7, restrict, scaling, n7, m, k, df7);
+
+                //Here, we need to adjust the restrict matrix, if there are Finnish trends
+                
+                double[,] restrict7 = null;
+                restrict7 = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, true);                
+
+                OLSResults ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7);
 
                 int index = df7 - df_start;
                 if (type == "l") index = rekur.datas[0].coeff.Length - (df7 - df_start) - 1;
@@ -29181,17 +29177,8 @@ namespace Gekko
                 double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // limit for df --> inf = 1.960. The AREMOS version subtracts 1, maybe this is an error?
                 double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
                 rekur.data.coeff[index] = chow;
-
-                //tab7.Set(row, 1, Math.Round(ols7.r2, 6, MidpointRounding.AwayFromZero).ToString());
-                //tab7.Set(row, 2, RoundToSignificantDigits(ols7.see, 6).ToString());
-                //tab7.Set(row, 3, Math.Round(ols7.dw, 4, MidpointRounding.AwayFromZero).ToString());
-                //if (!double.IsNaN(chow)) tab7.Set(row, 4, Math.Round(chow, 4, MidpointRounding.AwayFromZero).ToString());
-                //row++;
                 rss0 = ols7.rss;
-            }
-            //List<string> ss = tab7.Print();
-            //foreach (string s in ss) G.Writeln(s);
-            //G.Writeln("---------------------------------------------------------------------------------");
+            }           
 
             return rekur;
 
@@ -29252,8 +29239,7 @@ namespace Gekko
                 {
                     r[i, j] = restrict_input[i, j];
                 }
-            }
-            
+            }            
 
             alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
             //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
