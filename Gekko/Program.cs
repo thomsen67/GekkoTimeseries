@@ -28493,7 +28493,7 @@ namespace Gekko
             double[] y = new double[n];
 
             OLSPackData(rhs_unfolded, constant, poly, lhs_series, o.t1, o.t2, n, x, xOriginal, y);
-
+            
             Matrix name_param = new Matrix(m, 1, double.NaN);
             Matrix name_t = new Matrix(m, 1, double.NaN);
             Matrix name_se = new Matrix(m, 1, double.NaN);
@@ -28551,7 +28551,9 @@ namespace Gekko
             if (xtrendflat != null && xtrendflat.Count != 0)
             {
                 //note: this changes k (number of restrictions, where the trend restrictions are added)
-                restrict = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, false);
+                double vStart = x[0, trendparams[0]] * scaling[trendparams[0]];
+                double vEnd = x[x.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
+                restrict = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, vStart, vEnd);
                 k += xtrendflat.Count;
             }
 
@@ -28955,7 +28957,7 @@ namespace Gekko
             }
         }
 
-        private static double[,] OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, bool isRecursive)
+        private static double[,] OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, double vStart, double vEnd)
         {
             int extra = xtrendflat.Count;
                         
@@ -28976,32 +28978,16 @@ namespace Gekko
                 int j = restrict_original.GetLength(0) + counter2;
                 if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
                 {
-                    int d = -12345;
-                    int.TryParse(sflat.Substring("start".Length), out d);
-                    if (d == -12345 || d < 1)
+                    int degree = -12345;
+                    int.TryParse(sflat.Substring("start".Length), out degree);
+                    if (degree == -12345 || degree < 1)
                     {
                         G.Writeln2("*** ERROR: start... parameter must be >= 1");
                         throw new GekkoException();
                     }
-                    OLSHelper2(trendparams, d, "start");
-                    int counter = -1;
-                    int counterNonZero = -1;
-                    int degree = trendparams.Count;
-                    foreach (int i in trendparams)
-                    {
-                        counter++;
-                        double factor = 1d;
-                        for (int d2 = counter + 2 - d; d2 < counter + 2; d2++)
-                        {
-                            factor *= (double)d2;
-                        }
-                        if (factor != 0d)
-                        {
-                            counterNonZero++;
-                            factor *= Math.Pow(-1d, counterNonZero);
-                            restrict_rv[j, i] = factor / scaling[i];
-                        }
-                    }
+                    OLSHelper2(trendparams, degree, "start");
+                    
+                    OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, degree, vStart);
                 }
                 else if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
                 {
@@ -29013,7 +28999,8 @@ namespace Gekko
                         throw new GekkoException();
                     }
                     OLSHelper2(trendparams, d, "end");
-                    restrict_rv[j, trendparams[d - 1]] = 1d;
+                    OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vEnd);
+                    //restrict_rv[j, trendparams[d - 1]] = 1d;
                 }
 
                 else
@@ -29023,6 +29010,28 @@ namespace Gekko
                 }
             }
             return restrict_rv;
+        }
+
+        private static void OLSFinnishTrends2(List<int> trendparams, double[] scaling, double[,] restrict_rv, int j, int d, double v)
+        {
+            int counter = -1;
+            int counterNonZero = -1;
+            int degree = trendparams.Count;
+            foreach (int i in trendparams)
+            {
+                counter++;
+                double factor = 1d;
+                for (int d2 = counter + 2 - d; d2 < counter + 2; d2++)
+                {
+                    factor *= (double)d2;
+                }
+                if (factor != 0d)
+                {
+                    counterNonZero++;
+                    factor *= Math.Pow(v, counterNonZero);
+                    restrict_rv[j, i] = factor / scaling[i];
+                }
+            }
         }
 
         private static void OLSHelper2(List<int> trendparams, int d, string s)
@@ -29158,7 +29167,9 @@ namespace Gekko
                 //Here, we need to adjust the restrict matrix, if there are Finnish trends
                 
                 double[,] restrict7 = null;
-                restrict7 = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, true);                
+                double vStart7 = x7[0, trendparams[0]] * scaling[trendparams[0]];
+                double vEnd7 = x7[x7.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
+                restrict7 = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, vStart7, vEnd7);
 
                 OLSResults ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7);
 
