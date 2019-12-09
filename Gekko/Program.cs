@@ -28513,7 +28513,7 @@ namespace Gekko
                 }
                 scaling[kk] = sum / x.GetLength(0);
                 if (scaling[kk] == 0d) scaling[kk] = 1d;
-
+                                
                 for (int tt = 0; tt < x.GetLength(0); tt++)
                 {
                     x[tt, kk] = x[tt, kk] / scaling[kk];
@@ -28563,83 +28563,92 @@ namespace Gekko
                     int j = restrict_input.GetLength(0) + counter2;
                     if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
                     {
-                        if (G.Equal(sflat, "end1"))
+                        int d = -12345;
+                        int.TryParse(sflat.Substring("end".Length), out d);
+                        if (d == -12345 || d < 1)
                         {
-                            restrict_with_trend[j, trendparams[0]] = 1d / scaling[trendparams[0]];
-                        }
-                        else if (G.Equal(sflat, "end2"))
-                        {
-                            restrict_with_trend[j, trendparams[1]] = 2d / scaling[trendparams[1]];
-                        }
-                        else if (G.Equal(sflat, "end3"))
-                        {
-                            restrict_with_trend[j, trendparams[2]] = 2d * 3d / scaling[trendparams[2]];
-                        }
-                        else if (G.Equal(sflat, "end4"))
-                        {
-                            restrict_with_trend[j, trendparams[3]] = 2d * 3d * 4d / scaling[trendparams[3]];
-                        }
-                        else if (G.Equal(sflat, "end5"))
-                        {
-                            restrict_with_trend[j, trendparams[4]] = 2d * 3d * 4d * 5d / scaling[trendparams[4]];
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Unsupported end... parameter");
+                            G.Writeln2("*** ERROR: end... parameter must be >= 1");
                             throw new GekkoException();
                         }
+                        restrict_with_trend[j, trendparams[d - 1]] = 1d;
                     }
                     else if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
                     {
+                        int d = -12345;
+                        int.TryParse(sflat.Substring("start".Length), out d);
+                        if (d == -12345 || d < 1)
+                        {
+                            G.Writeln2("*** ERROR: start... parameter must be >= 1");
+                            throw new GekkoException();
+                        }
+
                         int counter = -1;
+                        int degree = trendparams.Count;
                         foreach (int i in trendparams)
                         {
                             counter++;
-                            if (G.Equal(sflat, "start1"))
-                            {                             
-                                //first order                         
-                                restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter - 0)) / scaling[i];
-                            }
-                            else if (G.Equal(sflat, "start2"))
+
+                            if (true)
                             {
-                                //second order   
-                                int c = 1;
-                                if (counter >= c)
+
+                                double factor = 1d;
+                                for (int d2 = counter + 1; d2 < counter + 1 + d; d2++)
                                 {
-                                    restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
+                                    factor *= (double)d2;
                                 }
-                            }
-                            else if (G.Equal(sflat, "start3"))
-                            {
-                                //third order                         
-                                int c = 2;
-                                if (counter >= c)
-                                {
-                                    restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                }
-                            }
-                            else if (G.Equal(sflat, "start4"))
-                            {
-                                //third order                         
-                                int c = 3;
-                                if (counter >= c)
-                                {
-                                    restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                }
-                            }
-                            else if (G.Equal(sflat, "start5"))
-                            {
-                                //third order                         
-                                int c = 4;
-                                if (counter >= c)
-                                {
-                                    restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
-                                }
+                                factor *= Math.Pow(-1d, counter);
+                                int i2 = i + d - 1;
+                                restrict_with_trend[j, i2] = factor / scaling[i2];
                             }
                             else
                             {
-                                G.Writeln2("*** ERROR: Unsupported start... parameter");
-                                throw new GekkoException();
+
+                                if (G.Equal(sflat, "start1"))
+                                {
+                                    //first order                         
+                                    restrict_with_trend[j, i] = ((counter + 1) * Math.Pow(-1, counter - 0)) / scaling[i];
+                                }
+                                else if (G.Equal(sflat, "start2"))
+                                {
+                                    //second order   
+                                    int c = 1;
+                                    if (counter >= c)
+                                    {
+                                        restrict_with_trend[j, i] = (counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
+                                    }
+                                }
+                                else if (G.Equal(sflat, "start3"))
+                                {
+                                    //third order                         
+                                    int c = 2;
+                                    if (counter >= c)
+                                    {
+                                        restrict_with_trend[j, i] = ((counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
+                                    }
+                                }
+                                else if (G.Equal(sflat, "start4"))
+                                {
+                                    //third order                         
+                                    int c = 3;
+                                    if (counter >= c)
+                                    {
+                                        restrict_with_trend[j, i] = ((counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
+                                    }
+                                }
+                                else if (G.Equal(sflat, "start5"))
+                                {
+                                    //third order                         
+                                    int c = 4;
+                                    if (counter >= c)
+                                    {
+                                        restrict_with_trend[j, i] = ((counter - 3) * (counter - 2) * (counter - 1) * counter * (counter + 1) * Math.Pow(-1, counter - c)) / scaling[i];
+                                    }
+                                }
+                                else
+                                {
+                                    G.Writeln2("*** ERROR: Unsupported start... parameter");
+                                    throw new GekkoException();
+                                }
                             }
                         }
                     }
