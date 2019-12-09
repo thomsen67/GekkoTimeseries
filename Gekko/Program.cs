@@ -28523,8 +28523,7 @@ namespace Gekko
             double[,] restrict_input = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
 
             int k = 0;
-            double[,] restrict = null;
-
+            
             if (o.impose != null)
             {
                 Matrix rr = O.ConvertToMatrix(o.impose); //a row for each of the k restriction, and it has m+1 cols (second-last col is const if present, and last is what the restrict sums up to)
@@ -28548,75 +28547,11 @@ namespace Gekko
                 }
             }
 
+            double[,] restrict = new double[0, m];
             if (xtrendflat != null && xtrendflat.Count != 0)
-            {                
-                int extra = xtrendflat.Count;
-                k += extra;
-                double[,] restrict_with_trend = new double[restrict_input.GetLength(0) + extra, restrict_input.GetLength(1)];
-
-                int counter2 = -1;
-                foreach (string sflat in xtrendflat)
-                {
-                    counter2++;
-                    int j = restrict_input.GetLength(0) + counter2;
-                    if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
-                    {
-                        int d = -12345;
-                        int.TryParse(sflat.Substring("start".Length), out d);
-                        if (d == -12345 || d < 1)
-                        {
-                            G.Writeln2("*** ERROR: start... parameter must be >= 1");
-                            throw new GekkoException();
-                        }
-                        OLSHelper2(trendparams, d, "start");
-                        int counter = -1;
-                        int counterNonZero = -1;
-                        int degree = trendparams.Count;
-                        foreach (int i in trendparams)
-                        {
-                            counter++;
-                            double factor = 1d;
-                            for (int d2 = counter + 2 - d; d2 < counter + 2; d2++)
-                            {
-                                factor *= (double)d2;
-                            }
-                            if (factor != 0d)
-                            {
-                                counterNonZero++;
-                                factor *= Math.Pow(-1d, counterNonZero);
-                                restrict_with_trend[j, i] = factor / scaling[i];
-                            }
-                        }
-                    }
-                    else if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
-                    {
-                        int d = -12345;
-                        int.TryParse(sflat.Substring("end".Length), out d);
-                        if (d == -12345 || d < 1)
-                        {
-                            G.Writeln2("*** ERROR: end... parameter must be >= 1");
-                            throw new GekkoException();
-                        }
-                        OLSHelper2(trendparams, d, "end");
-                        restrict_with_trend[j, trendparams[d - 1]] = 1d;
-                    }
-                    
-                    else
-                    {
-                        G.Writeln2("*** ERROR: Unsupported end... parameter");
-                        throw new GekkoException();
-                    }
-                }
-                restrict_input = restrict_with_trend;
-            }
-
-            restrict = new double[restrict_input.GetLength(0), restrict_input.GetLength(1) - 1];
-            for (int i = 0; i < restrict_input.GetLength(0); i++)
             {
-                for (int j = 0; j < restrict_input.GetLength(1) - 1; j++)
-                {
-                    restrict[i, j] = restrict_input[i, j];
-                }
+                //note: this changes k (number of restrictions, where the trend restrictions are added)
+                OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, ref restrict, ref k);
             }
 
             int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
@@ -28637,7 +28572,7 @@ namespace Gekko
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
-            OLSResults ols = OLSHelper(y, x, restrict_input, restrict, scaling, n, m, k, df);
+            OLSResults ols = OLSHelper(y, x, restrict, scaling, n, m, k, df);
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
@@ -28925,7 +28860,15 @@ namespace Gekko
             int fileWidthRemember = Program.options.print_filewidth;
             Program.options.print_width = int.MaxValue;
             Program.options.print_filewidth = int.MaxValue;
-            G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")");
+
+            string flat = null;
+            if (poly > 0) flat = ", poly = " + poly;
+            if (xtrendflat != null && xtrendflat.Count > 0)
+            {
+                flat += ", polydf = " + (poly - xtrendflat.Count);
+            }
+
+            G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
             G.Writeln(" Dep. variable = " + G.ReplaceGlueNew(o.expressionsText[0])); //labels contain the LHS and all the RHS!       
             foreach (string s in temp) G.Writeln(s);
 
@@ -29011,6 +28954,75 @@ namespace Gekko
             }
         }
 
+        private static void OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, ref double[,] restrict_rv, ref int k)
+        {
+            int extra = xtrendflat.Count;
+            k += extra;
+            restrict_rv = new double[restrict_original.GetLength(0) + extra, restrict_original.GetLength(1)];
+                        
+            for (int i = 0; i < restrict_original.GetLength(0); i++)
+            {
+                for (int j = 0; j < restrict_original.GetLength(1) - 1; j++)
+                {
+                    restrict_rv[i, j] = restrict_original[i, j];
+                }
+            }
+
+            int counter2 = -1;
+            foreach (string sflat in xtrendflat)
+            {
+                counter2++;
+                int j = restrict_original.GetLength(0) + counter2;
+                if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
+                {
+                    int d = -12345;
+                    int.TryParse(sflat.Substring("start".Length), out d);
+                    if (d == -12345 || d < 1)
+                    {
+                        G.Writeln2("*** ERROR: start... parameter must be >= 1");
+                        throw new GekkoException();
+                    }
+                    OLSHelper2(trendparams, d, "start");
+                    int counter = -1;
+                    int counterNonZero = -1;
+                    int degree = trendparams.Count;
+                    foreach (int i in trendparams)
+                    {
+                        counter++;
+                        double factor = 1d;
+                        for (int d2 = counter + 2 - d; d2 < counter + 2; d2++)
+                        {
+                            factor *= (double)d2;
+                        }
+                        if (factor != 0d)
+                        {
+                            counterNonZero++;
+                            factor *= Math.Pow(-1d, counterNonZero);
+                            restrict_rv[j, i] = factor / scaling[i];
+                        }
+                    }
+                }
+                else if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
+                {
+                    int d = -12345;
+                    int.TryParse(sflat.Substring("end".Length), out d);
+                    if (d == -12345 || d < 1)
+                    {
+                        G.Writeln2("*** ERROR: end... parameter must be >= 1");
+                        throw new GekkoException();
+                    }
+                    OLSHelper2(trendparams, d, "end");
+                    restrict_rv[j, trendparams[d - 1]] = 1d;
+                }
+
+                else
+                {
+                    G.Writeln2("*** ERROR: Unsupported end... parameter");
+                    throw new GekkoException();
+                }
+            }            
+        }
+
         private static void OLSHelper2(List<int> trendparams, int d, string s)
         {            
             if (d > trendparams.Count)
@@ -29091,10 +29103,10 @@ namespace Gekko
                 }
             }
 
-            if (xtrendflat != null)
-            {
-                polydf += xtrendflat.Count;  //if xtrend=3 and there are two restrictions, Gekko treats poly as if it was degree 5
-            }
+            //if (xtrendflat != null)
+            //{
+            //    polydf += xtrendflat.Count;  //if xtrend=3 and there are two restrictions, Gekko treats poly as if it was degree 5
+            //}
 
         }
 
@@ -29152,7 +29164,7 @@ namespace Gekko
                 {
                     OLSRecursiveHelperL(m, x, y, k, n, df7, out n7, out y7, out x7);
                 }
-                OLSResults ols7 = OLSHelper(y7, x7, restrict_input, restrict, scaling, n7, m, k, df7);
+                OLSResults ols7 = OLSHelper(y7, x7, restrict, scaling, n7, m, k, df7);
 
                 int index = df7 - df_start;
                 if (type == "l") index = rekur.datas[0].coeff.Length - (df7 - df_start) - 1;
@@ -29227,11 +29239,21 @@ namespace Gekko
             return "R2: " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
         }
 
-        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[,] restrict, double[] scaling, int n, int m, int k, int df)
+        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[] scaling, int n, int m, int k, int df)
         {
-
-
             OLSResults ols = new OLSResults();
+
+            double[,] r = null;
+
+            r = new double[restrict_input.GetLength(0), restrict_input.GetLength(1) - 1];
+            for (int i = 0; i < restrict_input.GetLength(0); i++)
+            {
+                for (int j = 0; j < restrict_input.GetLength(1) - 1; j++)
+                {
+                    r[i, j] = restrict_input[i, j];
+                }
+            }
+            
 
             alglib.lsfit.lsfitreport rep = new alglib.lsfit.lsfitreport();
             //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
@@ -29294,7 +29316,7 @@ namespace Gekko
             ols.see = Math.Sqrt(ols.rss / (double)df);
             ols.usedCovar = null;
             double[,] ixtx = InvertMatrix(XTransposeX(x));
-            if (restrict.GetLength(0) == 0)
+            if (r.GetLength(0) == 0)
             {
                 //covar = sigma^2 * inv(X'X)
                 ols.usedCovar = O.MultiplyMatrixScalar(ixtx, ols.see * ols.see, ixtx.GetLength(0), ixtx.GetLength(1));
@@ -29302,8 +29324,8 @@ namespace Gekko
             else
             {
                 //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
-                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(restrict, ixtx), Transpose(restrict)));
-                double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(restrict)), inside), restrict), ixtx);
+                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
+                double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
                 double[,] temp2 = O.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
                 ols.usedCovar = O.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
             }
