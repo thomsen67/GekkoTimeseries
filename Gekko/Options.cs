@@ -47,6 +47,8 @@ namespace Gekko
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
 
+        public int fit_ols_rekur_dfmin = 10;
+
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";
@@ -73,7 +75,7 @@ namespace Gekko
         public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
 
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
-
+        
         //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
         public bool interface_alias = false;  //reacts to globals.#alias list
         //public string interface_alias_file = "";

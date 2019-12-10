@@ -1002,12 +1002,14 @@ namespace Gekko
             int maxLength = 15; //default
             int decimals = 4; //default
 
+            string format2 = format.ToLower();  //F --> f or S --> s
+
             try
             {
-                string format2 = format.ToLower();  //F --> f
-                if (!format2.StartsWith("f"))
+                
+                if (!format2.StartsWith("f") && !format2.StartsWith("s"))
                 {
-                    G.Writeln("*** ERROR: Number format should start with 'f', e.g. 'f10.2': " + format);
+                    G.Writeln("*** ERROR: Number format should start with 'f' or 's', e.g. 'f10.2': " + format);
                     throw new GekkoException();
                 }
                 string format3 = format.Substring(1);
@@ -1065,15 +1067,40 @@ namespace Gekko
             string s = "";
             if (isTable && Program.options.table_thousandsseparator)
             {
-                if (decimals > 0) s = number.ToString("#,0." + new string('0', decimals), nfi);
-                else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("#,0", nfi);
-                else s = number.ToString("#,0", nfi);
+                if (format2.StartsWith("f"))
+                {
+                    //the comma below does NOT control how decimal comma is displayed: see nfi.NumberGroupSeparator above 
+                    if (decimals > 0) s = number.ToString("#,0." + new string('0', decimals), nfi);
+                    else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("#,0", nfi);
+                    else s = number.ToString("#,0", nfi);
+                }
+                else if (format2.StartsWith("s"))
+                {
+                    s = number.ToString("0." + new string('0', decimals) + "e+00", nfi);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Table format error");
+                    throw new GekkoException();
+                }
             }
             else
             {
-                if (decimals > 0) s = number.ToString("0." + new string('0', decimals), nfi);
-                else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
-                else s = number.ToString("0", nfi);
+                if (format2.StartsWith("f"))
+                {
+                    if (decimals > 0) s = number.ToString("0." + new string('0', decimals), nfi);
+                    else if (decimals < 0) s = (Math.Round(number / Math.Pow(10d, -decimals), 0, MidpointRounding.AwayFromZero) * Math.Pow(10d, -decimals)).ToString("0", nfi);
+                    else s = number.ToString("0", nfi);
+                }
+                else if (format2.StartsWith("s"))
+                {                    
+                    s = number.ToString("0." + new string('0', decimals) + "e+00", nfi);
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Table format error");
+                    throw new GekkoException();
+                }
             }
 
             if (s.Length > maxLength)

@@ -28453,15 +28453,11 @@ namespace Gekko
             for (int i = 1; i < o.expressions.Count; i++) rhs.Add(o.expressions[i]);
             List<Series> rhs_unfolded = UnfoldAsSeries(new GekkoSmpl(o.t1, o.t2), rhs);
 
-            List<string> xtrend = O.Restrict(o.opt_xtrend, false, false, false, false);
-            List<string> xflat = O.Restrict(o.opt_xflat, false, false, false, false);
-
             List<int> flatStart = new List<int>();
             List<int> flatEnd = new List<int>();
-
             int constant = 1; if (G.Equal(o.opt_constant, "no")) constant = 0;            
             int poly;  //0 if there is none, else > 1. Cf. also constant.
-            OLSGetTrendParameters(xtrend, xflat, flatStart, flatEnd, out poly);            
+            OLSGetTrendParameters(O.Restrict(o.opt_xtrend, false, false, false, false), O.Restrict(o.opt_xflat, false, false, false, false), flatStart, flatEnd, out poly);            
             int n = GekkoTime.Observations(o.t1, o.t2);
             int m = rhs_unfolded.Count + poly + constant; //explanatory vars including poly and constant = number of params estimated INCLUDING possible poly and constant     
             List<int> trendparams = new List<int>();
@@ -28548,13 +28544,13 @@ namespace Gekko
             }
 
             double[,] restrict = new double[0, m];
-            if (xflat != null && xflat.Count != 0)
+            if (flatStart.Count + flatEnd.Count > 0)
             {
                 //note: this changes k (number of restrictions, where the trend restrictions are added)
                 double vStart = x[0, trendparams[0]] * scaling[trendparams[0]];
                 double vEnd = x[x.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
                 restrict = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart, vEnd);
-                k += xflat.Count;
+                k += flatStart.Count + flatEnd.Count;
             }
 
             int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
@@ -28585,7 +28581,9 @@ namespace Gekko
             {
                 double[] contriby = new double[n];
                 double[,] contribx = new double[m, n];
-                double[] contribtrend = new double[n];                
+                double[,] contribx_raw = new double[m, n];
+                double[] contribtrend = new double[n];
+                double[] contribtrend_raw = new double[n];
                 double[,] levelx = new double[m, n];
                 double[] levely = new double[n];
                 double[] sumx = new double[m];
@@ -28596,6 +28594,7 @@ namespace Gekko
                     for (int i = 0; i < m; i++) //variable
                     {
                         contribx[i, t] = ols.coeff[i] * xOriginal[t, i];
+                        contribx_raw[i, t] = ols.coeff[i] * xOriginal[t, i];
                     }
                 }
 
@@ -28617,6 +28616,7 @@ namespace Gekko
                     foreach (int i in trendparams)
                     {
                         contribtrend[t] += contribx[i, t];
+                        contribtrend_raw[t] += contribx_raw[i, t];  //used for ols_trend variable
                     }
                     contriby[t] = ols.ypredict[t] - sumy / (double)n;
                 }
@@ -28650,6 +28650,14 @@ namespace Gekko
                             z2.SetData(o.t1.Add(t), contribtrend[t]);
                         }
                         Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq2, z2);
+
+                        string nameWithFreq3 = G.Chop_AddFreq(name + "_trend", G.GetFreq(lhs_series.freq));
+                        Series z3 = new Series(lhs_series.freq, nameWithFreq3);
+                        for (int t = 0; t < n; t++) //time
+                        {
+                            z3.SetData(o.t1.Add(t), contribtrend_raw[t]);
+                        }
+                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq3, z3);
                     }
                 }
 
@@ -28658,7 +28666,9 @@ namespace Gekko
             //Recursive estimation
             //Recursive estimation
             //Recursive estimation
-            int dfStart = 5;
+
+            int dfStart = Program.options.fit_ols_rekur_dfmin;
+
             if (rekurInfo.type != null)
             {
                 foreach (string type in new List<string>() { "l", "e", "r" })
@@ -28758,11 +28768,19 @@ namespace Gekko
                 tab.Set(i + 2, 1, s);
                 tab.SetAlign(i + 2, 1, Align.Left);
 
-                int digits = GetDigits(ols.coeff[i], 6);
-
-                tab.SetNumber(i + 2, 2, ols.coeff[i], "f16." + digits);
-                tab.SetNumber(i + 2, 3, ols.se[i], "f16." + digits);
-                tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
+                if (Math.Abs(ols.coeff[i]) > 1e12 || Math.Abs(ols.coeff[i]) < 1e-12)
+                {
+                    tab.SetNumber(i + 2, 2, ols.coeff[i], "s16.8");
+                    tab.SetNumber(i + 2, 3, ols.se[i], "s16.8");
+                    tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
+                }
+                else
+                {
+                    int digits = GetDigits(ols.coeff[i], 6);
+                    tab.SetNumber(i + 2, 2, ols.coeff[i], "f16." + digits);
+                    tab.SetNumber(i + 2, 3, ols.se[i], "f16." + digits);
+                    tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
+                }
 
                 if (true)
                 {
@@ -28770,7 +28788,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vleft" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vleft" + (ii + 1) + " <linecolor='red'>, " + name + "_vleft" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 6, G.GetLinkAction("Left", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -28783,7 +28801,7 @@ namespace Gekko
 
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vslide" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vslide" + (ii + 1) + " <linecolor='red'>, " + name + "_vslide" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 7, G.GetLinkAction("Slide", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -28795,7 +28813,7 @@ namespace Gekko
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
                     {
-                        Program.obeyCommandCalledFromGUI("p <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
+                        Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_vright" + (ii + 1) + "_low '' <type=lines linecolor='gray'>, " + name + "_vright" + (ii + 1) + " <linecolor='red'>, " + name + "_vright" + (ii + 1) + "_high '' <type=lines linecolor='gray'>;", new P());
                     };
                     tab.Set(i + 2, 8, G.GetLinkAction("Right", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
                     // ---------
@@ -28866,9 +28884,9 @@ namespace Gekko
 
             string flat = null;
             if (poly > 0) flat = ", poly = " + poly;
-            if (xflat != null && xflat.Count > 0)
+            if (flatStart.Count + flatEnd.Count > 0)
             {
-                flat += ", polydf = " + (poly - xflat.Count);
+                flat += ", polydf = " + (poly - (flatStart.Count + flatEnd.Count));
             }
 
             G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
@@ -28919,8 +28937,10 @@ namespace Gekko
                     string s = null;
                     s += "FRML _i ";
                     s += G.ReplaceGlueNew(o.expressionsText[0]) + " = ";
-                    for (int i = 0; i < o.expressionsText.Count - 1; i++)
+                    bool hasVariable = false;
+                    for (int i = 0; i < m - poly - constant; i++)
                     {
+                        hasVariable = true;
                         if (i > 0)
                         {
                             if (name_param.data[i, 0] >= 0) s += " +";
@@ -28931,11 +28951,17 @@ namespace Gekko
                         if (var.Contains("+") || var.Contains("-")) var = "(" + var + ")";
                         s += Program.NumberFormat(name_param.data[i, 0], "f" + GetDigits(name_param.data[i, 0], 6)) + "*" + var;
                     }
+                    if (poly > 0)
+                    {
+                        if (hasVariable) s += " + ";
+                        s += name + "_trend ";
+                    }
                     if (constant == 1)
                     {
-                        if (name_param.data[o.expressionsText.Count - 1, 0] >= 0) s += " +";
+                        int ii = m - 1;
+                        if (name_param.data[ii, 0] >= 0) s += " +";
                         else s += " ";
-                        s += Program.NumberFormat(name_param.data[o.expressionsText.Count - 1, 0], "f" + GetDigits(name_param.data[o.expressionsText.Count - 1, 0], 6));
+                        s += Program.NumberFormat(name_param.data[ii, 0], "f" + GetDigits(name_param.data[ii, 0], 6));
                     }
                     s += ";";
 
@@ -29140,11 +29166,15 @@ namespace Gekko
                 }
 
                 //Here, we need to adjust the restrict matrix, if there are Finnish trends
-                
-                double[,] restrict7 = null;
-                double vStart7 = x7[0, trendparams[0]] * scaling[trendparams[0]];
-                double vEnd7 = x7[x7.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
-                restrict7 = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart7, vEnd7);
+
+                double[,] restrict7 = restrict_input;
+
+                if (trendparams.Count > 0)
+                {
+                    double vStart7 = x7[0, trendparams[0]] * scaling[trendparams[0]];
+                    double vEnd7 = x7[x7.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
+                    restrict7 = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart7, vEnd7);
+                }                
 
                 OLSResults ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7);
 
