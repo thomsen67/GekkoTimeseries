@@ -28553,7 +28553,7 @@ namespace Gekko
                 //note: this changes k (number of restrictions, where the trend restrictions are added)
                 double vStart = x[0, trendparams[0]] * scaling[trendparams[0]];
                 double vEnd = x[x.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
-                restrict = OLSFinnishTrends(xflat, trendparams, scaling, restrict_input, vStart, vEnd);
+                restrict = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart, vEnd);
                 k += xflat.Count;
             }
 
@@ -28663,7 +28663,7 @@ namespace Gekko
             {
                 foreach (string type in new List<string>() { "l", "e", "r" })
                 {                    
-                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, xflat, trendparams);
+                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, trendparams, flatStart, flatEnd);
                     EFreq freq = lhs_series.freq;
                     string type2 = "left";
                     if (type == "e") type2 = "slide";
@@ -28957,9 +28957,9 @@ namespace Gekko
             }
         }
 
-        private static double[,] OLSFinnishTrends(List<string> xtrendflat, List<int> trendparams, double[] scaling, double[,] restrict_original, double vStart, double vEnd)
+        private static double[,] OLSFinnishTrends(List<int>flatStart, List<int>flatEnd, List<int> trendparams, double[] scaling, double[,] restrict_original, double vStart, double vEnd)
         {
-            int extra = xtrendflat.Count;
+            int extra = flatStart.Count + flatEnd.Count;
                         
             double[,] restrict_rv = new double[restrict_original.GetLength(0) + extra, restrict_original.GetLength(1)];                       
 
@@ -28972,43 +28972,23 @@ namespace Gekko
             }
 
             int counter2 = -1;
-            foreach (string sflat in xtrendflat)
+
+            foreach (int d in flatStart)
             {
                 counter2++;
                 int j = restrict_original.GetLength(0) + counter2;
-                if (sflat.StartsWith("s", StringComparison.OrdinalIgnoreCase))
-                {
-                    int degree = -12345;
-                    int.TryParse(sflat.Substring("s".Length), out degree);
-                    if (degree == -12345 || degree < 1)
-                    {
-                        G.Writeln2("*** ERROR: s... parameter must be >= 1");
-                        throw new GekkoException();
-                    }
-                    OLSHelper2(trendparams, degree, "s");
-                    
-                    OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, degree, vStart);
-                }
-                else if (sflat.StartsWith("e", StringComparison.OrdinalIgnoreCase))
-                {
-                    int d = -12345;
-                    int.TryParse(sflat.Substring("e".Length), out d);
-                    if (d == -12345 || d < 1)
-                    {
-                        G.Writeln2("*** ERROR: e... parameter must be >= 1");
-                        throw new GekkoException();
-                    }
-                    OLSHelper2(trendparams, d, "e");
-                    OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vEnd);
-                    //restrict_rv[j, trendparams[d - 1]] = 1d;
-                }
-
-                else
-                {
-                    G.Writeln2("*** ERROR: Unsupported xflat parameter");
-                    throw new GekkoException();
-                }
+                OLSHelper2(trendparams, d, "s");
+                OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vStart);
             }
+
+            foreach (int d  in flatStart)
+            {
+                counter2++;
+                int j = restrict_original.GetLength(0) + counter2;
+                OLSHelper2(trendparams, d, "e");
+                OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vEnd);
+            }
+
             return restrict_rv;
         }
 
@@ -29132,7 +29112,7 @@ namespace Gekko
             }
         }
 
-        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, int k, int n, double[,] restrict_input, int df_original, int df_start, string type, List<string>xtrendflat, List<int> trendparams)
+        private static OLSRekurDatas OLSRecursive(int m, double[,] x, double[] y, double[] scaling, int k, int n, double[,] restrict_input, int df_original, int df_start, string type, List<int> trendparams, List<int> flatStart, List<int> flatEnd)
         {
             if (df_start < 1)
             {
@@ -29164,7 +29144,7 @@ namespace Gekko
                 double[,] restrict7 = null;
                 double vStart7 = x7[0, trendparams[0]] * scaling[trendparams[0]];
                 double vEnd7 = x7[x7.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
-                restrict7 = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, vStart7, vEnd7);
+                restrict7 = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart7, vEnd7);
 
                 OLSResults ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7);
 
