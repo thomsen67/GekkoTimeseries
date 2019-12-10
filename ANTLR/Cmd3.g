@@ -122,7 +122,7 @@ tokens {
 	ASTOPT_STRING_METHOD;
 
 	ASTOPT_LIST_XTREND;
-	ASTOPT_LIST_XTRENDFLAT;
+	ASTOPT_LIST_XFLAT;
 
 	ASTOPT_VAR_DEP;
 
@@ -1021,7 +1021,7 @@ Y2                    = 'Y2'                       ;
     CODE = 'CODE';
     COLLAPSE         = 'COLLAPSE';
 	XTREND = 'XTREND';
-	XTRENDFLAT = 'XTRENDFLAT';
+	XFLAT = 'XFLAT';
 	PX = 'PX';
 	ARRAY = 'ARRAY';
 	BUGFIX = 'BUGFIX';
@@ -1656,7 +1656,7 @@ d.Add("Y" ,Y);
 										d.Add("gcm"  , GCM );
                                         d.Add("collapse"  , COLLAPSE );										
 										d.Add("xtrend"  , XTREND );		
-										d.Add("xtrendflat"  , XTRENDFLAT );		
+										d.Add("xflat"  , XFLAT );		
                                         d.Add("colors"  , COLORS );
 										d.Add("dateformat"  , DATEFORMAT );
 										d.Add("datetype"  , DATETYPE );
@@ -3103,8 +3103,8 @@ modelOpt1h:                 INFO (EQUAL yesNo)? -> ^(ASTOPT_STRING_INFO yesNo?)
 // OLS
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-ols:                        OLS olsOpt1? olsExpression EQUAL olsExpression (',' olsExpression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
-                          | OLS olsOpt1? name? olsExpression EQUAL olsExpression (',' olsExpression)* olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
+ols:                        OLS olsOpt1? olsExpression EQUAL (olsExpression (',' olsExpression)*)? olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
+                          | OLS olsOpt1? name? olsExpression EQUAL (olsExpression (',' olsExpression)*)? olsImpose? -> ^({token("ASTOLS", ASTOLS, input.LT(1).Line)} ^(ASTOPT_ olsOpt1?) ^(ASTNAMEHELPER name?) ^(ASTPLACEHOLDER olsImpose?) olsExpression*)						  
 						    ;
 
 olsExpression:				expression -> ^({token("ASTOLSEXPRESSION¤"+($expression.text), ASTOLSEXPRESSION, 0)} expression);
@@ -3116,7 +3116,7 @@ olsOpt1h:                   dates -> ^(ASTDATES dates)
 						  | DUMP (EQUAL fileName)? -> ^(ASTOPT_STRING_DUMP fileName?)
 						  | DUMPOPTIONS EQUAL expression -> ^(ASTOPT_STRING_DUMPOPTIONS expression)	
 						  | XTREND EQUAL seqOfBankvarnames -> ^(ASTOPT_LIST_XTREND seqOfBankvarnames)	
-						  | XTRENDFLAT EQUAL seqOfBankvarnames -> ^(ASTOPT_LIST_XTRENDFLAT seqOfBankvarnames)	
+						  | XFLAT EQUAL seqOfBankvarnames -> ^(ASTOPT_LIST_XFLAT seqOfBankvarnames)	
 						    ;
 							
 // ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -4710,7 +4710,7 @@ ident2: 					Ident |
   XZEROAXIS|
   X|
   XTREND|
-  XTRENDFLAT|
+  XFLAT|
   Y2LINE|
   Y2MAXHARD|
   Y2MAXSOFT|
@@ -5157,7 +5157,7 @@ ident3: 					Ident |
   XZEROAXIS|
   X|
   XTREND|
-  XTRENDFLAT|
+  XFLAT|
   Y2LINE|
   Y2MAXHARD|
   Y2MAXSOFT|

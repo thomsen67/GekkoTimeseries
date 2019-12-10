@@ -28454,14 +28454,14 @@ namespace Gekko
             List<Series> rhs_unfolded = UnfoldAsSeries(new GekkoSmpl(o.t1, o.t2), rhs);
 
             List<string> xtrend = O.Restrict(o.opt_xtrend, false, false, false, false);
-            List<string> xtrendflat = O.Restrict(o.opt_xtrendflat, false, false, false, false);
+            List<string> xflat = O.Restrict(o.opt_xflat, false, false, false, false);
 
             List<int> flatStart = new List<int>();
             List<int> flatEnd = new List<int>();
 
             int constant = 1; if (G.Equal(o.opt_constant, "no")) constant = 0;            
             int poly;  //0 if there is none, else > 1. Cf. also constant.
-            OLSGetTrendParameters(xtrend, xtrendflat, flatStart, flatEnd, out poly);            
+            OLSGetTrendParameters(xtrend, xflat, flatStart, flatEnd, out poly);            
             int n = GekkoTime.Observations(o.t1, o.t2);
             int m = rhs_unfolded.Count + poly + constant; //explanatory vars including poly and constant = number of params estimated INCLUDING possible poly and constant     
             List<int> trendparams = new List<int>();
@@ -28548,13 +28548,13 @@ namespace Gekko
             }
 
             double[,] restrict = new double[0, m];
-            if (xtrendflat != null && xtrendflat.Count != 0)
+            if (xflat != null && xflat.Count != 0)
             {
                 //note: this changes k (number of restrictions, where the trend restrictions are added)
                 double vStart = x[0, trendparams[0]] * scaling[trendparams[0]];
                 double vEnd = x[x.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
-                restrict = OLSFinnishTrends(xtrendflat, trendparams, scaling, restrict_input, vStart, vEnd);
-                k += xtrendflat.Count;
+                restrict = OLSFinnishTrends(xflat, trendparams, scaling, restrict_input, vStart, vEnd);
+                k += xflat.Count;
             }
 
             int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
@@ -28663,7 +28663,7 @@ namespace Gekko
             {
                 foreach (string type in new List<string>() { "l", "e", "r" })
                 {                    
-                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, xtrendflat, trendparams);
+                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, xflat, trendparams);
                     EFreq freq = lhs_series.freq;
                     string type2 = "left";
                     if (type == "e") type2 = "slide";
@@ -28866,9 +28866,9 @@ namespace Gekko
 
             string flat = null;
             if (poly > 0) flat = ", poly = " + poly;
-            if (xtrendflat != null && xtrendflat.Count > 0)
+            if (xflat != null && xflat.Count > 0)
             {
-                flat += ", polydf = " + (poly - xtrendflat.Count);
+                flat += ", polydf = " + (poly - xflat.Count);
             }
 
             G.Writeln2(" OLS estimation " + o.t1 + "-" + o.t2 + ", " + n + " obs, " + m + " params, " + k + " restrictions (df = " + df + ")" + flat);
@@ -28976,36 +28976,36 @@ namespace Gekko
             {
                 counter2++;
                 int j = restrict_original.GetLength(0) + counter2;
-                if (sflat.StartsWith("start", StringComparison.OrdinalIgnoreCase))
+                if (sflat.StartsWith("s", StringComparison.OrdinalIgnoreCase))
                 {
                     int degree = -12345;
-                    int.TryParse(sflat.Substring("start".Length), out degree);
+                    int.TryParse(sflat.Substring("s".Length), out degree);
                     if (degree == -12345 || degree < 1)
                     {
-                        G.Writeln2("*** ERROR: start... parameter must be >= 1");
+                        G.Writeln2("*** ERROR: s... parameter must be >= 1");
                         throw new GekkoException();
                     }
-                    OLSHelper2(trendparams, degree, "start");
+                    OLSHelper2(trendparams, degree, "s");
                     
                     OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, degree, vStart);
                 }
-                else if (sflat.StartsWith("end", StringComparison.OrdinalIgnoreCase))
+                else if (sflat.StartsWith("e", StringComparison.OrdinalIgnoreCase))
                 {
                     int d = -12345;
-                    int.TryParse(sflat.Substring("end".Length), out d);
+                    int.TryParse(sflat.Substring("e".Length), out d);
                     if (d == -12345 || d < 1)
                     {
-                        G.Writeln2("*** ERROR: end... parameter must be >= 1");
+                        G.Writeln2("*** ERROR: e... parameter must be >= 1");
                         throw new GekkoException();
                     }
-                    OLSHelper2(trendparams, d, "end");
+                    OLSHelper2(trendparams, d, "e");
                     OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vEnd);
                     //restrict_rv[j, trendparams[d - 1]] = 1d;
                 }
 
                 else
                 {
-                    G.Writeln2("*** ERROR: Unsupported end... parameter");
+                    G.Writeln2("*** ERROR: Unsupported xflat parameter");
                     throw new GekkoException();
                 }
             }
@@ -29079,19 +29079,19 @@ namespace Gekko
             {
                 foreach (string s in xtrendflat)
                 {
-                    if (s.StartsWith("start", StringComparison.Ordinal))
+                    if (s.StartsWith("s", StringComparison.Ordinal))
                     {
-                        string s2 = s.Substring("start".Length);
+                        string s2 = s.Substring("s".Length);
                         flatStart.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
                     }
-                    else if (s.StartsWith("end", StringComparison.Ordinal))
+                    else if (s.StartsWith("e", StringComparison.Ordinal))
                     {
-                        string s2 = s.Substring("end".Length);
+                        string s2 = s.Substring("e".Length);
                         flatEnd.Add(G.ConvertToInt(Functions.HelperValConvertFromString(s2)));
                     }
                     else
                     {
-                        G.Writeln2("*** ERROR: xtrendflat: syntax error");
+                        G.Writeln2("*** ERROR: xflat: syntax error");
                         throw new GekkoException();
                     }
                 }
@@ -29113,11 +29113,6 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-
-            //if (xtrendflat != null)
-            //{
-            //    polydf += xtrendflat.Count;  //if xtrend=3 and there are two restrictions, Gekko treats poly as if it was degree 5
-            //}
 
         }
 
