@@ -28455,9 +28455,9 @@ namespace Gekko
 
             List<int> flatStart = new List<int>();
             List<int> flatEnd = new List<int>();
-            int constant = 1; if (G.Equal(o.opt_constant, "no")) constant = 0;            
+            int constant = 1; if (G.Equal(o.opt_constant, "no")) constant = 0;
             int poly;  //0 if there is none, else > 1. Cf. also constant.
-            OLSGetTrendParameters(O.Restrict(o.opt_xtrend, false, false, false, false), O.Restrict(o.opt_xflat, false, false, false, false), flatStart, flatEnd, out poly);            
+            OLSGetTrendParameters(O.Restrict(o.opt_xtrend, false, false, false, false), O.Restrict(o.opt_xflat, false, false, false, false), flatStart, flatEnd, out poly);
             int n = GekkoTime.Observations(o.t1, o.t2);
             int m = rhs_unfolded.Count + poly + constant; //explanatory vars including poly and constant = number of params estimated INCLUDING possible poly and constant     
             List<int> trendparams = new List<int>();
@@ -28483,13 +28483,13 @@ namespace Gekko
 
             double[,] tsData2 = null;
             int m2 = 0;
-                       
+
             double[,] x = new double[n, m];  //includes poly and constant if it is there, does not include lhs
             double[,] xOriginal = new double[n, m];  //includes poly and constant if it is there, does not include lhs
             double[] y = new double[n];
 
             OLSPackData(rhs_unfolded, constant, poly, lhs_series, o.t1, o.t2, n, x, xOriginal, y);
-            
+
             Matrix name_param = new Matrix(m, 1, double.NaN);
             Matrix name_t = new Matrix(m, 1, double.NaN);
             Matrix name_se = new Matrix(m, 1, double.NaN);
@@ -28509,7 +28509,7 @@ namespace Gekko
                 }
                 scaling[kk] = sum / x.GetLength(0);
                 if (scaling[kk] == 0d) scaling[kk] = 1d;
-                                
+
                 for (int tt = 0; tt < x.GetLength(0); tt++)
                 {
                     x[tt, kk] = x[tt, kk] / scaling[kk];
@@ -28519,7 +28519,7 @@ namespace Gekko
             double[,] restrict_input = new double[0, m + 1];  //array[k, m+1]  c[i,0]*beta[0] + ... + c[i,m-1]*beta[m-1] = c[i,m]            
 
             int k = 0;
-            
+
             if (o.impose != null)
             {
                 Matrix rr = O.ConvertToMatrix(o.impose); //a row for each of the k restriction, and it has m+1 cols (second-last col is const if present, and last is what the restrict sums up to)
@@ -28551,6 +28551,10 @@ namespace Gekko
                 double vEnd = x[x.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
                 restrict = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart, vEnd);
                 k += flatStart.Count + flatEnd.Count;
+            }
+            else
+            {
+                restrict = restrict_input;
             }
 
             int df = n - m + k; //degrees of freedom: number of obs - estimated coeffs (including const) + impose restrictions
@@ -28667,62 +28671,66 @@ namespace Gekko
             //Recursive estimation
             //Recursive estimation
 
-            int dfStart = Program.options.fit_ols_rekur_dfmin;
-
-            if (rekurInfo.type != null)
+            if (OLSRecursiveDfOk(df))
             {
-                foreach (string type in new List<string>() { "l", "e", "r" })
-                {                    
-                    OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, dfStart, type, trendparams, flatStart, flatEnd);
-                    EFreq freq = lhs_series.freq;
-                    string type2 = "left";
-                    if (type == "e") type2 = "slide";
-                    else if (type == "r") type2 = "right";
-                    for (int i = 0; i < m; i++)
+                if (rekurInfo.type != null)
+                {
+                    foreach (string type in new List<string>() { "l", "e", "r" })
                     {
+                        OLSRekurDatas rekur = OLSRecursive(m, x, y, scaling, k, n, restrict_input, df, Program.options.fit_ols_rekur_dfmin, type, trendparams, flatStart, flatEnd);
+                        EFreq freq = lhs_series.freq;
+                        string type2 = "left";
+                        if (type == "e") type2 = "slide";
+                        else if (type == "r") type2 = "right";
+                        for (int i = 0; i < m; i++)
                         {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_low", G.GetFreq(freq));
-                            Series z = new Series(freq, nameWithFreq);
-                            if (type == "l")
-                                z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.datas[i].coeff_low);
-                            else
-                                z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff_low);
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                            {
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_low", G.GetFreq(freq));
+                                Series z = new Series(freq, nameWithFreq);
+                                if (type == "l")
+                                    z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff_low);
+                                else
+                                    z.SetDataSequence(o.t2.Add(-df + Program.options.fit_ols_rekur_dfmin), o.t2, rekur.datas[i].coeff_low);
+                                Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                            }
+
+                            {
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1), G.GetFreq(freq));
+                                Series z = new Series(freq, nameWithFreq);
+                                if (type == "l")
+                                    z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff);
+                                else
+                                    z.SetDataSequence(o.t2.Add(-df + Program.options.fit_ols_rekur_dfmin), o.t2, rekur.datas[i].coeff);
+                                Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                            }
+
+                            {
+                                string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_high", G.GetFreq(freq));
+                                Series z = new Series(freq, nameWithFreq);
+                                if (type == "l")
+                                    z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.datas[i].coeff_high);
+                                else
+                                    z.SetDataSequence(o.t2.Add(-df + Program.options.fit_ols_rekur_dfmin), o.t2, rekur.datas[i].coeff_high);
+                                Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
+                            }
                         }
 
                         {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1), G.GetFreq(freq));
+                            string nameWithFreq = G.Chop_AddFreq(name + "_chow" + "_" + type2, G.GetFreq(freq));
                             Series z = new Series(freq, nameWithFreq);
                             if (type == "l")
-                                z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.datas[i].coeff);
+                                z.SetDataSequence(o.t1, o.t1.Add(df - Program.options.fit_ols_rekur_dfmin), rekur.data.coeff);
                             else
-                                z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff);
+                                z.SetDataSequence(o.t2.Add(-df + Program.options.fit_ols_rekur_dfmin), o.t2, rekur.data.coeff);
                             Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                         }
-
-                        {
-                            string nameWithFreq = G.Chop_AddFreq(name + "_v" + type2 + (i + 1) + "_high", G.GetFreq(freq));
-                            Series z = new Series(freq, nameWithFreq);
-                            if (type == "l")
-                                z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.datas[i].coeff_high);
-                            else
-                                z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.datas[i].coeff_high);
-                            Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
-                        }
-                    }
-
-                    {
-                        string nameWithFreq = G.Chop_AddFreq(name + "_chow" + "_" + type2, G.GetFreq(freq));
-                        Series z = new Series(freq, nameWithFreq);
-                        if (type == "l")
-                            z.SetDataSequence(o.t1, o.t1.Add(df - dfStart), rekur.data.coeff);
-                        else
-                            z.SetDataSequence(o.t2.Add(-df + dfStart), o.t2, rekur.data.coeff);
-                        Program.databanks.GetFirst().AddIVariableWithOverwrite(nameWithFreq, z);
                     }
                 }
             }
-
+            else
+            {
+                G.Writeln2("Recursive estimation skipped because df is too low");
+            }
 
             for (int j = 0; j < n; j++)
             {
@@ -28737,7 +28745,12 @@ namespace Gekko
             tab.Set(1, 3, "Std error");
             tab.Set(1, 4, "T-stat");
             tab.Set(1, 5, "     ");  //to create some space between main table and links
-            tab.Set(1, 6, "Recursive"); tab.SetAlign(1, 6, Align.Center);
+
+            if (OLSRecursiveDfOk(df))
+            {
+                tab.Set(1, 6, "Recursive"); tab.SetAlign(1, 6, Align.Center);
+            }
+
             tab.Merge(1, 6, 1, 8);
             tab.SetAlign(1, 1, 1, 1, Align.Left);
             tab.SetAlign(1, 2, 1, 4, Align.Right);
@@ -28782,8 +28795,8 @@ namespace Gekko
                     tab.SetNumber(i + 2, 4, ols.t[i], "f12.2");
                 }
 
-                if (true)
-                {
+                if (OLSRecursiveDfOk(df))
+                {                    
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
                     Action a = () =>
@@ -28794,7 +28807,7 @@ namespace Gekko
                     // ---------
                 }
 
-                if (true)
+                if (OLSRecursiveDfOk(df))
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable
@@ -28807,7 +28820,7 @@ namespace Gekko
                     // ---------
                 }
 
-                if (true)
+                if (OLSRecursiveDfOk(df))
                 {
                     // ---------
                     int ii = i;  //because of closure, else i is wrong, since it is a loop variable                    
@@ -28849,8 +28862,8 @@ namespace Gekko
                     if (poly == 0)
                     {
                         for (int i = 0; i < m - constant; i++)
-                        {                            
-                            string label = o.expressionsText[i + 1];                            
+                        {
+                            string label = o.expressionsText[i + 1];
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
@@ -28859,13 +28872,13 @@ namespace Gekko
                     {
                         //poly > 0
                         for (int i = 0; i < m - poly - constant; i++)
-                        {                            
-                            string label = o.expressionsText[i + 1];                            
+                        {
+                            string label = o.expressionsText[i + 1];
                             s += ", " + name + "_dec" + (i + 1) + "'" + label + "'";
                         }
                         s += ", " + name + "_dec_trend 'trend'";
                         Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + "> " + name + "_dec '" + o.expressionsText[0] + "' <linewidth = 6>" + s + ";", new P());
-                    }                    
+                    }
                 };
                 line += "  " + G.GetLinkAction("Dec", new GekkoAction(EGekkoActionTypes.Ols, name, a));
             }
@@ -28983,6 +28996,11 @@ namespace Gekko
             }
         }
 
+        private static bool OLSRecursiveDfOk(int df)
+        {
+            return Program.options.fit_ols_rekur_dfmin < df;
+        }
+
         private static double[,] OLSFinnishTrends(List<int>flatStart, List<int>flatEnd, List<int> trendparams, double[] scaling, double[,] restrict_original, double vStart, double vEnd)
         {
             int extra = flatStart.Count + flatEnd.Count;
@@ -28991,7 +29009,7 @@ namespace Gekko
 
             for (int i = 0; i < restrict_original.GetLength(0); i++)
             {
-                for (int j = 0; j < restrict_original.GetLength(1) - 1; j++)
+                for (int j = 0; j < restrict_original.GetLength(1); j++)
                 {
                     restrict_rv[i, j] = restrict_original[i, j];
                 }
@@ -29007,7 +29025,7 @@ namespace Gekko
                 OLSFinnishTrends2(trendparams, scaling, restrict_rv, j, d, vStart);
             }
 
-            foreach (int d  in flatStart)
+            foreach (int d  in flatEnd)
             {
                 counter2++;
                 int j = restrict_original.GetLength(0) + counter2;
@@ -29261,9 +29279,9 @@ namespace Gekko
             //http://www.alglib.net/translator/man/manual.csharp.html#sub_lsfitlinearc
             //if it detects k = 0, it just calls same procedure as alglib.lsfit.lsfitlinear()
             ols.beta = null;
+            int info2 = -12345;
             try
-            {
-                int info2 = -12345;
+            {                
                 alglib.lsfit.lsfitlinearc(y, x, restrict_input, n, m, k, ref info2, ref ols.beta, rep);
             }
             catch (Exception e)
@@ -29279,6 +29297,21 @@ namespace Gekko
                     G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
                 }
                 throw;
+            }
+            if (info2 != 1)
+            {
+                G.Writeln2("*** ERROR: OLS does not solve.");
+                if (info2 == -2)
+                {
+                    G.Writeln("           Internal SVD decomposition subroutine failed (degenerate systems only)");
+                }
+                if (info2 == -3)
+                {
+                    G.Writeln("           Either too many constraints (more than # of parameters),");
+                    G.Writeln("           degenerate constraints (some constraints are");
+                    G.Writeln("           repeated twice) or inconsistent constraints were specified.");                    
+                }
+                throw new GekkoException();
             }
 
             ols.ypredict = new double[n];
