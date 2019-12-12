@@ -48,6 +48,15 @@ namespace Gekko
 
         private static void DownloadNew(O.Download o1)
         {
+            try
+            {
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2, must be used after 10/12 2019. This probably requires .NET 4.0.
+            }
+            catch
+            {
+                //no reason to fail on this
+            }
+
             string input = Program.options.folder_working + "\\" + o1.fileName;
             string jsonCode = Program.GetTextFromFileWithWait(input); //also removes some kinds of funny characters
             var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
@@ -58,8 +67,7 @@ namespace Gekko
             httpWebRequest.UseDefaultCredentials = true;  //to be able to access sumdatabasen from inside DST
             httpWebRequest.Credentials = CredentialCache.DefaultNetworkCredentials;  //seems necessary together with the above
             httpWebRequest.UserAgent = "Gekko/" + Globals.gekkoVersion;  //Pelle Rossau von Hedemann (DST) skriver "Jeg kan i øvrigt anbefale at sætte UserAgent, fx Gekko/2.3.4, på request-objektet, således at denne kan genfindes i loggen. API’et returnerer i øvrigt en header med navnet ” StatbankAPI-Request-Id”, som indeholder et GUID for hvert eneste kald. Denne gør det muligt at identificere det specifikke kald i vores log. Man kan, hvis man ønsker det, opsamle denne id og præsentere den for brugeren på en eller anden måde"
-
-            
+                        
             Dictionary<string, object> jsonTree = null;
             try
             {
@@ -160,11 +168,14 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;                    
+                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;
+                    bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
                     G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
                     G.Writeln("           " + e.Message);
+                    if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
                     if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
+                    if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
                     throw;
                 }
 
