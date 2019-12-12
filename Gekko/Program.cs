@@ -28575,7 +28575,7 @@ namespace Gekko
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
             //!!calling the engine ------------------------------------------------
-            OLSResults ols = OLSHelper(y, x, restrict, scaling, n, m, k, df);
+            OLSResults ols = OLSHelper(y, x, restrict, scaling, n, m, k, df, false);
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
             //---------------------------------------------------------------------
@@ -29192,26 +29192,47 @@ namespace Gekko
                     double vStart7 = x7[0, trendparams[0]] * scaling[trendparams[0]];
                     double vEnd7 = x7[x7.GetLength(0) - 1, trendparams[0]] * scaling[trendparams[0]];
                     restrict7 = OLSFinnishTrends(flatStart, flatEnd, trendparams, scaling, restrict_input, vStart7, vEnd7);
-                }                
+                }
 
-                OLSResults ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7);
+                bool fail = false;
+                OLSResults ols7 = null;
+                try
+                {
+                    ols7 = OLSHelper(y7, x7, restrict7, scaling, n7, m, k, df7, true);
+                }
+                catch
+                {
+                    fail = true;
+                }                
 
                 int index = df7 - df_start;
                 if (type == "l") index = rekur.datas[0].coeff.Length - (df7 - df_start) - 1;
 
                 // ---------> df_original - df_start + 1
 
-                for (int i = 0; i < m; i++)
+                if (fail)
                 {
-                    rekur.datas[i].coeff_low[index] = ols7.coeff[i] - 2d * ols7.se[i];
-                    rekur.datas[i].coeff[index] = ols7.coeff[i];
-                    rekur.datas[i].coeff_high[index] = ols7.coeff[i] + 2d * ols7.se[i];
+                    for (int i = 0; i < m; i++)
+                    {
+                        rekur.datas[i].coeff_low[index] = double.NaN;
+                        rekur.datas[i].coeff[index] = double.NaN;
+                        rekur.datas[i].coeff_high[index] = double.NaN;
+                    }
+                    rekur.data.coeff[index] = double.NaN;
                 }
-
-                double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // limit for df --> inf = 1.960. The AREMOS version subtracts 1, maybe this is an error?
-                double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
-                rekur.data.coeff[index] = chow;
-                rss0 = ols7.rss;
+                else
+                {
+                    for (int i = 0; i < m; i++)
+                    {
+                        rekur.datas[i].coeff_low[index] = ols7.coeff[i] - 2d * ols7.se[i];
+                        rekur.datas[i].coeff[index] = ols7.coeff[i];
+                        rekur.datas[i].coeff_high[index] = ols7.coeff[i] + 2d * ols7.se[i];
+                    }
+                    double t = alglib.studenttdistr.invstudenttdistribution(df7, 0.975);  // limit for df --> inf = 1.960. The AREMOS version subtracts 1, maybe this is an error?
+                    double chow = (ols7.rss - rss0) / rss0 * df7 / (t * t);
+                    rekur.data.coeff[index] = chow;
+                    rss0 = ols7.rss;
+                }                
             }           
 
             return rekur;
@@ -29260,7 +29281,7 @@ namespace Gekko
             return "R2: " + Math.Round(ols.r2, 6, MidpointRounding.AwayFromZero) + "    " + "SEE: " + RoundToSignificantDigits(ols.see, 6) + "    " + "DW: " + Math.Round(ols.dw, 4, MidpointRounding.AwayFromZero);
         }
 
-        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[] scaling, int n, int m, int k, int df)
+        private static OLSResults OLSHelper(double[] y, double[,] x, double[,] restrict_input, double[] scaling, int n, int m, int k, int df, bool calledFromRecursive)
         {
             OLSResults ols = new OLSResults();
 
@@ -29286,30 +29307,36 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                if (e.Message != null && e.Message != "")
+                if (calledFromRecursive == false)
                 {
-                    G.Writeln2("*** ERROR: " + e.Message);
-                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
-                }
-                if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
-                {
-                    G.Writeln2("*** ERROR: " + e.InnerException.Message);
-                    G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                    if (e.Message != null && e.Message != "")
+                    {
+                        G.Writeln2("*** ERROR: " + e.Message);
+                        G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                    }
+                    if (e.InnerException != null && e.InnerException.Message != null && e.InnerException.Message != "")
+                    {
+                        G.Writeln2("*** ERROR: " + e.InnerException.Message);
+                        G.Writeln("*** ERROR: OLS does not solve, please check data for missings etc.");
+                    }
                 }
                 throw;
             }
             if (info2 != 1)
             {
-                G.Writeln2("*** ERROR: OLS does not solve.");
-                if (info2 == -2)
+                if (calledFromRecursive == false)
                 {
-                    G.Writeln("           Internal SVD decomposition subroutine failed (degenerate systems only)");
-                }
-                if (info2 == -3)
-                {
-                    G.Writeln("           Either too many constraints (more than # of parameters),");
-                    G.Writeln("           degenerate constraints (some constraints are");
-                    G.Writeln("           repeated twice) or inconsistent constraints were specified.");                    
+                    G.Writeln2("*** ERROR: OLS does not solve.");
+                    if (info2 == -2)
+                    {
+                        G.Writeln("           Internal SVD decomposition subroutine failed (degenerate systems only)");
+                    }
+                    if (info2 == -3)
+                    {
+                        G.Writeln("           Either too many constraints (more than # of parameters),");
+                        G.Writeln("           degenerate constraints (some constraints are");
+                        G.Writeln("           repeated twice) or inconsistent constraints were specified.");
+                    }
                 }
                 throw new GekkoException();
             }
