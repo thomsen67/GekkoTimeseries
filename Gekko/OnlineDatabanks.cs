@@ -50,7 +50,9 @@ namespace Gekko
         {
             try
             {
-                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2, must be used after 10/12 2019. This probably requires .NET 4.0.
+                //In principle, it would be better to omit this and instead port Gekko for
+                //the .NET Framework 4.6.
+                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; //TLS 1.2, must be used after 10/12 2019. This probably requires that the user has .NET 4.5 to run the DOWNLOAD.
             }
             catch
             {
