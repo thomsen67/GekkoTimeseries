@@ -56,9 +56,30 @@ namespace Gekko
             {
                 //no reason to fail on this
             }
+
             string input = Program.options.folder_working + "\\" + o1.fileName;
             string jsonCode = Program.GetTextFromFileWithWait(input); //also removes some kinds of funny characters
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(o1.dbUrl);
+
+            string url = o1.dbUrl;
+            string s = o1.dbUrl;
+            string s1 = G.ReplaceFirstOccurrence(s, "http://", "");
+            string s2 = G.ReplaceFirstOccurrence(s, "https://", "");
+            if (s1.Length != s.Length)
+            {
+                if (s1.Contains("http://") || s1.Contains("https://"))
+                {
+                    url = s1;
+                }
+            }
+            else if (s2.Length != s.Length)
+            {
+                if (s2.Contains("http://") || s2.Contains("https://"))
+                {
+                    url = s2;
+                }
+            }
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
             httpWebRequest.Timeout = 24 * 60 * 60 * 1000; //24 hours max        
             httpWebRequest.ContentType = "text/json";
             httpWebRequest.Method = "POST";
@@ -87,7 +108,7 @@ namespace Gekko
             }
             catch { }
             if (saved2 != null) saved = true;
-            
+
 
             string tableName = null;
             if (!saved)
@@ -103,7 +124,7 @@ namespace Gekko
                     //throw new GekkoException();
                 }
             }
-            
+
             string format = null;
             try
             {
@@ -118,10 +139,10 @@ namespace Gekko
 
             List<string> codesHeaderJson = null;
             if (!saved)
-            {                
+            {
                 try
                 {
-                    object[] o = (object[])jsonTree["variables"];                    
+                    object[] o = (object[])jsonTree["variables"];
                     foreach (Dictionary<string, object> oo in o)
                     {
                         if (codesHeaderJson == null) codesHeaderJson = new List<string>();
@@ -142,15 +163,9 @@ namespace Gekko
             }
             catch (Exception e)
             {
-                //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80                
-                bool is405 = false; if (e.Message.Contains("405")) is405 = true;
-                bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
-                //timeout errors and the like
+                //May get something like this: System.Net.WebException: Der kunne ikke oprettes forbindelse til fjernserveren ---> System.Net.Sockets.SocketException: Det blev forsøgt at få adgang til en socket på en måde, der er forbudt af den pågældende sockets adgangstilladelser 91.208.143.3:80                                
                 G.Writeln2("*** ERROR: Download failed with the following error:");
                 G.Writeln("           " + e.Message);
-                if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
-                if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
-                if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
                 throw;
             }
 
@@ -172,11 +187,14 @@ namespace Gekko
                 }
                 catch (Exception e)
                 {
-                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;                    
+                    bool is405 = false; if (e.Message.Contains("405")) is405 = true;
+                    bool isTransport = false; if (e.InnerException != null && e.InnerException.Message != null && (G.Contains(e.InnerException.Message, "transportforbindelsen") || G.Contains(e.InnerException.Message, "transport connection"))) isTransport = true;
                     //timeout errors and the like
-                    G.Writeln2("*** ERROR: Download failed after " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + " with the following error:");
+                    G.Writeln2("*** ERROR: Download failed with the following error:");
                     G.Writeln("           " + e.Message);
+                    if (e.InnerException != null && e.InnerException.Message != null) G.Writeln("           " + e.InnerException.Message);
                     if (is405) G.Writeln("           This error type may indicate an erroneous path, for instance 'http://api.statbank.dk/v1' instead of 'http://api.statbank.dk/v1/data'");
+                    if (isTransport) G.Writeln("           The connection demands TSL 1.2, and therefore that Gekko runs on .NET Framework 4.5 or higher.");
                     throw;
                 }
 
@@ -203,7 +221,7 @@ namespace Gekko
 
                 G.Writeln("--> Download of data file ended (" + size + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ")");
 
-                string source = o1.dbUrl + ", " + o1.fileName;
+                string source = url + ", " + o1.fileName;
 
                 if (o1.fileName2 != null)
                 {
@@ -227,7 +245,7 @@ namespace Gekko
                     }
                 }
                 else
-                {                    
+                {
                     int vars;
                     GekkoTime perStart;
                     GekkoTime perEnd;
