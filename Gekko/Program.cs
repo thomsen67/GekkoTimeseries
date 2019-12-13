@@ -28347,20 +28347,24 @@ namespace Gekko
             return;
         }
 
-
         public static double[,] InvertMatrix(double[,] matrix)
+        {
+            return InvertMatrix(matrix, true);
+        }
+
+        public static double[,] InvertMatrix(double[,] matrix, bool printError)
         {
             int success = 0;
             alglib.matinvreport report = new alglib.matinvreport();
             alglib.rmatrixinverse(ref matrix, out success, out report);
             if (success == 3)
             {
-                G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
+                if(printError) G.Writeln2("*** ERROR: Inv(): It seems the matrix is singular");
                 throw new GekkoException();
             }
             else if (success != 1)
             {
-                G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
+                if (printError) G.Writeln2("*** ERROR: Inv(): Could not invert matrix");
                 throw new GekkoException();
             }
             return matrix;
@@ -28886,6 +28890,27 @@ namespace Gekko
             tab.Set(m + 2, 1, OLSFormatHelper(ols)); tab.SetAlign(m + 2, 1, Align.Left); tab.Merge(m + 2, 1, m + 2, 3);
             tab.Set(m + 2, 4, line); tab.SetAlign(m + 2, 4, Align.Right);
 
+            if (OLSRecursiveDfOk(df))
+            {
+                // ---------                
+                Action a = () =>
+                {
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_left 'Chow-test (left)' <type=boxes>;", new P());
+                };
+                tab.Set(m + 2, 6, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
+                // ---------
+            }
+            if (OLSRecursiveDfOk(df))
+            {
+                // ---------                
+                Action a = () =>
+                {
+                    Program.obeyCommandCalledFromGUI("plot <" + o.t1.ToString() + " " + o.t2.ToString() + " yline=1> " + name + "_chow_right 'Chow-test (right)' <type=boxes>;", new P());
+                };
+                tab.Set(m + 2, 8, G.GetLinkAction("Chow", new GekkoAction(EGekkoActionTypes.Ols, name, a)));
+                // ---------
+            }
+
             List<string> temp = tab.Print();
             Globals.lastPrtOrMulprtTable = tab;
             CrossThreadStuff.CopyButtonEnabled(true);
@@ -29377,7 +29402,7 @@ namespace Gekko
             ols.rmse = Math.Sqrt(ols.rss / (double)n);
             ols.see = Math.Sqrt(ols.rss / (double)df);
             ols.usedCovar = null;
-            double[,] ixtx = InvertMatrix(XTransposeX(x));
+            double[,] ixtx = InvertMatrix(XTransposeX(x), !calledFromRecursive);  //fails with an error, silent
             if (r.GetLength(0) == 0)
             {
                 //covar = sigma^2 * inv(X'X)
@@ -29386,7 +29411,7 @@ namespace Gekko
             else
             {
                 //covar = sigma^2 *( inv(X'X)  -   inv(X'X) * R' inv( R  inv(X'X) R' ) R  inv(X'X) )                
-                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)));
+                double[,] inside = InvertMatrix(MultiplyMatrices(MultiplyMatrices(r, ixtx), Transpose(r)), !calledFromRecursive);  //inv fails with an error, silent
                 double[,] temp1 = MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(MultiplyMatrices(ixtx, Transpose(r)), inside), r), ixtx);
                 double[,] temp2 = O.SubtractMatrixMatrix(ixtx, temp1, ixtx.GetLength(0), ixtx.GetLength(1));
                 ols.usedCovar = O.MultiplyMatrixScalar(temp2, ols.see * ols.see, temp2.GetLength(0), temp2.GetLength(1));
