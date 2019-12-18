@@ -123,7 +123,7 @@ namespace Gekko
     {
         public Action action = null;
         public EGekkoActionTypes type = EGekkoActionTypes.Unknown;
-        public string name = null;  //for instance the OLS name given
+        public string name = null;  //for instance the OLS name given, so that for type == ols, we can expire links with a certain name
         public GekkoAction(EGekkoActionTypes type, string name, Action action)
         {
             this.type = type;
@@ -17142,7 +17142,9 @@ namespace Gekko
                     G.Writeln("Period        value        %");
 
                     int counter = 0;
-                    foreach (GekkoTime gt in new GekkoTimeIterator(tStart, tEnd))
+
+                    //must be able to handle TIME where freq does not match the series freq
+                    foreach (GekkoTime gt in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))                    
                     {
                         counter++;
                         if (hasFilter)  //some periods are set via TIMEFILTER
@@ -17183,9 +17185,27 @@ namespace Gekko
                         G.Writeln("------------------------------------------------------------------------------------------");
                         string ps = "period";
                         if (surplus > 1) ps = "periods";
-                        G.Write(surplus + " " + ps + " hidden (");
-                        G.WriteLink("show", "disp3:" + varnameWithoutFreq);
-                        G.Writeln(")");
+
+                        if (false)
+                        {
+                            G.Write(surplus + " " + ps + " hidden (");                            
+                            G.WriteLink("show", "disp3:" + varnameWithoutFreq);
+                            G.Writeln(")");
+                        }
+                        else
+                        {
+                            //G.WriteLink("show", "disp3:" + ts.GetName());
+                            // ---------                
+                            Action a = () =>
+                            {                                
+                                Globals.guiHomeMainEnabled = true;                                
+                                List<string> temp = new List<string>();                                
+                                string varnameWithBankAndFreq = ts.GetParentDatabank().name + Globals.symbolBankColon + ts.GetName();
+                                temp.Add(varnameWithBankAndFreq);
+                                Program.Disp(ConvertFreqs(tStart, tEnd, ts.freq).Item1, ConvertFreqs(tStart, tEnd, ts.freq).Item2, temp, false, true, true, null);
+                            };
+                            G.Writeln(surplus + " " + ps + " hidden (" + G.GetLinkAction("show", new GekkoAction(EGekkoActionTypes.Unknown, null, a)) + ")");
+                        }
                     }
                 }
             }
@@ -29778,6 +29798,8 @@ namespace Gekko
 
             form.Text = title;
             label.Text = promptText;
+            //label.Text = "This is the first line\r\nAnd this is the second line.";
+            //string s = "This is the first line\r\nAnd this is the second line.";
             textBox.Text = value;
 
             buttonOk.Text = "OK";

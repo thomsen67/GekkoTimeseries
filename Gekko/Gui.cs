@@ -1522,7 +1522,7 @@ namespace Gekko
                 }
                 else
                 {
-                    G.Writeln2("*** ERROR: strange error rgd. links");
+                    G.Writeln2("*** ERROR: Unexpected error rgd. links");
                     throw new GekkoException();
                 }
             }

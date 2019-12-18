@@ -172,8 +172,7 @@ namespace Gekko
             //    So 3. dimension unfolds the folded equations, for instance x[#a] in e1 and y[#a] in e2.
             // The 1. dimension (super) is kind of like link variables, but where the x[#a] variables have no "mother" equation
             // to be put into. Each super element is adjusted on its own, and stuff sums to 0. In reporting, this is
-            // shown as "equ" to choose/pivot from.
-
+            // shown as "equ" to choose/pivot from
 
             List<List<DecompData>> decompDatas = new List<List<DecompData>>();
             List<string> expressionTexts = new List<string>();
@@ -1255,8 +1254,9 @@ namespace Gekko
                 }
                 if (s != null) s = s.Substring(0, s.Length - "; ".Length);
                 sb.AppendLine(s);
-            }
-            File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
+            }            
+            //File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
+            File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
@@ -1575,8 +1575,5 @@ namespace Gekko
 
             return found;
         }
-
-
-
     }
 }

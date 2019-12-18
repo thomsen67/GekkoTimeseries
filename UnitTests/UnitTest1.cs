@@ -3621,12 +3621,10 @@ namespace UnitTests
             I("prt <rdl> x;");
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(3, 2).number, Math.Log(102d / 100d), sharedDelta);
-
-
         }
 
         [TestMethod]
-        public void _Test_PrintMixedFrequencies()
+        public void _Test_PrintMixedFrequencies1()
         {
             //made by running the code and copy-pasting to Excel.
             I("reset;");
@@ -8886,13 +8884,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_Decomp1()
+        public void _Test_Decomp()
         {
             Table table = null;
 
             //NOTE: Globals.showDecompTable = true can be used to see tables in GUI
 
-            if(true)
+            if (true)
             {
                 // ===============================================
                 // ===============================================
@@ -8923,7 +8921,7 @@ namespace UnitTests
 
                 for (int j = 0; j < 3; j++)  //either direct expression, or using an equation from file
                 {
-                    
+
                     // j==0 and j==1
                     //             2009             2010             2011             2012             2013
                     // -------+--------------------------------------------------------------------------------
@@ -9016,9 +9014,9 @@ namespace UnitTests
                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
                     // =========== differences, decomposed =========================                
-                                                                
+
                     I("decomp2 <2011 2012 d> " + lhs + " LINK v[c] in e_c     GROUP #a as #a_agg level '10-year' zoom '27', #a as #a_agg level '10-year' zoom '27'   rows vars, #uni, lags        COLS time;");   //, i in e_i                        
-                    
+
                     table = Globals.lastDecompTable;
 
                     double ydif2011 = -0.44d; double ydif2012 = 1.1d;
@@ -9026,7 +9024,7 @@ namespace UnitTests
                     double reduce = 2d / 0.44d;
 
                     i = 1;
-                    
+
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2011");
                     Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2012");
                     // -------------------------------------------------------------                
@@ -9097,7 +9095,7 @@ namespace UnitTests
                     // -------------------------------------------------------------                                
                     i++;
                     if (j != 2)
-                    {                        
+                    {
                         Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,c,[0]");
                         Assert.AreEqual(table.Get(i, 2).number, 0d, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, 0d, 0.0001);
@@ -9105,7 +9103,7 @@ namespace UnitTests
                     // -------------------------------------------------------------                                
                     i++;
                     if (j != 2)
-                    {                        
+                    {
                         Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,y,[0]");
                         Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);
@@ -9113,7 +9111,7 @@ namespace UnitTests
                     // -------------------------------------------------------------                                
                     i++;
                     if (j != 2)
-                    {                        
+                    {
                         Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "w,null,[0]");
                         // is -2? we just omit it here
                     }
@@ -9211,11 +9209,11 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "xtot");
                 Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "y");
                 Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "z");
-            }            
+            }
 
             if (true)
-            {               
-                
+            {
+
                 // ===============================================
                 // ===============================================
                 // Test with UADAM, linking, pivoting
@@ -9291,6 +9289,12 @@ namespace UnitTests
 
             }
 
+
+        }
+
+        [TestMethod]
+        public void _Test_DecompAgeLead()
+        {
             if (true)
             {
                 // Consider this model, run over t = 2021, 2022
@@ -9371,10 +9375,10 @@ namespace UnitTests
                 // Globals.showDecompTable = true;  //will show the following decomp table and then abort
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                
+
                 I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
-                table = Globals.lastDecompTable;
+                Table table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
                 //TODO: aa___expr names row 2-5
@@ -9396,6 +9400,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(11, 3).number, -25.5555d, 0.0001);
             }
         }
+
 
         [TestMethod]
         public void _Test_SeriesResize()
