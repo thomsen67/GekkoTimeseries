@@ -42,15 +42,7 @@ namespace Gekko
 			InitializeComponent();
             this.PreviewKeyDown += new KeyEventHandler(CloseOnEscape);
             this.Loaded += WindowOpenDatabanks_Loaded;
-
-            if (Program.options.interface_databank_swap)
-            {
-                yellow.Text = "You may drag databanks to swap their places. This changes their position in the list. Swapping is intended for viewing purposes, and you may return the Work and Ref databanks to their 'normal' positions by means of clicking the 'Unswap' button or typing the UNSWAP command.";
-            }
-            else
-            {
-                yellow.Text = "Databank dragging/swapping deactivated, cf. 'OPTION interface databank swap = '. You may use OPEN<edit> or OPEN<ref> instead.";
-            }
+            yellow.Text = "You may use READ<first> or READ<ref> to put databanks into these positions.";
 		}
 
 		#region Window1_Loaded
@@ -174,12 +166,9 @@ namespace Gekko
 		{
 			// This shows how to customize the behavior of a drop.
 			// Here we perform a swap, instead of just moving the dropped item.
-
-            if (!Program.options.interface_databank_swap)
-            {
-                MessageBox.Show("*** ERROR: Databank swapping not allowed, since 'OPTION interface databank swap = no'");
-                return;
-            }
+            
+            MessageBox.Show("*** ERROR: Manual databank swapping not allowed anymore");
+            return;            
 
             string text = "";
 

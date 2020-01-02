@@ -26,29 +26,37 @@ namespace Gekko
 {
     public class Options
     {
-        
+
         //!! do not use '_' inside an option -- the '_' corresponds to a blank in ANTLR        
-                
-        public bool bugfix_import_export = false;
-        public bool bugfix_download = true;
+
         
+            
+            
+        
+            
+            
+        //NOTE: THESE LINES CORRESPOND TO LINES IN Cmd3.g, line for line    
+            
+        //these are not mentioned in help
+        public bool bugfix_import_export = false;             
         public bool bugfix_gbk = false;  //set true to activate old 7zip writer
 
-        public bool databank_create_auto = true;
-        public bool databank_create_message = true;  //this option could be removed now
-        public double databank_compare_tabs = 1.0d;
-        public double databank_compare_trel = 0.0001d;
+        //question
+        //public double databank_compare_tabs = 1.0d;
+        //public double databank_compare_trel = 0.0001d;
+        public bool databank_create_auto = true;             
         public bool databank_file_copylocal = true;
         public bool databank_file_gbk_compress = true;
         public string databank_file_gbk_version = "1.2";  //decides what kind of .gbk file is written  
         public string databank_file_gbk_internal = "databank.data"; //change to "databank.data" in Gekko 2.2        
         public bool databank_search = true;
-
+                
         public int decomp_maxlag = 10;
         public int decomp_maxlead = 10;
 
         public int fit_ols_rekur_dfmin = 10;
 
+        //question
         public bool folder = true;
         public string folder_bank = "";
         public string folder_bank1 = "";
@@ -65,33 +73,28 @@ namespace Gekko
         public string folder_table2 = "";
         public string folder_working = "";
 
+        //question
         public EFreq freq = EFreq.A;
 
-        public bool gams_fast = true; //use low-level api
         public string gams_exe_folder = "";
-        public string gams_time_freq = "a";  //could be u for undated
-        public string gams_time_set = "t";  //name of the time set in GAMS
-        public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
-        public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
-
+        public bool gams_fast = true; //use low-level api        
         public bool gams_time_detect_auto = false;  //will test if a dim looks like time. Only possible with gams_time_prefix != "".
+        public string gams_time_freq = "a";  //could be u for undated
+        public double gams_time_offset = 0;  //add to the integer after prefix, for instance t0 -> 2006
+        public string gams_time_prefix = "";  //prefix of time set elements, if 't' time can be for instance t0
+        public string gams_time_set = "t";  //name of the time set in GAMS                
         
-        //logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
-        public bool interface_alias = false;  //reacts to globals.#alias list
-        //public string interface_alias_file = "";
+        //question -- logic could be that interface assembles stuff that relates to the GUI, but also stuff like the help system which is 'passive' pages (unlike tables and menus).
+        public bool interface_alias = false;  //reacts to globals.#alias list        
         public string interface_clipboard_decimalseparator = "period";
-
         public string interface_csv_decimalseparator = "period";  //has to do with Windows interface, so ok here
         public string interface_csv_delimiter = "semicolon";      //--> we put it next to the decimalseparator
         public int interface_csv_ndec = 100;
-        public int interface_csv_pdec = 100;
-
-        public bool interface_databank_swap = false; //a bit dangerous...
+        public int interface_csv_pdec = 100;        
         public string interface_debug = "dialog";  //or "none"        
         public string interface_excel_language = "danish";
         public bool interface_excel_modernlook = true;
-        public bool interface_help_copylocal = true;
-        public bool interface_lagfix = true;
+        public bool interface_help_copylocal = true;        
         public string interface_mode = "data";  //sim, data, mixed
         public string interface_mute = "no";  //yes, no
         public bool interface_remote = false;  //remote control via remote.gcm
@@ -102,35 +105,36 @@ namespace Gekko
         public string interface_suggestions = "option"; //option or some or none or all   ---> //in the longer run: none, little, some, many, all
         public bool interface_table_operators = true;
         public int interface_zoom = 100;
+
+        //question
         public string menu_startfile = "menu.html";
+
+        //question
         public bool model_cache = true;  //if using cache on file or not        
         public int model_cache_max = 20;  //model options are non-solving options. How many fixed models are kept in RAM    
-
         public bool model_gams_dep_current = false;
         public string model_gams_dep_method = "lhs";  //lhs|eqname
-
         public string model_infofile = "yes";  //yes/no/temp
         public string model_type = "default";  //normal | gams
 
+        //question
         public string plot_decimalseparator = "period";  //comma|period
         public int plot_elements_max = 200;
         public bool plot_lines_points = true;
-        public bool plot_new = true;
-        //public string plot_xlabels_between_truncate = "auto";     //digits|skip|digitsskip|skipdigits|none  --> when all too pressed we use label at.
+        public string plot_using = ""; //a global template
         public string plot_xlabels_annual = "at"; //at|between
         public string plot_xlabels_nonannual = "between"; //at|between          
         public int plot_xlabels_digits = 4; // 4 or 2, only applies to 'between' type   
-        public string plot_using = ""; //a global template
 
-
+        //question
+        public string print_collapse = "none";  //avg or total or none
         public int print_disp_maxlines = 3; //-1 means infinite, 0 means no data shown
         public int print_elements_max = 400;
         public int print_fields_ndec = 4;
         public int print_fields_nwidth = 13;
         public int print_fields_pdec = 2;
         public int print_fields_pwidth = 8;  //to make more room for labels
-        public int print_filewidth = 130;
-        public string print_collapse = "none";  //avg or total or none
+        public int print_filewidth = 130;        
         public string print_freq = "pretty";  //pretty or simple
         public bool print_mulprt_lev = false;  //n
         public bool print_mulprt_abs = true;  //m
@@ -143,37 +147,28 @@ namespace Gekko
         public bool print_prt_gdif = false;  //dp        
         public int print_width = 100;  //so that eqs look ok in DISP
         public bool print_split = false;  //splits PRT x, y; into PRT x; PRT y;
-        
-        public string r_exe_folder = "";  //there will probably be more R options later on
-        public string r_exe_path = "";  //old name, delete at some point
 
         public string python_exe_folder = "";  //there will probably be more Python options later on
 
-        //DEAD!!
-        public bool series_array_ignoremissing = false;  //returns 0 (or skips) a non-existing array-series
+        public string r_exe_folder = "";  //there will probably be more R options later on
+        public string r_exe_path = "";  //old name, delete at some point in 3.3.x series       
 
-
-        // -------- new options regarding missings start ---------------------
+        //array ignoremissing is obsolete
+        //data ignoremissing is obsolete
 
         public bool series_dyn = false;
-
         public bool series_failsafe = false;  //with 'yes', will abort with error if a missing value is put into a series
-
-        //public bool series_data_ignoremissing = false;  //returns 0 instead of NaN (missing) for an observation in an existing series or arrayseries.
-        
         public ESeriesMissing series_normal_print_missing = ESeriesMissing.Error;
         public ESeriesMissing series_normal_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
         public ESeriesMissing series_normal_table_missing = ESeriesMissing.M;
-
         public ESeriesMissing series_array_print_missing = ESeriesMissing.Error;
-        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip
-                
+        public ESeriesMissing series_array_calc_missing = ESeriesMissing.Error;           //for sum, zero = skip                
+        public ESeriesMissing series_array_table_missing = ESeriesMissing.Error;          //not used at the moment
         public ESeriesMissing series_data_missing = ESeriesMissing.M;  //M or Zero, last one only when accessing a series from an open databank, not in other cases. Not implemented for SIM (has its own solve option for that)
 
-        // -------- new options regarding missings end ---------------------
-
-        public string sheet_engine = "internal";
+        //question
         public string sheet_collapse = "none";  //avg or total or none
+        public string sheet_engine = "internal";        
         public string sheet_freq = "simple";  //pretty or simple
         public bool sheet_mulprt_lev = false;  //n
         public bool sheet_mulprt_abs = true;  //m
@@ -186,16 +181,16 @@ namespace Gekko
         public bool sheet_prt_gdif = false;  //dp
         public bool sheet_cols = false;
         public bool sheet_rows = true;
+
+        //question
         public bool solve_data_create_auto = false;
-
-        //for now, we keep it here...
-        public bool solve_data_ignoremissing = false;
-
+        public bool solve_data_ignoremissing = false;  //for now, keep it here
         public bool solve_data_init = true;
         public bool solve_data_init_growth = true; //only has effect if solve_fast = true
         public double solve_data_init_growth_min = -0.02; //only has effect if solve_fast = true. Limit: -0.01 hurts.
         public double solve_data_init_growth_max = 0.06; //only has effect if solve_fast = true. Limit: it could be 0.05 without problems. But 0.04 hurts.
         public bool solve_failsafe = false;
+        //question
         public bool solve_forward_dump = false;
         public string solve_forward_fair_conv = "conv1";
         public double solve_forward_fair_conv1_abs = 0.001d; //it checks abs OR rel, so abs is set really low (for instance, interest rates have low abs value)
@@ -203,8 +198,7 @@ namespace Gekko
         public double solve_forward_fair_conv2_tabs = 1.0d;
         public double solve_forward_fair_conv2_trel = 0.001d;
         public double solve_forward_fair_damp = 0.0; //redefined in 2.0
-        public int solve_forward_fair_itermax = 200;
-        public bool solve_newton_robust = false;
+        public int solve_forward_fair_itermax = 200;        
         public int solve_forward_fair_itermin = 0;
         public string solve_forward_method = "fair";  //or "stacked" or "nfair" or "none"        
         public string solve_forward_nfair_conv = "conv1";
@@ -219,6 +213,7 @@ namespace Gekko
         public int solve_forward_stacked_horizon = 5;
         public string solve_forward_terminal = "const";  //or exo or growth (growth does not work at the moment)
         public string solve_forward_terminal_feed = "internal";  //or external
+        //question
         public string solve_gauss_conv = "conv1";
         public double solve_gauss_conv1_abs = 0.0001d; //perhaps decrease, what about an interest rate...? It checks abs OR rel, so abs is set really low (for instance, interest rates have low abs value)
         public double solve_gauss_conv1_rel = 0.0001d;
@@ -231,36 +226,37 @@ namespace Gekko
         public int solve_gauss_itermin = 10;
         public bool solve_gauss_reorder = false;  //false since Gekko 1.5.11. Setting true should theoretically give fewer iterations, but may also provoke some starting value problems not seen with 'false'. On the other hand, on some problems, reorder=true seems to yield convergence, so we keep it as default.
         public string solve_method = "gauss";  //gauss, newton
+        //question
         public bool solve_newton_backtrack = true;
         public double solve_newton_conv_abs = 0.0001;  //this is for a sum (really RMSQ) over all equations, so it is really low for most purposes. 
         public string solve_newton_invert = "lu"; //lu or iter, lu is more precise -- only problem is that the matrix is not sparse. Should maybe find sparse LU module.
         public int solve_newton_itermax = 200;
+        public bool solve_newton_robust = false;
         public int solve_newton_updatefreq = 15;  //fast steps are so fast now that we relax this from 10 -> 15
         public bool solve_print_details = false;
         public bool solve_print_iter = false;
         public bool solve_static = false;
 
-        public string string_interpolate_format_val = "";  //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
-        
+        public string string_interpolate_format_val = ""; //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used. //"0.000" for 3 dec, "12:0.000" 12 chars wide, "12:F3" the same, "-12:0.000" left-aligned, # can be used.
+
         public int system_code_split = 20; //20 seems good
         public bool system_clone = true; //y = f(#x); #x[2] = ...; No side-effect.
 
-        public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
-        public string table_decimalseparator = "period";  //comma|period
-        public bool table_thousandsseparator = false;
-        public bool table_stamp = true;
-
+        //question        
+        public string table_decimalseparator = "period";  //comma|period        
         public double table_html_datawidth = 5.5;  //in 'em' units
         public double table_html_firstcolwidth = 5.5;  //in 'em' units
         public string table_html_font = "Arial";
         public double table_html_fontsize = 72;  //in %                        
         public double table_html_secondcolwidth = 5.5;  //in 'em' units
         public bool table_html_specialminus = false;
-
-        //DEAD!!
-        public bool table_ignoremissingvars = true;
-
+        public bool table_ignoremissingvars = true;   //obsolete, delete in 3.3.x versions			
+        public string table_mdateformat = "";  //"danish-short" or "english-short" are possible. (could perhaps have a "-s" for small?)
+        public bool table_stamp = true;
+        public bool table_thousandsseparator = false;
         public string table_type = "html";  //txt or html
+
+        //question
         public bool timefilter = false;
         public string timefilter_type = "hide";  //"hide" or "avg"
 
