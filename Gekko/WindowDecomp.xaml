@@ -1,7 +1,40 @@
 ﻿<Window x:Class="Gekko.WindowDecomp"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:jas="clr-namespace:Gekko"
     Title="Decomposition" HorizontalAlignment="Left" Height="710" Width="900" Left="100" Top="30" Closing="Window_Closing">
+
+    <Window.Resources>
+        <Style x:Key="ItemContStyle" TargetType="ListViewItem">
+            <Style.Resources>
+                <LinearGradientBrush x:Key="MouseOverBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+                    <GradientStop Color="#22000000" Offset="0" />
+                    <GradientStop Color="#44000000" Offset="0.4" />
+                    <GradientStop Color="#55000000" Offset="0.6" />
+                    <GradientStop Color="#33000000" Offset="0.9" />
+                    <GradientStop Color="#22000000" Offset="1" />
+                </LinearGradientBrush>
+            </Style.Resources>
+            <Setter Property="Height" Value="25" />
+            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <!-- The default control template for ListViewItem has a Border
+           which contains the item's content. -->
+            <Setter Property="Border.BorderThickness" Value="0,0,0,.5" />
+            <Setter Property="Border.BorderBrush" Value="{Binding LineColor}" />
+            <!-- These triggers react to changes in the attached properties set
+           during a managed drag-drop operation. -->
+            <Style.Triggers>
+                <Trigger Property="jas:ListViewItemDragState.IsBeingDragged" Value="True">
+                    <Setter Property="FontWeight" Value="DemiBold" />
+                </Trigger>
+                <Trigger Property="jas:ListViewItemDragState.IsUnderDragCursor" Value="True">
+                    <Setter Property="Background" Value="{StaticResource MouseOverBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <DockPanel>
 
         <StatusBar Name="status" DockPanel.Dock="Bottom">
@@ -10,6 +43,7 @@
             </StatusBarItem>
 
         </StatusBar>
+        <StackPanel Orientation="Horizontal">
         <StackPanel>
 
 
@@ -327,6 +361,152 @@
                 </Grid>
             </Border>
 
+
+            </StackPanel>
+
+            <DockPanel LastChildFill="True">
+                <TextBox DockPanel.Dock="Bottom" Name ="yellow" Text=""  IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
+                </TextBox>
+                <Grid DockPanel.Dock="Bottom">
+                    <DockPanel LastChildFill="True">
+                        <Canvas Height="30" Width="160" DockPanel.Dock="Right">
+                            <Button Name="unswap" Content="Unswap" Height="21" Canvas.Left="29" Canvas.Top="2" Width="66" Click="Button_Click_1" ToolTip="Puts Work and Ref databanks back to their original ('normal') positions." />
+                            <Button Content="Close" Height="22" Canvas.Left="101" Canvas.Top="2" Width="53" Click="Button_Click" ToolTip="Close the window." />
+                        </Canvas>
+                        <Grid/>
+                    </DockPanel>
+                </Grid>
+
+
+
+                <!--<StackPanel Grid.Row="0" DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <TextBox Name ="yellow" Text="You may drag databanks to swap their places. This changes their alias names (if at least one of the swapped databanks is 'Work' or 'Ref'). After swapping, you may refresh ('Update' button) your PLOT or DECOMP windows."  IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
+            </TextBox>            
+            <Button Height="34"  >OK</Button>            
+        </StackPanel>-->
+
+                <Grid>
+                    <ListView Name="listView"    
+      ItemContainerStyle="{StaticResource ItemContStyle}"
+      Margin="4,4,0,4"
+      Padding="2"
+      SelectionMode="Single"
+      FontFamily="Calibri" 
+      FontSize="13"       
+      Height="Auto" SelectionChanged="listView_SelectionChanged">
+
+                        <ListView.View>
+                            <GridView>
+
+
+                                <GridViewColumn Width="32" Header="">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Number}" Foreground="Gray">
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="90" Header="Name">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding AliasName}">
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="110" Header="File name" DisplayMemberBinding="{Binding FileName}">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="230" Header="Label" DisplayMemberBinding="{Binding Info1}">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>
+
+
+                                <GridViewColumn Width="Auto" Header="Size">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Size}" TextAlignment="Right" Width="40">
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="30" Header="Edit">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Prot}" TextAlignment="Center" Width="25"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="Auto" Header="Period">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Period}" TextAlignment="Left" Width="80"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Width="130" Header="Written" DisplayMemberBinding="{Binding Date}" >
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>
+                                <GridViewColumn Width="240" Header="Full path" DisplayMemberBinding="{Binding FileNameWithPath}">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style  TargetType="{x:Type GridViewColumnHeader}">
+                                            <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>
+
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                </Grid>
+
+            </DockPanel>
 
 
         </StackPanel>

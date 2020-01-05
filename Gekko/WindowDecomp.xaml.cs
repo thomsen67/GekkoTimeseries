@@ -65,8 +65,29 @@ namespace Gekko
 
         public DecompOptions2 decompOptions2 = null;
 
-        public List<string> Customers = new List<string>();        
-        
+        public List<string> Customers = new List<string>();
+
+        private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //listView.SelectedItem = null;  --> no, then we cannot move the row
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Akaljdsf");
+            //RefreshList();
+            //string s = Program.UnswapMessageLong();
+            //yellow.Text = s;
+            //Program.ShowPeriodInStatusField("");
+            //G.Writeln();
+            //G.Writeln(Program.UnswapMessage());
+        }
+
         public void SetRadioButtons() {
             if (this.decompOptions2.isSubWindow)
             {
