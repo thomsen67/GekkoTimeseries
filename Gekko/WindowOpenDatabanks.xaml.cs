@@ -60,8 +60,6 @@ namespace Gekko
 
 			this.listView.ItemsSource = list;            
 
-			//this.listView2.ItemsSource = new ObservableCollection<Task>();
-
 			// This is all that you need to do, in order to use the ListViewDragManager.
 			this.dragMgr = new ListViewDragDropManager<Task>( this.listView );			
             this.dragMgr.ListView = this.listView;
@@ -71,25 +69,6 @@ namespace Gekko
             
             this.dragMgr.ProcessDrop += dragMgr_ProcessDrop;
 
-            //// Turn the ListViewDragManager on and off.
-            //this.chkManageDragging.Checked += delegate { this.dragMgr.ListView = this.listView; };
-            //this.chkManageDragging.Unchecked += delegate { this.dragMgr.ListView = null; };
-            //// Show and hide the drag adorner.
-            //this.chkDragAdorner.Checked += delegate { this.dragMgr.ShowDragAdorner = true; };
-            //this.chkDragAdorner.Unchecked += delegate { this.dragMgr.ShowDragAdorner = false; };
-            //// Change the opacity of the drag adorner.
-            //this.sldDragOpacity.ValueChanged += delegate { this.dragMgr.DragAdornerOpacity = this.sldDragOpacity.Value; };
-            //// Apply or remove the item container style, which responds to changes
-            //// in the attached properties of ListViewItemDragState.
-            //this.chkApplyContStyle.Checked += delegate { this.listView.ItemContainerStyle = this.FindResource( "ItemContStyle" ) as Style; };
-            //this.chkApplyContStyle.Unchecked += delegate { this.listView.ItemContainerStyle = null; };
-            //// Use or do not use custom drop logic.
-            //this.chkSwapDroppedItem.Checked += delegate { this.dragMgr.ProcessDrop += dragMgr_ProcessDrop; };
-            //this.chkSwapDroppedItem.Unchecked += delegate { this.dragMgr.ProcessDrop -= dragMgr_ProcessDrop; };
-            //// Show or hide the lower ListView.
-            //this.chkShowOtherListView.Checked += delegate { this.listView2.Visibility = Visibility.Visible; };
-            //this.chkShowOtherListView.Unchecked += delegate { this.listView2.Visibility = Visibility.Collapsed; };
-            
 			// Hook up events on both ListViews to that we can drag-drop
 			// items between them.
 			this.listView.DragEnter += OnListViewDragEnter;			

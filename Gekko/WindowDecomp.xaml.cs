@@ -32,6 +32,8 @@ using System.Windows.Shapes;
 using System.Windows.Controls.Primitives;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 
 
@@ -62,10 +64,226 @@ namespace Gekko
 
         public StatusBar _status = null;
         public TextBlock _statusText = null;
+        private ObservableCollection<Task> _list = new ObservableCollection<Task>();
+        ListViewDragDropManager<Task> dragMgr;
 
         public DecompOptions2 decompOptions2 = null;
 
         public List<string> Customers = new List<string>();
+
+        public ObservableCollection<Task> list
+        {
+            get
+            {
+                return _list;
+            }
+
+            set
+            {
+                _list = value;
+            }
+        }
+
+
+        private void RefreshList()
+        {
+            list.Clear();
+            List<string> banks2 = new List<string>();
+            banks2.Add("Local");
+            foreach (Databank db in Program.databanks.storage)
+            {
+                banks2.Add(db.name);
+            }
+            banks2.Add("Global");
+
+            for (int ii = 0; ii < banks2.Count; ii++)
+            {
+                string s = banks2[ii];
+                int i = ii - 1;
+                Databank databank = Program.databanks.GetDatabank(s);
+
+                if (databank.storage.Count == 0)
+                {
+                    if (G.Equal(s, Globals.Local))
+                    {
+                        i = -12345;
+                        continue;
+                    }
+                    else if (G.Equal(s, Globals.Global))
+                    {
+                        i = -12345;
+                        continue;
+                    }
+                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;
+                }
+
+                string c = "";
+
+                string i1, i2; Program.GetYearPeriod(databank.yearStart, databank.yearEnd, out i1, out i2);
+
+                string period = i1 + "-" + i2;
+
+
+                if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
+                string prot = null;
+                if (databank.editable) prot = Globals.protectSymbol;
+                else prot = "";
+                list.Add(new Task(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
+
+            }
+            //unswap.IsEnabled = Program.AreDatabanksSwapped();
+            //unswap.IsEnabled = false;  //FIXME
+        }
+
+        void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Give the ListView an ObservableCollection of Task
+            // as a data source.  Note, the ListViewDragManager MUST
+            // be bound to an ObservableCollection, where the collection's
+            // type parameter matches the ListViewDragManager's type
+            // parameter (in this case, both have a type parameter of Task).
+
+            list = new ObservableCollection<Task>();
+            RefreshList();
+
+            this.listView.ItemsSource = list;
+
+            // This is all that you need to do, in order to use the ListViewDragManager.
+            this.dragMgr = new ListViewDragDropManager<Task>(this.listView);
+            this.dragMgr.ListView = this.listView;
+            this.dragMgr.ShowDragAdorner = true;
+            this.dragMgr.DragAdornerOpacity = 0.5d;  //so that e.g. "Work" can still be seen underneath
+            this.listView.ItemContainerStyle = this.FindResource("ItemContStyle") as Style;
+
+            this.dragMgr.ProcessDrop += dragMgr_ProcessDrop;
+
+            // Hook up events on both ListViews to that we can drag-drop
+            // items between them.
+            this.listView.DragEnter += OnListViewDragEnter;
+            this.listView.Drop += OnListViewDrop;
+        }
+
+        void OnListViewDragEnter(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+
+        void OnListViewDrop(object sender, DragEventArgs e)
+        {
+            if (e.Effects == DragDropEffects.None)
+                return;
+
+            Task task = e.Data.GetData(typeof(Task)) as Task;
+            if (sender == this.listView)
+            {
+                if (this.dragMgr.IsDragInProgress)
+                    return;
+
+                // An item was dragged from the bottom ListView into the top ListView
+                // so remove that item from the bottom ListView.
+                //(this.listView2.ItemsSource as ObservableCollection<Task>).Remove( task );
+            }
+            else
+            {
+                //if( this.dragMgr2.IsDragInProgress )
+                //    return;
+
+                //// An item was dragged from the top ListView into the bottom ListView
+                //// so remove that item from the top ListView.
+                //(this.listView.ItemsSource as ObservableCollection<Task>).Remove( task );
+            }
+        }
+
+
+        void dragMgr_ProcessDrop(object sender, ProcessDropEventArgs<Task> e)
+        {
+            // This shows how to customize the behavior of a drop.
+            // Here we perform a swap, instead of just moving the dropped item.
+
+            MessageBox.Show("*** ERROR: Manual databank swapping not allowed anymore");
+            return;
+
+            string text = "";
+
+            int higherIdx = Math.Max(e.OldIndex, e.NewIndex);
+            int lowerIdx = Math.Min(e.OldIndex, e.NewIndex);
+
+            Task t_from = list[e.OldIndex];
+            Task t_to = list[e.NewIndex];
+
+            string aliasFromOld = t_from.AliasName;
+            string aliasToOld = t_to.AliasName;
+
+            string s = null;
+
+            if (lowerIdx < 0)
+            {
+                // The item came from the lower ListView
+                // so just insert it.
+                e.ItemsSource.Insert(higherIdx, e.DataItem);
+            }
+            else
+            {
+                // null values will cause an error when calling Move.
+                // It looks like a bug in ObservableCollection to me.
+                if (e.ItemsSource[lowerIdx] == null ||
+                    e.ItemsSource[higherIdx] == null)
+                {
+                    //Program.ShowPeriodInStatusField("");
+                    return;
+                }
+
+                // The item came from the ListView into which
+                // it was dropped, so swap it with the item
+                // at the target index.
+                e.ItemsSource.Move(lowerIdx, higherIdx);
+                e.ItemsSource.Move(higherIdx - 1, lowerIdx);
+
+                Databank lower = Program.databanks.storage[lowerIdx];
+                Databank higher = Program.databanks.storage[higherIdx];
+                Program.databanks.storage[lowerIdx] = higher;
+                Program.databanks.storage[higherIdx] = lower;
+                //remember that higher is at lowerIdx and vice versa!
+                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
+                {
+                    if (higher.editable)
+                    {
+                        higher.editable = false;
+                        s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
+                        list[lowerIdx].Prot = Globals.protectSymbol;
+                    }
+
+                }
+                //remember that higher is at lowerIdx and vice versa!
+                if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
+                {
+                    if (lower.editable)
+                    {
+                        lower.editable = false;
+                        s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
+                        list[higherIdx].Prot = Globals.protectSymbol;
+                    }
+                }
+
+                int counter = 0;
+                foreach (var x in e.ItemsSource)
+                {
+                    counter++;
+                    x.Number = counter.ToString();
+                    if (x.Number == "2") x.LineColor = "Black";  //these numbers are 1-based and are strings!
+                    else x.LineColor = "LightGray";
+                }
+            }
+
+            // Set this to 'Move' so that the OnListViewDrop knows to
+            // remove the item from the other ListView.
+            e.Effects = DragDropEffects.Move;
+            //unswap.IsEnabled = Program.AreDatabanksSwapped();
+            //unswap.IsEnabled = true;  //fixme
+
+            yellow.Text = "Databanks were swapped. " + s;
+            //Program.ShowPeriodInStatusField("");            
+        }
 
         private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -80,7 +298,7 @@ namespace Gekko
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Akaljdsf");
-            //RefreshList();
+            RefreshList();
             //string s = Program.UnswapMessageLong();
             //yellow.Text = s;
             //Program.ShowPeriodInStatusField("");
@@ -268,7 +486,9 @@ namespace Gekko
             }
             _status = status;
             _statusText = statusText;
-            //this.decompOptions.guiDecompOperator = "n";            
+            //this.decompOptions.guiDecompOperator = "n";   
+            //RefreshList();
+            this.Loaded += WindowDecomp_Loaded;
         }
 
         private void CreateGridRowsAndColumns(Grid g, Table table, GekkoTableTypes type)
