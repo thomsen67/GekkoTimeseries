@@ -216,8 +216,8 @@ namespace Gekko
                 {
                     counter++;
                     x.Number = counter.ToString();
-                    if (x.Number == "2") x.LineColor = "Black";  //these numbers are 1-based and are strings!
-                    else x.LineColor = "LightGray";
+                    //if (x.Number == "2") x.LineColor = "Black";  //these numbers are 1-based and are strings!
+                    //else x.LineColor = "LightGray";
                 }
 			}
 

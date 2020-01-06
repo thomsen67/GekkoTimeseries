@@ -38,7 +38,7 @@
         
         <Style x:Key="ItemContStyle" TargetType="ListViewItem">
             <Style.Resources>
-                <LinearGradientBrush x:Key="MouseOverBrush" StartPoint="0.5, 0" EndPoint="0.5, 1">
+                <LinearGradientBrush x:Key="MouseOverBrush" StartPoint="0.5, -0.1" EndPoint="0.5, 0.2">
                     <GradientStop Color="#22000000" Offset="0" />
                     <GradientStop Color="#44000000" Offset="0.4" />
                     <GradientStop Color="#55000000" Offset="0.6" />
@@ -46,9 +46,10 @@
                     <GradientStop Color="#22000000" Offset="1" />
                 </LinearGradientBrush>
             </Style.Resources>
-            <Setter Property="Height" Value="35" />
+            <Setter Property="Height" Value="28" />
             <Setter Property="MinWidth" Value="100" />
-            <Setter Property="Padding" Value="0,4" />
+            <Setter Property="Padding" Value="4,3,4,2" />
+            
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <!-- The default control template for ListViewItem has a Border
            which contains the item's content. -->
@@ -391,7 +392,7 @@
 
             <DockPanel LastChildFill="True">
             
-                <Grid>
+                
                     <ListView Name="listView"    
                       ItemContainerStyle="{StaticResource ItemContStyle}"
                       Margin="4,4,0,4"
@@ -404,9 +405,9 @@
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel>
-                                    <TextBlock Text="{Binding Pivot_Text}" FontWeight="Bold" HorizontalAlignment="Left" />                                                                        
+                                    <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />                                                                        
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Padding="2" Opacity="0.8" Click="ListButton1_Click" Content="Add" Visibility="{Binding Pivot_ButtonVisible1}"></Button>
+                                        <Button Padding="1,1,1,1"  Opacity="0.4" Click="ListButton1_Click" Content="Add" Visibility="{Binding Pivot_ButtonVisible1}"></Button>
                                         <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
                                     </StackPanel>
                                 </DockPanel>
@@ -415,7 +416,7 @@
                         
                     </ListView>
 
-                </Grid>
+                
 
             </DockPanel>
 

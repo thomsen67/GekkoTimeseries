@@ -26,16 +26,19 @@ namespace Gekko
         bool finished;
         string number;
         string prot;
-        string pivot_Text;
-        string pivot_ButtonVisible1;
-        string pivot_ButtonVisible2;
+        string pivot_text;
+        string pivot_buttonVisible1;
+        string pivot_buttonVisible2;
+        string pivot_fontWeight;
 
         //pivot
-        public Task(string text, string visible1, string visible2)
+        public Task(string text, string visible1, string visible2, string fontWeight, string lineColor)
         {
-            this.pivot_Text = text;
-            this.pivot_ButtonVisible1 = visible1;
-            this.pivot_ButtonVisible2 = visible2;
+            this.pivot_text = text;
+            this.pivot_buttonVisible1 = visible1;
+            this.pivot_buttonVisible2 = visible2;
+            this.pivot_fontWeight = fontWeight;
+            this.lineColor = lineColor;
         }
 
         //non-pivot
@@ -154,19 +157,23 @@ namespace Gekko
 
         public string Pivot_Text
         {
-            get { return this.pivot_Text; }
+            get { return this.pivot_text; }
         }
 
         public string Pivot_ButtonVisible1
         {
-            get { return this.pivot_ButtonVisible1; }
+            get { return this.pivot_buttonVisible1; }
         }
 
         public string Pivot_ButtonVisible2
         {
-            get { return this.pivot_ButtonVisible2; }
+            get { return this.pivot_buttonVisible2; }
         }
 
+        public string Pivot_FontWeight
+        {
+            get { return this.pivot_fontWeight; }
+        }
 
 
         // Create the OnPropertyChanged method to raise the event

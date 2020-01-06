@@ -814,7 +814,8 @@ namespace Gekko
 		public ObservableCollection<ItemType> ItemsSource
 		{
 			get { return this.itemsSource; }
-		}
+            set { this.itemsSource = value; }
+        }
 
 		/// <summary>
 		/// The data object which was dropped.

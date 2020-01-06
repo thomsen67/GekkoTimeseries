@@ -87,13 +87,14 @@ namespace Gekko
         private void RefreshList()
         {
             list.Clear();
-            list.Add(new Task("ROWS", "Visible", "Collapsed"));
-            list.Add(new Task("var", "Collapsed", "Visible"));
-            list.Add(new Task("#a", "Collapsed", "Visible"));
-            list.Add(new Task("COLS", "Visible", "Collapsed"));
-            list.Add(new Task("t", "Collapsed", "Visible"));
-            list.Add(new Task("FILTER", "Visible", "Collapsed"));
-            list.Add(new Task("t", "Collapsed", "Visible"));
+            list.Add(new Task("Rows", "Visible", "Collapsed", "Bold", "LightGray"));
+            list.Add(new Task("var", "Collapsed", "Visible", "Normal", "LightGray"));
+            list.Add(new Task("#a", "Collapsed", "Visible", "Normal", "Black"));
+            list.Add(new Task("Columns", "Visible", "Collapsed", "Bold", "LightGray"));
+            list.Add(new Task("t", "Collapsed", "Visible", "Normal", "Black"));
+            list.Add(new Task("Filters", "Visible", "Collapsed", "Bold", "LightGray"));
+            list.Add(new Task("t", "Collapsed", "Visible", "Normal", "Black"));
+            list.Add(new Task("", "Collapsed", "Collapsed", "Normal", "White"));
         }        
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -158,80 +159,25 @@ namespace Gekko
 
         void dragMgr_ProcessDrop(object sender, ProcessDropEventArgs<Task> e)
         {
-            // This shows how to customize the behavior of a drop.
-            // Here we perform a swap, instead of just moving the dropped item.
-
-            string text = "";
-
-            int higherIdx = Math.Max(e.OldIndex, e.NewIndex);
-            int lowerIdx = Math.Min(e.OldIndex, e.NewIndex);
-
-            Task t_from = list[e.OldIndex];
-            Task t_to = list[e.NewIndex];
-
-            string aliasFromOld = t_from.AliasName;
-            string aliasToOld = t_to.AliasName;
-
-            string s = null;
-
-            if (lowerIdx < 0)
+            //e.ItemsSource.Move(e.OldIndex, e.NewIndex);
+            List<Task> o = new List<Task>();
+            for (int i = 0; i < e.ItemsSource.Count; i++)
             {
-                // The item came from the lower ListView
-                // so just insert it.
-                e.ItemsSource.Insert(higherIdx, e.DataItem);
-            }
-            else
-            {
-                // null values will cause an error when calling Move.
-                // It looks like a bug in ObservableCollection to me.
-                if (e.ItemsSource[lowerIdx] == null ||
-                    e.ItemsSource[higherIdx] == null)
+                if (i == e.OldIndex) continue;
+                Task t = e.ItemsSource[e.NewIndex];
+                if (false && t.Pivot_FontWeight == "Bold")
                 {
-                    //Program.ShowPeriodInStatusField("");
-                    return;
+                    o.Add(e.ItemsSource[i]);
+                    if (i == e.NewIndex) o.Add(e.ItemsSource[e.OldIndex]);                    
                 }
-
-                // The item came from the ListView into which
-                // it was dropped, so swap it with the item
-                // at the target index.
-                e.ItemsSource.Move(lowerIdx, higherIdx);
-                e.ItemsSource.Move(higherIdx - 1, lowerIdx);
-
-                //Databank lower = Program.databanks.storage[lowerIdx];
-                //Databank higher = Program.databanks.storage[higherIdx];
-                //Program.databanks.storage[lowerIdx] = higher;
-                //Program.databanks.storage[higherIdx] = lower;
-                //remember that higher is at lowerIdx and vice versa!
-                //if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
-                //{
-                //    if (higher.editable)
-                //    {
-                //        higher.editable = false;
-                //        s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
-                //        list[lowerIdx].Prot = Globals.protectSymbol;
-                //    }
-                //}
-                //remember that higher is at lowerIdx and vice versa!
-                //if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
-                //{
-                //    if (lower.editable)
-                //    {
-                //        lower.editable = false;
-                //        s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
-                //        list[higherIdx].Prot = Globals.protectSymbol;
-                //    }
-                //}
-
-                int counter = 0;
-                foreach (var x in e.ItemsSource)
+                else
                 {
-                    counter++;
-                    x.Number = counter.ToString();
-                    if (x.Number == "2") x.LineColor = "Black";  //these numbers are 1-based and are strings!
-                    else x.LineColor = "LightGray";
-                }
+                    if (i == e.NewIndex) o.Add(e.ItemsSource[e.OldIndex]);
+                    o.Add(e.ItemsSource[i]);
+                }            
             }
-
+            e.ItemsSource.Clear(); foreach (Task t in o) e.ItemsSource.Add(t); //must clear and reuse existing object, a new object will fail to update
+            
             // Set this to 'Move' so that the OnListViewDrop knows to
             // remove the item from the other ListView.
             e.Effects = DragDropEffects.Move;
@@ -245,23 +191,7 @@ namespace Gekko
         private void listView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //listView.SelectedItem = null;  --> no, then we cannot move the row
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Akaljdsf");
-            RefreshList();
-            //string s = Program.UnswapMessageLong();
-            //yellow.Text = s;
-            //Program.ShowPeriodInStatusField("");
-            //G.Writeln();
-            //G.Writeln(Program.UnswapMessage());
-        }
+        }        
 
         public void SetRadioButtons() {
             if (this.decompOptions2.isSubWindow)
