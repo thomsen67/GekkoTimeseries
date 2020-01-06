@@ -365,8 +365,8 @@
             </StackPanel>
 
             <DockPanel LastChildFill="True">
-                <TextBox DockPanel.Dock="Bottom" Name ="yellow" Text=""  IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
-                </TextBox>
+                <!--<TextBox DockPanel.Dock="Bottom" Name ="yellow" Text=""  IsReadOnly="True" TextWrapping="Wrap" Background="LightYellow">
+                </TextBox>-->
                 <Grid DockPanel.Dock="Bottom">
                     <DockPanel LastChildFill="True">
                         <Canvas Height="30" Width="160" DockPanel.Dock="Right">
@@ -387,18 +387,25 @@
 
                 <Grid>
                     <ListView Name="listView"    
-      ItemContainerStyle="{StaticResource ItemContStyle}"
-      Margin="4,4,0,4"
-      Padding="2"
-      SelectionMode="Single"
-      FontFamily="Calibri" 
-      FontSize="13"       
-      Height="Auto" SelectionChanged="listView_SelectionChanged">
+                      ItemContainerStyle="{StaticResource ItemContStyle}"
+                      Margin="4,4,0,4"
+                      Padding="2"
+                      SelectionMode="Single"
+                      FontFamily="Calibri" 
+                      FontSize="13"       
+                      Height="Auto" SelectionChanged="listView_SelectionChanged">
 
-                        <ListView.View>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <WrapPanel>
+                                    <TextBlock Text="Name: " />
+                                    <TextBlock Text="{Binding Number}" FontWeight="Bold" />                                    
+                                </WrapPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+
+                        <!--<ListView.View>
                             <GridView>
-
-
                                 <GridViewColumn Width="32" Header="">
                                     <GridViewColumn.HeaderContainerStyle>
                                         <Style  TargetType="{x:Type GridViewColumnHeader}">
@@ -501,7 +508,7 @@
 
 
                             </GridView>
-                        </ListView.View>
+                        </ListView.View>-->
                     </ListView>
 
                 </Grid>

@@ -281,7 +281,7 @@ namespace Gekko
             //unswap.IsEnabled = Program.AreDatabanksSwapped();
             //unswap.IsEnabled = true;  //fixme
 
-            yellow.Text = "Databanks were swapped. " + s;
+            //yellow.Text = "Databanks were swapped. " + s;
             //Program.ShowPeriodInStatusField("");            
         }
 
