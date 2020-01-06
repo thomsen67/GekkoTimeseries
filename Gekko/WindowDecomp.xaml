@@ -21,7 +21,7 @@
                                 <!-- Then responsible for the content. In our case it did not really need, because it is set Path -->
                                 <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <!-- Our Path. Shows a cross -->
-                                <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove" Width="12" Height="11" Margin="0,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="#2D2D2D" Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
+                                <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove" Width="13" Height="11" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="LightGray"  Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
                             </Grid>
 
                             <!-- Trigger fires on the property -->
@@ -46,7 +46,8 @@
                     <GradientStop Color="#22000000" Offset="1" />
                 </LinearGradientBrush>
             </Style.Resources>
-            <Setter Property="Height" Value="25" />
+            <Setter Property="Height" Value="35" />
+            <Setter Property="MinWidth" Value="100" />
             <Setter Property="Padding" Value="0,4" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <!-- The default control template for ListViewItem has a Border
@@ -339,13 +340,6 @@
                     <Button Grid.Column="11" Grid.Row="4" HorizontalAlignment="Right" Margin="0,1.625,19.125,1.875" Name="button3" Width="18" ToolTip="Fewer decimals" Click="button3_Click" FontSize="10" Opacity="0.7">.0</Button>
                     <Button Name="button1" Click="button1_Click" ToolTip="Update values in table with newest from Gekko databanks (i.e., after simulation or opening databanks)" Grid.Column="11" Margin="17.27,2.529,34.208,0" Grid.Row="5" Opacity="0.8" Content="Refresh"></Button>
 
-                    <!--
-                <CheckBox x:Name="subst" Content="Subst.&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" Margin="130,3,-82,0" Grid.Row="1" VerticalAlignment="Top" Grid.ColumnSpan="2" Unchecked="Subst_Unchecked" Checked="Subst_Checked"/>
-                <CheckBox x:Name="sort" Content="Sort&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" HorizontalAlignment="Left" Margin="131,3,-42.667,0" Grid.Row="2" VerticalAlignment="Top" Width="59" Grid.ColumnSpan="2" Unchecked="Sort_Unchecked" Checked="Sort_Checked"/>
-                <CheckBox x:Name="pool" Content="Pool&#xD;&#xA;&#xD;&#xA;" Grid.Column="11" HorizontalAlignment="Left" Margin="131,3,-41,0" Grid.Row="3" VerticalAlignment="Top" Width="58" Grid.ColumnSpan="2" Unchecked="Pool_Unchecked" Checked="Pool_Checked" />                
-                <TextBox x:Name="limit" Grid.Column="11" HorizontalAlignment="Left" Height="18" Margin="131,2,-26,0" Grid.Row="4" TextWrapping="Wrap" Text="limit&#xD;&#xA;" VerticalAlignment="Top" Width="43" Grid.ColumnSpan="2" />
-                -->
-
                 </Grid>
 
                 <Label Name="flowText" Content="                                 Flowchart tracking: right-click a time period below"/>
@@ -409,14 +403,13 @@
 
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <WrapPanel>
-                                    <TextBlock Text="Name: " />
-                                    <TextBlock Text="{Binding AliasName}" FontWeight="Bold" />
-                                    <TextBlock Text="  " />
-                                    <Button Click="ListButton_Click" Content="{Binding AliasName}"></Button>
-                                    <TextBlock Text="  " />
-                                    <ToggleButton Name="CloseButton" Style="{StaticResource ToggleButtonWindowClose}" />                                    
-                                </WrapPanel>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding Pivot_Text}" FontWeight="Bold" HorizontalAlignment="Left" />                                                                        
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Padding="2" Opacity="0.8" Click="ListButton1_Click" Content="Add" Visibility="{Binding Pivot_ButtonVisible1}"></Button>
+                                        <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
+                                    </StackPanel>
+                                </DockPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                         

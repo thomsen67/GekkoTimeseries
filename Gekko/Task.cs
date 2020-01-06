@@ -26,8 +26,19 @@ namespace Gekko
         bool finished;
         string number;
         string prot;
-        
+        string pivot_Text;
+        string pivot_ButtonVisible1;
+        string pivot_ButtonVisible2;
 
+        //pivot
+        public Task(string text, string visible1, string visible2)
+        {
+            this.pivot_Text = text;
+            this.pivot_ButtonVisible1 = visible1;
+            this.pivot_ButtonVisible2 = visible2;
+        }
+
+        //non-pivot
         public Task(string AliasName, string FileName, string FileNameWithPath, string Size, string Period, string Info1, string Date, string RowColor, string prot, int i)
         {
             this.aliasName = AliasName;
@@ -38,9 +49,7 @@ namespace Gekko
             this.info1 = Info1;
             this.date = Date;
             this.rowColor = RowColor;
-            this.originalAliasName = AliasName;
-            //if (i == 1) this.lineColor = "Black";
-            //else this.lineColor = "LightGray";
+            this.originalAliasName = AliasName;            
             this.lineColor = "LightGray";
             this.number = "";
             if (i == 0) this.number = "1";
@@ -142,6 +151,23 @@ namespace Gekko
                 OnPropertyChanged("LineColor");
             }
         }
+
+        public string Pivot_Text
+        {
+            get { return this.pivot_Text; }
+        }
+
+        public string Pivot_ButtonVisible1
+        {
+            get { return this.pivot_ButtonVisible1; }
+        }
+
+        public string Pivot_ButtonVisible2
+        {
+            get { return this.pivot_ButtonVisible2; }
+        }
+
+
 
         // Create the OnPropertyChanged method to raise the event
         protected void OnPropertyChanged(string name)

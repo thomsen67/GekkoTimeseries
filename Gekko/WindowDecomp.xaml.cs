@@ -84,40 +84,17 @@ namespace Gekko
             }
         }
 
-
         private void RefreshList()
         {
             list.Clear();
-            list.Add(new Task("ROWS", null, null, null, null, null, null, "blue", null, 1));
-            list.Add(new Task("var", null, null, null, null, null, null, "blue", null, 2));
-            list.Add(new Task("#a", null, null, null, null, null, null, "blue", null, 3));
-            list.Add(new Task("COLS", null, null, null, null, null, null, "blue", null, 4));
-            list.Add(new Task("t", null, null, null, null, null, null, "blue", null, 5));
-            list.Add(new Task("FILTER", null, null, null, null, null, null, "blue", null, 6));
-            list.Add(new Task("t", null, null, null, null, null, null, "blue", null, 7));
-        }
-
-        private void ListButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button button = sender as Button;
-            Task task = button.DataContext as Task;
-            if (task.AliasName == "ROWS")
-            {
-                MessageBox.Show("Add new row item");
-            }
-            else if (task.AliasName == "COLS")
-            {
-                MessageBox.Show("Add new col item");
-            }
-            else if (task.AliasName == "FILTER")
-            {
-                MessageBox.Show("Add new filter item");
-            }
-            else
-            {
-                MessageBox.Show("Delete item");
-            }
-        }
+            list.Add(new Task("ROWS", "Visible", "Collapsed"));
+            list.Add(new Task("var", "Collapsed", "Visible"));
+            list.Add(new Task("#a", "Collapsed", "Visible"));
+            list.Add(new Task("COLS", "Visible", "Collapsed"));
+            list.Add(new Task("t", "Collapsed", "Visible"));
+            list.Add(new Task("FILTER", "Visible", "Collapsed"));
+            list.Add(new Task("t", "Collapsed", "Visible"));
+        }        
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
         {
@@ -1867,6 +1844,29 @@ namespace Gekko
                 this.decompOptions2.decompTablesFormat.showErrors = false;
                 RecalcCellsWithNewType();                
             }
+        }
+
+        private void ListButton1_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            Task task = button.DataContext as Task;
+            if (task.Pivot_Text == "ROWS")
+            {
+                MessageBox.Show("Add new row item");
+            }
+            else if (task.Pivot_Text == "COLS")
+            {
+                MessageBox.Show("Add new col item");
+            }
+            else if (task.Pivot_Text == "FILTER")
+            {
+                MessageBox.Show("Add new filter item");
+            }            
+        }
+
+        private void ListButton2_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Delete item");
         }
 
         //private void Sort_Checked(object sender, RoutedEventArgs e)
