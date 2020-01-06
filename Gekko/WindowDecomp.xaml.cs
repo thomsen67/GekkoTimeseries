@@ -88,51 +88,35 @@ namespace Gekko
         private void RefreshList()
         {
             list.Clear();
-            List<string> banks2 = new List<string>();
-            banks2.Add("Local");
-            foreach (Databank db in Program.databanks.storage)
+            list.Add(new Task("ROWS", null, null, null, null, null, null, "blue", null, 1));
+            list.Add(new Task("var", null, null, null, null, null, null, "blue", null, 2));
+            list.Add(new Task("#a", null, null, null, null, null, null, "blue", null, 3));
+            list.Add(new Task("COLS", null, null, null, null, null, null, "blue", null, 4));
+            list.Add(new Task("t", null, null, null, null, null, null, "blue", null, 5));
+            list.Add(new Task("FILTER", null, null, null, null, null, null, "blue", null, 6));
+            list.Add(new Task("t", null, null, null, null, null, null, "blue", null, 7));
+        }
+
+        private void ListButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            Task task = button.DataContext as Task;
+            if (task.AliasName == "ROWS")
             {
-                banks2.Add(db.name);
+                MessageBox.Show("Add new row item");
             }
-            banks2.Add("Global");
-
-            for (int ii = 0; ii < banks2.Count; ii++)
+            else if (task.AliasName == "COLS")
             {
-                string s = banks2[ii];
-                int i = ii - 1;
-                Databank databank = Program.databanks.GetDatabank(s);
-
-                if (databank.storage.Count == 0)
-                {
-                    if (G.Equal(s, Globals.Local))
-                    {
-                        i = -12345;
-                        continue;
-                    }
-                    else if (G.Equal(s, Globals.Global))
-                    {
-                        i = -12345;
-                        continue;
-                    }
-                    else if (G.Equal(databank.name, Globals.Ref) && i == 1) continue;
-                }
-
-                string c = "";
-
-                string i1, i2; Program.GetYearPeriod(databank.yearStart, databank.yearEnd, out i1, out i2);
-
-                string period = i1 + "-" + i2;
-
-
-                if (databank.yearStart == -12345 || databank.yearEnd == -12345) period = "";
-                string prot = null;
-                if (databank.editable) prot = Globals.protectSymbol;
-                else prot = "";
-                list.Add(new Task(s, Program.GetDatabankFilename(databank), databank.FileNameWithPath, databank.storage.Count.ToString(), period, databank.info1, databank.date, c, prot, i));
-
+                MessageBox.Show("Add new col item");
             }
-            //unswap.IsEnabled = Program.AreDatabanksSwapped();
-            //unswap.IsEnabled = false;  //FIXME
+            else if (task.AliasName == "FILTER")
+            {
+                MessageBox.Show("Add new filter item");
+            }
+            else
+            {
+                MessageBox.Show("Delete item");
+            }
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -200,9 +184,6 @@ namespace Gekko
             // This shows how to customize the behavior of a drop.
             // Here we perform a swap, instead of just moving the dropped item.
 
-            MessageBox.Show("*** ERROR: Manual databank swapping not allowed anymore");
-            return;
-
             string text = "";
 
             int higherIdx = Math.Max(e.OldIndex, e.NewIndex);
@@ -239,31 +220,30 @@ namespace Gekko
                 e.ItemsSource.Move(lowerIdx, higherIdx);
                 e.ItemsSource.Move(higherIdx - 1, lowerIdx);
 
-                Databank lower = Program.databanks.storage[lowerIdx];
-                Databank higher = Program.databanks.storage[higherIdx];
-                Program.databanks.storage[lowerIdx] = higher;
-                Program.databanks.storage[higherIdx] = lower;
+                //Databank lower = Program.databanks.storage[lowerIdx];
+                //Databank higher = Program.databanks.storage[higherIdx];
+                //Program.databanks.storage[lowerIdx] = higher;
+                //Program.databanks.storage[higherIdx] = lower;
                 //remember that higher is at lowerIdx and vice versa!
-                if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
-                {
-                    if (higher.editable)
-                    {
-                        higher.editable = false;
-                        s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
-                        list[lowerIdx].Prot = Globals.protectSymbol;
-                    }
-
-                }
+                //if ((lowerIdx == 0 || lowerIdx == 1) && !(G.Equal(higher.name, Globals.Work) || G.Equal(higher.name, Globals.Ref)))
+                //{
+                //    if (higher.editable)
+                //    {
+                //        higher.editable = false;
+                //        s += "Note that the databank '" + higher.name + "' has been set non-editable. ";
+                //        list[lowerIdx].Prot = Globals.protectSymbol;
+                //    }
+                //}
                 //remember that higher is at lowerIdx and vice versa!
-                if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
-                {
-                    if (lower.editable)
-                    {
-                        lower.editable = false;
-                        s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
-                        list[higherIdx].Prot = Globals.protectSymbol;
-                    }
-                }
+                //if ((higherIdx == 0 || higherIdx == 1) && !(G.Equal(lower.name, Globals.Work) || G.Equal(lower.name, Globals.Ref)))
+                //{
+                //    if (lower.editable)
+                //    {
+                //        lower.editable = false;
+                //        s += "Note that the databank '" + lower.name + "' has been set non-editable. ";
+                //        list[higherIdx].Prot = Globals.protectSymbol;
+                //    }
+                //}
 
                 int counter = 0;
                 foreach (var x in e.ItemsSource)
