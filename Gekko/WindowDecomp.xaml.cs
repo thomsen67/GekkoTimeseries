@@ -323,6 +323,16 @@ namespace Gekko
             }
         }
 
+        public class ViewModel
+        {
+            public ObservableCollection<string> ComboBoxContent { get; private set; }
+
+            public ViewModel()
+            {
+                ComboBoxContent = new ObservableCollection<string> { "test 1", "test 2" };
+            }
+        }
+
         public WindowDecomp(DecompOptions2 decompOptions)
         {
             
@@ -331,7 +341,9 @@ namespace Gekko
             this.isInitializing = true; //so that radiobuttons etc do not fire right now
             InitializeComponent();
             this.isInitializing = false;  //ready for clicking
-            
+
+            DataContext = new ViewModel();  //MVVM style
+
             Canvas.SetTop(this.frezenBorder, Globals.guiTableCellHeight);
             Canvas.SetLeft(this.frezenBorder2,Globals.guiTableCellWidth);
             this.gridUpperLeft.Width = Globals.guiTableCellWidth;
@@ -1802,12 +1814,10 @@ namespace Gekko
         }
 
         private void ListButton2_Click(object sender, RoutedEventArgs e)
-        {
-            //MessageBox.Show("Delete item");
+        {            
             ToggleButton button = sender as ToggleButton;
             Task task = button.DataContext as Task;
-            string s = G.HandleInternalIdentifyer2(task.Pivot_Text);
-            
+            string s = G.HandleInternalIdentifyer2(task.Pivot_Text);            
             if (task.Pivot_TaskType == TaskType.Rows)
             {
                 decompOptions2.rows.Remove(s);
@@ -1822,8 +1832,7 @@ namespace Gekko
             {
                 MessageBox.Show("*** ERROR: This item cannot be deleted");
             }            
-            RecalcCellsWithNewType();
-            //decompOptions2
+            RecalcCellsWithNewType();            
         }
 
         private void RemoveFromObservableCollection(Task task)

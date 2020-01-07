@@ -26,12 +26,13 @@ namespace Gekko
         bool finished;
         string number;
         string prot;
+        int i;  //number in collection
         string pivot_text;
         string pivot_buttonVisible1;
         string pivot_buttonVisible2;
         string pivot_fontWeight;
-        WindowDecomp.TaskType pivot_taskType;
-        int i;  //number in collection
+        WindowDecomp.TaskType pivot_taskType;        
+        ObservableCollection<string> pivot_sublist = new ObservableCollection<string>() { "s1", "s2" };
 
         //pivot
         public Task(string text, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i)
@@ -163,6 +164,11 @@ namespace Gekko
         {
             get { return this.i; }      
             set { this.i = value; }
+        }
+
+        public ObservableCollection<string> Pivot_Sublist
+        {
+            get { return this.pivot_sublist; }
         }
 
         public string Pivot_Text
