@@ -917,11 +917,11 @@ namespace Gekko
         {
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
 
-            if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
-            {
-                decompOptions2.rows = new List<string>() { "vars", "lags" };
-                decompOptions2.cols = new List<string>() { "time" };
-            }
+            //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
+            //{
+            //    decompOptions2.rows = new List<string>() { "vars", "lags" };
+            //    decompOptions2.cols = new List<string>() { "time" };
+            //}
 
             List<FrameFilter> filters = new List<FrameFilter>();
             if (decompOptions2.where != null)

@@ -16937,6 +16937,7 @@ namespace Gekko
 
         public static bool HasGamsEquation(string var)
         {
+            if (var == null) return false;
             return Program.modelGams?.equationsByVarname != null && Program.modelGams.equationsByVarname.ContainsKey(var);
         }
 
@@ -17425,6 +17426,7 @@ namespace Gekko
         public static EEndoOrExo VariableTypeEndoExo(string var)
         {
             EEndoOrExo type = EEndoOrExo.Unknown;
+            if (var == null) return type;
             if (Program.model != null)
             {
                 //checks if left-hand var in model. So this ignores exo/endo commands.

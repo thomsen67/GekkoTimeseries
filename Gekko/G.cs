@@ -772,6 +772,7 @@ namespace Gekko
 
         public static string ExtractOnlyVariableIgnoreLag(string key, string code)
         {
+            if (key == null) return null;
             string variable = null;
             int indx = key.LastIndexOf(code); //in decomp window, we may have x['a', 'z'][-1], so therefore we look for the last '['       
             if (indx != -1)
@@ -1298,6 +1299,7 @@ namespace Gekko
 
         public static string PrettifyTimeseriesHash(string s, bool isVarName, bool isInverse)
         {
+            if (s == null) return null;
             if (!isVarName && isInverse) throw new GekkoException();
             if (isInverse)
             {
