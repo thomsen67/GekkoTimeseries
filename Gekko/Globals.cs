@@ -59,6 +59,9 @@ namespace Gekko
 
         public static string internalColumnIdentifyer = "gekkopivot__";
         public static string internalSetIdentifyer = "gekkoset__";
+        public static string internalPivotRows = "Rows";
+        public static string internalPivotCols = "Columns";
+        public static string internalPivotFilters = "Filters";
 
         // ----------------------------------------------------------------
         // GRADIENT

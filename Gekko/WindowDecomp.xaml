@@ -385,8 +385,6 @@
                         </TextBox>
                     </Grid>
                 </Border>
-
-
             </StackPanel>
 
             <DockPanel LastChildFill="True">
@@ -406,25 +404,14 @@
                                 <DockPanel>
                                     <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />                                                                        
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <!--<Button Padding="1,1,1,1"  Opacity="0.4" Click="ListButton1_Click" Content="Add" Visibility="{Binding Pivot_ButtonVisible1}"></Button>-->
-                                    <ComboBox Padding="1,1,1,1"  Opacity="0.5" Visibility="{Binding Pivot_ButtonVisible1}" ItemsSource="{Binding Pivot_Sublist}">
-                                        <!--<ComboBoxItem>a1</ComboBoxItem>
-                                        <ComboBoxItem>a2</ComboBoxItem>
-                                        <ComboBoxItem>a3</ComboBoxItem>-->                                        
-                                    </ComboBox>
-                                    <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
+                                    <ComboBox Padding="1,1,1,1"  Opacity="0.5" Visibility="{Binding Pivot_ButtonVisible1}" ItemsSource="{Binding Pivot_Sublist}" SelectionChanged="ComboBox_SelectionChanged" />
+                                        <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
                                     </StackPanel>
                                 </DockPanel>
                             </DataTemplate>
-                        </ListView.ItemTemplate>
-                        
+                        </ListView.ItemTemplate>                        
                     </ListView>
-
-                
-
             </DockPanel>
-
-
         </StackPanel>
     </DockPanel>
 

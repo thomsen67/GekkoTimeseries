@@ -32,10 +32,10 @@ namespace Gekko
         string pivot_buttonVisible2;
         string pivot_fontWeight;
         WindowDecomp.TaskType pivot_taskType;        
-        ObservableCollection<string> pivot_sublist = new ObservableCollection<string>() { "s1", "s2" };
+        ObservableCollection<string> pivot_sublist;
 
         //pivot
-        public Task(string text, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i)
+        public Task(string text, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist)
         {
             this.pivot_text = text;
             this.pivot_buttonVisible1 = visible1;
@@ -44,6 +44,7 @@ namespace Gekko
             this.lineColor = "LightGray";
             this.pivot_taskType = taskType;
             this.i = i;
+            this.pivot_sublist = sublist;
         }
 
         //non-pivot

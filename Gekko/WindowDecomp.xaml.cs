@@ -88,25 +88,79 @@ namespace Gekko
             }
         }
 
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count < 1) return;  //why does this happen?????????
+            ComboBox cmb = sender as ComboBox;
+            string chosen = e.AddedItems[0] as string;
+            Task task = cmb.DataContext as Task;
+            string text = task.Pivot_Text;
+            int ii = -12345;
+            TaskType type = TaskType.None;
+            if (text == Globals.internalPivotRows)
+            {
+                type = TaskType.Rows;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].Pivot_Text == Globals.internalPivotCols)
+                    {
+                        ii = i;
+                    }
+                }
+            }
+            else if (text == Globals.internalPivotCols)
+            {
+                type = TaskType.Cols;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].Pivot_Text == Globals.internalPivotFilters)
+                    {
+                        ii = i;
+                    }
+                }
+            }
+            else if (text == Globals.internalPivotFilters)
+            {
+                type = TaskType.Filters;
+                ii = list.Count - 1;
+            }
+            else
+            {
+                MessageBox.Show("*** ERROR");
+            }
+            List<Task> m = new List<Task>();
+            int i2 = 0;
+            foreach (Task t in list)
+            {
+                if (t.I == ii)
+                {
+                    m.Add(new Task(chosen, "Collapsed", "Visible", "Normal", type, i2++, null));
+                }                
+                m.Add(t);
+                t.I = i2++;                
+            }
+            list.Clear(); foreach (Task t in m) list.Add(t);
+        }
+
         private void RefreshList()
         {
             list.Clear();
             int i = 0;
-            list.Add(new Task("Rows", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+            list.Add(new Task(Globals.internalPivotRows, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>() { "a1", "a2" }));
             foreach (string s in this.decompOptions2.rows)
             {
-                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Rows, i++));
+                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null));
             }
-            list.Add(new Task("Columns", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+            list.Add(new Task(Globals.internalPivotCols, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>() { "b1", "b2" }));
             foreach (string s in this.decompOptions2.cols)
             {
-                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Cols, i++));
+                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null));
             }
-            list.Add(new Task("Filters", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+            list.Add(new Task(Globals.internalPivotFilters, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>() { "c1", "c2" }));
 
-            list.Add(new Task("t", "Collapsed", "Visible", "Normal", TaskType.Filters, i++));
+            list.Add(new Task("t", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null));
 
-            list.Add(new Task("", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++));
+            list.Add(new Task("", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null));
 
             for (int i2 = 0; i2 < list.Count; i2++)
             {
