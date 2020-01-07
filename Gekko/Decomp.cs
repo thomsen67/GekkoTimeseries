@@ -917,7 +917,7 @@ namespace Gekko
         {
             FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
 
-            if (decompOptions2.rows.Count == 0 || decompOptions2.cols.Count == 0)
+            if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             {
                 decompOptions2.rows = new List<string>() { "vars", "lags" };
                 decompOptions2.cols = new List<string>() { "time" };
@@ -944,15 +944,14 @@ namespace Gekko
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
 
-            string internalColumnIdentifyer = "gekkopivot__";
-            string internalSetIdentifyer = "gekkoset__";
-            string col_t = internalColumnIdentifyer + "t";
-            string col_variable = internalColumnIdentifyer + "variable";
-            string col_lag = internalColumnIdentifyer + "lag";
-            string col_universe = internalColumnIdentifyer + "universe";
-            string col_value = internalColumnIdentifyer + "value";
+            
+            string col_t = Globals.internalColumnIdentifyer + "t";
+            string col_variable = Globals.internalColumnIdentifyer + "variable";
+            string col_lag = Globals.internalColumnIdentifyer + "lag";
+            string col_universe = Globals.internalColumnIdentifyer + "universe";
+            string col_value = Globals.internalColumnIdentifyer + "value";
             string gekko_null = "null";
-            string col_equ = internalColumnIdentifyer + "equ";
+            string col_equ = Globals.internalColumnIdentifyer + "equ";
 
             frame.AddColName(col_t);
             frame.AddColName(col_value);
@@ -1017,7 +1016,7 @@ namespace Gekko
                                     {
                                         for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
                                         {
-                                            domains[ii] = ConvertSetname(internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
+                                            domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
                                         }
                                     }
                                 }
@@ -1096,15 +1095,15 @@ namespace Gekko
 
             if (Globals.decompUnitPivot)
             {
-                WriteDatatableTocsv(frame, internalColumnIdentifyer, internalSetIdentifyer);
+                WriteDatatableTocsv(frame);
             }
             
             Table tab = new Table();
             tab.writeOnce = true;
 
-            DecomposeReplaceVars(decompOptions2.rows, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(decompOptions2.cols, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(filters, internalSetIdentifyer, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.rows, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(filters, col_t, col_variable, col_lag, col_universe, col_equ);
 
             List<string> rownames = new List<string>();
             List<string> colnames = new List<string>();
@@ -1181,7 +1180,7 @@ namespace Gekko
             return tab;
         }
 
-        private static void DecomposeReplaceVars(List<string> vars, string internalSetIdentifyer, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
+        private static void DecomposeReplaceVars(List<string> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)
             {
@@ -1190,11 +1189,11 @@ namespace Gekko
                 if (G.Equal(vars[i], "lags")) vars[i] = col_lag;
                 if (G.Equal(vars[i], "#uni")) vars[i] = col_universe;
                 if (G.Equal(vars[i], "equ")) vars[i] = col_equ;
-                if (vars[i].StartsWith("#")) vars[i] = internalSetIdentifyer + vars[i].Substring(1);
+                if (vars[i].StartsWith("#")) vars[i] = Globals.internalSetIdentifyer + vars[i].Substring(1);
             }
         }
 
-        public static void DecomposeReplaceVars(List<FrameFilter> vars, string internalSetIdentifyer, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
+        public static void DecomposeReplaceVars(List<FrameFilter> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)
             {
@@ -1203,7 +1202,7 @@ namespace Gekko
                 if (G.Equal(vars[i].name, "lags")) vars[i].name = col_lag;
                 if (G.Equal(vars[i].name, "#uni")) vars[i].name = col_universe;
                 if (G.Equal(vars[i].name, "equ")) vars[i].name = col_equ;
-                if (vars[i].name.StartsWith("#")) vars[i].name = internalSetIdentifyer + vars[i].name.Substring(1);
+                if (vars[i].name.StartsWith("#")) vars[i].name = Globals.internalSetIdentifyer + vars[i].name.Substring(1);
             }
         }
 
@@ -1234,14 +1233,13 @@ namespace Gekko
             return s1;
         }
 
-        public static void WriteDatatableTocsv(FrameLight dt, string internalColumnIdentifyer, string internalSetIdentifyer)
+        public static void WriteDatatableTocsv(FrameLight dt)
         {
             StringBuilder sb = new StringBuilder();
             List<string> columnNames = new List<string>(dt.colnames);
             for (int i = 0; i < columnNames.Count; i++)
             {
-                columnNames[i] = columnNames[i].Replace(internalColumnIdentifyer, "");
-                columnNames[i] = columnNames[i].Replace(internalSetIdentifyer, "#");
+                columnNames[i] = G.HandleInternalIdentifyer1(columnNames[i]);
                 if (columnNames[i] == "universe") columnNames[i] = "#uni";
             }
             sb.AppendLine(string.Join(";", columnNames));
@@ -1258,6 +1256,8 @@ namespace Gekko
             //File.WriteAllText(@"c:\Thomas\Gekko\regres\Models\Decomp\pivot.csv", sb.ToString());
             File.WriteAllText(Program.options.folder_working + "\\" + "decomp.csv", sb.ToString());
         }
+
+        
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
         {

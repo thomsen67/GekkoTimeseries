@@ -46,14 +46,18 @@ namespace Gekko
     /// </summary>
     public partial class WindowDecomp : Window
     {
-        
-        
-        public enum GekkoTableTypes { 
-            TableContent, Left, Top, UpperLeft, Unknown
-        };
 
-        
-        
+
+        public enum GekkoTableTypes
+        {
+            TableContent, Left, Top, UpperLeft, Unknown
+        }
+
+        public enum TaskType
+        {
+            None, Rows, Cols, Filters, Invisible
+        }
+
         public int frozenRows=0;
         public int frozenCols=0;
         
@@ -87,15 +91,29 @@ namespace Gekko
         private void RefreshList()
         {
             list.Clear();
-            list.Add(new Task("Rows", "Visible", "Collapsed", "Bold", "LightGray"));
-            list.Add(new Task("var", "Collapsed", "Visible", "Normal", "LightGray"));
-            list.Add(new Task("#a", "Collapsed", "Visible", "Normal", "Black"));
-            list.Add(new Task("Columns", "Visible", "Collapsed", "Bold", "LightGray"));
-            list.Add(new Task("t", "Collapsed", "Visible", "Normal", "Black"));
-            list.Add(new Task("Filters", "Visible", "Collapsed", "Bold", "LightGray"));
-            list.Add(new Task("t", "Collapsed", "Visible", "Normal", "Black"));
-            list.Add(new Task("", "Collapsed", "Collapsed", "Normal", "White"));
-        }        
+            int i = 0;
+            list.Add(new Task("Rows", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+            foreach (string s in this.decompOptions2.rows)
+            {
+                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Rows, i++));
+            }
+            list.Add(new Task("Columns", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+            foreach (string s in this.decompOptions2.cols)
+            {
+                list.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Cols, i++));
+            }
+            list.Add(new Task("Filters", "Visible", "Collapsed", "Bold", TaskType.None, i++));
+
+            list.Add(new Task("t", "Collapsed", "Visible", "Normal", TaskType.Filters, i++));
+
+            list.Add(new Task("", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++));
+
+            for (int i2 = 0; i2 < list.Count; i2++)
+            {
+                list[i2].Pivot_Text = list[i2].Pivot_Text.Replace(Globals.internalColumnIdentifyer, "");
+                list[i2].Pivot_Text = list[i2].Pivot_Text.Replace(Globals.internalSetIdentifyer, "#");
+            }
+        }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
         {
@@ -1779,61 +1797,48 @@ namespace Gekko
         private void ListButton1_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            Task task = button.DataContext as Task;
-            if (task.Pivot_Text == "ROWS")
-            {
-                MessageBox.Show("Add new row item");
-            }
-            else if (task.Pivot_Text == "COLS")
-            {
-                MessageBox.Show("Add new col item");
-            }
-            else if (task.Pivot_Text == "FILTER")
-            {
-                MessageBox.Show("Add new filter item");
-            }            
+            Task task = button.DataContext as Task;            
+            MessageBox.Show("Add new row item");            
         }
 
         private void ListButton2_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Delete item");
+            //MessageBox.Show("Delete item");
+            ToggleButton button = sender as ToggleButton;
+            Task task = button.DataContext as Task;
+            string s = G.HandleInternalIdentifyer2(task.Pivot_Text);
+            
+            if (task.Pivot_TaskType == TaskType.Rows)
+            {
+                decompOptions2.rows.Remove(s);
+                RemoveFromObservableCollection(task);
+            }
+            else if (task.Pivot_TaskType == TaskType.Cols)
+            {
+                decompOptions2.cols.Remove(s);
+                RemoveFromObservableCollection(task);
+            }
+            else
+            {
+                MessageBox.Show("*** ERROR: This item cannot be deleted");
+            }            
+            RecalcCellsWithNewType();
+            //decompOptions2
         }
 
-        //private void Sort_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isSort = false;
-        //    if (sort.IsChecked == true) this.decompOptions2.isSort = true;
-        //}
-
-        //private void Pool_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isPool = false;
-        //    if (pool.IsChecked == true) this.decompOptions2.isPool = true;
-        //}
-
-        //private void Subst_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isSubst = false;
-        //    if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
-        //}
-
-        //private void Sort_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isSort = false;
-        //    if (sort.IsChecked == true) this.decompOptions2.isSort = true;
-        //}
-
-        //private void Pool_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isPool = false;
-        //    if (pool.IsChecked == true) this.decompOptions2.isPool = true;
-        //}
-
-        //private void Subst_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    this.decompOptions2.isSubst = false;
-        //    if (subst.IsChecked == true) this.decompOptions2.isSubst = true;
-        //}
+        private void RemoveFromObservableCollection(Task task)
+        {
+            List<Task> m = new List<Task>();
+            int i = 0;
+            foreach (Task t in list)
+            {
+                if (task.I == t.I) continue;
+                m.Add(t);
+                t.I = i++;
+            }
+            list.Clear();
+            foreach (Task t in m) list.Add(t);
+        }
     }
 
     public class GekkoDockPanel2 : DockPanel

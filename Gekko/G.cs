@@ -151,6 +151,20 @@ namespace Gekko
             return double.TryParse(s, NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d);
         }
 
+        public static string HandleInternalIdentifyer1(string s)
+        {
+            s = s.Replace(Globals.internalColumnIdentifyer, "");
+            s = s.Replace(Globals.internalSetIdentifyer, "#");
+            return s;
+        }
+
+        public static string HandleInternalIdentifyer2(string s)
+        {
+            if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);
+            else s = Globals.internalColumnIdentifyer + s;
+            return s;
+        }
+
         public static double ParseIntoDouble(string s, bool reportError)
         {
             double d = double.NaN;

@@ -55,8 +55,11 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;                
         
-        public static bool decompUnitPivot = true;  //can activate xlsx pivot writing        
-                
+        public static bool decompUnitPivot = true;  //can activate xlsx pivot writing   
+
+        public static string internalColumnIdentifyer = "gekkopivot__";
+        public static string internalSetIdentifyer = "gekkoset__";
+
         // ----------------------------------------------------------------
         // GRADIENT
         // ----------------------------------------------------------------

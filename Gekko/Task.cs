@@ -30,15 +30,19 @@ namespace Gekko
         string pivot_buttonVisible1;
         string pivot_buttonVisible2;
         string pivot_fontWeight;
+        WindowDecomp.TaskType pivot_taskType;
+        int i;  //number in collection
 
         //pivot
-        public Task(string text, string visible1, string visible2, string fontWeight, string lineColor)
+        public Task(string text, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i)
         {
             this.pivot_text = text;
             this.pivot_buttonVisible1 = visible1;
             this.pivot_buttonVisible2 = visible2;
             this.pivot_fontWeight = fontWeight;
-            this.lineColor = lineColor;
+            this.lineColor = "LightGray";
+            this.pivot_taskType = taskType;
+            this.i = i;
         }
 
         //non-pivot
@@ -155,9 +159,16 @@ namespace Gekko
             }
         }
 
+        public int I
+        {
+            get { return this.i; }      
+            set { this.i = value; }
+        }
+
         public string Pivot_Text
         {
             get { return this.pivot_text; }
+            set { this.pivot_text = value; }
         }
 
         public string Pivot_ButtonVisible1
@@ -175,6 +186,10 @@ namespace Gekko
             get { return this.pivot_fontWeight; }
         }
 
+        public WindowDecomp.TaskType Pivot_TaskType
+        {
+            get { return this.pivot_taskType; }
+        }
 
         // Create the OnPropertyChanged method to raise the event
         protected void OnPropertyChanged(string name)
