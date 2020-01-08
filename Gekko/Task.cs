@@ -196,6 +196,7 @@ namespace Gekko
         public WindowDecomp.TaskType Pivot_TaskType
         {
             get { return this.pivot_taskType; }
+            set { this.pivot_taskType = value; }
         }
 
         // Create the OnPropertyChanged method to raise the event
