@@ -156,7 +156,7 @@ namespace Gekko
             }
         }
 
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame)
         {
             int perLag = -2;
             string lhsString = "Expression value";
@@ -378,7 +378,7 @@ namespace Gekko
             }
 
             Table table = null;
-            table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2);
+            table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);
 
             if (false)
             {
@@ -913,9 +913,8 @@ namespace Gekko
 
         }
 
-        public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2)
-        {
-            FrameLight frame = new FrameLight();  //light-weight Gekko dataframe
+        public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
+        {            
 
             //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             //{
@@ -943,7 +942,6 @@ namespace Gekko
             //<#universe>: universal set for elements without domain info
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
-
             
             string col_t = Globals.internalColumnIdentifyer + "t";
             string col_variable = Globals.internalColumnIdentifyer + "variable";

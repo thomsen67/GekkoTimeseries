@@ -390,7 +390,10 @@
             <DockPanel LastChildFill="True">
             
                 
-                    <ListView Name="listView"    
+                    <ListView Name="listView"   
+                      MaxWidth="300"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"       
                       ItemContainerStyle="{StaticResource ItemContStyle}"
                       Margin="4,4,0,4"
                       Padding="2"
