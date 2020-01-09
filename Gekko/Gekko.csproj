@@ -375,6 +375,9 @@
     <Compile Include="WindowTets.xaml.cs">
       <DependentUpon>WindowTets.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowTreeViewWithCheckBoxes.xaml.cs">
+      <DependentUpon>WindowTreeViewWithCheckBoxes.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XML_To_TreeView.xaml.cs">
       <DependentUpon>XML_To_TreeView.xaml</DependentUpon>
     </Compile>
@@ -530,6 +533,10 @@
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowTreeViewWithCheckBoxes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XML_To_TreeView.xaml">
       <SubType>Designer</SubType>

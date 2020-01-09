@@ -17467,6 +17467,12 @@ namespace Gekko
                 G.Writeln2(s);
             }
 
+            if (Globals.runningOnTTComputer && text == "c")
+            {
+                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
+                w.ShowDialog();
+            }
+
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
         }

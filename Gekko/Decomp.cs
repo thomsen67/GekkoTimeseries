@@ -201,7 +201,7 @@ namespace Gekko
             if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
             else nnn = 1;  //expression?
 
-            if (true)
+            if (false)
             {
                 DecompPrintDatas(decompDatas);
             }
@@ -914,7 +914,8 @@ namespace Gekko
         }
 
         public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
-        {            
+        {
+            bool ageHierarchy = true;
 
             //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             //{
@@ -957,6 +958,10 @@ namespace Gekko
             frame.AddColName(col_lag);
             frame.AddColName(col_universe);
             frame.AddColName(col_equ);
+            if (ageHierarchy)
+            {
+                frame.AddColName(Globals.internalSetIdentifyer + "a-10-year");
+            }
 
             int superN = decompDatas.Count;
 
@@ -1088,6 +1093,23 @@ namespace Gekko
                         dr.Set(frame, col_value, new CellLight(d));
                         frame.rows.Add(dr);
                     }
+                }
+            }
+
+            if (ageHierarchy)
+            {                
+                foreach (FrameLightRow row in frame.rows)
+                {
+                    CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
+                    string s = c.text;
+                    int i = -12345;
+                    string s2 = "null";
+                    if (int.TryParse(s, out i))
+                    {
+                        int i1 = i / 10;
+                        s2 = (i1 * 10) + ".." + ((i1 + 1) * 10 - 1);
+                    }                       
+                    row.Set(frame, Globals.internalSetIdentifyer + "a-10-year", new CellLight(s2));
                 }
             }
 

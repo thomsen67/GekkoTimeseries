@@ -1,0 +1,68 @@
+﻿<Window 
+  x:Class="Gekko.WindowTreeViewWithCheckBoxes"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="clr-namespace:Gekko"  
+  FontSize="13"
+  Title="TreeView with CheckBoxes"
+  Width="300" Height="300" 
+  WindowStartupLocation="CenterScreen"  
+  >
+    <Window.Resources>
+        <ResourceDictionary>
+            <!-- Load this specific theme because the Aero theme for CheckBox has issues. -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PresentationFramework.Royale;V3.0.0.0;31bf3856ad364e35;component\themes\royale.normalcolor.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+                <Setter Property="IsExpanded" Value="True" />
+                <Setter Property="IsSelected" Value="{Binding IsInitiallySelected, Mode=OneTime}" />
+                <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+                <Setter Property="local:VirtualToggleButton.IsVirtualToggleButton" Value="True" />
+                <Setter Property="local:VirtualToggleButton.IsChecked" Value="{Binding IsChecked}" />
+            </Style>
+
+            <HierarchicalDataTemplate 
+        x:Key="CheckBoxItemTemplate"
+        ItemsSource="{Binding Children, Mode=OneTime}"
+        >
+                <StackPanel Orientation="Horizontal">
+                    <!-- These elements are bound to a FooViewModel object. -->
+                    <CheckBox
+            Focusable="False" 
+            IsChecked="{Binding IsChecked}" 
+            VerticalAlignment="Center"
+            />
+                    <ContentPresenter 
+            Content="{Binding Name, Mode=OneTime}" 
+            Margin="2,0"
+            />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <ObjectDataProvider 
+      MethodName="CreateFoos"
+      ObjectType="{x:Type local:FooViewModel}" />
+    </Window.DataContext>
+
+    <DockPanel>
+        <Button 
+      DockPanel.Dock="Bottom" 
+      Command="Undo"
+      Content="Uncheck All" 
+      HorizontalAlignment="Center"
+      Margin="0,2"
+      Padding="8,0"
+      />
+        <TreeView 
+      x:Name="tree"
+      ItemContainerStyle="{StaticResource TreeViewItemStyle}"
+      ItemsSource="{Binding Mode=OneTime}"
+      ItemTemplate="{StaticResource CheckBoxItemTemplate}"
+      />
+    </DockPanel>
+</Window>
