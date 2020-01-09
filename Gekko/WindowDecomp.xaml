@@ -407,6 +407,7 @@
                                 <DockPanel>
                                     <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />                                                                        
                                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Padding="1,1,1,1"  Opacity="0.5" Click="OnButtonClick">...</Button>
                                     <ComboBox Padding="1,1,1,1"  Opacity="0.5" Visibility="{Binding Pivot_ButtonVisible1}" ItemsSource="{Binding Pivot_Sublist}" SelectionChanged="ComboBox_SelectionChanged" />
                                         <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
                                     </StackPanel>

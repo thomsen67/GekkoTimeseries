@@ -88,6 +88,24 @@ namespace Gekko
 
         public FrameLight frame;
 
+        private void OnButtonClick(object sender, RoutedEventArgs e)
+        {
+            WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
+            w.ShowDialog();
+            System.Windows.Controls.TreeView tree = w.tree;
+            List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
+            FooViewModel model = items[0];
+            Walk(model, 0);
+        }
+
+        public static void Walk(FooViewModel node, int d)
+        {
+            G.Writeln(G.Blanks(2 * d) + node.Name + "   " + node.IsInitiallySelected + " --> " + node.IsChecked);
+            if (node == null) return;
+            if (node.Children == null) return;
+            foreach (var child in node.Children) Walk(child, d + 1);
+        }
+
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count < 1) return;  //why does this happen?????????
