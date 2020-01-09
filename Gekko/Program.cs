@@ -17471,13 +17471,24 @@ namespace Gekko
             {
                 WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
                 w.ShowDialog();
+                System.Windows.Controls.TreeView tree = w.tree;
+                List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
+                FooViewModel model = items[0];
+                DoThing(model, 0);
+
             }
 
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
         }
 
-        
+        public static void DoThing(FooViewModel node, int d)
+        {
+            G.Writeln(G.Blanks(2 * d) + node.Name + "   " + node.IsInitiallySelected + " --> " + node.IsChecked);
+            if (node == null) return;
+            if (node.Children == null) return;
+            foreach (var child in node.Children) DoThing(child, d + 1);
+        }
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
