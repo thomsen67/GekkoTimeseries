@@ -73,7 +73,7 @@ namespace Gekko
 
         public DecompOptions2 decompOptions2 = null;
 
-        public ObservableCollection<Task> globalObservableCollectionOfTasks
+        public ObservableCollection<Task> taskList
         {
             get
             {
@@ -119,9 +119,9 @@ namespace Gekko
             if (text == Globals.internalPivotRows)
             {
                 type = TaskType.Rows;
-                for (int i = 0; i < globalObservableCollectionOfTasks.Count; i++)
+                for (int i = 0; i < taskList.Count; i++)
                 {
-                    if (globalObservableCollectionOfTasks[i].Pivot_Text == Globals.internalPivotCols)
+                    if (taskList[i].Pivot_Text == Globals.internalPivotCols)
                     {
                         ii = i;
                     }
@@ -131,9 +131,9 @@ namespace Gekko
             else if (text == Globals.internalPivotCols)
             {
                 type = TaskType.Cols;
-                for (int i = 0; i < globalObservableCollectionOfTasks.Count; i++)
+                for (int i = 0; i < taskList.Count; i++)
                 {
-                    if (globalObservableCollectionOfTasks[i].Pivot_Text == Globals.internalPivotFilters)
+                    if (taskList[i].Pivot_Text == Globals.internalPivotFilters)
                     {
                         ii = i;
                     }
@@ -143,7 +143,7 @@ namespace Gekko
             else if (text == Globals.internalPivotFilters)
             {
                 type = TaskType.Filters;
-                ii = globalObservableCollectionOfTasks.Count - 1;
+                ii = taskList.Count - 1;
             }
             else
             {
@@ -151,19 +151,19 @@ namespace Gekko
             }
             List<Task> m = new List<Task>();
             int i2 = 0;
-            foreach (Task t in globalObservableCollectionOfTasks)
+            foreach (Task t in taskList)
             {
                 if (t.I == ii)
                 {
                     //string x = "Collapsed";
                     //if (type == TaskType.Filters) x = "Visible";
-                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null));
+                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, decompOptions2));
                 }                
                 m.Add(t);
                 t.I = i2++;                
             }
-            globalObservableCollectionOfTasks.Clear(); foreach (Task t in m) globalObservableCollectionOfTasks.Add(t);
-            PutGuiPivotSelectionIntoDecompOptions(globalObservableCollectionOfTasks);
+            taskList.Clear(); foreach (Task t in m) taskList.Add(t);
+            PutGuiPivotSelectionIntoDecompOptions(taskList);
             RecalcCellsWithNewType();
         }
 
@@ -172,30 +172,28 @@ namespace Gekko
             List<string> fields = frame.colnames;
             for (int i3 = 0; i3 < fields.Count; i3++) fields[i3] = G.HandleInternalIdentifyer1(fields[i3]);
 
-            globalObservableCollectionOfTasks.Clear();
+            taskList.Clear();
             int i = 0;
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
             foreach (string s in this.decompOptions2.rows)
             {
-                globalObservableCollectionOfTasks.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null));
+                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, decompOptions2));
             }
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
             foreach (string s in this.decompOptions2.cols)
             {
-                globalObservableCollectionOfTasks.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null));
+                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, decompOptions2));
             }
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
 
-            globalObservableCollectionOfTasks.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null));
+            taskList.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
 
-            globalObservableCollectionOfTasks.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null));
+            taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, decompOptions2));
 
-            for (int i2 = 0; i2 < globalObservableCollectionOfTasks.Count; i2++)
+            for (int i2 = 0; i2 < taskList.Count; i2++)
             {                
-                globalObservableCollectionOfTasks[i2].Pivot_Text = G.HandleInternalIdentifyer1(globalObservableCollectionOfTasks[i2].Pivot_Text);
+                taskList[i2].Pivot_Text = G.HandleInternalIdentifyer1(taskList[i2].Pivot_Text);
             }
-
-
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -206,10 +204,10 @@ namespace Gekko
             // type parameter matches the ListViewDragManager's type
             // parameter (in this case, both have a type parameter of Task).
 
-            globalObservableCollectionOfTasks = new ObservableCollection<Task>();
+            taskList = new ObservableCollection<Task>();
             RefreshList();
 
-            this.listView.ItemsSource = globalObservableCollectionOfTasks;
+            this.listView.ItemsSource = taskList;
 
             // This is all that you need to do, in order to use the ListViewDragManager.
             this.dragMgr = new ListViewDragDropManager<Task>(this.listView);
@@ -1973,7 +1971,7 @@ namespace Gekko
             {
                 MessageBox.Show("*** ERROR: This item cannot be deleted");
             }
-            PutGuiPivotSelectionIntoDecompOptions(globalObservableCollectionOfTasks);
+            PutGuiPivotSelectionIntoDecompOptions(taskList);
             RecalcCellsWithNewType();            
         }
 
@@ -1981,14 +1979,14 @@ namespace Gekko
         {
             List<Task> m = new List<Task>();
             int i = 0;
-            foreach (Task t in globalObservableCollectionOfTasks)
+            foreach (Task t in taskList)
             {
                 if (task.I == t.I) continue;
                 m.Add(t);
                 t.I = i++;
             }
-            globalObservableCollectionOfTasks.Clear();
-            foreach (Task t in m) globalObservableCollectionOfTasks.Add(t);
+            taskList.Clear();
+            foreach (Task t in m) taskList.Add(t);
         }
     }
 
