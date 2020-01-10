@@ -164,35 +164,59 @@ namespace Gekko
             }
             taskList.Clear(); foreach (Task t in m) taskList.Add(t);
             PutGuiPivotSelectionIntoDecompOptions(taskList);
+            RefreshList2();
             RecalcCellsWithNewType();
         }
 
         private void RefreshList()
         {
-            List<string> fields = frame.colnames;
-            for (int i3 = 0; i3 < fields.Count; i3++) fields[i3] = G.HandleInternalIdentifyer1(fields[i3]);
+            RefreshList2();
 
             taskList.Clear();
             int i = 0;
-            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
             foreach (string s in this.decompOptions2.rows)
             {
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, decompOptions2));
             }
-            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
             foreach (string s in this.decompOptions2.cols)
             {
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, decompOptions2));
             }
-            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields), decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
 
             taskList.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
 
             taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, decompOptions2));
 
             for (int i2 = 0; i2 < taskList.Count; i2++)
-            {                
+            {
                 taskList[i2].Pivot_Text = G.HandleInternalIdentifyer1(taskList[i2].Pivot_Text);
+            }            
+        }
+
+        private void RefreshList2()
+        {
+            List<string> fields = frame.colnames;
+            decompOptions2.all.Clear();
+            foreach (string s in frame.colnames)
+            {
+                string s2 = G.HandleInternalIdentifyer1(s);
+                if (s2 == "value") continue;  //no need to show value, cannot be selected anyway. Could implement count at some point.
+                decompOptions2.all.Add(s2);
+            }
+            decompOptions2.free.Clear();
+
+            foreach (string s in decompOptions2.all)
+            {
+                if (this.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
+                {
+                }
+                else
+                {
+                    decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
+                }
             }
         }
 
@@ -305,6 +329,7 @@ namespace Gekko
                 t.I = i2++;
             }            
             PutGuiPivotSelectionIntoDecompOptions(e.ItemsSource);
+            RefreshList2();
             RecalcCellsWithNewType();            
         }
 
@@ -1972,6 +1997,7 @@ namespace Gekko
                 MessageBox.Show("*** ERROR: This item cannot be deleted");
             }
             PutGuiPivotSelectionIntoDecompOptions(taskList);
+            RefreshList2();
             RecalcCellsWithNewType();            
         }
 
@@ -2075,7 +2101,12 @@ namespace Gekko
         public List<List<string>> group = new List<List<string>>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
-        
+
+
+        // --------- used for dropdown lists in gui
+        public List<string> all = new List<string>();
+        public ObservableCollection<string> free = new ObservableCollection<string>();
+
 
         public DecompOptions2 Clone()
         {

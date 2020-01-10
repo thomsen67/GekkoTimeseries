@@ -181,24 +181,11 @@ namespace Gekko
         {
             get
             {
-                ObservableCollection<string> temp = new ObservableCollection<string>();
-                if (this.pivot_sublist != null)
-                {
-                    foreach (string s in this.pivot_sublist)
-                    {
-                        if (this.decompOptions2.rows.Contains(s) || this.decompOptions2.cols.Contains(s))
-                        {
-                        }
-                        else
-                        {
-                            temp.Add(s);
-                        }
-                    }
-                }
-                return temp;
+                return this.pivot_sublist;
             }
             set
             {
+                this.pivot_sublist = value;
                 OnPropertyChanged("Pivot_Sublist");
             }
         }
