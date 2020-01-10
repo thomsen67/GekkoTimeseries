@@ -4111,9 +4111,10 @@ namespace Gekko.Parser.Gek
                             string naked = "false";
                             if (node.Text == "ASTNAKEDLIST") naked = "true";
                             bool isFor = false;
-                            ASTNode parent = node?.Parent?.Parent?.Parent?.Parent;
-                            if (parent != null && parent.Text == "ASTFOR")
+
+                            if (node?.Parent?.Text == "ASTPLACEHOLDER" && node?.Parent?.Parent?.Text == "ASTFORTYPE2" && node?.Parent?.Parent?.Parent?.Text == "ASTPLACEHOLDER" && node?.Parent?.Parent?.Parent?.Parent?.Text == "ASTFOR")
                             {
+                                //We need to check parents carefully, otherwise the INDEX in stuff like FOR string %i = ... ; INDEX * to #m; END; will think it is a FOR-statement list (where '#' is not allowed)
                                 isFor = true;
                             }
 
