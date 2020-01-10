@@ -30,21 +30,24 @@ namespace Gekko
         string pivot_text;
         string pivot_buttonVisible1;
         string pivot_buttonVisible2;
+        string pivot_buttonVisible3;
         string pivot_fontWeight;
         WindowDecomp.TaskType pivot_taskType;        
         ObservableCollection<string> pivot_sublist;
 
         //pivot
-        public Task(string text, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist)
+        public Task(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist)
         {
             this.pivot_text = text;
             this.pivot_buttonVisible1 = visible1;
             this.pivot_buttonVisible2 = visible2;
+            this.pivot_buttonVisible3 = visible3;
             this.pivot_fontWeight = fontWeight;
             this.lineColor = "LightGray";
             this.pivot_taskType = taskType;
             this.i = i;
             this.pivot_sublist = sublist;
+            this.rowColor = rowColor;
         }
 
         //non-pivot
@@ -82,7 +85,11 @@ namespace Gekko
         public bool Finished
         {
             get { return this.finished; }
-            set { this.finished = value; }
+            set
+            {
+                this.finished = value;
+                OnPropertyChanged("Finished");
+            }
         }
 
         public string AliasName
@@ -91,8 +98,7 @@ namespace Gekko
             set 
             { 
                 this.aliasName = value;
-                OnPropertyChanged("AliasName");
-                
+                OnPropertyChanged("AliasName");                
                 //System.ComponentModel.notify em.RaisePropertyChanged("AliasName");
             }
         }
@@ -186,6 +192,16 @@ namespace Gekko
         public string Pivot_ButtonVisible2
         {
             get { return this.pivot_buttonVisible2; }
+        }
+
+        public string Pivot_ButtonVisible3
+        {
+            get { return this.pivot_buttonVisible3; }
+            set
+            {
+                this.pivot_buttonVisible3 = value;
+                OnPropertyChanged(Pivot_ButtonVisible3);
+            }
         }
 
         public string Pivot_FontWeight

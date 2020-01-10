@@ -62,6 +62,7 @@ namespace Gekko
         public static string internalPivotRows = "Rows";
         public static string internalPivotCols = "Columns";
         public static string internalPivotFilters = "Filters";
+        public static string internalPivotRowColor = "#fff8f8f8"; //same as this: #982354320985
 
         // ----------------------------------------------------------------
         // GRADIENT
@@ -910,7 +911,7 @@ namespace Gekko
         public static System.Windows.Media.Color GrayExcelLine = System.Windows.Media.Color.FromArgb(255, 208, 215, 229); //as in Excel
         public static System.Windows.Media.Color GrayExcelSelect = System.Windows.Media.Color.FromArgb(255, 234, 236, 245);  //as in Excel
         public static System.Drawing.Color LightBlueWord = System.Drawing.Color.FromArgb(74, 130, 189);  //as auto-tables in Word                
-        public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //seems ok        
+        public static System.Windows.Media.Color LightGray = System.Windows.Media.Color.FromArgb(255, 248, 248, 248);  //same as this: #982354320985
         public static System.Windows.Media.Color MediumBlueDecompLink = System.Windows.Media.Color.FromArgb(255, 6, 69, 173); //same color as wikipedia links //see also http://www.colorhexa.com/3232bb                
         public static System.Windows.Media.Color LightRed = System.Windows.Media.Color.FromArgb(255, 255, 247, 237);
 

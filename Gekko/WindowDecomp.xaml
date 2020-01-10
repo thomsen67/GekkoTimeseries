@@ -7,34 +7,34 @@
     <Window.Resources>
 
         <!-- Our style for the ToggleButton -->
-            <Style x:Key="ToggleButtonWindowClose" TargetType="{x:Type ToggleButton}">
-                <!-- Here you can set the initial properties for the control -->
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Style x:Key="ToggleButtonWindowClose" TargetType="{x:Type ToggleButton}">
+            <!-- Here you can set the initial properties for the control -->
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
 
-                <!-- Template needs to completely re-writing the standard control -->
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ToggleButton}">
-                            <Grid>
-                                <!-- Then responsible for the content. In our case it did not really need, because it is set Path -->
-                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                <!-- Our Path. Shows a cross -->
-                                <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove" Width="13" Height="11" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="LightGray"  Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
-                            </Grid>
+            <!-- Template needs to completely re-writing the standard control -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid>
+                            <!-- Then responsible for the content. In our case it did not really need, because it is set Path -->
+                            <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <!-- Our Path. Shows a cross -->
+                            <Path x:Name="CloseWindow" SnapsToDevicePixels="True" ToolTip="Remove" Width="13" Height="11" Margin="0,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center" Stretch="Fill" Fill="LightGray"  Data="F1 M 26.9166,22.1667L 37.9999,33.25L 49.0832,22.1668L 53.8332,26.9168L 42.7499,38L 53.8332,49.0834L 49.0833,53.8334L 37.9999,42.75L 26.9166,53.8334L 22.1666,49.0833L 33.25,38L 22.1667,26.9167L 26.9166,22.1667 Z " />
+                        </Grid>
 
-                            <!-- Trigger fires on the property -->
-                            <ControlTemplate.Triggers>
-                                <!-- Here change the color when the mouse cursor -->
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="CloseWindow" Property="Fill" Value="#C10000" />
-                                </Trigger>                                
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        
+                        <!-- Trigger fires on the property -->
+                        <ControlTemplate.Triggers>
+                            <!-- Here change the color when the mouse cursor -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="CloseWindow" Property="Fill" Value="#C10000" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="ItemContStyle" TargetType="ListViewItem">
             <Style.Resources>
                 <LinearGradientBrush x:Key="MouseOverBrush" StartPoint="0.5, -0.1" EndPoint="0.5, 0.2">
@@ -48,7 +48,9 @@
             <Setter Property="Height" Value="28" />
             <Setter Property="MinWidth" Value="100" />
             <Setter Property="Padding" Value="4,3,4,2" />
-            
+            <Setter Property="Background" Value="{Binding RowColor}" />
+            <!--<Setter Property="Focusable" Value="False" />-->
+
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <!-- The default control template for ListViewItem has a Border
            which contains the item's content. -->
@@ -62,7 +64,7 @@
                 </Trigger>
                 <Trigger Property="jas:ListViewItemDragState.IsUnderDragCursor" Value="True">
                     <Setter Property="Background" Value="{StaticResource MouseOverBrush}" />
-                </Trigger>
+                </Trigger>                
             </Style.Triggers>
         </Style>
     </Window.Resources>
@@ -387,34 +389,37 @@
                 </Border>
             </StackPanel>
 
-            <DockPanel LastChildFill="True">
-            
-                
-                    <ListView Name="listView"   
+            <DockPanel LastChildFill="True">                
+                <ListView Name="listView"   
                       MaxWidth="300"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"       
                       ItemContainerStyle="{StaticResource ItemContStyle}"
                       Margin="4,4,0,4"
-                      Padding="2"
+                      Padding="0"
                       SelectionMode="Single"
                       FontFamily="Calibri" 
                       FontSize="13"       
                       Height="Auto" SelectionChanged="listView_SelectionChanged">
 
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />                                                                        
-                                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Padding="1,1,1,1"  Opacity="0.5" Click="OnButtonClick">...</Button>
-                                    <ComboBox Padding="1,1,1,1"  Opacity="0.5" Visibility="{Binding Pivot_ButtonVisible1}" ItemsSource="{Binding Pivot_Sublist}" SelectionChanged="ComboBox_SelectionChanged" />
-                                        <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
+                    <ListView.ItemTemplate>
+                        <DataTemplate>                            
+                            <DockPanel>
+                                <TextBlock Text="{Binding Pivot_Text}" FontWeight="{Binding Pivot_FontWeight}" HorizontalAlignment="Left" />                                
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <StackPanel Width="25" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding Pivot_ButtonVisible3}" >
+                                        <Button Width="20"  Height="20" Padding="1,1,1,1"  Opacity="0.3"  Click="OnButtonClick" HorizontalAlignment="Right">...</Button>
                                     </StackPanel>
-                                </DockPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>                        
-                    </ListView>
+                                    <StackPanel Width="25" Orientation="Horizontal" HorizontalAlignment="Right" Visibility="{Binding Pivot_ButtonVisible1}" >
+                                        <!--<TextBlock Text="Add " FontSize="13" HorizontalAlignment="Right"  Opacity="0.3" />-->
+                                        <ComboBox Width="20" Height="20" Padding="1,1,1,1"  Opacity="0.5" ItemsSource="{Binding Pivot_Sublist}" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" />
+                                    </StackPanel>
+                                    <ToggleButton Click="ListButton2_Click" Style="{StaticResource ToggleButtonWindowClose}" Visibility="{Binding Pivot_ButtonVisible2}" />
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </DockPanel>
         </StackPanel>
     </DockPanel>

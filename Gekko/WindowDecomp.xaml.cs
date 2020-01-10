@@ -108,6 +108,7 @@ namespace Gekko
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //add new item from list (in rows, cols or filters), the name is 'chosen'
             if (e.AddedItems.Count < 1) return;  //why does this happen?????????
             ComboBox cmb = sender as ComboBox;
             string chosen = e.AddedItems[0] as string;
@@ -154,7 +155,9 @@ namespace Gekko
             {
                 if (t.I == ii)
                 {
-                    m.Add(new Task(chosen, "Collapsed", "Visible", "Normal", type, i2++, null));
+                    //string x = "Collapsed";
+                    //if (type == TaskType.Filters) x = "Visible";
+                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null));
                 }                
                 m.Add(t);
                 t.I = i2++;                
@@ -171,21 +174,21 @@ namespace Gekko
 
             globalObservableCollectionOfTasks.Clear();
             int i = 0;
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotRows, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
             foreach (string s in this.decompOptions2.rows)
             {
-                globalObservableCollectionOfTasks.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null));
+                globalObservableCollectionOfTasks.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null));
             }
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotCols, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
             foreach (string s in this.decompOptions2.cols)
             {
-                globalObservableCollectionOfTasks.Add(new Task(s, "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null));
+                globalObservableCollectionOfTasks.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null));
             }
-            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotFilters, "Visible", "Collapsed", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
+            globalObservableCollectionOfTasks.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, new ObservableCollection<string>(fields)));
 
-            globalObservableCollectionOfTasks.Add(new Task("t", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null));
+            globalObservableCollectionOfTasks.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null));
 
-            globalObservableCollectionOfTasks.Add(new Task("", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null));
+            globalObservableCollectionOfTasks.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null));
 
             for (int i2 = 0; i2 < globalObservableCollectionOfTasks.Count; i2++)
             {                
@@ -215,7 +218,7 @@ namespace Gekko
             this.dragMgr.DragAdornerOpacity = 0.5d;  //so that e.g. "Work" can still be seen underneath
             this.listView.ItemContainerStyle = this.FindResource("ItemContStyle") as Style;
 
-            this.dragMgr.ProcessDrop += dragMgr_ProcessDrop;
+            this.dragMgr.ProcessDrop += DragAndDrop;
 
             // Hook up events on both ListViews to that we can drag-drop
             // items between them.
@@ -255,7 +258,7 @@ namespace Gekko
         }
 
 
-        void dragMgr_ProcessDrop(object sender, ProcessDropEventArgs<Task> e)
+        void DragAndDrop(object sender, ProcessDropEventArgs<Task> e)
         {
             e.Effects = DragDropEffects.Move;
             //e.ItemsSource.Move(e.OldIndex, e.NewIndex);
@@ -291,12 +294,14 @@ namespace Gekko
                     if (type == TaskType.None) throw new GekkoException(); //check can be removed at some point
 
                     e.ItemsSource[e.OldIndex].Pivot_TaskType = type;
+                    if(type!=TaskType.Filters) e.ItemsSource[e.OldIndex].Pivot_ButtonVisible3 = "Collapse";                    
                     m.Add(e.ItemsSource[e.OldIndex]);
                 }
                 m.Add(e.ItemsSource[i]);
             }
             int i2 = 0;
-            e.ItemsSource.Clear(); foreach (Task t in m)
+            e.ItemsSource.Clear();
+            foreach (Task t in m)
             {
                 e.ItemsSource.Add(t); //must clear and reuse existing object, a new object will fail to update
                 t.I = i2++;
