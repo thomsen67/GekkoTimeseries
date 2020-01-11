@@ -178,13 +178,13 @@ namespace Gekko
             }
             taskList.Clear(); foreach (Task t in m) taskList.Add(t);
             PutGuiPivotSelectionIntoDecompOptions(taskList);
-            RefreshList2();
+            RefreshList2(type);
             RecalcCellsWithNewType();
         }
 
         private void RefreshList()
         {
-            RefreshList2();
+            RefreshList2(TaskType.None);
 
             taskList.Clear();
             int i = 0;
@@ -198,7 +198,7 @@ namespace Gekko
             {
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, decompOptions2));
             }
-            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, decompOptions2));
 
             taskList.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
 
@@ -210,7 +210,7 @@ namespace Gekko
             }            
         }
 
-        private void RefreshList2()
+        private void RefreshList2(TaskType taskType)
         {
             List<string> fields = frame.colnames;
             decompOptions2.all.Clear();
@@ -220,8 +220,21 @@ namespace Gekko
                 if (s2 == "value") continue;  //no need to show value, cannot be selected anyway. Could implement count at some point.
                 decompOptions2.all.Add(s2);
             }
-            decompOptions2.free.Clear();
 
+
+            decompOptions2.freeFilter.Clear();
+            foreach (string s in decompOptions2.all)
+            {
+                if (s == "t")
+                {
+                }
+                else
+                {
+                    decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
+                }
+            }
+
+            decompOptions2.free.Clear();
             foreach (string s in decompOptions2.all)
             {
                 if (this.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
@@ -232,6 +245,36 @@ namespace Gekko
                     decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
                 }
             }
+
+
+            //if (taskType == TaskType.Filters)
+            //{
+            //    decompOptions2.freeFilter.Clear();
+            //    foreach (string s in decompOptions2.all)
+            //    {
+            //        if (s != "t")
+            //        {
+            //        }
+            //        else
+            //        {
+            //            decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
+            //        }
+            //    }
+            //}
+            //else
+            //{
+            //    decompOptions2.free.Clear();
+            //    foreach (string s in decompOptions2.all)
+            //    {
+            //        if (this.decompOptions2.rows.Contains(G.HandleInternalIdentifyer2(s)) || this.decompOptions2.cols.Contains(G.HandleInternalIdentifyer2(s)))
+            //        {
+            //        }
+            //        else
+            //        {
+            //            decompOptions2.free.Add(G.HandleInternalIdentifyer1(s));
+            //        }
+            //    }
+            //}
         }
 
         void WindowDecomp_Loaded(object sender, RoutedEventArgs e)
@@ -296,17 +339,16 @@ namespace Gekko
 
         void DragAndDrop(object sender, ProcessDropEventArgs<Task> e)
         {
-            e.Effects = DragDropEffects.Move;
-            //e.ItemsSource.Move(e.OldIndex, e.NewIndex);
+            e.Effects = DragDropEffects.Move;            
             List<Task> m = new List<Task>();
-            
+            TaskType type = TaskType.None;
+
             for (int i = 0; i < e.ItemsSource.Count; i++)
             {
                 if (i == e.OldIndex) continue;
 
                 if (i == e.NewIndex)
-                {
-                    TaskType type = TaskType.None;
+                {                   
 
                     for (int ii = i - 1; ii >= 0; ii--)
                     {
@@ -343,7 +385,7 @@ namespace Gekko
                 t.I = i2++;
             }            
             PutGuiPivotSelectionIntoDecompOptions(e.ItemsSource);
-            RefreshList2();
+            RefreshList2(type);
             RecalcCellsWithNewType();            
         }
 
@@ -2007,11 +2049,11 @@ namespace Gekko
                 RemoveFromObservableCollection(task);
             }
             else
-            {
-                MessageBox.Show("*** ERROR: This item cannot be deleted");
+            {                
+                RemoveFromObservableCollection(task);
             }
             PutGuiPivotSelectionIntoDecompOptions(taskList);
-            RefreshList2();
+            RefreshList2(task.Pivot_TaskType);
             RecalcCellsWithNewType();            
         }
 
@@ -2118,6 +2160,7 @@ namespace Gekko
         // --------- used for dropdown lists in gui
         public List<string> all = new List<string>();
         public ObservableCollection<string> free = new ObservableCollection<string>();
+        public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
 
 
         public DecompOptions2 Clone()
