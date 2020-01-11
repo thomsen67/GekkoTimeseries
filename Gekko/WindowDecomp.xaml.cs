@@ -89,13 +89,27 @@ namespace Gekko
         public FrameLight frame;
 
         private void OnButtonClick(object sender, RoutedEventArgs e)
-        {
-            WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
-            w.ShowDialog();
-            System.Windows.Controls.TreeView tree = w.tree;
-            List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
-            FooViewModel model = items[0];
-            Walk(model, 0);
+        {            
+            Button cmb = sender as Button;            
+            Task task = cmb.DataContext as Task;
+
+            bool isTree = false;
+            if (task.Pivot_TaskType == TaskType.Filters) isTree = true;            
+
+            if (isTree)
+            {
+                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
+                w.ShowDialog();
+                System.Windows.Controls.TreeView tree = w.tree;
+                List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
+                FooViewModel model = items[0];
+                Walk(model, 0);
+            }
+            else
+            {
+                WindowDecompSortEtc w = new WindowDecompSortEtc();
+                w.ShowDialog();                
+            }
         }
 
         public static void Walk(FooViewModel node, int d)
@@ -2101,8 +2115,6 @@ namespace Gekko
         public List<List<string>> group = new List<List<string>>();
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
-
-
         // --------- used for dropdown lists in gui
         public List<string> all = new List<string>();
         public ObservableCollection<string> free = new ObservableCollection<string>();

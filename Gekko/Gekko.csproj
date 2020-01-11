@@ -357,6 +357,9 @@
     <Compile Include="Window2.xaml.cs">
       <DependentUpon>Window2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowDecompSortEtc.xaml.cs">
+      <DependentUpon>WindowDecompSortEtc.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowIntellisense.xaml.cs">
       <DependentUpon>WindowIntellisense.xaml</DependentUpon>
     </Compile>
@@ -497,6 +500,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="WindowDecompSortEtc.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="WindowIntellisense.xaml">
       <SubType>Designer</SubType>

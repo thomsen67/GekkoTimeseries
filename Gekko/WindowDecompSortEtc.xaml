@@ -1,0 +1,11 @@
+﻿<Window x:Class="Gekko.WindowDecompSortEtc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Gekko"
+             mc:Ignorable="d" Height="116.775" Width="391.333">
+    <Canvas Margin="0,0,400.333,352.667">
+        <TextBox Text="Here, sorting etc. of the rows/colums will be possible" Canvas.Left="57" Canvas.Top="33"/>
+    </Canvas>
+</Window>
