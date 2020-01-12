@@ -6,13 +6,17 @@ using System.Windows.Controls.Primitives;
 using System;
 
 namespace Gekko
-{
+{    
+
     public partial class WindowTreeViewWithCheckBoxes : Window
     {
-        public WindowTreeViewWithCheckBoxes()
-        {
-            InitializeComponent();
+        public DecompOptions2 decompOptions2;
 
+        public WindowTreeViewWithCheckBoxes(DecompOptions2 decompOptions2)
+        {
+            this.decompOptions2 = decompOptions2;
+            InitializeComponent();
+                        
             FooViewModel root = this.tree.Items[0] as FooViewModel;
 
             base.CommandBindings.Add(
@@ -299,51 +303,59 @@ namespace Gekko
     {
         #region Data
 
+        public DecompOptions2 decompOptions2;
         bool? _isChecked = false;
         FooViewModel _parent;
 
         #endregion // Data
-
-        #region CreateFoos
-
+        
         public static List<FooViewModel> CreateFoos()
         {
-            FooViewModel root = new FooViewModel("Weapons")
-            {
-                IsInitiallySelected = true,
-                Children =
-                {
-                    new FooViewModel("Blades")
-                    {
-                        Children =
-                        {
-                            new FooViewModel("Dagger"),
-                            new FooViewModel("Machete"),
-                            new FooViewModel("Sword"),
-                        }
-                    },
-                    new FooViewModel("Vehicles")
-                    {
-                        Children =
-                        {
-                            new FooViewModel("Apache Helicopter"),
-                            new FooViewModel("Submarine"),
-                            new FooViewModel("Tank"),
-                        }
-                    },
-                    new FooViewModel("Guns")
-                    {
-                        Children =
-                        {
-                            new FooViewModel("AK 47"),
-                            new FooViewModel("Beretta"),
-                            new FooViewModel("Uzi"),
-                        }
-                    },
-                }
-            };
 
-            root.Initialize();
+            FooViewModel root = new FooViewModel("Weapons");
+            //FooViewModel root = new FooViewModel("Weapons")
+            //{                
+            //    IsInitiallySelected = true,  //pivotfix
+            //    Children =
+            //    {
+            //        new FooViewModel("Blades")
+            //        {
+            //            Children =
+            //            {
+            //                new FooViewModel("Dagger"),
+            //                new FooViewModel("Machete"),
+            //                new FooViewModel("Sword"),
+            //            }
+            //        },
+            //        new FooViewModel("Vehicles")
+            //        {
+            //            Children =
+            //            {
+            //                new FooViewModel("Apache Helicopter"),
+            //                new FooViewModel("Submarine"),
+            //                new FooViewModel("Tank"),
+            //            }
+            //        },
+            //        new FooViewModel("Guns")
+            //        {
+            //            Children =
+            //            {
+            //                new FooViewModel("AK 47"),
+            //                new FooViewModel("Beretta"),
+            //                new FooViewModel("Uzi"),
+            //            }
+            //        },
+            //    }
+            //};
+
+            if (false)
+            {
+                root.IsInitiallySelected = true;
+                root.Children = new List<FooViewModel>();
+                root.Children.Add(new FooViewModel("Blades"));
+            }
+
+            root.Initialize(true);            
             return new List<FooViewModel> { root };
         }
 
@@ -353,16 +365,23 @@ namespace Gekko
             this.Children = new List<FooViewModel>();
         }
 
-        void Initialize()
+        void Initialize(bool first)
         {
+            if (first)
+            {
+                this.IsInitiallySelected = true;
+                this.Children = new List<FooViewModel>();
+                this.Children.Add(new FooViewModel("Blades"));
+            }
+
+            //pivotfix
+
             foreach (FooViewModel child in this.Children)
             {
                 child._parent = this;
-                child.Initialize();
+                child.Initialize(false);
             }
-        }
-
-        #endregion // CreateFoos
+        }        
 
         #region Properties
 

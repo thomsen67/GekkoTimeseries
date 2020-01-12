@@ -108,6 +108,7 @@ namespace Gekko
 
                 foreach (List<IVariable> liv in o.where)
                 {
+                    //pivotfix 
                     //'a' in #i
                     string x1 = O.ConvertToString(liv[0]);
                     List<string> x2 = O.Restrict(liv[1] as List, false, true, false, false);
@@ -923,7 +924,7 @@ namespace Gekko
             //    decompOptions2.cols = new List<string>() { "time" };
             //}
 
-            List<FrameFilter> filters = new List<FrameFilter>();
+            decompOptions2.filters = new List<FrameFilter>();
             if (decompOptions2.where != null)
             {
                 foreach (List<string> filter in decompOptions2.where)
@@ -932,7 +933,7 @@ namespace Gekko
                     filter1.active = true;
                     filter1.name = filter[filter.Count - 1];
                     filter1.selected = filter.GetRange(0, filter.Count - 1);
-                    filters.Add(filter1);
+                    decompOptions2.filters.Add(filter1);
                 }
             }
 
@@ -1123,7 +1124,7 @@ namespace Gekko
 
             DecomposeReplaceVars(decompOptions2.rows, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
-            DecomposeReplaceVars(filters, col_t, col_variable, col_lag, col_universe, col_equ);
+            DecomposeReplaceVars(decompOptions2.filters, col_t, col_variable, col_lag, col_universe, col_equ);
 
             List<string> rownames = new List<string>();
             List<string> colnames = new List<string>();
@@ -1131,16 +1132,19 @@ namespace Gekko
             foreach (FrameLightRow row in frame.rows)
             {
                 bool skip = false;
-                foreach (FrameFilter filter in filters)
+                foreach (FrameFilter filter in decompOptions2.filters)
                 {
                     CellLight c = row.Get(frame, filter.name);
-                    if (c.type != ECellLightType.String) throw new GekkoException();
+                    if (c.type != ECellLightType.String && c.type != ECellLightType.None) throw new GekkoException();
                     string ss = c.text;
-                    if (!filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
+                    if (c.type == ECellLightType.None || !filter.selected.Contains(ss, StringComparer.OrdinalIgnoreCase))
                     {
+                        //not part of the filter, is ignored
+                        //if the row has a null value regarding the filter, the row is also ignored (for instance, if #a must be 18 and the row has #a = null, the row is ignored)
                         skip = true;
                         break;
                     }
+
                 }
                 if (skip) continue;
 

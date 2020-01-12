@@ -98,7 +98,7 @@ namespace Gekko
 
             if (isTree)
             {
-                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
+                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes(decompOptions2);
                 w.ShowDialog();
                 System.Windows.Controls.TreeView tree = w.tree;
                 List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
@@ -199,8 +199,10 @@ namespace Gekko
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, decompOptions2));
             }
             taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, decompOptions2));
-
-            taskList.Add(new Task("t", "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
+            foreach (FrameFilter ff in this.decompOptions2.filters)
+            {
+                taskList.Add(new Task(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
+            }
 
             taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, decompOptions2));
 
@@ -221,14 +223,22 @@ namespace Gekko
                 decompOptions2.all.Add(s2);
             }
 
-
             decompOptions2.freeFilter.Clear();
+
+            
+
             foreach (string s in decompOptions2.all)
             {
-                if (s == "t")
+                bool isFilter = false;
+                foreach (FrameFilter ff in decompOptions2.filters)
                 {
+                    if (G.Equal(ff.name, G.HandleInternalIdentifyer2(s)))
+                    {
+                        isFilter = true;
+                        break;
+                    }
                 }
-                else
+                if (!isFilter)
                 {
                     decompOptions2.freeFilter.Add(G.HandleInternalIdentifyer1(s));
                 }
@@ -2158,10 +2168,17 @@ namespace Gekko
         public List<string> rows = new List<string>();
         public List<string> cols = new List<string>();
         // --------- used for dropdown lists in gui
+
+        //TODO
+        //TODO
+        //TODO Clone!!!!! ???
+        //TODO
+        //TODO
+
         public List<string> all = new List<string>();
         public ObservableCollection<string> free = new ObservableCollection<string>();
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
-
+        public List<FrameFilter> filters = new List<FrameFilter>();
 
         public DecompOptions2 Clone()
         {
@@ -2173,7 +2190,6 @@ namespace Gekko
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
             d.decompTablesFormat.showErrors = this.decompTablesFormat.showErrors;
 
-
             //d.tp = this.tp;
             d.variable = this.variable;
             d.t1 = this.t1;
@@ -2184,8 +2200,7 @@ namespace Gekko
             d.operatorHelper.guiDecompOperator = this.operatorHelper.guiDecompOperator;
             d.operatorHelper.guiDecompIsShares = this.operatorHelper.guiDecompIsShares;
             d.operatorHelper.guiDecompIsRaw = this.operatorHelper.guiDecompIsRaw;
-            d.operatorHelper.guiDecompIsRef = this.operatorHelper.guiDecompIsRef;
-            
+            d.operatorHelper.guiDecompIsRef = this.operatorHelper.guiDecompIsRef;            
 
             d.modelHash = this.modelHash;
             d.type = this.type;
@@ -2194,9 +2209,6 @@ namespace Gekko
             
             d.dream = this.dream;
 
-            //d.isSort = this.isSort;
-            //d.isSubst = this.isSubst;
-            //d.isPool = this.isPool;
             foreach (string s in this.subst)
             {
                 d.subst.Add(s);
