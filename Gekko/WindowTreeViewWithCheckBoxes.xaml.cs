@@ -16,8 +16,7 @@ namespace Gekko
         {
             this.decompOptions2 = decompOptions2;
             InitializeComponent();
-                        
-            FooViewModel root = this.tree.Items[0] as FooViewModel;
+            FooViewModel root = this.tree.Items[0] as FooViewModel;                       
 
             base.CommandBindings.Add(
                 new CommandBinding(
@@ -310,51 +309,8 @@ namespace Gekko
         #endregion // Data
         
         public static List<FooViewModel> CreateFoos()
-        {
-
-            FooViewModel root = new FooViewModel("Weapons");
-            //FooViewModel root = new FooViewModel("Weapons")
-            //{                
-            //    IsInitiallySelected = true,  //pivotfix
-            //    Children =
-            //    {
-            //        new FooViewModel("Blades")
-            //        {
-            //            Children =
-            //            {
-            //                new FooViewModel("Dagger"),
-            //                new FooViewModel("Machete"),
-            //                new FooViewModel("Sword"),
-            //            }
-            //        },
-            //        new FooViewModel("Vehicles")
-            //        {
-            //            Children =
-            //            {
-            //                new FooViewModel("Apache Helicopter"),
-            //                new FooViewModel("Submarine"),
-            //                new FooViewModel("Tank"),
-            //            }
-            //        },
-            //        new FooViewModel("Guns")
-            //        {
-            //            Children =
-            //            {
-            //                new FooViewModel("AK 47"),
-            //                new FooViewModel("Beretta"),
-            //                new FooViewModel("Uzi"),
-            //            }
-            //        },
-            //    }
-            //};
-
-            if (false)
-            {
-                root.IsInitiallySelected = true;
-                root.Children = new List<FooViewModel>();
-                root.Children.Add(new FooViewModel("Blades"));
-            }
-
+        {            
+            FooViewModel root = new FooViewModel(null);            
             root.Initialize(true);            
             return new List<FooViewModel> { root };
         }
@@ -369,9 +325,17 @@ namespace Gekko
         {
             if (first)
             {
+                this.Name = "gekkoroot";
                 this.IsInitiallySelected = true;
-                this.Children = new List<FooViewModel>();
-                this.Children.Add(new FooViewModel("Blades"));
+
+                //pivotfix
+                //FrameFilter xx = this.decompOptions2.filters[0];
+
+                //this.Children = new List<FooViewModel>();
+                //foreach (string s in xx.selected)
+                //{                    
+                //    this.Children.Add(new FooViewModel(s));
+                //}                
             }
 
             //pivotfix
