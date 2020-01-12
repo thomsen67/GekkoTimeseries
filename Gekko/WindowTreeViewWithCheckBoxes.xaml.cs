@@ -331,14 +331,31 @@ namespace Gekko
                 string name = "#a";
 
                 this.Name = name;
-                this.IsInitiallySelected = true;
+                this.IsInitiallySelected = false;
                 List list = Program.databanks.GetFirst().GetIVariable(name) as List;
-                                
+                
+                GekkoDictionary<string, string> selected2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (FrameFilter task in Globals.decompOptions2.filters)
+                {
+                    if (G.HandleInternalIdentifyer1(task.name) != name) continue;
+                    foreach (string s in task.selected)
+                    {
+                        selected2.Add(s, null);
+                    }
+                }
+
                 this.Children = new List<FooViewModel>();
                 foreach (IVariable iv in list.list)
-                {                    
-                    this.Children.Add(new FooViewModel(iv.ConvertToString()));
-                }                
+                {
+                    FooViewModel fvm = new FooViewModel(iv.ConvertToString());
+                    this.Children.Add(fvm);
+                    if (selected2.ContainsKey(iv.ConvertToString()))
+                    {
+                        //pivotfix
+                        fvm.IsInitiallySelected = true;
+                        fvm.SetIsChecked(true, false, false);
+                    }
+                }
             }            
 
             foreach (FooViewModel child in this.Children)
