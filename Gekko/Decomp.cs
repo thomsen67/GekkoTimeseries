@@ -924,16 +924,19 @@ namespace Gekko
             //    decompOptions2.cols = new List<string>() { "time" };
             //}
 
-            decompOptions2.filters = new List<FrameFilter>();
-            if (decompOptions2.where != null)
+            if (decompOptions2.filters == null)
             {
-                foreach (List<string> filter in decompOptions2.where)
+                decompOptions2.filters = new List<FrameFilter>();
+                if (decompOptions2.where != null)
                 {
-                    FrameFilter filter1 = new FrameFilter();
-                    filter1.active = true;
-                    filter1.name = filter[filter.Count - 1];
-                    filter1.selected = filter.GetRange(0, filter.Count - 1);
-                    decompOptions2.filters.Add(filter1);
+                    foreach (List<string> filter in decompOptions2.where)
+                    {
+                        FrameFilter filter1 = new FrameFilter();
+                        filter1.active = true;
+                        filter1.name = filter[filter.Count - 1];
+                        filter1.selected = filter.GetRange(0, filter.Count - 1);
+                        decompOptions2.filters.Add(filter1);
+                    }
                 }
             }
 

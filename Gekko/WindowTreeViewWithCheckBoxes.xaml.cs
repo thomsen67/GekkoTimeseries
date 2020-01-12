@@ -10,11 +10,13 @@ namespace Gekko
 
     public partial class WindowTreeViewWithCheckBoxes : Window
     {
-        public DecompOptions2 decompOptions2;
+        //public DecompOptions2 decompOptions2;
 
         public WindowTreeViewWithCheckBoxes(DecompOptions2 decompOptions2)
         {
-            this.decompOptions2 = decompOptions2;
+            Globals.decompOptions2 = decompOptions2;  //ugly to use global variable, but the treeView cannot be opened more than 1 at a time anyway.
+
+            //this.decompOptions2 = decompOptions2;
             InitializeComponent();
             FooViewModel root = this.tree.Items[0] as FooViewModel;                       
 
@@ -302,7 +304,7 @@ namespace Gekko
     {
         #region Data
 
-        public DecompOptions2 decompOptions2;
+        //public DecompOptions2 decompOptions2;
         bool? _isChecked = false;
         FooViewModel _parent;
 
@@ -325,20 +327,19 @@ namespace Gekko
         {
             if (first)
             {
-                this.Name = "gekkoroot";
-                this.IsInitiallySelected = true;
-
                 //pivotfix
-                //FrameFilter xx = this.decompOptions2.filters[0];
+                string name = "#a";
 
-                //this.Children = new List<FooViewModel>();
-                //foreach (string s in xx.selected)
-                //{                    
-                //    this.Children.Add(new FooViewModel(s));
-                //}                
-            }
-
-            //pivotfix
+                this.Name = name;
+                this.IsInitiallySelected = true;
+                List list = Program.databanks.GetFirst().GetIVariable(name) as List;
+                                
+                this.Children = new List<FooViewModel>();
+                foreach (IVariable iv in list.list)
+                {                    
+                    this.Children.Add(new FooViewModel(iv.ConvertToString()));
+                }                
+            }            
 
             foreach (FooViewModel child in this.Children)
             {

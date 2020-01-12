@@ -92,7 +92,9 @@ namespace Gekko
         //Using GekkoArg instead of IVariable as function parameters
         //with both false and true: below code is about 12.6 sec in debug mode --> 166.000 per second
         //CODE: function val f(val %x); return %x + 1; end; %y = 0; for(val %i = 1 to 2e6); %y = f(%y); end; prt %y;
-        
+
+        public static DecompOptions2 decompOptions2 = null;
+
         public static bool eliminateConcatenator = true;
 
         public static bool modeIntendedWarning = false;

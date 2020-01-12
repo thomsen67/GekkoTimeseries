@@ -103,7 +103,11 @@ namespace Gekko
                 System.Windows.Controls.TreeView tree = w.tree;
                 List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
                 FooViewModel model = items[0];
-                Walk(model, 0);
+                List<string> selected = new List<string>();
+                Walk(model, selected, 0);
+                //pivotfix
+                FrameFilter ff = decompOptions2.filters[0];
+                ff.selected = selected;
             }
             else
             {
@@ -112,12 +116,20 @@ namespace Gekko
             }
         }
 
-        public static void Walk(FooViewModel node, int d)
+        public static void Walk(FooViewModel node, List<string>selected, int d)
         {
-            G.Writeln(G.Blanks(2 * d) + node.Name + "   " + node.IsInitiallySelected + " --> " + node.IsChecked);
+            //pivotfix
+            //G.Writeln(G.Blanks(2 * d) + node.Name + "   " + node.IsInitiallySelected + " --> " + node.IsChecked);
             if (node == null) return;
-            if (node.Children == null) return;
-            foreach (var child in node.Children) Walk(child, d + 1);
+            if (node.Children == null || node.Children.Count == 0)
+            {
+                if (node.IsChecked == true)
+                {
+                    selected.Add(node.Name);
+                }
+                return;
+            }
+            foreach (var child in node.Children) Walk(child, selected, d + 1);
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2178,7 +2190,7 @@ namespace Gekko
         public List<string> all = new List<string>();
         public ObservableCollection<string> free = new ObservableCollection<string>();
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
-        public List<FrameFilter> filters = new List<FrameFilter>();
+        public List<FrameFilter> filters = null;
 
         public DecompOptions2 Clone()
         {
