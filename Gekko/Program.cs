@@ -4488,6 +4488,8 @@ namespace Gekko
                             if (G.Equal(tokens[j].s, "m"))
                             {
                                 //do nothing, it is a missing value.
+                                counter++;
+                                ts.SetData(gt1.Add(counter), d);
                             }
                             else
                             {
@@ -24237,6 +24239,16 @@ namespace Gekko
                     }
                 }
 
+                if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: No variables to write");
+                    if (!isRecordsFormat)
+                    {
+                        G.Writeln("+++ NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.");
+                    }
+                    throw new GekkoException();
+                }
+
                 if (tStart.IsNull() && tEnd.IsNull())
                 {
                     if (isDefault || G.Equal(o.opt_gbk, "yes") || G.Equal(o.opt_tsd, "yes") || G.Equal(o.opt_gdx, "yes"))
@@ -25887,22 +25899,6 @@ namespace Gekko
             foreach (ToFrom s in vars)
             {
                 IVariable iv = O.GetIVariableFromString(s.s1, O.ECreatePossibilities.NoneReportError, true);
-
-                //if (G.Chop_HasSigil(s.s1)) continue;
-                ////if (G.StartsWithSigil(s.name)) continue;  //ignore % and #
-                ////Databank db = GetBankFromBankNameVersion(s.bank);
-                //Databank db = Program.databanks.GetDatabank(G.Chop_BankPart(s.s1), true);
-                //IVariable iv = null;
-                //string name2 = s.name;
-                //if (s.freq != null && !name2.Contains(Globals.freqIndicator.ToString()))
-                //{
-                //    name2 = name2 + Globals.freqIndicator + s.freq;
-                //}
-                //iv = db.GetIVariableWithAddedFreq(name2);
-                //if (iv == null)
-                //{
-                //    G.Writeln2("*** ERROR: Could not find variable '" + name2 + "' in databank '" + s.bank + "'");
-                //}
                 if (iv.Type() != EVariableType.Series) continue;  //should never happen                
                 Series ts = (Series)iv;
                 if (ts.type != ESeriesType.Normal) continue;
