@@ -112,12 +112,47 @@ namespace Gekko
                 Walk(model, selected, 0);
                 //
 
+                
+
                 List<string> selectedOld = null;
-                foreach (FrameFilter ff in decompOptions2.filters)
+
+                //foreach (FrameFilter ff in decompOptions2.filters)
+                //{
+                //    if (G.Equal(G.HandleInternalIdentifyer1(ff.name), task.Pivot_Text))
+                //    {
+                //        selectedOld = ff.selected;
+                //        bool equal = true;
+                //        foreach (string s in selectedOld)
+                //        {
+                //            if (!selected.Contains(s, StringComparer.OrdinalIgnoreCase))
+                //            {
+                //                equal = false;
+                //                break;
+                //            }
+                //        }
+                //        foreach (string s in selected)
+                //        {
+                //            if (!selectedOld.Contains(s, StringComparer.OrdinalIgnoreCase))
+                //            {
+                //                equal = false;
+                //                break;
+                //            }
+                //        }
+                //        if (equal == false)
+                //        {
+                //            ff.selected = selected;
+                //            RecalcCellsWithNewType();
+                //        }
+                //        break;
+                //    }
+                //}    
+
+                //foreach (FrameFilter ff in decompOptions2.filters)
                 {
-                    if (G.Equal(G.HandleInternalIdentifyer1(ff.name), task.Pivot_Text))
+                    //if (G.Equal(G.HandleInternalIdentifyer1(ff.name), task.Pivot_Text))
                     {
-                        selectedOld = ff.selected;
+
+                        selectedOld = task.pivot_filterSelected;
                         bool equal = true;
                         foreach (string s in selectedOld)
                         {
@@ -137,12 +172,21 @@ namespace Gekko
                         }
                         if (equal == false)
                         {
-                            ff.selected = selected;
+                            task.pivot_filterSelected = selected;  //pivotfix
+
+                            //RefreshList2(TaskType.Filters);
+                            //RefreshList();
+                            //RecalcCellsWithNewType();
+
+
+                            //foreach (Task t in m) taskList.Add(t);
+                            PutGuiPivotSelectionIntoDecompOptions(taskList);                            
                             RecalcCellsWithNewType();
-                        }
-                        break;
+
+
+                        }                        
                     }
-                }                                
+                }
             }
             else
             {
@@ -218,15 +262,27 @@ namespace Gekko
                 {
                     //string x = "Collapsed";
                     //if (type == TaskType.Filters) x = "Visible";
-                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, decompOptions2));
+                    List<string> filters = null;
+                    if (type == TaskType.Filters)
+                    {
+                        filters = GetAllPossibleValuesForListFilter(chosen);
+                        //filters = new List<string>();  //resetting this filter list
+                    }
+                    m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, filters, decompOptions2));
                 }                
                 m.Add(t);
                 t.I = i2++;                
             }
-            taskList.Clear(); foreach (Task t in m) taskList.Add(t);
+            taskList.Clear();
+            foreach (Task t in m) taskList.Add(t);
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(type);
             RecalcCellsWithNewType();
+        }
+
+        public static List<string> GetAllPossibleValuesForListFilter(string name)
+        {
+            return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
         }
 
         private void RefreshList()
@@ -235,23 +291,23 @@ namespace Gekko
 
             taskList.Clear();
             int i = 0;
-            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotRows, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
             foreach (string s in this.decompOptions2.rows)
             {
-                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, decompOptions2));
+                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, null, decompOptions2));
             }
-            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
             foreach (string s in this.decompOptions2.cols)
             {
-                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, decompOptions2));
+                taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, null, decompOptions2));
             }
-            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, decompOptions2));
+            taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, null, decompOptions2));
             foreach (FrameFilter ff in this.decompOptions2.filters)
             {
-                taskList.Add(new Task(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, decompOptions2));
+                taskList.Add(new Task(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, decompOptions2));
             }
 
-            taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, decompOptions2));
+            taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, null, decompOptions2));
 
             for (int i2 = 0; i2 < taskList.Count; i2++)
             {
@@ -481,10 +537,10 @@ namespace Gekko
                 else if (state == 2 && task.Pivot_TaskType == TaskType.Cols) decompOptions2.cols.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
                 else if (state == 3 && task.Pivot_TaskType == TaskType.Filters)
                 {
-                    //FrameFilter ff = new FrameFilter();
-                    //ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);                    
-                    DecompOptions2 d1 = task.decompOptions2;
-                    DecompOptions2 d2 = decompOptions2;
+                    FrameFilter ff = new FrameFilter();
+                    ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);
+                    ff.selected = new List<string>(); foreach (string s in task.pivot_filterSelected) ff.selected.Add(s);
+                    decompOptions2.filters.Add(ff);
                 }
             }
         }

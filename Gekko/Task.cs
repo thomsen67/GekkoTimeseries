@@ -32,14 +32,14 @@ namespace Gekko
         string pivot_buttonVisible2;
         string pivot_buttonVisible3;
         string pivot_fontWeight;
-        WindowDecomp.TaskType pivot_taskType;  
-        
+        WindowDecomp.TaskType pivot_taskType;          
         ObservableCollection<string> pivot_sublist;
+        public List<string> pivot_filterSelected;
         // ----------------------------------------------
         public DecompOptions2 decompOptions2;
 
         //pivot
-        public Task(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist, DecompOptions2 decompOptions2)
+        public Task(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist, List<string> filterSelected, DecompOptions2 decompOptions2)
         {
             this.pivot_text = text;
             this.pivot_buttonVisible1 = visible1;
@@ -51,6 +51,7 @@ namespace Gekko
             this.i = i;
             this.pivot_sublist = sublist;
             this.rowColor = rowColor;
+            this.pivot_filterSelected = filterSelected;
             this.decompOptions2 = decompOptions2;
         }
 
