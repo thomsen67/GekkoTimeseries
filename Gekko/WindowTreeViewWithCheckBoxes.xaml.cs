@@ -347,30 +347,11 @@ namespace Gekko
 
                 this.Children = new List<FooViewModel>();
 
-                if (name == "#a" && list.Count > 10)  //pivotfix
+                if (Globals.isAgeHierarchy && name == "#a" && list.Count > 10)  //pivotfix
                 {
                     SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
                     List<string> m2 = new List<string>();
-
-                    foreach (string s in list)
-                    {
-                        //string s = iv.ConvertToString();
-                        int i = -12345;
-                        if (int.TryParse(s, out i))
-                        {
-                            string s2 = G.GroupBy10(i);
-                            if (!m1.ContainsKey(s2))
-                            {
-                                m1.Add(s2, new List<string>());
-                            }
-                            List<string> m3 = m1[s2];
-                            m3.Add(s);
-                        }
-                        else
-                        {
-                            m2.Add(s);
-                        }
-                    }
+                    WindowDecomp.GetHierarchyAggregateNames(list, m1, m2);
 
                     foreach (KeyValuePair<string, List<string>> kvp in m1)
                     {
@@ -388,6 +369,13 @@ namespace Gekko
                                 child.SetIsChecked(true, true, true);
                             }
                         }
+                    }
+
+                    foreach (string s in m2)  //if some of the elements of #a are not pure integers (for instance "80plus" etc.)
+                    {
+                        FooViewModel fvm = new FooViewModel(s);
+                        this.Children.Add(fvm);
+                        fvm._parent = this;
                     }
                 }
                 else
@@ -412,6 +400,8 @@ namespace Gekko
                 child.Initialize(false);
             }
         }
+
+        
 
         #region Properties
 

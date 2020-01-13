@@ -282,7 +282,49 @@ namespace Gekko
 
         public static List<string> GetAllPossibleValuesForListFilter(string name)
         {
-            return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
+            if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
+            {
+                List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
+                SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
+                List<string> m2 = new List<string>();
+                GetHierarchyAggregateNames(list, m1, m2);
+                List<string> names = new List<string>();
+                foreach (string s in m1.Keys)
+                {
+                    names.Add(s);
+                }
+                foreach (string s in m2)
+                {
+                    names.Add(s);
+                }
+                return names;
+            }
+            else
+            {
+                return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
+            }
+        }
+
+        public static void GetHierarchyAggregateNames(List<string> list, SortedDictionary<string, List<string>> m1, List<string> m2)
+        {
+            foreach (string s in list)
+            {
+                //string s = iv.ConvertToString();
+                int i = -12345;
+                if (int.TryParse(s, out i))
+                {
+                    string s2 = G.GroupBy10(i);
+                    if (!m1.ContainsKey(s2))
+                    {
+                        m1.Add(s2, new List<string>());
+                    }
+                    m1[s2].Add(s);
+                }
+                else
+                {
+                    m2.Add(s);
+                }
+            }
         }
 
         private void RefreshList()

@@ -916,7 +916,7 @@ namespace Gekko
 
         public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
         {
-            bool ageHierarchy = true;
+            bool ageHierarchy = Globals.isAgeHierarchy;
             if (G.IsUnitTesting()) ageHierarchy = false;
 
             //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
@@ -965,7 +965,7 @@ namespace Gekko
             frame.AddColName(col_equ);
             if (ageHierarchy)
             {
-                frame.AddColName(Globals.internalSetIdentifyer + "a-10-year");
+                frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
             }
 
             int superN = decompDatas.Count;
@@ -1113,7 +1113,7 @@ namespace Gekko
                     {
                         s2 = G.GroupBy10(i);
                     }
-                    row.Set(frame, Globals.internalSetIdentifyer + "a-10-year", new CellLight(s2));
+                    row.Set(frame, Globals.internalSetIdentifyer + Globals.ageHierarchyName, new CellLight(s2));
                 }
             }
 

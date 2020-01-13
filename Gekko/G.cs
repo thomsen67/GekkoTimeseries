@@ -162,7 +162,7 @@ namespace Gekko
         {
             string s2;
             int i1 = i / 10;
-            s2 = (i1 * 10) + ".." + ((i1 + 1) * 10 - 1);
+            s2 = (i1 * 10) + Globals.ageHierarchyDivider + ((i1 + 1) * 10 - 1);
             return s2;
         }
 
