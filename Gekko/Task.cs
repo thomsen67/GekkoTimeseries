@@ -36,7 +36,7 @@ namespace Gekko
         
         ObservableCollection<string> pivot_sublist;
         // ----------------------------------------------
-        DecompOptions2 decompOptions2;
+        public DecompOptions2 decompOptions2;
 
         //pivot
         public Task(string text, string rowColor, string visible3, string visible1, string visible2, string fontWeight, WindowDecomp.TaskType taskType, int i, ObservableCollection<string> sublist, DecompOptions2 decompOptions2)

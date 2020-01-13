@@ -450,36 +450,42 @@ namespace Gekko
         {
             decompOptions2.rows.Clear();
             decompOptions2.cols.Clear();
-            //decompOptions2.filters.Clear();
+            decompOptions2.filters.Clear();
             if (collection[0].Pivot_Text != Globals.internalPivotRows) throw new GekkoException();  //check can be removed at some point
             int state = 1;
             for (int i = 0; i < collection.Count; i++)
             {
-                Task t = collection[i];
-                if (i != t.I) throw new GekkoException();  //check can be removed at some point
-                if (t.Pivot_Text == Globals.internalPivotCols)
+                Task task = collection[i];
+                if (i != task.I) throw new GekkoException();  //check can be removed at some point
+                if (task.Pivot_Text == Globals.internalPivotCols)
                 {
                     if (state != 1) throw new GekkoException(); //check can be removed at some point                    
                     state = 2;
                 }
-                if (t.Pivot_Text == Globals.internalPivotFilters)
+                if (task.Pivot_Text == Globals.internalPivotFilters)
                 {
                     if (state != 2) throw new GekkoException(); //check can be removed at some point
                     state = 3;
                 }
-                if (t.Pivot_Text != "")
+                if (task.Pivot_Text != "")
                 {
-                    if (state == 1 && t.Pivot_Text != Globals.internalPivotRows && t.Pivot_TaskType != TaskType.Rows) throw new GekkoException(); //check can be removed at some point
-                    if (state == 2 && t.Pivot_Text != Globals.internalPivotCols && t.Pivot_TaskType != TaskType.Cols) throw new GekkoException(); //check can be removed at some point
-                    if (state == 3 && t.Pivot_Text != Globals.internalPivotFilters && t.Pivot_TaskType != TaskType.Filters) throw new GekkoException(); //check can be removed at some point
+                    if (state == 1 && task.Pivot_Text != Globals.internalPivotRows && task.Pivot_TaskType != TaskType.Rows) throw new GekkoException(); //check can be removed at some point
+                    if (state == 2 && task.Pivot_Text != Globals.internalPivotCols && task.Pivot_TaskType != TaskType.Cols) throw new GekkoException(); //check can be removed at some point
+                    if (state == 3 && task.Pivot_Text != Globals.internalPivotFilters && task.Pivot_TaskType != TaskType.Filters) throw new GekkoException(); //check can be removed at some point
                 }
                 else
                 {
                     //this is the last invisible member of type .Invisible
                 }
-                if (state == 1 && t.Pivot_TaskType == TaskType.Rows) decompOptions2.rows.Add(G.HandleInternalIdentifyer2(t.Pivot_Text));
-                else if (state == 2 && t.Pivot_TaskType == TaskType.Cols) decompOptions2.cols.Add(G.HandleInternalIdentifyer2(t.Pivot_Text));
-                //else if (state == 3 &&  && t.Pivot_TaskType == TaskType.Filters) decompOptions2.filters.Add(G.HandleInternalIdentifyer2(t.Pivot_Text));
+                if (state == 1 && task.Pivot_TaskType == TaskType.Rows) decompOptions2.rows.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
+                else if (state == 2 && task.Pivot_TaskType == TaskType.Cols) decompOptions2.cols.Add(G.HandleInternalIdentifyer2(task.Pivot_Text));
+                else if (state == 3 && task.Pivot_TaskType == TaskType.Filters)
+                {
+                    //FrameFilter ff = new FrameFilter();
+                    //ff.name = G.HandleInternalIdentifyer2(task.Pivot_Text);                    
+                    DecompOptions2 d1 = task.decompOptions2;
+                    DecompOptions2 d2 = decompOptions2;
+                }
             }
         }
 
