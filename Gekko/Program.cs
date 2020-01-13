@@ -4358,6 +4358,8 @@ namespace Gekko
                             if (G.Equal(tokens[j].s, "m"))
                             {
                                 //do nothing, it is a missing value.
+                                counter++;
+                                ts.SetData(gt1.Add(counter), d);
                             }
                             else
                             {
@@ -24051,6 +24053,16 @@ namespace Gekko
                             listFilteredForCurrentFreq.Add(list[0]);                            
                         }
                     }
+                }
+
+                if (listFilteredForCurrentFreq == null || listFilteredForCurrentFreq.Count == 0)
+                {
+                    G.Writeln2("*** ERROR: No variables to write");
+                    if (!isRecordsFormat)
+                    {
+                        G.Writeln("+++ NOTE: Only variables of the current frequency (" + Program.options.freq.ToString() + ") are considered.");
+                    }
+                    throw new GekkoException();
                 }
 
                 if (tStart.IsNull() && tEnd.IsNull())
