@@ -1110,9 +1110,8 @@ namespace Gekko
                     string s2 = "null";
                     if (int.TryParse(s, out i))
                     {
-                        int i1 = i / 10;
-                        s2 = (i1 * 10) + ".." + ((i1 + 1) * 10 - 1);
-                    }                       
+                        s2 = G.GroupBy10(i);
+                    }
                     row.Set(frame, Globals.internalSetIdentifyer + "a-10-year", new CellLight(s2));
                 }
             }
@@ -1206,7 +1205,7 @@ namespace Gekko
 
             return tab;
         }
-
+        
         private static void DecomposeReplaceVars(List<string> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)

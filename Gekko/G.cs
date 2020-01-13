@@ -158,6 +158,14 @@ namespace Gekko
             return s;
         }
 
+        public static string GroupBy10(int i)
+        {
+            string s2;
+            int i1 = i / 10;
+            s2 = (i1 * 10) + ".." + ((i1 + 1) * 10 - 1);
+            return s2;
+        }
+
         public static string HandleInternalIdentifyer2(string s)
         {
             if (s.StartsWith("#")) s = Globals.internalSetIdentifyer + s.Substring(1);

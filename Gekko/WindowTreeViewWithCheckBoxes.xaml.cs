@@ -12,9 +12,8 @@ namespace Gekko
     {
         //public DecompOptions2 decompOptions2;
 
-        public WindowTreeViewWithCheckBoxes(DecompOptions2 decompOptions2)
-        {
-            Globals.decompOptions2 = decompOptions2;  //ugly to use global variable, but the treeView cannot be opened more than 1 at a time anyway.
+        public WindowTreeViewWithCheckBoxes()
+        {           
 
             //this.decompOptions2 = decompOptions2;
             InitializeComponent();
@@ -328,14 +327,14 @@ namespace Gekko
             if (first)
             {
                 //pivotfix
-                string name = "#a";
+                string name = Globals.uglyHack_name;
 
                 this.Name = name;
                 this.IsInitiallySelected = false;
                 List list = Program.databanks.GetFirst().GetIVariable(name) as List;
                 
                 GekkoDictionary<string, string> selected2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (FrameFilter task in Globals.decompOptions2.filters)
+                foreach (FrameFilter task in Globals.uglyHack_decompOptions2.filters)
                 {
                     if (G.HandleInternalIdentifyer1(task.name) != name) continue;
                     foreach (string s in task.selected)
@@ -345,15 +344,62 @@ namespace Gekko
                 }
 
                 this.Children = new List<FooViewModel>();
-                foreach (IVariable iv in list.list)
+
+                if (name == "#a" && list.Count() > 10)  //pivotfix
                 {
-                    FooViewModel fvm = new FooViewModel(iv.ConvertToString());
-                    this.Children.Add(fvm);
-                    if (selected2.ContainsKey(iv.ConvertToString()))
+                    SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
+                    List<string> m2 = new List<string>();
+
+                    foreach (IVariable iv in list.list)
                     {
-                        //pivotfix
-                        fvm.IsInitiallySelected = true;
-                        fvm.SetIsChecked(true, false, false);
+                        string s = iv.ConvertToString();
+                        int i = -12345;
+                        if (int.TryParse(s, out i))
+                        {
+                            string s2 = G.GroupBy10(i);
+                            if (!m1.ContainsKey(s2))
+                            {
+                                m1.Add(s2, new List<string>());
+                            }
+                            List<string> m3 = m1[s2];
+                            m3.Add(s);                            
+                        }
+                        else
+                        {
+                            m2.Add(s);
+                        }
+                    }
+
+                    foreach (KeyValuePair<string, List<string>> kvp in m1)
+                    {
+                        FooViewModel fvm = new FooViewModel(kvp.Key);
+                        this.Children.Add(fvm);
+                        fvm._parent = this;
+                        foreach (string s in kvp.Value)
+                        {
+                            FooViewModel child = new FooViewModel(s);
+                            fvm.Children.Add(child);
+                            child._parent = fvm;                            
+                            if (selected2.ContainsKey(s))
+                            {                             
+                                //child.IsInitiallySelected = true;
+                                child.SetIsChecked(true, true, true);
+                            }
+                        }                        
+                    }                    
+                }
+                else
+                {
+                    foreach (IVariable iv in list.list)
+                    {
+                        FooViewModel fvm = new FooViewModel(iv.ConvertToString());
+                        this.Children.Add(fvm);
+                        fvm._parent = this;
+                        if (selected2.ContainsKey(iv.ConvertToString()))
+                        {                            
+                            fvm.IsInitiallySelected = true;
+                            fvm.SetIsChecked(true, true, true);
+                        }
                     }
                 }
             }            

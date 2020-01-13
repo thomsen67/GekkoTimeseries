@@ -34,7 +34,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
+using System.Linq;
 
 
 namespace Gekko
@@ -98,16 +98,51 @@ namespace Gekko
 
             if (isTree)
             {
-                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes(decompOptions2);
+                Globals.uglyHack_decompOptions2 = decompOptions2;  //ugly hack to use global variable, but the treeView cannot be opened more than 1 at a time anyway.
+                Globals.uglyHack_name = task.Pivot_Text;
+                WindowTreeViewWithCheckBoxes w = new WindowTreeViewWithCheckBoxes();
                 w.ShowDialog();
+                Globals.uglyHack_decompOptions2 = null;
+                Globals.uglyHack_name = null;
+
                 System.Windows.Controls.TreeView tree = w.tree;
                 List<FooViewModel> items = tree.ItemsSource as List<FooViewModel>;
                 FooViewModel model = items[0];
                 List<string> selected = new List<string>();
                 Walk(model, selected, 0);
-                //pivotfix
-                FrameFilter ff = decompOptions2.filters[0];
-                ff.selected = selected;
+                //
+
+                List<string> selectedOld = null;
+                foreach (FrameFilter ff in decompOptions2.filters)
+                {
+                    if (G.Equal(G.HandleInternalIdentifyer1(ff.name), task.Pivot_Text))
+                    {
+                        selectedOld = ff.selected;
+                        bool equal = true;
+                        foreach (string s in selectedOld)
+                        {
+                            if (!selected.Contains(s, StringComparer.OrdinalIgnoreCase))
+                            {
+                                equal = false;
+                                break;
+                            }
+                        }
+                        foreach (string s in selected)
+                        {
+                            if (!selectedOld.Contains(s, StringComparer.OrdinalIgnoreCase))
+                            {
+                                equal = false;
+                                break;
+                            }
+                        }
+                        if (equal == false)
+                        {
+                            ff.selected = selected;
+                            RecalcCellsWithNewType();
+                        }
+                        break;
+                    }
+                }                                
             }
             else
             {
