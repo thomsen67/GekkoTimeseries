@@ -917,6 +917,7 @@ namespace Gekko
         public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
         {
             bool ageHierarchy = true;
+            if (G.IsUnitTesting()) ageHierarchy = false;
 
             //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
             //{
