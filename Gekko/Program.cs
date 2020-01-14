@@ -44379,7 +44379,7 @@ namespace Gekko
             return this.storage[i];
         }
 
-        private static int FindColumn(FrameLight frame, string colname)
+        public static int FindColumn(FrameLight frame, string colname)
         {            
             int j = -12345;
             for (int i = 0; i < frame.colnames.Count; i++)

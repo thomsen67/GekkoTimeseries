@@ -333,7 +333,7 @@ namespace Gekko
                 this.IsInitiallySelected = false;
 
                 //List list = Program.databanks.GetFirst().GetIVariable(name) as List;
-                List<string> list = WindowDecomp.GetAllPossibleValuesForListFilter(name);
+                List<string> list = WindowDecomp.GetAllPossibleValuesForListFilter(name, Globals.uglyHack_decompOptions2);
 
                 GekkoDictionary<string, string> selected2 = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (FrameFilter task in Globals.uglyHack_decompOptions2.filters)

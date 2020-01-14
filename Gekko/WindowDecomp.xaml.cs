@@ -265,8 +265,7 @@ namespace Gekko
                     List<string> filters = null;
                     if (type == TaskType.Filters)
                     {
-                        filters = GetAllPossibleValuesForListFilter(chosen);
-                        //filters = new List<string>();  //resetting this filter list
+                        filters = GetAllPossibleValuesForListFilter(chosen, decompOptions2);  //we need to set the chosen values to all values (so the filter has no effect to begin with)
                     }
                     m.Add(new Task(chosen, "Transparent", "Visible", "Collapsed", "Visible", "Normal", type, i2++, null, filters, decompOptions2));
                 }                
@@ -280,13 +279,15 @@ namespace Gekko
             RecalcCellsWithNewType();
         }
 
-        public static List<string> GetAllPossibleValuesForListFilter(string name)
+        public static List<string> GetAllPossibleValuesForListFilter(string name, DecompOptions2 decompOptions2)
         {
             //TODO TODO TODO
             //TODO TODO TODO
             //TODO TODO TODO do this when looping all the rows in the dataframe, instead of looking for variables externally
             //TODO TODO TODO
             //TODO TODO TODO
+
+            List<GekkoDictionary<string, string>> xx = decompOptions2.freeValues;
 
             if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
             {
@@ -380,9 +381,7 @@ namespace Gekko
                 decompOptions2.all.Add(s2);
             }
 
-            decompOptions2.freeFilter.Clear();
-
-            
+            decompOptions2.freeFilter.Clear();            
 
             foreach (string s in decompOptions2.all)
             {
@@ -2340,6 +2339,7 @@ namespace Gekko
 
         public List<string> all = new List<string>();
         public ObservableCollection<string> free = new ObservableCollection<string>();
+        public List<GekkoDictionary<string, string>> freeValues = null;
         public ObservableCollection<string> freeFilter = new ObservableCollection<string>();
         public List<FrameFilter> filters = null;
 

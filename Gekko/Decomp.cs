@@ -1133,8 +1133,34 @@ namespace Gekko
             List<string> rownames = new List<string>();
             List<string> colnames = new List<string>();
             GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+
+            //get the free values start
+            bool getFreeValues = false;
+            if (decompOptions2.freeValues == null)
+            {
+                decompOptions2.freeValues = new List<GekkoDictionary<string, string>>();
+                getFreeValues = true;
+            }
+            int valueI = FrameLightRow.FindColumn(frame, G.HandleInternalIdentifyer2("value"));
+            for (int i = 0; i < frame.colnames.Count; i++)
+            {
+                decompOptions2.freeValues.Add(new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+            }
+            //get the free values end
+
             foreach (FrameLightRow row in frame.rows)
             {
+                if (getFreeValues)
+                {
+                    for (int i = 0; i < frame.colnames.Count; i++)
+                    {
+                        if (i == valueI) continue;
+                        string s = row.storage[i].text;
+                        if (s == null) s = "null";
+                        if (!decompOptions2.freeValues[i].ContainsKey(s)) decompOptions2.freeValues[i].Add(s, null);
+                    }
+                }
+
                 bool skip = false;
                 foreach (FrameFilter filter in decompOptions2.filters)
                 {
