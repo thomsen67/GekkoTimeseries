@@ -282,6 +282,12 @@ namespace Gekko
 
         public static List<string> GetAllPossibleValuesForListFilter(string name)
         {
+            //TODO TODO TODO
+            //TODO TODO TODO
+            //TODO TODO TODO do this when looping all the rows in the dataframe, instead of looking for variables externally
+            //TODO TODO TODO
+            //TODO TODO TODO
+
             if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
             {
                 List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));

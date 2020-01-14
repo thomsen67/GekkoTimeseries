@@ -9029,7 +9029,7 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2012");
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + ",null,[0]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + " | null | [0]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, reduce * 4d, 0.0001);
@@ -9042,7 +9042,7 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1,null,[0]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1 | null | [0]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, -reduce * 3.66d, 0.0001);
@@ -9055,7 +9055,7 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1,null,[+1]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1 | null | [+1]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.2d * 1.0000d, 0.0001);
@@ -9068,7 +9068,7 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2,null,[-1]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g2 | null | [-1]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, -reduce * 0.8d * 1.0000d, 0.0001);
@@ -9081,7 +9081,7 @@ namespace UnitTests
                     }
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i,null,[0]");
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "i | null | [0]");
                     if (j != 2)
                     {
                         Assert.AreEqual(table.Get(i, 2).number, reduce * 1.0000d, 0.0001);
@@ -9096,7 +9096,7 @@ namespace UnitTests
                     i++;
                     if (j != 2)
                     {
-                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,c,[0]");
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v | c | [0]");
                         Assert.AreEqual(table.Get(i, 2).number, 0d, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, 0d, 0.0001);
                     }
@@ -9104,7 +9104,7 @@ namespace UnitTests
                     i++;
                     if (j != 2)
                     {
-                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v,y,[0]");
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v | y | [0]");
                         Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);
                     }
@@ -9112,7 +9112,7 @@ namespace UnitTests
                     i++;
                     if (j != 2)
                     {
-                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "w,null,[0]");
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "w | null | [0]");
                         // is -2? we just omit it here
                     }
                 }
@@ -9382,12 +9382,12 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
                 //TODO: aa___expr names row 2-5
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "c,18,[0]");
-                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "demand,18,[0]");
-                Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "g,18,[0]");
-                Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "supply,18,[0]");
-                Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "y,18,[0]");
-                Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "y,19,[+1]");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "c | 18 | [0]");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "demand | 18 | [0]");
+                Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "g | 18 | [0]");
+                Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "supply | 18 | [0]");
+                Assert.AreEqual(table.Get(10, 1).CellText.TextData[0], "y | 18 | [0]");
+                Assert.AreEqual(table.Get(11, 1).CellText.TextData[0], "y | 19 | [+1]");
                 Assert.AreEqual(table.Get(2, 3).number, 0.0000d, 0.0001);
                 Assert.AreEqual(table.Get(3, 3).number, 0.0000d, 0.0001);
                 Assert.AreEqual(table.Get(4, 3).number, 0.0000d, 0.0001);

@@ -909,7 +909,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.CA("new ScalarString(`[`)");
 
-                            if (Globals.fixConcat)
+                            if (Globals.concatPointer)
                             {
                                 for (int i = 0; i < node.ChildrenCount(); i++)
                                 {
@@ -917,22 +917,10 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A(".Concat(null, ").A(node[i][j].Code).A(")");
                                     }
-                                    if (i < node.ChildrenCount() - 1) node.Code.A(".Concat(null, new ScalarString(`,`))");
+                                    if (i < node.ChildrenCount() - 1) node.Code.A(".Concat(null, new ScalarString(`, `))");  //a blank here, for prettier output and also suits keys in DECOMP dictionary etc.
                                 }
                                 node.Code.A(".Concat(null, new ScalarString(`]`))");
-                            }
-                            else
-                            {
-                                for (int i = 0; i < node.ChildrenCount(); i++)
-                                {
-                                    for (int j = 0; j < node[i].ChildrenCount(); j++)
-                                    {
-                                        node.Code.A(".Add(null, ").A(node[i][j].Code).A(")");
-                                    }
-                                    if (i < node.ChildrenCount() - 1) node.Code.A(".Add(null, new ScalarString(`,`))");
-                                }
-                                node.Code.A(".Add(null, new ScalarString(`]`))");
-                            }
+                            }                            
                         }
                         break;
                     //case "ASTL1":
@@ -963,14 +951,10 @@ namespace Gekko.Parser.Gek
                                         if (!isFirst)
                                         {
                                             ss1 = null;
-                                            if (Globals.fixConcat)
+                                            if (Globals.concatPointer)
                                             {
                                                 ss1 = ".Concat(null, ";
-                                            }
-                                            else
-                                            {
-                                                ss1 = ".Add(null, ";
-                                            }
+                                            }                                            
                                             ss2 = ")";
                                         }
                                         s += ss1 + node[i][j].Code.ToString() + ss2;
@@ -4421,14 +4405,10 @@ namespace Gekko.Parser.Gek
                                         //bank indicator  
                                         string bankNameCs = null;
                                         bankNameCs = node[0][0].Code.ToString();
-                                        if (Globals.fixConcat)
+                                        if (Globals.concatPointer)
                                         {
                                             nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(" + Globals.smpl + ", O.scalarStringColon)" + ".Concat(" + Globals.smpl + ", " + node[1].Code + ")";
-                                        }
-                                        else
-                                        {
-                                            nameAndBankCode = "(" + bankNameCs + ")" + ".Add(" + Globals.smpl + ", O.scalarStringColon)" + ".Add(" + Globals.smpl + ", " + node[1].Code + ")";
-                                        }
+                                        }                                        
                                     }
                                     lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
                                                                         
@@ -4541,26 +4521,20 @@ namespace Gekko.Parser.Gek
                                 if (s2)
                                 {
                                     //%a!q, does not make sense...
-                                    if (Globals.fixConcat)
+                                    if (Globals.concatPointer)
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
-                                    else
-                                    {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Add(" + Globals.smpl + ", O.scalarStringTilde)").A(".Add(" + Globals.smpl + ", " + node[2][0].Code + ")");
-                                    }
+                                    
                                 }
                                 else
                                 {
                                     //%a
-                                    if (Globals.fixConcat)
+                                    if (Globals.concatPointer)
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")");
                                     }
-                                    else
-                                    {
-                                        node.Code.A("(" + node[0][0].Code + ")").A(".Add(" + Globals.smpl + ", " + node[1][0].Code + ")");
-                                    }
+                                    
                                 }                         
                             }
                             else
@@ -4568,15 +4542,10 @@ namespace Gekko.Parser.Gek
                                 if (s2)
                                 {
                                     //a!q
-                                    if (Globals.fixConcat)
+                                    if (Globals.concatPointer)
                                     {
                                         node.Code.A("(" + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
-                                    }
-
-                                    else
-                                    {
-                                        node.Code.A("(" + node[1][0].Code + ")").A(".Add(" + Globals.smpl + ", O.scalarStringTilde)").A(".Add(" + Globals.smpl + ", " + node[2][0].Code + ")");
-                                    }
+                                    }                                    
                                 }
                                 else
                                 {
@@ -4600,14 +4569,10 @@ namespace Gekko.Parser.Gek
                                     }
                                     else
                                     {
-                                        if (Globals.fixConcat)
+                                        if (Globals.concatPointer)
                                         {
                                             node.Code.A(".Concat(" + Globals.smpl + ", " + child.Code + ")");
-                                        }
-                                        else
-                                        {                                            
-                                            node.Code.A(".Add(" + Globals.smpl + ", " + child.Code + ")");
-                                        }
+                                        }                                        
                                     }
                                     counter++;
                                 }

@@ -1113,6 +1113,7 @@ namespace Gekko
                     {
                         s2 = G.GroupBy10(i);
                     }
+                    //set a new column with aggregated ages
                     row.Set(frame, Globals.internalSetIdentifyer + Globals.ageHierarchyName, new CellLight(s2));
                 }
             }
@@ -1183,8 +1184,16 @@ namespace Gekko
                     agg[key] += d;
                 }
             }
+
             rownames.Sort(StringComparer.OrdinalIgnoreCase);
+            List<string> rownames2 = new List<string>();
+            foreach (var rowname in rownames.OrderBy(x => x, new G.SemiNumericComparer())) rownames2.Add(rowname);
+            rownames = rownames2;
+
             colnames.Sort(StringComparer.OrdinalIgnoreCase);
+            List<string> colnames2 = new List<string>();
+            foreach (var colname in colnames.OrderBy(x => x, new G.SemiNumericComparer())) colnames2.Add(colname);
+            colnames = colnames2;
 
             for (int i = 0; i < rownames.Count; i++)
             {

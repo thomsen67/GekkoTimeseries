@@ -645,12 +645,12 @@ namespace Gekko
         public static string expressionText = null;
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
         public static List<Func<GekkoSmpl, IVariable>> expressions = null;  //used for x[#i] kind of equations
-                
+
         //public static List<string> freeIndexedListsDecomp = null;
 
-        public static bool fixALag = true;
+        public static bool concatPointer = true;
 
-        public static bool fixConcat = true;
+        public static bool fixALag = true;
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';
