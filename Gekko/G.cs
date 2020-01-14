@@ -1456,59 +1456,319 @@ namespace Gekko
             return 0;
         }
 
-        public class SemiNumericComparer : IComparer<string>
+        //public class SemiNumericComparer : IComparer<string>
+        //{
+        //    /// <summary>
+        //    /// Method to determine if a string is a number
+        //    /// </summary>
+        //    /// <param name="value">String to test</param>
+        //    /// <returns>True if numeric</returns>
+        //    public static bool IsNumeric(string value)
+        //    {
+        //        return int.TryParse(value, out _);
+        //    }
+
+        //    /// <inheritdoc />
+        //    public int Compare(string s1, string s2)
+        //    {
+        //        const int S1GreaterThanS2 = 1;
+        //        const int S2GreaterThanS1 = -1;
+
+        //        var IsNumeric1 = IsNumeric(s1);
+        //        var IsNumeric2 = IsNumeric(s2);
+
+        //        if (IsNumeric1 && IsNumeric2)
+        //        {
+        //            var i1 = Convert.ToInt32(s1);
+        //            var i2 = Convert.ToInt32(s2);
+
+        //            if (i1 > i2)
+        //            {
+        //                return S1GreaterThanS2;
+        //            }
+
+        //            if (i1 < i2)
+        //            {
+        //                return S2GreaterThanS1;
+        //            }
+
+        //            return 0;
+        //        }
+
+        //        if (IsNumeric1)
+        //        {
+        //            return S2GreaterThanS1;
+        //        }
+
+        //        if (IsNumeric2)
+        //        {
+        //            return S1GreaterThanS2;
+        //        }
+
+        //        return string.Compare(s1, s2, true, CultureInfo.InvariantCulture);
+        //    }
+        //}
+
+        public class NaturalComparer : IComparer<string>, IComparer
         {
-            /// <summary>
-            /// Method to determine if a string is a number
-            /// </summary>
-            /// <param name="value">String to test</param>
-            /// <returns>True if numeric</returns>
-            public static bool IsNumeric(string value)
+
+            private StringParser mParser1;
+            private StringParser mParser2;
+            private NaturalComparerOptions mNaturalComparerOptions;
+
+            private enum TokenType
             {
-                return int.TryParse(value, out _);
+                Nothing,
+                Numerical,
+                String
             }
 
-            /// <inheritdoc />
-            public int Compare(string s1, string s2)
+            private class StringParser
             {
-                const int S1GreaterThanS2 = 1;
-                const int S2GreaterThanS1 = -1;
+                private TokenType mTokenType;
+                private string mStringValue;
+                private decimal mNumericalValue;
+                private int mIdx;
+                private string mSource;
+                private int mLen;
+                private char mCurChar;
+                private NaturalComparer mNaturalComparer;
 
-                var IsNumeric1 = IsNumeric(s1);
-                var IsNumeric2 = IsNumeric(s2);
-
-                if (IsNumeric1 && IsNumeric2)
+                public StringParser(NaturalComparer naturalComparer)
                 {
-                    var i1 = Convert.ToInt32(s1);
-                    var i2 = Convert.ToInt32(s2);
+                    mNaturalComparer = naturalComparer;
+                }
 
-                    if (i1 > i2)
+                public void Init(string source)
+                {
+                    if (source == null)
+                        source = string.Empty;
+                    mSource = source;
+                    mLen = source.Length;
+                    mIdx = -1;
+                    mNumericalValue = 0;
+                    NextChar();
+                    NextToken();
+                }
+
+                public TokenType TokenType
+                {
+                    get { return mTokenType; }
+                }
+
+                public decimal NumericalValue
+                {
+                    get
                     {
-                        return S1GreaterThanS2;
+                        if (mTokenType == NaturalComparer.TokenType.Numerical)
+                        {
+                            return mNumericalValue;
+                        }
+                        else
+                        {
+                            throw new NaturalComparerException("Internal Error: NumericalValue called on a non numerical value.");
+                        }
                     }
+                }
 
-                    if (i1 < i2)
+                public string StringValue
+                {
+                    get { return mStringValue; }
+                }
+
+                public void NextToken()
+                {
+                    do
                     {
-                        return S2GreaterThanS1;
+                        //CharUnicodeInfo.GetUnicodeCategory 
+                        if (mCurChar == '\0')
+                        {
+                            mTokenType = NaturalComparer.TokenType.Nothing;
+                            mStringValue = null;
+                            return;
+                        }
+                        else if (char.IsDigit(mCurChar))
+                        {
+                            ParseNumericalValue();
+                            return;
+                        }
+                        else if (char.IsLetter(mCurChar))
+                        {
+                            ParseString();
+                            return;
+                        }
+                        else
+                        {
+                            //ignore this character and loop some more 
+                            NextChar();
+                        }
                     }
+                    while (true);
+                }
 
+                private void NextChar()
+                {
+                    mIdx += 1;
+                    if (mIdx >= mLen)
+                    {
+                        mCurChar = '\0';
+                    }
+                    else
+                    {
+                        mCurChar = mSource[mIdx];
+                    }
+                }
+
+                private void ParseNumericalValue()
+                {
+                    int start = mIdx;
+                    char NumberDecimalSeparator = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
+                    char NumberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator[0];
+                    do
+                    {
+                        NextChar();
+                        if (mCurChar == NumberDecimalSeparator)
+                        {
+                            // parse digits after the Decimal Separator 
+                            do
+                            {
+                                NextChar();
+                                if (!char.IsDigit(mCurChar) && mCurChar != NumberGroupSeparator)
+                                    break;
+
+                            }
+                            while (true);
+                            break;
+                        }
+                        else
+                        {
+                            if (!char.IsDigit(mCurChar) && mCurChar != NumberGroupSeparator)
+                                break;
+                        }
+                    }
+                    while (true);
+                    mStringValue = mSource.Substring(start, mIdx - start);
+                    if (decimal.TryParse(mStringValue, out mNumericalValue))
+                    {
+                        mTokenType = NaturalComparer.TokenType.Numerical;
+                    }
+                    else
+                    {
+                        // We probably have a too long value 
+                        mTokenType = NaturalComparer.TokenType.String;
+                    }
+                }
+
+                private void ParseString()
+                {
+                    int start = mIdx;
+                    bool roman = (mNaturalComparer.mNaturalComparerOptions & NaturalComparerOptions.RomanNumbers) != 0;
+                    int romanValue = 0;
+                    int lastRoman = int.MaxValue;
+                    int cptLastRoman = 0;
+                    do
+                    {                        
+                        
+                        NextChar();                        
+                        if (!char.IsLetter(mCurChar)) break;
+                    }
+                    while (true);
+                    mStringValue = mSource.Substring(start, mIdx - start);
+                    if (roman)
+                    {
+                        mNumericalValue = romanValue;
+                        mTokenType = NaturalComparer.TokenType.Numerical;
+                    }
+                    else
+                    {
+                        mTokenType = NaturalComparer.TokenType.String;
+                    }
+                }
+
+            }
+
+            public NaturalComparer(NaturalComparerOptions NaturalComparerOptions)
+            {
+                mNaturalComparerOptions = NaturalComparerOptions;
+                mParser1 = new StringParser(this);
+                mParser2 = new StringParser(this);
+            }
+
+            public NaturalComparer()
+               : this(NaturalComparerOptions.Default)
+            {
+            }
+
+            int System.Collections.Generic.IComparer<string>.Compare(string string1, string string2)
+            {
+                mParser1.Init(string1);
+                mParser2.Init(string2);
+                int result;
+                do
+                {
+                    if (mParser1.TokenType == TokenType.Numerical & mParser2.TokenType == TokenType.Numerical)
+                    {
+                        // both string1 and string2 are numerical 
+                        result = decimal.Compare(mParser1.NumericalValue, mParser2.NumericalValue);
+                    }
+                    else
+                    {
+                        result = string.Compare(mParser1.StringValue, mParser2.StringValue);
+                    }
+                    if (result != 0)
+                    {
+                        return result;
+                    }
+                    else
+                    {
+                        mParser1.NextToken();
+                        mParser2.NextToken();
+                    }
+                }
+                while (!(mParser1.TokenType == TokenType.Nothing & mParser2.TokenType == TokenType.Nothing));
+                //identical 
+                return 0;
+            }
+            
+            public int RomanValue(string string1)
+            {
+                mParser1.Init(string1);
+
+                if (mParser1.TokenType == TokenType.Numerical)
+                {
+                    return (int)mParser1.NumericalValue;
+                }
+                else
+                {
                     return 0;
                 }
+            }
 
-                if (IsNumeric1)
-                {
-                    return S2GreaterThanS1;
-                }
-
-                if (IsNumeric2)
-                {
-                    return S1GreaterThanS2;
-                }
-
-                return string.Compare(s1, s2, true, CultureInfo.InvariantCulture);
+            int IComparer.Compare(object x, object y)
+            {
+                return ((System.Collections.Generic.IComparer<string>)this).Compare((string)x, (string)y);
             }
         }
 
+        public class NaturalComparerException : System.Exception
+        {
+
+            public NaturalComparerException(string msg)
+               : base(msg)
+            {
+            }
+        }
+
+        [System.Flags()]
+        public enum NaturalComparerOptions
+        {
+            None,
+            RomanNumbers,
+            //DecimalValues <- we could put this as an option 
+            //IgnoreSpaces <- we could put this as an option 
+            //IgnorePunctuation <- we could put this as an option 
+            Default = None
+        }
 
         public class CustomComparer<T> : IComparer<T>
         {

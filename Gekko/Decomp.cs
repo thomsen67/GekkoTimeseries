@@ -1213,12 +1213,12 @@ namespace Gekko
 
             rownames.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> rownames2 = new List<string>();
-            foreach (var rowname in rownames.OrderBy(x => x, new G.SemiNumericComparer())) rownames2.Add(rowname);
+            foreach (var rowname in rownames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
             rownames = rownames2;
 
             colnames.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> colnames2 = new List<string>();
-            foreach (var colname in colnames.OrderBy(x => x, new G.SemiNumericComparer())) colnames2.Add(colname);
+            foreach (var colname in colnames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
             colnames = colnames2;
 
             for (int i = 0; i < rownames.Count; i++)
