@@ -1156,13 +1156,16 @@ namespace Gekko
                 {
                     s1 = DecompAddText(frame, row, s1, s);
                 }
-                if (s1 != null) s1 = s1.Substring(1);
+                if (s1 != null)
+                    s1 = s1.Substring(Globals.pivotTableDelimiter.Length);
+
                 string s2 = null;
                 foreach (string s in decompOptions2.cols)
                 {
                     s2 = DecompAddText(frame, row, s2, s);
                 }
-                if (s2 != null) s2 = s2.Substring(1);
+                if (s2 != null)
+                    s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
                 string key = s1 + "¤" + s2;
 
                 if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
@@ -1247,11 +1250,11 @@ namespace Gekko
             CellLight c = row.Get(frame, s);
             if (c.type == ECellLightType.None)
             {
-                s1 += "," + "null";
+                s1 += Globals.pivotTableDelimiter + "null";
             }
             else if (c.type == ECellLightType.String)
             {
-                s1 += "," + c.text;
+                s1 += Globals.pivotTableDelimiter + c.text;
             }
             else
             {

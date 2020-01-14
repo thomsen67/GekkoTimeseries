@@ -62,7 +62,7 @@ namespace Gekko
         public static string internalPivotRows = "Rows";
         public static string internalPivotCols = "Columns";
         public static string internalPivotFilters = "Filters";
-        public static string internalPivotRowColor = "#fff8f8f8"; //same as this: #982354320985
+        public static string internalPivotRowColor = "#ffededed"; // "#fff8f8f8"; //same as this: #982354320985
 
         // ----------------------------------------------------------------
         // GRADIENT
@@ -99,6 +99,7 @@ namespace Gekko
         public static string ageHierarchyDivider = "..";
         public static string ageHierarchyName = "a10";
         public static string ageName = "a";
+        public static string pivotTableDelimiter = " | ";
 
         public static bool eliminateConcatenator = true;
 

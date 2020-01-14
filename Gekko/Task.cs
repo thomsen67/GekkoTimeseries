@@ -46,7 +46,7 @@ namespace Gekko
             this.pivot_buttonVisible2 = visible2;
             this.pivot_buttonVisible3 = visible3;
             this.pivot_fontWeight = fontWeight;
-            this.lineColor = "LightGray";
+            this.lineColor = "LightGray";            
             this.pivot_taskType = taskType;
             this.i = i;
             this.pivot_sublist = sublist;

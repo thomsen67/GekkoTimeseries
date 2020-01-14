@@ -338,18 +338,24 @@ namespace Gekko
             {
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Rows, i++, null, null, decompOptions2));
             }
+            //taskList[taskList.Count - 1].LineColor = "Black";
+
             taskList.Add(new Task(Globals.internalPivotCols, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.free, null, decompOptions2));
             foreach (string s in this.decompOptions2.cols)
             {
                 taskList.Add(new Task(s, "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Cols, i++, null, null, decompOptions2));
             }
+            //taskList[taskList.Count - 1].LineColor = "Black";
+
             taskList.Add(new Task(Globals.internalPivotFilters, Globals.internalPivotRowColor, "Collapsed", "Visible", "Hidden", "Bold", TaskType.None, i++, decompOptions2.freeFilter, null, decompOptions2));
             foreach (FrameFilter ff in this.decompOptions2.filters)
             {
                 taskList.Add(new Task(G.HandleInternalIdentifyer1(ff.name), "Transparent", "Visible", "Collapsed", "Visible", "Normal", TaskType.Filters, i++, null, ff.selected, decompOptions2));
             }
+            //taskList[taskList.Count - 1].LineColor = "Black";
 
             taskList.Add(new Task("", "Transparent", "Collapsed", "Collapsed", "Collapsed", "Normal", TaskType.Invisible, i++, null, null, decompOptions2));
+            
 
             for (int i2 = 0; i2 < taskList.Count; i2++)
             {
