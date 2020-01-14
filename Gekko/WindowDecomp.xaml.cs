@@ -290,13 +290,13 @@ namespace Gekko
             List<GekkoDictionary<string, string>> xx = decompOptions2.freeValues;
 
             List<string> list = new List<string>();
-            int i = -1;
-            foreach (GekkoDictionary<string, string> xxx in xx)
-            {
-                i++;
-                if (G.Equal(decompOptions2.free[i], name))
+
+            for (int i = 0; i < xx.Count; i++)
+            {                
+                if (G.Equal(decompOptions2.all[i], name))  //.all has same members as colnames in frame.
                 {
                     foreach (string ss in xx[i].Keys) list.Add(ss);
+                    break;
                 }
             }
 
@@ -389,7 +389,7 @@ namespace Gekko
             foreach (string s in frame.colnames)
             {
                 string s2 = G.HandleInternalIdentifyer1(s);
-                if (s2 == "value") continue;  //no need to show value, cannot be selected anyway. Could implement count at some point.
+                //if (s2 == "value") continue;  //no need to show value, cannot be selected anyway. Could implement count at some point.
                 decompOptions2.all.Add(s2);
             }
 
