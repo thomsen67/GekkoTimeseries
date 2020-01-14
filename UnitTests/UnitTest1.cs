@@ -9029,19 +9029,6 @@ namespace UnitTests
                     Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2012");
                     // -------------------------------------------------------------                
                     i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + " | null | [0]");
-                    if (j != 2)
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, reduce * 4d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -reduce * 6d, 0.0001);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, 2d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -1d, 0.0001);
-                    }
-                    // -------------------------------------------------------------                
-                    i++;
                     Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + "_link1 | null | [0]");
                     if (j != 2)
                     {
@@ -9052,6 +9039,19 @@ namespace UnitTests
                     {
                         Assert.AreEqual(table.Get(i, 2).number, ydif2011b, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, ydif2012b, 0.0001);
+                    }
+                    // -------------------------------------------------------------                
+                    i++;
+                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompExpressionName + " | null | [0]");
+                    if (j != 2)
+                    {
+                        Assert.AreEqual(table.Get(i, 2).number, reduce * 4d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, -reduce * 6d, 0.0001);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(table.Get(i, 2).number, 2d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, -1d, 0.0001);
                     }
                     // -------------------------------------------------------------                
                     i++;
@@ -9169,7 +9169,7 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "a_residual__");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "ktot");
                 Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "ntot");
                 Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "xtot_a");
@@ -9181,11 +9181,11 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "aa__expr___link4");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "a_residual__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "a_residual___link1");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "a_residual___link2");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "a_residual___link3");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "a_residual___link4");
                 Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "k");
                 Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "ktot");
                 Assert.AreEqual(table.Get(9, 1).CellText.TextData[0], "n");
@@ -9201,8 +9201,8 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "a_residual__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "a_residual___link1");
                 Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "k");
                 Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "n");
                 Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "x");
@@ -9272,10 +9272,10 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "51");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "52");
                 Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "null");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "aa__expr__");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "aa__expr___link1");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "aa__expr___link2");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "aa__expr___link3");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "a_residual__");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "a_residual___link1");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "a_residual___link2");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "a_residual___link3");
                 Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "bqrsm");
                 Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "bqrss");
                 Assert.AreEqual(table.Get(8, 1).CellText.TextData[0], "Qrs");
