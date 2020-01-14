@@ -289,9 +289,20 @@ namespace Gekko
 
             List<GekkoDictionary<string, string>> xx = decompOptions2.freeValues;
 
+            List<string> list = new List<string>();
+            int i = -1;
+            foreach (GekkoDictionary<string, string> xxx in xx)
+            {
+                i++;
+                if (G.Equal(decompOptions2.free[i], name))
+                {
+                    foreach (string ss in xx[i].Keys) list.Add(ss);
+                }
+            }
+
             if (Globals.isAgeHierarchy && name.EndsWith(Globals.ageHierarchyName))
             {
-                List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
+                //List<string> list = Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable("#" + Globals.ageName));
                 SortedDictionary<string, List<string>> m1 = new SortedDictionary<string, List<string>>();
                 List<string> m2 = new List<string>();
                 GetHierarchyAggregateNames(list, m1, m2);
@@ -308,7 +319,8 @@ namespace Gekko
             }
             else
             {
-                return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
+                //return Program.GetListOfStringsFromList(Program.databanks.GetFirst().GetIVariable(name));
+                return list;
             }
         }
 
