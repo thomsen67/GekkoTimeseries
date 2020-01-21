@@ -12876,7 +12876,7 @@ namespace Gekko
                 {
                     G.Writeln2("*** ERROR: Internal error #809735208375");
                 }
-                found = eqs[0];  //pick the first one, probably alway only one here, cf. #820948324: 
+                found = eqs[0];  //pick the first one, probably always only one here, cf. #820948324: 
             }
             else
             {
@@ -37609,7 +37609,7 @@ namespace Gekko
             return vars2;
         }
 
-        public static List<string> DecompGetVars3(int chosen, List<DecompData> decompDatas, List<string> varnames, string expressionText)
+        public static List<string> DecompGetVars3OLD(int chosen, List<DecompData> decompDatas, List<string> varnames, string expressionText)
         {
             DecompData decompData = decompDatas[chosen];
             string varname = varnames[chosen];
@@ -37643,9 +37643,46 @@ namespace Gekko
                 }
             }
             return vars2;
-        }        
-        
-        
+        }
+
+        public static List<string> DecompGetVars3(int chosen, List<DecompData> decompDatas, List<string> varnames, string expressionText)
+        {
+            DecompData decompData = decompDatas[chosen];
+
+            //if there are 100 equations, stemming from y[#a] = x[#a] + 5 , where #a are ages 1 to 100, these eqs are looped one by one.
+            //for each of these equations, we investigate if the variables to show are found. For instance, if we are decomping y[31] and y[32], 
+            //we will find equation number 21, which has the variables y[31] and x[31].
+
+            Dictionary<string, string> vars2 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string varname in varnames)
+            {
+                foreach (string var in decompData.cellsContribD.storage.Keys)
+                {
+                    string[] ss = var.Split('¤');
+                    string varnameWithoutFirstBank = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                    if (ss[1] == "[0]" && G.Equal(varname, varnameWithoutFirstBank))
+                    {
+                        foreach (string z in decompData.cellsContribD.storage.Keys)
+                        {
+                            if (!vars2.ContainsKey(z))
+                            {
+                                vars2.Add(z, null);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            //List<string> vars = new List<string>(decompData.cellsContribD.storage.Keys);
+            //vars.Sort(StringComparer.OrdinalIgnoreCase);
+
+            List<string> xx = vars2.Keys.ToList<string>();
+            xx.Sort(StringComparer.OrdinalIgnoreCase);
+
+            return xx;
+        }
+
+
 
         private static void DecomposeAddToRow(DataRow dr, string col_variable, string varName)
         {

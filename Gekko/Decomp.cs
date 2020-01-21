@@ -11,6 +11,12 @@ namespace Gekko
     {
         public static void DecompStart(O.Decomp2 o)
         {
+            //In general, uncontrolled sets produce a list of equations. Hard to prune these, it is a bit like the lag problem, only lazy 
+            //  eval might help.
+            //In an equation like y[#a] = x[#a] + 5, there will be 100 equations if #a is 1..100. For each of these, lags are tried. So
+            //it is checked if x[31][2000] affects y[31][2001] --> a lag. If such a lag is detected, x[#a][-1] is added to the variables
+            //that contribute.
+
             //DecompStart()                              --> This is the starting point
             //  DecompGetFuncExpressions()               --> May use Program.DecompEvalGams() or Program.DecompEval(), with I("EVAL ...") 
             //                                               DecompEvalGams() finds the equation, translates to Gekko, and returns a 
@@ -178,14 +184,15 @@ namespace Gekko
             List<List<DecompData>> decompDatas = new List<List<DecompData>>();
             List<string> expressionTexts = new List<string>();
             int counter2 = -1;
-            foreach (Link link in decompOptions2.link)
+            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
             {
                 counter2++;
                 string residualName = Program.GetDecompExpressionName(counter2);
                 List<DecompData> temp = new List<DecompData>();
                 foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
                 {
-                    temp.Add(Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName));
+                    DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName);
+                    temp.Add(dd);
                 }
                 decompDatas.Add(temp);
             }
@@ -404,7 +411,7 @@ namespace Gekko
                 {
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {
-                        ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varnames[0]);
+                        ModelGamsEquation found = Program.DecompEvalGams(link.eqname, link.varnames[0]);  //if link.eqname != null, link.varnames[0] is not used at all
                         link.expressions = found.expressions;
                         link.expressionText = found.lhs + " = " + found.rhs;
                     }
@@ -767,6 +774,12 @@ namespace Gekko
                                         y_series = y0Ref_series;
                                     }
                                     double x_before = x_series.GetData(smpl, t1);
+
+                                    //if(x_series.GetName().ToLower().Contains("qc_a"))
+                                    //{
+
+                                    //}
+
                                     try
                                     {
                                         double x_after = x_before + eps;
@@ -816,6 +829,15 @@ namespace Gekko
                                                 }
                                             }
 
+                                            if (Globals.fixDecomp)
+                                            {
+                                                //this has been moved out of the above if, so the var always get added, even if it only contains missings
+                                                if (!vars.ContainsKey(name))
+                                                {
+                                                    vars.Add(name, 0);
+                                                }
+                                            }
+
                                             if (!G.isNumericalError(grad) && grad != 0d)
                                             {
                                                 if (j == 0)
@@ -827,12 +849,13 @@ namespace Gekko
                                                     d.cellsGradRef[name].SetData(t2, grad);
                                                 }
 
-                                                if (!vars.ContainsKey(name))
+                                                if (!Globals.fixDecomp)
                                                 {
-                                                    vars.Add(name, 0);
-                                                }
-                                                else
-                                                {
+                                                    //this has been moved out of the above if, so the var always get added, even if it only contains missings
+                                                    if (!vars.ContainsKey(name))
+                                                    {
+                                                        vars.Add(name, 0);
+                                                    }
                                                 }
 
                                             }
@@ -878,7 +901,7 @@ namespace Gekko
                             double dContribD = vGradQuoLag * (vQuo - vQuoLag);
                             d.cellsContribD[s].SetData(t2, dContribD);
 
-                            if (false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
+                            if (Globals.runningOnTTComputer && false) G.Writeln2(s + " quo " + vQuo + " quo.1 " + vQuoLag + " grad.1 " + vGradQuoLag + " " + dContribD);
 
                             if (mm.Contains(1))
                             {
@@ -970,11 +993,13 @@ namespace Gekko
 
             int superN = decompDatas.Count;
 
-            for (int super = 0; super < superN; super++)
+            for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
 
                 int parentI = 0;
-                List<string> vars2 = Program.DecompGetVars3(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
+                List<string> vars2 = null;
+                if(Globals.fixDecomp) vars2 = Program.DecompGetVars3(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
+                else vars2 = Program.DecompGetVars3OLD(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
 
                 int j = 0;
                 foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
