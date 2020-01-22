@@ -385,6 +385,11 @@ namespace Gekko
                 }
             }
 
+            //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
+            //for each uncontrolled set like #a. The main variables (MAIN_varnames) are normalized to 1.
+            //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]"with values as timeseries.
+            //This example is split into y, #a, 1, t, value --> so we get a dataframe row like this:
+            //eq=0, variable=y, #a = 19, lag=1, t=2010, 1.2345
             Table table = null;
             table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);
 
@@ -795,69 +800,60 @@ namespace Gekko
                                         //Function call end   --------------
 
                                         Series y1_series = y1 as Series;
+                                        string nameOriginal = G.Chop_FreqRemove(dp.s, tt1.freq);
 
                                         foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(perLag), tt2.Add(0)))
                                         {
                                             double y0_double = y_series.GetData(smpl, t2);
                                             double y1_double = y1_series.GetData(smpl, t2);
-                                            double grad = (y1_double - y0_double) / eps;
-                                            int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1
-                                            string name = G.Chop_FreqRemove(dp.s, tt1.freq);
-
-                                            string lag2 = lag.ToString();
-                                            if (lag >= 1) lag2 = "+" + lag;
-                                            name += "¤[" + lag2 + "]";
-
-                                            if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
-                                            {
-                                                //SLACK
-                                                //SLACK
-                                                //SLACK fix this if decomp becomes too slow
-                                                //SLACK
-                                                //SLACK
-                                                //slack: we get too many variants of name[-x] and name[+x] here
-                                                //they are all just offsets of each other, no?
-                                                if (j == 0)
-                                                {
-                                                    d.cellsQuo[name].SetData(t2, x_before);
-                                                    //G.Writeln("quo " + name + " " + t2.ToString() + " " + x_before);
-                                                }
-                                                else
-                                                {
-                                                    d.cellsRef[name].SetData(t2, x_before);
-                                                    //G.Writeln("ref " + name + " " + t2.ToString() + " " + x_before);
-                                                }
-                                            }
-
-                                            if (Globals.fixDecomp)
-                                            {
-                                                //this has been moved out of the above if, so the var always get added, even if it only contains missings
-                                                if (!vars.ContainsKey(name))
-                                                {
-                                                    vars.Add(name, 0);
-                                                }
-                                            }
+                                            double grad = (y1_double - y0_double) / eps;                                            
 
                                             if (!G.isNumericalError(grad) && grad != 0d)
                                             {
-                                                if (j == 0)
+                                                //For the gradient to be a real number <> 0, the expression must evaluate
+                                                //before shock (y0) in the year considered (t2)
+                                                //If it does evaluate, but there is no effect, it is skipped too.
+
+                                                int lag = -(GekkoTime.Observations(t1, t2) - 1);  //x[-1] --> lag = -1                                                                                        
+                                                string lag2 = null;
+                                                if (lag >= 1)
                                                 {
-                                                    d.cellsGradQuo[name].SetData(t2, grad);
+                                                    lag2 = "+" + lag.ToString();
                                                 }
                                                 else
                                                 {
-                                                    d.cellsGradRef[name].SetData(t2, grad);
+                                                    lag2 = lag.ToString();
                                                 }
+                                                string name = nameOriginal + "¤[" + lag2 + "]";
 
-                                                if (!Globals.fixDecomp)
+                                                if (lag == 0 || (lag < 0 && -lag <= Program.options.decomp_maxlag) || (lag > 0 && lag <= Program.options.decomp_maxlead))
                                                 {
-                                                    //this has been moved out of the above if, so the var always get added, even if it only contains missings
-                                                    if (!vars.ContainsKey(name))
+                                                    
+                                                    if (j == 0)
                                                     {
-                                                        vars.Add(name, 0);
+                                                        d.cellsQuo[name].SetData(t2, x_before);
                                                     }
-                                                }
+                                                    else
+                                                    {
+                                                        d.cellsRef[name].SetData(t2, x_before);
+                                                    }
 
+                                                    if (j == 0)
+                                                    {
+                                                        d.cellsGradQuo[name].SetData(t2, grad);
+                                                    }
+                                                    else
+                                                    {
+                                                        d.cellsGradRef[name].SetData(t2, grad);
+                                                    }
+                                                }                                                
+                                                
+                                                if (!vars.ContainsKey(name))
+                                                {
+                                                    //list of relevant variables to handle later on
+                                                    //in decomp pivot
+                                                    vars.Add(name, 0);
+                                                }
                                             }
                                         }
                                     }
@@ -993,14 +989,12 @@ namespace Gekko
 
             int superN = decompDatas.Count;
 
+            //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
+
             for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
-
                 int parentI = 0;
-                List<string> vars2 = null;
-                if(Globals.fixDecomp) vars2 = Program.DecompGetVars3(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
-                else vars2 = Program.DecompGetVars3OLD(super, decompDatas, varnames, decompOptions2.link[parentI].expressionText);
-
+                
                 int j = 0;
                 foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
                 {
@@ -1008,7 +1002,8 @@ namespace Gekko
                     int i = 0;
                     double lhsSum = 0d;
                     double rhsSum = 0d;
-                    foreach (string colname in vars2)
+
+                    foreach (string varname in decompDatas[super].cellsContribD.storage.Keys)
                     {
                         i++;
 
@@ -1019,59 +1014,56 @@ namespace Gekko
 
                         string lag = null;
 
-                        if (true)
+                        //there is some repeated work done here, but not really bad
+                        //problem is we prefer to do one period at a time, to sum up, adjust etc.
+
+                        string[] ss = varname.Split('¤');
+                        string fullName = ss[0];
+                        lag = ss[1];
+                        if (lag == "[0]")
                         {
-                            //there is some repeated work done here, but not really bad
-                            //problem is we prefer to do one period at a time, to sum up, adjust etc.
-
-                            string[] ss = colname.Split('¤');
-                            string fullName = ss[0];
-                            lag = ss[1];
-                            if (lag == "[0]")
-                            {
-                                lag = null;
-                            }
-
-                            char firstChar;
-                            O.Chop(fullName, out dbName, out varName, out freq, out indexes);
-
-                            if (indexes != null) domains = new string[indexes.Length];
-
-                            if (domains != null)
-                            {
-                                //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
-                                //So in this case, #a and #sector would be added as columns
-                                IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
-                                if (iv != null)
-                                {
-                                    Series ts = iv as Series;
-                                    if (ts?.mmi?.parent?.meta?.domains != null)
-                                    {
-                                        for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
-                                        {
-                                            domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
-                                        }
-                                    }
-                                }
-
-                                foreach (string domain in domains)
-                                {
-                                    if (domain != null)
-                                    {
-                                        string setname = domain.ToLower();
-                                        if (setname == null) setname = col_universe;
-                                        frame.AddColName(setname);  //will .tolower() and ignore dublets
-                                    }
-                                }
-                            }
-
-                            //See #876435924365              
-                            string bank2 = dbName;
-                            if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
-                            string name2 = O.UnChop(null, varName, null, indexes);
+                            lag = null;
                         }
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDatas[super], code1, smpl, lhs, t2, colname);
+                        char firstChar;
+                        O.Chop(fullName, out dbName, out varName, out freq, out indexes);
+
+                        if (indexes != null) domains = new string[indexes.Length];
+
+                        if (domains != null)
+                        {
+                            //Adding domain info. We may have x[18, gov] which is part of x[#a, #sector].
+                            //So in this case, #a and #sector would be added as columns
+                            IVariable iv = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull);
+                            if (iv != null)
+                            {
+                                Series ts = iv as Series;
+                                if (ts?.mmi?.parent?.meta?.domains != null)
+                                {
+                                    for (int ii = 0; ii < ts.mmi.parent.meta.domains.Length; ii++)
+                                    {
+                                        domains[ii] = ConvertSetname(Globals.internalSetIdentifyer, col_universe, ts.mmi.parent.meta.domains[ii]);
+                                    }
+                                }
+                            }
+
+                            foreach (string domain in domains)
+                            {
+                                if (domain != null)
+                                {
+                                    string setname = domain.ToLower();
+                                    if (setname == null) setname = col_universe;
+                                    frame.AddColName(setname);  //will .tolower() and ignore dublets
+                                }
+                            }
+                        }
+
+                        //See #876435924365              
+                        string bank2 = dbName;
+                        if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
+                        string name2 = O.UnChop(null, varName, null, indexes);
+
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatas[super], code1, smpl, lhs, t2, varname);
 
                         if (i == 1)
                         {
