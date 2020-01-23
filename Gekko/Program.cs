@@ -37324,14 +37324,12 @@ namespace Gekko
             
             return tab;
 
-        }
+        }        
 
-        
-
-        public static string GetDecompExpressionName(int counter)
+        public static string GetDecompResidualName(int counter)
         {
-            if (counter == 0) return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "¤[0]";
-            else return Program.databanks.GetFirst().name + ":" + Globals.decompExpressionName + "_link" + counter + "¤[0]";
+            if (counter == 0) return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + "¤[0]";
+            else return Program.databanks.GetFirst().name + ":" + Globals.decompResidualName + "_link" + counter + "¤[0]";
         }
 
         private static void DecomposePutIntoTable(DecompOptions o, string code1, string code2, Table tab, GekkoTime per1, GekkoTime per2, GekkoSmpl smpl, string lhs, List<string> vars2)

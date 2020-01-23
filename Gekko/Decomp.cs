@@ -197,7 +197,7 @@ namespace Gekko
                 foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
                 {
                     counter2++;
-                    string residualName = Program.GetDecompExpressionName(counter2);
+                    string residualName = Program.GetDecompResidualName(counter2);
                     List<DecompData> temp = new List<DecompData>();
 
                     foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
@@ -214,7 +214,7 @@ namespace Gekko
 
                 if (decompOptions2.link[parentI].varnames == null)
                 {
-                    decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompExpressionName };
+                    decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
                 }                
 
                 int nnn = -12345;
@@ -331,41 +331,56 @@ namespace Gekko
                 {
                     for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
                     {
-                        DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;
-                        Series xx = dd[linkVariable];
-
-                        bool isZero = true;
-                        foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(Globals.decompPerLag), per2))
-                        {
-                            double d = xx.GetDataSimple(t);
-                            if (!G.isNumericalError(d) && Math.Abs(d) > 1e-10d)
-                            {
-                                isZero = false;
-                                break;
-                            }
-                        }
-
-                        if (isZero)
+                        DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;                        
+                        if (IsAlmostZeroTimeseries(per1, per2, dd[linkVariable], 1e-10d))
                         {
                             bool b = dd.Remove(linkVariable);
                         }
                         else
                         {
                             problem.Add(linkVariable);
-                        }                        
+                        }
                     }
                 }
                 foreach (string linkVariable in problem)
                 {
                     G.Writeln("NOTE: DECOMP: Variable " + linkVariable + " is not eliminated");
                 }
-
-                //TODO: remove residuals = 0
-                //for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
-                //{
-                //    DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;                    
-                //}
-
+                
+                for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
+                {
+                    List<string> remove = new List<string>();
+                    DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;
+                    foreach (KeyValuePair<string, Series> kvp in dd.storage)
+                    {
+                        string s = kvp.Key;                        
+                        string[] ss = s.Split('¤');
+                        string s2 = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                        if (s2.StartsWith(Globals.decompResidualName))
+                        {
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO threshold should be decimals used in GUI!!
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            //TODO TODO TODO
+                            if (IsAlmostZeroTimeseries(per1, per2, kvp.Value, 1e-5d))
+                            {
+                                remove.Add(kvp.Key);
+                            }
+                        }
+                    }
+                    foreach(string s in remove)
+                    {
+                        bool b = dd.Remove(s);
+                    }
+                }
 
                 //TODO: make sure that every lhs variable is found 1 and only 1 time
                 //      in the decompDatas, and report error if not.
@@ -374,7 +389,7 @@ namespace Gekko
                 //correct if the lhs variable is not stated with an implicit 1, like
                 //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
                 //the last one must be multiplied with 5.
-                                
+
                 //foreach (string name in MAIN_varnames)
                 foreach (string name in decompOptions2.link[parentI].varnames)
                 {
@@ -384,7 +399,7 @@ namespace Gekko
                     Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
 
                     Series lhsReal = null;
-                    if (name == Globals.decompExpressionName)
+                    if (name == Globals.decompResidualName)
                     {
                         //just keep lhsReal = null
                     }
@@ -462,6 +477,22 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static bool IsAlmostZeroTimeseries(GekkoTime per1, GekkoTime per2, Series xx, double eps)
+        {
+            bool isZero = true;
+            foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(Globals.decompPerLag), per2))
+            {
+                double d = xx.GetDataSimple(t);
+                if (!G.isNumericalError(d) && Math.Abs(d) > eps)
+                {
+                    isZero = false;
+                    break;
+                }
+            }
+
+            return isZero;
         }
 
         public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
