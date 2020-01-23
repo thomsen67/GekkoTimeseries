@@ -4451,21 +4451,27 @@ namespace Gekko
         }
 
         public static void AdjustSmplForDecomp(GekkoSmpl smpl, int i)
-        {
-            int add = 2;
+        {           
+            
+            int add2a = O.MaxLag();
+            int add2b = O.MaxLead();
+
+            //add2a = 0; //seems ok, but check with large lag/lead to see if really ok!   <---- HMM why should this work??
+            //add2b = 0; //seems ok, but check with large lag/lead to see if really ok!
+
             if (i == 0)
             {
-                smpl.t0 = smpl.t0.Add(-O.MaxLag() - add);
-                smpl.t1 = smpl.t1.Add(-O.MaxLag() - add);
-                smpl.t2 = smpl.t2.Add(O.MaxLead());
-                smpl.t3 = smpl.t3.Add(O.MaxLead());
+                smpl.t0 = smpl.t0.Add(-add2a + Globals.decompPerLag);
+                smpl.t1 = smpl.t1.Add(-add2a + Globals.decompPerLag);
+                smpl.t2 = smpl.t2.Add(add2b);
+                smpl.t3 = smpl.t3.Add(add2b);
             }
             else
             {
-                smpl.t0 = smpl.t0.Add(O.MaxLag() + add);
-                smpl.t1 = smpl.t1.Add(O.MaxLag() + add);
-                smpl.t2 = smpl.t2.Add(-O.MaxLead());
-                smpl.t3 = smpl.t3.Add(-O.MaxLead());
+                smpl.t0 = smpl.t0.Add(add2a - Globals.decompPerLag);
+                smpl.t1 = smpl.t1.Add(add2a - Globals.decompPerLag);
+                smpl.t2 = smpl.t2.Add(-add2b);
+                smpl.t3 = smpl.t3.Add(-add2b);
             }
         }
 

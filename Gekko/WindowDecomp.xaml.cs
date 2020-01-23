@@ -58,6 +58,8 @@ namespace Gekko
             None, Rows, Cols, Filters, Invisible
         }
 
+        public List<List<DecompData>> decompDatas = null; //stores data for reuse, for instance for fast pivot selection
+
         public int frozenRows=0;
         public int frozenCols=0;
         
@@ -181,7 +183,7 @@ namespace Gekko
 
                             //foreach (Task t in m) taskList.Add(t);
                             PutGuiPivotSelectionIntoDecompOptions(taskList);                            
-                            RecalcCellsWithNewType();
+                            RecalcCellsWithNewType(false);
 
 
                         }                        
@@ -276,7 +278,7 @@ namespace Gekko
             foreach (Task t in m) taskList.Add(t);
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(type);
-            RecalcCellsWithNewType();
+            RecalcCellsWithNewType(false);
         }
 
         public static List<string> GetAllPossibleValuesForListFilter(string name, DecompOptions2 decompOptions2)
@@ -564,7 +566,7 @@ namespace Gekko
             }            
             PutGuiPivotSelectionIntoDecompOptions(e.ItemsSource);
             RefreshList2(type);
-            RecalcCellsWithNewType();            
+            RecalcCellsWithNewType(false);            
         }
 
         private void PutGuiPivotSelectionIntoDecompOptions(ObservableCollection<Task> collection)
@@ -1682,7 +1684,7 @@ namespace Gekko
             }
         }
 
-        public void RecalcCellsWithNewType()
+        public void RecalcCellsWithNewType(bool refresh)
         {
             try
             {
@@ -1731,7 +1733,7 @@ namespace Gekko
                 IVariable y0aRef = null;
 
                 frame = new FrameLight();
-                Table table = Decomp.DecompMain(smpl, per1, per2, operator1, isShares, this.decompOptions2, frame);
+                Table table = Decomp.DecompMain(smpl, per1, per2, operator1, isShares, this.decompOptions2, frame, refresh, ref this.decompDatas);
 
                 string s = FindEquationText2(this.decompOptions2);
                 equation.Text = s;
@@ -1962,7 +1964,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "n";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -1972,7 +1974,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "d";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -1982,7 +1984,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "d";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -1992,7 +1994,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "p";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2002,7 +2004,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "p";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }        
 
@@ -2012,7 +2014,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "n";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2022,7 +2024,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "m";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2032,7 +2034,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "m";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }        
 
@@ -2042,7 +2044,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "q";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2052,7 +2054,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "q";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2062,7 +2064,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "mp";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2072,7 +2074,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "mp";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2082,7 +2084,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = true;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "dp";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }       
         
@@ -2092,7 +2094,7 @@ namespace Gekko
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRaw = false;
                 this.decompOptions2.operatorHelper.guiDecompOperator = "dp";
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2101,7 +2103,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.operatorHelper.guiDecompIsShares = true;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2110,7 +2112,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.operatorHelper.guiDecompIsShares = false;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2119,7 +2121,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRef = true;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2128,7 +2130,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.operatorHelper.guiDecompIsRef = false;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2154,7 +2156,7 @@ namespace Gekko
             if (!this.isInitializing)
             {
                 this.decompOptions2.localBanks = null;  //clearing this, forcing window to use vales from Gekko databanks
-                this.RecalcCellsWithNewType();
+                this.RecalcCellsWithNewType(true);
             }
         }
 
@@ -2170,7 +2172,7 @@ namespace Gekko
                 {
                     this.decompOptions2.decompTablesFormat.decimalsLevel++;
                 }
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2188,7 +2190,7 @@ namespace Gekko
                     this.decompOptions2.decompTablesFormat.decimalsLevel--;
                     if (this.decompOptions2.decompTablesFormat.decimalsLevel < 0) this.decompOptions2.decompTablesFormat.decimalsLevel = 0;
                 }
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2197,7 +2199,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.decompTablesFormat.showErrors = true;
-                RecalcCellsWithNewType();
+                RecalcCellsWithNewType(false);
             }
         }
 
@@ -2206,7 +2208,7 @@ namespace Gekko
             if (!isInitializing)
             {
                 this.decompOptions2.decompTablesFormat.showErrors = false;
-                RecalcCellsWithNewType();                
+                RecalcCellsWithNewType(false);                
             }
         }
 
@@ -2238,7 +2240,7 @@ namespace Gekko
             }
             PutGuiPivotSelectionIntoDecompOptions(taskList);
             RefreshList2(task.Pivot_TaskType);
-            RecalcCellsWithNewType();            
+            RecalcCellsWithNewType(false);            
         }
 
         private void RemoveFromObservableCollection(Task task)

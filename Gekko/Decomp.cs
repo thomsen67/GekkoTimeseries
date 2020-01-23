@@ -164,13 +164,14 @@ namespace Gekko
             }
         }
 
-        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame)
+        public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref List<List<DecompData>> decompDatas)
         {
             DateTime t0 = DateTime.Now;
 
             int perLag = -2;
             string lhsString = "Expression value";
             int parentI = 0;
+            //List<string> MAIN_varnames = decompOptions2.link[parentI].varnames;
 
             // decompDatas
             // Example: DECOMP x[#a] in e1 link y[#a] in e2
@@ -187,210 +188,259 @@ namespace Gekko
             int funcCounter = 0;
             G.Writeln2(">>>Before low level " + DateTime.Now.ToLongTimeString());
 
-            List<List<DecompData>> decompDatas = new List<List<DecompData>>();
-            List<string> expressionTexts = new List<string>();
-            int counter2 = -1;
-            foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+            if (decompDatas == null || refresh)  //signals a recalc of data, not a reuse
             {
-                counter2++;
-                string residualName = Program.GetDecompExpressionName(counter2);
-                List<DecompData> temp = new List<DecompData>();
-                
-                foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
+                decompDatas = new List<List<DecompData>>();
+
+                List<string> expressionTexts = new List<string>();
+                int counter2 = -1;
+                foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
                 {
-                    DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
-                    temp.Add(dd);
-                }
-                decompDatas.Add(temp);
-            }
+                    counter2++;
+                    string residualName = Program.GetDecompExpressionName(counter2);
+                    List<DecompData> temp = new List<DecompData>();
 
-            G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
-
-            List<DecompData> MAIN_decompData = decompDatas[0];  //this is where all the linking ends up. Clone it??
-
-            if (decompOptions2.link[parentI].varnames == null)
-            {
-                decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompExpressionName };
-            }
-            List<string> MAIN_varnames = decompOptions2.link[parentI].varnames;
-
-            int nnn = -12345;
-            if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
-            else nnn = 1;  //expression?
-
-            if (false)
-            {
-                DecompPrintDatas(decompDatas);
-            }
-
-            bool[] used = new bool[decompDatas.Count];
-            used[0] = true;  //primary equation
-
-            GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-            
-            //linking
-            //linking
-            //linking
-
-            //------------------------
-            //Example: e1: y = c + i + g  --> y - (c + i + g)
-            //         e2: c = 0.8 * y    --> c - 0.8 * y
-            //------------------------
-
-            //Takes the link equations, skipping the first one (which is the "normal" equation)
-            //Example: decomp y in e1 link c in e2
-            //the link equation is e2
-
-            for (int i = 1; i < decompOptions2.link.Count; i++)  //skips the MAIN equation
-            {
-                //For each link variable (c) in the link equation (e2)
-                for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
-                {
-
-                    //adjust the table according to link variable, so it fits with the destination table
-                    string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
-                    //if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
-
-                    //TODO TODO
-                    //TODO TODO if there > 1 hit here, error or warning should be issued
-                    //TODO TODO
-                    //looks in the uncontrolled eqs in link # i to find a match
-                    int j = FindLinkJ(decompDatas, i, linkVariable);  //Example: find row with c in table corresponding to e2
-
-                    for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
                     {
-                        //The series below is the lhs series of the whole decomposition. If the rhs or a link contains the lhs variable,
-                        //it will be altered, therefore the clone. For instance, in y = c + g and c = 0.8*y, a naive decomp for data where
-                        //y changes with 1 each period will only show 0.2. This is corrected below, corresponding to y = 0.8*y + g --> 0.2 y = g --> y = 5*g.
+                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
+                        temp.Add(dd);
+                    }
+                    decompDatas.Add(temp);
+                }
 
-                        //in y = c + i + g // c = 0.8 y
-                        //DECOMP y in eq1 link c in eq2.
-                        //linkparent would be c from eq1, and linkchild would be c from eq2.
-                        //linkparent is always from first equation
-                        Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable); //Example: decomposed c from e1                       
-                                                                                                         //maybe check that all link equations are used, and report if they are not.
-                        if (linkParent == null)
+                G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
+
+                List<DecompData> MAIN_decompData = decompDatas[0];  //this is where all the linking ends up. Clone it??
+
+                if (decompOptions2.link[parentI].varnames == null)
+                {
+                    decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompExpressionName };
+                }                
+
+                int nnn = -12345;
+                //if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
+                if (decompOptions2.link[parentI].varnames != null) nnn = decompOptions2.link[parentI].varnames.Count;
+                
+                else nnn = 1;  //expression?
+
+                if (false)
+                {
+                    DecompPrintDatas(decompDatas);
+                }
+
+                bool[] used = new bool[decompDatas.Count];
+                used[0] = true;  //primary equation
+
+                GekkoDictionary<string, bool> ignore = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+                //linking
+                //linking
+                //linking
+
+                //------------------------
+                //Example: e1: y = c + i + g  --> y - (c + i + g)
+                //         e2: c = 0.8 * y    --> c - 0.8 * y
+                //------------------------
+
+                //Takes the link equations, skipping the first one (which is the "normal" equation)
+                //Example: decomp y in e1 link c in e2
+                //the link equation is e2
+
+                List<string> linkVariables = new List<string>();
+
+                for (int i = 1; i < decompOptions2.link.Count; i++)  //skips the MAIN equation
+                {
+                    //For each link variable (c) in the link equation (e2)
+                    for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
+                    {
+
+                        //adjust the table according to link variable, so it fits with the destination table
+                        string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
+                        linkVariables.Add(linkVariable);
+
+                        //if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
+
+                        //TODO TODO
+                        //TODO TODO if there > 1 hit here, error or warning should be issued
+                        //TODO TODO
+                        //looks in the uncontrolled eqs in link # i to find a match
+                        int j = FindLinkJ(decompDatas, i, linkVariable);  //Example: find row with c in table corresponding to e2
+
+                        for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
                         {
-                            continue;
-                        }
-                        else
-                        {
-                            used[i] = true; //this link equation is somehow used, for some of its variables and one or more of the primary variables that are going to be decomposed (= super)
-                        }
-                        Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable); //Example: decomposed c from e2
+                            //The series below is the lhs series of the whole decomposition. If the rhs or a link contains the lhs variable,
+                            //it will be altered, therefore the clone. For instance, in y = c + g and c = 0.8*y, a naive decomp for data where
+                            //y changes with 1 each period will only show 0.2. This is corrected below, corresponding to y = 0.8*y + g --> 0.2 y = g --> y = 5*g.
 
-                        List<double> factors = new List<double>();
-                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                        {
-                            //Example: the factor is -(-1/1) = 1, so that adding the two tables would eliminate c in e1 equation.
-                            // y - (c + i + g) + 1*(c - 0.8 * y) = y + i + g - 0.8 * y =  0.2 * y + i + g
-                            // when showing this for y, the result must be multiplied by 5.
-                            double dLinkParent = linkParent.GetDataSimple(t);
-                            double dLinkChild = linkChild.GetDataSimple(t);
-                            double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much
-                            factors.Add(factor);
-                        }
+                            //in y = c + i + g // c = 0.8 y
+                            //DECOMP y in eq1 link c in eq2.
+                            //linkparent would be c from eq1, and linkchild would be c from eq2.
+                            //linkparent is always from first equation
+                            Series linkParent = FindLinkSeries(decompDatas, parentI, parentJ, linkVariable); //Example: decomposed c from e1                       
+                                                                                                             //maybe check that all link equations are used, and report if they are not.
+                            if (linkParent == null)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                used[i] = true; //this link equation is somehow used, for some of its variables and one or more of the primary variables that are going to be decomposed (= super)
+                            }
+                            Series linkChild = FindLinkSeries(decompDatas, i, j, linkVariable); //Example: decomposed c from e2
 
-                        //for each period, find the variable value in the original equation, and compute
-                        //  a correction factor for the sub-equation.                    
-
-                        foreach (KeyValuePair<string, Series> kvp in decompDatas[i][j].cellsContribD.storage)
-                        {
-                            Series varParent = decompDatas[parentI][parentJ].cellsContribD[kvp.Key];  //will be created
-                            Series varChild = kvp.Value;
-
-                            int counter = -1;
-
+                            List<double> factors = new List<double>();
                             foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                             {
-                                counter++;
-                                //if (G.Equal(kvp.Key, linkVariable)) continue;
+                                //Example: the factor is -(-1/1) = 1, so that adding the two tables would eliminate c in e1 equation.
+                                // y - (c + i + g) + 1*(c - 0.8 * y) = y + i + g - 0.8 * y =  0.2 * y + i + g
+                                // when showing this for y, the result must be multiplied by 5.
+                                double dLinkParent = linkParent.GetDataSimple(t);
+                                double dLinkChild = linkChild.GetDataSimple(t);
+                                double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much
+                                factors.Add(factor);
+                            }
 
-                                double dVarParent = varParent.GetDataSimple(t);
-                                if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
-                                double dVarChild = varChild.GetDataSimple(t);
-                                double x = dVarParent + factors[counter] * dVarChild;
+                            //for each period, find the variable value in the original equation, and compute
+                            //  a correction factor for the sub-equation.                    
 
-                                decompDatas[parentI][parentJ].cellsContribD[kvp.Key].SetData(t, x);
+                            foreach (KeyValuePair<string, Series> kvp in decompDatas[i][j].cellsContribD.storage)
+                            {
+                                Series varParent = decompDatas[parentI][parentJ].cellsContribD[kvp.Key];  //will be created
+                                Series varChild = kvp.Value;
+
+                                int counter = -1;
+
+                                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                                {
+                                    counter++;
+                                    //if (G.Equal(kvp.Key, linkVariable)) continue;
+
+                                    double dVarParent = varParent.GetDataSimple(t);
+                                    if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
+                                    double dVarChild = varChild.GetDataSimple(t);
+                                    double x = dVarParent + factors[counter] * dVarChild;
+                                    decompDatas[parentI][parentJ].cellsContribD[kvp.Key].SetData(t, x);
+                                }
                             }
                         }
                     }
                 }
-            }
-                       
 
-            //TODO: make sure that every lhs variable is found 1 and only 1 time
-            //      in the decompDatas, and report error if not.
-            //      To do this, FindLinkJ() and FindLinkSeries() need adjustments
-
-            //correct if the lhs variable is not stated with an implicit 1, like
-            //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
-            //the last one must be multiplied with 5.
-            
-            foreach (string name in MAIN_varnames)
-            {
-                string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                string name2 = Program.databanks.GetFirst().name + ":" + name;
-                int j = FindLinkJ(decompDatas, parentI, name1);
-                Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
-
-                Series lhsReal = null;
-                if (name == Globals.decompExpressionName)
+                List<string> problem = new List<string>();
+                foreach (string linkVariable in linkVariables)
                 {
-                    //just keep lhsReal = null
-                }
-                else
-                {
-                    lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                }
-
-                DecompData d = decompDatas[parentI][j];
-                foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                {
-                    double d1 = lhs.GetDataSimple(t);
-                    double factor = 1d;
-
-                    if (lhsReal == null)
+                    for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
                     {
-                        //keep factor = 1
+                        DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;
+                        Series xx = dd[linkVariable];
+
+                        bool isZero = true;
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(Globals.decompPerLag), per2))
+                        {
+                            double d = xx.GetDataSimple(t);
+                            if (!G.isNumericalError(d) && Math.Abs(d) > 1e-10d)
+                            {
+                                isZero = false;
+                                break;
+                            }
+                        }
+
+                        if (isZero)
+                        {
+                            bool b = dd.Remove(linkVariable);
+                        }
+                        else
+                        {
+                            problem.Add(linkVariable);
+                        }                        
+                    }
+                }
+                foreach (string linkVariable in problem)
+                {
+                    G.Writeln("NOTE: DECOMP: Variable " + linkVariable + " is not eliminated");
+                }
+
+                //TODO: remove residuals = 0
+                //for (int parentJ = 0; parentJ < decompDatas[parentI].Count; parentJ++)
+                //{
+                //    DecompDict dd = decompDatas[parentI][parentJ].cellsContribD;                    
+                //}
+
+
+                //TODO: make sure that every lhs variable is found 1 and only 1 time
+                //      in the decompDatas, and report error if not.
+                //      To do this, FindLinkJ() and FindLinkSeries() need adjustments
+
+                //correct if the lhs variable is not stated with an implicit 1, like
+                //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
+                //the last one must be multiplied with 5.
+                                
+                //foreach (string name in MAIN_varnames)
+                foreach (string name in decompOptions2.link[parentI].varnames)
+                {
+                    string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+                    string name2 = Program.databanks.GetFirst().name + ":" + name;
+                    int j = FindLinkJ(decompDatas, parentI, name1);
+                    Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
+
+                    Series lhsReal = null;
+                    if (name == Globals.decompExpressionName)
+                    {
+                        //just keep lhsReal = null
                     }
                     else
                     {
-
-                        // --------------------------------------------
-                        //TODO: other operators
-                        //TODO: other operators
-                        //TODO: other operators
-                        //TODO: other operators, this is <d>
-                        //TODO: other operators
-                        //TODO: other operators
-                        //TODO: other operators
-                        double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                        // ----------------------------------------------
-
-                        factor = d2 / d1;
+                        lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
                     }
 
-
-                    if (factor != 1d)
+                    DecompData d = decompDatas[parentI][j];
+                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                     {
-                        foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                        double d1 = lhs.GetDataSimple(t);
+                        double factor = 1d;
+
+                        if (lhsReal == null)
                         {
-                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                            //keep factor = 1
+                        }
+                        else
+                        {
+
+                            // --------------------------------------------
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators, this is <d>
+                            //TODO: other operators
+                            //TODO: other operators
+                            //TODO: other operators
+                            double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                            // ----------------------------------------------
+
+                            factor = d2 / d1;
+                        }
+
+
+                        if (factor != 1d)
+                        {
+                            foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                            {
+                                kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                            }
                         }
                     }
                 }
-            }
-            
 
-            //At this point, all linked equations i = 1, 2, ... have been merged into
-            //the MAIN equation i = 0.
 
-            for (int i = 0; i < decompDatas.Count; i++)
-            {
-                if (used[i] != true)
+                //At this point, all linked equations i = 1, 2, ... have been merged into
+                //the MAIN equation i = 0.
+
+                for (int i = 0; i < decompDatas.Count; i++)
                 {
-                    G.Writeln2("+++ WARNING: did not use link-equation #" + i + " of " + (decompDatas.Count - 1) + " (is it superfluous?)");
+                    if (used[i] != true)
+                    {
+                        G.Writeln2("+++ WARNING: did not use link-equation #" + i + " of " + (decompDatas.Count - 1) + " (is it superfluous?)");
+                    }
                 }
             }
             
@@ -400,8 +450,9 @@ namespace Gekko
             //This example is split into y, #a, 1, t, value --> so we get a dataframe row like this:
             //eq=0, variable=y, #a = 19, lag=1, t=2010, 1.2345
             Table table = null;
-            table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);
-            
+            //table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);
+            table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);                        
+
             if (false)
             {
                 DecompPrintDatas(decompDatas);
@@ -413,7 +464,7 @@ namespace Gekko
             return table;
         }
 
-        public static void DecompGetFuncExpressions(DecompOptions2 o)
+        public static void DecompGetFuncExpressionsAndRecalc(DecompOptions2 o)
         {
             DecompOptions2 decompOptions = (DecompOptions2)o;
             WindowDecomp w = null;
@@ -483,7 +534,7 @@ namespace Gekko
             w.SetRadioButtons();
             w.isInitializing = false;
 
-            w.RecalcCellsWithNewType();
+            w.RecalcCellsWithNewType(true);
             decompOptions.numberOfRecalcs++;  //signal for Decomp() method to move on
 
             if (G.IsUnitTesting() && Globals.showDecompTable == false)
@@ -646,9 +697,7 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(tt1, tt2);
             IVariable y0a = null;
             IVariable y0aRef = null;
-
-            int perLag = -2;
-
+            
             try
             {  //resets Globals.precedents afterwards
 
@@ -800,13 +849,13 @@ namespace Gekko
                                         x_series.SetData(t1, x_after);
 
                                         //Function call start --------------
-                                        O.AdjustSmplForDecomp(smpl, 0);
+                                        O.AdjustSmplForDecomp(smpl, 0);  //no reason to enlarge this smpl with 10 pers at both ends, since it is only t2 that is written afterwards
                                         if (j == 1) smpl.bankNumber = 1;
                                         IVariable y1 = null;
 
                                         if (true)  //this is what takes most of the time in DECOMP
                                         {
-                                            y1 = expression(smpl); funcCounter++;
+                                            y1 = expression(smpl); funcCounter++;  // <============================ THIS TAKES TIME!
                                         }
 
                                         if (j == 1) smpl.bankNumber = 0;
@@ -818,7 +867,7 @@ namespace Gekko
 
                                         if (true)  //this does not seem to cost any time...?
                                         {
-                                            foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(perLag), tt2.Add(0)))
+                                            foreach (GekkoTime t2 in new GekkoTimeIterator(tt1.Add(Globals.decompPerLag), tt2.Add(0)))
                                             {
                                                 double y0_double = y_series.GetDataSimple(t2);
                                                 double y1_double = y1_series.GetDataSimple(t2);
@@ -1256,7 +1305,12 @@ namespace Gekko
                     string key = rownames[i] + "¤" + colnames[j];
                     double d = 0d;
                     agg.TryGetValue(key, out d);
-                    tab.SetNumber(i + 2, j + 2, d, "f10.4");
+                                        
+                    int decimals = 0;
+                    if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
+                    else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
+                    string format2 = "f16." + decimals.ToString();
+                    tab.SetNumber(i + 2, j + 2, d, format2);
                 }
             }
 

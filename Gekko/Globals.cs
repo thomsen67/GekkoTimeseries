@@ -135,6 +135,8 @@ namespace Gekko
 
         public static int foldingButtonCounter = 0;
 
+        public static int decompPerLag = -2;
+
         public static GekkoDictionary<string, int> precedents = null;  //important that it starts out as null
 
         public static bool autoSigils = false; //adds sigils in "ACCEPT val v = ...", for loop "FOR string s = ...", function/proc-def "FUNCTION val f(string s, ...)", assign "string s = ..."

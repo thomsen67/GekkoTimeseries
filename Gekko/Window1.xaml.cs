@@ -1168,12 +1168,11 @@ namespace Gekko
                 //}
 
                 Table table = null;
-                //table = Program.DecompHelper2(this.decompOptions, transformationCodeAugmented, useLocalData);
 
                 this.decompOptions.prtOptionLower = transformationCodeAugmented;
 
-
                 table = Program.Decompose(this.decompOptions);
+
                 if (this.decompOptions.isSubst && this.decompOptions.subst.Count > 0)
                 {
                     foreach (string var in this.decompOptions.subst)
