@@ -386,8 +386,13 @@ namespace Gekko
                 //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
                 //the last one must be multiplied with 5.
 
-                bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
 
+                //TODO
+                //TODO
+                //TODO must be moved into pivottotable()
+                //TODO
+                //TODO
+                bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
                 //This normalizes the parent-link-variables so that they reflect their real values
                 //Parent-link-variables are for instance x1, x2, x3 here: DECOMP x1, x2, x2 IN ...
                 if (orderNormalize)
@@ -471,64 +476,7 @@ namespace Gekko
                     }
                 }
                
-                //{
-
-                //    foreach (string name in decompOptions2.link[parentI].varnames)
-                //    {
-                //        string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                //        string name2 = Program.databanks.GetFirst().name + ":" + name;
-                //        int j = FindLinkJ(decompDatas, parentI, name1);
-                //        Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
-
-                //        Series lhsReal = null;
-                //        if (name == Globals.decompResidualName)
-                //        {
-                //            //just keep lhsReal = null
-                //        }
-                //        else
-                //        {
-                //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                //        }
-
-                //        DecompData d = decompDatas[parentI][j];
-                //        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                //        {
-                //            double d1 = lhs.GetDataSimple(t);
-                //            double factor = 1d;
-
-                //            if (lhsReal == null)
-                //            {
-                //                //keep factor = 1
-                //            }
-                //            else
-                //            {
-
-                //                // --------------------------------------------
-                //                //TODO: other operators
-                //                //TODO: other operators
-                //                //TODO: other operators
-                //                //TODO: other operators, this is <d>
-                //                //TODO: other operators
-                //                //TODO: other operators
-                //                //TODO: other operators
-                //                double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                //                // ----------------------------------------------
-
-                //                factor = d2 / d1;
-                //            }
-
-
-                //            if (factor != 1d)
-                //            {
-                //                foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
-                //                {
-                //                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
-
+                
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.
 
@@ -1411,15 +1359,14 @@ namespace Gekko
 
             List<string> varnames = decompOptions2.link[parentI].varnames;
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
-
-            string rownamesFirst = null;
-            string colnamesFirst = null;
-
+            
             List<string> rownames = new List<string>();
             List<string> colnames = new List<string>();
+
+            string rownamesFirst = null;
             for (int i = 0; i < rownames3.Count; i++)
             {
-                if (orderNormalize && G.ContainsWord(rownames3[i], varnames[0]))
+                if (rownamesFirst == null && orderNormalize && DecompMatchWord(rownames3[i], varnames[0]))
                 {
                     rownamesFirst = rownames3[i];
                 }
@@ -1428,9 +1375,11 @@ namespace Gekko
                     rownames.Add(rownames3[i]);
                 }
             }
+
+            string colnamesFirst = null;
             for (int i = 0; i < colnames3.Count; i++)
             {
-                if (orderNormalize && G.ContainsWord(colnames3[i], varnames[0]))
+                if (colnamesFirst == null && orderNormalize && DecompMatchWord(colnames3[i], varnames[0]))
                 {
                     colnamesFirst = colnames3[i];
                 }
@@ -1444,6 +1393,11 @@ namespace Gekko
             if (colnamesFirst != null) colnames.Insert(0, colnamesFirst);
             rownames3 = null;
             colnames3 = null;
+
+            if (orderNormalize && rownamesFirst == null && colnamesFirst == null)
+            {
+                MessageBox.Show("*** ERROR: Could not find row/col to put first for normalization");
+            }
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -1473,7 +1427,10 @@ namespace Gekko
             return tab;
         }
 
-        
+        private static bool DecompMatchWord(string colnames3, string varnames)
+        {
+            return G.ContainsWord(colnames3, G.Chop_GetName(varnames));
+        }
 
         private static bool OrderNormalize(DecompOptions2 decompOptions2, List<string> varnames)
         {

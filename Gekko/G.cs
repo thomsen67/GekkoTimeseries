@@ -3185,6 +3185,11 @@ namespace Gekko
             }
         }
 
+        public static bool ContainsWord(string s, string word)
+        {                       
+            return Regex.Match(s, @"\b" + word + @"\b", RegexOptions.IgnoreCase).Success;
+        }
+
         public static string RemoveComments(string input)
         {
             var blockComments = @"/\*(.*?)\*/";
