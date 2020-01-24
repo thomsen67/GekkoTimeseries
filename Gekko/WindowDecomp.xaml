@@ -318,7 +318,7 @@
                         </Border>
                     </DockPanel>
                     <CheckBox Grid.Column="11" Grid.Row="2" Name="checkBox1" HorizontalAlignment="Left" VerticalAlignment="Center" Checked="checkBox1_Checked" Unchecked="checkBox1_Unchecked" ToolTip="Show decomposition shares (not meaningful for &quot;Raw&quot; options)">Show as shares</CheckBox>
-                    <CheckBox Grid.Column="11" Grid.Row="3" Name="checkBoxErrors" HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Show decomposition and data errors" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Margin="0,3,48.333,3">Show errors</CheckBox>
+                    <CheckBox Grid.Column="11" Grid.Row="3" x:Name="checkBoxErrors" HorizontalAlignment="Right" VerticalAlignment="Center" ToolTip="Show decomposition and data errors" Checked="checkBoxErrors_Checked" Unchecked="checkBoxErrors_Unchecked" Margin="0,3,48.333,3" Content="Normalize" Width="83"/>
                     <TextBlock Grid.Column="11" Grid.Row="0" Name="textBlock1" FontWeight="Bold">
                         Options
                     </TextBlock>

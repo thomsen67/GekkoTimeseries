@@ -19614,6 +19614,12 @@ namespace Gekko
             int i2Start = i1End + eqsign.Count + 1;
             int iSemi = tok.Search(i2Start, new List<string>() { ";" });
 
+            if (iSemi == -12345)
+            {
+                G.Writeln2("*** ERROR: Could not find ending ';' in eq definition, " + tok.Offset(i).LineAndPosText());
+                throw new GekkoException();
+            }
+
             int iEqEnd = iSemi;
 
             lhsGams = tok.OffsetInterval(i1Start, i1End).ToString().Trim();
@@ -44337,6 +44343,15 @@ namespace Gekko
         {
             int i = FindColumn(frame, colname);
             return this.storage[i];
+        }
+
+        public static bool HasColumn(FrameLight frame, string colname)
+        {
+            for (int i = 0; i < frame.colnames.Count; i++)
+            {
+                if (G.Equal(frame.colnames[i], colname)) return true;
+            }
+            return false;
         }
 
         public static int FindColumn(FrameLight frame, string colname)

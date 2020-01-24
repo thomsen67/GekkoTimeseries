@@ -1210,7 +1210,7 @@ namespace Gekko
             TspUtilityFindWord(out ii, 1, al, alType, i, relativePosition);
             return ii;
         }
-
+                
         public static void CloneDatabank(Databank newDatabank, Databank originalDatabank)
         {
             newDatabank.FileNameWithPath = originalDatabank.FileNameWithPath;

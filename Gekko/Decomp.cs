@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Gekko
 {
@@ -171,7 +172,8 @@ namespace Gekko
             int perLag = -2;
             string lhsString = "Expression value";
             int parentI = 0;
-            //List<string> MAIN_varnames = decompOptions2.link[parentI].varnames;
+
+            //MAIN varnames are: decompOptions2.link[parentI].varnames
 
             // decompDatas
             // Example: DECOMP x[#a] in e1 link y[#a] in e2
@@ -215,13 +217,7 @@ namespace Gekko
                 if (decompOptions2.link[parentI].varnames == null)
                 {
                     decompOptions2.link[parentI].varnames = new List<string>() { Globals.decompResidualName };
-                }                
-
-                int nnn = -12345;
-                //if (MAIN_varnames != null) nnn = MAIN_varnames.Count;
-                if (decompOptions2.link[parentI].varnames != null) nnn = decompOptions2.link[parentI].varnames.Count;
-                
-                else nnn = 1;  //expression?
+                }                                
 
                 if (false)
                 {
@@ -253,7 +249,6 @@ namespace Gekko
                     //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
                     {
-
                         //adjust the table according to link variable, so it fits with the destination table
                         string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
                         linkVariables.Add(linkVariable);
@@ -326,6 +321,7 @@ namespace Gekko
                     }
                 }
 
+                //remove linked variables from result (are 0)
                 List<string> problem = new List<string>();
                 foreach (string linkVariable in linkVariables)
                 {
@@ -390,62 +386,148 @@ namespace Gekko
                 //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
                 //the last one must be multiplied with 5.
 
-                //foreach (string name in MAIN_varnames)
-                foreach (string name in decompOptions2.link[parentI].varnames)
+                bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
+
+                //This normalizes the parent-link-variables so that they reflect their real values
+                //Parent-link-variables are for instance x1, x2, x3 here: DECOMP x1, x2, x2 IN ...
+                if (orderNormalize)
                 {
-                    string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                    string name2 = Program.databanks.GetFirst().name + ":" + name;
-                    int j = FindLinkJ(decompDatas, parentI, name1);
-                    Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
-
-                    Series lhsReal = null;
-                    if (name == Globals.decompResidualName)
+                    if (decompOptions2.link[parentI].varnames.Count != decompDatas[parentI].Count)
                     {
-                        //just keep lhsReal = null
+                        G.Writeln2("*** ERROR: The number of variables and equations do not match. For istance, in ");
+                        G.Writeln("           DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is,", System.Drawing.Color.Red);
+                        G.Writeln("           it must be defined over one or more sets with 2 elements in all).", System.Drawing.Color.Red);
+                        throw new GekkoException();
                     }
-                    else
+                    for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
                     {
-                        lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                    }
+                        string name = decompOptions2.link[parentI].varnames[j];
+                        string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+                        string name2 = Program.databanks.GetFirst().name + ":" + name;
 
-                    DecompData d = decompDatas[parentI][j];
-                    foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                    {
-                        double d1 = lhs.GetDataSimple(t);
-                        double factor = 1d;
-
-                        if (lhsReal == null)
+                        if (decompDatas[parentI][j].cellsContribD.ContainsKey(name1))
                         {
-                            //keep factor = 1
+                            Series lhs = decompDatas[parentI][j].cellsContribD[name1];
+                            Series lhsReal = null;
+                            if (name == Globals.decompResidualName)
+                            {
+                                //just keep lhsReal = null
+                            }
+                            else
+                            {
+                                lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                            }
+
+                            DecompData d = decompDatas[parentI][j];
+                            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                            {
+                                double d1 = lhs.GetDataSimple(t);
+                                double factor = 1d;
+
+                                if (lhsReal == null)
+                                {
+                                    //keep factor = 1
+                                }
+                                else
+                                {
+
+                                    // --------------------------------------------
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators, this is <d>
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    //TODO: other operators
+                                    double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                                    // ----------------------------------------------
+
+                                    factor = d2 / d1;
+                                }
+
+                                if (factor != 1d)
+                                {
+                                    foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                                    {
+                                        if (kvp.Key == name1)
+                                        {
+                                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                                        }
+                                        else
+                                        {
+                                            //switch sign!
+                                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-
-                            // --------------------------------------------
-                            //TODO: other operators
-                            //TODO: other operators
-                            //TODO: other operators
-                            //TODO: other operators, this is <d>
-                            //TODO: other operators
-                            //TODO: other operators
-                            //TODO: other operators
-                            double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                            // ----------------------------------------------
-
-                            factor = d2 / d1;
-                        }
-
-
-                        if (factor != 1d)
-                        {
-                            foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
-                            {
-                                kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                            }
-                        }
+                            G.Writeln2("*** ERROR: Could not find variable " + name1 + " in non-linked equation number " + j);
+                            G.Writeln("           Beware of alignment: the names and equations must match.", System.Drawing.Color.Red);
+                            throw new GekkoException();
+                        }                        
                     }
                 }
+               
+                //{
 
+                //    foreach (string name in decompOptions2.link[parentI].varnames)
+                //    {
+                //        string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+                //        string name2 = Program.databanks.GetFirst().name + ":" + name;
+                //        int j = FindLinkJ(decompDatas, parentI, name1);
+                //        Series lhs = FindLinkSeries(decompDatas, parentI, j, name1);
+
+                //        Series lhsReal = null;
+                //        if (name == Globals.decompResidualName)
+                //        {
+                //            //just keep lhsReal = null
+                //        }
+                //        else
+                //        {
+                //            lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                //        }
+
+                //        DecompData d = decompDatas[parentI][j];
+                //        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                //        {
+                //            double d1 = lhs.GetDataSimple(t);
+                //            double factor = 1d;
+
+                //            if (lhsReal == null)
+                //            {
+                //                //keep factor = 1
+                //            }
+                //            else
+                //            {
+
+                //                // --------------------------------------------
+                //                //TODO: other operators
+                //                //TODO: other operators
+                //                //TODO: other operators
+                //                //TODO: other operators, this is <d>
+                //                //TODO: other operators
+                //                //TODO: other operators
+                //                //TODO: other operators
+                //                double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                //                // ----------------------------------------------
+
+                //                factor = d2 / d1;
+                //            }
+
+
+                //            if (factor != 1d)
+                //            {
+                //                foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                //                {
+                //                    kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
 
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.
@@ -464,9 +546,7 @@ namespace Gekko
             //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]"with values as timeseries.
             //This example is split into y, #a, 1, t, value --> so we get a dataframe row like this:
             //eq=0, variable=y, #a = 19, lag=1, t=2010, 1.2345
-            Table table = null;
-            //table = Decomp.DecompPivotToTable(MAIN_varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);
-            table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);                        
+            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);                        
 
             if (false)
             {
@@ -1024,16 +1104,18 @@ namespace Gekko
 
         }
 
-        public static Table DecompPivotToTable(List<string> varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatas, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
+        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupreme, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
         {
+            int parentI = 0;
+
             bool ageHierarchy = Globals.isAgeHierarchy;
             if (G.IsUnitTesting()) ageHierarchy = false;
 
-            //if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
-            //{
-            //    decompOptions2.rows = new List<string>() { "vars", "lags" };
-            //    decompOptions2.cols = new List<string>() { "time" };
-            //}
+            if (decompOptions2.rows.Count == 0 && decompOptions2.cols.Count == 0)
+            {
+                decompOptions2.rows = new List<string>() { "vars" };
+                decompOptions2.cols = new List<string>() { "time" };
+            }
 
             if (decompOptions2.filters == null)
             {
@@ -1058,7 +1140,7 @@ namespace Gekko
             //<#universe>: universal set for elements without domain info
             //#i:          set names, like #age, #sector, etc.
             //<value>:     data value
-            
+
             string col_t = Globals.internalColumnIdentifyer + "t";
             string col_variable = Globals.internalColumnIdentifyer + "variable";
             string col_lag = Globals.internalColumnIdentifyer + "lag";
@@ -1078,14 +1160,12 @@ namespace Gekko
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
             }
 
-            int superN = decompDatas.Count;
+            int superN = decompDatasSupreme.Count;
 
             //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
 
             for (int super = 0; super < superN; super++)  //equations, like if y[#a] = x[#a] + 5, superN will correspond to number of elements in #a.
             {
-                int parentI = 0;
-                
                 int j = 0;
                 foreach (GekkoTime t2 in new GekkoTimeIterator(per1, per2))
                 {
@@ -1094,7 +1174,7 @@ namespace Gekko
                     double lhsSum = 0d;
                     double rhsSum = 0d;
 
-                    foreach (string varname in decompDatas[super].cellsContribD.storage.Keys)
+                    foreach (string varname in decompDatasSupreme[super].cellsContribD.storage.Keys)
                     {
                         i++;
 
@@ -1154,7 +1234,7 @@ namespace Gekko
                         if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
                         string name2 = O.UnChop(null, varName, null, indexes);
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDatas[super], code1, smpl, lhs, t2, varname);
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupreme[super], code1, smpl, lhs, t2, varname);
 
                         if (i == 1)
                         {
@@ -1209,8 +1289,8 @@ namespace Gekko
                 }
             }
 
-            if (ageHierarchy)
-            {                
+            if (ageHierarchy && FrameLightRow.HasColumn(frame, Globals.internalSetIdentifyer + "a"))
+            {
                 foreach (FrameLightRow row in frame.rows)
                 {
                     CellLight c = row.Get(frame, Globals.internalSetIdentifyer + "a");
@@ -1230,7 +1310,7 @@ namespace Gekko
             {
                 WriteDatatableTocsv(frame);
             }
-            
+
             Table tab = new Table();
             tab.writeOnce = true;
 
@@ -1238,8 +1318,8 @@ namespace Gekko
             DecomposeReplaceVars(decompOptions2.cols, col_t, col_variable, col_lag, col_universe, col_equ);
             DecomposeReplaceVars(decompOptions2.filters, col_t, col_variable, col_lag, col_universe, col_equ);
 
-            List<string> rownames = new List<string>();
-            List<string> colnames = new List<string>();
+            List<string> rownames3 = new List<string>();
+            List<string> colnames3 = new List<string>();
             GekkoDictionary<string, double> agg = new GekkoDictionary<string, double>(StringComparer.OrdinalIgnoreCase);
 
             //get the free values start
@@ -1303,8 +1383,8 @@ namespace Gekko
                     s2 = s2.Substring(Globals.pivotTableDelimiter.Length);
                 string key = s1 + "¤" + s2;
 
-                if (!rownames.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames.Add(s1);
-                if (!colnames.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames.Add(s2);
+                if (!rownames3.Contains(s1, StringComparer.OrdinalIgnoreCase)) rownames3.Add(s1);
+                if (!colnames3.Contains(s2, StringComparer.OrdinalIgnoreCase)) colnames3.Add(s2);
 
                 CellLight c3 = row.Get(frame, col_value);
                 double d = c3.data;
@@ -1319,15 +1399,51 @@ namespace Gekko
                 }
             }
 
-            rownames.Sort(StringComparer.OrdinalIgnoreCase);
+            rownames3.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> rownames2 = new List<string>();
-            foreach (var rowname in rownames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
-            rownames = rownames2;
+            foreach (var rowname in rownames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) rownames2.Add(rowname);
+            rownames3 = rownames2;
 
-            colnames.Sort(StringComparer.OrdinalIgnoreCase);
+            colnames3.Sort(StringComparer.OrdinalIgnoreCase);
             List<string> colnames2 = new List<string>();
-            foreach (var colname in colnames.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
-            colnames = colnames2;
+            foreach (var colname in colnames3.OrderBy(x => x, new G.NaturalComparer(G.NaturalComparerOptions.Default))) colnames2.Add(colname);
+            colnames3 = colnames2;
+
+            List<string> varnames = decompOptions2.link[parentI].varnames;
+            bool orderNormalize = OrderNormalize(decompOptions2, varnames);
+
+            string rownamesFirst = null;
+            string colnamesFirst = null;
+
+            List<string> rownames = new List<string>();
+            List<string> colnames = new List<string>();
+            for (int i = 0; i < rownames3.Count; i++)
+            {
+                if (orderNormalize && G.ContainsWord(rownames3[i], varnames[0]))
+                {
+                    rownamesFirst = rownames3[i];
+                }
+                else
+                {
+                    rownames.Add(rownames3[i]);
+                }
+            }
+            for (int i = 0; i < colnames3.Count; i++)
+            {
+                if (orderNormalize && G.ContainsWord(colnames3[i], varnames[0]))
+                {
+                    colnamesFirst = colnames3[i];
+                }
+                else
+                {
+                    colnames.Add(colnames3[i]);
+                }
+            }
+
+            if (rownamesFirst != null) rownames.Insert(0, rownamesFirst);
+            if (colnamesFirst != null) colnames.Insert(0, colnamesFirst);
+            rownames3 = null;
+            colnames3 = null;
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -1336,7 +1452,6 @@ namespace Gekko
                     string key = rownames[i] + "¤" + colnames[j];
                     double d = 0d;
                     agg.TryGetValue(key, out d);
-                                        
                     int decimals = 0;
                     if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
@@ -1357,7 +1472,27 @@ namespace Gekko
 
             return tab;
         }
+
         
+
+        private static bool OrderNormalize(DecompOptions2 decompOptions2, List<string> varnames)
+        {
+            bool orderNormalize = false;
+            if (decompOptions2.decompTablesFormat.showErrors)
+            {
+                if (varnames.Count == 1)
+                {
+                    orderNormalize = true;
+                }
+                else
+                {
+                    MessageBox.Show("+++ WARNING: Normalization ordering not implemented for sets of equations");
+                }
+            }
+
+            return orderNormalize;
+        }
+
         private static void DecomposeReplaceVars(List<string> vars, string col_t, string col_variable, string col_lag, string col_universe, string col_equ)
         {
             for (int i = 0; i < vars.Count; i++)
