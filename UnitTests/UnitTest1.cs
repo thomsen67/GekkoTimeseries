@@ -9027,41 +9027,29 @@ namespace UnitTests
 
                     Assert.AreEqual(table.Get(i, 2).CellText.TextData[0], "2011");
                     Assert.AreEqual(table.Get(i, 3).CellText.TextData[0], "2012");
-                    // -------------------------------------------------------------                                                                         
-                    i++;
+                    // -------------------------------------------------------------                                                                                             
                     if (j != 2)
                     {
+                        i++;
                         Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v | y | [0]");
                         Assert.AreEqual(table.Get(i, 2).number, reduce * ydif2011, 0.0001);
                         Assert.AreEqual(table.Get(i, 3).number, reduce * ydif2012, 0.0001);
                     }
                     // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + "_link1 | null | [0]");
+
                     if (j != 2)
                     {
-                        Assert.AreEqual(table.Get(i, 2).number, reduce * 3.66d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -reduce * 9.1d, 0.0001);
+                        i = Helper_residual1(table, j, i, ydif2011b, ydif2012b, reduce);
+                        i = Helper_residual2(table, j, i, reduce);
                     }
                     else
                     {
-                        Assert.AreEqual(table.Get(i, 2).number, -ydif2011b, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -ydif2012b, 0.0001);
+                        //swapped for some reason
+                        i = Helper_residual2(table, j, i, reduce);
+                        i = Helper_residual1(table, j, i, ydif2011b, ydif2012b, reduce);
                     }
                     // -------------------------------------------------------------                
-                    i++;
-                    Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + " | null | [0]");
-                    if (j != 2)
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, -reduce * 4d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, reduce * 6d, 0.0001);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(table.Get(i, 2).number, 2d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -1d, 0.0001);
-                    }
-                    // -------------------------------------------------------------                
+
                     i++;
                     Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "g1 | null | [+1]");
                     if (j != 2)
@@ -9071,8 +9059,8 @@ namespace UnitTests
                     }
                     else
                     {
-                        Assert.AreEqual(table.Get(i, 2).number, -0.2d * 1.0000d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -0.2d * 2.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 2).number, 0.2d * 1.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, 0.2d * 2.0000d, 0.0001);
                     }
                     // -------------------------------------------------------------                
                     i++;
@@ -9084,8 +9072,8 @@ namespace UnitTests
                     }
                     else
                     {
-                        Assert.AreEqual(table.Get(i, 2).number, -0.8d * 1.0000d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -0.8d * 2.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 2).number, 0.8d * 1.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, 0.8d * 2.0000d, 0.0001);
                     }
                     // -------------------------------------------------------------                
                     i++;
@@ -9097,10 +9085,17 @@ namespace UnitTests
                     }
                     else
                     {
-                        Assert.AreEqual(table.Get(i, 2).number, 1.0000d, 0.0001);
-                        Assert.AreEqual(table.Get(i, 3).number, -2.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 2).number, -1.0000d, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, 2.0000d, 0.0001);
                     }
-                    
+                    // -------------------------------------------------------------                                
+                    if (j == 2)
+                    {
+                        i++;
+                        Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], "v | y | [0]");
+                        Assert.AreEqual(table.Get(i, 2).number, -1.5600, 0.0001);
+                        Assert.AreEqual(table.Get(i, 3).number, 3.9000, 0.0001);
+                    }
                     // -------------------------------------------------------------                                
                     i++;
                     if (j != 2)
@@ -9161,34 +9156,34 @@ namespace UnitTests
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");                
-                Assert.AreEqual(table.Get(3 - 1, 1).CellText.TextData[0], "ktot");
-                Assert.AreEqual(table.Get(4 - 1, 1).CellText.TextData[0], "ntot");
-                Assert.AreEqual(table.Get(5 - 1, 1).CellText.TextData[0], "xtot_a");
-                Assert.AreEqual(table.Get(6 - 1, 1).CellText.TextData[0], "yavg");
-                Assert.AreEqual(table.Get(7 - 1, 1).CellText.TextData[0], "zavg");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "xtot_a");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "ktot");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "ntot");                
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "yavg");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "zavg");
 
                 I("decomp2 <d> xtot_a in e_xtot_a link ktot in e_ktot, yavg in e_yavg, zavg in e_zavg, ntot in e_ntot rows vars cols time;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");                
-                Assert.AreEqual(table.Get(7 - 5, 1).CellText.TextData[0], "k");
-                Assert.AreEqual(table.Get(8 - 5, 1).CellText.TextData[0], "n");                
-                Assert.AreEqual(table.Get(9 - 5, 1).CellText.TextData[0], "xtot_a");
-                Assert.AreEqual(table.Get(10 - 5, 1).CellText.TextData[0], "y");                
-                Assert.AreEqual(table.Get(11 - 5, 1).CellText.TextData[0], "z");                
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "xtot_a");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "k");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "n");                
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y");                
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "z");                
 
                 I("decomp2 <d> xtot in e_xtot link x[#a] in e_x rows vars cols time;");
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2001");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2002");
-                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");                
-                Assert.AreEqual(table.Get(4 - 2, 1).CellText.TextData[0], "k");
-                Assert.AreEqual(table.Get(5 - 2, 1).CellText.TextData[0], "n");
-                Assert.AreEqual(table.Get(6 - 2, 1).CellText.TextData[0], "xtot");
-                Assert.AreEqual(table.Get(7 - 2, 1).CellText.TextData[0], "y");
-                Assert.AreEqual(table.Get(8 - 2, 1).CellText.TextData[0], "z");
+                Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "2003");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "xtot");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "k");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "n");                
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "z");
             }
 
             if (true)
@@ -9251,21 +9246,57 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "50");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "51");
                 Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "52");
-                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "null");                
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "a_residual___link2");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "a_residual___link3");
-                Assert.AreEqual(table.Get(6 - 2, 1).CellText.TextData[0], "bqrsm");
-                Assert.AreEqual(table.Get(7 - 2, 1).CellText.TextData[0], "bqrss");
-                Assert.AreEqual(table.Get(8 - 2, 1).CellText.TextData[0], "Qrs");                
-                Assert.AreEqual(table.Get(11 - 2 - 2, 1).CellText.TextData[0], "U");
-                Assert.AreEqual(table.Get(8 - 2, 5).number, 562d, 0.0001);
-                Assert.AreEqual(table.Get(6 - 2, 2).number, 14.4824d, 0.0001);
-                Assert.AreEqual(table.Get(6 - 2, 3).number, 0.1727d, 0.0001);
-                Assert.AreEqual(table.Get(6 - 2, 4).number, 16.9358d, 0.0001);
+                Assert.AreEqual(table.Get(1, 5).CellText.TextData[0], "null");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "Qrs");
+                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "a_residual___link2");
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "a_residual___link3");
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "bqrsm");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "bqrss");                
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "U");
+                Assert.AreEqual(table.Get(2, 5).number, 562d, 0.0001);                
+                Assert.AreEqual(table.Get(5, 2).number, -14.4824d, 0.0001);
+                Assert.AreEqual(table.Get(5, 3).number, -0.1727d, 0.0001);
+                Assert.AreEqual(table.Get(5, 4).number, -16.9358d, 0.0001);
 
             }
 
 
+        }
+
+        private static int Helper_residual2(Table table, int j, int i, double reduce)
+        {
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + " | null | [0]");
+            if (j != 2)
+            {
+                Assert.AreEqual(table.Get(i, 2).number, -reduce * 4d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, reduce * 6d, 0.0001);
+            }
+            else
+            {
+                Assert.AreEqual(table.Get(i, 2).number, 2d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, -1d, 0.0001);
+            }
+
+            return i;
+        }
+
+        private static int Helper_residual1(Table table, int j, int i, double ydif2011b, double ydif2012b, double reduce)
+        {
+            i++;
+            Assert.AreEqual(table.Get(i, 1).CellText.TextData[0], Globals.decompResidualName + "_link1 | null | [0]");
+            if (j != 2)
+            {
+                Assert.AreEqual(table.Get(i, 2).number, reduce * 3.66d, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, -reduce * 9.1d, 0.0001);
+            }
+            else
+            {
+                Assert.AreEqual(table.Get(i, 2).number, -ydif2011b, 0.0001);
+                Assert.AreEqual(table.Get(i, 3).number, -ydif2012b, 0.0001);
+            }
+
+            return i;
         }
 
         [TestMethod]
