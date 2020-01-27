@@ -293,6 +293,16 @@ namespace Gekko
         {
             return storage.ContainsKey(s);
         }
+
+        public DecompDict DeepClone()
+        {
+            DecompDict dd = new DecompDict();
+            foreach (KeyValuePair<string, Series> kvp in this.storage)
+            {
+                dd.storage.Add(kvp.Key, kvp.Value.DeepClone(null) as Series);
+            }
+            return dd;
+        }
     }
 
     public class MyCustomAttribute : Attribute
@@ -37008,12 +37018,12 @@ namespace Gekko
             GekkoSmpl smpl = new GekkoSmpl(per1, per2);
             IVariable y0a = null;
             IVariable y0aRef = null;
-            
+
             int perLag = -2;
             string lhs = "Expression value";
 
-            bool usesRef = code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
-
+            bool usesRef = OperatorUsesRef(code1);
+            
             try
             {
 
@@ -37040,7 +37050,7 @@ namespace Gekko
                         mm.Add(1);
                         o.hasCalculatedRef = true;
                     }
-                    
+
                     Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
                     //Function call start --------------
@@ -37048,7 +37058,7 @@ namespace Gekko
                     y0a = o.expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
                     O.AdjustSmplForDecomp(smpl, 1);
                     //Function call end   --------------
-                    
+
                     List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
                     if (true)
                     {
@@ -37109,7 +37119,7 @@ namespace Gekko
                             y0Ref_series = y0aRef.DeepClone(null) as Series;  //a lag like "DECOMP x[-1]" may just move a pointer to real timeseries x, and x is changed with shocks...
                         }
                     }
-                    
+
                     foreach (GekkoTime t in new GekkoTimeIterator(per1.Add(perLag), per2))
                     {
                         o.decompTables.cellsQuo[lhs].SetData(t, y0_series.GetData(smpl, t));
@@ -37159,8 +37169,8 @@ namespace Gekko
                                 // --------------------------------------------
                                 // This is where the decomposition takes place
                                 // --------------------------------------------
-                                
-                                foreach(int j in mm)
+
+                                foreach (int j in mm)
                                 {
                                     if (dpx.Type() == EVariableType.Series)
                                     {
@@ -37310,7 +37320,7 @@ namespace Gekko
                                     o.decompTables.cellsContribDRef[s].SetData(t2, dContribDRef);
                                 }
                             }
-                        }                                         
+                        }
                     }
                 }
             }
@@ -37327,10 +37337,15 @@ namespace Gekko
             }
 
             DecomposePutIntoTable(o, code1, code2, tab, per1, per2, smpl, lhs, o.vars2);
-            
+
             return tab;
 
-        }        
+        }
+
+        private static bool OperatorUsesRef(string code1)
+        {
+            return code1 == "r" || code1 == "xr" || code1 == "xrn" || code1 == "rd" || code1 == "xrd" || code1 == "m" || code1 == "xm" || code1 == "rp" || code1 == "xrp" || code1 == "q" || code1 == "xq" || code1 == "rdp" || code1 == "xrdp" || code1 == "mp" || code1 == "xmp";
+        }
 
         public static string GetDecompResidualName(int counter)
         {

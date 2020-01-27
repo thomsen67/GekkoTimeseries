@@ -1807,7 +1807,7 @@ namespace Gekko
         public int decimalsPch = 2;
         public bool isPercentageType = false;
         public bool showErrors = false;
-    }
+    }    
 
     public class DecompData
     {
@@ -1821,6 +1821,19 @@ namespace Gekko
         public DecompDict cellsContribDRef = null;
         // -------------------------------------
         public DecompDict cellsContribM = null;
+
+        public DecompData DeepClone()
+        {
+            DecompData dd = new DecompData();
+            dd.cellsQuo = this.cellsQuo.DeepClone();
+            dd.cellsGradQuo = this.cellsGradQuo.DeepClone();
+            dd.cellsContribD = this.cellsContribD.DeepClone();
+            dd.cellsRef = this.cellsRef.DeepClone();
+            dd.cellsGradRef = this.cellsGradRef.DeepClone();
+            dd.cellsContribDRef = this.cellsContribDRef.DeepClone();
+            dd.cellsContribM = this.cellsContribM.DeepClone();
+            return dd;
+        }
     }
 
     public class DecompOptions

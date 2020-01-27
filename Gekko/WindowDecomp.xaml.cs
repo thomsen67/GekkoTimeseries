@@ -2264,6 +2264,24 @@ namespace Gekko
         public Brush originalBackgroundColor = null;
     }
 
+    public enum EDecompOperatorBankTypes
+    {
+        Unknown,
+        Work,
+        Ref,
+        Both
+    }
+
+    public enum EDecompOperatorHelperTypes
+    {
+        Unknown,
+        N,
+        RN,
+        D,        
+        RD,
+        M        
+    }
+
     public class DecompOperatorHelper
     {
         //this object contains the important operators regarding how
@@ -2271,7 +2289,7 @@ namespace Gekko
         public string guiDecompOperator = null;  //used to be "n"
         public bool guiDecompIsShares = false;
         public bool guiDecompIsRaw = true;
-        public bool guiDecompIsRef = false;
+        public bool guiDecompIsRef = false;       
     }
 
     public class DecompTablesFormat2

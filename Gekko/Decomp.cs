@@ -10,6 +10,14 @@ namespace Gekko
 {
     class Decomp
     {
+        public enum EContribType
+        {
+            Unknown,
+            D,
+            RD,
+            M
+        }
+
         public static void DecompStart(O.Decomp2 o)
         {
             
@@ -167,7 +175,8 @@ namespace Gekko
         }
 
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref List<List<DecompData>> decompDatas)
-        {
+        {            
+
             DateTime t0 = DateTime.Now;
 
             int perLag = -2;
@@ -385,105 +394,7 @@ namespace Gekko
 
                 //correct if the lhs variable is not stated with an implicit 1, like
                 //y = c + g, but instead 2*y = 2*c +2*g, or y = c + g, c = 0.8 * y ---> 0.2 * y = g,
-                //the last one must be multiplied with 5.
-
-
-                //TODO
-                //TODO
-                //TODO must be moved into pivottotable()
-                //TODO
-                //TODO
-                bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
-                //This normalizes the parent-link-variables so that they reflect their real values
-                //Parent-link-variables are for instance x1, x2, x3 here: DECOMP x1, x2, x2 IN ...
-                
-                if (orderNormalize)
-                {
-                    if (decompOptions2.link[parentI].varnames.Count != decompDatas[parentI].Count)
-                    {
-                        G.Writeln2("*** ERROR: The number of variables and equations do not match. For istance, in ");
-                        G.Writeln("           DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is,", System.Drawing.Color.Red);
-                        G.Writeln("           it must be defined over one or more sets with 2 elements in all).", System.Drawing.Color.Red);
-                        throw new GekkoException();
-                    }
-                    for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
-                    {
-                        string name = decompOptions2.link[parentI].varnames[j];
-                        string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
-                        string name2 = Program.databanks.GetFirst().name + ":" + name;
-
-                        if (decompDatas[parentI][j].cellsContribD.ContainsKey(name1))
-                        {
-                            Series lhs = decompDatas[parentI][j].cellsContribD[name1];
-                            Series lhsReal = null;
-                            if (name == Globals.decompResidualName)
-                            {
-                                //just keep lhsReal = null
-                            }
-                            else
-                            {
-                                lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
-                            }
-
-                            DecompData d = decompDatas[parentI][j];
-                            foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
-                            {
-                                double d1 = lhs.GetDataSimple(t);
-                                double factor = 1d;
-
-                                if (lhsReal == null)
-                                {
-                                    //keep factor = 1
-                                }
-                                else
-                                {
-
-                                    // --------------------------------------------
-                                    //TODO: other operators
-                                    //TODO: other operators
-                                    //TODO: other operators
-                                    //TODO: other operators, this is <d>
-                                    //TODO: other operators
-                                    //TODO: other operators
-                                    //TODO: other operators
-                                    double d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
-                                    // ----------------------------------------------
-
-                                    factor = d2 / d1;
-                                }
-
-                                if (true)
-                                {
-                                    bool found = false;
-                                    foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
-                                    {
-                                        if (G.Equal(kvp.Key, name1))
-                                        {
-                                            kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
-                                            found = true;
-                                        }
-                                        else
-                                        {
-                                            //switch sign!
-                                            kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
-                                        }
-                                    }
-                                    if (found == false)
-                                    {
-                                        MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            G.Writeln2("*** ERROR: Could not find variable " + name1 + " in non-linked equation number " + j);
-                            G.Writeln("           Beware of alignment: the names and equations must match.", System.Drawing.Color.Red);
-                            throw new GekkoException();
-                        }                        
-                    }
-                }
-               
+                //the last one must be multiplied with 5.                
                 
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.
@@ -496,13 +407,16 @@ namespace Gekko
                     }
                 }
             }
-            
+
             //decompDatas[parentI] is the main equation, the other ones are in-substituted. This decompDatas[parentI] has a member
             //for each uncontrolled set like #a. The main variables (MAIN_varnames) are normalized to 1.
-            //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]"with values as timeseries.
+            //decompData.cellsContribD contains keys like "Work:y[19]¤[+1]" with values as timeseries.
             //This example is split into y, #a, 1, t, value --> so we get a dataframe row like this:
             //eq=0, variable=y, #a = 19, lag=1, t=2010, 1.2345
-            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatas[parentI], decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);                        
+            //We clone the data first, before calling DecompPivotToTable(), because they may be normalized etc. 
+            List<DecompData> decompDatasSupremeClone = new List<DecompData>();
+            foreach (DecompData dd in decompDatas[parentI]) decompDatasSupremeClone.Add(dd.DeepClone());                        
+            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame);                        
 
             if (false)
             {
@@ -1060,9 +974,11 @@ namespace Gekko
 
         }
 
-        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupreme, DecompTablesFormat2 format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
+        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
         {
-            int parentI = 0;
+            int parentI = 0;            
+
+            DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone);
 
             bool ageHierarchy = Globals.isAgeHierarchy;
             if (G.IsUnitTesting()) ageHierarchy = false;
@@ -1116,7 +1032,7 @@ namespace Gekko
                 frame.AddColName(Globals.internalSetIdentifyer + Globals.ageHierarchyName);
             }
 
-            int superN = decompDatasSupreme.Count;
+            int superN = decompDatasSupremeClone.Count;
 
             //adding frame rows, while also getting sets defined for variables (these are added as frame cols)
 
@@ -1130,7 +1046,7 @@ namespace Gekko
                     double lhsSum = 0d;
                     double rhsSum = 0d;
 
-                    foreach (string varname in decompDatasSupreme[super].cellsContribD.storage.Keys)
+                    foreach (string varname in decompDatasSupremeClone[super].cellsContribD.storage.Keys)
                     {
                         i++;
 
@@ -1190,8 +1106,16 @@ namespace Gekko
                         if (G.Equal(Program.databanks.GetFirst().name, dbName)) bank2 = null;
                         string name2 = O.UnChop(null, varName, null, indexes);
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupreme[super], code1, smpl, lhs, t2, varname);
+                        double dd = double.NaN;
+                        Series xx = null;
+                        if (code1.StartsWith("x"))
+                        {
+                            xx = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                            dd = xx.GetDataSimple(t2);
+                        }                        
 
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], code1, smpl, lhs, t2, varname);
+                        
                         if (i == 1)
                         {
                             lhsSum = d;
@@ -1292,6 +1216,10 @@ namespace Gekko
             }
             //get the free values end
 
+            //Aggregation
+            //Aggregation
+            //Aggregation
+
             foreach (FrameLightRow row in frame.rows)
             {
                 if (getFreeValues)
@@ -1318,7 +1246,6 @@ namespace Gekko
                         skip = true;
                         break;
                     }
-
                 }
                 if (skip) continue;
 
@@ -1367,7 +1294,7 @@ namespace Gekko
 
             List<string> varnames = decompOptions2.link[parentI].varnames;
             bool orderNormalize = OrderNormalize(decompOptions2, varnames);
-            
+
             List<string> rownames = new List<string>();
             List<string> colnames = new List<string>();
 
@@ -1433,6 +1360,166 @@ namespace Gekko
             }
 
             return tab;
+        }
+
+        private static void DecompNormalize(GekkoTime per1, GekkoTime per2, DecompOptions2 decompOptions2, int parentI, List<DecompData> decompDatasSupremeClone)
+        {
+            EDecompBanks edb = DecompBanks(decompOptions2.prtOptionLower);
+
+            bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
+            //This normalizes the parent-link-variables so that they reflect their real values
+            //Parent-link-variables are for instance x1, x2, x3 here: DECOMP x1, x2, x2 IN ...
+
+            if (orderNormalize)
+            {
+                if (decompOptions2.link[parentI].varnames.Count != decompDatasSupremeClone.Count)
+                {
+                    G.Writeln2("*** ERROR: The number of variables and equations do not match. For istance, in ");
+                    G.Writeln("           DECOMP x1, x2 in e_eqs, the equation e_eqs must contain 2 elements (that is,", System.Drawing.Color.Red);
+                    G.Writeln("           it must be defined over one or more sets with 2 elements in all).", System.Drawing.Color.Red);
+                    throw new GekkoException();
+                }
+                for (int j = 0; j < decompOptions2.link[parentI].varnames.Count; j++)
+                {
+                    string name = decompOptions2.link[parentI].varnames[j];
+
+                    bool isResidualName = name == Globals.decompResidualName;
+
+                    string name1 = Program.databanks.GetFirst().name + ":" + name + "¤[0]";  //what about lags in eqs??
+                    string name2 = Program.databanks.GetFirst().name + ":" + name;
+                    string name2Ref = Program.databanks.GetRef().name + ":" + name;
+
+                    if (decompDatasSupremeClone[j].cellsContribD.ContainsKey(name1))
+                    {
+                        Series lhs2 = decompDatasSupremeClone[j].cellsContribD[name1];
+                        Series lhsReal = null;
+                        Series lhsRealRef = null;
+                        if (isResidualName)
+                        {
+                            //just keep lhsReal/lhsRealRef = null
+                        }
+                        else
+                        {                            
+                            if (edb == EDecompBanks.Work)
+                            {
+                                lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                            }
+                            else if (edb == EDecompBanks.Ref)
+                            {
+                                lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
+                            }
+                            else if (edb == EDecompBanks.Both)
+                            {
+                                lhsReal = O.GetIVariableFromString(name2, O.ECreatePossibilities.NoneReportError) as Series;
+                                lhsRealRef = O.GetIVariableFromString(name2Ref, O.ECreatePossibilities.NoneReportError) as Series;
+                            }
+                        }
+
+                        DecompData d = decompDatasSupremeClone[j];
+                        foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
+                        {
+                            double d1 = lhs2.GetDataSimple(t);
+                            double factor = 1d;
+
+                            if (isResidualName)
+                            {
+                                //keep factor = 1
+                            }
+                            else
+                            {
+
+                                // --------------------------------------------
+                                //TODO: other operators
+                                //TODO: other operators
+                                //TODO: other operators
+                                //TODO: other operators, this is <d>
+                                //TODO: other operators
+                                //TODO: other operators
+                                //TODO: other operators
+
+                                //Stuff below does not always work: the variable to be shown may not even be in the first equation (for instance: DECOMP y[#a] in demand[#a] = supply[#a]...
+                                //So for now, we allow it to be fetched from the databank
+                                //Series temp = decompDatasSupremeClone[j].cellsQuo.storage[name1];
+                                //double d2 = temp.GetDataSimple(t) - temp.GetDataSimple(t.Add(-1));        
+
+                                string op = decompOptions2.prtOptionLower;
+                                if (op.StartsWith("x")) op = op.Substring(1);
+                                if (op.StartsWith("s")) op = op.Substring(1);
+
+                                double d2 = double.NaN;
+
+                                EContribType ect = DecompContribType(op);
+
+                                if (ect == EContribType.D)
+                                {
+                                    d2 = lhsReal.GetDataSimple(t) - lhsReal.GetDataSimple(t.Add(-1));
+                                }
+                                else if (ect == EContribType.RD)
+                                {
+                                    d2 = lhsRealRef.GetDataSimple(t) - lhsRealRef.GetDataSimple(t.Add(-1));
+                                }
+                                else if (ect == EContribType.M)
+                                {
+                                    d2 = lhsReal.GetDataSimple(t) - lhsRealRef.GetDataSimple(t);
+                                }
+
+                                // ----------------------------------------------
+
+                                factor = d2 / d1;
+                            }
+
+                            if (true)
+                            {
+                                bool found = false;
+                                foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
+                                {
+                                    if (G.Equal(kvp.Key, name1))
+                                    {
+                                        kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                                        found = true;
+                                    }
+                                    else
+                                    {
+                                        //switch sign!
+                                        kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
+                                    }
+                                }
+                                if (found == false)
+                                {
+                                    MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        G.Writeln2("*** ERROR: Could not find variable " + name1 + " in non-linked equation number " + j);
+                        G.Writeln("           Beware of alignment: the names and equations must match.", System.Drawing.Color.Red);
+                        throw new GekkoException();
+                    }
+                }
+            }
+
+            return;
+        }
+
+        private static EContribType DecompContribType(string op)
+        {
+            EContribType ect = EContribType.Unknown;
+
+            if (op == "d" || op == "p" || op == "dp")
+            {
+                ect = EContribType.D;
+            }
+            else if (op == "rd" || op == "rp" || op == "rdp")
+            {
+                ect = EContribType.RD;
+            }
+            else if (op == "m" || op == "q" || op == "mp")
+            {
+                ect = EContribType.M;
+            }
+            return ect;
         }
 
         private static bool DecompMatchWord(string colnames3, string varnames)
@@ -1539,6 +1626,136 @@ namespace Gekko
 
         public static double DecomposePutIntoTable2HelperOperators(DecompData decompTables, string code1, GekkoSmpl smpl, string lhs, GekkoTime t2, string colname)
         {
+            //double d = double.NaN;
+            //if (code1 == "n" || code1 == "xn" || code1 == "x")
+            //{
+            //    d = decompTables.cellsQuo[colname].GetData(smpl, t2);  //for instance {"x¤2002", 2.5} or {"x[-1]¤2003", -1.5}
+            //}
+            //else if (code1 == "r" || code1 == "xr" || code1 == "xrn")
+            //{
+            //    d = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //}
+            //else if (code1 == "d")
+            //{
+            //    d = decompTables.cellsContribD[colname].GetData(smpl, t2);
+            //}
+            //else if (code1 == "rd")
+            //{
+            //    d = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
+            //}
+            //else if (code1 == "xd")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
+            //    d = d1 - d0;
+            //}
+            //else if (code1 == "xrd")
+            //{
+            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
+            //    d = d1 - d0;
+            //}
+            //else if (code1 == "m")
+            //{
+            //    d = decompTables.cellsContribM[colname].GetData(smpl, t2);
+            //}
+            //else if (code1 == "xm")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    d = d1 - d0;
+            //}
+            //else if (code1 == "p")
+            //{
+            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
+            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+            //    d = (dd / dLhsLag) * 100d;
+            //}
+            //else if (code1 == "rp")
+            //{
+            //    double dd = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
+            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+            //    d = (dd / dLhsLag) * 100d;
+            //}
+            //else if (code1 == "xp")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
+            //    d = (d1 / d0 - 1d) * 100d;
+            //}
+            //else if (code1 == "xrp")
+            //{
+            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
+            //    d = (d1 / d0 - 1d) * 100d;
+            //}
+            //else if (code1 == "q")
+            //{
+            //    double dd = decompTables.cellsContribM[colname].GetData(smpl, t2);
+            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2);
+            //    d = (dd / dLhsLag) * 100d;
+            //}
+            //else if (code1 == "xq")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    d = (d1 / d0 - 1d) * 100d;
+            //}
+            //else if (code1 == "dp")
+            //{
+            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
+            //    double dd_lag = decompTables.cellsContribD[colname].GetData(smpl, t2.Add(-1));
+            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+            //    double dLhsLag_lag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+            //    d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+            //}
+            //else if (code1 == "rdp")
+            //{
+            //    double dd = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
+            //    double dd_lag = decompTables.cellsContribDRef[colname].GetData(smpl, t2.Add(-1));
+            //    double dLhsLag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+            //    double dLhsLag_lag = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1).Add(-1));
+            //    d = (dd / dLhsLag - dd_lag / dLhsLag_lag) * 100d;
+            //}
+            //else if (code1 == "xdp")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d1_lag = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
+            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
+            //    double d0_lag = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1).Add(-1));
+            //    d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+            //}
+            //else if (code1 == "xrdp")
+            //{
+            //    double d1 = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    double d1_lag = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
+            //    double d0 = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
+            //    double d0_lag = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1).Add(-1));
+            //    d = (d1 / d0 - 1d - (d1_lag / d0_lag - 1d)) * 100d;
+            //}
+            //else if (code1 == "mp")  // <p> - <rp>
+            //{
+            //    double dd = decompTables.cellsContribD[colname].GetData(smpl, t2);
+            //    double dLhsLag = decompTables.cellsQuo[lhs].GetData(smpl, t2.Add(-1));
+
+            //    double dd2 = decompTables.cellsContribDRef[colname].GetData(smpl, t2);
+            //    double dLhsLag2 = decompTables.cellsRef[lhs].GetData(smpl, t2.Add(-1));
+            //    d = (dd / dLhsLag - dd2 / dLhsLag2) * 100d;
+            //}
+            //else if (code1 == "xmp")
+            //{
+            //    double d1 = decompTables.cellsQuo[colname].GetData(smpl, t2);
+            //    double d0 = decompTables.cellsQuo[colname].GetData(smpl, t2.Add(-1));
+            //    double d1_ref = decompTables.cellsRef[colname].GetData(smpl, t2);
+            //    double d0_ref = decompTables.cellsRef[colname].GetData(smpl, t2.Add(-1));
+            //    d = (d1 / d0 - 1d - (d1_ref / d0_ref - 1d)) * 100d;
+            //}
+            //else
+            //{
+            //    MessageBox.Show("*** ERROR: Wrong operator");
+            //    throw new GekkoException();
+            //}
+
             double d = double.NaN;
             if (code1 == "n" || code1 == "xn" || code1 == "x")
             {
