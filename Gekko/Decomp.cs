@@ -101,6 +101,7 @@ namespace Gekko
             {                
 
                 DecompOptions2 decompOptions2 = new DecompOptions2();
+                decompOptions2.decompTablesFormat.showErrors = true; //
                 decompOptions2.t1 = o.t1;
                 decompOptions2.t2 = o.t2;
                 decompOptions2.expressionOld = o.label;
@@ -395,6 +396,7 @@ namespace Gekko
                 bool orderNormalize = OrderNormalize(decompOptions2, decompOptions2.link[parentI].varnames);
                 //This normalizes the parent-link-variables so that they reflect their real values
                 //Parent-link-variables are for instance x1, x2, x3 here: DECOMP x1, x2, x2 IN ...
+                
                 if (orderNormalize)
                 {
                     if (decompOptions2.link[parentI].varnames.Count != decompDatas[parentI].Count)
@@ -450,19 +452,25 @@ namespace Gekko
                                     factor = d2 / d1;
                                 }
 
-                                if (factor != 1d)
+                                if (true)
                                 {
+                                    bool found = false;
                                     foreach (KeyValuePair<string, Series> kvp in d.cellsContribD.storage)
                                     {
-                                        if (kvp.Key == name1)
+                                        if (G.Equal(kvp.Key, name1))
                                         {
                                             kvp.Value.SetData(t, factor * kvp.Value.GetDataSimple(t));
+                                            found = true;
                                         }
                                         else
                                         {
                                             //switch sign!
                                             kvp.Value.SetData(t, -factor * kvp.Value.GetDataSimple(t));
                                         }
+                                    }
+                                    if (found == false)
+                                    {
+                                        MessageBox.Show("*** ERROR: Did not find " + name1 + " for normalization");
                                     }
                                 }
                             }
@@ -1052,7 +1060,7 @@ namespace Gekko
 
         }
 
-        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupreme, DecompTablesFormat format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
+        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupreme, DecompTablesFormat2 format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame)
         {
             int parentI = 0;
 
@@ -1433,11 +1441,11 @@ namespace Gekko
         }
 
         private static bool OrderNormalize(DecompOptions2 decompOptions2, List<string> varnames)
-        {
+        {            
             bool orderNormalize = false;
             if (decompOptions2.decompTablesFormat.showErrors)
             {
-                if (varnames.Count == 1)
+                if (varnames.Count == decompOptions2.link[0].expressions.Count)
                 {
                     orderNormalize = true;
                 }

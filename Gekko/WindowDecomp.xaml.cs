@@ -2274,9 +2274,17 @@ namespace Gekko
         public bool guiDecompIsRef = false;
     }
 
+    public class DecompTablesFormat2
+    {
+        public int decimalsLevel = 4;
+        public int decimalsPch = 2;
+        public bool isPercentageType = false;
+        public bool showErrors = false;
+    }
+
     public class DecompOptions2
     {
-        public DecompTablesFormat decompTablesFormat = new DecompTablesFormat();
+        public DecompTablesFormat2 decompTablesFormat = new DecompTablesFormat2();
 
         //-------- tranformation start --------------
         public DecompOperatorHelper operatorHelper = new DecompOperatorHelper();
@@ -2361,7 +2369,7 @@ namespace Gekko
         {
             //clones relevant parts for new window
             DecompOptions2 d = new DecompOptions2();
-            d.decompTablesFormat = new DecompTablesFormat();
+            d.decompTablesFormat = new DecompTablesFormat2();
             d.decompTablesFormat.decimalsLevel = this.decompTablesFormat.decimalsLevel;
             d.decompTablesFormat.decimalsPch = this.decompTablesFormat.decimalsPch;
             d.decompTablesFormat.isPercentageType = this.decompTablesFormat.isPercentageType;
