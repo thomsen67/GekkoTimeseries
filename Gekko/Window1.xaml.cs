@@ -1807,7 +1807,15 @@ namespace Gekko
         public int decimalsPch = 2;
         public bool isPercentageType = false;
         public bool showErrors = false;
-    }    
+    }
+
+    public class DecompDatas
+    {
+        public List<List<DecompData>> storage = null;
+        public bool hasD = false;
+        public bool hasM = false;
+        public bool hasRD = false;
+    }
 
     public class DecompData
     {
