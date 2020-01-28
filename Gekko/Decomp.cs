@@ -1158,7 +1158,7 @@ namespace Gekko
                         double dLevelRef = double.NaN;
                         double dLevelRefLag = double.NaN;
                         
-                        Series xx = null;
+                        
                         if (code1.StartsWith("x"))
                         {
                             if (varname.Contains(Globals.decompResidualName))
@@ -1167,14 +1167,32 @@ namespace Gekko
                             }
                             else
                             {
-                                xx = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
-                                if (xx == null)
+
+                                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
-                                    G.Writeln2("*** ERROR: Decomp #7093473984");
-                                    throw new GekkoException();
+                                    Series tsFirst = null;
+                                    tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (tsFirst == null)
+                                    {
+                                        G.Writeln2("*** ERROR: Decomp #7093473984");
+                                        throw new GekkoException();
+                                    }
+                                    dLevel = tsFirst.GetDataSimple(t2);
+                                    dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
                                 }
-                                dLevel = xx.GetDataSimple(t2);
-                                dLevelLag = xx.GetDataSimple(t2.Add(-1));
+
+                                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+                                {
+                                    Series tsRef = null;
+                                    tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
+                                    if (tsRef == null)
+                                    {
+                                        G.Writeln2("*** ERROR: Decomp #7093473985");
+                                        throw new GekkoException();
+                                    }
+                                    dLevelRef = tsRef.GetDataSimple(t2);
+                                    dLevelRefLag = tsRef.GetDataSimple(t2.Add(-1));
+                                }
                             }
                         }                        
 
@@ -1424,7 +1442,19 @@ namespace Gekko
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
 
-                        if (code1 == "d")
+                        if (code1 == "n")
+                        {
+                            d = dLevel;
+                        }
+                        else if (code1 == "rn")
+                        {
+                            d = dLevelRef;
+                        }
+                        else if (code1 == "d")
+                        {
+                            d = td.change;
+                        }
+                        else if (code1 == "m")
                         {
                             d = td.change;
                         }
@@ -1435,6 +1465,14 @@ namespace Gekko
                         else if (code1 == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
+                        }
+                        else if (code1 == "xm")
+                        {
+                            d = dLevel - dLevelRef;
+                        }
+                        else if (code1 == "xq")
+                        {
+                            d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
                     }
 
