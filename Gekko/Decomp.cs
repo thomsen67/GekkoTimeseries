@@ -31,6 +31,8 @@ namespace Gekko
         public enum EContribType
         {
             Unknown,
+            N,
+            RN,
             D,
             RD,
             M
@@ -463,8 +465,7 @@ namespace Gekko
             else if (operatorOneOf3Types == EContribType.M) return decompData.cellsContribM;
             else
             {
-                G.Writeln2("*** ERROR: Operator problem #8349321");
-                throw new GekkoException();
+                return decompData.cellsContribD;  //just to get something going when doing for instance "xn" option
             }
         }
 
@@ -1013,11 +1014,14 @@ namespace Gekko
 
         }
 
-        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string code1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
+        public static Table DecompPivotToTable(List<string> main_varnames, GekkoTime per1, GekkoTime per2, List<DecompData> decompDatasSupremeClone, DecompTablesFormat2 format, string operator1, string isShares, GekkoSmpl smpl, string lhs, string expressionText, DecompOptions2 decompOptions2, FrameLight frame, EContribType operatorOneOf3Types)
         {
-            int parentI = 0;            
+            int parentI = 0;
 
-            DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, operatorOneOf3Types);
+            if (!operator1.StartsWith("x"))
+            {
+                DecompNormalize(per1, per2, decompOptions2, parentI, decompDatasSupremeClone, operatorOneOf3Types);
+            }
 
             bool ageHierarchy = Globals.isAgeHierarchy;
             if (G.IsUnitTesting()) ageHierarchy = false;
@@ -1159,7 +1163,7 @@ namespace Gekko
                         double dLevelRefLag = double.NaN;
                         
                         
-                        if (code1.StartsWith("x"))
+                        if (operator1.StartsWith("x"))
                         {
                             if (varname.Contains(Globals.decompResidualName))
                             {
@@ -1168,7 +1172,7 @@ namespace Gekko
                             else
                             {
 
-                                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
+                                if (operatorOneOf3Types == EContribType.N || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.D)
                                 {
                                     Series tsFirst = null;
                                     tsFirst = O.GetIVariableFromString(fullName, O.ECreatePossibilities.NoneReturnNull) as Series;
@@ -1181,7 +1185,7 @@ namespace Gekko
                                     dLevelLag = tsFirst.GetDataSimple(t2.Add(-1));
                                 }
 
-                                if (operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
+                                if (operatorOneOf3Types == EContribType.RN || operatorOneOf3Types == EContribType.M || operatorOneOf3Types == EContribType.RD)
                                 {
                                     Series tsRef = null;
                                     tsRef = O.GetIVariableFromString(G.Chop_SetBank(fullName, "Ref"), O.ECreatePossibilities.NoneReturnNull) as Series;
@@ -1196,7 +1200,7 @@ namespace Gekko
                             }
                         }                        
 
-                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], code1, smpl, lhs, t2, varname);
+                        double d = DecomposePutIntoTable2HelperOperators(decompDatasSupremeClone[super], operator1, smpl, lhs, t2, varname);
                         
                         FrameLightRow dr = new FrameLightRow(frame);
                         dr.Set(frame, col_equ, new CellLight(super.ToString()));
@@ -1442,35 +1446,35 @@ namespace Gekko
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
 
-                        if (code1 == "n")
+                        if (operator1 == "xn")
                         {
                             d = dLevel;
                         }
-                        else if (code1 == "rn")
+                        else if (operator1 == "xrn")
                         {
                             d = dLevelRef;
                         }
-                        else if (code1 == "d")
+                        else if (operator1 == "d")
                         {
                             d = td.change;
                         }
-                        else if (code1 == "m")
+                        else if (operator1 == "m")
                         {
                             d = td.change;
                         }
-                        else if (code1 == "xd")
+                        else if (operator1 == "xd")
                         {
                             d = dLevel - dLevelLag;                            
                         }
-                        else if (code1 == "xp")
+                        else if (operator1 == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
                         }
-                        else if (code1 == "xm")
+                        else if (operator1 == "xm")
                         {
                             d = dLevel - dLevelRef;
                         }
-                        else if (code1 == "xq")
+                        else if (operator1 == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
@@ -1644,7 +1648,15 @@ namespace Gekko
         {
             EContribType ect = EContribType.Unknown;
 
-            if (op == "d" || op == "p" || op == "dp")
+            if (op == "n")
+            {
+                ect = EContribType.N;
+            }
+            else if (op == "rn")
+            {
+                ect = EContribType.RN;
+            }
+            else if (op == "d" || op == "p" || op == "dp")
             {
                 ect = EContribType.D;
             }
