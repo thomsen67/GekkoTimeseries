@@ -9408,13 +9408,7 @@ namespace UnitTests
         public void _Test_DecompOperators()
         {
             if (true)
-            {
-                // Consider this model, run over t = 2021, 2022
-                // over the ages #a = 18, 19
-                //
-                // c[#a] = 0.40 * (y[#a] + y[#a+1][+1])
-                // y[#a] = c[#a] + g[#a]                
-                //
+            {                
                 I("RESET;");
                 I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
                 I("OPTION model type = gams;");
@@ -9436,6 +9430,12 @@ namespace UnitTests
                 I("c[19] = 121, 125;");
                 I("c[20] = 136, 125;");
                 I("ctot = c[18] + c[19] - c[20] + 1;");
+
+                //ctot           Work         %            Ref        r%            <m>          m%
+                //2020        99.0000         M       101.0000         M        -2.0000       -1.98
+                //2021       119.0000     20.20       110.0000      8.91         9.0000        8.18
+
+                I("gmulprt ctot;");
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

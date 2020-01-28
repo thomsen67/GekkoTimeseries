@@ -440,7 +440,7 @@ namespace Gekko
             //We clone the data first, before calling DecompPivotToTable(), because they may be normalized etc. 
             List<DecompData> decompDatasSupremeClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas[parentI]) decompDatasSupremeClone.Add(dd.DeepClone());                        
-            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);  
+             Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);  
 
             if (false)
             {
@@ -1160,10 +1160,9 @@ namespace Gekko
                         double dLevel = double.NaN;
                         double dLevelLag = double.NaN;
                         double dLevelRef = double.NaN;
-                        double dLevelRefLag = double.NaN;
+                        double dLevelRefLag = double.NaN;                        
                         
-                        
-                        if (operator1.StartsWith("x"))
+                        if (true || operator1.StartsWith("x"))
                         {
                             if (varname.Contains(Globals.decompResidualName))
                             {
@@ -1439,6 +1438,7 @@ namespace Gekko
 
             for (int i = 0; i < rownames.Count; i++)
             {
+
                 for (int j = 0; j < colnames.Count; j++)
                 {
                     string key = rownames[i] + "¤" + colnames[j];
@@ -1459,7 +1459,7 @@ namespace Gekko
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
 
-                        if (rownames[i] == rownamesFirst || colnames[i] == colnamesFirst)
+                        if (rownames[i] == rownamesFirst || colnames[j] == colnamesFirst)
                         {
                             dFirstLevel = dLevel;
                             dFirstLevelLag = dLevelLag;
@@ -1478,10 +1478,18 @@ namespace Gekko
                         else if (operator1 == "d")
                         {
                             d = td.change;
-                        }                        
+                        }
+                        else if (operator1 == "p")
+                        {
+                            d = td.change / dFirstLevelLag * 100d;
+                        }
                         else if (operator1 == "m")
                         {
                             d = td.change;
+                        }
+                        else if (operator1 == "q")
+                        {
+                            d = td.change / dFirstLevelRef * 100d;
                         }
                         else if (operator1 == "xd")
                         {
@@ -1490,15 +1498,16 @@ namespace Gekko
                         else if (operator1 == "xp")
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
-                        }
-                        else if (operator1 == "p")
+                        }                        
+                        else if (operator1 == "xm")
                         {
-                            d = td.change / dFirstLevel * 100d;
+                            d = dLevel - dLevelRef;
                         }
                         else if (operator1 == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
+
                     }
                     
                     int decimals = 0;
