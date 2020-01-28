@@ -9302,6 +9302,7 @@ namespace UnitTests
         [TestMethod]
         public void _Test_DecompAgeLead()
         {
+            
             if (true)
             {
                 // Consider this model, run over t = 2021, 2022
@@ -9391,15 +9392,65 @@ namespace UnitTests
                 //TODO: a_residual row 2 (residual)              
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
                 Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");                
+                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
                 Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
                 Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
                 Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
-                Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);                
+                Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
                 Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
             }
+
+
+
         }
 
+        [TestMethod]
+        public void _Test_DecompOperators()
+        {
+            if (true)
+            {
+                // Consider this model, run over t = 2021, 2022
+                // over the ages #a = 18, 19
+                //
+                // c[#a] = 0.40 * (y[#a] + y[#a+1][+1])
+                // y[#a] = c[#a] + g[#a]                
+                //
+                I("RESET;");
+                I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+                I("OPTION model type = gams;");
+                I("model <gms> agesimple;");
+                I("#a = seq(18, 20).strings();");
+                I("#a += tot,;");
+                I("c = series(1);");
+                I("c.setdomains(('#a',));");
+                I("time 2020 2021;");
+                //---
+                I("c[18] = 110, 114;");
+                I("c[19] = 120, 123;");
+                I("c[20] = 130, 128;");
+                I("ctot = c[18] + c[19] - c[20] + 1;");
+
+                I("clone;");
+
+                I("c[18] = 113, 118;");
+                I("c[19] = 121, 125;");
+                I("c[20] = 136, 125;");
+                I("ctot = c[18] + c[19] - c[20] + 1;");
+
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                I("decomp2<xm> ctot in e_c rows vars, #a, lags cols time;");
+
+                Table table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+
+            }           
+        }
 
         [TestMethod]
         public void _Test_SeriesResize()
