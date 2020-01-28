@@ -9443,7 +9443,7 @@ namespace UnitTests
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-                I("decomp2<xm> ctot in e_c rows vars, #a, lags cols time;");
+                I("decomp2 <xd> ctot in e_c rows vars, #a, lags cols time;");
 
                 Table table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");

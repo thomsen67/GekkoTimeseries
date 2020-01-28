@@ -1422,14 +1422,27 @@ namespace Gekko
 
             if (orderNormalize && rownamesFirst == null && colnamesFirst == null)
             {
-                MessageBox.Show("*** ERROR: Could not find row/col to put first for normalization");
+                if (rownamesFirst == null && colnamesFirst == null)
+                {
+                    MessageBox.Show("*** ERROR: Could not find row/col to put first for normalization");
+                }
+                if (rownamesFirst != null && colnamesFirst != null)
+                {
+                    MessageBox.Show("*** ERROR: Both row and col are set first for normalization");
+                }
             }
+
+            double dFirstLevel = double.NaN;
+            double dFirstLevelLag = double.NaN;
+            double dFirstLevelRef = double.NaN;
+            double dFirstLevelRefLag = double.NaN;
 
             for (int i = 0; i < rownames.Count; i++)
             {
                 for (int j = 0; j < colnames.Count; j++)
                 {
-                    string key = rownames[i] + "¤" + colnames[j];                    
+                    string key = rownames[i] + "¤" + colnames[j];
+                    
                     FiveDouble td = null;
                     agg.TryGetValue(key, out td);
                     double d = 0d;
@@ -1446,6 +1459,14 @@ namespace Gekko
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
 
+                        if (rownames[i] == rownamesFirst || colnames[i] == colnamesFirst)
+                        {
+                            dFirstLevel = dLevel;
+                            dFirstLevelLag = dLevelLag;
+                            dFirstLevelRef = dLevelRef;
+                            dFirstLevelRefLag = dLevelRefLag;
+                        }
+
                         if (operator1 == "xn")
                         {
                             d = dLevel;
@@ -1457,7 +1478,7 @@ namespace Gekko
                         else if (operator1 == "d")
                         {
                             d = td.change;
-                        }
+                        }                        
                         else if (operator1 == "m")
                         {
                             d = td.change;
@@ -1470,21 +1491,25 @@ namespace Gekko
                         {
                             d = (dLevel - dLevelLag) / dLevelLag * 100d;
                         }
-                        else if (operator1 == "xm")
+                        else if (operator1 == "p")
                         {
-                            d = dLevel - dLevelRef;
+                            d = td.change / dFirstLevel * 100d;
                         }
                         else if (operator1 == "xq")
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
                     }
-
+                    
                     int decimals = 0;
                     if (decompOptions2.decompTablesFormat.isPercentageType) decimals = decompOptions2.decompTablesFormat.decimalsPch;
                     else decimals = decompOptions2.decompTablesFormat.decimalsLevel;
                     string format2 = "f16." + decimals.ToString();                    
                     tab.SetNumber(i + 2, j + 2, d, format2);
+
+
+
+
                 }
             }
 
