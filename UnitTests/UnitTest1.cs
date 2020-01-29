@@ -9434,9 +9434,7 @@ namespace UnitTests
                 //ctot           Work         %            Ref        r%            <m>          m%
                 //2020        99.0000         M       101.0000         M        -2.0000       -1.98
                 //2021       119.0000     20.20       110.0000      8.91         9.0000        8.18
-
-                I("gmulprt ctot;");
-
+                
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // Globals.showDecompTable = true;  //will show the following decomp table and then abort

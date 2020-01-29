@@ -1772,6 +1772,7 @@ namespace Gekko
 
         private static bool DecompMatchWord(string colnames3, string varnames)
         {
+            if (colnames3 == null) return false;
             return G.ContainsWord(colnames3, G.Chop_GetName(varnames));
         }
 
