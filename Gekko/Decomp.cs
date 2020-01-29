@@ -1471,10 +1471,7 @@ namespace Gekko
                 }
             }
 
-            double dFirstLevel = double.NaN;
-            double dFirstLevelLag = double.NaN;
-            double dFirstLevelRef = double.NaN;
-            double dFirstLevelRefLag = double.NaN;
+            
 
             for (int i = 0; i < rownames.Count; i++)
             {
@@ -1499,19 +1496,30 @@ namespace Gekko
                         dLevelRef = td.levelRef;
                         dLevelRefLag = td.levelRefLag;
 
-                        if (rownames[i] == rownamesFirst || colnames[j] == colnamesFirst)
+                        // ----- first start -----------------------------------------------
+                        double dFirstLevel = double.NaN;
+                        double dFirstLevelLag = double.NaN;
+                        double dFirstLevelRef = double.NaN;
+                        double dFirstLevelRefLag = double.NaN;
+                        string keyFirst = null;
+                        if (rownamesFirst != null) keyFirst = rownamesFirst + "¤" + colnames[j];
+                        else if (colnamesFirst != null) keyFirst = rownames[i] + "¤" + colnamesFirst;
+                        FiveDouble tdFirst = null;
+                        agg.TryGetValue(keyFirst, out tdFirst);
+                        if (tdFirst != null)
                         {
-                            dFirstLevel = dLevel;
-                            dFirstLevelLag = dLevelLag;
-                            dFirstLevelRef = dLevelRef;
-                            dFirstLevelRefLag = dLevelRefLag;
+                            dFirstLevel = tdFirst.level;
+                            dFirstLevelLag = tdFirst.levelLag;
+                            dFirstLevelRef = tdFirst.levelRef;
+                            dFirstLevelRefLag = tdFirst.levelRefLag;
                         }
+                        // ----- first end --------------------------------------------------
 
-                        if (operator1 == "xn")
+                        if (operator1 == "n" || operator1 == "xn")
                         {
                             d = dLevel;
                         }
-                        else if (operator1 == "xrn")
+                        else if (operator1 == "rn" || operator1 == "r" || operator1 == "xrn" || operator1 == "xr")
                         {
                             d = dLevelRef;
                         }
