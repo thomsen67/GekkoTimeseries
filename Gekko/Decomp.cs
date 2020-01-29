@@ -1547,6 +1547,23 @@ namespace Gekko
                         {
                             d = (dLevel - dLevelRef) / dLevelRef * 100d;
                         }
+                        // -----------------
+                        else if (operator1 == "rd")
+                        {                         
+                            d = td.change;
+                        }
+                        else if (operator1 == "rp")
+                        {
+                            d = td.change / dFirstLevelRefLag * 100d;
+                        }                        
+                        else if (operator1 == "xrd")
+                        {
+                            d = dLevelRef - dLevelRefLag;
+                        }
+                        else if (operator1 == "xrp")
+                        {
+                            d = (dLevelRef - dLevelRefLag) / dLevelRefLag * 100d;
+                        }
 
                     }
                     
