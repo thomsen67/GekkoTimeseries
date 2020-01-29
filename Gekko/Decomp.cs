@@ -235,27 +235,52 @@ namespace Gekko
             }
 
             if (shouldRecalc || refresh)  //signals a recalc of data, not a reuse
-            {
+            {                
+                if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
+
+                bool shouldMerge = decompDatas.hasD || decompDatas.hasRD || decompDatas.hasM;
+
+                List<string> expressionTexts = new List<string>();
+                int ii = -1;
+                foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
+                {
+                    ii++;
+                    string residualName = Program.GetDecompResidualName(ii);
+                    List<DecompData> temp = new List<DecompData>();
+
+                    int jj = -1;
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
+                    {
+                        jj++;
+                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
+                        if (shouldMerge)
+                        {                            
+                            if (operatorOneOf3Types == EContribType.D)
+                            {
+                                decompDatas.storage[ii][jj].cellsContribD = dd.cellsContribD;
+                            }
+                            else if (operatorOneOf3Types == EContribType.RD)
+                            {
+                                decompDatas.storage[ii][jj].cellsContribDRef = dd.cellsContribDRef;
+                            }
+                            else if (operatorOneOf3Types == EContribType.M)
+                            {
+                                decompDatas.storage[ii][jj].cellsContribM = dd.cellsContribM;
+                            }
+                        }
+                        else
+                        {
+                            temp.Add(dd);
+                        }
+                    }
+                    if (!shouldMerge)
+                    {
+                        decompDatas.storage.Add(temp);
+                    }
+                }
                 if (operatorOneOf3Types == EContribType.D) decompDatas.hasD = true;
                 else if (operatorOneOf3Types == EContribType.RD) decompDatas.hasRD = true;
                 else if (operatorOneOf3Types == EContribType.M) decompDatas.hasM = true;
-                if (decompDatas.storage == null) decompDatas.storage = new List<List<DecompData>>();
-
-                List<string> expressionTexts = new List<string>();
-                int counter2 = -1;
-                foreach (Link link in decompOptions2.link)  //including the "mother" non-linked equation
-                {
-                    counter2++;
-                    string residualName = Program.GetDecompResidualName(counter2);
-                    List<DecompData> temp = new List<DecompData>();
-
-                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
-                    {
-                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
-                        temp.Add(dd);
-                    }
-                    decompDatas.storage.Add(temp);
-                }
 
                 G.Writeln2(">>>After low level " + DateTime.Now.ToLongTimeString());
 
