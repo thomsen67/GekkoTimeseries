@@ -1811,10 +1811,11 @@ namespace Gekko
 
     public class DecompDatas
     {
-        public List<List<DecompData>> storage = null;        
+        public List<List<DecompData>> storage = null; //untouched decomps of equations
+        public List<DecompData> MAIN_data = null;  //first equation with the rest in-substituted
         public bool hasD = false;
         public bool hasM = false;
-        public bool hasRD = false;
+        public bool hasRD = false;     
     }
 
     public class DecompData
