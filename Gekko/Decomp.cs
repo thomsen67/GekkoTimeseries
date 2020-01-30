@@ -319,6 +319,12 @@ namespace Gekko
 
                 for (int i = 1; i < decompOptions2.link.Count; i++)  //skips the MAIN equation
                 {
+                    // ---------------------------------------------------------------
+                    // ---------------------------------------------------------------
+                    // Decomp over time (see example here: #98750984325)
+                    // ---------------------------------------------------------------
+                    // ---------------------------------------------------------------
+
                     bool isLead = G.Equal(decompOptions2.link[i].option, "lead");
 
                     //For each link variable (c) in the link equation (e2)

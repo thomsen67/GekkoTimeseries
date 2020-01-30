@@ -9384,20 +9384,71 @@ namespace UnitTests
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-                I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
+                if (true)
+                {
+                    I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
-                Table table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
-                //TODO: a_residual row 2 (residual)              
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
-                Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
-                Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
-                Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
-                Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
+                    Table table = Globals.lastDecompTable;
+                    Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+                    Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+                    //TODO: a_residual row 2 (residual)              
+                    Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
+                    Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
+                    Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
+                    Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
+                    Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
+                    Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
+                }
+                else
+                {
+
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    Globals.showDecompTable = true;  //will show the following decomp table and then abort
+                                                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+                    // Decomp over time example (#98750984325)
+                    //
+                    // eq1           2021       2022
+                    // ---------------------------------
+                    // y[18][0]     8.8889    32.2223
+                    // residual     0          0
+                    // g[18][0]     3.3333     6.6667
+                    // y[19][+1]    5.5556    25.5555
+
+                    // eq2           2021       2022
+                    // ---------------------------------
+                    // y[19][0]     3.33330    8.3333
+                    // residual     0          0
+                    // g[19][0]     3.333333   8.33333
+                    // y[20][+1]    0          0
+
+                    //in eq1, we want to substitute the 5.56 in the last row
+                    //with eq2. So y[19][+1] in 2021 in eq1 is = y[19] in 2022 in eq2.
+                    //So the 5.56 link up with the 8.33, and the effect is this for eq1:
+
+                    // eq1           2021       2022
+                    // ---------------------------------
+                    // y[18][0]     8.8889    32.2223
+                    // residual     0          0
+                    // g[18][0]     3.3333     6.6667
+                    // y[19][+1]    0         25.5555     <---- has 5.5556 removed in 2021
+                    // g[19][+1]    5.5556     0          <---- has 5.5556 added in 2021
+                    // y[20][+2]    0          0
+                    //
+                    // So for t = 2021 we take y[19][+1] in eq1, with value 5.5556. 
+                    // Then we subtract 1 from lead --> y[19][0], and look that up,
+                    // but for t+1 --> 8.3333. A factor is calculated, and the rows
+                    // from eq2 in t+1 are put into eq1, where the names have 1 added
+                    // to their leads (g[19][0] --> g[19][+1] and y[20][+1] --> y[20][+2].
+
+                    I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2, y[19], y[20] in e1c <lead>, s[19], s[20] in e1a <lead>, d[19], d[20] in e1b <lead>, c[19], c[20] in e2 <lead> where '0' in equ rows vars, #a, lags cols time;");
+
+                }
             }
 
 
