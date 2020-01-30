@@ -40,6 +40,7 @@ namespace Gekko
         public List<Func<GekkoSmpl, IVariable>> expressions = null;
         public List<string> varnames = null;
         public string eqname = null;
+        public string option = null;
     }
 
     public class DecompItems
@@ -47,12 +48,14 @@ namespace Gekko
         public Func<GekkoSmpl, IVariable> expression = null;
         public IVariable varnames = null;
         public IVariable eqname = null;
+        public IVariable option = null;
 
-        public DecompItems(Func<GekkoSmpl, IVariable> expression, IVariable name1, IVariable name2)
+        public DecompItems(Func<GekkoSmpl, IVariable> expression, IVariable name1, IVariable name2, IVariable option)
         {
             this.expression = expression;
             this.varnames = name1;
             this.eqname = name2;
+            this.option = option;
         }
     }
 

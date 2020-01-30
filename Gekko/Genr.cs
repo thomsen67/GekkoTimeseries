@@ -23,7 +23,7 @@ namespace Gekko
 
             o0.opt_prtcode = O.ConvertToString((new ScalarString("d")));
 
-            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qc_a").Concat(null, new ScalarString("[").Concat(null, new ScalarString("30")).Concat(null, new ScalarString("]"))), new ScalarString("qc_a").Concat(null, new ScalarString("[").Concat(null, new ScalarString("31")).Concat(null, new ScalarString("]"))) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("E_qC_a") }))));
+            //o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("qc_a").Concat(null, new ScalarString("[").Concat(null, new ScalarString("30")).Concat(null, new ScalarString("]"))), new ScalarString("qc_a").Concat(null, new ScalarString("[").Concat(null, new ScalarString("31")).Concat(null, new ScalarString("]"))) })), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("E_qC_a") }))));
             
             o0.Exe();
 

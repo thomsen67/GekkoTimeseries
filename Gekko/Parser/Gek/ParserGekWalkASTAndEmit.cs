@@ -5514,6 +5514,10 @@ namespace Gekko.Parser.Gek
                         {
                             string methodName = "Evalcode" + ++Globals.counter;
                             string code = null;
+
+                            string n2 = "null";
+                            if (node[2].ChildrenCount() > 0) n2 = node[2][0].Code.ToString();
+
                             if (node[1].ChildrenCount() == 1)
                             {
                                 //DECOMP x1 + x2
@@ -5528,14 +5532,17 @@ namespace Gekko.Parser.Gek
                             StashIntoLocalFuncs(w, methodName, code, false);
                             string n = "null";
                             if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
-                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + n + ", null))" + ";" + G.NL);                            
+                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(" + methodName + ", " + n + ", null, " + n2 + "))" + ";" + G.NL);
                         }
                         break;
                     case "ASTDECOMPITEMSNAME":
                         {
+                            string n2 = "null";
+                            if (node[2].ChildrenCount() > 0) n2 = node[2][0].Code.ToString();                            
                             string n = "null";
-                            if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();                                                        
-                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + node[1][0].Code + "))" + ";" + G.NL);                            
+                            if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
+                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + node[1][0].Code + ", " + n2 + "))" + ";" + G.NL);
+                            
                         }
                         break;
                     case "ASTDECOMP2":

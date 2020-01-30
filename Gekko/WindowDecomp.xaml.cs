@@ -1789,9 +1789,46 @@ namespace Gekko
 
         private void SetRadioButtonsDefaults()
         {
-            //if (this.decompOptions2.isSubst) subst.IsChecked = true;
-            //if (this.decompOptions2.isSort) sort.IsChecked = true;
-            //if (this.decompOptions2.isPool) pool.IsChecked = true;
+            if (true)
+            {
+                //Setting defaults
+                radioButton21.IsEnabled = true;
+                radioButton21.Opacity = 1.0;
+                radioButton22.IsEnabled = true;
+                radioButton22.Opacity = 1.0;
+                radioButton24.IsEnabled = true;
+                radioButton24.Opacity = 1.0;
+                radioButton29.IsEnabled = true;
+                radioButton29.Opacity = 1.0;
+                radioButton26.IsEnabled = true;
+                radioButton26.Opacity = 1.0;
+                radioButton28.IsEnabled = true;
+                radioButton28.Opacity = 1.0;
+                radioButton30.IsEnabled = true;
+                radioButton30.Opacity = 1.0;
+                //---
+                radioButton1.IsEnabled = true;
+                radioButton1.Opacity = 1.0;
+                radioButton2.IsEnabled = true;
+                radioButton2.Opacity = 1.0;
+                radioButton4.IsEnabled = true;
+                radioButton4.Opacity = 1.0;
+                radioButton9.IsEnabled = true;
+                radioButton9.Opacity = 1.0;
+                radioButton6.IsEnabled = true;
+                radioButton6.Opacity = 1.0;
+                radioButton8.IsEnabled = true;
+                radioButton8.Opacity = 1.0;
+                radioButton10.IsEnabled = true;
+                radioButton10.Opacity = 1.0;
+                //---
+                checkBox1.IsEnabled = true;
+                checkBox1.Opacity = 1.0;
+                checkBox2.IsEnabled = true;
+                checkBox2.Opacity = 1.0;
+                flowText.Opacity = 0.5;
+                flowText.Visibility = Visibility.Visible;
+            }
 
             if (this.decompOptions2.operatorHelper.guiDecompIsRef)
             {
@@ -1847,48 +1884,67 @@ namespace Gekko
                 checkBox2.IsEnabled = false;  //baseline, not meaningful for multiplier types
                 checkBox2.Opacity = 0.5;
             }
+
+            if (true)
+            {
+                //TODO TODO TODO TODO TODO TODO  TODO TODO
+                //TODO TODO TODO TODO TODO TODO  TODO TODO
+                //TODO TODO TODO TODO TODO TODO  TODO TODO greyed out for now
+                //TODO TODO TODO TODO TODO TODO  TODO TODO
+                //TODO TODO TODO TODO TODO TODO  TODO TODO
+                radioButton9.IsEnabled = false;
+                radioButton9.Opacity = 0.5;
+                radioButton10.IsEnabled = false;
+                radioButton10.Opacity = 0.5;
+                radioButton29.IsEnabled = false;
+                radioButton29.Opacity = 0.5;
+                radioButton30.IsEnabled = false;
+                radioButton30.Opacity = 0.5;
+                checkBox1.IsEnabled = false;
+                checkBox1.Opacity = 0.5;
+            }
         }
 
-        private void SetRadioButtonDefaults()
-        {
-            //Setting defaults
-            radioButton21.IsEnabled = true;
-            radioButton21.Opacity = 1.0;
-            radioButton22.IsEnabled = true;
-            radioButton22.Opacity = 1.0;
-            radioButton24.IsEnabled = true;
-            radioButton24.Opacity = 1.0;
-            radioButton29.IsEnabled = true;
-            radioButton29.Opacity = 1.0;
-            radioButton26.IsEnabled = true;
-            radioButton26.Opacity = 1.0;
-            radioButton28.IsEnabled = true;
-            radioButton28.Opacity = 1.0;
-            radioButton30.IsEnabled = true;
-            radioButton30.Opacity = 1.0;
-            //---
-            radioButton1.IsEnabled = true;
-            radioButton1.Opacity = 1.0;
-            radioButton2.IsEnabled = true;
-            radioButton2.Opacity = 1.0;
-            radioButton4.IsEnabled = true;
-            radioButton4.Opacity = 1.0;
-            radioButton9.IsEnabled = true;
-            radioButton9.Opacity = 1.0;
-            radioButton6.IsEnabled = true;
-            radioButton6.Opacity = 1.0;
-            radioButton8.IsEnabled = true;
-            radioButton8.Opacity = 1.0;
-            radioButton10.IsEnabled = true;
-            radioButton10.Opacity = 1.0;
-            //---
-            checkBox1.IsEnabled = true;
-            checkBox1.Opacity = 1.0;
-            checkBox2.IsEnabled = true;
-            checkBox2.Opacity = 1.0;
-            flowText.Opacity = 0.5;
-            flowText.Visibility = Visibility.Visible;
-        }
+        //private void SetRadioButtonDefaults()
+        //{
+        //    //Setting defaults
+        //    radioButton21.IsEnabled = true;
+        //    radioButton21.Opacity = 1.0;
+        //    radioButton22.IsEnabled = true;
+        //    radioButton22.Opacity = 1.0;
+        //    radioButton24.IsEnabled = true;
+        //    radioButton24.Opacity = 1.0;
+        //    radioButton29.IsEnabled = true;
+        //    radioButton29.Opacity = 1.0;
+        //    radioButton26.IsEnabled = true;
+        //    radioButton26.Opacity = 1.0;
+        //    radioButton28.IsEnabled = true;
+        //    radioButton28.Opacity = 1.0;
+        //    radioButton30.IsEnabled = true;
+        //    radioButton30.Opacity = 1.0;
+        //    //---
+        //    radioButton1.IsEnabled = true;
+        //    radioButton1.Opacity = 1.0;
+        //    radioButton2.IsEnabled = true;
+        //    radioButton2.Opacity = 1.0;
+        //    radioButton4.IsEnabled = true;
+        //    radioButton4.Opacity = 1.0;
+        //    radioButton9.IsEnabled = true;
+        //    radioButton9.Opacity = 1.0;
+        //    radioButton6.IsEnabled = true;
+        //    radioButton6.Opacity = 1.0;
+        //    radioButton8.IsEnabled = true;
+        //    radioButton8.Opacity = 1.0;
+        //    radioButton10.IsEnabled = true;
+        //    radioButton10.Opacity = 1.0;
+        //    //---
+        //    checkBox1.IsEnabled = true;
+        //    checkBox1.Opacity = 1.0;
+        //    checkBox2.IsEnabled = true;
+        //    checkBox2.Opacity = 1.0;
+        //    flowText.Opacity = 0.5;
+        //    flowText.Visibility = Visibility.Visible;
+        //}
 
         private void ClearGrid()
         {

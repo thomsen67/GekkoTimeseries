@@ -175,6 +175,7 @@ namespace Gekko
                     }
                     if (x2 != null) temp.eqname = x2[0];
                     temp.expressions = new List<Func<GekkoSmpl, IVariable>>() { liv.expression };
+                    if (liv.option != null) temp.option = liv.option.ConvertToString(); //"lead"
                     decompOptions2.link.Add(temp);
                 }
                                 
@@ -318,14 +319,19 @@ namespace Gekko
 
                 for (int i = 1; i < decompOptions2.link.Count; i++)  //skips the MAIN equation
                 {
+                    bool isLead = G.Equal(decompOptions2.link[i].option, "lead");
+
                     //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
                     {
                         //adjust the table according to link variable, so it fits with the destination table
-                        string linkVariable = Program.databanks.GetFirst().name + ":" + decompOptions2.link[i].varnames[n] + "¤[0]";
-                        linkVariables.Add(linkVariable);
+                        string linkVariable = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 0);
+                        linkVariables.Add(linkVariable);  //used to remove 0's later on
 
-                        //if (!ignore.ContainsKey(linkVariable)) ignore.Add(linkVariable, true); //the if should not be necessary, just for safety
+                        if (isLead)
+                        {
+
+                        }
 
                         //TODO TODO
                         //TODO TODO if there > 1 hit here, error or warning should be issued
@@ -343,8 +349,12 @@ namespace Gekko
                             //DECOMP y in eq1 link c in eq2.
                             //linkparent would be c from eq1, and linkchild would be c from eq2.
                             //linkparent is always from first equation
-                            Series linkParent = FindLinkSeries(decompDatas.storage, parentI, parentJ, linkVariable, operatorOneOf3Types); //Example: decomposed c from e1                       
-                                                                                                             //maybe check that all link equations are used, and report if they are not.
+
+                            string linkVariableHelper = linkVariable;
+                            if (isLead) linkVariableHelper = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 1);
+
+                            Series linkParent = FindLinkSeries(decompDatas.storage, parentI, parentJ, linkVariableHelper, operatorOneOf3Types); //Example: decomposed c from e1                       
+                                                                                                                                          //maybe check that all link equations are used, and report if they are not.
                             if (linkParent == null)
                             {
                                 continue;
@@ -361,7 +371,16 @@ namespace Gekko
                                 //Example: the factor is -(-1/1) = 1, so that adding the two tables would eliminate c in e1 equation.
                                 // y - (c + i + g) + 1*(c - 0.8 * y) = y + i + g - 0.8 * y =  0.2 * y + i + g
                                 // when showing this for y, the result must be multiplied by 5.
-                                double dLinkParent = linkParent.GetDataSimple(t);
+                                double dLinkParent = double.NaN;
+
+                                int add = 0;
+                                if (isLead)
+                                {
+                                    add = 1;
+                                }
+                                
+                                dLinkParent = linkParent.GetDataSimple(t.Add(add));
+
                                 double dLinkChild = linkChild.GetDataSimple(t);
                                 double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much
                                 factors.Add(factor);
@@ -370,25 +389,31 @@ namespace Gekko
                             //for each period, find the variable value in the original equation, and compute
                             //  a correction factor for the sub-equation.     
 
-
-
                             foreach (KeyValuePair<string, Series> kvp in GetDecompDatas(decompDatas.storage[i][j], operatorOneOf3Types).storage)
                             {
-                                Series varParent = GetDecompDatas(decompDatas.storage[parentI][parentJ], operatorOneOf3Types)[kvp.Key];  //will be created
+
+                                
+                                string childVariableName = kvp.Key;
+                                Series varParent = GetDecompDatas(decompDatas.storage[parentI][parentJ], operatorOneOf3Types)[childVariableName];  //will be created
                                 Series varChild = kvp.Value;
+
+                                if (isLead)
+                                {
+                                    string[] ss = childVariableName.Split('¤');
+                                    int lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
+                                    childVariableName = DecompGetLinkVariableName(ss[0], lag + 1);
+                                }
 
                                 int counter = -1;
 
                                 foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
                                 {
                                     counter++;
-                                    //if (G.Equal(kvp.Key, linkVariable)) continue;
-
                                     double dVarParent = varParent.GetDataSimple(t);
                                     if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
                                     double dVarChild = varChild.GetDataSimple(t);
                                     double x = dVarParent + factors[counter] * dVarChild;
-                                    GetDecompDatas(decompDatas.storage[parentI][parentJ], operatorOneOf3Types)[kvp.Key].SetData(t, x);
+                                    GetDecompDatas(decompDatas.storage[parentI][parentJ], operatorOneOf3Types)[childVariableName].SetData(t, x);
                                 }
                             }
                         }
@@ -480,7 +505,7 @@ namespace Gekko
             //We clone the data first, before calling DecompPivotToTable(), because they may be normalized etc. 
             List<DecompData> decompDatasSupremeClone = new List<DecompData>();
             foreach (DecompData dd in decompDatas.storage[parentI]) decompDatasSupremeClone.Add(dd.DeepClone());                        
-             Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);  
+            Table table = Decomp.DecompPivotToTable(decompOptions2.link[parentI].varnames, per1, per2, decompDatasSupremeClone, decompOptions2.decompTablesFormat, operator1, isShares, smpl, lhsString, decompOptions2.link[parentI].expressionText, decompOptions2, frame, operatorOneOf3Types);  
 
             if (false)
             {
@@ -491,6 +516,14 @@ namespace Gekko
             G.Writeln2("DECOMP took " + G.SecondsFormat((DateTime.Now - t0).TotalMilliseconds) + ", function evals = " + funcCounter);
 
             return table;
+        }
+
+        private static string DecompGetLinkVariableName(string s, int lag)
+        {
+            string slag = lag.ToString();
+            if (lag > 0) slag = "+" + slag;
+            slag = "[" + slag + "]";
+            return s + "¤" + slag;
         }
 
         //public static DecompDict GetDecompDatas(List<List<DecompData>> decompDatas, int i, int j, EContribType operatorOneOf3Types)

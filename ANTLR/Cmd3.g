@@ -34,6 +34,7 @@ tokens {
 	ASTDOLLAR;
 	ASTFORTYPE1;
 	ASTNUMBERMINUS;
+	ASTDECOMPITEMOPTION;
 	ASTDECOMPWHERE;
 	ASTDECOMPGROUP;
 	ASTDECOMPLINK;
@@ -873,6 +874,13 @@ ASTOPT_STRING_Y2;
 
 	// --- tokens1 start ---
 	
+	MAXLAG ='MAXLAG';
+	DFMIN ='DFMIN';
+	LEAD ='LEAD';
+	REKUR ='REKUR';
+	MAXLEAD ='MAXLEAD';
+	FIT ='FIT';
+
 	GMS = 'GMS';
 	ELEMENTS = 'ELEMENTS';
 	NOMAX = 'NOMAX';
@@ -1937,6 +1945,15 @@ d.Add("Y" ,Y);
                                         d.Add("RESTART", RESTART);
 										d.Add("elements"  , ELEMENTS    );
 										d.Add("nomax"  , NOMAX    );
+
+										d.Add("MAXLAG"  , MAXLAG    );
+										d.Add("DFMIN"  ,  DFMIN   );
+										d.Add("LEAD"  , LEAD    );
+										d.Add("REKUR"  , REKUR    );
+										d.Add("MAXLEAD"  , MAXLEAD    );
+										d.Add("FIT"  , FIT    );
+
+
 										d.Add("gms"  , GMS    );
                                         d.Add("return"  , RETURN2    );
                                         d.Add("ring"    , RING    );
@@ -2828,8 +2845,8 @@ seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
 seqOfBankvarnamesAlias: seqOfBankvarnames;
 
 //decompVar1:                 (seqOfBankvarnamesOnly1Alias IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1));
-decompVar1:                 (seqOfBankvarnamesAlias IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesAlias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1));
-decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression2       -> ^(ASTDECOMPITEMSEXPR ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER decompExpression2));
+decompVar1:                 (seqOfBankvarnamesAlias IN)? seqOfBankvarnamesOnly1 decompOpt2? -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesAlias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1) ^(ASTPLACEHOLDER decompOpt2?));
+decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression2 decompOpt2? -> ^(ASTDECOMPITEMSEXPR ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER decompExpression2) ^(ASTPLACEHOLDER decompOpt2?));
 
 decompExpression2:          (expression EQUAL)? expression -> expression+;
 
@@ -2854,6 +2871,10 @@ decompOpt1:					ISNOTQUAL
 						  | leftAngleNo2 dates? decompOpt1h* RIGHTANGLE -> ^(ASTOPT1 ^(ASTDATES dates?) decompOpt1h*)
                             ;
 decompOpt1h:				name -> ^(ASTOPT_STRING_PRTCODE name);
+
+decompOpt2:					ISNOTQUAL
+						  | leftAngle name RIGHTANGLE -> name 
+                            ;
 
 eval:						EVAL expression -> ^({token("ASTEVAL¤"+($expression.text), ASTEVAL, input.LT(1).Line)} expression);
 
@@ -3980,7 +4001,7 @@ optionType:
              | TABLE HTML FONTSIZE '='? numberIntegerOrDouble ->  TABLE HTML FONTSIZE numberIntegerOrDouble		
 			 | TABLE HTML SECONDCOLWIDTH '='? numberIntegerOrDouble ->  TABLE HTML SECONDCOLWIDTH numberIntegerOrDouble
 			 | TABLE HTML SPECIALMINUS '='? yesNoSimple ->  TABLE HTML SPECIALMINUS ^(ASTBOOL yesNoSimple)
-             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple)´ //obsolete, delete in 3.3.x versions			
+             | TABLE IGNOREMISSINGVARS '='? yesNoSimple ->  TABLE IGNOREMISSINGVARS ^(ASTBOOL yesNoSimple) //obsolete, delete in 3.3.x versions			
 			 | TABLE MDATEFORMAT '='? expression ->  TABLE MDATEFORMAT ^(ASTSTRINGSIMPLE expression)			 
              | TABLE STAMP '='? yesNoSimple ->  TABLE STAMP ^(ASTBOOL yesNoSimple)
 			 | TABLE THOUSANDSSEPARATOR '='? yesNoSimple ->  TABLE THOUSANDSSEPARATOR ^(ASTBOOL yesNoSimple)
@@ -4520,6 +4541,14 @@ ident2: 					Ident |
   NOGDIF|
   NOLEV|
   NOMAX|
+
+  MAXLAG|
+  DFMIN|
+  LEAD|
+  REKUR|
+  MAXLEAD|
+  FIT|
+
   NONANNUAL|
   CURRENT|
   NONE|
@@ -4966,6 +4995,14 @@ ident3: 					Ident |
   NOGDIF|
   NOLEV|
   NOMAX|
+
+  MAXLAG|
+  DFMIN|
+  LEAD|
+  REKUR|
+  MAXLEAD|
+  FIT|
+
   PYTHON|
   NONANNUAL|
   CURRENT|

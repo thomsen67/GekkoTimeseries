@@ -1811,7 +1811,7 @@ namespace Gekko
 
     public class DecompDatas
     {
-        public List<List<DecompData>> storage = null;
+        public List<List<DecompData>> storage = null;        
         public bool hasD = false;
         public bool hasM = false;
         public bool hasRD = false;
