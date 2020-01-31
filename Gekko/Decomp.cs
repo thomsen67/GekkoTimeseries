@@ -293,7 +293,7 @@ namespace Gekko
                 if (false)
                 {
                     DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
-                }
+                }                
 
                 bool[] used = new bool[decompDatas.storage.Count];
                 used[0] = true;  //primary equation
@@ -328,6 +328,19 @@ namespace Gekko
                     // ---------------------------------------------------------------
 
                     bool isLead = G.Equal(decompOptions2.link[i].option, "lead");
+                    int add = 0;
+                    if (isLead)
+                    {
+                        add = 1;
+
+                        if (false)
+                        {
+                            List<List<DecompData>> delete = new List<List<DecompData>>();
+                            delete.Add(decompDatas.MAIN_data);
+                            DecompPrintDatas(delete, operatorOneOf3Types);
+                            throw new GekkoException();
+                        }
+                    }
 
                     //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
@@ -380,16 +393,13 @@ namespace Gekko
                                 // y - (c + i + g) + 1*(c - 0.8 * y) = y + i + g - 0.8 * y =  0.2 * y + i + g
                                 // when showing this for y, the result must be multiplied by 5.
                                 double dLinkParent = double.NaN;
-
-                                int add = 0;
-                                if (isLead)
-                                {
-                                    add = 1;
-                                }
                                 
-                                dLinkParent = linkParent.GetDataSimple(t.Add(add));
+                                dLinkParent = linkParent.GetDataSimple(t);
+                                double dLinkChild = linkChild.GetDataSimple(t.Add(add));
 
-                                double dLinkChild = linkChild.GetDataSimple(t);
+                                //dLinkParent = linkParent.GetDataSimple(t.Add(add));
+                                //double dLinkChild = linkChild.GetDataSimple(t);
+
                                 double factor = -dLinkParent / dLinkChild;  //recalculated for each kvp, but never mind, should not matter much
                                 factors.Add(factor);
                             }
@@ -402,15 +412,17 @@ namespace Gekko
 
                                 
                                 string childVariableName = kvp.Key;
-                                Series varParent = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName];  //will be created
-                                Series varChild = kvp.Value;
-
+                                
                                 if (isLead)
                                 {
                                     string[] ss = childVariableName.Split('¤');
                                     int lag = int.Parse(ss[1].Substring(1, ss[1].Length - 2));
                                     childVariableName = DecompGetLinkVariableName(ss[0], lag + 1);
                                 }
+
+                                Series varParent = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName];  //will be created
+                                Series varChild = kvp.Value;
+
 
                                 int counter = -1;
 
@@ -419,7 +431,7 @@ namespace Gekko
                                     counter++;
                                     double dVarParent = varParent.GetDataSimple(t);
                                     if (G.isNumericalError(dVarParent)) dVarParent = 0d;  //it usually does not exist beforehand
-                                    double dVarChild = varChild.GetDataSimple(t);
+                                    double dVarChild = varChild.GetDataSimple(t.Add(add));
                                     double x = dVarParent + factors[counter] * dVarChild;
                                     GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types)[childVariableName].SetData(t, x);
                                 }
@@ -428,8 +440,16 @@ namespace Gekko
                     }
                 }
 
+                if (false)
+                {
+                    List<List<DecompData>> delete = new List<List<DecompData>>();
+                    delete.Add(decompDatas.MAIN_data);
+                    DecompPrintDatas(delete, operatorOneOf3Types);
+                    throw new GekkoException();
+                }
+
                 //remove linked variables from result (are 0)
-                List<string> problem = new List<string>();
+                List <string> problem = new List<string>();
                 foreach (string linkVariable in linkVariables)
                 {
                     for (int parentJ = 0; parentJ < decompDatas.MAIN_data.Count; parentJ++)
@@ -447,7 +467,7 @@ namespace Gekko
                 }
                 foreach (string linkVariable in problem)
                 {
-                    G.Writeln("NOTE: DECOMP: Variable " + linkVariable + " is not eliminated");
+                    G.Writeln("+++ WARNING: DECOMP: Variable " + linkVariable + " is not eliminated");
                 }
                 
                 for (int parentJ = 0; parentJ < decompDatas.MAIN_data.Count; parentJ++)
@@ -2094,7 +2114,7 @@ namespace Gekko
                     {
                         string nme = kvp.Key;
                         Series ts = kvp.Value;
-                        for (int i = 2022; i <= 2022; i++)
+                        for (int i = 2021; i <= 2022; i++)
                         {
                             double v = ts.GetVal(new GekkoTime(EFreq.A, i, 1));
                             G.Writeln(c1 + " -- " + c2 + "  name " + nme + " " + i + " = " + v);
