@@ -9383,7 +9383,7 @@ namespace UnitTests
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            if (false)
+            if (true)
             {
                 I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
@@ -9400,14 +9400,15 @@ namespace UnitTests
                 Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
                 Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
             }
-            else
+
+            if (true)
             {
 
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                Globals.showDecompTable = true;  //will show the following decomp table and then abort
-                                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                                                 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                Globals.showDecompTable = false;  //will show the following decomp table and then abort
+                                                  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                                                  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
                 // Decomp over time example (#98750984325)
@@ -9535,7 +9536,7 @@ namespace UnitTests
                 // 0-- 1  name Work:y[20]¤[+1] 2022 = 0
                 // 0-- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
                 // 0-- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
-                                
+
 
                 // TOGETHER, 2021
                 // name Work:y[18]¤[0] 2021 = 5.3333
@@ -9564,18 +9565,28 @@ namespace UnitTests
                 // name Work:g[18]¤[0] 2021 = -2.0000                
                 // name Work:g[19]¤[+1] 2021 = -3.3333
 
-                // -----------the calculated result is this:
+                // AFTER NORMALIZATION:
 
-                // 0-- 1  name Work:y[19]¤[0] 2021 = 1.9999800000664
-                // 0-- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
-                // 0-- 0  name Work:y[18]¤[0] 2021 = 5.33333999992441                
-                // 0-- 0  name Work:y[19]¤[+1] 2021 = 3.33336000011065                
-                // 0-- 0  name Work:g[19]¤[+1] 2021 = -3.33333333342504
-                // 0-- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
+                // name Work:y[18]¤[0] 2021 = 8.8889
+                // name Work:g[18]¤[0] 2021 = 3.3333                
+                // name Work:g[19]¤[+1] 2021 = 5.5556
 
                 //I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e3 <lead>, c[19] in e2 <lead> where '0' in equ rows vars, #a, lags cols time;");
                 I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e4 <lead> where '0' in equ rows vars, #a, lags cols time;");
 
+                Table table = Globals.lastDecompTable;
+                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+                //to residual rows
+                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g | 18 | [0]");
+                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "g | 19 | [+1]");
+                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "y | 20 | [+2]");
+                Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
+                //to residual rows
+                Assert.AreEqual(table.Get(5, 2).number, 3.3333d, 0.0001);
+                Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
+                Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
             }
         }
     

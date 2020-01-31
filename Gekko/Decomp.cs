@@ -344,16 +344,13 @@ namespace Gekko
 
                     //For each link variable (c) in the link equation (e2)
                     for (int n = 0; n < decompOptions2.link[i].varnames.Count; n++)
-                    {
+                    {                        
                         //adjust the table according to link variable, so it fits with the destination table
                         string linkVariable = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 0);
-                        linkVariables.Add(linkVariable);  //used to remove 0's later on
-
-                        if (isLead)
-                        {
-
-                        }
-
+                        string linkVariableHelper = linkVariable;
+                        if (isLead) linkVariableHelper = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 1);
+                        linkVariables.Add(linkVariableHelper);  //used to remove 0's later on
+                                                
                         //TODO TODO
                         //TODO TODO if there > 1 hit here, error or warning should be issued
                         //TODO TODO
@@ -370,10 +367,7 @@ namespace Gekko
                             //DECOMP y in eq1 link c in eq2.
                             //linkparent would be c from eq1, and linkchild would be c from eq2.
                             //linkparent is always from first equation
-
-                            string linkVariableHelper = linkVariable;
-                            if (isLead) linkVariableHelper = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(decompOptions2.link[i].varnames[n], 1);
-
+                                                        
                             Series linkParent = FindLinkSeries(decompDatas.MAIN_data, parentJ, linkVariableHelper, operatorOneOf3Types); //Example: decomposed c from e1                       
                                                                                                                                           //maybe check that all link equations are used, and report if they are not.
                             if (linkParent == null)
