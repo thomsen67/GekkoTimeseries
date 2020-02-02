@@ -31,18 +31,9 @@ namespace Gekko
         OnRightHandSide
     }
 
-    //public class IVariablesFilterRange
-    //{
-    //    //Used for a[1:4] or a[1:4, 2:3].        
-    //    public IVariable first = null;
-    //    public IVariable last = null;
-    //    public IVariablesFilterRange(IVariable v1, IVariable v2)
-    //    {        
-    //        this.first = v1;
-    //        this.last = v2;
-    //    }
-    //}    
-
+    //IMPORTANT
+    //IMPORTANT see #70324327984
+    //IMPORTANT
     [ProtoContract]    
     [ProtoInclude(1, typeof(Series))]
     [ProtoInclude(2, typeof(ScalarVal))]

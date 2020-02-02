@@ -53,7 +53,9 @@ namespace Gekko
         public static bool gnuplotfix = true;
 
         public static bool prompting = true;
-        public static List<string> unitTestsPromtingHelper = null;                
+        public static List<string> unitTestsPromtingHelper = null;
+
+        public static bool excelDna = true;
         
         public static bool decompUnitPivot = true;  //can activate xlsx pivot writing   
 

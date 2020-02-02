@@ -2760,7 +2760,7 @@ namespace Gekko
             return;
         }
 
-        private static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
+        public static Databank GetDatabankFromFile(CellOffset offset, ReadOpenMulbkHelper oRead, ReadInfo readInfo, string file, string originalFilePath, string dateformat, string datetype, ref string tsdxFile, ref string tempTsdxPath, ref int NaNCounter)
         {
             //note: file is altered below, not sure why
 
@@ -3184,7 +3184,7 @@ namespace Gekko
         }
 
 
-        private static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
+        public static void ReadGbk(ReadOpenMulbkHelper oRead, ReadInfo readInfo, ref string file, ref Databank databank, string originalFilePath, ref string tsdxFile, ref string tempTsdxPath)
         {
             
             //Note: file is altered below in several places, including is_a_protobuffer_file stuff
@@ -3336,18 +3336,33 @@ namespace Gekko
                     G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
                     throw new GekkoException();
                 }
-
-
+                
                 using (FileStream fs = WaitForFileStream(fileName, GekkoFileReadOrWrite.Read))
                 {
-
-
                     ////May take a little time to create: so use static serializer if doing serialize on a lot of small objects
                     //RuntimeTypeModel serializer = TypeModel.Create();
                     //serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
                     try
                     {
                         DateTime dt3 = DateTime.Now;
+
+                        if (Globals.excelDna)
+                        {
+                            //IMPORTANT
+                            //IMPORTANT see #70324327984
+                            //IMPORTANT
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                        }
+
                         deserializedDatabank = Serializer.Deserialize<Databank>(fs);
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {                            
@@ -17478,7 +17493,26 @@ namespace Gekko
                 string s = Python();
                 G.Writeln2(s);
             }
-        
+
+            if (Globals.runningOnTTComputer && text == "excel")
+            {
+                ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+                Program.ReadInfo info = new Program.ReadInfo();
+                string file = @"c:\Thomas\Desktop\gekko\testing\jul05.gbk";
+                string tsdxFile = null;
+                string tempTsdxPath = null;
+                int NaNCounter = 0;
+
+                if (true)
+                {
+                    Databank db = Program.GetDatabankFromFile(null, oRead, info, file, file, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                    Series ts = db.GetIVariable("enl!a") as Series;
+                    GekkoTime gt = new GekkoTime(EFreq.A, 2006, 1);
+                    double x = ts.GetDataSimple(gt);
+                    
+                }
+            }
+
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
         }       
@@ -24575,66 +24609,7 @@ namespace Gekko
             G.Writeln("           Tip: try 'DISP " + name + ";' to see the dimensions.", Color.Red);
         }
         
-        //private static List<BankNameVersion> GetAllVariablesFromBank(Databank work)
-        //{
-        //    List<BankNameVersion> list = new List<BankNameVersion>();
-        //    foreach (string s in work.storage.Keys)
-        //    {
-        //        if (s == "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" || s == "")
-        //        {
-        //            continue;  //probably some artefact creeping in from PCIM?
-        //        }
-        //        BankNameVersion bnv = new Gekko.BankNameVersion();
-        //        bnv.name = s;
-        //        list.Add(bnv);
-        //    }
-        //    //list.Sort(StringComparer.InvariantCulture);
-        //    list = list.OrderBy(o => o.name).ToList();
-        //    return list;
-        //}
-
-        //private static List<BankNameVersion> FilterListForFrequency(List<BankNameVersion> list)
-        //{
-        //    //Returns a list where !q, !m at the end of each item is removed
-        //    List<BankNameVersion> newList = new List<BankNameVersion>();
-        //    Dictionary<string, double> skipped = new Dictionary<string, double>();
-        //    skipped.Add("u", 0d);
-        //    skipped.Add("a", 0d);
-        //    skipped.Add("q", 0d);
-        //    skipped.Add("m", 0d);
-        //    foreach (BankNameVersion var in list)
-        //    {
-        //        if (G.StartsWithSigil(var.name)) continue;  //ignore these % and #
-        //        string freq = G.GetFreq(Program.options.freq);
-        //        string s2 = var.name;
-        //        //if (!s2.Contains(Globals.freqIndicator)) s2 = s2 + Globals.freqIndicator + "a"; //because annual data does not have this indicator
-        //        string[] temp = s2.Split(new string[] { Globals.freqIndicator.ToString() }, StringSplitOptions.None);
-        //        if (temp.Length == 1) temp = new string[2] { temp[0], freq };
-        //        if (!G.Equal(freq, temp[1]))
-        //        {
-        //            skipped[temp[1]]++;
-        //            continue;
-        //        }
-        //        string s3 = temp[0];
-        //        BankNameVersion bnv = new BankNameVersion();
-        //        bnv.name = s3;
-        //        bnv.bank = var.bank;
-        //        newList.Add(bnv);
-        //    }
-
-        //    bool skipped2 = false;
-        //    foreach (string s in skipped.Keys)
-        //    {
-        //        if (skipped[s] > 0d)
-        //        {
-        //            skipped2 = true;
-        //            G.Writeln("+++ WARNING: ignored " + skipped[s] + " variables with frequency '" + s + "'");
-        //        }
-        //    }
-        //    if (skipped2) G.Writeln("You may change frequency (OPTION freq) to write these variables");
-        //    return newList;
-        //}
-
+        
         public static int WriteGbk(Databank databank, GekkoTime yr1, GekkoTime yr2, string file, bool isCaps, List<ToFrom> list, string writeOption, bool writeAllVariables, bool isCloseCommand)
         {
             if (databank.storage.Count == 0)
@@ -24774,16 +24749,53 @@ namespace Gekko
 
                 using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
                 {
-                    try
-                    {                        
-                        serializer.Serialize(fs, databank);                     
-                        count = databank.storage.Count;
-                    }
-                    catch (Exception e)
+
+                    if (Globals.excelDna)
                     {
-                        G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        throw new GekkoException();
+                        if (Globals.excelDna)
+                        {
+                            //IMPORTANT
+                            //IMPORTANT see #70324327984
+                            //IMPORTANT
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+
+                            try
+                            {                                
+                                Serializer.Serialize(fs, databank);
+                                count = databank.storage.Count;
+                            }
+                            catch (Exception e)
+                            {
+                                G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                                G.Writeln("           Message: " + e.Message, Color.Red);
+                                throw new GekkoException();
+                            }
+                        }
+
+                    }
+                    else
+                    {
+
+                        try
+                        {
+                            serializer.Serialize(fs, databank);
+                            count = databank.storage.Count;
+                        }
+                        catch (Exception e)
+                        {
+                            G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
+                            G.Writeln("           Message: " + e.Message, Color.Red);
+                            throw new GekkoException();
+                        }
                     }
                 }
             }
@@ -42966,8 +42978,11 @@ namespace Gekko
                 Program.options.print_filewidth = int.MaxValue;
                 try
                 {
-                    List<string> ss = tab.Print();
-                    foreach (string s in ss) G.Writeln(s);
+                    if (!Globals.excelDna)
+                    {
+                        List<string> ss = tab.Print();
+                        foreach (string s in ss) G.Writeln(s);
+                    }
 
                     if (this.modelName != null)
                     {

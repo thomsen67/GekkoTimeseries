@@ -9303,7 +9303,6 @@ namespace UnitTests
         public void _Test_DecompAgeLead()
         {
 
-
             // Consider this model, run over t = 2021, 2022
             // over the ages #a = 18, 19
             //
@@ -9383,213 +9382,222 @@ namespace UnitTests
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-            if (true)
-            {
-                I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
+            I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
 
-                Table table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
-                //TODO: a_residual row 2 (residual)              
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
-                Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
-                Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
-                Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
-                Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
-            }
+            Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+            //TODO: a_residual row 2 (residual)              
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
+            Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
+            Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
+            Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
+            
+            // Decomp over time example (#98750984325)
+            //
+            // eq1           2021       2022
+            // ---------------------------------
+            // y[18][0]     8.8889    32.2223
+            // residual     0          0
+            // g[18][0]     3.3333     6.6667
+            // y[19][+1]    5.5556    25.5555
 
-            if (true)
-            {
+            // eq2           2021       2022
+            // ---------------------------------
+            // y[19][0]     3.33330    8.3333
+            // residual     0          0
+            // g[19][0]     3.333333   8.33333
+            // y[20][+1]    0          0
 
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                Globals.showDecompTable = false;  //will show the following decomp table and then abort
-                                                  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                                                  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            //in eq1, we want to substitute the 5.56 in the last row
+            //with eq2. So y[19][+1] in 2021 in eq1 is = y[19] in 2022 in eq2.
+            //So the 5.56 link up with the 8.33, and the effect is this for eq1:
 
+            // eq1           2021       2022
+            // ---------------------------------
+            // y[18][0]     8.8889    32.2223
+            // residual     0          0
+            // g[18][0]     3.3333     6.6667
+            // y[19][+1]    0         25.5555     <---- has 5.5556 removed in 2021
+            // g[19][+1]    5.5556     0          <---- has 5.5556 added in 2021
+            // y[20][+2]    0          0
+            //
+            // So for t = 2021 we take y[19][+1] in eq1, with value 5.5556. 
+            // Then we subtract 1 from lead --> y[19][0], and look that up,
+            // but for t+1 --> 8.3333. A factor is calculated, and the rows
+            // from eq2 in t+1 are put into eq1, where the names have 1 added
+            // to their leads (g[19][0] --> g[19][+1] and y[20][+1] --> y[20][+2].
 
-                // Decomp over time example (#98750984325)
-                //
-                // eq1           2021       2022
-                // ---------------------------------
-                // y[18][0]     8.8889    32.2223
-                // residual     0          0
-                // g[18][0]     3.3333     6.6667
-                // y[19][+1]    5.5556    25.5555
+            //After initial DecompLowLevel():
 
-                // eq2           2021       2022
-                // ---------------------------------
-                // y[19][0]     3.33330    8.3333
-                // residual     0          0
-                // g[19][0]     3.333333   8.33333
-                // y[20][+1]    0          0
+            // ------------------------------------------------------
+            // EQ e3: y(a, t) =E= c(a, t) + g(a, t)
+            // ------------------------------------------------------
+            //0 -- 0  name Work:c[18]¤[0] 2021 = -6.8889000000329         [LINK]
+            //0 -- 0  name Work:c[18]¤[0] 2022 = -28.2223000001347
+            //0 -- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
+            //0 -- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
+            //0 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
+            //0 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
+            //0 -- 0  name Work:a_residual__¤[0] 2021 = 0
+            //0 -- 0  name Work:a_residual__¤[0] 2022 = 0
+            // ------------------------------------------------------
+            //0 -- 1  name Work:c[19]¤[0] 2021 = -1.33330000000637
+            //0 -- 1  name Work:c[19]¤[0] 2022 = -3.3334000000159
+            //0 -- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
+            //0 -- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
+            //0 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
+            //0 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977
+            //0 -- 1  name Work:a_residual__¤[0] 2021 = 0
+            //0 -- 1  name Work:a_residual__¤[0] 2022 = 0
+            // ------------------------------------------------------
+            // EQ e2: c(a, t)    =E=  0.40 * (y(a, t) + y(a+1, t+1))
+            // ------------------------------------------------------
+            //1 -- 0  name Work:c[18]¤[0] 2021 = 6.8889000000329           [LINK]
+            //1 -- 0  name Work:c[18]¤[0] 2022 = 28.2223000001347
+            //1 -- 0  name Work:y[18]¤[0] 2021 = -3.55556000011804
+            //1 -- 0  name Work:y[18]¤[0] 2022 = -12.8889200004279
+            //1 -- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
+            //1 -- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
+            //1 -- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
+            //1 -- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
+            // ------------------------------------------------------
+            //1 -- 1  name Work:c[19]¤[0] 2021 = 1.33330000000637
+            //1 -- 1  name Work:c[19]¤[0] 2022 = 3.3334000000159
+            //1 -- 1  name Work:y[19]¤[0] 2021 = -1.33331999994953
+            //1 -- 1  name Work:y[19]¤[0] 2022 = -3.3333599998738
+            //1 -- 1  name Work:y[20]¤[+1] 2021 = 0
+            //1 -- 1  name Work:y[20]¤[+1] 2022 = 0
+            //1 -- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
+            //1 -- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
+            // ------------------------------------------------------
+            // EQ e4: y(a, t) =E= 1/0.60 * ( 0.40 * y(a+1, t+1) + g(a, t))
+            // ------------------------------------------------------
+            //2 -- 0  name Work:g[18]¤[0] 2021 = -3.33333333330188
+            //2 -- 0  name Work:g[18]¤[0] 2022 = -6.66666666671745
+            //2 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
+            //2 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
+            //2 -- 0  name Work:y[19]¤[+1] 2021 = -5.55559999982914
+            //2 -- 0  name Work:y[19]¤[+1] 2022 = -25.5555333330922
+            //2 -- 0  name Work:a_residual___link2¤[0] 2021 = 3.33333333060182E-05
+            //2 -- 0  name Work:a_residual___link2¤[0] 2022 = -9.99999999748979E-05
+            // ------------------------------------------------------
+            //2 -- 1  name Work:g[19]¤[0] 2021 = -3.33333333338715  
+            //2 -- 1  name Work:g[19]¤[0] 2022 = -8.33333333332575 <---- stored as g[19][+1], same with the others (lead)
+            //2 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
+            //2 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977  <--------------- y[19][0] linkChild, multiplied with 0.4 to give 3.3333
+            //2 -- 1  name Work:y[20]¤[+1] 2021 = 0
+            //2 -- 1  name Work:y[20]¤[+1] 2022 = 0
+            //2 -- 1  name Work:a_residual___link2¤[0] 2021 = 3.33333333344399E-05
+            //2 -- 1  name Work:a_residual___link2¤[0] 2022 = -6.66666666404581E-05
 
-                //in eq1, we want to substitute the 5.56 in the last row
-                //with eq2. So y[19][+1] in 2021 in eq1 is = y[19] in 2022 in eq2.
-                //So the 5.56 link up with the 8.33, and the effect is this for eq1:
-
-                // eq1           2021       2022
-                // ---------------------------------
-                // y[18][0]     8.8889    32.2223
-                // residual     0          0
-                // g[18][0]     3.3333     6.6667
-                // y[19][+1]    0         25.5555     <---- has 5.5556 removed in 2021
-                // g[19][+1]    5.5556     0          <---- has 5.5556 added in 2021
-                // y[20][+2]    0          0
-                //
-                // So for t = 2021 we take y[19][+1] in eq1, with value 5.5556. 
-                // Then we subtract 1 from lead --> y[19][0], and look that up,
-                // but for t+1 --> 8.3333. A factor is calculated, and the rows
-                // from eq2 in t+1 are put into eq1, where the names have 1 added
-                // to their leads (g[19][0] --> g[19][+1] and y[20][+1] --> y[20][+2].
-
-                //After initial DecompLowLevel():
-
-                // ------------------------------------------------------
-                // EQ e3: y(a, t) =E= c(a, t) + g(a, t)
-                // ------------------------------------------------------
-                //0 -- 0  name Work:c[18]¤[0] 2021 = -6.8889000000329         [LINK]
-                //0 -- 0  name Work:c[18]¤[0] 2022 = -28.2223000001347
-                //0 -- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
-                //0 -- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
-                //0 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
-                //0 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
-                //0 -- 0  name Work:a_residual__¤[0] 2021 = 0
-                //0 -- 0  name Work:a_residual__¤[0] 2022 = 0
-                // ------------------------------------------------------
-                //0 -- 1  name Work:c[19]¤[0] 2021 = -1.33330000000637
-                //0 -- 1  name Work:c[19]¤[0] 2022 = -3.3334000000159
-                //0 -- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
-                //0 -- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
-                //0 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
-                //0 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977
-                //0 -- 1  name Work:a_residual__¤[0] 2021 = 0
-                //0 -- 1  name Work:a_residual__¤[0] 2022 = 0
-                // ------------------------------------------------------
-                // EQ e2: c(a, t)    =E=  0.40 * (y(a, t) + y(a+1, t+1))
-                // ------------------------------------------------------
-                //1 -- 0  name Work:c[18]¤[0] 2021 = 6.8889000000329           [LINK]
-                //1 -- 0  name Work:c[18]¤[0] 2022 = 28.2223000001347
-                //1 -- 0  name Work:y[18]¤[0] 2021 = -3.55556000011804
-                //1 -- 0  name Work:y[18]¤[0] 2022 = -12.8889200004279
-                //1 -- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
-                //1 -- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
-                //1 -- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
-                //1 -- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
-                // ------------------------------------------------------
-                //1 -- 1  name Work:c[19]¤[0] 2021 = 1.33330000000637
-                //1 -- 1  name Work:c[19]¤[0] 2022 = 3.3334000000159
-                //1 -- 1  name Work:y[19]¤[0] 2021 = -1.33331999994953
-                //1 -- 1  name Work:y[19]¤[0] 2022 = -3.3333599998738
-                //1 -- 1  name Work:y[20]¤[+1] 2021 = 0
-                //1 -- 1  name Work:y[20]¤[+1] 2022 = 0
-                //1 -- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
-                //1 -- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
-                // ------------------------------------------------------
-                // EQ e4: y(a, t) =E= 1/0.60 * ( 0.40 * y(a+1, t+1) + g(a, t))
-                // ------------------------------------------------------
-                //2 -- 0  name Work:g[18]¤[0] 2021 = -3.33333333330188
-                //2 -- 0  name Work:g[18]¤[0] 2022 = -6.66666666671745
-                //2 -- 0  name Work:y[18]¤[0] 2021 = 8.88890000004245
-                //2 -- 0  name Work:y[18]¤[0] 2022 = 32.2223000001538
-                //2 -- 0  name Work:y[19]¤[+1] 2021 = -5.55559999982914
-                //2 -- 0  name Work:y[19]¤[+1] 2022 = -25.5555333330922
-                //2 -- 0  name Work:a_residual___link2¤[0] 2021 = 3.33333333060182E-05
-                //2 -- 0  name Work:a_residual___link2¤[0] 2022 = -9.99999999748979E-05
-                // ------------------------------------------------------
-                //2 -- 1  name Work:g[19]¤[0] 2021 = -3.33333333338715  
-                //2 -- 1  name Work:g[19]¤[0] 2022 = -8.33333333332575 <---- stored as g[19][+1], same with the others (lead)
-                //2 -- 1  name Work:y[19]¤[0] 2021 = 3.33330000001592
-                //2 -- 1  name Work:y[19]¤[0] 2022 = 8.33340000003977  <--------------- y[19][0] linkChild, multiplied with 0.4 to give 3.3333
-                //2 -- 1  name Work:y[20]¤[+1] 2021 = 0
-                //2 -- 1  name Work:y[20]¤[+1] 2022 = 0
-                //2 -- 1  name Work:a_residual___link2¤[0] 2021 = 3.33333333344399E-05
-                //2 -- 1  name Work:a_residual___link2¤[0] 2022 = -6.66666666404581E-05
-
-                // ------------------------------------------------------
-                // MAIN_data: after the two first equations, just before the lead-equation
-                // ------------------------------------------------------
-                // 0-- 0  name Work:c[18]¤[0] 2021 = 0
-                // 0-- 0  name Work:c[18]¤[0] 2022 = 0
-                // 0-- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
-                // 0-- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
-                // 0-- 0  name Work:y[18]¤[0] 2021 = 5.33333999992441
-                // 0-- 0  name Work:y[18]¤[0] 2022 = 19.333379999726
-                // 0-- 0  name Work:a_residual__¤[0] 2021 = 0
-                // 0-- 0  name Work:a_residual__¤[0] 2022 = 0
-                // 0-- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
-                // 0-- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
-                // 0-- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
-                // 0-- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
-                // 0-- 1  name Work:c[19]¤[0] 2021 = 0
-                // 0-- 1  name Work:c[19]¤[0] 2022 = 0
-                // 0-- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
-                // 0-- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
-                // 0-- 1  name Work:y[19]¤[0] 2021 = 1.9999800000664
-                // 0-- 1  name Work:y[19]¤[0] 2022 = 5.00004000016597
-                // 0-- 1  name Work:a_residual__¤[0] 2021 = 0
-                // 0-- 1  name Work:a_residual__¤[0] 2022 = 0
-                // 0-- 1  name Work:y[20]¤[+1] 2021 = 0
-                // 0-- 1  name Work:y[20]¤[+1] 2022 = 0
-                // 0-- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
-                // 0-- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
+            // ------------------------------------------------------
+            // MAIN_data: after the two first equations, just before the lead-equation
+            // ------------------------------------------------------
+            // 0-- 0  name Work:c[18]¤[0] 2021 = 0
+            // 0-- 0  name Work:c[18]¤[0] 2022 = 0
+            // 0-- 0  name Work:g[18]¤[0] 2021 = -2.00000000000955
+            // 0-- 0  name Work:g[18]¤[0] 2022 = -4.0000000000191
+            // 0-- 0  name Work:y[18]¤[0] 2021 = 5.33333999992441
+            // 0-- 0  name Work:y[18]¤[0] 2022 = 19.333379999726
+            // 0-- 0  name Work:a_residual__¤[0] 2021 = 0
+            // 0-- 0  name Work:a_residual__¤[0] 2022 = 0
+            // 0-- 0  name Work:y[19]¤[+1] 2021 = -3.33336000011065
+            // 0-- 0  name Work:y[19]¤[+1] 2022 = -15.333320000509
+            // 0-- 0  name Work:a_residual___link1¤[0] 2021 = 1.99999999779266E-05
+            // 0-- 0  name Work:a_residual___link1¤[0] 2022 = -5.99999999622014E-05
+            // 0-- 1  name Work:c[19]¤[0] 2021 = 0
+            // 0-- 1  name Work:c[19]¤[0] 2022 = 0
+            // 0-- 1  name Work:g[19]¤[0] 2021 = -2.00000000000955
+            // 0-- 1  name Work:g[19]¤[0] 2022 = -5.00000000002387
+            // 0-- 1  name Work:y[19]¤[0] 2021 = 1.9999800000664
+            // 0-- 1  name Work:y[19]¤[0] 2022 = 5.00004000016597
+            // 0-- 1  name Work:a_residual__¤[0] 2021 = 0
+            // 0-- 1  name Work:a_residual__¤[0] 2022 = 0
+            // 0-- 1  name Work:y[20]¤[+1] 2021 = 0
+            // 0-- 1  name Work:y[20]¤[+1] 2022 = 0
+            // 0-- 1  name Work:a_residual___link1¤[0] 2021 = 2.00000000063483E-05
+            // 0-- 1  name Work:a_residual___link1¤[0] 2022 = -3.99999999842748E-05
 
 
-                // TOGETHER, 2021
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000
-                // name Work:y[19]¤[+1] 2021 = -3.3333     <---------------------linkParent in 2021
+            // TOGETHER, 2021
+            // name Work:y[18]¤[0] 2021 = 5.3333
+            // name Work:g[18]¤[0] 2021 = -2.0000
+            // name Work:y[19]¤[+1] 2021 = -3.3333     <---------------------linkParent in 2021
 
-                // LEAD EQUATION MULTIPLIED WITH 0.4 to give this:                
-                //2 -- 1  name Work:g[19]¤[0] 2022 = -3.3333
-                //2 -- 1  name Work:y[19]¤[0] 2022 = 3.3333 
+            // LEAD EQUATION MULTIPLIED WITH 0.4 to give this:                
+            //2 -- 1  name Work:g[19]¤[0] 2022 = -3.3333
+            //2 -- 1  name Work:y[19]¤[0] 2022 = 3.3333 
 
-                // Changed lead and period:
-                //2 -- 1  name Work:g[19]¤[+1] 2021 = -3.3333
-                //2 -- 1  name Work:y[19]¤[+1] 2021 = 3.3333 
+            // Changed lead and period:
+            //2 -- 1  name Work:g[19]¤[+1] 2021 = -3.3333
+            //2 -- 1  name Work:y[19]¤[+1] 2021 = 3.3333 
 
-                // NOW ADD TO "TOGETHER" ABOVE:
+            // NOW ADD TO "TOGETHER" ABOVE:
 
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000
-                // name Work:y[19]¤[+1] 2021 = -3.3333  
-                // name Work:g[19]¤[+1] 2021 = -3.3333
-                // name Work:y[19]¤[+1] 2021 = 3.3333 
+            // name Work:y[18]¤[0] 2021 = 5.3333
+            // name Work:g[18]¤[0] 2021 = -2.0000
+            // name Work:y[19]¤[+1] 2021 = -3.3333  
+            // name Work:g[19]¤[+1] 2021 = -3.3333
+            // name Work:y[19]¤[+1] 2021 = 3.3333 
 
-                // WHICH IS:
+            // WHICH IS:
 
-                // name Work:y[18]¤[0] 2021 = 5.3333
-                // name Work:g[18]¤[0] 2021 = -2.0000                
-                // name Work:g[19]¤[+1] 2021 = -3.3333
+            // name Work:y[18]¤[0] 2021 = 5.3333
+            // name Work:g[18]¤[0] 2021 = -2.0000                
+            // name Work:g[19]¤[+1] 2021 = -3.3333
 
-                // AFTER NORMALIZATION:
+            // AFTER NORMALIZATION:
 
-                // name Work:y[18]¤[0] 2021 = 8.8889
-                // name Work:g[18]¤[0] 2021 = 3.3333                
-                // name Work:g[19]¤[+1] 2021 = 5.5556
+            // name Work:y[18]¤[0] 2021 = 8.8889
+            // name Work:g[18]¤[0] 2021 = 3.3333                
+            // name Work:g[19]¤[+1] 2021 = 5.5556
 
-                //I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e3 <lead>, c[19] in e2 <lead> where '0' in equ rows vars, #a, lags cols time;");
-                I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e4 <lead> where '0' in equ rows vars, #a, lags cols time;");
+            
+            I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e4 <lead> where '0' in equ rows vars, #a, lags cols time;");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+            //to residual rows
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g | 18 | [0]");
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "g | 19 | [+1]");
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "y | 20 | [+2]");
+            Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
+            //to residual rows
+            Assert.AreEqual(table.Get(5, 2).number, 3.3333d, 0.0001);
+            Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
+            Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
 
-                Table table = Globals.lastDecompTable;
-                Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
-                Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
-                Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                //to residual rows
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g | 18 | [0]");
-                Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "g | 19 | [+1]");
-                Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "y | 20 | [+2]");
-                Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
-                //to residual rows
-                Assert.AreEqual(table.Get(5, 2).number, 3.3333d, 0.0001);
-                Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
-                Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
-            }
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e3 <lead>, c[19] in e2 <lead> where '0' in equ rows vars, #a, lags cols time;");
+                        
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
+            //to residual rows
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "g | 18 | [0]");
+            Assert.AreEqual(table.Get(6, 1).CellText.TextData[0], "g | 19 | [+1]");
+            Assert.AreEqual(table.Get(7, 1).CellText.TextData[0], "y | 20 | [+2]");
+            Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
+            //to residual rows
+            Assert.AreEqual(table.Get(5, 2).number, 3.3333d, 0.0001);
+            Assert.AreEqual(table.Get(6, 2).number, 5.5556d, 0.0001);
+            Assert.AreEqual(table.Get(7, 2).number, 0d, 0.0001);
+
         }
-    
+
 
         [TestMethod]
         public void _Test_DecompOperators()
