@@ -110,7 +110,7 @@ namespace Gekko
             {
                 Databank db = Program.GetDatabankFromFile(null, oRead, info, file, file, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
                 Series ts = db.GetIVariable(s + "!a") as Series;
-                GekkoTime gt = new GekkoTime(EFreq.A, 2006, 1);
+                GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
                 double x = ts.GetDataSimple(gt);
                 return x;
             }

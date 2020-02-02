@@ -3345,25 +3345,30 @@ namespace Gekko
                     try
                     {
                         DateTime dt3 = DateTime.Now;
+                        
+                        RuntimeTypeModel serializer = TypeModel.Create();
 
                         if (Globals.excelDna)
                         {
                             //IMPORTANT
                             //IMPORTANT see #70324327984
                             //IMPORTANT
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                                                        
+                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
+                            serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                            serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                            serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                            serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                            serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                            serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                            serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                            serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                            serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                            serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                            
                         }
 
-                        deserializedDatabank = Serializer.Deserialize<Databank>(fs);
+                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {                            
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
@@ -24676,8 +24681,7 @@ namespace Gekko
             CreateDatabankXmlInfo(tempTsdxPath, tsdxVersion, isCloseCommand);
 
             //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
-            RuntimeTypeModel serializer = TypeModel.Create();
-            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+            
             string pathAndFilename2 = tempTsdxPath + "\\" + Program.options.databank_file_gbk_internal; //changed from .bin to .data
             databank.Trim();  //to make it smaller, slack removed from each IVariable
 
@@ -24757,20 +24761,23 @@ namespace Gekko
                             //IMPORTANT
                             //IMPORTANT see #70324327984
                             //IMPORTANT
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                            RuntimeTypeModel.Default.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                            RuntimeTypeModel serializer = TypeModel.Create();
+                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
+                            serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                            serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                            serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                            serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                            serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                            serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                            serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                            serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                            serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                            serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                            
 
                             try
-                            {                                
-                                Serializer.Serialize(fs, databank);
+                            {
+                                serializer.Serialize(fs, databank);
                                 count = databank.storage.Count;
                             }
                             catch (Exception e)
@@ -24787,7 +24794,9 @@ namespace Gekko
 
                         try
                         {
-                            serializer.Serialize(fs, databank);
+                            RuntimeTypeModel serializer = TypeModel.Create();
+                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                            serializer.Serialize(fs, databank);                            
                             count = databank.storage.Count;
                         }
                         catch (Exception e)
@@ -24807,7 +24816,6 @@ namespace Gekko
 
             DateTime dt0 = DateTime.Now;
             WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
-
 
             if (!Globals.setPrintMute)
             {
