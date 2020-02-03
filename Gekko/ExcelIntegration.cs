@@ -79,10 +79,11 @@ namespace Gekko
     {
 
         [ExcelFunction(Name = "GEKKO_ReadData", Description = "Get data from Gekko databank")]
-        public static double GEKKO_ReadData(string s)
+        public static double GEKKO_ReadData()
         {
 
-
+            string s = "x";
+            //return 787d;
 
             ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
             //oRead.Type = EDataFormat.Tsd;
