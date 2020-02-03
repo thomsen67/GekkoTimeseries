@@ -25130,7 +25130,15 @@ namespace Gekko
                         string sevenzPath = null;
                         if (G.IsUnitTesting())
                         {
-                            sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                            if (Globals.excelDna)
+                            {
+                                
+                                sevenzPath = Path.Combine(Globals.excelDnaPath, "7z.dll");
+                            }
+                            else
+                            {
+                                sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                            }
                         }
                         else
                         {
@@ -25168,11 +25176,19 @@ namespace Gekko
 
                 if (Globals.threadIsInProcessOfAborting && !Globals.applicationIsInProcessOfAborting) throw new GekkoException();
                 try
-                {
+                {                   
+
                     string sevenzPath = null;
                     if (G.IsUnitTesting())
                     {
-                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        if (Globals.excelDna)
+                        {
+                            sevenzPath = Path.Combine(Globals.excelDnaPath, "7z.dll");
+                        }
+                        else
+                        {
+                            sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        }
                     }
                     else
                     {
@@ -25239,8 +25255,15 @@ namespace Gekko
                 {
                     string sevenzPath = null;
                     if (G.IsUnitTesting())
-                    {
-                        sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                    {                        
+                        if (Globals.excelDna)
+                        {
+                            sevenzPath = Path.Combine(Globals.excelDnaPath, "7z.dll");
+                        }
+                        else
+                        {
+                            sevenzPath = Globals.ttPath2 + @"\GekkoCS\Gekko\bin\Debug\zip\7z.dll";
+                        }
                     }
                     else
                     {

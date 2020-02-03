@@ -56,6 +56,8 @@ namespace Gekko
         public static List<string> unitTestsPromtingHelper = null;
 
         public static bool excelDna = true;
+        public static string excelDnaPath = null;
+        //public static int excelDnaCounter = 0;
         
         public static bool decompUnitPivot = true;  //can activate xlsx pivot writing   
 

@@ -7,18 +7,12 @@ using ProtoBuf;
 using ProtoBuf.Meta;
 using SevenZip;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 using System.Text.RegularExpressions;
-//using System;
 
 using System.IO;
-//using System.Text;
-//using System.Collections.Generic;
+
 using System.Collections;
 using System.Globalization;
 
@@ -52,70 +46,46 @@ using System.Collections.ObjectModel;
 using Gekko;
 using ProtoBuf;
 
-
 namespace Gekko
 {
-    
-    [ProtoContract]
-    [ProtoInclude(1, typeof(Series))]
-    public class PTest
-    {     
-
-        [ProtoMember(1)]
-        public GekkoDictionary<string, PTest2> xx = new GekkoDictionary<string, PTest2>(StringComparer.OrdinalIgnoreCase);
-    }
-
-    
-    [ProtoContract]
-    [ProtoInclude(1, typeof(Series))]
-    public class PTest2
-    {
-        [ProtoMember(2)]
-        public GekkoDictionary<string, IVariable> xx = new GekkoDictionary<string, IVariable>(StringComparer.OrdinalIgnoreCase);
-
-    }
-
+        
     public static class MyFunctions
     {
-
-        [ExcelFunction(Name = "GEKKO_ReadData", Description = "Get data from Gekko databank")]
-        public static double GEKKO_ReadData()
+        [ExcelFunction(Name = "GEKKO_Roundtrip", Description = "Roundtrip")]
+        public static double GEKKO_Roundtrip()
         {
+            //NOTE: See c:\Thomas\slet regarding files. 7z.dll needs to be in same folder.
+            
+            //Data
+            string fileName = "test.gbk";
+            string name = "x";
+            double v = 12345d;
+            int year = 2000;
+            Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
+            string path = Path.Combine(Globals.excelDnaPath, fileName);
 
-            string s = "x";
-            //return 787d;
+            //Setup Work databanks with series inside (used for writing)
+            Program.databanks = new Databanks();
+            Program.databanks.storage.Add(new Databank("Work"));            
+            Series ts2 = new Series(EFreq.A, name + "!a");
+            ts2.SetData(new GekkoTime(EFreq.A, year, 1), v);
+            Program.databanks.GetFirst().AddIVariable(name + "!a", ts2);
 
+            //Write gbk file
+            int i = Program.WriteGbk(Program.databanks.GetFirst(), new GekkoTime(EFreq.A, 1999, 1), new GekkoTime(EFreq.A, 2001, 1), path, false, null, null, true, false);
+
+            //Read gbk file
             ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-            //oRead.Type = EDataFormat.Tsd;
             Program.ReadInfo info = new Program.ReadInfo();
-            //string file = @"c:\Thomas\Desktop\gekko\testing\sim.gbk";
-            string file1 = @"c:\Thomas\Desktop\gekko\testing\jul05.gbk";
-            string file = @"c:\Thomas\Desktop\gekko\testing\test.gbk";
             string tsdxFile = null;
             string tempTsdxPath = null;
             int NaNCounter = 0;
-
-
-            Program.databanks = new Databanks();
-            Program.databanks.storage.Add(new Databank("Work"));
-            Program.databanks.storage.Add(new Databank("Ref"));
-            Series ts2 = new Series(EFreq.A, s + "!a");
-            ts2.SetData(new GekkoTime(EFreq.A, 2000, 1), 777d);
-            Program.databanks.GetFirst().AddIVariable(s + "!a", ts2);
+            Databank db = Program.GetDatabankFromFile(null, oRead, info, path, path, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+            Series ts = db.GetIVariable(name + "!a") as Series;
+            GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
+            double d = ts.GetDataSimple(gt);
+            return d;
             
-            int i = Program.WriteGbk(Program.databanks.GetFirst(), new GekkoTime(EFreq.A, 1999, 1), new GekkoTime(EFreq.A, 2001, 1), file, false, null, null, true, false);
-            
-            double d = double.NaN;
-
-            if (true)
-            {
-                Databank db = Program.GetDatabankFromFile(null, oRead, info, file, file, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-                Series ts = db.GetIVariable(s + "!a") as Series;
-                GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
-                double x = ts.GetDataSimple(gt);
-                return x;
-            }
-
         }
     }
 }

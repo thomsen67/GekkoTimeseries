@@ -84,15 +84,8 @@ namespace Gekko.Parser.Gek
                 //code = code;  //just so it is easy to see here                                                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
                 Assembly assembly2 = compilerResults.CompiledAssembly;
-                Type assembly = null;
-                if (Globals.excelDna)
-                {
-                    assembly = assembly2.GetType("Gekko.TranslatedCode");  //the class
-                }
-                else
-                {
-                    assembly = assembly2.GetType("Gekko.TranslatedCode");  //the class
-                }
+                Type assembly = null;                
+                assembly = assembly2.GetType("Gekko.TranslatedCode");  //the class                
                 assembly.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
             }
