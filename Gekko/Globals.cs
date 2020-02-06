@@ -55,7 +55,7 @@ namespace Gekko
         public static bool prompting = true;
         public static List<string> unitTestsPromtingHelper = null;
 
-        public static bool excelDna = true;
+        public static bool excelDna = false;
         public static string excelDnaPath = null;
         //public static int excelDnaCounter = 0;
         
@@ -344,8 +344,8 @@ namespace Gekko
         public static string functionP1Cs = "p";
         public static string functionP2Cs = "P p";
 
-        public static string uProc = "UProc";
-        public static Dictionary<string, string> uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        //public static string uProc = "UProc";
+        //public static Dictionary<string, string> uFunctionStorageCs = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public const int timeStringsStart = 1900;
         public const int timeStringsEnd = 2500;

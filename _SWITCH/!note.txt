@@ -1,0 +1,2 @@
+must be put into \Gekko subfolder
+for "pure", the file is essentially empty

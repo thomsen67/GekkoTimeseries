@@ -3815,21 +3815,9 @@ namespace Gekko
             //also deals with merging (not clearing the databank first if merging)
             ReadAllTsdRecords(file, oRead.Merge, isTsdx, databank, ref NaNCounter, readInfo);
             readInfo.nanCounter = NaNCounter;
+            readInfo.startPerResultingBank = readInfo.startPerInFile;
+            readInfo.endPerResultingBank = readInfo.endPerInFile;
 
-            //See almost identical code in readCsv() and others
-            //if (mergeOrTimeLimit)
-            //{
-            //    readInfo.startPerResultingBank = G.GekkoMin(readInfo.startPerInFile, databank.yearStart);
-            //    readInfo.endPerResultingBank = G.GekkoMax(readInfo.endPerInFile, databank.yearEnd);
-            //}
-            //else
-            //{
-                readInfo.startPerResultingBank = readInfo.startPerInFile;
-                readInfo.endPerResultingBank = readInfo.endPerInFile;
-            //}
-            //Databank currentBank = Program.databanks.GetDatabank(databank.name);
-            //currentBank.yearStart = readInfo.startPerResultingBank;
-            //currentBank.yearEnd = readInfo.endPerResultingBank;
         }
 
         public static Tuple<GekkoTime, GekkoTime, int> GetFirstLastDates(AllFreqsHelper dates, GekkoTime first, GekkoTime last)
@@ -3949,7 +3937,7 @@ namespace Gekko
 
                             //read stamp
                             string stamp = line.Substring(32, 8).Trim();
-                            
+
                             //read date
                             int iiStart = 37;
                             string date1 = line.Substring(iiStart + 7, 4);
@@ -4018,7 +4006,7 @@ namespace Gekko
                                     G.Writeln2("*** ERROR: " + varName + ": could not parse '" + date2subsub + "' as an int (end day)");
                                     throw new GekkoException();
                                 }
-                            }                            
+                            }
 
                             d1min = G.GekkoMin(d1, d1min);  //finding min and max years
                             d2max = G.GekkoMax(d2, d2max);
@@ -4061,9 +4049,9 @@ namespace Gekko
 
                                 countdata = 0;
                                 freq = G.GetFreq(frequency);
-                                
+
                                 obs = GekkoTime.Observations(new GekkoTime(freq, d1, d1sub, d1subsub), new GekkoTime(freq, d2, d2sub, d2subsub));
-                                
+
                                 obsLeft = obs;
                                 ts = null;
                                 if (IsNonsenseVariableName(varName))
@@ -4140,7 +4128,7 @@ namespace Gekko
                                 GekkoTime gt2 = new GekkoTime(freq, d2, d2sub, d2subsub);
 
                                 int offset = 0;
-                                
+
                                 int nob = GekkoTime.Observations(gt1, gt2);
                                 if (nob > 0)
                                 {
@@ -8133,9 +8121,10 @@ namespace Gekko
         {
             //#98073245298345
             //Here, we are translating (1) a gui oneliner, (2) a gui command block, or a gcm file (that might be .ini or called with LIBRARY).
-            //So we wipe out the uFunctions, to have a clean desk.
-            //We do not wipe it if it is a library, since it has already been wiped just before (LIBRARY must be the first command).
-            if (!isLibrary) Globals.uFunctionStorageCs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            
+            ////So we wipe out the uFunctions, to have a clean desk.
+            ////We do not wipe it if it is a library, since it has already been wiped just before (LIBRARY must be the first command).
+            //if (!isLibrary) Globals.uFunctionStorageCs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             int max = 1;
             if (G.Equal(Program.options.interface_debug, "dialog")) max = int.MaxValue;  //should suffice as tries :-)
@@ -8253,7 +8242,7 @@ namespace Gekko
                     {
                         Gekko.Parser.Gek.ParserGekCompileAndRunAST.CompileAndRunAST(ch, p);
                     }
-                    catch
+                    catch (Exception e)
                     {
                         if (!G.IsDebugSession) throw;
                     }

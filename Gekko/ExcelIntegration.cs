@@ -54,36 +54,59 @@ namespace Gekko
         [ExcelFunction(Name = "GEKKO_Roundtrip", Description = "Roundtrip")]
         public static double GEKKO_Roundtrip()
         {
+
+
             //NOTE: See c:\Thomas\slet regarding files. 7z.dll needs to be in same folder.
-            
+
             //Data
+            Program.databanks.storage.Add(new Databank("Work"));
+            Program.databanks.storage.Add(new Databank("Ref"));
+
+            Series ts2 = new Series(EFreq.A, "testing1234" + "!a");
+            ts2.SetData(new GekkoTime(EFreq.A, 2020, 1), 1234d);
+            Program.databanks.GetFirst().AddIVariable("testing1234" + "!a", ts2);
+
             string fileName = "test.gbk";
-            string name = "x";
-            double v = 12345d;
+            string name = "y";
+            double v = 54321d;
             int year = 2000;
             Globals.excelDnaPath = Path.GetDirectoryName(ExcelDnaUtil.XllPath);
             string path = Path.Combine(Globals.excelDnaPath, fileName);
+            double d = double.NaN;
 
-            //Setup Work databanks with series inside (used for writing)
-            Program.databanks = new Databanks();
-            Program.databanks.storage.Add(new Databank("Work"));            
-            Series ts2 = new Series(EFreq.A, name + "!a");
-            ts2.SetData(new GekkoTime(EFreq.A, year, 1), v);
-            Program.databanks.GetFirst().AddIVariable(name + "!a", ts2);
+            try
+            {
+                //this actually works, but when inside the call, it is a blank Gekko with no Work and Ref
+                //databanks etc. So no state is transferred.
+                Program.obeyCommandCalledFromGUI(@"edit 'c:\tools\dok.bat';", new P());
+            }
+            catch (Exception e)
+            {
 
-            //Write gbk file
-            int i = Program.WriteGbk(Program.databanks.GetFirst(), new GekkoTime(EFreq.A, 1999, 1), new GekkoTime(EFreq.A, 2001, 1), path, false, null, null, true, false);
+            }
 
-            //Read gbk file
-            ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-            Program.ReadInfo info = new Program.ReadInfo();
-            string tsdxFile = null;
-            string tempTsdxPath = null;
-            int NaNCounter = 0;
-            Databank db = Program.GetDatabankFromFile(null, oRead, info, path, path, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-            Series ts = db.GetIVariable(name + "!a") as Series;
-            GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
-            double d = ts.GetDataSimple(gt);
+            if (false)  //this works
+            {
+
+                //Setup Work databanks with series inside (used for writing)            
+                Series ts5 = new Series(EFreq.A, name + "!a");
+                ts5.SetData(new GekkoTime(EFreq.A, year, 1), v);
+                Program.databanks.GetFirst().AddIVariable(name + "!a", ts5);
+
+                //Write gbk file
+                int i = Program.WriteGbk(Program.databanks.GetFirst(), new GekkoTime(EFreq.A, 1999, 1), new GekkoTime(EFreq.A, 2001, 1), path, false, null, null, true, false);
+
+                //Read gbk file
+                ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
+                Program.ReadInfo info = new Program.ReadInfo();
+                string tsdxFile = null;
+                string tempTsdxPath = null;
+                int NaNCounter = 0;
+                Databank db = Program.GetDatabankFromFile(null, oRead, info, path, path, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
+                Series ts = db.GetIVariable(name + "!a") as Series;
+                GekkoTime gt = new GekkoTime(EFreq.A, 2000, 1);
+                d = ts.GetDataSimple(gt);
+            }
             return d;
             
         }

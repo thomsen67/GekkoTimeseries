@@ -3491,7 +3491,7 @@ namespace Gekko
         public string code;        
         public List<string> errors;
         public string commandsText;
-        public string codeUFunctions;        
+        //public string codeUFunctions;        
     }
 
     public class WalkHelper

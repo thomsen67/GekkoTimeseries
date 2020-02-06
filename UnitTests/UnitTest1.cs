@@ -20924,8 +20924,8 @@ namespace UnitTests
             I("#m = {#m1}, b;");
             _AssertListString(First(), "#m", new StringOrList("a", "b", "b"));
 
-            I("#m = a, b, -c, b:a rep 1+1, b:a[x, y], 0a, 01, 10;");  //note: blank removed in ...[x, y]
-            _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x,y]", "0a", "01", "10"));
+            I("#m = a, b, -c, b:a rep 1+1, b:a[x, y], 0a, 01, 10;");  //note: no blank removed in ...[x, y]
+            _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x, y]", "0a", "01", "10"));
             I("#m = ('a', 'b', '-c', 'b:a' rep 1+1, 'b:a[x, y]', '0a', '01', '10');");
             _AssertListString(First(), "#m", new StringOrList("a", "b", "-c", "b:a", "b:a", "b:a[x, y]", "0a", "01", "10"));
 
@@ -20966,8 +20966,8 @@ namespace UnitTests
 
             //now with minus --------------
 
-            I("#m = -a, -b, c, -b:a rep 1+1, -b:a[x, y], -0a, -01, -10;");  //note: blank removed in ...[x, y]
-            _AssertListString(First(), "#m", new StringOrList("-a", "-b", "c", "-b:a", "-b:a", "-b:a[x,y]", "-0a", "-01", "-10"));
+            I("#m = -a, -b, c, -b:a rep 1+1, -b:a[x, y], -0a, -01, -10;");  //note: blank not removed in ...[x, y]
+            _AssertListString(First(), "#m", new StringOrList("-a", "-b", "c", "-b:a", "-b:a", "-b:a[x, y]", "-0a", "-01", "-10"));
             
             I("#m = -1.0, m(), -3 rep 2, -3.0e6;");
             _AssertListVal(First(), "#m", new List<double> { -1d, double.NaN, -3d, -3d, -3e6d });
