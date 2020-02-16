@@ -205,7 +205,7 @@ namespace Gekko
         public static Table DecompMain(GekkoSmpl smpl, GekkoTime per1, GekkoTime per2, string operator1, string isShares, DecompOptions2 decompOptions2, FrameLight frame, bool refresh, ref DecompDatas decompDatas)
         {           
 
-            DateTime t0 = DateTime.Now; 
+            DateTime t0 = DateTime.Now;  
 
             EContribType operatorOneOf3Types = DecompContribTypeHelper(decompOptions2.prtOptionLower);
 
