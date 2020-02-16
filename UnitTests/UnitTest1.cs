@@ -9392,8 +9392,38 @@ namespace UnitTests
             Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "vtArv");
             Assert.AreEqual(table.Get(15, 2).number, -0.4469d, 0.0001);
             Assert.AreEqual(table.Get(15, 3).number, 0.4308d, 0.0001);
+        }
 
+        [TestMethod]
+        public void _Test_DecompSimul()
+        {
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option model type = gams;");
+            I("model <gms> simul.gms;");
+            I("time 2001 2002;");
+            I("y = 25, 50;");
+            I("c = 20, 40;");
+            I("g = 5, 10;");
+            I("g0 = 1, 2;");
 
+            I("time 2002 2002;");
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            I("decomp3 <d> y from e1, e2, e3 endo y, c, g;");
+            
+            Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2002");
+            //TODO: a_residual row 2 (residual)              
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y");
+            Assert.AreEqual(table.Get(2, 2).number, 25.0000d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "g0");
+            Assert.AreEqual(table.Get(3, 2).number, 25.0000d, 0.0001);
         }
 
         [TestMethod]

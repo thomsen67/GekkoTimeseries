@@ -484,7 +484,32 @@ namespace Gekko
                         //  8         -1.33                                            1.33
 
 
-                        double[,] inverse = Program.InvertMatrix(mEndo);
+                        double[,] inverse = null;
+
+                        try
+                        {
+                            double[,] temp = (double[,])mEndo.Clone();
+                            inverse = Program.InvertMatrix(temp);
+                        }
+                        catch (Exception e)
+                        {
+                            G.Writeln2("*** ERROR: Matrix inversion for DECOMP failed for period " + t.ToString());
+                            bool nan = false;
+                            foreach (double d in mEndo)
+                            {
+                                if (G.isNumericalError(d))
+                                {
+                                    nan = true;
+                                    break;
+                                }
+                            }
+                            if (nan)
+                            {
+                                G.Writeln("*** ERROR: The matrix contains missing or infinite values");
+                            }
+                            throw new GekkoException();
+                        }                        
+                        
                         double[,] effect = Program.MultiplyMatrices(inverse, mExo);
 
                         //the effect matrix is #endo x #exo

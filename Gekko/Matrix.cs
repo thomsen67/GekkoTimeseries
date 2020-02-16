@@ -367,6 +367,8 @@ namespace Gekko
 
         public Matrix Clone()
         {
+            //TODO: could use double[,] b = (double[,])a.Clone();
+
             int n1 = this.data.GetLength(0);
             int n2 = this.data.GetLength(1);
             Matrix m = new Matrix(n1, n2);
