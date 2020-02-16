@@ -2394,8 +2394,10 @@ namespace Gekko
 
         public IVariable name = null;  //only active for names like x, x[a] and the like, not for expressions
 
-        
-        
+        public List<string> new_select = null;
+        public List<string> new_from = null;
+        public List<string> new_endo = null;
+
         //-------- tranformation end ----------------
         public int guiDecompLastClickedRow = 0;
         public int guiDecompLastClickedCol = 0;
@@ -2515,6 +2517,27 @@ namespace Gekko
                 tempRows.Add(s);
             }
             d.rows = tempRows;
+
+            List<string> tempSelect = new List<string>();
+            foreach (string s in this.new_select)
+            {
+                tempSelect.Add(s);
+            }
+            d.new_select = tempSelect;
+
+            List<string> tempFrom = new List<string>();
+            foreach (string s in this.new_from)
+            {
+                tempFrom.Add(s);
+            }
+            d.new_from = tempFrom;
+
+            List<string> tempEndo = new List<string>();
+            foreach (string s in this.new_endo)
+            {
+                tempEndo.Add(s);
+            }
+            d.new_endo = tempEndo;
 
             return d;
         }

@@ -216,18 +216,9 @@ namespace Gekko.Parser.Gek
             }
             else if (G.IsUnitTesting())
             {
-                //if running test cases, use this absolute path, this will never be run by users
-                if (true)
-                {
-                    compilerParams.ReferencedAssemblies.Add(@"C:\GekkoCS\Gekko\bin\Debug\ANTLR.dll");
-                    compilerParams.ReferencedAssemblies.Add(@"C:\GekkoCS\Gekko\bin\Debug\gekko.exe");
-                }
-                else
-                {
-                    compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
-                    compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
-                }
-                
+                //if running test cases, use this absolute path, this will never be run by users                
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
+                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");                
             }
             else
             {

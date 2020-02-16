@@ -5567,7 +5567,12 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPFROM":
                         {
-                            if (node.ChildrenCount() > 0) node.Code.A(node[0].Code);
+                            if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".from.Add(" + node[0].Code + ");" + G.NL);
+                        }
+                        break;
+                    case "ASTDECOMPSELECT":
+                        {
+                            if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".select.Add(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTDECOMPENDO":
