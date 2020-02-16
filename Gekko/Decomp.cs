@@ -343,19 +343,32 @@ namespace Gekko
                 //------------------------
 
                 if (Globals.decompUseMatrixInverse)
-                {   
+                {
 
-                    //We have n equations, and must identify n endogenous variables (not all of these may be shown). The rest are 
-                    //considered exogenous.
                     GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
-                    {
-                        foreach (string s in decompOptions2.link[i].varnames)
+                    if (decompOptions2.link[0].endo.Count > 0)
+                    {                        
+                        foreach (string s in decompOptions2.link[0].endo)
                         {
                             string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-                            if (!endo.ContainsKey(s)) endo.Add(s2, endo.Count);
+                            if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
                         }
                     }
+                    else
+                    {
+                        //We have n equations, and must identify n endogenous variables (not all of these may be shown). The rest are 
+                        //considered exogenous.
+                        
+                        for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+                        {
+                            foreach (string s in decompOptions2.link[i].varnames)
+                            {
+                                string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+                                if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count);  //why if here?
+                            }
+                        }
+                    }
+
                     GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                     for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
                     {
