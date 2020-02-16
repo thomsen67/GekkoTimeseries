@@ -9300,6 +9300,103 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DecompBig()
+        {
+            I("reset;");
+            I("OPTION folder working = '" + Globals.ttPath2 + @"\regres\Models\Decomp';");
+            I("option model type = gams;");
+            I("model <gms> big.gms;");
+            I("read big;");
+            I("#a18t100 = seq(18, 100).strings();");
+            I("#a19t100 = seq(19, 100).strings();");
+            I("#a18t99 = seq(18, 99).strings();");
+            I("#a18t18 = seq(18, 18).strings();");
+            I("#a0t100 = seq(0, 100).strings();");
+            I("#a100t100 = seq(100, 100).strings();");
+            I("time 2015 2016;");
+            //hmmm, qc_a[#a] er defineret over #a, mens npop[#a_] er defineret over #a_, dvs. har også a15t100 og tot.
+            I("npop.setdomains(('#a',));");
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            //2015    2016
+            //qC  5.88000887002727    9.35507860159851
+            //dArv - 0.168360969760489 - 0.0797363727806105
+            //EmrHhRente  0.222980194345246   0.120656066180453
+            //EpC - 2.42399221511223 - 2.96743364463208
+            //ErDisk  7.76079834577429    8.21492331748983
+            //ErOverlev   0.010490570877268   0.000278629455632681
+            //nPop    5.2486699737577 5.52628826893317
+            //pC  8.0292841739063 9.32769414117502
+            //qC_a - 0.615584918565111  0.0529402334943975
+            //qCxRef  2.30873367350501 - 5.70272233321886
+            //uUC 0   0
+            //vArv    2.13507950651876    0.284617948740825
+            //vHhTilBoern 0.14044182362823 - 0.562866143807517
+            //vPrimInd - 15.8713130277437 - 4.98015660375826
+            //vtArv - 0.44669281123282   0.430610285717499
+            I("decomp2 <d> qc[cikkebol] in E_qC_cNonHou link qc_a[#a18t100] in E_qC_a, qchtm[#a18t100] in E_qCHtM, qCr[#a19t100] in E_qCxRef, qCr[#a18t18] in E_qCxRef_a18, qCxRef[#a18t100] in E_mUC, mUC[#a18t100] in E_qCR, emUC[#a18t99] in E_Emuc, EmUC[#a100t100] in E_Emuc_aEnd;");
+            //                                           qCxRef[#a18t100] in E_mUC <lead>,
+            //                                           muc[#a18t100] in e_qCr <lead>,
+            //                                           emuc[#a18t99] in E_EmUC <lead>;
+            Table table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
+            //TODO: a_residual row 2 (residual)              
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC");
+            Assert.AreEqual(table.Get(2, 2).number, 5.8800d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, 9.3551d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv");
+            Assert.AreEqual(table.Get(3, 2).number, -0.1684d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -0.0797d, 0.0001);
+            Assert.AreEqual(table.Get(16, 1).CellText.TextData[0], "vtArv");
+            Assert.AreEqual(table.Get(16, 2).number, -0.4467d, 0.0001);
+            Assert.AreEqual(table.Get(16, 3).number, 0.4306d, 0.0001);
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            // Globals.showDecompTable = true;  //will show the following decomp table and then abort
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            //2015    2016
+            //qC  5.88000887002727    9.35507860159851
+            //dArv - 0.168493168366812 - 0.0797709286236514
+            //EmrHhRente  0.223496222452474   0.120948848589002
+            //EpC - 2.42990214824462 - 2.97483990036674
+            //ErDisk  7.80791180586102    8.22171096961776
+            //ErOverlev   0.0104691331031865  0.000203101011898132
+            //nPop    5.2486699737577 5.52628826893317
+            //pC  8.0385618482645 9.33879874840471
+            //qC_a - 0.651667680911228  0.0492202875268899
+            //qCxRef  2.30600672302267 - 5.70663737882794
+            //vArv    2.13602105123533    0.284503816831412
+            //vHhTilBoern 0.140441131261036 - 0.562884260348958
+            //vPrimInd - 15.882724567599 - 4.98310555860543
+            //vtArv - 0.446904847512389  0.43082959783288
+            I("decomp3<d> qC[cikkebol] from E_qC_cNonHou, E_qC_a, E_qCHtM, E_qCxRef, E_qCxRef_a18, E_mUC, E_qCR, E_Emuc, E_Emuc_aEnd     endo qC[cikkebol], qc_a[#a18t100], qchtm[#a18t100], qCr[#a19t100], qCr[#a18t18], qCxRef[#a18t100], mUC[#a18t100], emUC[#a18t99], EmUC[#a100t100];");
+            table = Globals.lastDecompTable;
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2015");
+            Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2016");
+            //TODO: a_residual row 2 (residual)              
+            Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "qC");
+            Assert.AreEqual(table.Get(2, 2).number, 5.8800d, 0.0001);
+            Assert.AreEqual(table.Get(2, 3).number, 9.3551d, 0.0001);
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "dArv");
+            Assert.AreEqual(table.Get(3, 2).number, -0.1685d, 0.0001);
+            Assert.AreEqual(table.Get(3, 3).number, -0.0798d, 0.0001);
+            Assert.AreEqual(table.Get(15, 1).CellText.TextData[0], "vtArv");
+            Assert.AreEqual(table.Get(15, 2).number, -0.4469d, 0.0001);
+            Assert.AreEqual(table.Get(15, 3).number, 0.4308d, 0.0001);
+
+
+        }
+
+        [TestMethod]
         public void _Test_DecompAgeLead()
         {
 
@@ -9387,33 +9484,38 @@ namespace UnitTests
             for (int i = 0; i < 2; i++)
             {
                 if (i == 0)
-                {
-                    Globals.decompUseMatrixInverse = true;
+                {                    
                     //I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
                     I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo y[18], y[19], demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
                 }
                 else
-                {
-                    Globals.decompUseMatrixInverse = false;
+                {                    
                     I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
                 }
+
+                int ii = -1 + i;
 
                 table = Globals.lastDecompTable;
                 Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");
                 Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "2022");
                 //TODO: a_residual row 2 (residual)              
                 Assert.AreEqual(table.Get(2, 1).CellText.TextData[0], "y | 18 | [0]");
-                Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
-                Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "g | 18 | [0]");
-                Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "y | 19 | [+1]");
                 Assert.AreEqual(table.Get(2, 2).number, 8.8889d, 0.0001);
-                Assert.AreEqual(table.Get(3, 2).number, 0.0000d, 0.0001);
-                Assert.AreEqual(table.Get(4, 2).number, 3.3333d, 0.0001);
-                Assert.AreEqual(table.Get(5, 2).number, 5.5556d, 0.0001);
                 Assert.AreEqual(table.Get(2, 3).number, 32.2223d, 0.0001);
-                Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
-                Assert.AreEqual(table.Get(4, 3).number, 6.6667d, 0.0001);
-                Assert.AreEqual(table.Get(5, 3).number, 25.5555d, 0.0001);
+
+                if (i == 1)
+                {
+                    Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], Globals.decompResidualName + "_link3 | null | [0]");
+                    Assert.AreEqual(table.Get(3, 2).number, 0.0000d, 0.0001);
+                    Assert.AreEqual(table.Get(3, 3).number, 0.0001d, 0.0001);
+                }
+                
+                Assert.AreEqual(table.Get(4 + ii, 1).CellText.TextData[0], "g | 18 | [0]");
+                Assert.AreEqual(table.Get(4 + ii, 2).number, 3.3333d, 0.0001);
+                Assert.AreEqual(table.Get(4 + ii, 3).number, 6.6667d, 0.0001);
+                Assert.AreEqual(table.Get(5 + ii, 1).CellText.TextData[0], "y | 19 | [+1]");                
+                Assert.AreEqual(table.Get(5 + ii, 2).number, 5.5556d, 0.0001);                
+                Assert.AreEqual(table.Get(5 + ii, 3).number, 25.5555d, 0.0001);
             }
 
             if (true)
@@ -9580,8 +9682,7 @@ namespace UnitTests
                 // name Work:g[19]¤[+1] 2021 = 5.5556
 
                 if (true)
-                {
-                    Globals.decompUseMatrixInverse = false;  //cannot run with 'true'
+                {                    
                     I("decomp2<d> y[18], y[19] in e3 link c[18], c[19] in e2, y[19] in e4 <lead> where '0' in equ rows vars, #a, lags cols time;");
                     table = Globals.lastDecompTable;
                     Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "2021");

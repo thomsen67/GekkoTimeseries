@@ -345,30 +345,14 @@ namespace Gekko
 
                 if (decompOptions2.type == "ASTDECOMP3")
                 {
-                    
                     GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    if (decompOptions2.link[0].endo.Count > 0)
-                    {                        
-                        foreach (string s in decompOptions2.link[0].endo)
-                        {
-                            string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-                            if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
-                        }
-                    }
-                    else
+                    foreach (string s in decompOptions2.link[0].endo)
                     {
-                        //We have n equations, and must identify n endogenous variables (not all of these may be shown). The rest are 
-                        //considered exogenous.
-                        
-                        for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
-                        {
-                            foreach (string s in decompOptions2.link[i].varnames)
-                            {
-                                string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
-                                if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count);  //why if here?
-                            }
-                        }
+                        string s2 = Program.databanks.GetFirst().name + ":" + DecompGetLinkVariableName(s, 0);
+                        if (!endo.ContainsKey(s2)) endo.Add(s2, endo.Count); //why if here?
                     }
+
+                    DecompCheckNumberOfEqsAndEndo(decompDatas, endo);
 
                     GekkoDictionary<string, int> exo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                     for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
@@ -395,7 +379,7 @@ namespace Gekko
                     //consider this: 
                     //1 x1 + 2 x2 + 3 x3 + 4 x4 + 5 x5 = 0 
                     //2 x1 + 3 x2 + 4 x3 + 5 x4 + 6 x5= 0
-                                        
+
                     //now if x2 is exo, we skip these in Jacobi, getting:
                     //
                     // [1 3] [x1]  +  [2 4 5] [x2]   =   0
@@ -406,7 +390,10 @@ namespace Gekko
                     // [x3]  =    [. .] [3 5 6] [x4]   
                     //                          [x5]
 
-                    DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                    if (false)
+                    {
+                        DecompPrintDatas(decompDatas.storage, operatorOneOf3Types);
+                    }
                     decompDatas.MAIN_data = new List<DecompData>();  //this is where the results end up
 
                     foreach (GekkoTime t in new GekkoTimeIterator(per1, per2))
@@ -435,12 +422,22 @@ namespace Gekko
                                     {
                                         int i1 = c;
                                         int i2 = endo[kvp.Key];
+                                        if (!(i1 < mEndo.GetLength(0) && i2 < mEndo.GetLength(1)))
+                                        {
+                                            G.Writeln2("*** ERROR: DECOMP matrix invert problem");
+                                            throw new GekkoException();
+                                        }
                                         mEndo[i1, i2] = d;
                                     }
                                     else if (exo.ContainsKey(kvp.Key))
                                     {
                                         int i1 = c;
                                         int i2 = exo[kvp.Key];
+                                        if (!(i1 < mExo.GetLength(0) && i2 < mExo.GetLength(1)))
+                                        {
+                                            G.Writeln2("*** ERROR: DECOMP matrix invert problem");
+                                            throw new GekkoException();
+                                        }
                                         mExo[i1, i2] = d;
                                     }
                                     else
@@ -496,7 +493,7 @@ namespace Gekko
                         foreach (string s in decompOptions2.link[parentI].varnames)
                         {
                             //these are the ones being reported. Is a subset of endo.
-                            
+
                             varnamesCounter++;
 
                             if (t.IsSamePeriod(per1))
@@ -528,6 +525,9 @@ namespace Gekko
                             }
                         }
                     }   //foreach t
+                    
+                    DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
+                
                 }
                 else
                 {
@@ -681,40 +681,7 @@ namespace Gekko
                         G.Writeln("+++ WARNING: DECOMP: Variable " + linkVariable + " is not eliminated");
                     }
 
-                    for (int parentJ = 0; parentJ < decompDatas.MAIN_data.Count; parentJ++)
-                    {
-                        List<string> remove = new List<string>();
-                        DecompDict dd = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types);
-                        foreach (KeyValuePair<string, Series> kvp in dd.storage)
-                        {
-                            string s = kvp.Key;
-                            string[] ss = s.Split('¤');
-                            string s2 = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
-                            if (s2.StartsWith(Globals.decompResidualName))
-                            {
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO threshold should be decimals used in GUI!!
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                //TODO TODO TODO
-                                if (IsAlmostZeroTimeseries(per1, per2, kvp.Value, 1e-5d))
-                                {
-                                    remove.Add(kvp.Key);
-                                }
-                            }
-                        }
-                        foreach (string s in remove)
-                        {
-                            bool b = dd.Remove(s);
-                        }
-                    }
+                    DecompRemoveResidualsIfZero(per1, per2, decompDatas, operatorOneOf3Types);
 
                     //TODO: make sure that every lhs variable is found 1 and only 1 time
                     //      in the decompDatas, and report error if not.
@@ -732,7 +699,7 @@ namespace Gekko
                         }
                     }
                 }
-                
+
                 //At this point, all linked equations i = 1, 2, ... have been merged into
                 //the MAIN equation i = 0.                
             }
@@ -761,7 +728,67 @@ namespace Gekko
             return table;
         }
 
-        
+        private static void DecompRemoveResidualsIfZero(GekkoTime per1, GekkoTime per2, DecompDatas decompDatas, EContribType operatorOneOf3Types)
+        {
+            for (int parentJ = 0; parentJ < decompDatas.MAIN_data.Count; parentJ++)
+            {
+                List<string> remove = new List<string>();
+                DecompDict dd = GetDecompDatas(decompDatas.MAIN_data[parentJ], operatorOneOf3Types);
+                foreach (KeyValuePair<string, Series> kvp in dd.storage)
+                {
+                    string s = kvp.Key;
+                    string[] ss = s.Split('¤');
+                    string s2 = G.Chop_RemoveBank(ss[0], Program.databanks.GetFirst().name);
+                    if (s2.StartsWith(Globals.decompResidualName))
+                    {
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO threshold should be decimals used in GUI!!
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        //TODO TODO TODO
+                        if (IsAlmostZeroTimeseries(per1, per2, kvp.Value, 1e-5d))
+                        {
+                            remove.Add(kvp.Key);
+                        }
+                    }
+                }
+                foreach (string s in remove)
+                {
+                    bool b = dd.Remove(s);
+                }
+            }
+        }
+
+        private static void DecompCheckNumberOfEqsAndEndo(DecompDatas decompDatas, GekkoDictionary<string, int> endo)
+        {
+            int nEqs = 0;
+            for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+            {
+                for (int j = 0; j < decompDatas.storage[i].Count; j++) //for each uncontrolled set in eq
+                {
+                    nEqs++;
+                }
+            }
+
+            if (nEqs != endo.Count)
+            {
+                G.Writeln2("*** ERROR: The number of equations and endogenous variables do not match (" + nEqs + " vs " + endo.Count + ")");
+                G.Writeln2("Equations (unrolled over sets):");
+                for (int i = 0; i < decompDatas.storage.Count; i++) //for each linked eq, including the first one
+                {
+                    G.Writeln("Equation #" + (i + 1) + " has " + decompDatas.storage[i].Count + " unrolled equations");
+                }
+                throw new GekkoException();
+            }
+        }
+
         private static string DecompGetLinkVariableName(string s, int lag)
         {
             string slag = lag.ToString();
@@ -1588,7 +1615,7 @@ namespace Gekko
                 }
             }
 
-            if (Globals.decompUnitPivot)
+            if (Globals.decompUnitCsvPivot)
             {
                 WriteDatatableTocsv(frame);
             }
