@@ -187,6 +187,29 @@ namespace Gekko
                     decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                     decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, false);
                     decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
+
+                    int counter = -1;
+                    foreach (string s in decompOptions2.new_from)
+                    {
+                        counter++;
+                        Link link = new Link();
+                        link.eqname = s;
+                        if (counter == 0)
+                        {
+                            link.endo = new List<string>();
+                            link.endo.AddRange(decompOptions2.new_endo);
+                            link.varnames = new List<string>();
+                            link.varnames.AddRange(decompOptions2.new_select);
+                        }
+                        else
+                        {
+                            link.varnames = new List<string>();
+                            link.varnames.Add("<not used>"); //strange but necessary further on
+                        }
+                        link.expressions = new List<Func<GekkoSmpl, IVariable>>();
+                        link.expressions.Add(null); //strange but necessary further on
+                        decompOptions2.link.Add(link);
+                    }
                 }
 
                 CrossThreadStuff.Decomp2(decompOptions2);

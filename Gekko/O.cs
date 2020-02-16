@@ -39,6 +39,7 @@ namespace Gekko
         public string expressionText = null;
         public List<Func<GekkoSmpl, IVariable>> expressions = null;
         public List<string> varnames = null;
+        public List<string> endo = null; //for links item after the first one, varnames may be 
         public string eqname = null;
         public string option = null;
     }
