@@ -182,8 +182,9 @@ namespace Gekko
                     decompOptions2.link.Add(temp);
                 }
 
-                if (o.select.Count > 0)
+                if (decompOptions2.type == "ASTDECOMP3")
                 {
+                    
                     decompOptions2.new_select = O.Restrict(o.select[0] as List, false, false, false, true);
                     decompOptions2.new_from = O.Restrict(o.from[0] as List, false, false, false, false);
                     decompOptions2.new_endo = O.Restrict(o.endo[0] as List, false, false, false, true);
@@ -342,9 +343,9 @@ namespace Gekko
                 //         e2: c = 0.8 * y    --> c - 0.8 * y
                 //------------------------
 
-                if (Globals.decompUseMatrixInverse)
+                if (decompOptions2.type == "ASTDECOMP3")
                 {
-
+                    
                     GekkoDictionary<string, int> endo = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                     if (decompOptions2.link[0].endo.Count > 0)
                     {                        
