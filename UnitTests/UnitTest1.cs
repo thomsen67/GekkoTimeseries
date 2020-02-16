@@ -9389,8 +9389,8 @@ namespace UnitTests
                 if (i == 0)
                 {
                     Globals.decompUseMatrixInverse = true;
-                    //I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
-                    I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
+                    I("decomp2<d> y[18], y[19] in e1a link demand[18], demand[19] in e1b, supply[18], supply[19] in e1c, c[18], c[19] in e2 where '0' in equ rows vars, #a, lags cols time;");
+                    //I("decomp3<d> y[18], y[19] from e1a, e1b, e1c, e2 endo demand[18], demand[19], supply[18], supply[19], c[18], c[19]  where '0' in equ rows vars, #a, lags cols time;");                    
                 }
                 else
                 {
