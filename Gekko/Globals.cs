@@ -58,7 +58,8 @@ namespace Gekko
         public static bool excelDna = false;
         public static string excelDnaPath = null;
         //public static int excelDnaCounter = 0;
-        
+
+        public static bool decompUseMatrixInverse = false;
         public static bool decompUnitPivot = true;  //can activate xlsx pivot writing   
 
         public static string internalColumnIdentifyer = "gekkopivot__";

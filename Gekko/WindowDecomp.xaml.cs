@@ -1734,7 +1734,7 @@ namespace Gekko
 
                 frame = new FrameLight();
                 Table table = Decomp.DecompMain(smpl, per1, per2, operator1, isShares, this.decompOptions2, frame, refresh, ref this.decompDatas);
-
+                
                 string s = FindEquationText2(this.decompOptions2);
                 equation.Text = s;
                 //

@@ -8808,6 +8808,10 @@ namespace Gekko
             public List<DecompItems> decompItems = new List<DecompItems>();  //second, third etc. elements are links
             public List<IVariable> rows = new List<IVariable>();
             public List<IVariable> cols = new List<IVariable>();
+            
+            //DECOMP3 special fields
+            public List<IVariable> from = new List<IVariable>();
+            public List<IVariable> endo = new List<IVariable>();
 
             public void Exe()
             {

@@ -40,6 +40,8 @@ tokens {
 	ASTDECOMPLINK;
 	ASTDECOMPLINK1;
 	ASTDECOMPWHERE2;
+    ASTDECOMPFROM;
+    ASTDECOMPENDO;
 	ASTDECOMPCOLS;
 	ASTDECOMPROWS;
 	ASTDECOMPGROUP1;
@@ -2520,6 +2522,7 @@ statements2:                SEMICOLON -> //stray semicolon is ok, nothing is wri
 						  | decomp               SEMICOLON!						  
 						  | decomp2a             SEMICOLON! //cannot join these
 						  | decomp2b             SEMICOLON! //cannot join these
+                          | decomp3a             SEMICOLON! //cannot join these						  
 						  | eval                 SEMICOLON!
 						  | delete               SEMICOLON!
 						  | disp                 SEMICOLON!
@@ -2838,8 +2841,9 @@ decompExpression:           expression;
 
 // --------------
 
-decomp2a:                 	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP3¤"+($decompVar1.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar1  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
-decomp2b:                   DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?         -> ^({token("ASTDECOMP3¤"+($decompVar2.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?) decompVar2  ^(ASTDECOMPLINK decompLink?) ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+decomp2a:                 	DECOMP2 decompOpt1? decompVar1 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar1.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar1          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+decomp2b:                   DECOMP2 decompOpt1? decompVar2 decompLink? decompWhere? decompGroup? decompRows? decompCols?                          -> ^({token("ASTDECOMP2¤"+($decompVar2.text), ASTDECOMP2, input.LT(1).Line)}        ^(ASTOPT_ decompOpt1?) decompVar2          ^(ASTDECOMPLINK decompLink?)                             ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
+decomp3a:                 	DECOMP3 decompOpt1? decompVar1Simple decompFrom decompEndo decompWhere? decompGroup? decompRows? decompCols?          -> ^({token("ASTDECOMP3¤"+($decompVar1Simple.text), ASTDECOMP3, input.LT(1).Line)} ^(ASTOPT_ decompOpt1?)  decompVar1Simple    ^(ASTDECOMPFROM decompFrom) ^(ASTDECOMPENDO decompEndo)  ^(ASTDECOMPWHERE decompWhere?) ^(ASTDECOMPGROUP decompGroup?) ^(ASTDECOMPROWS decompRows?) ^(ASTDECOMPCOLS decompCols?));
 
 seqOfBankvarnamesOnly1Alias: seqOfBankvarnamesOnly1;
 seqOfBankvarnamesAlias: seqOfBankvarnames;
@@ -2847,6 +2851,11 @@ seqOfBankvarnamesAlias: seqOfBankvarnames;
 //decompVar1:                 (seqOfBankvarnamesOnly1Alias IN)? seqOfBankvarnamesOnly1  -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1));
 decompVar1:                 (seqOfBankvarnamesAlias IN)? seqOfBankvarnamesOnly1 decompOpt2? -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesAlias?) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1) ^(ASTPLACEHOLDER decompOpt2?));
 decompVar2:                 (seqOfBankvarnamesOnly1Alias IN)? decompExpression2 decompOpt2? -> ^(ASTDECOMPITEMSEXPR ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1Alias?) ^(ASTPLACEHOLDER decompExpression2) ^(ASTPLACEHOLDER decompOpt2?));
+
+decompVar1Simple:           seqOfBankvarnamesAlias decompOpt2? -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER seqOfBankvarnamesAlias?) ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER decompOpt2?));
+decompFrom:                 FROM decompFrom1 (COMMA2 decompFrom1)* -> decompFrom1+;
+decompFrom1:                seqOfBankvarnamesOnly1 decompOpt2? -> ^(ASTDECOMPITEMSNAME ^(ASTPLACEHOLDER) ^(ASTPLACEHOLDER seqOfBankvarnamesOnly1) ^(ASTPLACEHOLDER decompOpt2?));
+decompEndo:                 ENDO seqOfBankvarnames -> seqOfBankvarnames;
 
 decompExpression2:          (expression EQUAL)? expression -> expression+;
 

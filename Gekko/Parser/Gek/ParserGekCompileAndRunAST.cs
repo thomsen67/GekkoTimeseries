@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using ExcelDna.Integration;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Gekko.Parser.Gek
 {
@@ -191,14 +193,42 @@ namespace Gekko.Parser.Gek
             if (Globals.excelDna)
             {
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "ANTLR.dll"));
-                compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "gekko.exe"));
+                //compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "gekko.exe"));
+                //compilerParams.ReferencedAssemblies.Add(Path.Combine(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug", "gekko.exe"));
+                compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
+
+                string s = Environment.StackTrace;
+                Assembly asm1 = Assembly.GetExecutingAssembly();
+                Assembly asm2 = Assembly.GetAssembly(typeof(Program));
+                Assembly asm3 = Assembly.GetCallingAssembly();
+                Assembly asm4 = Assembly.GetEntryAssembly();
+                string ss = ExcelDnaUtil.XllPath;
+
+                Assembly xx = typeof(Program).Assembly;
+                
+                StackFrame[] frames = new StackTrace().GetFrames();
+                string initialAssembly = (from f in frames
+                                          select f.GetMethod().ReflectedType.AssemblyQualifiedName
+                                         ).Distinct().Last();
+                //MÅske er løsningen her:
+                //https://groups.google.com/forum/#!topic/exceldna/x1hjPCFwmFQ
+
             }
             else if (G.IsUnitTesting())
             {
                 //if running test cases, use this absolute path, this will never be run by users
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
-                compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
-            }            
+                if (true)
+                {
+                    compilerParams.ReferencedAssemblies.Add(@"C:\GekkoCS\Gekko\bin\Debug\ANTLR.dll");
+                    compilerParams.ReferencedAssemblies.Add(@"C:\GekkoCS\Gekko\bin\Debug\gekko.exe");
+                }
+                else
+                {
+                    compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\ANTLR.dll");
+                    compilerParams.ReferencedAssemblies.Add(Globals.ttPath2 + "\\" + Globals.ttPath3 + @"\Gekko\bin\Debug\gekko.exe");
+                }
+                
+            }
             else
             {
                 compilerParams.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "ANTLR.dll"));
@@ -206,23 +236,27 @@ namespace Gekko.Parser.Gek
             }
 
             compilerParams.GenerateExecutable = false;
-                        
+
             //code = ch.code + " ";
             Globals.lastDynamicCsCode = code;  //would be nicer to have this in the P object.        
 
             CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE START");
+
             cr = provider.CompileAssemblyFromSource(compilerParams, code);
+            
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("COMPILE END");
             if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Compile end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
 
             if (cr.Errors.HasErrors)
             {
-                HandleCompileErrors(p, cr);                
-        }
+                HandleCompileErrors(p, cr);
+            }
             return cr;
         }
+
+        
 
         private static void HandleRunErrors(P p, Exception e)
         {

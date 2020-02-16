@@ -5538,10 +5538,12 @@ namespace Gekko.Parser.Gek
                     case "ASTDECOMPITEMSNAME":
                         {
                             string n2 = "null";
-                            if (node[2].ChildrenCount() > 0) n2 = node[2][0].Code.ToString();                            
+                            if (node[2].ChildrenCount() > 0) n2 = node[2][0].Code.ToString();
+                            string n1 = "null";
+                            if (node[1].ChildrenCount() > 0) n1 = node[1][0].Code.ToString();
                             string n = "null";
                             if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
-                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + node[1][0].Code + ", " + n2 + "))" + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + n1 + ", " + n2 + "))" + ";" + G.NL);
                             
                         }
                         break;
@@ -5561,6 +5563,16 @@ namespace Gekko.Parser.Gek
                             {
                                 node.Code.A("o" + Num(node) + ".where.Add(" + node[i].Code + ");" + G.NL);
                             }
+                        }
+                        break;
+                    case "ASTDECOMPFROM":
+                        {
+                            if (node.ChildrenCount() > 0) node.Code.A(node[0].Code);
+                        }
+                        break;
+                    case "ASTDECOMPENDO":
+                        {
+                            if (node.ChildrenCount() > 0) node.Code.A("o" + Num(node) + ".endo.Add(" + node[0].Code + ");" + G.NL);
                         }
                         break;
                     case "ASTDECOMPROWS":

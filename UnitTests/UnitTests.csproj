@@ -138,9 +138,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="UnitTests-AddIn.dna" />
     <None Include="packages.config" />
     <None Include="Properties\ExcelDna.Build.props" />
+    <None Include="UnitTests-AddIn.dna" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\ExcelDna.AddIn.1.0.0\build\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.1.0.0\build\ExcelDna.AddIn.targets')" />
