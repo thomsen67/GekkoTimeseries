@@ -483,7 +483,6 @@ namespace Gekko
                         //  7 -3.55                                             6.88                   -3.33 (y19[+1])
                         //  8         -1.33                                            1.33
 
-
                         double[,] inverse = null;
 
                         try
@@ -1096,16 +1095,13 @@ namespace Gekko
 
                 //Function call start --------------
                 O.AdjustSmplForDecomp(smpl, 0);
-
                 //TODO: can be deleted, #p24234oi32
                 string s5 = Globals.expressionText;
-
                 y0a = expression(smpl); funcCounter++;  //this call fills Globals.precedents with variables
                 O.AdjustSmplForDecomp(smpl, 1);
                 //Function call end   --------------
 
                 List<DecompPrecedent> decompPrecedents = new List<DecompPrecedent>();
-
 
                 List<string> ss = Globals.precedents.Keys.ToList<string>();
                 ss.Sort(StringComparer.OrdinalIgnoreCase);
@@ -1126,9 +1122,13 @@ namespace Gekko
                 }
 
 
-                //decompPrecedents.Add(new DecompPrecedent(Globals.decompExpressionName + "¤[0]", null));  //seems variable is not used anyway
-
+                //IMPORTANT
+                //IMPORTANT
+                //IMPORTANT
                 Globals.precedents = null;  //!!! This is important: if not set to null, afterwards there will be a lot of superfluous lookup in the dictionary
+                //IMPORTANT
+                //IMPORTANT
+                //IMPORTANT
 
                 Series y0a_series = y0a as Series;
                 if (y0a == null)

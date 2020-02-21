@@ -16966,20 +16966,21 @@ namespace Gekko
         {
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
 
-            GekkoDictionary<string, string> precedents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equationsByVarname)
             {
                 foreach (ModelGamsEquation e5 in e4.Value)
                 {
                     GekkoDictionary<string, string> knownVars2 = GetKnownVars(e5.rhsGams);
-                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !precedents.ContainsKey(e4.Key))
+                    if (knownVars2.ContainsKey(varnameWithoutFreqAndIndex) && !dependents.ContainsKey(e4.Key))
                     {
-                        precedents.Add(e4.Key, null);
+                        dependents.Add(e4.Key, null);
                     }
                 }
-            }
+            }            
+
             List<string> precedents2 = new List<string>();
-            precedents2.AddRange(precedents.Keys);
+            precedents2.AddRange(dependents.Keys);
             precedents2.Sort();
 
             if (precedents2.Count > 0)
@@ -17269,7 +17270,19 @@ namespace Gekko
                     //int length = (lhs + " = ").Length;
 
                     PrintEquation(rhs); G.Writeln(";");
-                    if (conditionals != null && conditionals.Trim() != "") G.Writeln("Conditionals: " + conditionals);
+
+                    // ------------- conditionals ---------------
+                    // see also #9872034985732
+
+                    string conditionals2 = null;
+                    if (conditionals != null) conditionals2 = conditionals.Trim();
+
+                    if (!G.NullOrEmpty(conditionals2))
+                    {
+                        //removes a stray ending " and" that may be left after removing time conditionals
+                        if (conditionals2.EndsWith(" and", StringComparison.OrdinalIgnoreCase)) conditionals2 = conditionals2.Substring(0, conditionals2.Length - " and".Length);
+                        G.Writeln("Conditionals: " + conditionals2);
+                    }
                 }
             }
 
@@ -19359,8 +19372,11 @@ namespace Gekko
 
         private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine();
+            StringBuilder sb1 = new StringBuilder();
+            sb1.AppendLine();
+
+            StringBuilder sb2 = new StringBuilder();
+            sb2.AppendLine();
 
             int eqCounter = 0;
 
@@ -19460,7 +19476,7 @@ namespace Gekko
                     }
                     else
                     {
-                        eqCounter = ReadGamsModelEquation(sb, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
+                        eqCounter = ReadGamsModelEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
                     }
                 }
             }
@@ -19482,16 +19498,134 @@ namespace Gekko
                 using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gcm", Program.GekkoFileReadOrWrite.Write))
                 using (StreamWriter sw = G.GekkoStreamWriter(fs))
                 {
-                    sw.Write(sb);
+                    sw.Write(sb1);
+                }
+
+                using (FileStream fs = Program.WaitForFileStream(Program.options.folder_working + "\\dump.gms", Program.GekkoFileReadOrWrite.Write))
+                using (StreamWriter sw = G.GekkoStreamWriter(fs))
+                {
+                    sw.Write(sb2);
                 }
             }
 
+            if (false && Globals.runningOnTTComputer)
+            {
+                DateTime dt = DateTime.Now;
+                double ms1 = 0;
+                double ms2 = 0;
+                List<string> sletmig = new List<string>();
+                int counterA = 0;
+                int counterError1 = 0;
+                int counterError2 = 0;
+
+                foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
+                {
+                    if (counterA > 20) break;
+                    if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
+                    counterA++;
+                    ModelGamsEquation eq = kvp.Value[0];
+
+                    eq.expressionVariables = new List<List<string>>();
+                    eq.expressionVariablesWithSets = new List<List<string>>();
+
+                    string rhs = eq.rhs.Trim();
+                    string lhs = eq.lhs.Trim();
+                    string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+
+                    if (eq.expressions == null || eq.expressions.Count == 0)
+                    {
+                        Globals.expressions = null;  //maybe not necessary
+
+                        try
+                        {
+                            DateTime dt1 = DateTime.Now;
+                            Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
+                            ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
+                        }
+                        catch
+                        {
+                            counterError1++;
+                            continue;
+                        }
+                        eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+
+                        DateTime dt2 = DateTime.Now;
+                        foreach (var expression in Globals.expressions)
+                        {
+                            //Function call start --------------
+                            //O.AdjustSmplForDecomp(smpl, 0);
+                            //TODO: can be deleted, #p24234oi32      
+                            Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                            try
+                            {
+                                IVariable iv = expression(new GekkoSmpl());
+                                List<string> m1 = new List<string>();
+                                List<string> m2 = new List<string>();
+                                foreach (string s in Globals.precedents.Keys)
+                                {
+                                    string ss1 = G.Chop_RemoveBank(s);
+                                    ss1 = G.Chop_RemoveFreq(s);
+                                    if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
+                                    {
+                                        m1.Add(ss1);
+                                    }
+                                    string ss2 = G.Chop_RemoveIndex(s);
+                                    ss2 = G.Chop_RemoveBank(ss2);
+                                    ss2 = G.Chop_RemoveFreq(ss2);
+                                    if (!m2.Contains(ss2, StringComparer.OrdinalIgnoreCase))
+                                    {
+                                        m2.Add(ss2);
+                                    }
+                                }
+                                eq.expressionVariablesWithSets.Add(m1);
+                                eq.expressionVariables.Add(m2);
+                            }
+                            catch
+                            {
+                                counterError2++;
+                                eq.expressionVariablesWithSets.Add(null); //keep alignment
+                                eq.expressionVariables.Add(null); //keep alignment
+                                break;
+                            }
+                            finally
+                            {
+                                Globals.precedents = null;
+                            }
+                            //O.AdjustSmplForDecomp(smpl, 1);
+                            //Function call end   --------------
+                        }
+                        ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
+                        Globals.expressions = null;  //maybe not necessary
+                    }
+                }
+                G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
+
+                foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
+                {
+                    ModelGamsEquation eq = kvp.Value[0];
+                    G.Writeln2("-----------------------------------------------------------");
+                    G.Writeln("Eq = " + eq.nameGams + ", #sub-eqs = " + eq.expressions.Count);
+                    if (eq.expressionVariables == null)
+                    {
+                        G.Writeln("SMALL null");
+                        G.Writeln("FULL  null");
+                    }
+                    else
+                    {
+                        for (int i = 0; i < eq.expressionVariables.Count; i++)
+                        {
+                            List<string> m1 = eq.expressionVariables[i];
+                            List<string> m2 = eq.expressionVariablesWithSets[i];
+                            G.Writeln("SMALL " + G.GetListWithCommas(m1));
+                            G.Writeln("FULL  " + G.GetListWithCommas(m2));
+                        }
+                    }
+                }
+            }
         }
 
-        private static int ReadGamsModelEquation(StringBuilder sb, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equations, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
+        private static int ReadGamsModelEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
         {
-
-
             int iEqStart = 0;
             //searches for '..' with no blank between (could be improved)
             //now we search backwards for start of line
@@ -19531,6 +19665,7 @@ namespace Gekko
             string eqnameGams = null;
             string dollarGams = null;
             string setsGams = null;
+            List<string> setsGamsList = new List<string>();
             string lhsGams = null;
             string rhsGams = null;
             TokenHelper lhsTokensGams = null;
@@ -19547,14 +19682,19 @@ namespace Gekko
             if (tok2.SubnodesTypeParenthesisStart())
             {
                 setsGams = tok2.subnodes.ToString();
+
+                List<TokenHelperComma> split = tok2.SplitCommas(true);
+                foreach (TokenHelperComma item in split)
+                {
+                    string set = item.list.ToString();
+                    setsGamsList.Add(set.Trim());
+                }
+
                 i++;
 
                 if (tok.Offset(i).s == "$")
                 {
                     i++;
-
-                    //TODO: remove stray ANDs
-
 
                     TokenHelper tok3 = tok.Offset(i);
                     dollarGams = null;
@@ -19563,6 +19703,7 @@ namespace Gekko
                         dollarGams = tok3.subnodes.ToString();
                     }
 
+                    // see also #9872034985732, removing stray " and"
                     if (tok3.SubnodesTypeParenthesisStart())
                     {
 
@@ -19678,16 +19819,15 @@ namespace Gekko
             }
 
             ModelGamsEquation equation = new ModelGamsEquation();
-            if (true)
-            {
-                equation.nameGams = eqnameGams;
-                equation.setsGams = setsGams;
-                equation.conditionalsGams = dollarGams;
-                equation.lhsGams = lhsGams;
-                equation.rhsGams = rhsGams;
-                equation.lhsTokensGams = lhsTokensGams;
-                equation.rhsTokensGams = rhsTokensGams;
-            }
+            
+            equation.nameGams = eqnameGams;
+            equation.setsGams = setsGams;
+            equation.setsGamsList = setsGamsList;
+            equation.conditionalsGams = dollarGams;
+            equation.lhsGams = lhsGams;
+            equation.rhsGams = rhsGams;
+            equation.lhsTokensGams = lhsTokensGams;
+            equation.rhsTokensGams = rhsTokensGams;            
 
             TokenHelper lhsTokensGekko = equation.lhsTokensGams.DeepClone(null);
             TokenHelper rhsTokensGekko = equation.rhsTokensGams.DeepClone(null);
@@ -19711,13 +19851,13 @@ namespace Gekko
                 int v = 3;
                 if (v == 1)
                 {
-                    sb.Append("PRT " + lhs + ";" + G.NL);
-                    sb.Append("PRT " + rhs + ";" + G.NL);
-                    sb.AppendLine();
+                    sb1.Append("PRT " + lhs + ";" + G.NL);
+                    sb1.Append("PRT " + rhs + ";" + G.NL);
+                    sb1.AppendLine();
                 }
                 else if (v == 2)
                 {
-                    sb.Append("PRT<n> " + lhs + " - ( " + rhs + " );" + G.NL);
+                    sb1.Append("PRT<n> " + lhs + " - ( " + rhs + " );" + G.NL);
                 }
                 else
                 {
@@ -19727,15 +19867,27 @@ namespace Gekko
                         dollar2 = dollar.Trim();
                     }
 
-                    sb.AppendLine("Equation: " + eqnameGams);
+                    sb1.AppendLine("Equation: " + eqnameGams);
                     if (dollar2 != null)
                     {
-                        sb.Append("(" + lhs + ") $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
+                        sb1.Append("(" + lhs + ") $ (" + dollar2 + ") = " + rhs + ";" + G.NL);  //always add parentheses
                     }
                     else
                     {
-                        sb.Append(lhs + " = " + rhs + ";" + G.NL);
+                        sb1.Append(lhs + " = " + rhs + ";" + G.NL);
                     }
+
+                    sb2.AppendLine("" + equation.nameGams);
+                    sb2.AppendLine("" + equation.setsGams);
+                    sb2.AppendLine("" + equation.conditionalsGams);
+                    sb2.AppendLine(equation.lhsGams + "  =  ");
+                    sb2.AppendLine(equation.rhsGams);
+                    sb2.AppendLine();
+                    sb2.AppendLine("--------------------------------------");
+                    sb2.AppendLine();
+
+                    
+
 
                     //if (dollar2 != null)
                     //{
@@ -19756,14 +19908,14 @@ namespace Gekko
             }
 
             bool fromList = false;
-            string lhsVariable = ReadGamsModelGetLhsName(equations, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
+            string lhsVariable = ReadGamsModelGetLhsName(equationsByVarname, equationsByEqname, lhsTokensGekko, equation, eqnameGams, dependents, problems, ref fromList);
             string s = null;
             if (fromList) s = ", designated from list";
             if (lhsVariable == null) lhsVariable = "[not identified]";
-            sb.AppendLine("--> " + lhsVariable + " (dependent" + s + ")");
-            sb.AppendLine();
-            sb.AppendLine("----------------------------------------------------------------------------------------------------------------");
-            sb.AppendLine();
+            sb1.AppendLine("--> " + lhsVariable + " (dependent" + s + ")");
+            sb1.AppendLine();
+            sb1.AppendLine("----------------------------------------------------------------------------------------------------------------");
+            sb1.AppendLine();
 
             return eqCounter;
         }
@@ -19839,7 +19991,7 @@ namespace Gekko
 
         }
 
-        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equations, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
+        private static string ReadGamsModelGetLhsName(Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname, TokenHelper lhsTokensGams2, ModelGamsEquation e, string eqnameGams, GekkoDictionary<string, string> dependents, List<string>problems, ref bool fromList)
         {
 
             string lhs = null;
@@ -19896,15 +20048,15 @@ namespace Gekko
             }
             else
             {
-                if (equations.ContainsKey(varnameFound))
+                if (equationsByVarname.ContainsKey(varnameFound))
                 {
-                    equations[varnameFound].Add(e);  //can have more than one eq with same lhs variable                
+                    equationsByVarname[varnameFound].Add(e);  //can have more than one eq with same lhs variable                
                 }
                 else
                 {
                     List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
                     e2.Add(e);
-                    equations.Add(varnameFound, e2);
+                    equationsByVarname.Add(varnameFound, e2);
                 }
 
                 if (equationsByEqname.ContainsKey(eqnameGams))

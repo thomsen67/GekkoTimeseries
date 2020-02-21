@@ -388,13 +388,14 @@ namespace Gekko
     public class ModelGams
     {
         public Dictionary<string, List<ModelGamsEquation>> equationsByVarname = null;
-        public Dictionary<string, List<ModelGamsEquation>> equationsByEqname = null;
+        public Dictionary<string, List<ModelGamsEquation>> equationsByEqname = null;  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname
     }
 
     public class ModelGamsEquation
     {
         public string nameGams = null;
         public string setsGams = null;
+        public List<string> setsGamsList = null;  //list of uncontrolled sets, no #-indicator
         public string conditionalsGams = null;
         public string lhsGams = null;
         public string rhsGams = null;
@@ -409,8 +410,8 @@ namespace Gekko
         public TokenHelper rhsTokensGams = null;
 
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
-        public List<string> expressionsNames = new List<string>();
-
+        public List<List<string>> expressionVariablesWithSets = null;  //for each expression in .expressions: contains the list of variables in the eq
+        public List<List<string>> expressionVariables = null;  //same as above, but with no sets
 
     }
 }
