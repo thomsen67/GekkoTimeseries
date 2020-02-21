@@ -3304,7 +3304,7 @@ namespace UnitTests
             table = Globals.lastPrtOrMulprtTable;
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1z");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2z");
-            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3z");
+            Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3z"); 
 
             I("reset;");
             I("time 2001 2003;");
