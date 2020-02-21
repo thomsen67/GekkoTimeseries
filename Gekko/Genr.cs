@@ -15,31 +15,13 @@ namespace Gekko
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-
-            O.Decomp2 o0 = new O.Decomp2();
-            o0.type = @"ASTDECOMP3";
-            o0.label = @"y[18], y[19]";
-            o0.t1 = Globals.globalPeriodStart;
-            o0.t2 = Globals.globalPeriodEnd;
-
-            o0.opt_prtcode = O.ConvertToString((new ScalarString("d")));
-
-
-
-            o0.decompItems.Add(new DecompItems(null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("y").Concat(null, new ScalarString("[").Concat(null, new ScalarString("18")).Concat(null, new ScalarString("]"))), new ScalarString("y").Concat(null, new ScalarString("[").Concat(null, new ScalarString("19")).Concat(null, new ScalarString("]"))) })), null, null));
-
-            o0.decompItems.Add(new DecompItems(null, null, O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("e1a") })), null));
-
-            o0.endo.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("demand").Concat(null, new ScalarString("[").Concat(null, new ScalarString("18")).Concat(null, new ScalarString("]"))), new ScalarString("demand").Concat(null, new ScalarString("[").Concat(null, new ScalarString("19")).Concat(null, new ScalarString("]"))), new ScalarString("supply").Concat(null, new ScalarString("[").Concat(null, new ScalarString("18")).Concat(null, new ScalarString("]"))), new ScalarString("supply").Concat(null, new ScalarString("[").Concat(null, new ScalarString("19")).Concat(null, new ScalarString("]"))), new ScalarString("c").Concat(null, new ScalarString("[").Concat(null, new ScalarString("18")).Concat(null, new ScalarString("]"))), new ScalarString("c").Concat(null, new ScalarString("[").Concat(null, new ScalarString("19")).Concat(null, new ScalarString("]"))) })));
-
-            o0.where.Add(new List<IVariable>() { O.HandleString(new ScalarString(@"0")), O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("equ") })) });
-
-
-            o0.rows.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("vars"), O.scalarStringHash.Concat(null, new ScalarString("a")), new ScalarString("lags") })));
-
-            o0.cols.Add(O.ExplodeIvariablesSeq(false, new List(new List<IVariable> { new ScalarString("time") })));
-
-            o0.Exe();
+            var Evalcode10 = new List<Func<GekkoSmpl, IVariable>>(); 
+            foreach (IVariable listloop_s9 in new O.GekkoListIterator(O.DecompLooper("#s")))
+            {
+                Evalcode10.Add((smpl11) => { return O.Subtract(smpl11, O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "vY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9), O.Multiply(smpl11, O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "pY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9), O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "qY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9))); });
+            }
+            Globals.expressionText = @"vY[#s] - (pY[#s] * qY[#s])";
+            Globals.expressions = Evalcode10;
 
             //[[commandEnd]]0
         }
@@ -57,3 +39,4 @@ namespace Gekko
         }
     }
 }
+

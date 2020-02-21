@@ -2259,7 +2259,7 @@ namespace Gekko
         }
 
         private IVariable FindArraySeriesHelper(GekkoSmpl smpl, bool isLhs, string[] keys, bool rhsIsTimeless, LookupSettings settings)
-        {
+        {            
             IVariable rv = null;
             if (true)
             {
@@ -2288,7 +2288,7 @@ namespace Gekko
                     {
 
                         //on the RHS
-                        
+
                         if (smpl != null && smpl.command == GekkoSmplCommand.Unfold)
                         {
                             //print
@@ -2374,12 +2374,12 @@ namespace Gekko
 
                         if (rhsIsTimeless)
                         {
-                            rv = new Series(ESeriesType.Timeless, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq), double.NaN);                            
+                            rv = new Series(ESeriesType.Timeless, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq), double.NaN);
                         }
                         else
                         {
                             rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
-                        }                        
+                        }
                         MapMultidimItem mmi = new MapMultidimItem(keys, this);
                         this.dimensionsStorage.AddIVariableWithOverwrite(mmi, rv);
                     }
@@ -2406,18 +2406,12 @@ namespace Gekko
                 }
             }
 
-            if (Globals.precedents != null && rv != null)
-            {
-                Series rv_series = rv as Series;
-                if (rv_series.type != ESeriesType.ArraySuper)
-                {                    
-                    //TODO: name may probably be null, for instance in x[#i] where the #i is not present, and a timeless series with NaN or 0 is returned
-                    Program.AddToPrecedents(this.GetParentDatabank(), rv_series.GetName());                    
-                }
-            }
+            Program.PrecedentsHelper(null, rv, this.GetParentDatabank());
 
             return rv;
         }
+
+        
 
         private void FindArraySeriesHelper2(string[] keys)
         {

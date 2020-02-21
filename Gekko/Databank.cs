@@ -164,13 +164,13 @@ namespace Gekko
         }
 
         public IVariable GetIVariable(string variable)
-        {
+        {            
             IVariable iv = null;
             if (this.storage.Count > 0)
             {
                 this.storage.TryGetValue(variable, out iv);
-            }            
-            if (iv != null && Globals.precedents != null) Program.AddToPrecedents(this, variable);
+            }
+            Program.PrecedentsHelper(null, iv, this);
             return iv;
         }
 
