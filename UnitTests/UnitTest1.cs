@@ -3302,6 +3302,7 @@ namespace UnitTests
             //Globals.lastPrtOrMulprtTable = null;
             I("p <n> {#a+'z'}, {%s+%{%{''+%s3}+''}2+'z'};");  //in {#a...} a plus or minus is allowed. Nothing else.
             table = Globals.lastPrtOrMulprtTable;
+
             Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "a1z");
             Assert.AreEqual(table.Get(1, 3).CellText.TextData[0], "a2z");
             Assert.AreEqual(table.Get(1, 4).CellText.TextData[0], "a3z");    
