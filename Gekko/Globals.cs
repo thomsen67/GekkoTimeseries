@@ -118,6 +118,8 @@ namespace Gekko
 
         public static string errorHelper = null;
 
+        public static bool newEval = true;
+
         public static bool series_dynamic = true;
 
         public static bool fixLookup = true;

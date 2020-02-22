@@ -19619,15 +19619,21 @@ namespace Gekko
                         try
                         {
                             DateTime dt1 = DateTime.Now;
-                            //Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
 
-                            string c = null;
-                            if (!G.NullOrEmpty(eq.conditionals))
+                            if (!Globals.newEval)
                             {
-                                c = "$ (" + eq.conditionals + ")";
-                            }
+                                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
 
-                            Program.obeyCommandCalledFromGUI("VAR deleteme " + c + " = " + s1, new P()); //produces Func<> Globals.expression with the expression 
+                            }
+                            else
+                            {
+                                string c = null;
+                                if (!G.NullOrEmpty(eq.conditionals))
+                                {
+                                    c = "$ (" + eq.conditionals + ")";
+                                }
+                                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + s1, new P()); //produces Func<> Globals.expression with the expression 
+                            }
 
                             ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
                         }

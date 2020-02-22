@@ -15,13 +15,24 @@ namespace Gekko
             //[[commandStart]]0
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
-            var Evalcode10 = new List<Func<GekkoSmpl, IVariable>>(); 
-            foreach (IVariable listloop_s9 in new O.GekkoListIterator(O.DecompLooper("#s")))
+            O.Assignment o0 = new O.Assignment();
+            o0.opt_source = @"<[code]>VAR2 deleteme $ (#a15t100[#a]) = fDeltag[#a] - (uDeltag[#a] * (nSoegBase[#a] / nPop[#a]) / (nSoegBase[#a][%tbase] / nPop[#a][%tbase]))";
+            
+            foreach (IVariable listloop_a20 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, o0)))
             {
-                Evalcode10.Add((smpl11) => { return O.Subtract(smpl11, O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "vY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9), O.Multiply(smpl11, O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "pY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9), O.Indexer(O.Indexer2(smpl11, O.EIndexerType.None, listloop_s9), smpl11, O.EIndexerType.None, O.Lookup(smpl11, null, null, "qY", null, null, new LookupSettings(), EVariableType.Var, null), listloop_s9))); });
+                ScalarVal v = O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "#a15t100", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20) as ScalarVal;
+                if (v != null && (v as ScalarVal).val == 0d) continue;
+
+                IVariable ivTmpvar21 = O.Subtract(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "fDeltag", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20), O.Divide(smpl, O.Multiply(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "uDeltag", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20), O.Divide(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "nSoegBase", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20), O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "nPop", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20))), O.Divide(smpl, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
+                ), smpl, O.EIndexerType.None, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "nSoegBase", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20), O.Lookup(smpl, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
+                ), O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
+                ), smpl, O.EIndexerType.None, O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "nPop", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20), O.Lookup(smpl, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
+                ))));
+
+                //O.DollarLookup(O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a20), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "#a15t100", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a20)
+                //, smpl, null, null, "deleteme", null, ivTmpvar21, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null)
+                ;
             }
-            Globals.expressionText = @"vY[#s] - (pY[#s] * qY[#s])";
-            Globals.expressions = Evalcode10;
 
             //[[commandEnd]]0
         }
@@ -39,4 +50,3 @@ namespace Gekko
         }
     }
 }
-

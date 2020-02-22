@@ -83,6 +83,7 @@ namespace Gekko.Parser
         //public GekkoDictionary<string, string> freeIndexedListsLeftSide = null; //like series x[#m] = 1
         public List<Tuple<string, string>> forLoop = null;
         public string localInsideLoopVariablesCs = null;
+        public string loopCodeCs = null;
 
         //public string listLoopNestCode = null; //code delivered from sub-tree
         public string ivTempVarName = null;

@@ -1916,7 +1916,17 @@ namespace Gekko.Parser.Gek
                                 //Problem is, we have this ASTDOLLAR, with ASTBANKVARNAME and ASTDOLLARCONDITIONAL as children. 
                                 //Both of these produce an IVARIABLE, but ASTDOLLARCONDITIONAL is still empty when ASTBANKVARNAME is encountered. 
                                 //A solution could be to walk ASTDOLLARCONDITIONAL manually, and do the DollarLookup() from ASTBANKVARNAME. 
-                                //But the hack is not that bad. 
+                                //But the hack is not that bad.
+
+                                if (node.Parent.Parent.Text == "ASTASSIGNMENT")
+                                {
+                                    //must probably always be so
+                                    ASTNode gparent = node.Parent.Parent;
+                                    if (G.Equal(gparent[3].Text, "var2"))
+                                    {
+                                        gparent.loopCodeCs = node[1].Code.ToString();
+                                    }
+                                }
 
                                 if (s.StartsWith("O.Lookup("))
                                 {                                    
@@ -3951,44 +3961,63 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
 
-                                GekkoSB sb1 = new GekkoSB();
-                                GekkoSB sb2 = new GekkoSB();
-
-                                if (true)
+                                if (G.Equal(type, "var2"))
                                 {
+                                    StringBuilder sb7 = new StringBuilder();
+                                    node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                    node.Code.A("ScalarVal v = " + node.loopCodeCs + " as ScalarVal").End();
+                                    node.Code.A("if (v != null && (v as ScalarVal).val == 0d) continue").End();
 
-                                    sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
-                                    sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                                    sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+                                    string methodName = "Evalcode" + ++Globals.counter;
+                                    node.Code.A("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
+                                    node.Code.A("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
+                                    node.Code.A("return " + node[0].Code.ToString() + " ;");
+                                    node.Code.A("  });");                                    
 
-                                    sb2.A(sb1); //cloning
-
-                                    //sb1.A(sb);
-                                    //sb2.A(sb);
-
-                                    sb1.A(node[0].Code).End();  //simple Lookup() for sb1
-
-                                    //more complicated probing for sb2
-                                    sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
-                                    sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
-                                    sb2.A(node[0].Code).End();
-                                    sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
-                                    //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+                                    //node.Code.A(node[0].Code).End();
                                 }
-
-                                if (Globals.series_dynamic)
+                                else
                                 {
-                                    //node.Code.A(sb);
 
-                                    node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
-                                    node.Code.A(sb1);
-                                    node.Code.A("};" + G.NL);  //end of action
+                                    GekkoSB sb1 = new GekkoSB();
+                                    GekkoSB sb2 = new GekkoSB();
 
-                                    node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
-                                    node.Code.A(sb2);
-                                    node.Code.A("};" + G.NL);  //end of action
+                                    if (true)
+                                    {
 
-                                    node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                                        sb1.A(OperatorHelper(null, -Globals.smplOffset)).End();
+                                        sb1.A("IVariable " + ivTempVar + " = ").A(temp).End();
+                                        sb1.A(OperatorHelper(null, Globals.smplOffset)).End();
+
+                                        sb2.A(sb1); //cloning
+
+                                        //sb1.A(sb);
+                                        //sb2.A(sb);
+
+                                        sb1.A(node[0].Code).End();  //simple Lookup() for sb1
+
+                                        //more complicated probing for sb2
+                                        sb2.A("if (" + ivTempVar + ".Type() != EVariableType.Series) return false;" + G.NL);
+                                        sb2.A("O.Dynamic1(" + Globals.smpl + ");" + G.NL);
+                                        sb2.A(node[0].Code).End();
+                                        sb2.A("return O.Dynamic2(" + Globals.smpl + ");" + G.NL);
+                                        //sb2.A("return O.CheckForDynamicSeries(" + ivTempVar + ", " + lhsCode.Replace("O.Lookup(", "O.NameLookup(")).A(")").End();
+                                    }
+
+                                    if (Globals.series_dynamic)
+                                    {
+                                        //node.Code.A(sb);
+
+                                        node.Code.A("Action assign" + number + " = () => {" + G.NL);  //start of action
+                                        node.Code.A(sb1);
+                                        node.Code.A("};" + G.NL);  //end of action
+
+                                        node.Code.A("Func<bool> check" + number + " = () => {" + G.NL);  //start of action
+                                        node.Code.A(sb2);
+                                        node.Code.A("};" + G.NL);  //end of action
+
+                                        node.Code.A("O.RunAssigmentMaybeDynamic(" + Globals.smpl + ", assign" + number + ", check" + number + ", " + "o" + Num(node) + ");" + G.NL);
+                                    }
                                 }
 
                                 if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
@@ -6616,6 +6645,7 @@ namespace Gekko.Parser.Gek
                     if (parent.Text == "ASTASSIGNMENT")
                     {                        
                         type = parent[3].Text;
+                        if (G.Equal(type, "var2")) type = "var";
                         break;
                     }
                     parent = parent.Parent;
