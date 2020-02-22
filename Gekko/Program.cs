@@ -17300,19 +17300,8 @@ namespace Gekko
                     //int length = (lhs + " = ").Length;
 
                     PrintEquation(rhs); G.Writeln(";");
+                    G.Writeln("Conditionals: " + eq.conditionals);
 
-                    // ------------- conditionals ---------------
-                    // see also #9872034985732
-
-                    string conditionals2 = null;
-                    if (conditionals != null) conditionals2 = conditionals.Trim();
-
-                    if (!G.NullOrEmpty(conditionals2))
-                    {
-                        //removes a stray ending " and" that may be left after removing time conditionals
-                        if (conditionals2.EndsWith(" and", StringComparison.OrdinalIgnoreCase)) conditionals2 = conditionals2.Substring(0, conditionals2.Length - " and".Length);
-                        G.Writeln("Conditionals: " + conditionals2);
-                    }
                 }
             }
 
@@ -19532,11 +19521,7 @@ namespace Gekko
                         }
                         dependents.Add(ss[i], lhs);
                     }
-
-
-
                 }
-
             }
 
             List<string> problems = new List<string>();
@@ -19590,7 +19575,7 @@ namespace Gekko
                 }
             }
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {
                 DateTime dt = DateTime.Now;
                 double ms1 = 0;
@@ -20041,7 +20026,18 @@ namespace Gekko
             {
                 equation.lhs = lhs;
                 equation.rhs = rhs;
-                equation.conditionals = dollar;
+
+                // ------------- conditionals ---------------
+                // see also #9872034985732
+
+                string conditionals2 = null;
+                if (dollar != null) conditionals2 = dollar.Trim();
+                if (!G.NullOrEmpty(conditionals2))
+                {
+                    //removes a stray ending " and" that may be left after removing time conditionals
+                    if (conditionals2.EndsWith(" and", StringComparison.OrdinalIgnoreCase)) conditionals2 = conditionals2.Substring(0, conditionals2.Length - " and".Length);                    
+                }
+                equation.conditionals = conditionals2;
             }
 
             bool fromList = false;
