@@ -12896,7 +12896,9 @@ namespace Gekko
                     G.Writeln2("EVAL " + G.ReplaceGlueNew(rhs));
                     G.Writeln2("-----------------------------------");
                 }               
-                Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
+                
+                //Program.obeyCommandCalledFromGUI("EVAL " + rhs, new P());  //produces Func<> Globals.expression with the expression
+                CallEval(null, rhs);
             }
             catch (Exception e)
             {
@@ -12947,7 +12949,8 @@ namespace Gekko
             if (found.expressions == null || found.expressions.Count == 0)
             {
                 Globals.expressions = null;  //maybe not necessary
-                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression                 
+                //Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression   
+                CallEval(found.conditionals, s1);
                 found.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
                 Globals.expressions = null;  //maybe not necessary
             }
@@ -19619,10 +19622,7 @@ namespace Gekko
                         try
                         {
                             DateTime dt1 = DateTime.Now;
-
-                            CallEval(eq.conditionals, s1);
-                            return;
-
+                            CallEval(eq.conditionals, s1);                           
                             ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
                         }
                         catch
@@ -19732,11 +19732,11 @@ namespace Gekko
 
         }
 
-        private static void CallEval(string conditionals, string s1)
+        public static void CallEval(string conditionals, string statement)
         {
             if (!Globals.newEval)
             {
-                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
+                Program.obeyCommandCalledFromGUI("EVAL " + statement, new P()); //produces Func<> Globals.expression with the expression 
             }
             else
             {
@@ -19745,7 +19745,14 @@ namespace Gekko
                 {
                     c = "$ (" + conditionals + ")";
                 }
-                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + s1, new P()); //produces Func<> Globals.expression with the expression 
+                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + statement, new P()); //produces Func<> Globals.expression with the expression 
+
+                if (Globals.expressions == null)
+                {
+
+                }
+
+
             }
         }
 

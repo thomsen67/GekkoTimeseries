@@ -364,8 +364,10 @@ namespace Gekko.Parser.Gek
                                     }
                                 }
                             }
-                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL")  //Note: we cannot have both of these in the same tree, they are always separate
+                            else if (node2.Text == "ASTPRTELEMENT" || node2.Text == "ASTLEFTSIDE" || node2.Text == "ASTEVAL" || (node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "var2")))  //Note: we cannot have both of these in the same tree, they are always separate
                             {
+                                //node2.Text == "ASTASSIGNMENT" && G.Equal(node2[3].Text, "var2"): when using VAR2 for eval, we allow the right-hand side to create uncontrolled sets, so that VAR2 deleteme = y[#a] - (x[#a]) will get #a as a set (normally they are only fetched from the LHS)
+
                                 ASTNode tmp = node2;
                                 if (node2.Text == "ASTLEFTSIDE")
                                 {
