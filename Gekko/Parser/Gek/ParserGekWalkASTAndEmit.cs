@@ -3953,6 +3953,13 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("o" + Num(node) + ".opt_lsfunc = `" + node[0][1][0].Text + "`;" + G.NL);
                                 }
 
+                                string methodName = null;
+                                if (G.Equal(type, "var2"))
+                                {
+                                    methodName = "Evalcode" + ++Globals.counter;
+                                    node.Code.A("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
+                                }
+
                                 if (node.listLoopAnchor != null && node.listLoopAnchor.Count > 0)
                                 {
                                     foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
@@ -3963,16 +3970,22 @@ namespace Gekko.Parser.Gek
 
                                 if (G.Equal(type, "var2"))
                                 {
+                                    string vName = "v" + ++Globals.counter;
                                     StringBuilder sb7 = new StringBuilder();
-                                    node.Code.A("IVariable " + ivTempVar + " = ").A(temp).End();
-                                    node.Code.A("ScalarVal v = " + node.loopCodeCs + " as ScalarVal").End();
-                                    node.Code.A("if (v != null && (v as ScalarVal).val == 0d) continue").End();
 
-                                    string methodName = "Evalcode" + ++Globals.counter;
-                                    node.Code.A("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
-                                    node.Code.A("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
-                                    node.Code.A("return " + node[0].Code.ToString() + " ;");
-                                    node.Code.A("  });");                                    
+                                    if (!G.NullOrBlanks(node.loopCodeCs))
+                                    {
+                                        node.Code.A("ScalarVal " + vName + " = " + node.loopCodeCs + " as ScalarVal").End();
+                                        node.Code.A("if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue").End();
+                                    }
+                                    
+                                    StringBuilder sb4 = new StringBuilder();                                    
+                                    sb4.AppendLine("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
+                                    sb4.AppendLine("return " + node[1].Code.ToString() + " ;");
+                                    sb4.AppendLine("  });");
+                                    string codeNew;  string smplLocal; ReplaceSmpl(sb4.ToString(), out smplLocal, out codeNew);
+                                    node.Code.A(codeNew);
+                                                                       
 
                                     //node.Code.A(node[0].Code).End();
                                 }
@@ -4026,6 +4039,11 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A("}" + G.NL);
                                     }
+                                }
+
+                                if (G.Equal(type, "var2"))
+                                {
+                                    node.Code.A("Globals.expressions = " + methodName + ";" + G.NL);
                                 }
 
                                 string localFuncCode = "";

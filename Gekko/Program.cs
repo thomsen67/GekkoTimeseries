@@ -19587,7 +19587,7 @@ namespace Gekko
                 }
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {
                 DateTime dt = DateTime.Now;
                 double ms1 = 0;
@@ -19623,7 +19623,6 @@ namespace Gekko
                             if (!Globals.newEval)
                             {
                                 Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
-
                             }
                             else
                             {
