@@ -19620,19 +19620,8 @@ namespace Gekko
                         {
                             DateTime dt1 = DateTime.Now;
 
-                            if (!Globals.newEval)
-                            {
-                                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
-                            }
-                            else
-                            {
-                                string c = null;
-                                if (!G.NullOrEmpty(eq.conditionals))
-                                {
-                                    c = "$ (" + eq.conditionals + ")";
-                                }
-                                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + s1, new P()); //produces Func<> Globals.expression with the expression 
-                            }
+                            CallEval(eq.conditionals, s1);
+                            return;
 
                             ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
                         }
@@ -19741,6 +19730,23 @@ namespace Gekko
 
 
 
+        }
+
+        private static void CallEval(string conditionals, string s1)
+        {
+            if (!Globals.newEval)
+            {
+                Program.obeyCommandCalledFromGUI("EVAL " + s1, new P()); //produces Func<> Globals.expression with the expression 
+            }
+            else
+            {
+                string c = null;
+                if (!G.NullOrEmpty(conditionals))
+                {
+                    c = "$ (" + conditionals + ")";
+                }
+                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + s1, new P()); //produces Func<> Globals.expression with the expression 
+            }
         }
 
         private static int ReadGamsModelEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
