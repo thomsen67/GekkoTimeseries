@@ -1474,7 +1474,7 @@ namespace Gekko.Parser.Gek
                             {
                                 //See also #980752345
                                 string listName = GetSimpleHashName(child[0][0]);                                
-                                if (false && listName != null)
+                                if (Globals.oldcontrol && listName != null)
                                 {
                                     TwoStrings two = SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1506,7 +1506,7 @@ namespace Gekko.Parser.Gek
                             {
                                 string listName = GetSimpleHashName(node[0]);
                                 
-                                if (false && listName != null)
+                                if (Globals.oldcontrol && listName != null)
                                 {
                                     TwoStrings two= SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1804,7 +1804,7 @@ namespace Gekko.Parser.Gek
                             string listName = GetSimpleHashName(child);
                             string internalName = null;
                             string internalFunction = null;
-                            if (false && listName != null)
+                            if (Globals.oldcontrol && listName != null)
                             {
                                 TwoStrings two = SearchUpwardsInTree2(node, listName);
                                 if (two != null)
@@ -1875,7 +1875,12 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("O.NonEquals(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
-                            {                                
+                            {
+                                if (Globals.oldcontrol)
+                                {
+                                    code1 = MaybeControlledSet777(node[1], code1);
+                                    code2 = MaybeControlledSet777(node[2], code2);
+                                }
                                 node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                         }
@@ -3249,7 +3254,7 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0][0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (false && listName != null)
+                                    if (Globals.oldcontrol && listName != null)
                                     {
                                         TwoStrings two = SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -3317,7 +3322,7 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (false && listName != null)
+                                    if (Globals.oldcontrol && listName != null)
                                     {
                                         TwoStrings two= SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -4383,7 +4388,8 @@ namespace Gekko.Parser.Gek
                                     //simpleName can never contain a '!', but if simpleFreq = null, a freq like "!a" will be added
                                     //  when looking up.
 
-                                    string code = MaybeControlledSet(node);
+                                    string code = null;
+                                    if (!Globals.oldcontrol) code = MaybeControlledSet(node);
                                     if (code != null)
                                     {
                                         //a controlled list, like y[#i] = x[#i] inside an implicit loop or sum loop over #i.

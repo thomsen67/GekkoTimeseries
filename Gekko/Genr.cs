@@ -16,28 +16,41 @@ namespace Gekko
             p.SetText(@"¤1"); O.InitSmpl(smpl, p);
 
             O.Assignment o0 = new O.Assignment();
-            o0.opt_source = @"<[code]>VAR2 deleteme $ (#a15t100[#a]) = fDeltag[#a] - (uDeltag[#a] * (nSoegBase[#a] / nPop[#a]) / (nSoegBase[#a][%tbase] / nPop[#a][%tbase]))";
-            
-            var Evalcode12 = new List<Func<GekkoSmpl, IVariable>>(); 
-            foreach (IVariable listloop_a9 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("a")))), null, new LookupSettings(), EVariableType.Var, o0)))
+            o0.opt_source = @"<[code]>y4[#i] $ (#i.val() > 10) = 1";
+
+
+            foreach (IVariable listloop_i23 in new O.GekkoListIterator(O.Lookup(smpl, null, ((O.scalarStringHash).Add(smpl, (new ScalarString("i")))), null, new LookupSettings(), EVariableType.Var, o0)))
             {
-                ScalarVal v13 = O.Indexer(O.Indexer2(smpl, O.EIndexerType.None, listloop_a9), smpl, O.EIndexerType.None, O.Lookup(smpl, null, null, "#a15t100", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9)
-                 as ScalarVal;
-                if (v13 != null && (v13 as ScalarVal).val == 0d) continue;
-                Evalcode12.Add((smpl14) => {
-                    return O.Subtract(smpl14, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "fDeltag", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9), O.Divide(smpl14, O.Multiply(smpl14, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "uDeltag", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9), O.Divide(smpl14, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "nSoegBase", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9), O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "nPop", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9))), O.Divide(smpl14, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
-                    ), smpl14, O.EIndexerType.None, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "nSoegBase", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9), O.Lookup(smpl14, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
-                    ), O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
-                    ), smpl14, O.EIndexerType.None, O.Indexer(O.Indexer2(smpl14, O.EIndexerType.None, listloop_a9), smpl14, O.EIndexerType.None, O.Lookup(smpl14, null, null, "nPop", null, null, new LookupSettings(), EVariableType.Var, null), listloop_a9), O.Lookup(smpl14, null, null, "%tbase", null, null, new LookupSettings(), EVariableType.Var, null)
-                    ))));
-                });
+                Action assign_27 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar24 = i26;
+                    O.AdjustT0(smpl, 2);
+                    O.DollarIndexerSetData(O.StrictlyLargerThan(smpl, Functions.val(smpl, null, null, O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null)), i25)
+                    , smpl, O.Lookup(smpl, null, null, "y4", null, null, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null), ivTmpvar24, o0, listloop_i23)
+                    ;
+                };
+                Func<bool> check_27 = () =>
+                {
+                    O.AdjustT0(smpl, -2);
+                    IVariable ivTmpvar24 = i26;
+                    O.AdjustT0(smpl, 2);
+                    if (ivTmpvar24.Type() != EVariableType.Series) return false;
+                    O.Dynamic1(smpl);
+                    O.DollarIndexerSetData(O.StrictlyLargerThan(smpl, Functions.val(smpl, null, null, O.Lookup(smpl, null, null, "#i", null, null, new LookupSettings(), EVariableType.Var, null)), i25)
+                    , smpl, O.Lookup(smpl, null, null, "y4", null, null, new LookupSettings(O.ELookupType.LeftHandSide), EVariableType.Var, null), ivTmpvar24, o0, listloop_i23)
+                    ;
+                    return O.Dynamic2(smpl);
+                };
+                O.RunAssigmentMaybeDynamic(smpl, assign_27, check_27, o0);
             }
-            Globals.expressions = Evalcode12;
 
             //[[commandEnd]]0
         }
 
 
+        public static readonly ScalarVal i25 = new ScalarVal(10d, 0);
+        public static readonly ScalarVal i26 = new ScalarVal(1d, 0);
 
         public static void CodeLines(P p)
         {

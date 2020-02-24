@@ -9450,13 +9450,13 @@ namespace UnitTests
             Series y3 = Program.databanks.GetFirst().GetIVariable("y3!a") as Series;
             Assert.AreEqual(y3.dimensionsStorage.storage.Count, 1);
             _AssertSeries(First(), "y3!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
-
+            
             I("y4 = series(1);");
             I("y4[#i] $ (#i.val() > 10) = 1;");
             Series y4 = Program.databanks.GetFirst().GetIVariable("y4!a") as Series;
             Assert.AreEqual(y4.dimensionsStorage.storage.Count, 1);
             _AssertSeries(First(), "y4!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
-
+                        
         }
 
         [TestMethod]

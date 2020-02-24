@@ -46,6 +46,8 @@ namespace Gekko
 
         public static bool lagfix = true;
 
+        public static bool oldcontrol = true;
+
         public static bool decompSubstitute = false;
 
         public static StreamWriter sw = null; 
