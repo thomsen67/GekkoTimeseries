@@ -19032,7 +19032,13 @@ namespace Gekko
 
                         if (Globals.gamsFunctions.ContainsKey(node.s))
                         {
-                            //"sum(" or "log(" or "exp("
+                            string x = Globals.gamsFunctions[node.s];
+                            if (x != null)
+                            {
+                                node.s = x;  //sqr() --> sqrt()
+                            }
+
+                            //"sum(" or "log(" or "exp(" etc.
                             if (G.Equal(node.s, "sum"))
                             {
                                 if (nextNode.subnodes.Count() > 0)
@@ -19675,7 +19681,8 @@ namespace Gekko
                     ModelGamsEquation eq = kvp.Value[0];
                     sb.WriteLine();
                     sb.WriteLine("-----------------------------------------------------------");
-                    sb.WriteLine("Eq = " + eq.nameGams + ", #sub-eqs = " + eq.expressions.Count);
+                    sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
+                    sb.WriteLine("$condition: "+eq.conditionals);
                     sb.WriteLine(eq.lhs + " = " + eq.rhs);
                     if (eq.expressionVariables == null)
                     {

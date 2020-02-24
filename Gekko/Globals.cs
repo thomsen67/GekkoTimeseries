@@ -233,7 +233,7 @@ namespace Gekko
         public static Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>> ufunctionsNew13 = new Dictionary<string, Func<GekkoSmpl, P, bool,GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, GekkoArg, IVariable>>();        
 
         //maybe 14 is max??
-        public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null } };
+        public static Dictionary<string, string> gamsFunctions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "log", null }, { "exp", null }, { "sum", null }, { "power", null }, { "sqr", "sqrt" } };
 
         public const string procedure = "procedure___";
         public const string functionAndProcedureQuestion = "?";
@@ -657,8 +657,6 @@ namespace Gekko
         //public static List<string> freeIndexedListsDecomp = null;
 
         public static bool concatPointer = true;
-
-        public static bool fixALag = true;
 
         public static int removeAllLags = 0;
         public static char parserErrorSeparator = '¤';

@@ -1871,10 +1871,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("O.NonEquals(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
-                            {
-                                //node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
-
-
+                            {                                
                                 ASTNode child = node[1];
 
                                 string indexes = null;
@@ -3451,16 +3448,9 @@ namespace Gekko.Parser.Gek
                                     node.Code.A(s2);
                                 }                                
                                 else
-                                {
-                                    if (Globals.fixALag)
-                                    {
-                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
-                                    }
-                                    else
-                                    {
-                                        node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + indexes + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + indexesReport + ")");
-                                    }
-
+                                {                                    
+                                    node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
+                                 
                                     //this alternative code is only done for x[a] type of variables, not x.f() etc.
 
                                     if (node[0].AlternativeCode != null)

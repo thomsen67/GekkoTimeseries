@@ -9428,6 +9428,35 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_DecompGamsSpecifics()
+        {            
+            I("RESET; time 2000 2000;");            
+            I("#i = ('10', '11');");
+            I("#i0 = ('11',);");
+            I("y1 = series(1);");
+            I("y1[#i] $ (#i in '11') = 1;");
+            Series y1 = Program.databanks.GetFirst().GetIVariable("y1!a") as Series;
+            Assert.AreEqual(y1.dimensionsStorage.storage.Count, 1);
+            _AssertSeries(First(), "y1!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            
+            I("y2 = series(1);");
+            I("y2[#i] $ (#i0[#i]) = 1;");
+            Series y2 = Program.databanks.GetFirst().GetIVariable("y2!a") as Series;
+            Assert.AreEqual(y2.dimensionsStorage.storage.Count, 1);
+            _AssertSeries(First(), "y2!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+
+            I("y3 = series(1);");
+            I("y3[#i] $ (#i == '11') = 1;");
+            Series y3 = Program.databanks.GetFirst().GetIVariable("y3!a") as Series;
+            Assert.AreEqual(y3.dimensionsStorage.storage.Count, 1);
+            _AssertSeries(First(), "y3!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+
+
+
+
+        }
+
+        [TestMethod]
         public void _Test_DecompAgeLead()
         {
 
