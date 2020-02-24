@@ -1836,9 +1836,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.A("O.ListContains(" + node[0].Code + "," + indexes + ")");
-                            }
-
-                            
+                            }                            
                         }
                         break;
                     case "ASTCOMPARE":
@@ -1846,6 +1844,11 @@ namespace Gekko.Parser.Gek
                             string op = node[0][0].Text;
                             string code1 = node[1].Code.ToString();
                             string code2 = node[2].Code.ToString();
+
+                            //all comparisons, including "... in ..." can use controlled set
+                            code1 = MaybeControlledSet(node[1], code1);
+                            code2 = MaybeControlledSet(node[2], code2);
+                            
                             if (op == "ASTIFOPERATOR4")  //"<"
                             {                                
                                 node.Code.A("O.StrictlySmallerThan(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
@@ -1872,29 +1875,7 @@ namespace Gekko.Parser.Gek
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
                             {                                
-                                ASTNode child = node[1];
-
-                                string indexes = null;
-                                string listName = GetSimpleHashName(child);
-                                string internalName = null;
-                                string internalFunction = null;
-                                if (listName != null)
-                                {
-                                    TwoStrings two = SearchUpwardsInTree2(node, listName);
-                                    if (two != null)
-                                    {
-                                        internalName = two.s1;
-                                        internalFunction = two.s2;
-                                    }
-                                }
-
-                                if (internalName != null)
-                                {
-                                    code1 = internalName;
-                                }                                
-
                                 node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
-
                             }
                         }
                         break;
@@ -6374,6 +6355,18 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
+        }
+
+        private static string MaybeControlledSet(ASTNode node, string code)
+        {
+            string listName = GetSimpleHashName(node);
+            if (listName != null)
+            {
+                TwoStrings two = SearchUpwardsInTree2(node.Parent, listName);
+                if (two != null) code = two.s1;
+            }
+
+            return code;
         }
 
         private static string GetParametersInAList(ASTNode node, int numberOfParameters, int j)
