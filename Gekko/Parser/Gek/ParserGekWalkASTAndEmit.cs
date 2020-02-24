@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
@@ -6,12 +6,11 @@ using System.Text;
 
 namespace Gekko.Parser.Gek
 {
-
-
+    
     public class GekkoSB
     {
         private StringBuilder storage = null;
-
+        
         public GekkoSB()
         {
             //this.storage = new StringBuilder();
@@ -28,7 +27,7 @@ namespace Gekko.Parser.Gek
         //    this.storage = null;
         //}
 
-
+            
 
         public override string ToString()
         {
@@ -47,10 +46,10 @@ namespace Gekko.Parser.Gek
 
         public GekkoSB A(string s)
         {
-            if (this.storage == null) this.storage = new StringBuilder();
+            if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Append(s);
             return this;
-        }
+        }        
 
         public GekkoSB A(int i)
         {
@@ -61,21 +60,21 @@ namespace Gekko.Parser.Gek
 
         public GekkoSB A(GekkoSB sb)
         {
-            if (this.storage == null) this.storage = new StringBuilder();
+            if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Append(sb.storage);
             return this;
         }
 
         public void CA(string s)
         {
-            if (this.storage == null) this.storage = new StringBuilder();
+            if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Clear();
             this.storage.Append(s);
         }
 
         public void CA(GekkoSB sb)
         {
-            if (this.storage == null) this.storage = new StringBuilder();
+            if (this.storage == null) this.storage = new StringBuilder();                
             this.storage.Clear();
             this.storage.Append(sb.storage);
         }
@@ -90,7 +89,7 @@ namespace Gekko.Parser.Gek
         public void Prepend(string s)
         {
             if (s == null || s.Trim() == "") return;
-            if (this.storage == null) this.storage = new StringBuilder();
+            if (this.storage == null) this.storage = new StringBuilder();            
             this.storage.Insert(0, s);
         }
 
@@ -104,7 +103,7 @@ namespace Gekko.Parser.Gek
         public void LoopSmplCode(string s)
         {
             this.A(Globals.startGekkoSmplIteratorCode);
-            this.A(s).End();
+            this.A(s).End();            
             this.A(Globals.endGekkoSmplIteratorCode);
             this.Replace(Globals.gekkoSmplIteratorName, (++Globals.counter).ToString());
         }
@@ -119,7 +118,7 @@ namespace Gekko.Parser.Gek
     //    {
     //        this.sb = new StringBuilder();
     //    }
-
+        
     //    public void __(GekkoStringBuilder sb2)
     //    {
     //        this.sb.Append(sb2);
@@ -146,14 +145,14 @@ namespace Gekko.Parser.Gek
     //        this.sb.Clear();
     //        this.sb.Append(sb2);
     //    }
-
+        
     //    public void __Clear(string s)
     //    {
     //        this.sb.Clear();
     //        this.sb.Append(s);
     //    }
     //}
-
+    
     public enum EOptionType
     {
         String,
@@ -190,13 +189,13 @@ namespace Gekko.Parser.Gek
         public static void FindFunctionsUsedInGekkoCode(ASTNode node, Dictionary<string, int> functions)
         {
             if (node.Text == "ASTFUNCTION" || node.Text == "ASTFUNCTION_Q")
-            {
+            {                
                 string functionName = GetFunctionName(node);
-                if (!functions.ContainsKey(functionName)) functions.Add(functionName, 1);  //1 just arbitrary
+                if (!functions.ContainsKey(functionName)) functions.Add(functionName, 1);  //1 just arbitrary            
             }
             foreach (ASTNode child in node.ChildrenIterator())
             {
-                FindFunctionsUsedInGekkoCode(child, functions);
+                FindFunctionsUsedInGekkoCode(child, functions);                
             }
         }
 
@@ -214,13 +213,13 @@ namespace Gekko.Parser.Gek
                             {
                                 s = node[i][0][0][0][0].Text;
                             }
-                            catch { };
+                            catch { };                            
                         }
                         if (s == "ASTHASH") found[0] = 1;
                     }
                     break;
                 case "ASTCURLY":  //indexer, x{#i}
-                    {
+                    {                        
                         string s = null;
                         try
                         {
@@ -234,14 +233,14 @@ namespace Gekko.Parser.Gek
             if (found[0] == 1) return;
             foreach (ASTNode child in node.ChildrenIterator())
             {
-                WalkASTToCheckSumFunction(child, found);
+                WalkASTToCheckSumFunction(child, found);                
             }
         }
 
         public static void WalkASTAndEmitUnfold(ASTNode node)
         {
             //before subnodes
-            //locates x[#m] or x[#m+...] or x[#m-...], or same for curlies
+            //locates x[#m] or x[#m+...] or x[#m-...], or same for curlies         
             //The #m is assigned to sum() or unfold() or to PRTELEMENT (last one will be converted to unfold()).
             //Also in x[#m] = y[#m] + ... , the #m is assigned to ASTASSIGNMENT
             //also locates ... $ (#m in ...)
@@ -252,7 +251,7 @@ namespace Gekko.Parser.Gek
             if (node.Text == "ASTBANKVARNAME2")
             {
                 //listfile
-
+                
                 ASTNode name = node[1][1][0];
                 ASTNode placeholder = node[1][1];
 
@@ -285,7 +284,7 @@ namespace Gekko.Parser.Gek
                     //       ASTNAME ----------> [1][1][0], name, here an ASTCNAME is inserted with 'listfile' as first node
                     //         ASTCURLY
                     //           ASTSTRINGINQUOTES
-                    //             'i'
+                    //             'i' 
                     //     ASTPLACEHOLDER
 
                     // becomes...
@@ -303,7 +302,7 @@ namespace Gekko.Parser.Gek
                     //         ASTNAME -----------> name, is detached from ASTPLACEHOLDER above and attached here
                     //           ASTCURLY
                     //             ASTSTRINGINQUOTES
-                    //               'i'
+                    //               'i' 
                     //     ASTPLACEHOLDER
 
 
@@ -382,7 +381,7 @@ namespace Gekko.Parser.Gek
                                 if (tmp.freeIndexedLists == null) tmp.freeIndexedLists = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                                 if (!tmp.freeIndexedLists.ContainsKey(listnameWithoutSigil)) tmp.freeIndexedLists.Add(listnameWithoutSigil, null);
                             }
-
+                            
                             node2 = node2.Parent;
                         }
                         Label: node2 = node2;
@@ -432,7 +431,7 @@ namespace Gekko.Parser.Gek
                         //    ASTPRTELEMENT
                         // 0    ASTEXPRESSION
                         // 1      ASTFUNCTION    <----------- our insert begins here
-                        // 2        ASTIDENT
+                        // 2        ASTIDENT  
                         // 3          unfold
                         // 3a       ASTSPECIALARGS
                         // 4        ASTBANKVARNAME         <-- if there are > 1 lists, an LISTDEF and LISTDEFITEM node is inserted here, and the ASTBANKVARNAME nodes are subnodes
@@ -458,7 +457,7 @@ namespace Gekko.Parser.Gek
                         n2.Add(n3);
                         n1.Add(n3a);
 
-                        ASTNode list = new ASTNode("ASTLISTDEF", true);
+                        ASTNode list = new ASTNode("ASTLISTDEF", true);                        
 
                         for (int i = 0; i < xx.Count; i++)
                         {
@@ -505,7 +504,7 @@ namespace Gekko.Parser.Gek
                 }
             }
         }
-
+                
 
         public static void WalkASTAndEmit(ASTNode node, int absoluteDepth, int relativeDepth, string textInput, W w, P p)
         {
@@ -519,7 +518,7 @@ namespace Gekko.Parser.Gek
                 //{
                 //    s = "_tuple_" + node.Number;  //a (VAL x, GENR y) = ... tuple is kind of like two separate commands.
                 //}
-                node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.
+                node.commandLinesCounter = node.Parent.commandLinesCounter + s;  //default, may be overridden if new command is encountered.               
             }
 
             //HACK #438543
@@ -544,7 +543,7 @@ namespace Gekko.Parser.Gek
             if (node.Text == "ASTGENR" || node.Text == "ASTSERIES" || node.Text == "ASTGENRLHSFUNCTION" || node.Text == "ASTPRTELEMENT" || node.Text == "ASTOLSELEMENT" || node.Text == "ASTTABLESETVALUESELEMENT")
             {
                 //This local cache is only used for commands that do implicit timeseries looping with expressions
-                //For instance PRT fX%i (PRT fXnz would end in global cache), where we do not have to
+                //For instance PRT fX%i (PRT fXnz would end in global cache), where we do not have to 
                 //  find fx%i for each period in the time loop (the reference fx%i is always fixed over that loop
                 //  which is internal/implicit inside the GENR statement).
                 ClearLocalStatementCache(w);
@@ -594,7 +593,7 @@ namespace Gekko.Parser.Gek
                 case "ASTFOR":
                     {
                         List<string> varnames = GetForLoopVariables(node);  //TODO: more than 1...
-
+                                                
                         foreach (string varname in varnames)
                         {
                             if (node.forLoopAnchor == null) node.forLoopAnchor = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -636,7 +635,7 @@ namespace Gekko.Parser.Gek
                             {
                                 continue;  //<date %t1, date %t2> has been done above
                             }
-                            //here we need to take into account default values, like function
+                            //here we need to take into account default values, like function 
                             FunctionHelper4(node, functionName, child);
                         }
                         string ftype = null;
@@ -669,7 +668,7 @@ namespace Gekko.Parser.Gek
                     break;
                 case "ASTLEFTSIDE":
                     {
-                        node.ivTempVarName = "ivTmpvar" + ++Globals.counter;  //we use the counter value to hook up the rhs with the lhs
+                        node.ivTempVarName = "ivTmpvar" + ++Globals.counter;  //we use the counter value to hook up the rhs with the lhs                        
                     }
                     break;
                 case "ASTMAPDEF":
@@ -677,13 +676,13 @@ namespace Gekko.Parser.Gek
                         node.mapTempVarName = "mapTmpvar" + ++Globals.counter;  //we use the counter value to hook up in a map def
                     }
                     break;
-            }
-
+            }                           
+            
             foreach (ASTNode child in node.ChildrenIterator())
-            {
+            {                   
                 WalkASTAndEmit(child, absoluteDepth + 1, relativeDepth + 1, textInput, w, p);
                 //return; Globals.testing = true;
-            }
+            }            
 
             //In general, we have this pattern
             //
@@ -692,7 +691,7 @@ namespace Gekko.Parser.Gek
             //       ASTOPT_STRING_AS
             //       ASTOPT_DATE_END
             //       ASTOPT_DATE_START
-            //
+            //   
             //The code below is to avoid a lot of repetitive coding regarding options to commands
             //#astopt
             if (node.Text != null && node.Text.StartsWith("ASTOPT_STRING_"))
@@ -706,13 +705,13 @@ namespace Gekko.Parser.Gek
             }
             else if (node.Text != null && node.Text.StartsWith("ASTOPT_VAL_"))
             {
-                string s2 = node.Text.Substring(11);
+                string s2 = node.Text.Substring(11);                
                 if (node.ChildrenCount() == 0) throw new GekkoException();
                 else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.ConvertToVal(" + node[0].Code + ");" + G.NL);
             }
             else if (node.Text != null && node.Text.StartsWith("ASTOPT_DATE_"))
             {
-                string s2 = node.Text.Substring(12);
+                string s2 = node.Text.Substring(12);                
                 if (node.ChildrenCount() == 0) throw new GekkoException();
                 else node.Code.A("o" + Num(node) + ".opt_" + s2.ToLower() + " = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
             }
@@ -730,7 +729,7 @@ namespace Gekko.Parser.Gek
             }
             else
             {
-                //After sub-nodes
+                //After sub-nodes  
 
                 switch (node.Text)
                 {
@@ -738,7 +737,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
-                        break;
+                        break;                    
                     case "-":
                         {
                             node.Code.CA("O.Subtract(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
@@ -783,7 +782,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("O.Union(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                         }
-                        break;
+                        break;                    
                     case "ASTPLUS":
                         {
                             node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
@@ -885,7 +884,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("new ScalarString(`append`)");
                         }
-                        break;
+                        break;                    
                     case "ASTAT":
                         {
                             node.Code.CA("new ScalarString(`Ref:`)");
@@ -907,7 +906,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTL0":
-                        {
+                        {                            
 
                             node.Code.CA("new ScalarString(`[`)");
 
@@ -922,7 +921,7 @@ namespace Gekko.Parser.Gek
                                     if (i < node.ChildrenCount() - 1) node.Code.A(".Concat(null, new ScalarString(`, `))");  //a blank here, for prettier output and also suits keys in DECOMP dictionary etc.
                                 }
                                 node.Code.A(".Concat(null, new ScalarString(`]`))");
-                            }
+                            }                            
                         }
                         break;
                     //case "ASTL1":
@@ -936,14 +935,14 @@ namespace Gekko.Parser.Gek
                     //    }
                     //    break;
                     case "ASTSEQ7":
-                        {
+                        {                                                       
 
                             string s = null;
                             bool isFirst = true;
                             for ( int i = 0; i < 3; i++)
                             {
                                 if (node[i] != null)
-                                {
+                                {                                    
                                     for (int j = 0; j < node[i].ChildrenCount(); j++)
                                     {
                                         //if (i == 0 && j == 0) s += node[i][j].Code.ToString();
@@ -956,12 +955,12 @@ namespace Gekko.Parser.Gek
                                             if (Globals.concatPointer)
                                             {
                                                 ss1 = ".Concat(null, ";
-                                            }
+                                            }                                            
                                             ss2 = ")";
                                         }
                                         s += ss1 + node[i][j].Code.ToString() + ss2;
-
-                                        isFirst = false;
+                                        
+                                        isFirst = false;                                     
                                     }
                                 }
                             }
@@ -978,22 +977,22 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTUPDDATACOMPLICATED":
                         {
-
+                            
                             GetCodeFromAllChildren(node);
                         }
                         break;
-                    case "ASTS":
+                    case "ASTS":                    
                         {
                             node.Code.A(AddOperator( Globals.operator_r, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
-                        break;
+                        break;                    
                     case "ASTSN":  //rn
                         {
                             node.Code.A(AddOperator(Globals.operator_rn, node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
                     case "ASTBANK":
-                        {
+                        {                            
                             if (node.ChildrenCount() == 0)
                             {
                                 node.Code.CA("new ScalarString(`" + Globals.firstCheatString + "`)");
@@ -1020,7 +1019,7 @@ namespace Gekko.Parser.Gek
                         {
                             GetCodeFromAllChildren(node);
                         }
-                        break;
+                        break;                    
                     case "ASTCLEAR":
                         {
                             node.Code.A("O.Clear o" + Num(node) + " = new O.Clear();" + G.NL);
@@ -1051,7 +1050,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTCLONE":
                         {
-                            node.Code.A("O.Clone o" + Num(node) + " = new O.Clone();" + G.NL);
+                            node.Code.A("O.Clone o" + Num(node) + " = new O.Clone();" + G.NL);                                                        
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -1063,11 +1062,11 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTCLOSE":
-                        {
-                            node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
+                        {                            
+                            node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".listItems = " + node[0].Code + ";" + G.NL);
-                            GetCodeFromAllChildren(node, node[1]);  //options
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            GetCodeFromAllChildren(node, node[1]);  //options                      
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTRESET":
@@ -1086,10 +1085,10 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTCLOSESTAR":
-                        {
+                        {                                     
                             node.Code.A("O.Close o" + Num(node) + " = new O.Close();" + G.NL);
                             node.Code.A("o" + Num(node) + ".name = `*`;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                       
                         }
                         break;
                     case "ASTCLS":
@@ -1102,12 +1101,12 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Collapse o" + Num(node) + " = new O.Collapse();" + G.NL);
                             node.Code.A("o" + Num(node) + ".lhs = " + node[0].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".rhs = " + node[1].Code + ";" + G.NL);                            
                             string type = "null";
                             if (node.ChildrenCount() >= 3) type = "O.ConvertToString(" + node[2].Code.ToString() + ")";
                             node.Code.A("o" + Num(node) + ".type = " + type + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;");
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTINTERPOLATE":
@@ -1134,7 +1133,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTANALYZE":
                         {
-
+                            
                             node.Code.A("O.Analyze o" + Num(node) + " = new O.Analyze();" + G.NL);
 
                             GetCodeFromAllChildren(node, node[0]);
@@ -1181,14 +1180,14 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Accept o" + Num(node) + " = new O.Accept();" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;" + G.NL);
                             node.Code.A("o" + Num(node) + ".name = " + node[1].Code + ";" + G.NL);
-                            node.Code.A("o" + Num(node) + ".message = " + node[2].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".message = " + node[2].Code + ";" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTCOPY":
                         {
                             node.Code.A("O.Copy o" + Num(node) + " = new O.Copy();" + G.NL);
-
+                            
                             if (node[0][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[0][0].Text + "`;");
 
                             GetCodeFromAllChildren(node, node[1]);
@@ -1228,7 +1227,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".names = " + node[0][0].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
-                            break;
+                            break;                            
                         }
                         break;
                     case "ASTLOCAL":
@@ -1271,7 +1270,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 string a = node[1][0].AlternativeCode.ToString();
-
+                                
                                 string gt = "gt" + ++Globals.counter;
                                 string la = "la" + ++Globals.counter;
                                 string l = "l" + ++Globals.counter;
@@ -1324,7 +1323,7 @@ namespace Gekko.Parser.Gek
 
                                         node.Code.A(helper + ii + ".varname = " + "O.NameLookup(" + node[ii][0][0].Code.ToString().Substring("O.Lookup(".Length) + ";" + G.NL);
                                         node.Code.A(helper + ii + ".indices = " + l + ii + ";" + G.NL);
-
+                                        
                                     }
                                     else if (node[ii][0].Text == "ASTBANKVARNAME")
                                     {
@@ -1400,7 +1399,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Findmissingdata o" + Num(node) + " = new O.Findmissingdata();" + G.NL);
                             if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTHDG":
@@ -1412,13 +1411,13 @@ namespace Gekko.Parser.Gek
                             string ss = "new ScalarString(``)";
                             if (node.ChildrenCount() > 1)
                             {
-                                s = "true";
+                                s = "true";                                
                             }
                             if (node[0].ChildrenCount() == 1)
                             {
                                 ss = node[0][0].Code.ToString();
                             }
-                            node.Code.A("Program.Tell(O.ConvertToString(" + ss + "), " + s + ");");
+                            node.Code.A("Program.Tell(O.ConvertToString(" + ss + "), " + s + ");");                            
                         }
                         break;
                     case "ASTSYS":
@@ -1474,9 +1473,8 @@ namespace Gekko.Parser.Gek
                             if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                             {
                                 //See also #980752345
-                                string listName = GetSimpleHashName(child[0][0]);
-
-                                if (listName != null)
+                                string listName = GetSimpleHashName(child[0][0]);                                
+                                if (false && listName != null)
                                 {
                                     TwoStrings two = SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1501,14 +1499,14 @@ namespace Gekko.Parser.Gek
                                 {
                                     //keep the s from above
                                 }
-
+                                
                             }
 
                             else
                             {
                                 string listName = GetSimpleHashName(node[0]);
-
-                                if (listName != null)
+                                
+                                if (false && listName != null)
                                 {
                                     TwoStrings two= SearchUpwardsInTree2(node, listName);
                                     if (two != null)
@@ -1516,11 +1514,11 @@ namespace Gekko.Parser.Gek
                                         internalName = two.s1;
                                         internalFunction = two.s2;
                                     }
-                                }
+                                }                                
                                 if (internalName != null) s = internalName;
                             }
 
-
+                            
 
                             if ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent))
                             {
@@ -1540,8 +1538,8 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.CA(s);
-                            }
-
+                            }                            
+                            
                         }
                         break;
                     //case "ASTCURLYSIMPLE":
@@ -1642,7 +1640,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDATES":
                     case "ASTDATES_BLOCK":
-                    case "ASTDATES_TYPE2":
+                    case "ASTDATES_TYPE2":                    
                         {
                             //what about G.GetStart/EndDate()??
                             //We use  O.GetDateChoices.FlexibleStart and  O.GetDateChoices.FlexibleEnd
@@ -1700,13 +1698,13 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDATES2":
-                        {
+                        {                            
                             string ss1 = node.GetChildCode(0).ToString();
                             string s1 = "O.ConvertToDate(" + ss1 + ", O.GetDateChoices.FlexibleStart)" + G.NL;
                             string ss2 = node.GetChildCode(1).ToString();
                             string s2 = "O.ConvertToDate(" + ss2 + ", O.GetDateChoices.FlexibleEnd)" + G.NL;
                             string s = "O.HandleDates(" + s1 + "," + s2 + " );";
-                            node.Code.A(s);
+                            node.Code.A(s);                            
                         }
                         break;
                     case "ASTDOTINDEXER":
@@ -1751,11 +1749,11 @@ namespace Gekko.Parser.Gek
                             if (temp.EndsWith(".d")) temp = temp.Substring(0, temp.Length - 2) + ".0d";
                             string s = "new ScalarVal(" + minus + temp + ")";
                             GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + doubleWithNumber + " = " + s + ";");
-                            node.Code.CA(doubleWithNumber); //no need for checking if it exists
+                            node.Code.CA(doubleWithNumber); //no need for checking if it exists                      
                         }
                         break;
                     case "ASTOR":
-                        {
+                        {                            
                             //node.Code.A("((");
                             //node.Code.A(node[0].Code);
                             //node.Code.A(") || (");
@@ -1768,8 +1766,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A(node[1].Code);
                             node.Code.A(")");
                         }
-                        break;
-                    case "ASTAND":
+                        break;                    
+                    case "ASTAND":                    
                         {
                             //node.Code.A("((");
                             //node.Code.A(node[0].Code);
@@ -1784,21 +1782,21 @@ namespace Gekko.Parser.Gek
                             node.Code.A(")");
 
                         }
-                        break;
+                        break;                    
                     case "ASTNOT":
                         {
                             //node.Code.A("!(");
-                            //node.Code.A(node[0].Code);
+                            //node.Code.A(node[0].Code);                            
                             //node.Code.A(")");
 
                             node.Code.A("O.LogicalNot(" + Globals.smpl + ", ");
                             node.Code.A(node[0].Code);
-                            node.Code.A(")");
+                            node.Code.A(")");                            
                         }
                         break;
                     case "ASTCOMPARE2":
                         {
-
+                            
                             string indexes = null;
 
                             ASTNode child = node[1];
@@ -1806,7 +1804,7 @@ namespace Gekko.Parser.Gek
                             string listName = GetSimpleHashName(child);
                             string internalName = null;
                             string internalFunction = null;
-                            if (listName != null)
+                            if (false && listName != null)
                             {
                                 TwoStrings two = SearchUpwardsInTree2(node, listName);
                                 if (two != null)
@@ -1836,9 +1834,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.A("O.ListContains(" + node[0].Code + "," + indexes + ")");
-                            }
-
-
+                            }                            
                         }
                         break;
                     case "ASTCOMPARE":
@@ -1846,8 +1842,16 @@ namespace Gekko.Parser.Gek
                             string op = node[0][0].Text;
                             string code1 = node[1].Code.ToString();
                             string code2 = node[2].Code.ToString();
-                            if (op == "ASTIFOPERATOR4")  //"<"
+
+                            //all comparisons, including "... in ..." can use controlled set
+                            if (false)
                             {
+                                code1 = MaybeControlledSet777(node[1], code1);
+                                code2 = MaybeControlledSet777(node[2], code2);
+                            }
+                            
+                            if (op == "ASTIFOPERATOR4")  //"<"
+                            {                                
                                 node.Code.A("O.StrictlySmallerThan(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR6")  //"<="
@@ -1871,30 +1875,8 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("O.NonEquals(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
                             }
                             else if (op == "ASTIFOPERATOR7") //"in"
-                            {
-                                ASTNode child = node[1];
-
-                                string indexes = null;
-                                string listName = GetSimpleHashName(child);
-                                string internalName = null;
-                                string internalFunction = null;
-                                if (listName != null)
-                                {
-                                    TwoStrings two = SearchUpwardsInTree2(node, listName);
-                                    if (two != null)
-                                    {
-                                        internalName = two.s1;
-                                        internalFunction = two.s2;
-                                    }
-                                }
-
-                                if (internalName != null)
-                                {
-                                    code1 = internalName;
-                                }
-
+                            {                                
                                 node.Code.A("O.In(" + Globals.smpl + ", " + code1 + "," + code2 + ")");
-
                             }
                         }
                         break;
@@ -1912,9 +1894,9 @@ namespace Gekko.Parser.Gek
                             if (node.Parent.Text == "ASTLEFTSIDE")
                             {
                                 //This is a hack, but quite innocent.
-                                //Problem is, we have this ASTDOLLAR, with ASTBANKVARNAME and ASTDOLLARCONDITIONAL as children.
-                                //Both of these produce an IVARIABLE, but ASTDOLLARCONDITIONAL is still empty when ASTBANKVARNAME is encountered.
-                                //A solution could be to walk ASTDOLLARCONDITIONAL manually, and do the DollarLookup() from ASTBANKVARNAME.
+                                //Problem is, we have this ASTDOLLAR, with ASTBANKVARNAME and ASTDOLLARCONDITIONAL as children. 
+                                //Both of these produce an IVARIABLE, but ASTDOLLARCONDITIONAL is still empty when ASTBANKVARNAME is encountered. 
+                                //A solution could be to walk ASTDOLLARCONDITIONAL manually, and do the DollarLookup() from ASTBANKVARNAME. 
                                 //But the hack is not that bad.
 
                                 if (node.Parent.Parent.Text == "ASTASSIGNMENT")
@@ -1928,18 +1910,18 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 if (s.StartsWith("O.Lookup("))
-                                {
+                                {                                    
                                     node.Code.A("O.DollarLookup(" + node[1].Code.ToString() + ", " + s.Substring("O.Lookup(".Length));
                                 }
                                 else if (s.StartsWith("O.IndexerSetData("))
-                                {
+                                {                                    
                                     node.Code.A("O.DollarIndexerSetData(" + node[1].Code.ToString() + ", " + s.Substring("O.IndexerSetData(".Length));
                                 }
                                 else
                                 {
                                     G.Writeln2("*** ERROR: Internal error related to $ on left-hand side");
                                     throw new GekkoException();
-                                }
+                                }                              
 
                             }
                             else
@@ -1957,12 +1939,12 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(Globals.splitSTOP);
                             node.Code.A("(" + node[1].Code + ")");
                             node.Code.A(" ? ");
-                            node.Code.A("(");
-                            node.Code.A(node[0].Code);
+                            node.Code.A("(");                            
+                            node.Code.A(node[0].Code);                            
                             node.Code.A(")");
                             node.Code.A(" : ");
-                            node.Code.A("(");
-                            node.Code.A("new ScalarVal(0d)");
+                            node.Code.A("(");                            
+                            node.Code.A("new ScalarVal(0d)");                            
                             node.Code.A(")");
                             //node.Code.A(Globals.splitSTART);
                             break;
@@ -1970,7 +1952,7 @@ namespace Gekko.Parser.Gek
                     case "ASTFORSTATEMENTS":
                         {
                             GetCodeFromAllChildren(node);
-                            //AddSplitMarkers(node);
+                            //AddSplitMarkers(node);                        
                         }
                         break;
                     //case "ASTIFSTATEMENTS":
@@ -1988,7 +1970,7 @@ namespace Gekko.Parser.Gek
                     //case "ASTFUNCTIONDEFCODE":
                     //    {
                     //        GetCodeFromAllChildren(node);
-                    //        //AddSplitMarkers(node);
+                    //        //AddSplitMarkers(node);                        
                     //    }
                     //    break;
 
@@ -1998,8 +1980,8 @@ namespace Gekko.Parser.Gek
 
                     //case "ASTRETURNTUPLE":  //see ASTRETURN
                     //    {
-                    //        node.Code.A(Globals.splitSTOP);
-
+                    //        node.Code.A(Globals.splitSTOP);                            
+                            
                     //        if (w.uFunctionsHelper == null)
                     //        {
                     //            if (!node[0].Code.IsNull())
@@ -2034,7 +2016,7 @@ namespace Gekko.Parser.Gek
                     //                    s += "foreach (GekkoTime t2 in new GekkoTimeIterator(Globals.globalPeriodStart, Globals.globalPeriodEnd))" + G.NL;
                     //                    s += GekkoTimeIteratorStartCode(w, node);  //node is where this text is put below
                     //                    s += "    double data = O.ConvertToVal(" + child.Code + ", t);" + G.NL;  //uuu
-                    //                    s += "    " + tempName + ".SetData(t, data);" + G.NL;
+                    //                    s += "    " + tempName + ".SetData(t, data);" + G.NL;                                        
                     //                    s += GekkoTimeIteratorEndCode();
                     //                    s += "IVariable " + tn + " = new MetaTimeSeries(" + tempName + ");" + G.NL;
                     //                }
@@ -2191,7 +2173,7 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("}").End();
 
                                 //parallel loop
-
+                                
                             }
 
 
@@ -2200,17 +2182,17 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTBLOCK":
-                        {
+                        {                           
 
                             string record = null;
                             string alter = null;
-                            string play = null;
+                            string play = null;                            
                             bool first = true;
                             foreach(ASTNode child in node[0].ChildrenIterator())
                             {
                                 if (first)
                                 {
-                                    string ss = child.Code.ToString();
+                                    string ss = child.Code.ToString();                                 
                                     if (ss != null)
                                     {
                                         string[] sss = ss.Split(new string[] { Globals.blockHelper }, StringSplitOptions.None);
@@ -2260,7 +2242,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A(G.NL + Globals.splitSpecial + Num(node) + G.NL);
                             node.Code.A("if(O.IsTrue(" + Globals.smpl + ", " + node[0].Code + ")) {");
                             //node.Code.A(Globals.splitSTART);
-                            GetCodeFromAllChildren(node, node[1][0]);
+                            GetCodeFromAllChildren(node, node[1][0]);                            
                             //node.Code.A(Globals.splitSTOP);
                             node.Code.A("}");
                             node.Code.A("else {");
@@ -2288,7 +2270,7 @@ namespace Gekko.Parser.Gek
 
                             //int numberOfArguments = node[2][0].ChildrenCount() + node[2].ChildrenCount() - 1;
                             int numberOfParameters = node.functionDef.Count;
-
+                            
                             string internalName = "FunctionDef" + ++Globals.counter;
 
                             GetCodeFromAllChildren(node[3]);  //it is a placeholder node that does not get code
@@ -2296,7 +2278,7 @@ namespace Gekko.Parser.Gek
                             sb.AppendLine(internalName + "();" + G.NL);
 
                             //string vars = null; for (int i = 0; i < numberOfArguments; i++) vars += ", IVariable i" + (i + 1);
-
+                            
                             string typeChecks = null;
 
                             int numberOfOptionalParameters = 0;
@@ -2326,7 +2308,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         numberOfOptionalParameters++;
                                     }
-                                }
+                                }                                
 
                                 for (int i = 0; i < numberOfParameters; i++)
                                 {
@@ -2366,7 +2348,7 @@ namespace Gekko.Parser.Gek
                             //be overwritten.
 
                             for (int i = 0; i < numberOfOptionalParameters; i++)  //i = 0, 1 in example
-                            {
+                            {                                
                                 // numberOfParametersOverload = 4, 3 in the example
                                 int numberOfParametersOverloadedVersion = numberOfParameters - i - 1;
 
@@ -2389,7 +2371,7 @@ namespace Gekko.Parser.Gek
                                 string prompts2 = null;
                                 for (int j = 0; j < numberOfParametersCutOff; j++)
                                 {
-                                    //j will run 0 first time, and then 0, 1.
+                                    //j will run 0 first time, and then 0, 1. 
 
                                     //j=0 -->add 1
                                     //j=1 -->add 0
@@ -2398,7 +2380,7 @@ namespace Gekko.Parser.Gek
                                     int xxx = numberOfParameters - (numberOfParametersCutOff - j - 1) - 1;
 
                                     string defaultValueCode = node.functionDef[xxx].defaultValueCode;
-
+                                    
                                     int jjj = numberOfParameters - i - 1 + j;
 
                                     string defaultValueCode2 = node.functionDef[jjj].defaultValueCode;
@@ -2412,7 +2394,7 @@ namespace Gekko.Parser.Gek
                                         types += ", ";
                                         questions += ", ";
                                     }
-
+                                    
                                     defaultValueCodes += defaultValueCode;
                                     labelCodes += labelCode;
                                     types += "`" + type.Replace("`", "\\`") + "`";
@@ -2432,9 +2414,9 @@ namespace Gekko.Parser.Gek
                                             prompts += ", new GekkoArg((spml" + n + ") => " + promptResultsName + "[" + j + "], (spml" + n + ") => null)";
                                             prompts2 += ", new GekkoArg((spml" + n + ") => " + defaultValueCode2 + ", (spml" + n + ") => null)";  //simple version, just normal overload
                                         }
-                                    }
-                                }
-
+                                    }                                    
+                                }                                
+                                                                
                                 string defaultValues = null;
 
                                 w.headerCs.AppendLine("O.PrepareUfunction(" + numberOfParametersOverloadedVersion + ", `" + functionNameLower + "`);" + G.NL);
@@ -2454,16 +2436,16 @@ namespace Gekko.Parser.Gek
                                 w.headerCs.AppendLine("return O.FunctionLookupNew" + numberOfParameters + "(`" + functionNameLower + "`)(smpl, p, false " + GetParametersInAList(node, numberOfParametersOverloadedVersion, 1) + " " + prompts2 + ");");
                                 w.headerCs.AppendLine("}" + G.NL);
 
-
-
+                                
+                                
 
                                 w.headerCs.AppendLine(G.NL + " return null; });" + G.NL);
 
 
                             }
-                            w.headerCs.AppendLine("}" + G.NL);
-
-                            node.Code.A(sb.ToString());
+                            w.headerCs.AppendLine("}" + G.NL);                            
+                            
+                            node.Code.A(sb.ToString());                            
 
                         }
                         break;
@@ -2472,7 +2454,7 @@ namespace Gekko.Parser.Gek
                     // ================= INDENTATION CODE END ==================
                     // ================= INDENTATION CODE END ==================
                     // ================= INDENTATION CODE END ==================
-
+                    
                     case "ASTURL":
                         {
                             //node.Code.CA(node[0].Code;
@@ -2501,15 +2483,15 @@ namespace Gekko.Parser.Gek
                             node.Code.CA(node[0].Code + ".Add(" + Globals.smpl + ", new ScalarString(`http://`)).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                         }
                         break;
-                    case "ASTURLFIRST3":
+                    case "ASTURLFIRST3":                    
                         {
                             node.Code.CA(node[0].Code);
                         }
-                        break;
+                        break;                    
                     case "ASTFILENAME":
                         {
                             //node.Code.CA(node[0].Code;
-                            string s = null;
+                            string s = null;                            
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 if (child.IsFirstChild()) s = child.Code.ToString();
@@ -2529,11 +2511,11 @@ namespace Gekko.Parser.Gek
                             node.Code.A(s);
                         }
                         break;
-                    case "ASTFILENAMEFIRST1":
+                    case "ASTFILENAMEFIRST1":                    
                         {
                             node.Code.CA(node[0].Code + ".Add(" + Globals.smpl + ", new ScalarString(`:\\\\`)).Add(" + Globals.smpl + ", " + node[1].Code + ")");
                         }
-                        break;
+                        break;                    
                     case "ASTFILENAMEFIRST2":
                     case "ASTFILENAMEFIRST3":
                         {
@@ -2573,7 +2555,7 @@ namespace Gekko.Parser.Gek
                             if (listNames != null && listNames.Length > 0 && listNames[0] != null)
                             {
                                 //We do not expect this to be called with sum?(...), but it will work if so
-
+                                
                                 //GAMS-like sum function, for instance sum(#i, x[#i]+1),
                                 //or unfold()-function, for instance unfold(#i, x[#i]+1)
 
@@ -2603,7 +2585,7 @@ namespace Gekko.Parser.Gek
 
                                 string tempName = "temp" + ++Globals.counter;
                                 string funcName = "func" + ++Globals.counter;
-
+                                
                                 string listName = null;
                                 if (node.listLoopAnchor == null)
                                 {
@@ -2631,7 +2613,7 @@ namespace Gekko.Parser.Gek
 
                                 //NOTE: local functions are in C#7, but to compile them .NET 4.6 is necessary. So use Func<> for now, small speed penalty.
                                 //sb1.AppendLine(iv + " " + funcName + "(" + parentListLoopVars1 + ")" + " {");
-
+                                                                
                                 if (node.localInsideLoopVariablesCs != null)
                                 {
                                     sb1.AppendLine(node.localInsideLoopVariablesCs);
@@ -2654,7 +2636,7 @@ namespace Gekko.Parser.Gek
                                     string internalName = SearchUpwardsInTree3(node, listname);
                                     string s = SearchUpwardsInTree3(node, listname);
 
-                                    if (s == null)
+                                    if (s == null) 
                                     {
                                         s = "O.Lookup(" + Globals.smpl + ", null, ((O.scalarStringHash).Add(" + Globals.smpl + ", (new ScalarString(" + Globals.QT + kvp.Key + Globals.QT + ")))), null, new  LookupSettings(), EVariableType.Var, null)";  //false is regarding isLeftSide, null regarding options
                                     }
@@ -2663,14 +2645,14 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
-                                {
+                                {                                    
                                     sb1.AppendLine(tempName + ".InjectAdd(" + Globals.smpl + ", " + node[3].Code.ToString() + ");" + G.NL);
                                     sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
                                 else
                                 {
                                     //unfold
-                                    sb1.AppendLine(tempName + ".Add(" + node[3].Code.ToString() + ");" + G.NL);
+                                    sb1.AppendLine(tempName + ".Add(" + node[3].Code.ToString() + ");" + G.NL);                                    
                                 }
 
                                 foreach (KeyValuePair<string, TwoStrings> kvp in node.listLoopAnchor)
@@ -2704,8 +2686,8 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                //Not a sum() or unfold() function that is going to be looped
-
+                                //Not a sum() or unfold() function that is going to be looped                                
+                                
                                 string meta = null;
                                 if (Globals.gekkoInbuiltFunctions.TryGetValue(functionNameLower, out meta))
                                 {
@@ -2722,7 +2704,7 @@ namespace Gekko.Parser.Gek
                                             meta = meta.Replace("lag=", "");
                                             if (G.IsInteger(meta))
                                             {
-                                                //simple: lag=2
+                                                //simple: lag=2                                                
                                                 extra = "O.Smpl(" + Globals.smpl + ", " + -int.Parse(meta) + "), ";
                                             }
                                             else
@@ -2804,7 +2786,7 @@ namespace Gekko.Parser.Gek
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                     {
-                                        //same as the other???
+                                        //same as the other???                                        
                                         node.Code.A("Functions." + functionNameLower + "(").A(extra + Globals.functionT1Cs + ", ").A(aa1).A(", " + Globals.objFunctionPlaceholder + "").A("" + aa2).A(")");
                                         //node.Code.A("Functions." + functionNameLower + "_naked(").A(extra + Globals.functionT1Cs + ", ").A("" + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                     }
@@ -2850,7 +2832,7 @@ namespace Gekko.Parser.Gek
 
                                     //int numberOfArguments = 2 + node.ChildrenCount() - 2;
                                     int numberOfArguments = args.Count;
-
+                                    
 
                                     //TODO TODO TODO
                                     // the 'extra' parameter indicating lag to come
@@ -2870,7 +2852,7 @@ namespace Gekko.Parser.Gek
                                         node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
                                     else if (node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q")
-                                    {
+                                    {                                        
                                         //node.Code.A("O.FunctionLookup").A(numberOfArguments + 1).A("(`").A(functionNameLower + "_naked").A("`)(" + Globals.functionTP1Cs + "").A(", " + Globals.objFunctionPlaceholder + "").A(args).A(")");
                                         node.Code.A(fl).A(numberOfArguments + 1).A("(`").A(functionNameLower + "").A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1).A(", " + Globals.objFunctionPlaceholder + "").A(aa2).A(")");
                                     }
@@ -2878,7 +2860,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A(fl).A(numberOfArguments).A("(`").A(functionNameLower).A("`)(" + Globals.functionTP1Cs + "").A(", " + q).A(", " + aa1 + aa2).A(")");
                                     }
-
+                                    
                                     if (node.Text == "ASTFUNCTIONNAKED" || node.Text == "ASTFUNCTIONNAKED_Q" || node.Text == "ASTOBJECTFUNCTIONNAKED" || node.Text == "ASTOBJECTFUNCTIONNAKED_Q" || node.Text == "ASTPROCEDURE" || node.Text == "ASTPROCEDURE_Q")
                                     {
                                         node.Code.A(";" + G.NL);
@@ -2902,27 +2884,27 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTFUNCTIONDEFRHSTUPLE":
-                        {
-                            //TODO TODO TODO check that args have different names
+                        {                            
+                            //TODO TODO TODO check that args have different names     
                             int counter = 0;
                             int paramCount = -12345;
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
                                 counter++;
                                 if (counter == 1) paramCount = w.uFunctionsHelper.storage.Count;
-                                FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();
+                                FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();                                
                                 fah.parameterName = child[1].Text;
                                 fah.type = child[0].Text;
                                 fah.tupleNameCode = Globals.functionParameterCode + fah.type + "_" + paramCount;
                                 fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + paramCount + ".tuple" + (counter - 1);
                                 fah.tupleCount = node.ChildrenCount();
                                 w.uFunctionsHelper.storage.Add(fah);
-                            }
+                            }                            
                         }
                         break;
                     case "ASTFUNCTIONDEFRHSSIMPLE":
                         {
-                            //TODO TODO TODO check that args have different names
+                            //TODO TODO TODO check that args have different names                         
                             ASTNode child = node[0];
                             FunctionArgumentsHelperElements fah = new FunctionArgumentsHelperElements();
                             fah.parameterName = child[1].Text;
@@ -2930,20 +2912,20 @@ namespace Gekko.Parser.Gek
                             fah.parameterCode = Globals.functionParameterCode + fah.type + "_" + fah.parameterName + w.uFunctionsHelper.storage.Count;
                             w.uFunctionsHelper.storage.Add(fah);
                         }
-                        break;
+                        break;                                        
                     case "ASTFUNCTIONDEFLHSTUPLE":
                         {
                             //do nothing
                         }
-                        break;
+                        break;                    
                     case "ASTFUNCTIONDEFTYPE":
                             {
                                 if (node[0].Text == "ASTFUNCTIONDEFLHSTUPLE")
-                                {
+                                {                                    
                                     foreach (ASTNode child in node[0].ChildrenIterator())
                                     {
                                         w.uFunctionsHelper.lhsTypes.Add(child.Text);
-                                    }
+                                    }                                    
                                 }
                                 else
                                 {
@@ -2959,46 +2941,46 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTGENERIC1":
                         {
-                            //This catches name:name or identDigit.
+                            //This catches name:name or identDigit.                            
                             if (node.ChildrenCount() == 1)
-                            {
+                            {                                
                                 //identDigit
                                 node.Code.CA(node[0].Code);
                             }
                             else
-                            {
+                            {                                
                                 //name:name
-                                node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", new ScalarString(`:`), " + node[1].Code + ")");
+                                node.Code.CA("O.Add(" + Globals.smpl + ", " + node[0].Code + ", new ScalarString(`:`), " + node[1].Code + ")");                             
                             }
                         }
                         break;
                     case "ASTSERIESQUESTION":
                         {
-                            //GENR fy = ...
+                            //GENR fy = ...                            
                             node.Code.A("O.SeriesQuestion();" + G.NL);
                         }
                         break;
-                    case "ASTGENR":
+                    case "ASTGENR":                    
                         {
-                            //GENR fy = ...
+                            //GENR fy = ...                            
                             node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), node[1].Code.ToString(), node[2].Code.ToString(), w, null));
                         }
                         break;
-
+                    
                     case "ASTSERIESLHS":
                         {
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node);                                                       
                         }
                         break;
                     case "ASTSERIESRHS":
-                        {
+                        {                            
                             node.Code.CA(node[0].Code.ToString());
-
+                                                        
                         }
                         break;
                     case "ASTGENRLHSFUNCTION":
                         {
-                            //GENR dlog(fy) = ...
+                            //GENR dlog(fy) = ...                            
                             node.Code.A(HandleGenr(node, Num(node), node[0].Code.ToString(), node[1].Code.ToString(), node[2].Code.ToString(), w, node[3].Text));
                         }
                         break;
@@ -3014,7 +2996,7 @@ namespace Gekko.Parser.Gek
                             //MATRIX a[3, 5] = ...
                             node.Code.A("O.GetMatrixFromString(" + node[0].Code + ").SetData(" + node[1].Code + ", " + node[2].Code + ", " + node[3].Code + ");" + G.NL);
                         }
-                        break;
+                        break;                    
                     //case "ASTMATRIX":
                     //    {
                     //        //MATRIX a = matrix(100, 100);  etc.
@@ -3044,10 +3026,10 @@ namespace Gekko.Parser.Gek
                     //            node.Code.A("O.Matrix2 o" + Num(node) + " = new O.Matrix2();" + G.NL);
                     //            if (node[0].ChildrenCount() > 0)
                     //            {
-                    //                GetCodeFromAllChildren(node[0]); //options
+                    //                GetCodeFromAllChildren(node[0]); //options  
                     //                node.Code.A(node[0].Code);
-                    //            }
-
+                    //            }                                
+                                                                                              
                     //            node.Code.A("o" + Num(node) + ".Exe(" + node[1].Code + ", " + s + ");" + G.NL);
                     //        }
                     //    }
@@ -3092,13 +3074,13 @@ namespace Gekko.Parser.Gek
 
                         }
                         break;
-
-                    case "ASTIDENT":
+                    
+                    case "ASTIDENT":                    
                         {
                             node.Code.CA("new ScalarString(`" + node[0].Text + "`)");  //problem is that we now allow VAL %v = 1, for instance. Here %v is not recursive.
                         }
                         break;
-
+                                            
                     case "ASTIDENTDIGIT":
                         {
                             if (node[0].Text == "ASTIDENT" || node[0].Text == "ASTNAME")
@@ -3108,7 +3090,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 node.Code.CA("new ScalarString(`" + node[0].Text + "`)");
-                            }
+                            }                            
                         }
                         break;
                     //case "ASTIMPORT":
@@ -3136,13 +3118,13 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("null");
                         }
-                        break;
+                        break;                        
                     case "ASTINDEX":  //the INDEX command
                     case "ASTCOUNT":  //the COUNT command
                         {
                             node.Code.A("O.Index o" + Num(node) + " = new O.Index();" + G.NL);
                             if (node[0][0] != null) node.Code.A(node[0][0].Code);  //options
-                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);
+                            if (node[1][0] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[1][0].Code + ";" + G.NL);                            
                             if (node[2][0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[2][0].Text + "`;");
                             if (node[3] != null) node.Code.A("o" + Num(node) + ".names1 = " + node[3].Code + ";" + G.NL);
                             if (node.Text != "ASTINDEX") node.Code.A("o" + Num(node) + ".isCountCommand = true;" + G.NL);
@@ -3150,11 +3132,11 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTPRT":
-                        {
+                        {                            
                             {
                                 //PRT
 
-                                //NOTE: This Func<> does not need to have a smpl argument, since it can not be used in
+                                //NOTE: This Func<> does not need to have a smpl argument, since it can not be used in 
                                 //      a recursive way.
                                 node.Code.A("Func<GraphHelper, string> print" + Num(node) + " = (gh) =>" + G.NL);
                                 node.Code.A("{" + G.NL);  //start Action
@@ -3166,19 +3148,19 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("o" + Num(node) + ".guiGraphIsRefreshing = gh.isRefreshing;" + G.NL);
                                 node.Code.A("o" + Num(node) + ".guiGraphOperator = gh.operator2;" + G.NL); //printCode is from the Func<> call, is null if PLOT window buttons are not clicked
                                 node.Code.A("o" + Num(node) + ".guiGraphIsLogTransform = gh.isLogTransform;" + G.NL);
-
-                                node.Code.A(node[0].Code);  //type (prt, plot, ...)
+                                                                
+                                node.Code.A(node[0].Code);  //type (prt, plot, ...)                          
                                 GetCodeFromAllChildren(node, node[1]);  //options
-                                GetCodeFromAllChildren(node, node[2]);  //option
+                                GetCodeFromAllChildren(node, node[2]);  //option         
 
-                                node.Code.A(LocalCode3(Num(node)));
+                                node.Code.A(LocalCode3(Num(node)));                                
 
                                 node.Code.A(node[3].Code);
 
                                 //node.Code.A(LocalCode4(Num(node)));
-
+                                                                
                                 node.Code.A("o" + Num(node) + ".printCsCounter = Globals.printCs.Count - 1;" + G.NL);
-
+                                                                
                                 node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                                 node.Code.A(LocalCode4(Num(node)));
@@ -3186,19 +3168,19 @@ namespace Gekko.Parser.Gek
                                 node.Code.A("return o" + Num(node) + ".emfName;" + G.NL);
 
                                 node.Code.A("};" + G.NL);  //end Action
-
+                                
                                 node.Code.A("Globals.printCs.Add(Globals.printCs.Count, print" + Num(node) + "); " + G.NL);
 
                                 node.Code.A("print" + Num(node) + "(new GraphHelper());" + G.NL); //end Action
 
                             }
-
+                            
 
                         }
                         break;
                     case "ASTREBASE":  //the REBASE command
                         {
-                            node.Code.A("O.Rebase o" + Num(node) + " = new O.Rebase();" + G.NL);
+                            node.Code.A("O.Rebase o" + Num(node) + " = new O.Rebase();" + G.NL);                                                        
                             //node.Code.A(node[0].Code);
 
                             node.Code.A("o" + Num(node) + ".names = " + node[0].Code + ";" + G.NL);
@@ -3216,15 +3198,15 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     //case "ASTCOUNT":  //the COUNT command
-                    //    {
-                    //        node.Code.A("O.Count o" + Num(node) + " = new O.Count();" + G.NL);
+                    //    {                            
+                    //        node.Code.A("O.Count o" + Num(node) + " = new O.Count();" + G.NL);                            
                     //        node.Code.A("o" + Num(node) + ".listItems = O.GetList(" + node[0].Code + ");" + G.NL);
                     //        node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                     //    }
                     //    break;
                     //case "ASTINDEXERALONE":  //indexer with nothing at the left: [a*], not #z[a*]. For ASTINDEXER, see "["
                     //    {
-                    //        //Only 1 dimension supported
+                    //        //Only 1 dimension supported                        
                     //        if (node.ChildrenCount() > 1) throw new GekkoException();
                     //        node.Code.A("O.Indexer(O.Indexer2(smpl, " + node[0].Code + "), smpl, null, " + node[0].Code + ")"); //null signals that it has nothing on the left
                     //    }
@@ -3237,7 +3219,7 @@ namespace Gekko.Parser.Gek
                     case "ASTDOTORINDEXER":
                         {
 
-
+ 
                             string ivTempVar = SearchUpwardsInTree4(node);  //checks if left-hand side
 
                             //isLhs is true if the indexer is on the left-hand side, and is the last indexer.
@@ -3250,7 +3232,7 @@ namespace Gekko.Parser.Gek
                             bool reportInterior = ((w.wh.currentCommand == "ASTPRT" || w.wh.currentCommand == "ASTDISP") && !SearchUpwardsInTree6(node.Parent));
                             if (node[1].Text == "ASTDOT")
                                 reportInterior = false;  //never for #x.??? type indexing
-
+                            
                             string indexes = null;  //DELETE THESE SOON!!!
                             string indexesReport = null;  //DELETE THESE SOON!!!
 
@@ -3260,14 +3242,14 @@ namespace Gekko.Parser.Gek
                             for (int i = 0; i < node[1].ChildrenCount(); i++)
                             {
                                 ASTNode child = node[1][i];
-
+                                
                                 if (child[0].Text == "ASTPLUS" || child[0].Text == "ASTMINUS")
                                 {
                                     //See also #980752345
                                     string listName = GetSimpleHashName(child[0][0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (listName != null)
+                                    if (false && listName != null)
                                     {
                                         TwoStrings two = SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -3335,7 +3317,7 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (listName != null)
+                                    if (false && listName != null)
                                     {
                                         TwoStrings two= SearchUpwardsInTree2(node, listName);
                                         if (two != null)
@@ -3344,13 +3326,13 @@ namespace Gekko.Parser.Gek
                                             internalFunction = two.s2;
                                         }
                                     }
-
+                                    
                                     string s = node[1][i].Code.ToString();
                                     if (internalName != null) s = internalName;
 
-                                    indexes += s;  //always done as fallback
+                                    indexes += s;  //always done as fallback      
                                     ix[i] = s;
-
+                                                                  
                                     if (reportInterior)
                                     {
                                         bool xxx = ReportHelperIsSum(internalName, internalFunction);
@@ -3412,12 +3394,12 @@ namespace Gekko.Parser.Gek
                                 else
                                 {
                                     //do nothing
-                                }
+                                }                                
                             }
 
                             if (ivTempVar == null)
                             {
-                                if (indexesReport == null) indexesReport = indexes;
+                                if (indexesReport == null) indexesReport = indexes;                                
 
                                 if (node[1][0].Text == "ASTOBJECTFUNCTION" || node[1][0].Text == "ASTOBJECTFUNCTION_Q" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED" || node[1][0].Text == "ASTOBJECTFUNCTIONNAKED_Q")
                                 {
@@ -3439,18 +3421,18 @@ namespace Gekko.Parser.Gek
                                     if (!isInbuilt)
                                     {
                                         string code = GetFuncArgumentCode(node, 0);
-                                        s2 = s.Replace(Globals.objFunctionPlaceholder, code);
+                                        s2 = s.Replace(Globals.objFunctionPlaceholder, code);                                        
                                     }
                                     else
-                                    {
-                                        s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());
+                                    {                                        
+                                        s2 = s.Replace(Globals.objFunctionPlaceholder, node[0].Code.ToString());                                        
                                     }
                                     node.Code.A(s2);
-                                }
+                                }                                
                                 else
-                                {
-                                    node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");
-
+                                {                                    
+                                    node.Code.A("O.Indexer(O.Indexer2(" + Globals.smpl + ", " + indexerType + "," + G.GetListWithCommas(ix) + "), " + Globals.smpl + ", " + indexerType + ", " + node[0].Code + ", " + G.GetListWithCommas(ixr) + ")");                                        
+                                 
                                     //this alternative code is only done for x[a] type of variables, not x.f() etc.
 
                                     if (node[0].AlternativeCode != null)
@@ -3468,7 +3450,7 @@ namespace Gekko.Parser.Gek
 
                                 }
 
-
+                                
                             }
                             else
                             {
@@ -3498,11 +3480,11 @@ namespace Gekko.Parser.Gek
                             //GetCommaCodeFromAllChildren(node);
                         }
                         break;
-                    case "ASTINDEXERELEMENTIDENT":
+                    case "ASTINDEXERELEMENTIDENT": 
                         {
                             string s = node[0][0].Text;
                             node.Code.A("new ScalarString(\"" + s + "\")");
-
+                            
                         }
                         break;
                     case "ASTINDEXERELEMENT":
@@ -3524,9 +3506,9 @@ namespace Gekko.Parser.Gek
                             //}
                         }
                         break;
-                    case "ASTINDEXERELEMENTBANK":
+                    case "ASTINDEXERELEMENTBANK":                    
                         {
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node);                            
                         }
                         break;
                     case "ASTINTEGER":
@@ -3543,7 +3525,7 @@ namespace Gekko.Parser.Gek
                                     //but x[01] will become x['01'], if x is an array-series. They way this is done is that
                                     //the ScalarVal contains info on trailing zeroes, which can be used later on. This info
                                     //is not stored in databanks or anything, and they will not survive addition, multiplication,
-                                    //etc.
+                                    //etc.  
                                     for (byte i = 0; i < node[0].Text.Length; i++)
                                     {
                                         if (node[0].Text[i] != '0')
@@ -3592,11 +3574,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTMISSING":
                         {
-                            //TODO
-                            //TODO
+                            //TODO 
+                            //TODO 
                             //TODO use cache to avoid dublets
                             //TODO Maybe not: this simplifies user defined functions
-                            //TODO
+                            //TODO                             
                             string intWithNumber = "d" + ++Globals.counter;
                             string s = "new ScalarVal(double.NaN)";
                             GetHeaderCs(w).AppendLine("public static readonly ScalarVal " + intWithNumber + " = " + s + ";");
@@ -3606,7 +3588,7 @@ namespace Gekko.Parser.Gek
                     case "ASTLISTDEF":
                         {
                             node.Code.A("O.ListDefHelper(");
-                            ListDefHelper(node);
+                            ListDefHelper(node);                            
                             node.Code.A(")");
                         }
                         break;
@@ -3624,7 +3606,7 @@ namespace Gekko.Parser.Gek
                                 }
                             }
                             else
-                            {
+                            {                                
                                 node.Code.A(HandleList(node, node[1].Code.ToString()));
                             }
                         }
@@ -3638,13 +3620,13 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.RangeGeneral(" + node[0].Code + ", " + node[1].Code + ")");
                         }
-                        break;
-                    case "ASTWILDCARDWITHBANK":
+                        break;                    
+                    case "ASTWILDCARDWITHBANK":                    
                         {
                             string bankCs = node[0].Code.ToString();
                             if (true)
                             {
-                                //wildcard
+                                //wildcard   
                                 if (bankCs == null || bankCs == "")
                                 {
                                     node.Code.CA(node[1].Code);
@@ -3655,7 +3637,7 @@ namespace Gekko.Parser.Gek
                                 }
 
                             }
-
+                                                        
                         }
                         break;
                     case "ASTRANGEWITHBANK":
@@ -3669,13 +3651,13 @@ namespace Gekko.Parser.Gek
                     case "ASTLISTITEMWILDRANGEBANK":
                         {
                             if (node.ChildrenCount() > 0)
-                            {
+                            {                            
                                 node.Code.A(node[0].Code);
                             }
                         }
                         break;
                     //case "ASTLISTITEM":
-                    //    {
+                    //    {                           
 
                     //        List<string> ss = new List<string>();
                     //        string number = "";
@@ -3721,7 +3703,7 @@ namespace Gekko.Parser.Gek
                     //            //#m[2]
                     //            node.Code.CA(listNameCs + ".AddRange(O.GetList(" + child.Code + "));" + G.NL);
                     //        }
-
+                                                        
                     //        //Node always has one child here, so this is not used anymore
                     //        //string cs = null;
                     //        //if (node[0].Text == "ASTNAMEWITHBANK")
@@ -3733,15 +3715,15 @@ namespace Gekko.Parser.Gek
                     //        //    cs = node[0].Code.ToString();
                     //        //}
                     //        //node.Code.A("o" + Num(node) + ".listItems" + number + " = O.AddBankToListItems(o" + Num(node) + ".listItems" + number + ", O.ConvertToString(" + cs + "));" + G.NL);
-
+                            
                     //    }
                     //    break;
                     case "ASTLISTITEMS":
                         {
                             node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node);                            
                         }
-                        break;
+                        break;                    
                     case "ASTLISTITEMS0":
                         {
                             node.Code.A("o" + Num(node) + ".listItems0 = new List<string>();" + G.NL);
@@ -3759,7 +3741,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("o" + Num(node) + ".listItems2 = new List<string>();" + G.NL);
                             GetCodeFromAllChildren(node);
                         }
-                        break;
+                        break;          
                     case "ASTLISTPREFIX":
                         {
                             //if (node.ChildrenCount() == 1 && node[0].Text == "ASTNAMEWITHBANK")
@@ -3820,7 +3802,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("Program.Mem(null);" + G.NL);
                         }
-                        break;
+                        break;                    
                     case "ASTMODEL":
                         {
                             node.Code.A("O.Model o" + Num(node) + " = new O.Model();" + G.NL);
@@ -3854,14 +3836,14 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTMODEQUESTION":
                         {
-                            node.Code.A("O.Mode.Q();" + G.NL);
+                            node.Code.A("O.Mode.Q();" + G.NL);                            
                         }
                         break;
                     case "ASTTIMEQUESTION":
-                        {
-                            node.Code.A("O.Time.Q();" + G.NL);
+                        {                            
+                            node.Code.A("O.Time.Q();" + G.NL);                            
                         }
-                        break;
+                        break;     
                     case "ASTMP":
                         {
                             node.Code.A(AddOperator("mp", node[0].Code.ToString(), node.Parent.Parent.Text, node));
@@ -3880,14 +3862,14 @@ namespace Gekko.Parser.Gek
                             node.Code.A(AddOperator("n", node[0].Code.ToString(), node.Parent.Parent.Text, node));
                         }
                         break;
-
+                    
                     case "ASTASSIGNMENT":
                         {
                             if (node[0].Text == "ASTASSIGNMENTQUESTION")
                             {
                                 //val?, series?, etc.
-                                string type = node[1].Text.ToLower();
-                                node.Code.A("Program.Mem(`" + type + "`);" + G.NL);
+                                string type = node[1].Text.ToLower();                                
+                                node.Code.A("Program.Mem(`" + type + "`);" + G.NL);                                
                             }
                             else
                             {
@@ -3914,7 +3896,7 @@ namespace Gekko.Parser.Gek
                                     sb.A("o" + Num(node) + ".opt_source = @`<[code]>" + G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1]) + "`;" + G.NL);
                                 }
 
-                                string type = HandleVar(node[3].Text);  //2 is options
+                                string type = HandleVar(node[3].Text);  //2 is options   
                                 GetCodeFromAllChildren(sb, node[2]);
                                 if (G.Equal(type, "STRING2")) type = "string";
                                 string ivTempVar = SearchUpwardsInTree4(node[0]);
@@ -3970,14 +3952,14 @@ namespace Gekko.Parser.Gek
                                         node.Code.A("ScalarVal " + vName + " = " + node.loopCodeCs + " as ScalarVal").End();
                                         node.Code.A("if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue").End();
                                     }
-
-                                    StringBuilder sb4 = new StringBuilder();
+                                    
+                                    StringBuilder sb4 = new StringBuilder();                                    
                                     sb4.AppendLine("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
                                     sb4.AppendLine("return " + node[1].Code.ToString() + " ;");
                                     sb4.AppendLine("  });");
                                     string codeNew;  string smplLocal; ReplaceSmpl(sb4.ToString(), out smplLocal, out codeNew);
                                     node.Code.A(codeNew);
-
+                                                                       
 
                                     //node.Code.A(node[0].Code).End();
                                 }
@@ -4082,7 +4064,7 @@ namespace Gekko.Parser.Gek
                             //string s2 = "Map " + node.mapTempVarName + " = new Map();" + G.NL;
                             //foreach (ASTNode child in node.ChildrenIterator()) s2 += child.Code.ToString();
                             //string s = "public static IVariable " + funcName + "(GekkoSmpl smpl) {" + G.NL + s2 + G.NL + "return " + node.mapTempVarName + ";" + G.NL + "}";
-                            //w.headerCs.Append(s);
+                            //w.headerCs.Append(s);                            
                             //node.Code.A(funcName + "(smpl)");
 
                             string funcName = "MapDef_" + node.mapTempVarName;
@@ -4134,7 +4116,7 @@ namespace Gekko.Parser.Gek
                             string naked = "false";
                             if (node.Text == "ASTNAKEDLIST") naked = "true";
                             bool isFor = false;
-
+                            
                             if (node?.Parent?.Text == "ASTPLACEHOLDER" && node?.Parent?.Parent?.Text == "ASTFORTYPE2" && node?.Parent?.Parent?.Parent?.Text == "ASTPLACEHOLDER" && node?.Parent?.Parent?.Parent?.Parent?.Text == "ASTFOR")
                             {
                                 //We need to check parents carefully, otherwise the INDEX in stuff like FOR string %i = ... ; INDEX * to #m; END; will think it is a FOR-statement list (where '#' is not allowed)
@@ -4177,8 +4159,8 @@ namespace Gekko.Parser.Gek
                             string code = "O.ExplodeIvariables(new List(new List<IVariable> {";
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
-                                string name = null;
-                                name = child.Code.ToString();
+                                string name = null;                                
+                                name = child.Code.ToString();                                
                                 code += name + ", ";
                             }
                             code = code.Substring(0, code.Length - ", ".Length);
@@ -4213,9 +4195,9 @@ namespace Gekko.Parser.Gek
 
                            #m.#m2.#m3.z = 56
                                        astleftside
-                                         /
-                                        /
-                                 astdotori
+                                         / 
+                                        /                                         
+                                 astdotori   
                                    /     \
                                   /       \
                              astdotori    astdot
@@ -4226,7 +4208,7 @@ namespace Gekko.Parser.Gek
                         /   \         \                and then a astleftside, we are ok.
                        #m  astdot      #m3 --------------> but this is where the IndexerSetData
                              \                        is called, because it might be #m.#m2.x[2000],
-                              \                       where ivtempvar != null
+                              \                       where ivtempvar != null 
                                #m2
 
 
@@ -4292,25 +4274,17 @@ namespace Gekko.Parser.Gek
                                 //four possibilities, y1 = x1 and #m = (y2 = x2)
                                 //here, x1 and x2 have !isLeftSide
                                 //for y2, isMapItem is true.
-                                //only one left is thus y1, for which printcodes work.
+                                //only one left is thus y1, for which printcodes work.                                                                                            
                                 optionsString = OperatorHelper(node, -12345);  //options like <p> or <keep> etc.
-                            }
-                            //else if (node?.Parent?.Text == "ASTDOTORINDEXER" && node?.Parent?.Parent.Text == "ASTLEFTSIDE")
-                            //{
-                            //    leftSideType = 2;
-                            //}
+                            }                            
 
                             Tuple<bool, string> tuple = CheckIfLeftSide(node);  //In x[%s1, %s2][%date] = ... this will only be true for x, not for the other vars
                             bool isLeftSideVariable = tuple.Item1;
                             string type = tuple.Item2;
 
                             string lookupSettings = "new  LookupSettings()";
-                            if (isLeftSideVariable) lookupSettings = "new  LookupSettings(O.ELookupType.LeftHandSide)";
-                            //if (isLoneOnRightSide) isLeftSideVariableString = "O.ELookupType.RightHandSideLoneVariable";
+                            if (isLeftSideVariable) lookupSettings = "new  LookupSettings(O.ELookupType.LeftHandSide)";                            
                             bool isInsidePrintStatement = SearchUpwardsInTree5(node);
-
-                            //string optionsString = "null";
-                            //if (isLeftSideVariable) optionsString = "o" + Num(node);  //options like <p> or <keep> etc.
 
                             string ivTempVar = SearchUpwardsInTree4(node);
 
@@ -4328,7 +4302,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.Code.CA(internalName);
                                 }
-
+                                
                                 //node.Code.CA("[[" + internalName + " = " + ivTempVar + ";" + G.NL + "]]");
                                 functionHit = true;
                             }
@@ -4341,11 +4315,11 @@ namespace Gekko.Parser.Gek
                                     mapName = node.Parent.Parent.Parent.Parent.mapTempVarName;
                                     if (mapName == null) throw new GekkoException();
                                 }
-
+                                
                                 if (ivTempVar == null) ivTempVar = "null";
 
                                 //Check for simple variable like b:x!q or b:%s
-                                //This is only for performance reasons, making lookup faster especially for VALs
+                                //This is only for performance reasons, making lookup faster especially for VALs                            
 
                                 //Check bank
                                 string simpleBank = null;
@@ -4409,50 +4383,57 @@ namespace Gekko.Parser.Gek
                                     //simpleName can never contain a '!', but if simpleFreq = null, a freq like "!a" will be added
                                     //  when looking up.
 
-                                    string hasSigilText = "false";
-                                    if (sigil != null) hasSigilText = "true";
-                                    string simpleBankText777 = Globals.QT+simpleBank+ Globals.QT;
-                                    if (simpleBank == "") simpleBankText777 = "null";
-                                    string simpleFreqText777 = Globals.QT+simpleFreq+ Globals.QT;
-                                    if (simpleFreq == "") simpleFreqText777 = "null";
+                                    string code = MaybeControlledSet(node);
+                                    if (code != null)
+                                    {
+                                        //a controlled list, like y[#i] = x[#i] inside an implicit loop or sum loop over #i.
+                                        node.Code.A(code);  //will be the C# name of the listitem
+                                    }
+                                    else
+                                    {
 
-                                    //if (mapName != null || (node.Parent != null && node.Parent.Text == "ASTDOTORINDEXER")) optionsString = "null"; //kills off all attempts to use <p>, <m> etc. in a map defintion, and also
-                                    //optionsString = "null";  //the above does not work
+                                        string hasSigilText = "false";
+                                        if (sigil != null) hasSigilText = "true";
+                                        string simpleBankText777 = Globals.QT + simpleBank + Globals.QT;
+                                        if (simpleBank == "") simpleBankText777 = "null";
+                                        string simpleFreqText777 = Globals.QT + simpleFreq + Globals.QT;
+                                        if (simpleFreq == "") simpleFreqText777 = "null";
 
-                                    lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
+                                        lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + simpleBankText777 + ", " + Globals.QT + sigil + simpleName + Globals.QT + ", " + simpleFreqText777 + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
 
-                                    node.AlternativeCode = new GekkoSB();
-                                    string ss = sigil + simpleName;
-                                    if (simpleBankText777 != "null") ss = simpleBank + Globals.symbolBankColon + ss;
-                                    if (simpleFreqText777 != "null") ss = ss + Globals.freqIndicator + simpleFreq;
-                                    node.AlternativeCode.A("new ScalarString(" + Globals.QT + ss + Globals.QT + ")");
+                                        node.AlternativeCode = new GekkoSB();
+                                        string ss = sigil + simpleName;
+                                        if (simpleBankText777 != "null") ss = simpleBank + Globals.symbolBankColon + ss;
+                                        if (simpleFreqText777 != "null") ss = ss + Globals.freqIndicator + simpleFreq;
+                                        node.AlternativeCode.A("new ScalarString(" + Globals.QT + ss + Globals.QT + ")");
+                                    }
                                 }
                                 else
                                 {
                                     //Complicated name, for instance
-                                    //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ...
+                                    //{%s}, a%s, a{#m}, {%b}:a, b:a!{%f}, %(%s),  ... 
 
                                     //#746384984 merge these in a method
                                     string nameAndBankCode = null;
                                     if (node[0][0] == null)
                                     {
-                                        //no bank indicator
+                                        //no bank indicator        
                                         nameAndBankCode = node[1].Code.ToString();
                                     }
                                     else
                                     {
-                                        //bank indicator
+                                        //bank indicator  
                                         string bankNameCs = null;
                                         bankNameCs = node[0][0].Code.ToString();
                                         if (Globals.concatPointer)
                                         {
                                             nameAndBankCode = "(" + bankNameCs + ")" + ".Concat(" + Globals.smpl + ", O.scalarStringColon)" + ".Concat(" + Globals.smpl + ", " + node[1].Code + ")";
-                                        }
+                                        }                                        
                                     }
                                     lookupCode = "O.Lookup(" + Globals.smpl + ", " + mapName + ", " + nameAndBankCode + ", " + ivTempVar + ", " + lookupSettings + ", EVariableType." + type + ", " + optionsString + ")";
-
+                                                                        
                                     node.AlternativeCode = new GekkoSB();
-                                    node.AlternativeCode.A("" + nameAndBankCode + "");
+                                    node.AlternativeCode.A("" + nameAndBankCode + "");     
                                 }
 
                                 //if (Globals.bugfix_speedup)
@@ -4466,10 +4447,10 @@ namespace Gekko.Parser.Gek
                                 //        }
                                 //        else
                                 //        {
-
+                                            
                                 //            string name = Globals.listLoopMovedStuff + ++Globals.counter;
                                 //            w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
-                                //            lookupCode = name;
+                                //            lookupCode = name;                                            
                                 //            //highest.CodeSentFromSubTree+=
                                 //        }
                                 //    }
@@ -4486,7 +4467,7 @@ namespace Gekko.Parser.Gek
                                         }
                                         else
                                         {
-
+                                                                                        
                                             string name = Globals.listLoopMovedStuff + ++Globals.counter;
 
                                             if (Globals.bugfix_speedup3)
@@ -4495,7 +4476,7 @@ namespace Gekko.Parser.Gek
                                                 lookupCode = name;
                                             }
                                             else
-                                            {
+                                            {                                                
                                                 w.wh.localInsideLoopVariables += "IVariable " + name + " = " + lookupCode + ";" + G.NL;
                                                 lookupCode = name;
                                                 //highest.CodeSentFromSubTree+=
@@ -4508,7 +4489,7 @@ namespace Gekko.Parser.Gek
                             }
                             break;
                         }
-
+                        
                         case "ASTPRINT":
                         {
                             if (true)
@@ -4528,7 +4509,7 @@ namespace Gekko.Parser.Gek
                                 if(false) node.Code.LoopSmplCode("O.Print(" + Globals.smpl + ", " + listName + ")");
                                 node.Code.A("O.Print(" + Globals.smpl + ", " + listName + ");");
                             }
-                            else {
+                            else { 
 
                                 string code = null;
                                 string funcName = "PrintHelper_" + ++Globals.counter;
@@ -4554,7 +4535,7 @@ namespace Gekko.Parser.Gek
                         {
                             bool s0 = false; if (node[0][0] != null) s0 = true;  //sigil % or #
                             bool s2 = false; if (node[2][0] != null) s2 = true;  //freq !
-
+                            
                             if (s0)
                             {
                                 if (s2)
@@ -4564,7 +4545,7 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
                                     }
-
+                                    
                                 }
                                 else
                                 {
@@ -4573,8 +4554,8 @@ namespace Gekko.Parser.Gek
                                     {
                                         node.Code.A("(" + node[0][0].Code + ")").A(".Concat(" + Globals.smpl + ", " + node[1][0].Code + ")");
                                     }
-
-                                }
+                                    
+                                }                         
                             }
                             else
                             {
@@ -4584,13 +4565,13 @@ namespace Gekko.Parser.Gek
                                     if (Globals.concatPointer)
                                     {
                                         node.Code.A("(" + node[1][0].Code + ")").A(".Concat(" + Globals.smpl + ", O.scalarStringTilde)").A(".Concat(" + Globals.smpl + ", " + node[2][0].Code + ")");
-                                    }
+                                    }                                    
                                 }
                                 else
                                 {
                                     //a
                                     node.Code = node[1][0].Code;
-                                }
+                                }                                
                             }
                         }
                         break;
@@ -4611,7 +4592,7 @@ namespace Gekko.Parser.Gek
                                         if (Globals.concatPointer)
                                         {
                                             node.Code.A(".Concat(" + Globals.smpl + ", " + child.Code + ")");
-                                        }
+                                        }                                        
                                     }
                                     counter++;
                                 }
@@ -4627,7 +4608,7 @@ namespace Gekko.Parser.Gek
                         {
                             //Can only have 2 ASTNAME's as children
                             if (node.ChildrenCount() == 1)
-                            {
+                            {                                
                                 //no dot in this name
                                 node.Code.A(node[0].Code);
                                 node.nameSimpleIdent = node[0].nameSimpleIdent;  //inherits this info
@@ -4637,7 +4618,7 @@ namespace Gekko.Parser.Gek
                                 //stuff like fy.1
                                 if (Globals.useDotFunctionalityInParser)
                                 {
-                                    //for instance in fy.1
+                                    //for instance in fy.1                            
                                     node.Code.A(node[0].Code);
                                     node.nameSimpleIdent = node[0].nameSimpleIdent;  //inherits this info
                                     node.dotNumber = node[1].Code.ToString();
@@ -4663,7 +4644,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.nameSimpleIdent = node[0].nameSimpleIdent + "." + node[1].nameSimpleIdent;
                                     node.Code.CA("new ScalarString(`" + node.nameSimpleIdent + "`)");  //overrides
-                                }
+                                }                               
                             }
                         }
                         break;
@@ -4714,7 +4695,7 @@ namespace Gekko.Parser.Gek
                     //                ////          b
                     //                //node[1][0][0].Code = null;  //sub-nodes have been visited: this result gets overridden
                     //                //HandleScalar(node[1][0][0], false, wh2);
-                    //                //node.Code.CA(node[1][0][0].Code;
+                    //                //node.Code.CA(node[1][0][0].Code;                                
                     //            }
                     //            else
                     //            {
@@ -4745,7 +4726,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTSEQITEMMINUS":
-                        {
+                        {                            
                             node.Code.A("(").A("(new ScalarString(`-`)).Add(" + Globals.smpl + ", " + node[0].Code.ToString() + ")").A(")");
                         }
                         break;
@@ -4758,8 +4739,8 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTLEFTSIDE":
-                        {
-                            node.Code.A(node[0].Code + G.NL);
+                        {                            
+                            node.Code.A(node[0].Code + G.NL);                            
                         }
                         break;
                     case "ASTOPENHELPER":
@@ -4769,8 +4750,8 @@ namespace Gekko.Parser.Gek
                             if (node[1][0] != null)
                             {
                                 as2 = node[1][0].Code.ToString();
-                            }
-                            node.Code.A("o" + Num(node) + ".openFileNamesAs2 = " + as2 + ";" + G.NL);
+                            }                            
+                            node.Code.A("o" + Num(node) + ".openFileNamesAs2 = " + as2 + ";" + G.NL);                            
                         }
                         break;
                     case "ASTOPT_":
@@ -4797,7 +4778,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     //node.Code.A(Globals.clearTsCsCode + G.NL);
                                     node.Code.A("Program.AdjustFreq();");
-                                }
+                                }                                
                                 else if (o == "interface_sound_type")
                                 {
                                     if (!p.hasBeenCmdFile)
@@ -4814,7 +4795,7 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("CrossThreadStuff.Zoom();");
                                 }
                                 else if (o == "folder_working")
-                                {
+                                {                                    
                                     node.Code.A("CrossThreadStuff.WorkingFolder(``);");
                                 }
                                 else if (o == "interface_remote")
@@ -4839,21 +4820,21 @@ namespace Gekko.Parser.Gek
                                     node.Code.A("G.Writeln();");
                                     node.Code.A("throw new GekkoException();");
                                 }
-
+                                
                                 //if (o == "databank_file_format")
                                 //{
                                 //    node.Code.A("Globals.hasBeenTsdTsdxOptionChangeSinceLastClear = true;");
                                 //}
                                 else if (o == "timefilter_type")  //TODO: only issue if really avg
-                                {
+                                {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Timefilter type = 'avg' only works for PRT and MULPRT.`);");
                                 }
                                 else if (o == "solve_forward_nfair_damp" || o == "solve_forward_fair_damp" || o == "solve_gauss_damp")
-                                {
+                                {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Damping in Gekko 2.0 should be set to 1 minus damping in Gekko 1.8.`);");
                                 }
                                 else if (o == "r_exe_path")
-                                {
+                                {                                    
                                     node.Code.A("G.Writeln2(`+++ NOTE: Please use OPTION r exe folder ... instead`);");
                                 }
                                 else if (o == "series_array_ignoremissing")
@@ -4993,9 +4974,9 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTIMPOSE":  //"impose = " in OLS
                         {
-                            node.Code.A("o" + Num(node) + ".impose = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".impose = " + node[0].Code + ";" + G.NL);                           
                         }
-                        break;
+                        break;                    
                     case "ASTPRTTYPE":
                         {
                             node.Code.A("o" + Num(node) + ".prtType = `" + node[0].Text + "`;" + G.NL);
@@ -5007,7 +4988,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTPRTELEMENTOPTIONFIELD":
-                        {
+                        {                            
                             GetCodeFromAllChildren(node);
                         }
                         break;
@@ -5055,8 +5036,8 @@ namespace Gekko.Parser.Gek
                             node.Code.A("}").A(G.NL);
                             node.Code.A("finally {").A(G.NL);
                             node.Code.A("  O.isTableCall = false;").A(G.NL);
-                            node.Code.A("}").A(G.NL);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("}").A(G.NL);                            
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
 
@@ -5064,7 +5045,7 @@ namespace Gekko.Parser.Gek
                     case "ASTTABLESETBOTTOMBORDER":
                         {
                             string name = node.GetChild(0).Text;
-                            //CheckCurrow(node.GetChild(1).Text);
+                            //CheckCurrow(node.GetChild(1).Text);                            
                             string ss = "Top";
                             if (node.Text == "ASTTABLESETBOTTOMBORDER") ss = "Bottom";
                             node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);
@@ -5073,37 +5054,37 @@ namespace Gekko.Parser.Gek
 
                     case "ASTTABLESETLEFTBORDER":
                     case "ASTTABLESETRIGHTBORDER":
-                        {
+                        {                            
                             bool color = false;
                             if (node.ChildrenCount() == 4)
                             {
                                 color = true;
-                            }
+                            }                            
                             string ss = "Left";
                             if (node.Text == "ASTTABLESETRIGHTBORDER") ss = "Right";
                             if (color)
                             {
-                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);
+                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "), O.ConvertToInt(" + node[3].Code + "));" + G.NL);                               
                             }
                             else
                             {
-                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);
+                                node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Set" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);                                                               
                             }
                         }
                         break;
 
                     case "ASTTABLEHIDELEFTBORDER":
                     case "ASTTABLEHIDERIGHTBORDER":
-                        {
+                        {                            
                             string ss = "Left";
                             if (node.Text == "ASTTABLEHIDERIGHTBORDER") ss = "Right";
                             node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.Hide" + ss + "Border(O.ConvertToInt(" + node[2].Code + "));" + G.NL);
                         }
                         break;
                     case "ASTTABLESHOWBORDERS":
-                        {
+                        {                            
                             node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.ShowBorders();");
-                        }
+                        }                        
                         break;
 
                     case "ASTTABLESETTEXT":
@@ -5112,8 +5093,8 @@ namespace Gekko.Parser.Gek
                         }
                         break;
 
-                    case "ASTTABLEALIGNLEFT":
-                    case "ASTTABLEALIGNCENTER":
+                    case "ASTTABLEALIGNLEFT":                        
+                    case "ASTTABLEALIGNCENTER":                    
                     case "ASTTABLEALIGNRIGHT":
                         {
                             string type = "Left";
@@ -5129,8 +5110,8 @@ namespace Gekko.Parser.Gek
                         break;
 
                     case "ASTTABLESETDATES":
-                        {
-                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict), O.ConvertToDate(" + node[4].Code + ", O.GetDateChoices.Strict));");
+                        {                            
+                            node.Code.A("Program.GetTable(O.ConvertToString(" + node[0].Code + ")).CurRow.SetDates(O.ConvertToInt(" + node[2].Code + "), O.ConvertToDate(" + node[3].Code + ", O.GetDateChoices.Strict), O.ConvertToDate(" + node[4].Code + ", O.GetDateChoices.Strict));");                            
                         }
                         break;
 
@@ -5142,7 +5123,7 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node);
                             if (node.Text == "ASTMENUTABLE") node.Code.A("o" + Num(node) + ".menuTable = true;" + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                           
                         }
                         break;
                     case "ASTPRTELEMENTLINETYPE":
@@ -5225,13 +5206,13 @@ namespace Gekko.Parser.Gek
                                             node.Code.A("o").A(Num(node)).A(".timefilter = @`").A(node[0].Text).A("`;").A(G.NL);
                                         }
                                         break;
-
+                                                                    
                     case "ASTPRTELEMENT":
                     case "ASTTABLESETVALUESELEMENT":
                         {
 
                             w.expressionCounter++;
-                            node.Code.A("{" + G.NL);  //avoid scope collisions
+                            node.Code.A("{" + G.NL);  //avoid scope collisions                            
                             if (node.Text == "ASTTABLESETVALUESELEMENT")
                             {
                                 node.Code.A("List<int> bankNumbers = O.Prt.CreateBankHelper(1);" + G.NL);
@@ -5307,7 +5288,7 @@ namespace Gekko.Parser.Gek
                             if (node.Text == "ASTPRTELEMENT")
                             {
                                 node.Code.A("ope" + Num(node) + ".operatorsFinal = Program.GetElementOperators(o" + Num(node) + ", ope" + Num(node) + ");");
-                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".operatorsFinal);");
+                                node.Code.A("bankNumbers = O.Prt.GetBankNumbers(null, ope" + Num(node) + ".operatorsFinal);");                                
                             }
                             else if (node.Text == "ASTTABLESETVALUESELEMENT")
                             {
@@ -5322,7 +5303,7 @@ namespace Gekko.Parser.Gek
                             node.Code.A("" + Globals.smpl + ".bankNumber = bankNumber;" + G.NL);
                             node.Code.A(EmitLocalCacheForTimeLooping(w));
 
-                            //node.Code.A("smpl"
+                            //node.Code.A("smpl" 
                             node.Code.A("ope" + Num(node) + ".variable[bankNumber] = " + node[0].Code + ";" + G.NL);
 
                             node.Code.A("if(bankNumberI == 0) O.PrtElementHandleLabel(" + Globals.smpl + ", ope" + Num(node) + ");" + G.NL);
@@ -5336,8 +5317,8 @@ namespace Gekko.Parser.Gek
                             //node.Code.A(Globals.GekkoSmplNull);
 
                         }
-                        break;
-
+                        break;                            
+                    
                     case "ASTOLSELEMENTS":
                     case "ASTPRTELEMENTS":
                         {
@@ -5352,12 +5333,12 @@ namespace Gekko.Parser.Gek
                             if (node[0] != null) node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                             node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
-
+                            
                             if (node[3] != null) node.Code.A(node[2].Code); //options
-
+                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
-                        break;
+                        break;                    
                     case "ASTEXPRESSIONTUPLE":  //see ASTRETURNTUPLE
                         {
                             int counter = 0;
@@ -5366,12 +5347,12 @@ namespace Gekko.Parser.Gek
                             string classCs = G.GetVariableType(node.ChildrenCount());
                             //CreateTupleClass(w.uHeaderCs, node.ChildrenCount(), classCs, w.tupleClasses);
 
-                            string tempCs = "temp" + ++Globals.counter;
-
+                            string tempCs = "temp" + ++Globals.counter;                            
+                                                        
                             string s = null;
                             foreach (ASTNode child in node.ChildrenIterator())
                             {
-                                //counter++;
+                                //counter++;                                
                                 //node.Code.A(tempCs + ".tuple" + (counter - 1) + " = " + child.Code + ";" + G.NL;
                                 s += child.Code + ", ";
                             }
@@ -5383,7 +5364,7 @@ namespace Gekko.Parser.Gek
                             //node.Code.A("return " + tempCs + ";" + G.NL;
                         }
                         break;
-
+                    
                     case "ASTSIGN":
                         {
                             node.Code.A("Program.Sign();" + G.NL);
@@ -5400,7 +5381,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTRES":
                         {
-                            node.Code.A("O.Res o" + Num(node) + " = new O.Res();" + G.NL);
+                            node.Code.A("O.Res o" + Num(node) + " = new O.Res();" + G.NL);                            
                             GetCodeFromAllChildren(node);  //gets dates
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -5408,7 +5389,7 @@ namespace Gekko.Parser.Gek
                     case "ASTSMOOTH":
                         {
                             node.Code.A("O.Smooth o" + Num(node) + " = new O.Smooth();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".p = p;" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".names0 = " + node[1].Code + ";" + G.NL);
                             node.Code.A("o" + Num(node) + ".names1 = " + node[2].Code + ";" + G.NL);
                             if (node[3] != null) node.Code.A("o" + Num(node) + ".names2 = " + node[3].Code + ";" + G.NL);
@@ -5459,12 +5440,12 @@ namespace Gekko.Parser.Gek
                             string tempName = "temp" + ++Globals.counter;
                             node.Code.A("O.TimeFilterHelper " + tempName + " = new O.TimeFilterHelper();" + G.NL);
                             if (node.ChildrenCount() == 1)
-                            {
-                                node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                            {                                
+                                node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);                                                                
                             }
                             else if (node.ChildrenCount() == 2) {
                                 node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
-                                node.Code.A(tempName + ".to = O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict);" + G.NL);
+                                node.Code.A(tempName + ".to = O.ConvertToDate(" + node[1].Code + ", O.GetDateChoices.Strict);" + G.NL);                                                                
                             }
                             else if (node.ChildrenCount() == 3) {
                                 node.Code.A(tempName + ".from = O.ConvertToDate(" + node[0].Code + ", O.GetDateChoices.Strict);" + G.NL);
@@ -5503,7 +5484,7 @@ namespace Gekko.Parser.Gek
                                 }
                             }
 
-                            ////List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();
+                            ////List<Func<GekkoSmpl, IVariable>> Evalcode555 = new List<Func<GekkoSmpl, IVariable>>();                                
                             code.Append("var " + methodName + " = new List<Func<GekkoSmpl, IVariable>>();");
                             code.Append(before);
 
@@ -5512,7 +5493,7 @@ namespace Gekko.Parser.Gek
                             code.Append("  });");
                             code.Append(after);
                             string smplLocal; ReplaceSmpl(code.ToString(), out smplLocal, out codeNew);
-
+                            
 
                             StashIntoLocalFuncs(w, methodName, codeNew, isLoop);
 
@@ -5541,12 +5522,12 @@ namespace Gekko.Parser.Gek
                         {
                             string methodName = "Evalcode" + ++Globals.counter;
                             StashIntoLocalFuncs(w, methodName, node[0].Code.ToString(), false);
-                            node.Code.A("o" + Num(node) + ".expression = " + methodName + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".expression = " + methodName + ";" + G.NL);                            
                         }
                         break;
                     case "ASTDECOMPITEMS2":
                         {
-                            node.Code.A("o" + Num(node) + ".name = " + node[0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".name = " + node[0].Code + ";" + G.NL);                            
                         }
                         break;
                     case "ASTDECOMPITEMSEXPR":
@@ -5564,9 +5545,9 @@ namespace Gekko.Parser.Gek
                             }
                             else
                             {
-                                //DECOMP y = x1 + x2
+                                //DECOMP y = x1 + x2                                
                                 code = Program.EquationLhsRhs(node[1][0].Code.ToString(), node[1][1].Code.ToString(), false);
-                            }
+                            }                            
 
                             StashIntoLocalFuncs(w, methodName, code, false);
                             string n = "null";
@@ -5583,7 +5564,7 @@ namespace Gekko.Parser.Gek
                             string n = "null";
                             if (node[0].ChildrenCount() > 0) n = node[0][0].Code.ToString();
                             node.Code.A("o" + Num(node) + ".decompItems.Add(new DecompItems(null, " + n + ", " + n1 + ", " + n2 + "))" + ";" + G.NL);
-
+                            
                         }
                         break;
                     case "ASTDECOMP2":
@@ -5592,10 +5573,10 @@ namespace Gekko.Parser.Gek
                             node.Code.A("O.Decomp2 o" + Num(node) + " = new O.Decomp2();" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node.Text + "`;" + G.NL);
                             node.Code.A("o" + Num(node) + ".label = @`" + G.StripQuotes(G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[1])) + "`;" + G.NL);
-                            GetCodeFromAllChildren(node);
+                            GetCodeFromAllChildren(node);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
-                        break;
+                        break;                    
                     case "ASTDECOMPWHERE":
                         {
                             for (int i = 0; i < node.ChildrenCount(); i++)
@@ -5631,7 +5612,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPWHERE2":
                         {
-                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + "}");
+                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + "}");                            
                         }
                         break;
                     case "ASTDECOMPGROUP":
@@ -5650,11 +5631,11 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTDECOMPGROUP1":
                         {
-                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + ", " + node[2][0].Code + ", " + node[3][0].Code + "}");
+                            node.Code.A("new List<IVariable>() {" + node[0].Code + ", " + node[1].Code + ", " + node[2][0].Code + ", " + node[3][0].Code + "}");                        
                         }
                         break;
                     case "ASTDECOMPLINK":
-                        {
+                        {                            
                             GetCodeFromAllChildren(node);
                         }
                         break;
@@ -5678,10 +5659,10 @@ namespace Gekko.Parser.Gek
                         break;
                     //case "ASTUPDPRT":
                     //    {
-                    //        node.Code.A("O.Updprt o" + Num(node) + " = new O.Updprt();" + G.NL);
+                    //        node.Code.A("O.Updprt o" + Num(node) + " = new O.Updprt();" + G.NL);                            
                     //        node.Code.A(node[0].Code);
                     //        node.Code.A(node[1].Code);
-                    //        node.Code.A("o" + Num(node) + ".op = `" + node[2].Code + "`;" + G.NL);
+                    //        node.Code.A("o" + Num(node) + ".op = `" + node[2].Code + "`;" + G.NL);                            
                     //        if (node.ChildrenCount() > 3)
                     //        {
                     //            node.Code.A(node[3].Code);
@@ -5690,8 +5671,8 @@ namespace Gekko.Parser.Gek
                     //    }
                     //    break;
                     case "ASTPIPE":
-                        {
-                            node.Code.A("O.Pipe o" + Num(node) + " = new O.Pipe();" + G.NL);
+                        {                            
+                            node.Code.A("O.Pipe o" + Num(node) + " = new O.Pipe();" + G.NL);                            
                             GetCodeFromAllChildren(node);  //gets fileName and options
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
@@ -5718,7 +5699,7 @@ namespace Gekko.Parser.Gek
                                 {
                                     node.Code.A("o" + Num(node) + ".readTo =  O.ConvertToString(" + node[0].Code + ");");
                                 }
-                            }
+                            }                            
                         }
                         break;
                     //case "ASTIMPORTTO":
@@ -5730,7 +5711,7 @@ namespace Gekko.Parser.Gek
                     //    }
                     //    break;
                     case "ASTWRITE":
-                        {
+                        {                            
                             node.Code.A("O.Write o" + Num(node) + " = new O.Write();" + G.NL);
                             node.Code.A("o" + Num(node) + ".type = @`" + node[0].Text + "`;");
                             GetCodeFromAllChildren(node, node[1]);  //options
@@ -5743,7 +5724,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTFLEXIBLELIST":
                     case "ASTNAMESLIST":
-                        {
+                        {                            
                             GetCodeFromAllChildren(node);
                         }
                         break;
@@ -5778,7 +5759,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.R_export o" + Num(node) + " = new O.R_export();" + G.NL);
                             GetCodeFromAllChildren(node, node[0]);
-                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);
+                            node.Code.A("o" + Num(node) + ".names = " + node[1][0].Code + ";" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -5791,7 +5772,7 @@ namespace Gekko.Parser.Gek
                         break;
                     case "ASTR_EXPORTITEMS":
                         {
-                            //G.Writeln2(node.Text);
+                            //G.Writeln2(node.Text);                            
                             string s2 = "";
                             bool first = true;
                             foreach (ASTNode child in node.ChildrenIterator())
@@ -5839,18 +5820,18 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTRUN":
-                        {
+                        {                            
                             node.Code.A(LocalCode1(Num(node), null)); //see LocalCode2
                             node.Code.A("O.Run o" + Num(node) + " = new O.Run();" + G.NL);
                             //HMMM is this right:
                             node.Code.A("o" + Num(node) + ".fileName = O.ConvertToString(" + node[0].Code + ");" + G.NL);
                             if (node[1] != null) node.Code.A(node[1].Code + G.NL);
                             node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                             node.Code.A(LocalCode2(Num(node), null)); //see LocalCode1
                         }
-                        break;
-
+                        break;                    
+                    
                     case "ASTSTAMP":
                         {
                             node.Code.A("Program.Stamp();" + G.NL);
@@ -5880,7 +5861,7 @@ namespace Gekko.Parser.Gek
 
                                 if (i >= 2) ss += ".Add(" + Globals.smpl + ", O.HandleString(new ScalarString(@`" + s1 + "`)))" + add;
                                 else ss += "O.HandleString(new ScalarString(@`" + s1 + "`))" + add;
-                            }
+                            }                            
 
                             //for instance, @"this is a ""word"" shown", where "" are kind of @-escaped.
                             //but @ will keep backslashes.
@@ -5919,7 +5900,7 @@ namespace Gekko.Parser.Gek
                             GetCodeFromAllChildren(node, node[0]);  //options
                             node.Code.A("o" + Num(node) + ".names = " + node[1].Code + ";" + G.NL);
                             //node.Code.A("o" + Num(node) + ".listItems = new List<string>();" + G.NL;
-                            //node.Code.A(node[1].Code);  //list1
+                            //node.Code.A(node[1].Code);  //list1                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -5939,7 +5920,7 @@ namespace Gekko.Parser.Gek
                         }
                         break;
                     case "ASTDISP":
-                        {
+                        {                            
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
                             node.Code.A("" + Globals.labelCounter + " = 0;");
                             node.Code.A(node[0].Code);  //dates
@@ -5947,7 +5928,7 @@ namespace Gekko.Parser.Gek
 
                             node.Code.A("o" + Num(node) + ".iv = " + node[2].Code + ";" + G.NL);
 
-                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
+                            node.Code.A("o" + Num(node) + ".Exe();" + G.NL);                            
                         }
                         break;
                     case "ASTINI":
@@ -5959,7 +5940,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.A("O.Info o" + Num(node) + " = new O.Info();" + G.NL);
                             node.Code.A(node[0].Code);  //dates
-                            node.Code.A(node[1].Code);  //list
+                            node.Code.A(node[1].Code);  //list                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -5968,7 +5949,7 @@ namespace Gekko.Parser.Gek
                         {
                             //node.Code.A("O.Itershow o" + Num(node) + " = new O.Itershow();" + G.NL);
                             //node.Code.A(node[0].Code);  //dates
-                            //node.Code.A(node[1].Code);  //list
+                            //node.Code.A(node[1].Code);  //list                            
                             //node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
 
                             node.Code.A("O.Itershow o" + Num(node) + " = new O.Itershow();" + G.NL);
@@ -5983,12 +5964,12 @@ namespace Gekko.Parser.Gek
                     case "ASTDISPSEARCH":
                         {
                             node.Code.A("O.Disp o" + Num(node) + " = new O.Disp();" + G.NL);
-                            node.Code.A("o" + Num(node) + ".searchName = `" + G.StripQuotes(node[0][0].Text) + "`;" + G.NL);
+                            node.Code.A("o" + Num(node) + ".searchName = `" + G.StripQuotes(node[0][0].Text) + "`;" + G.NL);                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
                     case "ASTPAUSE":
-                        {
+                        {                            
                             if (node.ChildrenCount() == 0) node.Code.A("Program.Pause(``);");
                             else node.Code.A("Program.Pause(O.ConvertToString(" + node[0].Code + "));");
                             break;
@@ -5997,7 +5978,7 @@ namespace Gekko.Parser.Gek
                     case "ASTEFTER":
                         {
                             node.Code.A("O.Efter o" + Num(node) + " = new O.Efter();" + G.NL);
-                            node.Code.A(node[0].Code);  //dates
+                            node.Code.A(node[0].Code);  //dates                            
                             node.Code.A("o" + Num(node) + ".Exe();" + G.NL);
                         }
                         break;
@@ -6008,7 +5989,7 @@ namespace Gekko.Parser.Gek
                     //        //TODO and what about 'xx' prefix? Maybe allow this for GENR too!
                     //        //TODO
                     //        //node.Code.A("O.Upd o" + Num(node) + " = new O.Upd();" + G.NL);
-                    //        node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);
+                    //        node.Code.A("O.Upd o").A(Num(node)).A(" = new O.Upd();").A(G.NL);                            
                     //        node.Code.A("o" + Num(node) + ".p = p;" + G.NL);
 
                     //        if (node.Parent != null && node.Parent.Text == "ASTMETA" && node.Parent.specialExpressionAndLabelInfo != null && node.Parent.specialExpressionAndLabelInfo.Length > 1)
@@ -6035,7 +6016,7 @@ namespace Gekko.Parser.Gek
                     //                repCs = node[i + nn][1].Code.ToString();
                     //                if (rep.Text == "ASTSTAR")
                     //                {
-                    //                    repCs = "new ScalarVal(-12345d)";  //secret code for '*'
+                    //                    repCs = "new ScalarVal(-12345d)";  //secret code for '*'                                        
                     //                }
                     //                else if (rep.Text == "ASTEMPTY")
                     //                {
@@ -6054,7 +6035,7 @@ namespace Gekko.Parser.Gek
                     //            {
                     //                node.Code.A("o").A(Num(node)).A(".rep[").A(i).A("] = (").A(repCs).A(").GetVal(" + Globals.smpl + ")").A(G.NL);
                     //            }
-                    //        }
+                    //        }                            
                     //        node.Code.A("o").A(Num(node)).A(".Exe();").A(G.NL);
                     //        //G.Writeln(node.Code);
                     //    }
@@ -6108,8 +6089,8 @@ namespace Gekko.Parser.Gek
                                 givenLabel = G.ReplaceGlueNew(node.specialExpressionAndLabelInfo[2]);
                                 givenLabel = G.StripQuotes(givenLabel);
                             }
-                            else givenLabel = node.specialExpressionAndLabelInfo[1];
-
+                            else givenLabel = node.specialExpressionAndLabelInfo[1];                            
+                            
                             node.Code.A("O.Show o" + Num(node) + " = new O.Show();" + G.NL);
 
                             node.Code.A("o" + Num(node) + ".input = " + node[0].Code + ";" + G.NL);
@@ -6132,7 +6113,7 @@ namespace Gekko.Parser.Gek
                     //            //string cs1 = "IVariable p" + Num(node) + "= " + node[0][0][2].Code + ";";
                     //            //string cs2 = "IVariable q" + Num(node) + " = " + node[0][1][2].Code + ";";
                     //            //string cs3 = "GekkoTuple.Tuple2 temp = " + rhsCode + ";";
-                    //            node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);
+                    //            node.Code.A("Functions.HELPER_HandleLasp(" + rhsCode + ", " + node[0][0][2].Code + ", " + node[0][1][2].Code + ");" + G.NL);                            
                     //        }
                     //        else
                     //        {
@@ -6179,10 +6160,10 @@ namespace Gekko.Parser.Gek
                     //            }
 
                     //            string className = G.GetVariableType(number);
-                    //            node.Code.A(className + " " + tempName + " = " + rhsCode + ";" + G.NL);  //for instance "ScalarVal_ScalarVal temp117 = f()"
+                    //            node.Code.A(className + " " + tempName + " = " + rhsCode + ";" + G.NL);  //for instance "ScalarVal_ScalarVal temp117 = f()"                            
                     //            node.Code.A(nodeCodeTemp);
                     //        }
-
+                            
                     //    }
                     //    break;
                     case "ASTYES":
@@ -6290,7 +6271,7 @@ namespace Gekko.Parser.Gek
                         {
                             node.Code.CA("%$");
                         }
-                        break;
+                        break;                   
 
                 }
             }  //end of switch on node.Text AFTER sub-nodes are done
@@ -6298,7 +6279,7 @@ namespace Gekko.Parser.Gek
 
             ////if (relativeDepth == 1)
             //{
-            //    //#982375: if it is 0, walk the sub-tree to see...
+            //    //#982375: if it is 0, walk the sub-tree to see...                  
             //    bool gotoTarget = false;
             //    if (w.wh != null && w.wh.isGotoOrTarget) gotoTarget = true;
 
@@ -6311,12 +6292,12 @@ namespace Gekko.Parser.Gek
             //        {
             //            if (Globals.special.ContainsKey(node.Text))
             //            {
-            //                //do nothing
+            //                //do nothing                        
             //            }
             //            else
             //            {
-            //                //#2384328423
-            //                putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL;
+            //                //#2384328423                        
+            //                putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`Â¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL;
             //            }
             //        }
             //        string addText = null;
@@ -6325,18 +6306,18 @@ namespace Gekko.Parser.Gek
             //            addText = w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
             //        }
             //        node.Code.Prepend(putInBefore + addText);
-            //    }
-            //}
+            //    }                
+            //}         
 
             bool isGoto = false;
             if (w.wh != null && w.wh.isGotoOrTarget) isGoto = true;
-
+            
             if (!isGoto)
-            {
+            {                
 
                 if (relativeDepth == 1)
                 {
-                    //#982375: if it is 0, walk the sub-tree to see...
+                    //#982375: if it is 0, walk the sub-tree to see...                  
 
                     //HACK #438543
                     if (Globals.special.ContainsKey(node.Text))
@@ -6349,8 +6330,8 @@ namespace Gekko.Parser.Gek
                     }
                     else
                     {
-                        //#2384328423
-                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
+                        //#2384328423                        
+                        string putInBefore = G.NL + Globals.splitStart + Num(node) + G.NL + "p.SetText(@`Â¤" + node.Line + "`); " + Globals.gekkoSmplInitCommand + G.NL + w.wh?.localInsideLoopVariables + G.NL + w.wh?.localFuncs?.ToString() + G.NL;
                         node.Code.Prepend(putInBefore);
                     }
 
@@ -6362,11 +6343,11 @@ namespace Gekko.Parser.Gek
 
             if (node != null && absoluteDepth == 0)
             {
-                //returning from the whole tree
+                //returning from the whole tree                
                 //node.Code.A(Globals.splitSTART);
                 foreach (ASTNode child in node.ChildrenIterator())
-                {
-                    node.Code.A(child.Code + G.NL);
+                {                    
+                    node.Code.A(child.Code + G.NL);                
                 }
                 //node.Code.A(Globals.splitSTOP);
             }
@@ -6376,13 +6357,43 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static string MaybeControlledSet(ASTNode node)
+        {
+            string rv = null;
+            
+            string listName = GetSimpleHashName(node);
+            if (listName != null)
+            {
+                if (node.Parent != null && node.Parent.listLoopAnchor != null && node.Number == 2)
+                {
+                    //this is #i in sum(#i, ...) or unfold(#i, ...). Note that the latter function is artificial, captures uncontrolled sets.
+                    return rv;  //null
+                }
+                TwoStrings two = SearchUpwardsInTree2(node.Parent, listName);
+                if (two != null) rv = two.s1;
+            }
+            return rv;
+        }
+
+        private static string MaybeControlledSet777(ASTNode node, string code)
+        {
+            string listName = GetSimpleHashName(node);
+            if (listName != null)
+            {
+                TwoStrings two = SearchUpwardsInTree2(node.Parent, listName);
+                if (two != null) code = two.s1;
+            }
+
+            return code;
+        }
+
         private static string GetParametersInAList(ASTNode node, int numberOfParameters, int j)
         {
             string vars = null;
             for (int i = 0; i < numberOfParameters; i++)
             {
-                if (j == 0) vars += ", GekkoArg " + node.functionDef[i].internalName + "_func"; //type is checked later on
-                else vars += ", " + node.functionDef[i].internalName + "_func"; //type is checked later on
+                if (j == 0) vars += ", GekkoArg " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
+                else vars += ", " + node.functionDef[i].internalName + "_func"; //type is checked later on                                    
             }
             return vars;
         }
@@ -6395,19 +6406,19 @@ namespace Gekko.Parser.Gek
         }
 
         //private static void FunctionHelper3(ASTNode node, int lagIndex, int lagIndexOffset, List<string> args, int i)
-        //{
+        //{            
         //    args.Add(node[i].Code.ToString());
         //    //args += ", " + node[i].Code;
         //}
 
         private static void FunctionHelper2(ASTNode node, List<string> args, int i)
         {
-
+            
                 string result = GetFuncArgumentCode(node, i);
                 args.Add(result);
                 //args += ", " + result;
-
-
+            
+            
 
             //return args;
         }
@@ -6499,7 +6510,7 @@ namespace Gekko.Parser.Gek
 
         private static string GetFuncArgumentCode(ASTNode node, int i)
         {
-
+            
             string alternative = "null";
 
             string c = "spml" + ++Globals.counter;
@@ -6509,11 +6520,11 @@ namespace Gekko.Parser.Gek
             string result = "new GekkoArg((" + c + ") => " + original + ", " + "(" + c + ") => " + alternative + ")";
             return result;
         }
-
+        
         private static string OperatorHelper(ASTNode node, int i)
         {
             //This helper is just to mark the two places it is used
-            if (node != null) return "o" + Num(node);
+            if (node != null) return "o" + Num(node);                       
             return "O.AdjustT0(" + Globals.smpl + ", " + i + ")";
             throw new GekkoException();
         }
@@ -6543,7 +6554,7 @@ namespace Gekko.Parser.Gek
         private static string LocalCode3(string num)
         {
             return "ESeriesMissing r1_" + num + " = Program.options.series_array_print_missing; ESeriesMissing r2_" + num + " = Program.options.series_array_calc_missing; ESeriesMissing r3_" + num + " = Program.options.series_data_missing; try {" + G.NL + "O.HandleOptionBankRef1(o" + num + ".opt_bank, o" + num + ".opt_ref); O.HandleMissing1(o" + num + ".opt_missing);" + G.NL;
-        }
+        }        
 
         private static string LocalCode4(string num)
         {
@@ -6651,9 +6662,9 @@ namespace Gekko.Parser.Gek
                 parent = node.Parent;  //cannot be null
                 while (true)
                 {
-                    if (parent == null) break;  //just for ultra safety, will not happen
+                    if (parent == null) break;  //just for ultra safety, will not happen                    
                     if (parent.Text == "ASTASSIGNMENT")
-                    {
+                    {                        
                         type = parent[3].Text;
                         if (G.Equal(type, "var2")) type = "var";
                         break;
@@ -6701,7 +6712,7 @@ namespace Gekko.Parser.Gek
                     G.Writeln2("*** ERROR: At present, only scalar variables (%) are allowed as FOR loop variablse");
                     throw new GekkoException();
                 }
-
+                
                 rv.Add(varname);
             }
             return rv;
@@ -6732,9 +6743,9 @@ namespace Gekko.Parser.Gek
                     xx = child[1].Code.ToString();
                 }
                 node.Code.A(child[0].Code + ", " + xx);
-                if (i < node.ChildrenCount() - 1) node.Code.A(", ");
+                if (i < node.ChildrenCount() - 1) node.Code.A(", ");                
             }
-        }
+        }        
 
         private static string[] IsGamsSumFunctionOrUnfoldFunction(ASTNode node, string functionName)
         {
@@ -6765,16 +6776,16 @@ namespace Gekko.Parser.Gek
                 //success, do nothing
             }
             else
-            {
+            {                
                 if (G.Equal(functionName, "sum)"))
                 {
                     //extra check, this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
                     int[] found = new int[1];
                     WalkASTToCheckSumFunction(node[2], found);
-                    if (found[0] == 0) rv = null;
+                    if (found[0] == 0) rv = null;  
                 }
             }
-
+            
             return rv;
         }
 
@@ -6855,7 +6866,7 @@ namespace Gekko.Parser.Gek
             }
             return rv;
         }
-
+        
         private static string GetLoopNameCs(ASTNode node, string i)
         {
             return "loop" + Num(node) + "_" + i;
@@ -6874,46 +6885,12 @@ namespace Gekko.Parser.Gek
             if (functionName == "string") functionName = "tostring";
             return functionName;
         }
-
-        //private static void SearchUpwardsInTree(ASTNode node, out int timeLoopDepth, out ASTNode parentTimeLoop)
-        //{
-        //    timeLoopDepth = 0;
-        //    ASTNode tmp = node.Parent;
-        //    parentTimeLoop = null;
-        //    while (tmp != null)
-        //    {
-        //        bool ok = false;
-
-        //        if (
-
-        //               (tmp.Text == "ASTFUNCTION" && (Globals.lagFunctions.Contains(tmp[0].Text.ToLower()) || tmp[0].Text.ToLower() == "sum"))  //check that sum is gams-like
-        //            || tmp.Text == "ASTOLSELEMENT"
-        //            || tmp.Text == "ASTPRTELEMENT"
-        //            || tmp.Text == "ASTTABLESETVALUESELEMENT"
-        //            || tmp.Text == "ASTSERIES"
-        //            || tmp.Text == "ASTGENR"
-        //            || tmp.Text == "ASTGENRLHSFUNCTION"
-        //            || tmp.Text == "ASTGENRLISTINDEXER"
-        //            || tmp.Text == "ASTRETURNTUPLE"
-        //            || (G.Equal(tmp.Text, "series") && (tmp.Parent != null && tmp.Text == "ASTTUPLEITEM") && (tmp.Parent.Parent != null && tmp.Parent.Text == "ASTTUPLE"))
-
-        //            ) ok = true;
-
-        //        if (ok)
-        //        {
-        //            timeLoopDepth++;
-        //            if (parentTimeLoop == null) parentTimeLoop = tmp;  //only first one
-        //        }
-        //        tmp = tmp.Parent;
-        //    }
-        //}
-
-
+        
         private static TwoStrings SearchUpwardsInTree2(ASTNode node, string listName)
         {
             //Looks for list loop anchor, for instance looping in sum() or unfold()  -- or the left-hand side controlled lists in SERIES looping (like x[#i] = y[#i] + ...)
             ASTNode tmp = node.Parent;
-            TwoStrings rv = null;
+            TwoStrings rv = null;         
             while (tmp != null)
             {
                 bool ok = false;
@@ -6928,7 +6905,7 @@ namespace Gekko.Parser.Gek
             return rv;
         }
 
-
+        
         private static string SearchUpwardsInTree3(ASTNode node, string varName)
         {
             //Looking for function defintion (bound arguments), or for loop vars
@@ -6936,8 +6913,8 @@ namespace Gekko.Parser.Gek
             ASTNode parent = null;
             string rv = null;
             while (tmp != null)
-            {
-                if (tmp.functionDefAnchor != null && tmp.functionDefAnchor.ContainsKey(varName))
+            {                
+                if (tmp.functionDefAnchor != null && tmp.functionDefAnchor.ContainsKey(varName))                
                 {
                     parent = tmp;
                     rv = tmp.functionDefAnchor[varName];
@@ -6958,8 +6935,8 @@ namespace Gekko.Parser.Gek
         {
             //finds out if the variable is a LHS (left-side) variable
             //returns null if RHS or (LHS and there is a ASTDOTORINDEXER or ASTDOLLOARabove, the a in x.a, or the a in y $ (a == 1) = 100;
-
-            ASTNode tmp = node;
+            
+            ASTNode tmp = node;            
             string rv = null;
             while (tmp != null)
             {
@@ -6991,7 +6968,7 @@ namespace Gekko.Parser.Gek
 
         private static bool SearchUpwardsInTree5(ASTNode node)
         {
-            //finds out if the variable is inside a PRINT statement
+            //finds out if the variable is inside a PRINT statement         
             ASTNode tmp = node;
             string rv = null;
             while (tmp != null)
@@ -7014,7 +6991,7 @@ namespace Gekko.Parser.Gek
             }
             return false;
         }
-
+                
         private static bool SearchUpwardsInTree7(ASTNode node)
         {
             //finds out if node is inside sum() function of type sum(#x, ...)
@@ -7031,7 +7008,7 @@ namespace Gekko.Parser.Gek
                         //this is a gams-like sum
                         return true;
                     }
-                }
+                }                 
                 tmp = tmp.Parent;
             }
             return false;
@@ -7041,7 +7018,7 @@ namespace Gekko.Parser.Gek
         {
             //finds highest sum() function of type sum(#x, ...)
             ASTNode tmp = node;
-            ASTNode highest = null;
+            ASTNode highest = null;            
             while (tmp != null)
             {
                 //if(IsGamsSumFunction(node, ))
@@ -7072,7 +7049,7 @@ namespace Gekko.Parser.Gek
                     parent = tmp;
                     rv = tmp.functionType;
                     break;
-                }
+                }                
                 tmp = tmp.Parent;
             }
             return rv;
@@ -7086,7 +7063,7 @@ namespace Gekko.Parser.Gek
             while (tmp != null)
             {
                 //if (node.Text == "ASTIFSTATEMENTS" || node.Text == "ASTELSESTATEMENTS" || node.Text == "ASTFUNCTIONDEFCODE" || node.Text == "ASTPROCEDUREDEFCODE")
-
+                
                 //if (tmp.Text == "ASTMAPITEM" || tmp.Text == "ASTFUNCTIONDEFCODE" || tmp.Text == "ASTPROCEDUREDEFCODE") return true;
                 if (tmp.Text == "ASTMAPITEM") return true;
                 tmp = tmp.Parent;
@@ -7096,7 +7073,7 @@ namespace Gekko.Parser.Gek
 
         private static void ResetUFunctionHelpers(W w)
         {
-            w.uFunctionsHelper = null;  //do not remove this line: important!
+            w.uFunctionsHelper = null;  //do not remove this line: important!      
             w.uListCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             w.uScalarCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             w.uTsCache = new Gekko.GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -7137,7 +7114,7 @@ namespace Gekko.Parser.Gek
                 node.Code.A(nameCode);
             }
             else
-            {
+            {                
                 string stringifyString = "false"; if (stringify) stringifyString = "true";
                 GekkoDictionary<string, string> listCache = GetListCache(w);
                 string s = null; listCache.TryGetValue(simpleIdent, out s);
@@ -7194,7 +7171,7 @@ namespace Gekko.Parser.Gek
             nodeCode += "o" + Num(node) + ".p = p;" + G.NL;
 
             //Quite an ugly hack. Problem is that with "LIST<direct>xx = 0, 1, 2" Gekko will try to convert 0 into a list and will
-            //throw an exception before O.List.Exe() is even called. So with <direct> we need to suppress the O.GetList()-code that
+            //throw an exception before O.List.Exe() is even called. So with <direct> we need to suppress the O.GetList()-code that 
             //puts stuff inside the elements.
             bool directOption = false;
             string extraCode = null;
@@ -7249,7 +7226,7 @@ namespace Gekko.Parser.Gek
 
         private static string HandleVal(ASTNode node, string childCode, W w)
         {
-            string nodeCodeTemp = null;
+            string nodeCodeTemp = null;            
             ASTNode node0 = node[0];
             if (node[0].Text == "?")
             {
@@ -7259,7 +7236,7 @@ namespace Gekko.Parser.Gek
             {
                 if (node0.nameSimpleIdent != null)
                 {
-                    //It is a simple ident code, such as VAL x = ...
+                    //It is a simple ident code, such as VAL x = ...                                
                     string tempDoubleCs = "tempDouble" + ++Globals.counter;
                     nodeCodeTemp += "double " + tempDoubleCs + " = (" + childCode + ").GetVal(" + Globals.smpl + ");" + G.NL;
                     string notUsed = null;
@@ -7268,7 +7245,7 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
-                    //fancy name like VAL x|%y = ... --> this will be slow!
+                    //fancy name like VAL x|%y = ... --> this will be slow!                                
                     nodeCodeTemp += "O.SetValData(" + Globals.smpl + ", " + node0.Code + ", " + childCode + ");" + G.NL;
                 }
             }
@@ -7286,7 +7263,7 @@ namespace Gekko.Parser.Gek
             nodeCode += "foreach (GekkoTime t2 in new GekkoTimeIterator(o" + numNode + ".t1, o" + numNode + ".t2))" + G.NL;
             nodeCode += GekkoTimeIteratorStartCode(w, node);
             nodeCode += "  double data = O.ConvertToVal(" + childCodeRhs + ", t);" + G.NL;  //uuu
-            nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).
+            nodeCode += "if(o" + numNode + ".lhs == null) o" + numNode + ".lhs = O.GetTimeSeries(" + childCodeLhsName + ");" + G.NL; //we want the rhs to be constructed first, so that SERIES xx1 = xx1; fails if y does not exist (otherwist it would have been autocreated).                        
             //nodeCode += "  double dataLag = O.ConvertToVal(o" + numNode + ".lhs, t.Add(-1));" + G.NL;
             if (lhsFunction == null)
             {
@@ -7327,7 +7304,7 @@ namespace Gekko.Parser.Gek
 
         private static string GekkoTimeIteratorEndCode()
         {
-            return Globals.endGekkoTimeIteratorCode;
+            return Globals.endGekkoTimeIteratorCode;            
         }
 
         //private static string GekkoListIteratorEndCode()
@@ -7336,9 +7313,9 @@ namespace Gekko.Parser.Gek
         //}
 
         private static string GekkoTimeIteratorStartCode(W w, ASTNode node)
-        {
+        {            
             string nodeCode = Globals.startGekkoTimeIteratorCode;
-            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;
+            if (node.timeLoopNestCode != null) nodeCode += node.timeLoopNestCode;                      
             return nodeCode;
         }
 
@@ -7353,7 +7330,7 @@ namespace Gekko.Parser.Gek
         //{
         //    //Tuples 2-10 are now predefined.
 
-        //    //if(tupleClasses.ContainsKey(className)) return;  //do not duplicate, has been encountered before/elsewhere
+        //    //if(tupleClasses.ContainsKey(className)) return;  //do not duplicate, has been encountered before/elsewhere            
         //    ////a bit inefficient, but oh well
         //    //string ss = null;
         //    //string uu = null;
@@ -7369,12 +7346,12 @@ namespace Gekko.Parser.Gek
         //    //if (vv.EndsWith(", ")) vv = vv.Substring(0, vv.Length - 2);
         //    //headerCs.AppendLine("public class " + className + " { " + ss + G.NL + "public " + className + "(" + vv + ") {" + G.NL + uu + "} }");
         //    //tupleClasses.Add(className, true);
-        //}
+        //}        
 
         private static string Num(ASTNode node)
         {
             return "" + node.commandLinesCounter;
-        }
+        }        
 
         private static string EmitLocalCacheForTimeLooping(W wh2)
         {
@@ -7396,16 +7373,16 @@ namespace Gekko.Parser.Gek
         //{
         //    bool stringify = false;
         //    if (node.ChildrenCount() > 0 && (node[0].Text == "ASTDOLLARPERCENTNAMESIMPLE" || node[0].Text == "ASTDOLLARPERCENTPAREN")) stringify = true;
-
+            
         //    bool transformationAllowed = true;
         //    bool isPartOfComposedName = false;
-
-        //    if ((node.Number == 1 && node.Parent.Text == "ASTNAMEWITHBANK")
+            
+        //    if ((node.Number == 1 && node.Parent.Text == "ASTNAMEWITHBANK") 
         //        || node.Parent.Text == "ASTNAME"
         //        || node.Parent.Text == "ASTCURLY"
         //        || node.Parent.Text == "ASTCURLYSIMPLE")
         //    {
-        //        //For instance base:%s. If %s is NAME 'fy', this would be equal to base:fy.
+        //        //For instance base:%s. If %s is NAME 'fy', this would be equal to base:fy.                            
         //        //In that case, O.GetScalar must not be allowed to transform the string/name into a timeseries,
         //        //because we are going to look up the timeseries in the databank (in the example: base databank).
         //        //Therefore we call an overload of O.GetScalar()
@@ -7417,15 +7394,15 @@ namespace Gekko.Parser.Gek
         //        if (node.Parent.Text == "ASTLISTITEM")
         //        {
         //            transformationAllowed = false;
-        //        }
+        //        }                
         //    }
 
         //    if ((node.Parent.Text == "ASTNAME" && node.Parent.ChildrenCount() > 1)
         //        || (node.Parent.Text == "ASTCURLY" && node.Parent.ChildrenCount() == 1))
         //    {
-        //        isPartOfComposedName = true; //composed names cannot be looked up in cache
+        //        isPartOfComposedName = true; //composed names cannot be looked up in cache                                            
         //    }
-
+            
         //    string scalarSimpleIdent = null;
         //    if (isCurlyWithoutPercent)
         //    {
@@ -7450,14 +7427,14 @@ namespace Gekko.Parser.Gek
         //            node.Code.A(fa);  //????????? What is this????????
         //        }
         //        else
-        //        {
+        //        {                   
 
         //            //hmmm why do we have isPartOfComposedName and transformationAllowed at the same time
         //            //is it not the same thing?
 
         //            if (!isPartOfComposedName && w.wh.localStatementCache != null)
         //            {
-        //                //not for instance a%s or %(%s) but clean %s, and part of GENR statement
+        //                //not for instance a%s or %(%s) but clean %s, and part of GENR statement                        
         //                //In that case, we look for the variable in the local GENR cache
         //                string refCode = "ts" + ++Globals.counter;
 
@@ -7469,11 +7446,11 @@ namespace Gekko.Parser.Gek
         //                if (stringify) s = "true";
 
         //                fallBackCode = "O.GetScalar(`" + scalarSimpleIdent + "`, " + t + ", " + s + ")";
-
+                        
         //                string xx = null; w.wh.localStatementCache.TryGetValue(fallBackCode, out xx);
         //                if (xx != null)
         //                {
-        //                    //This complicated timeseries (or scalar) has been seen before in this particular GENR statement
+        //                    //This complicated timeseries (or scalar) has been seen before in this particular GENR statement                        
         //                    node.Code.CA(xx);
         //                }
         //                else
@@ -7507,8 +7484,8 @@ namespace Gekko.Parser.Gek
                 //this scalar name has not been encountered before
                 scalarNameInGlobalCache = "scalar" + ++Globals.counter;
                 scalarCache.Add(scalarSimpleIdent, scalarNameInGlobalCache);
-                headerCs.AppendLine("public static IVariable " + scalarNameInGlobalCache + " = null;");
-            }
+                headerCs.AppendLine("public static IVariable " + scalarNameInGlobalCache + " = null;");                
+            }            
             //using the scalar name (for instance scalar117) found or created in the global cache
             if (type == EScalarRefType.OnRightHandSide)
             {
@@ -7537,25 +7514,25 @@ namespace Gekko.Parser.Gek
                 //see also SetMatrixData(), should that be used??
                 scalarCs = "O.SetMatrixFromCache(ref " + scalarNameInGlobalCache + ", `" + scalarSimpleIdent + "`, " + rhsCs + ");" + G.NL;
             }
-            else throw new GekkoException();
+            else throw new GekkoException();    
             return scalarCs;
-        }
+        }        
 
         private static string FindFunctionArguments(ASTNode node, W wh2, string simpleIdent)
-        {
+        {            
             if (wh2.uFunctionsHelper != null)
             {
                 foreach (FunctionArgumentsHelperElements fah in wh2.uFunctionsHelper.storage)
                 {
                     if (G.Equal(fah.parameterName, simpleIdent))
                     {
-                        //this list is a function argument, use that
+                        //this list is a function argument, use that                        
                         return fah.parameterCode;
                     }
                 }
             }
             return null;
-        }
+        }        
 
         private static void GetCodeFromAllChildren(ASTNode node)
         {
@@ -7599,7 +7576,7 @@ namespace Gekko.Parser.Gek
         //    {
         //        bankNumberCode = "1";  //default: Work
         //    }
-        //    string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";
+        //    string code = "O.GetListWithBankPrefix(" + node[0].Code + ", " + node[1].Code + ", " + bankNumberCode + ")";            
         //    return code;
         //}
 
@@ -7701,7 +7678,7 @@ namespace Gekko.Parser.Gek
         //            //has not been seen before
         //            string ivWithNumber = "iv" + ++Globals.counter;
         //            tsCache.Add(simpleHash, ivWithNumber);
-        //            GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...
+        //            GetHeaderCs(wh2).AppendLine("public static IVariable " + ivWithNumber + " = null;");  //cannot set it to ScalarVal since it may change type...                    
         //            node.Code.A("O.GetTimeSeriesFromCache(ref " + ivWithNumber + ", `" + simpleHash + "`, " + bankNumberCode + isLhsSoCanAutoCreate + ")");
         //        }
         //        else
@@ -7711,7 +7688,7 @@ namespace Gekko.Parser.Gek
         //    }
         //    else if (choice == 3)
         //    {
-        //        //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)
+        //        //This means that the name is complicated like %x or b:%x or %y:a or %x:%y (or fx%i)                
         //        if (wh2.wh.seriesHelper != WalkHelper.seriesType.SeriesLhs && wh2.wh.localStatementCache != null)
         //        {
         //            //GENR statement for instance, maybe also VAL if indexer fY[2010]??
@@ -7721,8 +7698,8 @@ namespace Gekko.Parser.Gek
         //            string xx = null; wh2.wh.localStatementCache.TryGetValue(fallBackCode2, out xx);
         //            if (xx != null)
         //            {
-        //                //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement
-        //                code = xx;
+        //                //This complicated timeseries (or scalar) has been seen before in this particular GENR/PRT statement                        
+        //                code = xx;                                                
         //            }
         //            else
         //            {
@@ -7776,8 +7753,8 @@ namespace Gekko.Parser.Gek
                 }
                 else if (node.Parent.Text == "ASTNAMEWITHDOT")
                 {
-                    //For parent ASTNAMEWITHBANK nothing is ignored
-                    minus = "-";
+                    //For parent ASTNAMEWITHBANK nothing is ignored 
+                    minus = "-";                    
                 }
             }
             return minus;
@@ -7843,7 +7820,7 @@ namespace Gekko.Parser.Gek
         //    string bank = split[0].Trim();
         //    string variable = split[1].Trim();
         //    string hash2 = "O.ConvertToString(" + bank + "), O.ConvertToString(" + variable + ")";
-
+                        
         //    if (isSimple)
         //    {
         //        //name like adambk:fy, not bank%1:fx%i
@@ -7863,11 +7840,11 @@ namespace Gekko.Parser.Gek
         //            //TODO TODO TODO TODO
         //            //TODO TODO TODO TODO do something intellingent regarding uploading
         //            //TODO TODO TODO TODO
-        //            //TODO TODO TODO TODO
+        //            //TODO TODO TODO TODO                
 
         //            if (node2.Text == "ASTGENR" || node2.Text == "ASTVAL" || node2.Text == "ASTSTRING" || node2.Text == "ASTDATE" || node2.Text == "ASTUPD")
         //            {
-        //                node2.CodeSentFromSubTree += "IVariable " + tsWithNumber + " = new MetaTimeSeries(O.GetTS(" + hash2 + "));" + G.NL;
+        //                node2.CodeSentFromSubTree += "IVariable " + tsWithNumber + " = new MetaTimeSeries(O.GetTS(" + hash2 + "));" + G.NL;                        
         //                succes = true;
         //                break;
         //            }
@@ -7892,14 +7869,14 @@ namespace Gekko.Parser.Gek
         //        }
         //    }
         //    return;
-        //}
+        //}        
 
         private static string AddOperator(string type, string s, string parentType, ASTNode node)
         {
-            string o = "o" + Num(node) + ".operators";
+            string o = "o" + Num(node) + ".operators"; 
             if (parentType == "ASTPRTELEMENTOPTIONFIELD") o = "ope" + Num(node) + ".operators";
             return o + ".Add(new OptString(`" + type + "`, O.ConvertToString(" + s + ")));" + G.NL;
-        }
+        }        
 
         //private static string CondenseChildrenNodesToList(ASTNode node)  //last arg. just so that it is more likely that the user remembers to augment Globals.counter before call
         //{
@@ -7930,7 +7907,7 @@ namespace Gekko.Parser.Gek
             {
                 st.Append("xx{#}.Add({0});", child);
             }
-        }
+        }        
 
         private static void CreateOptionVariable(ASTNode node, bool block, StringBuilder s, ref string o)
         {
@@ -8063,14 +8040,14 @@ namespace Gekko.Parser.Gek
                 }
                 else throw new GekkoException();
             }
-
+            
             s.Append(s2);
             s.Append(s1);
             if (!block) o = s1.ToString();
             else o = s2.ToString() + s1.ToString();
             s.Append(" = ");
             s.Append(s1a);
-            s.AppendLine(";");
+            s.AppendLine(";");                      
 
             StringBuilder s3 = new StringBuilder();
             s3.Append("option_");
@@ -8097,9 +8074,9 @@ namespace Gekko.Parser.Gek
             sss = sss.Replace("true", "`yes`");
             sss = sss.Replace("false", "`no`");
             sss = "(" + sss + ").ToString().ToLower()";  //may be an enum
-
+            
             if(!block) s.AppendLine("G.Writeln(`option " + s1.ToString() + " = ` + " + sss + " + ``);");
-
+            
         }
 
         private static void CreateOptionVariableOLD(ASTNode node, StringBuilder s, ref string o)
@@ -8194,7 +8171,7 @@ namespace Gekko.Parser.Gek
                         }
                         else
                         {
-                            s7 = "O.ConvertToString(" + child[0].Code + ")";
+                            s7 = "O.ConvertToString(" + child[0].Code + ")";                            
                         }
                         if (G.Equal(node[0].Text, "freq"))  //OPTION freq = ...
                         {
@@ -8211,7 +8188,7 @@ namespace Gekko.Parser.Gek
                 }
                 else throw new GekkoException();
             }
-            o = s1.ToString();
+            o = s1.ToString();            
             s.Append(s2);
             s.Append(s1);
             s.Append(" = ");
@@ -8236,9 +8213,9 @@ namespace Gekko.Parser.Gek
     }
 
     public class W
-    {
+    {         
         //W is created when running a .cmd/.gcm file
-        public WalkHelper wh = null;  //is created when encountering a Gekko command (like SERIES, PRT, etc.)
+        public WalkHelper wh = null;  //is created when encountering a Gekko command (like SERIES, PRT, etc.)        
         public Dictionary<int, List<string>> prtItems;
         public Dictionary<int, List<string>> prtLabels;
         public string fileNameContainingParsedCode = null;
@@ -8250,17 +8227,17 @@ namespace Gekko.Parser.Gek
         public GekkoDictionary<string, string> tsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public StringBuilder headerCs = new StringBuilder(); //stuff to be put at the very start.
         public StringBuilder headerMethodTsCs = new StringBuilder(); //stuff to clear Series pointers
-        public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers
+        public StringBuilder headerMethodScalarCs = new StringBuilder(); //stuff to clear scalar pointers   
         public StringBuilder headerExpressions = new StringBuilder();
 
         //public GekkoDictionary<string, bool> functionUserDefined = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, bool> tupleClasses = new GekkoDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 
-        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.
+        public StringBuilder uHeaderCs = new StringBuilder(); //stuff to be put at the very start.        
         public FunctionArgumentsHelper uFunctionsHelper = null; //important that it starts out as null here
         public GekkoDictionary<string, string> uScalarCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public GekkoDictionary<string, string> uListCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        public GekkoDictionary<string, string> uTsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        public GekkoDictionary<string, string> uTsCache = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);        
     }
 
     public class FunctionArgumentsHelperElements
@@ -8294,7 +8271,7 @@ namespace Gekko.Parser.Gek
         public GekkoStringBuilder localFuncs = null;
         public string localInsideLoopVariables = null;  //probably obsolete now
 
-        public GekkoDictionary<string, string> localStatementCache = null;
+        public GekkoDictionary<string, string> localStatementCache = null;        
         public seriesType seriesHelper = seriesType.None;
 
         public GekkoDictionary<string, string> seriesHelperListNames = null;
@@ -8302,7 +8279,7 @@ namespace Gekko.Parser.Gek
 
         public string currentCommand = null;
         public bool isGotoOrTarget = false;
-
+             
     }
 
     public class OPrt : O_OLD
@@ -8345,4 +8322,3 @@ namespace Gekko.Parser.Gek
 
     }
 }
-
