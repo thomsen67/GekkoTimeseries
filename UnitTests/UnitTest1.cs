@@ -2500,6 +2500,54 @@ namespace UnitTests
             Assert.AreEqual(table.Get(4, 2).number, 12.0000d, 0.0001);
         }
 
+        [TestMethod]
+        public void _Test_SumUnfold()
+        {
+            // setting up the tests
+            // setting up the tests ----------------------------------------------
+            // setting up the tests
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("xx = series(2);");
+            I("xx[a, x] = (1,2,3);");
+            I("xx[b, x] = (4,5,6);");
+            I("xx[a, y] = (7,8,9);");
+            I("xx[b, y] = (14,15,16);");
+            I("yy = series(2);");
+            I("yy[a, x] = (11,12,13);");
+            I("yy[b, x] = (14,15,16);");
+            I("yy[a, y] = (17,18,19);");
+            I("yy[b, y] = (24,25,26);");
+            I("zz = (3, 2, 1);");
+            I("%v = 12;");
+
+            I("#m1 = ('a', 'b');");
+            I("#m2 = ('x', 'y');");
+            I("#m3 = ('a', );");
+            I("#m4 = ('b', );");
+
+            I("xxax = (1,2,3);");
+            I("xxbx = (4,5,6);");
+            I("xxay = (7,8,9);");
+            I("xxby = (14,15,16);");
+
+            I("CLONE;");
+                       
+            Table table = null;
+            I("p <n> sum(#m1, xx[#m1, x]);");
+            table = Globals.lastPrtOrMulprtTable;
+
+            Assert.AreEqual(table.Get(3, 1).CellText.TextData[0], "2001"); //why is it not a date?
+            Assert.AreEqual(table.Get(4, 1).CellText.TextData[0], "2002"); //why is it not a date?
+            Assert.AreEqual(table.Get(5, 1).CellText.TextData[0], "2003"); //why is it not a date?
+            Assert.AreEqual(table.Get(1, 2).CellText.TextData[0], "sum(#m1");
+            Assert.AreEqual(table.Get(2, 2).CellText.TextData[0], ", xx[#m1, x])");
+            Assert.AreEqual(table.Get(3, 2).number, 5.0000d, 0.0001);
+            Assert.AreEqual(table.Get(4, 2).number, 7.0000d, 0.0001);
+            Assert.AreEqual(table.Get(5, 2).number, 9.0000d, 0.0001);
+        }
+
 
         [TestMethod]
         public void _Test_SumUnfoldDollarPrint()

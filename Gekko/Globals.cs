@@ -47,6 +47,7 @@ namespace Gekko
         public static bool lagfix = true;
 
         public static bool oldcontrol = true;
+        public static bool oldcontrol2 = false;
 
         public static bool decompSubstitute = false;
 

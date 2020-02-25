@@ -3322,9 +3322,9 @@ namespace Gekko.Parser.Gek
                                     string listName = GetSimpleHashName(child[0]);
                                     string internalName = null;
                                     string internalFunction = null;
-                                    if (Globals.oldcontrol && listName != null)
+                                    if (Globals.oldcontrol && listName != null)                                    
                                     {
-                                        TwoStrings two= SearchUpwardsInTree2(node, listName);
+                                        TwoStrings two = SearchUpwardsInTree2(node, listName);
                                         if (two != null)
                                         {
                                             internalName = two.s1;
@@ -4389,7 +4389,7 @@ namespace Gekko.Parser.Gek
                                     //  when looking up.
 
                                     string code = null;
-                                    if (!Globals.oldcontrol) code = MaybeControlledSet(node);
+                                    if (!Globals.oldcontrol2) code = MaybeControlledSet(node);
                                     if (code != null)
                                     {
                                         //a controlled list, like y[#i] = x[#i] inside an implicit loop or sum loop over #i.
