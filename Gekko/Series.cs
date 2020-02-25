@@ -2530,12 +2530,20 @@ namespace Gekko
 
         public double ConvertToVal()
         {
-            G.Writeln2("*** ERROR: Cannot extract a val from " + G.GetTypeString(this) + " type");
-            throw new GekkoException();
+            double v = double.NaN;
+            if (this.type == ESeriesType.Timeless)
+            {
+                v = this.GetTimelessData();
+            }
+            else
+            {
+                G.Writeln2("*** ERROR: Cannot convert a non-timeless SERIES to a VAL");
+                throw new GekkoException();
+            }
+            return v;
         }
 
-        public string ConvertToString()
-        {
+        public string ConvertToString()        {
             G.Writeln2("*** ERROR: Cannot convert series to string (series name: '" + this.GetName() + "')");
             throw new GekkoException();
         }

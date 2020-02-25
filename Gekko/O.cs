@@ -4362,6 +4362,10 @@ namespace Gekko
             bool specialAdd = false;
             if (x1.Type() == EVariableType.String && x2.Type() == EVariableType.Val)
             {
+                //This would normally produce an error, but we allow it for array-series with
+                //elements that are integers stored as strings. For instance x['30']. In that case,
+                //running a loop over #i = ('30', '31') is possible via x[#i], but here we allow 
+                //x[#i+1] or x[#i-1] instead of the more tedious x[(#i.val()+1).string()].
                 string x1_string = ((ScalarString)x1).string2;
                 bool x1IsInteger = false;
                 int i1 = 0;

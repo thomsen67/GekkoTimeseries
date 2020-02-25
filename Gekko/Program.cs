@@ -19014,9 +19014,12 @@ namespace Gekko
         {
             //Performs these transformations:
             //- GAMS functions are not touched (log, etc)
+            //-      but sqr() becomes sqrt()
             //- sum() function has # put in on sets
             //- parameter t is removed, and lags/leads like t-1 are transformed into [-1] etc. So x(a, t) --> x[#a], and x(t) --> x not x().
             //- strings have quotes removed, x['a'] --> x[a]
+            //- stuff like a.val becomes #a.val(), whereas t.val is ignored for now
+            //
 
             if (node.HasNoChildren())
             {
@@ -19082,6 +19085,10 @@ namespace Gekko
                                 }
                             }
                         }
+                        else if (node.s == "val")
+                        {
+
+                        }
                         else
                         {
                             //first we check for stuff like a15t100(a), where a15t100 is a set, not a variable
@@ -19104,7 +19111,7 @@ namespace Gekko
                             {
                                 //now we look at the arguments, x(a1, a2, 's', t) or x(a1, a2, 's', t-1) or x(a1, a2, 's')
                                 List<TokenHelperComma> split = nextNode.SplitCommas(true);
-                                
+
                                 for (int iSplit = 0; iSplit < split.Count; iSplit++)
                                 {
                                     TokenHelperComma helper = split[iSplit];
@@ -19115,11 +19122,6 @@ namespace Gekko
                                     else if (helper.list.storage.Count == 1)
                                     {
                                         //a single token in the slot , .... , so this is not an expression like t+1 etc.
-
-                                        //if (helper.list[0].s == "2099")
-                                        //{
-
-                                        //}
 
                                         if (helper.list[0].type == ETokenType.Word)
                                         {
@@ -19178,9 +19180,7 @@ namespace Gekko
                                                     parent.subnodes.storage.RemoveAt(id);
                                                     parent.subnodes.storage.Insert(id, nextNode2);
                                                     parent.subnodes.storage.Insert(id, nextNode1);
-                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
-
-
+                                                    parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok                                                   
 
                                                 }
                                             }
@@ -19549,7 +19549,7 @@ namespace Gekko
                     }
                     else
                     {
-                        eqCounter = ReadGamsModelEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
+                        eqCounter = ReadGamsEquation(sb1, sb2, eqCounter, equationsByVarname, equationsByEqname, tok, dependents, problems, G.Equal(o.opt_dump, "yes"));
                     }
                 }
             }
@@ -19748,7 +19748,7 @@ namespace Gekko
             }
         }
 
-        private static int ReadGamsModelEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
+        private static int ReadGamsEquation(StringBuilder sb1, StringBuilder sb2, int eqCounter, Dictionary<string, List<ModelGamsEquation>> equationsByVarname, Dictionary<string, List<ModelGamsEquation>> equationsByEqname,  TokenHelper tok, GekkoDictionary<string, string> dependents, List<string>problems, bool dump)
         {
             WalkTokensHelper wh = new WalkTokensHelper();
 

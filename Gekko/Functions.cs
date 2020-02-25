@@ -3426,8 +3426,16 @@ namespace Gekko
             }
             else if (x1.Type() == EVariableType.Series)
             {
-                G.Writeln2("*** ERROR: Cannot convert a SERIES to a DATE");
-                throw new GekkoException();
+                Series x1_series = x1 as Series;
+                if (x1_series.type == ESeriesType.Timeless)
+                {
+                    v = x1_series.GetTimelessData();
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: Cannot convert a non-timeless SERIES to a VAL");
+                    throw new GekkoException();
+                }                
             }
             return new ScalarVal(v);
         }

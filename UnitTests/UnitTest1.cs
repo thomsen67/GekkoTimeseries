@@ -9476,35 +9476,128 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void _Test_DecompGamsSpecifics()
-        {            
-            I("RESET; time 2000 2000;");            
+        public void _Test_DecompAndArraySeries()
+        {
+            I("RESET; time 2000 2000;");
             I("#i = ('10', '11');");
             I("#i0 = ('11',);");
-            I("y1 = series(1);");
-            I("y1[#i] $ (#i in '11') = 1;");
-            Series y1 = Program.databanks.GetFirst().GetIVariable("y1!a") as Series;
-            Assert.AreEqual(y1.dimensionsStorage.storage.Count, 1);
-            _AssertSeries(First(), "y1!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
-            
-            I("y2 = series(1);");
-            I("y2[#i] $ (#i0[#i]) = 1;");
-            Series y2 = Program.databanks.GetFirst().GetIVariable("y2!a") as Series;
-            Assert.AreEqual(y2.dimensionsStorage.storage.Count, 1);
-            _AssertSeries(First(), "y2!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            I("o = series(1);");
+            I("o[11] = timeless(1);");
+            I("x = series(1);");
+            I("x[#i-1] = #i.val()-5;");  //will get 5, 6 for x[9] and x[10]
 
-            I("y3 = series(1);");
-            I("y3[#i] $ (#i == '11') = 1;");
-            Series y3 = Program.databanks.GetFirst().GetIVariable("y3!a") as Series;
-            Assert.AreEqual(y3.dimensionsStorage.storage.Count, 1);
-            _AssertSeries(First(), "y3!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            if (true)
+            {
+                I("y1 = series(1);");
+                I("y1[#i] $ (#i in '11') = 1;");
+                Series y1 = Program.databanks.GetFirst().GetIVariable("y1!a") as Series;
+                Assert.AreEqual(y1.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y1!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            }
+
+            if (true)
+            {
+                I("y2 = series(1);");
+                I("y2[#i] $ (#i0[#i]) = 1;");
+                Series y2 = Program.databanks.GetFirst().GetIVariable("y2!a") as Series;
+                Assert.AreEqual(y2.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y2!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            }
+
+            if (true)
+            {
+                I("y3 = series(1);");
+                I("y3[#i] $ (#i == '11') = 1;");
+                Series y3 = Program.databanks.GetFirst().GetIVariable("y3!a") as Series;
+                Assert.AreEqual(y3.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y3!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            }
+
+            if (true)
+            {
+                I("y4 = series(1);");
+                I("y4[#i] $ (#i.val() > 10) = 1;");
+                Series y4 = Program.databanks.GetFirst().GetIVariable("y4!a") as Series;
+                Assert.AreEqual(y4.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y4!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
+            }
+
+            if (true)
+            {
+                I("y5 = series(1);");
+                I("y5[#i+1] $ (#i.val() > 10 and #i.val() < 12) = x[#i-1];");  //y[12] = x[10] = 6         
+                Series y5 = Program.databanks.GetFirst().GetIVariable("y5!a") as Series;
+                Assert.AreEqual(y5.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y5!a", new string[] { "12" }, EFreq.A, 2000, 1, 6d, sharedDelta);
+            }
+
+            if (true)
+            {
+                I("y6 = series(1);");  //#i runs over 10, 11, so the first condition filters 10 out, keeping 11. Also, o[11] = 1, so the two conditions amout to the same
+                I(@"block series array calc missing = zero; 
+                  y6[#i+1] $ (#i.val() > 10 and o[#i]) = 4; 
+                end;"); //block: else it will complain that o[10] does not exist.
+                Series y6 = Program.databanks.GetFirst().GetIVariable("y6!a") as Series;
+                Assert.AreEqual(y6.dimensionsStorage.storage.Count, 1);
+                _AssertSeries(First(), "y6!a", new string[] { "12" }, EFreq.A, 2000, 1, 4d, sharedDelta);
+            }
+
+        }
+
+        [TestMethod]
+        public void _Test_LogicalConditionsScalarAndSeries()
+        {
+            I("reset;");
+            I("time 2001 2003;");
+            I("o = 1, 0, 1;");
+            I("%o = 1;");
+            I("y1 $ (o == 1) = 100;");
+            I("y2 $ (%o == 1) = 100;");
+            _AssertSeries(First(), "y1!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2003, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2003, 100d, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("o = series(1);");
+            I("o[a] = 1, 0, 1;");
+            I("o2 = series(1);");
+            I("o2[a] = timeless(1);");
+            I("y1 $ (o[a] == 1) = 100;");
+            I("y2 $ (o2[a] == 1) = 100;");
+            _AssertSeries(First(), "y1!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", 2003, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", 2003, 100d, sharedDelta);
+
+            I("reset;");
+            I("time 2001 2003;");
+            I("o = series(1);");
+            I("o[a] = 1, 0, 1;");
+            I("o2 = series(1);");
+            I("o2[a] = timeless(1);");
+            I("y1 = series(1);");
+            I("y2 = series(1);");
+            I("#i = a,;");
+            I("y1[#i] $ (o[#i] == 1) = 100;");
+            I("y2[#i] $ (o2[#i] == 1) = 100;");
+            _AssertSeries(First(), "y1!a", new string[] { "a" }, 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y1!a", new string[] { "a" }, 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y1!a", new string[] { "a" }, 2003, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", new string[] { "a" }, 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", new string[] { "a" }, 2002, 100d, sharedDelta);
+            _AssertSeries(First(), "y2!a", new string[] { "a" }, 2003, 100d, sharedDelta);
+            I("y3 = series(1);");            
+            I("y3[#i] $ (o[#i] == 1 and o2[#i] == 1) = 100;");
+            _AssertSeries(First(), "y3!a", new string[] { "a" }, 2001, 100d, sharedDelta);
+            _AssertSeries(First(), "y3!a", new string[] { "a" }, 2002, 0d, sharedDelta);
+            _AssertSeries(First(), "y3!a", new string[] { "a" }, 2003, 100d, sharedDelta);
             
-            I("y4 = series(1);");
-            I("y4[#i] $ (#i.val() > 10) = 1;");
-            Series y4 = Program.databanks.GetFirst().GetIVariable("y4!a") as Series;
-            Assert.AreEqual(y4.dimensionsStorage.storage.Count, 1);
-            _AssertSeries(First(), "y4!a", new string[] { "11" }, EFreq.A, 2000, 1, 1d, sharedDelta);
-                        
         }
 
         [TestMethod]
@@ -19175,10 +19268,12 @@ namespace UnitTests
             Assert.AreEqual(m.colnames.Count, 4);
             I("PRT #a;");
 
-
-            I("time 2001 2004;");
-            I("#x = [1; 2; 3];");
-            I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
+            if (Globals.UNITTESTFOLLOWUP_important)
+            {
+                I("time 2001 2004;");
+                I("#x = [1; 2; 3];");
+                I("x = #x.unpack(<2001 2003>);");  //toosmalltoolarge error
+            }
 
         }
 
