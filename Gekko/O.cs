@@ -1402,6 +1402,62 @@ namespace Gekko
             return new List(m);
         }
 
+        public static bool IsTimelessSeries(IVariable x)
+        {
+            bool rv = false;
+            Series x_series = x as Series;
+            if (x_series != null && x_series.type == ESeriesType.Timeless) rv = true;
+            return rv;
+        }
+
+        private static IVariable Helper_LogicalAndOr(GekkoSmpl smpl, IVariable x, IVariable y, bool and)
+        {
+            //same logic in Equals(), StrictlyLargerThan() etc.
+            //hmm, comparing two 1x1 matrices will fail
+            IVariable rv = Globals.scalarVal0;
+            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            {
+                //must return a VAL, therefore special treatment
+                if (and)
+                {
+                    if (O.ConvertToVal(x) == 1d && O.ConvertToVal(y) == 1d) rv = Globals.scalarVal1;
+                    else rv = Globals.scalarVal0;
+                }
+                else
+                {
+                    if (O.ConvertToVal(x) == 1d || O.ConvertToVal(y) == 1d) rv = Globals.scalarVal1;
+                    else rv = Globals.scalarVal0;
+                }
+            }
+            else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
+            {
+                CheckFreq(x, y);  //checks freqs
+                Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
+                rv = rv_series;
+                foreach (GekkoTime t in smpl.Iterate03())
+                {
+                    //if x or y does not have frequency corresponding to t, we will get an error here
+                    if (x.GetVal(t) == y.GetVal(t)) rv_series.SetData(t, 1d);
+                    else rv_series.SetData(t, 0d);  //else it would be missing
+                }
+            }
+            else if (x.Type() == EVariableType.Date && y.Type() == EVariableType.Date)
+            {
+                if (O.ConvertToDate(x).IsSamePeriod(O.ConvertToDate(y))) rv = Globals.scalarVal1;
+            }
+            else if (x.Type() == EVariableType.String && y.Type() == EVariableType.String)
+            {
+                if (G.Equal(x.ConvertToString(), y.ConvertToString())) rv = Globals.scalarVal1;
+            }
+            else
+            {
+                G.Writeln();
+                G.Writeln2("*** ERROR: Variable types " + G.GetTypeString(x) + " and " + G.GetTypeString(y) + " do not match for '==' compare");
+                throw new GekkoException();
+            }
+            return rv;
+        }
+
         public static IVariable LogicalAnd(GekkoSmpl smpl, IVariable x1, IVariable x2)
         {
             if (O.ConvertToVal(x1) == 1d && O.ConvertToVal(x2) == 1d) return Globals.scalarVal1;
@@ -5339,12 +5395,13 @@ namespace Gekko
 
         public static IVariable Equals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
+            //same logic in LogicalOr() and LogicalAnd()
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
-                //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                //must return a VAL, not a SERIES                
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 if (G.IsBothNumericalError(d1, d2))  // see also #87342543534
                 {
                     rv = Globals.scalarVal1;
@@ -5356,7 +5413,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5388,11 +5445,11 @@ namespace Gekko
         public static IVariable NonEquals(GekkoSmpl smpl, IVariable x, IVariable y)
         {
             //hmm, comparing two 1x1 matrices will fail
-            IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            IVariable rv = Globals.scalarVal0;            
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
-                //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                //must return a VAL, not a SERIES                
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 if (G.isNumericalError(d1) && G.isNumericalError(d2))
                 {
                     rv = Globals.scalarVal0;
@@ -5404,7 +5461,7 @@ namespace Gekko
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5435,15 +5492,15 @@ namespace Gekko
         {            
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;                
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();                
                 if (d1 < d2) rv = Globals.scalarVal1; ;                
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5470,15 +5527,15 @@ namespace Gekko
         {
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 if (d1 <= d2) rv = Globals.scalarVal1; ;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5505,15 +5562,15 @@ namespace Gekko
         {
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 if (d1 >= d2) rv = Globals.scalarVal1; ;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5540,15 +5597,15 @@ namespace Gekko
         {
             //hmm, comparing two 1x1 matrices will fail
             IVariable rv = Globals.scalarVal0;
-            if (x.Type() == EVariableType.Val && y.Type() == EVariableType.Val)
+            if ((x.Type() == EVariableType.Val || O.IsTimelessSeries(x)) && (y.Type() == EVariableType.Val || O.IsTimelessSeries(y)))
             {
                 //must return a VAL, not a SERIES
-                double d1 = ((ScalarVal)x).val; double d2 = ((ScalarVal)y).val;
+                double d1 = x.ConvertToVal(); double d2 = y.ConvertToVal();
                 if (d1 > d2) rv = Globals.scalarVal1; ;
             }
             else if (x.Type() == EVariableType.Series || y.Type() == EVariableType.Series)
             {
-                CheckFreqAndCreateSeries(x, y);  //checks freqs
+                CheckFreq(x, y);  //checks freqs
                 Series rv_series = new Series(ESeriesType.Light, smpl.t0, smpl.t3);
                 rv = rv_series;
                 foreach (GekkoTime t in smpl.Iterate03())
@@ -5578,9 +5635,9 @@ namespace Gekko
 
         public static bool IsTrue(GekkoSmpl smpl, IVariable x)
         {
-            if (x.Type() == EVariableType.Val)
+            if (x.Type() == EVariableType.Val || O.IsTimelessSeries(x))
             {
-                if (IsTrue(((ScalarVal)x).val)) return true;
+                if (IsTrue(x.ConvertToVal())) return true;
             }
             else if (x.Type() == EVariableType.Matrix)
             {
@@ -5611,11 +5668,9 @@ namespace Gekko
                 throw new GekkoException();
             }
             return false;
-        }
+        }        
 
-        
-
-        private static void CheckFreqAndCreateSeries(IVariable x, IVariable y)
+        private static void CheckFreq(IVariable x, IVariable y)
         {
             EFreq freq = EFreq.A;
             if (x.Type() == EVariableType.Series) freq = ((Series)x).freq;
@@ -5628,10 +5683,7 @@ namespace Gekko
                     throw new GekkoException();
                 }
             }
-        }
-
-        
-        
+        }        
 
         public static void PrepareUfunction(int number, string name)
         {
