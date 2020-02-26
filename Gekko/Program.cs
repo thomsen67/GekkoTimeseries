@@ -19340,7 +19340,15 @@ namespace Gekko
                 }
                 else if (node.s == "=")
                 {
-                    node.s = "==";  //stuff like ... $ (a.val = 15) 
+                    TokenHelper prevNode1 = node.Offset(-1);
+                    if (prevNode1 != null && (prevNode1.s == "<" || prevNode1.s == ">"))
+                    {
+                        //do nothing, we do not want <= to become <== !
+                    }
+                    else
+                    {
+                        node.s = "==";  //stuff like ... $ (a.val = 15) 
+                    }
                 }            
                 return;
             }

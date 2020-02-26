@@ -244,7 +244,9 @@ namespace Gekko.Parser.Gek
             //The #m is assigned to sum() or unfold() or to PRTELEMENT (last one will be converted to unfold()).
             //Also in x[#m] = y[#m] + ... , the #m is assigned to ASTASSIGNMENT
             //also locates ... $ (#m in ...)
-            //also locates ... #a.val()
+            // ---> these sets are assigned to a "parent", either sum() or unfold() function.
+            //      sets that are in conditions like "a.val = 15" will later on point to their "parent", 
+            //      so that they are treated like elements and not lists when the code i rum.
 
             //Also locates listfiles via ASTBANKVARNAME2. For instance #(listfile m) or #(listfile {'m'})
             //the former will work with sum(), unfold() etc.
