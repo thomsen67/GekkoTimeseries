@@ -5219,7 +5219,7 @@ namespace Gekko
         private static IVariable Helper_LogicalAndOr(GekkoSmpl smpl, IVariable x1, IVariable x2, bool and)
         {
             //same logic in Equals(), StrictlyLargerThan() etc.
-            //hmm, comparing two 1x1 matrices will fail
+            //hmm, comparing two 1x1 matrices will fail            
             IVariable rv = Globals.scalarVal0;
             if ((x1.Type() == EVariableType.Val || O.IsTimelessSeries(x1)) && (x2.Type() == EVariableType.Val || O.IsTimelessSeries(x2)))
             {

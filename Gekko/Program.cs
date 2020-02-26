@@ -19019,21 +19019,54 @@ namespace Gekko
             //- parameter t is removed, and lags/leads like t-1 are transformed into [-1] etc. So x(a, t) --> x[#a], and x(t) --> x not x().
             //- strings have quotes removed, x['a'] --> x[a]
             //- stuff like a.val becomes #a.val(), whereas t.val is ignored for now
-            //
+            //- sameas(i,j) and sameas(i,'a') become #i==#j and #i=='a'
+            //- single '=' becomes '=='
 
             if (node.HasNoChildren())
             {
                 //not a sub-node
                 if (node.s != "" && node.type == ETokenType.Word)
                 {
-                    //a leaf node
+                    //an IDENT-type leaf node, not symbols etc.
                     //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided
                     TokenHelper nextNode = node.Offset(1);
                     if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
                         //a pattern like "x(" with no blanks in between                    
+                        
+                        if (G.Equal(node.s, "sameas"))
+                        {
+                            List<TokenHelperComma> split = nextNode.SplitCommas(false);
+                            if (split.Count != 2)
+                            {
+                                G.Writeln2("*** ERROR: Expected sameas() function with 2 arguments");
+                                throw new GekkoException();
+                            }
 
-                        if (Globals.gamsFunctions.ContainsKey(node.s))
+                            //TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();                            
+                            //nextNode2.subnodes.storage.Add(new TokenHelper("("));
+                            //nextNode2.subnodes.storage.Add(new TokenHelper(split[1].));
+                            //nextNode2.subnodes.storage.Add(new TokenHelper(")"));
+                            //int id = nextNode.id;
+                            //TokenHelper parent = nextNode.parent;
+                            //parent.subnodes.storage.RemoveAt(id);
+                            //parent.subnodes.storage.Insert(id, nextNode2);
+                            //parent.subnodes.storage.Insert(id, nextNode1);
+                            //parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
+
+                            //string s1 = split[0].list.ToStringTrim();
+                            //string s2 = split[1].list.ToStringTrim();
+
+                            //node.s = s1 + " == " + s2;
+                            //nextNode = null;
+                            //nextNode = null;
+
+                            node.s = "";
+                            split[1].comma.s = "==";
+                        
+
+                        }
+                        else if (Globals.gamsFunctions.ContainsKey(node.s))
                         {
                             string x = Globals.gamsFunctions[node.s];
                             if (x != null)
@@ -19085,26 +19118,13 @@ namespace Gekko
                                 }
                             }
                         }
-                        else if (node.s == "val")
-                        {
-
-                        }
                         else
                         {
                             //first we check for stuff like a15t100(a), where a15t100 is a set, not a variable
                             //so it should be #a15t100[#a], not a15t100[#a]
 
-                            bool isSetWithIndexer = false;
-                            if (th.checkIfVariableIsASet)
-                            {
-                                string name = node.s;
-                                IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + name);
-                                if (iv != null && iv.Type() == EVariableType.List)
-                                {
-                                    isSetWithIndexer = true;
-                                    node.s = "#" + node.s;
-                                }
-                            }
+                            bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
+                            if (isSetWithIndexer) node.s = "#" + node.s;
 
                             bool removeParenthesis = false;
                             if (true)
@@ -19293,8 +19313,35 @@ namespace Gekko
                             }
                         }
                     }
+                    else
+                    {
+
+                        //could be a standalone a here: ... $ (sameas(a, '15'))
+                        bool isSetWithIndexer = CheckIfVarIsASet(node.s, th);
+                        if (isSetWithIndexer) node.s = "#" + node.s;
+
+                        TokenHelper nextNode1 = node.Offset(1);
+                        TokenHelper nextNode2 = node.Offset(2);
+
+                        if (nextNode1 != null && nextNode2 != null)
+                        {
+
+                            if (nextNode1.s == "." && G.Equal(nextNode2.s, "val"))
+                            {
+                                //a pattern like a.val or t.val, used in for instance a.val > 15 etc.
+                                //now we transform a.val into #a.val().
+                                //it must use val(), since the #a elements are strings.
+                                //the fact that x[#a+1] works is a special exception.
+                                //node.s = "#" + node.s;
+                                nextNode2.s = nextNode2.s + "()";
+                            }
+                        }
+                    }
                 }
-            
+                else if (node.s == "=")
+                {
+                    node.s = "==";  //stuff like ... $ (a.val = 15) 
+                }            
                 return;
             }
             else
@@ -19311,6 +19358,21 @@ namespace Gekko
                     WalkTokens(node.subnodes.storage[i], th);
                 }
             }
+        }
+
+        private static bool CheckIfVarIsASet(string name,  WalkTokensHelper th)
+        {
+            bool isSetWithIndexer = false;
+            if (th.checkIfVariableIsASet)
+            {
+
+                IVariable iv = Program.databanks.GetFirst().GetIVariable("#" + name);
+                if (iv != null && iv.Type() == EVariableType.List)
+                {
+                    isSetWithIndexer = true;
+                }
+            }
+            return isSetWithIndexer;
         }
 
         public static void WalkTokensHandleParentheses(TokenList nodes) {
@@ -19737,7 +19799,8 @@ namespace Gekko
                 {
                     c = "$ (" + conditionals + ")";
                 }
-                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + c + " = " + statement, new P()); //produces Func<> Globals.expression with the expression 
+                string s = c + " = " + statement;
+                Program.obeyCommandCalledFromGUI("VAR2 deleteme " + s, new P()); //produces Func<> Globals.expression with the expression 
 
                 if (Globals.expressions == null)
                 {
