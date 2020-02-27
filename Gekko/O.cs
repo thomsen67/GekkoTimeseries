@@ -5396,16 +5396,37 @@ namespace Gekko
             return rv;
         }
 
-        public static double Conditional2Of3(IVariable tmp)
+        public static double Conditional2Of3(GekkoSmpl smpl, IVariable tmp)
         {
             //Code located here to keep all conditional code in one place 
+            double v = double.NaN;
             if (tmp.Type() == EVariableType.Series && (tmp as Series).type != ESeriesType.Timeless)
             {
-                G.Writeln2("*** ERROR: $-conditional returns a (non-timeless) series, not a scalar.");
-                G.Writeln("    Time-varying logical conditions are not implemented in Gekko yet", Color.Red);
-                throw new GekkoException();
+                if (Globals.holesFix)
+                {
+                    double v2 = 0d;
+                    Series tmp_series = tmp as Series;
+                    foreach (GekkoTime t in smpl.Iterate12())
+                    {
+                        double v3 = tmp_series.GetDataSimple(t);
+                        if (v3 == 1d)
+                        {
+                            v = v3;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    G.Writeln2("*** ERROR: $-conditional returns a (non-timeless) series, not a scalar.");
+                    G.Writeln("    Time-varying logical conditions are not implemented in Gekko yet", Color.Red);
+                    throw new GekkoException();
+                }
             }
-            double v = tmp.ConvertToVal();
+            else
+            {
+                v = tmp.ConvertToVal();
+            }
             return v;
         }
 
@@ -5413,7 +5434,7 @@ namespace Gekko
         {
             //Code located here to keep all conditional code in one place 
             //return "ScalarVal " + vName + " = " + code + " as ScalarVal" + ";" + G.NL + "if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue" + ";";
-            return "double " + vName + " = O.Conditional2Of3("+code+");" + G.NL + "if (" + vName + " != 1d) continue" + ";";
+            return "double " + vName + " = O.Conditional2Of3(" + Globals.smpl + ", " + code + ");" + G.NL + "if (" + vName + " != 1d) continue" + ";";
         }
 
         // =========================================================================

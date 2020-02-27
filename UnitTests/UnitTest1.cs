@@ -9579,14 +9579,10 @@ namespace UnitTests
             I("i00 = series(2);");
             I("i00[a, x] = 1;"); //now it is a timeseries
             I("i00[b, z] = 1;");
-            I("i00[c, y] = 1;");
-            if (Globals.UNITTESTFOLLOWUP_important)
-            {
-                //does not work because i00 returns a series
-                //should work like for x[#i] $ (...) assignments
-                I("y5 = sum((#i, #j) $ (i00[#i, #j]), x[#i, #j]);");
-                _AssertSeries(First(), "y5!a", 2001, 10d, sharedDelta);
-            }
+            I("i00[c, y] = 1;");            
+            //the i00 series is implicitly converted to a scalar value
+            I("y5 = sum((#i, #j) $ (i00[#i, #j]), x[#i, #j]);");
+            _AssertSeries(First(), "y5!a", 2001, 6d, sharedDelta);            
         }
 
         [TestMethod]

@@ -278,6 +278,8 @@ namespace Gekko
         
         public static bool UNITTESTFOLLOWUP = false;
         public static bool UNITTESTFOLLOWUP_important = false;
+
+        public static bool holesFix = true;
                 
         public static string restartSnippet = "restart; mode data;";
 
