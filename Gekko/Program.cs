@@ -19689,6 +19689,7 @@ namespace Gekko
                         catch
                         {
                             counterError1++;
+                            G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
                             continue;
                         }
                         eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
@@ -19729,6 +19730,7 @@ namespace Gekko
                                 counterError2++;
                                 eq.expressionVariablesWithSets.Add(null); //keep alignment
                                 eq.expressionVariables.Add(null); //keep alignment
+                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
                                 break;
                             }
                             finally
