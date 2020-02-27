@@ -1442,7 +1442,7 @@ namespace Gekko
             {
                 //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
-                IVariable y = Dollar(smpl, rhsExpression, logical);
+                IVariable y = Conditional1Of3(smpl, rhsExpression, logical);
                 Lookup(smpl, map, dbName, varname, freq, y, isLeftSideVariable, type, options);
             }
             else
@@ -3961,17 +3961,7 @@ namespace Gekko
             }
         }
 
-        public static double LoopConditional(IVariable tmp)
-        {
-            if (tmp.Type() == EVariableType.Series && (tmp as Series).type != ESeriesType.Timeless)
-            {
-                G.Writeln2("*** ERROR: $-conditional returns a series, not a scalar or timeless series.");
-                G.Writeln("    Time-varying logical conditions are not implemented in Gekko yet", Color.Red);
-                throw new GekkoException();
-            }
-            double v7 = tmp.ConvertToVal();
-            return v7;
-        }
+        
 
 
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
@@ -4491,9 +4481,9 @@ namespace Gekko
             }
             else if (logical.Type() == EVariableType.Series)
             {
-                //This deviates a bit from23 GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
+                //This deviates a bit from GAMS: when logical is 0 here, a 0 will also be set for the LHS, it is not just skipped.
                 //See also #6238454
-                IVariable z = Dollar(smpl, y, logical);
+                IVariable z = Conditional1Of3(smpl, y, logical);
                 x.IndexerSetData(smpl, z, options, indexes);
             }
             else
@@ -5318,8 +5308,15 @@ namespace Gekko
             return rv;
         }
 
-        public static IVariable Dollar(GekkoSmpl smpl, IVariable x, IVariable logical)
+        // =========================================================================
+        // =========================================================================
+        // ============ conditional logic start ====================================
+        // =========================================================================
+        // =========================================================================
+        
+        public static IVariable Conditional1Of3(GekkoSmpl smpl, IVariable x, IVariable logical)
         {
+            //Code located here to keep all conditional code in one place 
             //logical is 1 for true, and false otherwise
             IVariable rv = null;
             if (x.Type() == EVariableType.Series)
@@ -5398,6 +5395,32 @@ namespace Gekko
             }
             return rv;
         }
+
+        public static double Conditional2Of3(IVariable tmp)
+        {
+            //Code located here to keep all conditional code in one place 
+            if (tmp.Type() == EVariableType.Series && (tmp as Series).type != ESeriesType.Timeless)
+            {
+                G.Writeln2("*** ERROR: $-conditional returns a (non-timeless) series, not a scalar.");
+                G.Writeln("    Time-varying logical conditions are not implemented in Gekko yet", Color.Red);
+                throw new GekkoException();
+            }
+            double v = tmp.ConvertToVal();
+            return v;
+        }
+
+        public static string Conditional3Of3(string code, string vName)
+        {
+            //Code located here to keep all conditional code in one place 
+            //return "ScalarVal " + vName + " = " + code + " as ScalarVal" + ";" + G.NL + "if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue" + ";";
+            return "double " + vName + " = O.Conditional2Of3("+code+");" + G.NL + "if (" + vName + " != 1d) continue" + ";";
+        }
+
+        // =========================================================================
+        // =========================================================================
+        // ============ conditional logic end ======================================
+        // =========================================================================
+        // =========================================================================
 
         public static bool IsTrue(double d)
         {

@@ -28,7 +28,7 @@ namespace Gekko
                     foreach (IVariable listloop_j3 in new O.GekkoListIterator(O.Lookup(smpl8, null, ((O.scalarStringHash).Add(smpl8, (new ScalarString("j")))), null, new LookupSettings(), EVariableType.Var, null)))
                     {
                         IVariable tmp = O.Indexer(O.Indexer2(smpl8, O.EIndexerType.None, listloop_i2, listloop_j3), smpl8, O.EIndexerType.None, O.Lookup(smpl8, null, null, "i00", null, null, new LookupSettings(), EVariableType.Var, null), listloop_i2, listloop_j3);
-                        double v7 = O.LoopConditional(tmp);
+                        double v7 = O.Conditional2Of3(tmp);
                         if (v7 != 1d) continue;
                         temp4.InjectAdd(smpl8, O.Indexer(O.Indexer2(smpl8, O.EIndexerType.None, listloop_i2, listloop_j3), smpl8, O.EIndexerType.None, O.Lookup(smpl8, null, null, "x", null, null, new LookupSettings(), EVariableType.Var, null), listloop_i2, listloop_j3));
 

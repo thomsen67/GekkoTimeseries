@@ -1942,7 +1942,7 @@ namespace Gekko.Parser.Gek
                             else
                             {
                                 //right-hand side, much easier
-                                node.Code.A("O.Dollar(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
+                                node.Code.A("O.Conditional1Of3(" + Globals.smpl + ", " + node[0].Code + ", " + node[1].Code + ")");
                             }
                             break;
                         }
@@ -2667,7 +2667,7 @@ namespace Gekko.Parser.Gek
                                     if (!G.NullOrBlanks(dollarCode))
                                     {
                                         string vName = "v" + ++Globals.counter;
-                                        string s = LoopConditional(dollarCode, vName);
+                                        string s = O.Conditional3Of3(dollarCode, vName);
                                         sb1.AppendLine(s);
                                     }
                                     
@@ -3975,10 +3975,8 @@ namespace Gekko.Parser.Gek
                                     if (!G.NullOrBlanks(node.loopCodeCs))
                                     {                                        
                                         string vName = "v" + ++Globals.counter;
-                                        string s = LoopConditional(node.loopCodeCs, vName);
-                                        node.Code.A(s);
-                                        //node.Code.A("ScalarVal " + vName + " = " + node.loopCodeCs + " as ScalarVal").End();
-                                        //node.Code.A("if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue").End();
+                                        string s = O.Conditional3Of3(node.loopCodeCs, vName);
+                                        node.Code.A(s);                                        
                                     }
 
                                     StringBuilder sb4 = new StringBuilder();                                    
@@ -6384,11 +6382,6 @@ namespace Gekko.Parser.Gek
             {
                 node.Code.A(G.NL + Globals.splitEnd + Num(node) + G.NL);
             }
-        }
-
-        private static string LoopConditional(string code, string vName)
-        {
-            return "ScalarVal " + vName + " = " + code + " as ScalarVal" + ";" + G.NL + "if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue" + ";";
         }
 
         private static string MaybeControlledSet(ASTNode node)
