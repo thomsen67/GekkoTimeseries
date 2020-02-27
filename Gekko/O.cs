@@ -3961,6 +3961,19 @@ namespace Gekko
             }
         }
 
+        public static double LoopConditional(IVariable tmp)
+        {
+            if (tmp.Type() == EVariableType.Series && (tmp as Series).type != ESeriesType.Timeless)
+            {
+                G.Writeln2("*** ERROR: $-conditional returns a series, not a scalar or timeless series.");
+                G.Writeln("    Time-varying logical conditions are not implemented in Gekko yet", Color.Red);
+                throw new GekkoException();
+            }
+            double v7 = tmp.ConvertToVal();
+            return v7;
+        }
+
+
         private static void HelperListdata(GekkoSmpl smpl, Series lhs_series, ESeriesUpdTypes operatorType, List rhs_list)
         {
             bool lastElementStar = false;

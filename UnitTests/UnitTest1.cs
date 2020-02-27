@@ -9545,6 +9545,46 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void _Test_ConditionalsGamsStyle()
+        {
+            I("reset; time 2001 2001;");
+            I("#i = a, b, c;");
+            I("#i0 = a, c;");
+            I("x = series(1);");            
+            I("x[a] = 1;");
+            I("x[b] = 2;");
+            I("x[c] = 3;");
+            I("y1 = sum(#i, x[#i]);");
+            _AssertSeries(First(), "y1!a", 2001, 6d, sharedDelta);
+            I("y2 = sum(#i $ (#i in #i0), x[#i]);");
+            _AssertSeries(First(), "y2!a", 2001, 4d, sharedDelta);
+
+            I("reset; time 2001 2001;");
+            I("#i = a, b, c;");
+            I("#j = x, y, z;");
+            I("i0 = series(2);");
+            I("x = series(2);");
+            I("x[a, x] = 1;");
+            I("x[b, z] = 2;");
+            I("x[c, y] = 3;");
+            I("x[c, z] = 4;");  //will be skipped
+            I("i0[a, x] = timeless(1);"); //acts like a kind of list without time dimension
+            I("i0[b, z] = timeless(1);");
+            I("i0[c, y] = timeless(1);");
+            I("option series array calc missing = zero;");
+            I("y3 = sum((#i, #j), x[#i, #j]);");
+            _AssertSeries(First(), "y3!a", 2001, 10d, sharedDelta);
+            I("y4 = sum((#i, #j) $ (i0[#i, #j]), x[#i, #j]);");
+            _AssertSeries(First(), "y4!a", 2001, 10d, sharedDelta);
+            I("i00 = series(2);");
+            I("i00[a, x] = 1;"); //now it is a timeseries
+            I("i00[b, z] = 1;");
+            I("i00[c, y] = 1;");
+            I("y5 = sum((#i, #j) $ (i00[#i, #j]), x[#i, #j]);");
+            _AssertSeries(First(), "y5!a", 2001, 10d, sharedDelta);
+        }
+
+        [TestMethod]
         public void _Test_LogicalConditionsScalarAndSeries()
         {
             I("reset;");
@@ -9597,7 +9637,12 @@ namespace UnitTests
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2001, 100d, sharedDelta);
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2002, 0d, sharedDelta);
             _AssertSeries(First(), "y3!a", new string[] { "a" }, 2003, 100d, sharedDelta);
-            
+
+            // e1 $ (...) .. y = x;
+            // y $ (...) = x;
+            // y = sum(i $ (...), x(i))
+
+
         }
 
         [TestMethod]

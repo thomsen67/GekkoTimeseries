@@ -347,8 +347,15 @@ namespace Gekko.Parser.Gek
                                 {
                                     string s2 = GetSimpleName(node2[2]);
                                     if (G.Equal(s, s2))
-                                    {
-                                        //node2 = node2.Parent;
+                                    {                                        
+                                        goto Label;
+                                    }
+                                }
+                                else if (node2[2].Text == "ASTDOLLAR")
+                                {
+                                    string s2 = GetSimpleName(node2[2][0]);
+                                    if (G.Equal(s, s2))
+                                    {                                     
                                         goto Label;
                                     }
                                 }
@@ -2653,7 +2660,17 @@ namespace Gekko.Parser.Gek
                                 }
 
                                 if (G.Equal(functionNameLower, "sum"))
-                                {                                    
+                                {
+                                    string dollarCode = null;
+                                    if (node[2].Text == "ASTDOLLAR") dollarCode = node[2][1].Code.ToString();
+
+                                    if (!G.NullOrBlanks(dollarCode))
+                                    {
+                                        string vName = "v" + ++Globals.counter;
+                                        string s = LoopConditional(dollarCode, vName);
+                                        sb1.AppendLine(s);
+                                    }
+                                    
                                     sb1.AppendLine(tempName + ".InjectAdd(" + Globals.smpl + ", " + node[3].Code.ToString() + ");" + G.NL);
                                     sb1.AppendLine(Globals.labelCounter + "++;"); //not done for unfold. This means that only first item in loop(s) is recorded.
                                 }
@@ -3952,15 +3969,18 @@ namespace Gekko.Parser.Gek
 
                                 if (G.Equal(type, "var2"))
                                 {
-                                    string vName = "v" + ++Globals.counter;
+                                    
                                     StringBuilder sb7 = new StringBuilder();
 
                                     if (!G.NullOrBlanks(node.loopCodeCs))
-                                    {
-                                        node.Code.A("ScalarVal " + vName + " = " + node.loopCodeCs + " as ScalarVal").End();
-                                        node.Code.A("if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue").End();
+                                    {                                        
+                                        string vName = "v" + ++Globals.counter;
+                                        string s = LoopConditional(node.loopCodeCs, vName);
+                                        node.Code.A(s);
+                                        //node.Code.A("ScalarVal " + vName + " = " + node.loopCodeCs + " as ScalarVal").End();
+                                        //node.Code.A("if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue").End();
                                     }
-                                    
+
                                     StringBuilder sb4 = new StringBuilder();                                    
                                     sb4.AppendLine("  " + methodName + ".Add((" + Globals.smpl + ") => { ");
                                     sb4.AppendLine("return " + node[1].Code.ToString() + " ;");
@@ -6366,6 +6386,11 @@ namespace Gekko.Parser.Gek
             }
         }
 
+        private static string LoopConditional(string code, string vName)
+        {
+            return "ScalarVal " + vName + " = " + code + " as ScalarVal" + ";" + G.NL + "if (" + vName + " != null && (" + vName + " as ScalarVal).val == 0d) continue" + ";";
+        }
+
         private static string MaybeControlledSet(ASTNode node)
         {
             string rv = null;
@@ -6786,7 +6811,7 @@ namespace Gekko.Parser.Gek
             }
             else
             {                
-                if (G.Equal(functionName, "sum)"))
+                if (G.Equal(functionName, "sum)")) //!!! HMMMM this "sum)" must be a mistake, but maybe the extra check is not necessary anyway
                 {
                     //extra check, this may be, for instance, sum(#i, x) or sum(#i, #j) --> these are not GAMS-like sums
                     int[] found = new int[1];
@@ -6806,23 +6831,37 @@ namespace Gekko.Parser.Gek
                 if (node.ChildrenCount() == 3 + 1)
                 {
                     int ii = 2;
-                    if (node[ii].Text == "ASTLISTDEF")  //ZXCVB
-                    {
-                        //TODO: CHECK types of rv[i], are they all simple #i, #j, ...?
 
-                        rv = new string[node[ii].ChildrenCount()];
-                        for (int i = 0; i < node[ii].ChildrenCount(); i++)
-                        {
-                            //rv[i] = GetSimpleHashName(node[1][i]);
-                            rv[i] = GetSimpleHashName(node[ii][i][0]);  //ZXCVB
-                        }
+                    if (node[ii].Text == "ASTDOLLAR")
+                    {
+                        rv = GetListNames2(node[ii][0]);
                     }
                     else
-                    {
-                        rv = new string[1];
-                        rv[0] = GetSimpleHashName(node[ii]);
+                    {                        
+                        rv = GetListNames2(node[ii]);
                     }
                 }
+            }
+
+            return rv;
+        }
+
+        private static string[] GetListNames2(ASTNode node)
+        {
+            string[] rv;
+            if (node.Text == "ASTLISTDEF")  //ZXCVB
+            {
+                //TODO: CHECK types of rv[i], are they all simple #i, #j, ...?
+                rv = new string[node.ChildrenCount()];
+                for (int i = 0; i < node.ChildrenCount(); i++)
+                {
+                    rv[i] = GetSimpleHashName(node[i][0]);  //ZXCVB
+                }
+            }
+            else
+            {
+                rv = new string[1];
+                rv[0] = GetSimpleHashName(node);
             }
 
             return rv;
