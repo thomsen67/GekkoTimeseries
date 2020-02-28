@@ -2280,10 +2280,13 @@ namespace Gekko
                     G.Writeln("*** ERROR: " + keys.Length + " dimensional index used on " + this.dimensions + "-dimensional array-timeseries " + G.GetNameAndFreqPretty(this.name));
                     throw new GekkoException();
                 }
-                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);
+                                
+                this.dimensionsStorage.TryGetValue(new MapMultidimItem(keys), out iv);                
+                string name2 = Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq);
 
                 if (iv == null)
-                {
+                {   
+
                     if (!isLhs)
                     {
 
@@ -2298,19 +2301,22 @@ namespace Gekko
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.M)
                             {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(double.NaN);
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.M;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Zero)
                             {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Zero;
                             }
                             else if (Program.options.series_array_print_missing == ESeriesMissing.Skip)
                             {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);  //must be 0 for .isNotFound to work
                                 ((Series)rv).isNotFoundArraySubSeries = ESeriesMissing.Skip;
                             }
@@ -2328,8 +2334,8 @@ namespace Gekko
                             }
                             else if (settings?.create == O.ECreatePossibilities.Can || settings?.create == O.ECreatePossibilities.Must)
                             {
-                                Series ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
-                                this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                                Series ts = new Series(ESeriesType.Normal, this.freq, name2);
+                                this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), ts);
                                 rv = ts;
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Error)
@@ -2338,12 +2344,14 @@ namespace Gekko
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.M)
                             {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(double.NaN);
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Zero)
                             {
-                                rv = new Series(ESeriesType.Timeless, this.freq, null);
+                                rv = new Series(ESeriesType.Timeless, this.freq, name2);
+                                ((Series)rv).mmi = new MapMultidimItem(keys, this);
                                 ((Series)rv).SetTimelessData(0d);
                             }
                             else if (Program.options.series_array_calc_missing == ESeriesMissing.Skip)
@@ -2374,14 +2382,13 @@ namespace Gekko
 
                         if (rhsIsTimeless)
                         {
-                            rv = new Series(ESeriesType.Timeless, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq), double.NaN);
+                            rv = new Series(ESeriesType.Timeless, this.freq, name2, double.NaN);
                         }
                         else
                         {
-                            rv = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
-                        }
-                        MapMultidimItem mmi = new MapMultidimItem(keys, this);
-                        this.dimensionsStorage.AddIVariableWithOverwrite(mmi, rv);
+                            rv = new Series(ESeriesType.Normal, this.freq, name2);
+                        }                        
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), rv);
                     }
                 }
                 else
@@ -2389,8 +2396,8 @@ namespace Gekko
                     if (settings?.create == O.ECreatePossibilities.Must)
                     {
                         //creates a brand new                        
-                        Series ts = new Series(ESeriesType.Normal, this.freq, Globals.seriesArraySubName + Globals.freqIndicator + G.GetFreq(this.freq));
-                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys), ts);
+                        Series ts = new Series(ESeriesType.Normal, this.freq, name2);
+                        this.dimensionsStorage.AddIVariableWithOverwrite(new MapMultidimItem(keys, this), ts);
                         rv = ts;
                     }
                     else

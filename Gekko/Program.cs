@@ -10857,6 +10857,7 @@ namespace Gekko
 
         public static void AddToPrecedents(Databank db, string varnameWithFreq)
         {
+            
             string two = db.name + ":" + varnameWithFreq;
             if (!Globals.precedents.ContainsKey(two))
             {
@@ -19078,21 +19079,20 @@ namespace Gekko
                             if (G.Equal(node.s, "sum"))
                             {
                                 if (nextNode.subnodes.Count() > 0)
-                                {
-                                    TokenHelper first = nextNode.subnodes[1];  //skips parenthesis
-                                    if (first.HasNoChildren())
+                                {                                    
+                                    if (nextNode.subnodes[1].HasNoChildren())
                                     {
                                         //stuff like "sum(i, x(i))"
-                                        if (first.type == ETokenType.Word && G.Equal(nextNode.subnodes[2].s, ","))
+                                        if (nextNode.subnodes[1].type == ETokenType.Word && (G.Equal(nextNode.subnodes[2].s, ",") || G.Equal(nextNode.subnodes[2].s, "$")))
                                         {
-                                            //checks that it has "sum(x," pattern
-                                            first.s = "#" + first.s;
+                                            //checks that it has "sum(x," or sum(x$" pattern
+                                            nextNode.subnodes[1].s = "#" + nextNode.subnodes[1].s;
                                         }
                                     }
                                     else
                                     {
                                         //stuff like "sum((i, j), x(i, j))"
-                                        List<TokenHelperComma> list2 = first.SplitCommas(true);
+                                        List<TokenHelperComma> list2 = nextNode.subnodes[1].SplitCommas(true);
                                         foreach (TokenHelperComma item in list2)
                                         {
                                             //TODO CHECK
