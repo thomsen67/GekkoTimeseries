@@ -1116,9 +1116,13 @@ namespace Gekko.Parser.Gek
 
                             lineTemp = G.ReplaceGlueNew(lineTemp);
 
-                            string line0 = lineTemp.Substring(0, positionNo - 1);
-                            string line1 = lineTemp.Substring(positionNo - 1, 1);
-                            string line2 = lineTemp.Substring(positionNo - 1 + 1);
+                            //try: not the end of the world if one of these fails
+                            string line0 = "";
+                            string line1 = "";
+                            string line2 = "";
+                            try  { line0 = lineTemp.Substring(0, positionNo - 1); } catch { };
+                            try  { line1 = lineTemp.Substring(positionNo - 1, 1); } catch { };
+                            try  { line2 = lineTemp.Substring(positionNo - 1 + 1); } catch { };
 
                             if (previousLineProbablyCulprit && lineNo > 1)
                             {

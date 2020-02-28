@@ -19653,6 +19653,8 @@ namespace Gekko
 
             if (true && Globals.runningOnTTComputer)
             {
+                //qwerty
+                
                 DateTime dt = DateTime.Now;
                 double ms1 = 0;
                 double ms2 = 0;
@@ -19669,6 +19671,11 @@ namespace Gekko
                     counterA++;
                     ModelGamsEquation eq = kvp.Value[0];
 
+                    //if(G.Equal(eq.nameGams, "e_vhhx_tot"))
+                    //{
+
+                    //}
+                    
                     eq.expressionVariables = new List<List<string>>();
                     eq.expressionVariablesWithSets = new List<List<string>>();
 
@@ -19686,10 +19693,17 @@ namespace Gekko
                             CallEval(eq.conditionals, s1);                           
                             ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
                         }
-                        catch
+                        catch (Exception e)
                         {
                             counterError1++;
-                            G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                            if (e.Message.Contains("System.OutOfMemoryException"))
+                            {
+                                G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
+                            }
+                            else
+                            {
+                                G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
+                            }                            
                             continue;
                         }
                         eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
@@ -19703,7 +19717,23 @@ namespace Gekko
                             Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                             try
                             {
+                                
+                                Globals.mem = 0;
+                                foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();                                                                
+                                int mem1 = Globals.mem;
+
                                 IVariable iv = expression(new GekkoSmpl());
+
+                                Globals.mem = 0;
+                                foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();                                
+                                int mem2 = Globals.mem;
+
+                                if (mem2 - mem1 > 0)
+                                {
+                                    G.Writeln2("+++ MEM: " + (mem2 - mem1));
+                                }
+
+                                iv = null;
                                 List<string> m1 = new List<string>();
                                 List<string> m2 = new List<string>();
                                 foreach (string s in Globals.precedents.Keys)
@@ -19725,12 +19755,19 @@ namespace Gekko
                                 eq.expressionVariablesWithSets.Add(m1);
                                 eq.expressionVariables.Add(m2);
                             }
-                            catch
+                            catch (Exception e)
                             {
                                 counterError2++;
                                 eq.expressionVariablesWithSets.Add(null); //keep alignment
                                 eq.expressionVariables.Add(null); //keep alignment
-                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                                if (e.Message.Contains("System.OutOfMemoryException"))
+                                {
+                                    G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
+                                }
+                                else
+                                {
+                                    G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                                }
                                 break;
                             }
                             finally
@@ -19743,10 +19780,12 @@ namespace Gekko
                         ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
                         Globals.expressions = null;  //maybe not necessary
                     }
+
+                    //kvp.Value.Clear();  //qwerty
+
                 }
                 G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
-
-                
+                                
                 StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
                 foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
                 {

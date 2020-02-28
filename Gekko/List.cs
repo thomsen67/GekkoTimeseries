@@ -487,6 +487,7 @@ namespace Gekko
             {
                 if (!Object.ReferenceEquals(this, iv))
                 {
+                    Globals.mem++;
                     iv.DeepTrim();
                 }
             }         

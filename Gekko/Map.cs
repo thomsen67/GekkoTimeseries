@@ -272,6 +272,7 @@ namespace Gekko
             {
                 if (!Object.ReferenceEquals(this, kvp.Value))
                 {
+                    Globals.mem++;
                     kvp.Value.DeepTrim();
                 }                
             }            

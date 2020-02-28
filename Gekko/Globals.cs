@@ -44,6 +44,8 @@ namespace Gekko
         
         public static string versionInternal = "";
 
+        public static int mem = 0;
+
         public static bool lagfix = true;
 
         public static bool oldcontrol = true;
