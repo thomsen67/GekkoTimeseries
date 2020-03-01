@@ -17515,29 +17515,25 @@ namespace Gekko
 
         public static void Tell(string text, bool nocr)
         {            
-            if (Globals.runningOnTTComputer && text == "python")
+            if (Globals.runningOnTTComputer)
             {
-                string s = Python();
-                G.Writeln2(s);
-            }
-
-            if (Globals.runningOnTTComputer && text == "excel")
-            {
-                ReadOpenMulbkHelper oRead = new ReadOpenMulbkHelper();
-                Program.ReadInfo info = new Program.ReadInfo();
-                string file = @"c:\Thomas\Desktop\gekko\testing\jul05.gbk";
-                string tsdxFile = null;
-                string tempTsdxPath = null;
-                int NaNCounter = 0;
-
-                if (true)
+                if (text == "python")
                 {
-                    Databank db = Program.GetDatabankFromFile(null, oRead, info, file, file, oRead.dateformat, oRead.datetype, ref tsdxFile, ref tempTsdxPath, ref NaNCounter);
-                    Series ts = db.GetIVariable("enl!a") as Series;
-                    GekkoTime gt = new GekkoTime(EFreq.A, 2006, 1);
-                    double x = ts.GetDataSimple(gt);
-                    
+                    string s = Python();
+                    G.Writeln2(s);
                 }
+                else
+                {
+                    List m1 = Program.databanks.GetFirst().GetIVariable("#large") as List;
+                    foreach (List m2 in m1.list)
+                    {
+                        foreach (List m3 in m2.list)
+                        {
+
+                        }
+                    }
+                }
+                return;
             }
 
             if (nocr) G.Write(text);
@@ -19034,7 +19030,7 @@ namespace Gekko
                     if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
                         //a pattern like "x(" with no blanks in between                    
-                        
+
                         if (G.Equal(node.s, "sameas"))
                         {
                             List<TokenHelperComma> split = nextNode.SplitCommas(false);
@@ -19044,27 +19040,9 @@ namespace Gekko
                                 throw new GekkoException();
                             }
 
-                            //TokenHelper nextNode2 = new TokenHelper(); nextNode2.subnodes = new TokenList();                            
-                            //nextNode2.subnodes.storage.Add(new TokenHelper("("));
-                            //nextNode2.subnodes.storage.Add(new TokenHelper(split[1].));
-                            //nextNode2.subnodes.storage.Add(new TokenHelper(")"));
-                            //int id = nextNode.id;
-                            //TokenHelper parent = nextNode.parent;
-                            //parent.subnodes.storage.RemoveAt(id);
-                            //parent.subnodes.storage.Insert(id, nextNode2);
-                            //parent.subnodes.storage.Insert(id, nextNode1);
-                            //parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
-
-                            //string s1 = split[0].list.ToStringTrim();
-                            //string s2 = split[1].list.ToStringTrim();
-
-                            //node.s = s1 + " == " + s2;
-                            //nextNode = null;
-                            //nextNode = null;
-
                             node.s = "";
                             split[1].comma.s = "==";
-                        
+
 
                         }
                         else if (Globals.gamsFunctions.ContainsKey(node.s))
@@ -19079,7 +19057,7 @@ namespace Gekko
                             if (G.Equal(node.s, "sum"))
                             {
                                 if (nextNode.subnodes.Count() > 0)
-                                {                                    
+                                {
                                     if (nextNode.subnodes[1].HasNoChildren())
                                     {
                                         //stuff like "sum(i, x(i))"
@@ -19349,8 +19327,29 @@ namespace Gekko
                     {
                         node.s = "==";  //stuff like ... $ (a.val = 15) 
                     }
-                }            
-                return;
+                }
+                else if (node.s == "$")
+                {
+                    TokenHelper nextNode = node.Offset(1);  //b
+                    TokenHelper nextNode2 = node.Offset(2);  //(i, j)
+                    //We look for the pattern "a $ b(i, j)", where Gekko does not allow simply a $ b[#i, #j], but must use a $ (b[#i, #j])
+                    if (nextNode != null && nextNode.s != "" && nextNode.type == ETokenType.Word)
+                    {                        
+                        if (nextNode2 != null && nextNode2.HasChildren() && nextNode2.SubnodesType() == "(" && nextNode2.subnodes[0].leftblanks == 0)
+                        {
+                            int id = nextNode.id;
+                            TokenHelper parent = nextNode.parent;
+                            TokenHelper newNode = new TokenHelper(); newNode.subnodes = new TokenList();
+                            newNode.subnodes.storage.Add(new TokenHelper("("));
+                            newNode.subnodes.storage.Add(nextNode);
+                            newNode.subnodes.storage.Add(nextNode2);
+                            newNode.subnodes.storage.Add(new TokenHelper(")"));
+                            parent.subnodes.storage.RemoveAt(id);
+                            parent.subnodes.storage.Insert(id, newNode);
+                            parent.OrganizeSubnodes();  //to get the id's and pointers to parent ok
+                        }
+                    }
+                }
             }
             else
             {
@@ -19665,17 +19664,12 @@ namespace Gekko
 
                 foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
                 {
-                    //if (counterA > 101) break;
+                    if (counterA > 30) break;
                     if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
                     counterA++;
                     ModelGamsEquation eq = kvp.Value[0];
 
-                    //if(G.Equal(eq.nameGams, "e_vhhx_tot"))
-                    //{
-
-                    //}
-                    
                     eq.expressionVariables = new List<List<string>>();
                     eq.expressionVariablesWithSets = new List<List<string>>();
 
@@ -19785,11 +19779,26 @@ namespace Gekko
 
                 }
                 G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
-                                
+
+
+                List smallSuper = new List();
+                List largeSuper = new List();
+
                 StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
                 foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
                 {
                     ModelGamsEquation eq = kvp.Value[0];
+
+                    //List: idea is to have a list m0 in this format:
+                    //m0 is a list of (list) m1
+                    //each m1 corresponds to a GAMS-eq. First element of m1 is the name, the rest are sub-equations (lists) m2
+                    //each m2 is a list of strings (variable names)
+
+                    smallSuper.Add(new ScalarString(eq.nameGams));
+                    largeSuper.Add(new ScalarString(eq.nameGams));
+                    List small = new List();  //for each equation
+                    List large = new List();
+                    
                     sb.WriteLine();
                     sb.WriteLine("-----------------------------------------------------------");
                     sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
@@ -19811,6 +19820,11 @@ namespace Gekko
                         {
                             for (int i = 0; i < eq.expressionVariables.Count; i++)
                             {
+                                //for each sub-equation
+
+                                List smallSub = new List();  //for each sub-equation
+                                List largeSub = new List();
+
                                 List<string> m1 = eq.expressionVariables[i];
                                 List<string> m2 = eq.expressionVariablesWithSets[i];
                                 if (m1 == null || m1.Count == 0)
@@ -19820,15 +19834,45 @@ namespace Gekko
                                 }
                                 else
                                 {
+
+                                    foreach (string s1 in m1)
+                                    {
+                                        ScalarString ss1 = new ScalarString(s1);
+                                        smallSub.Add(ss1);
+                                    }
+
+                                    foreach (string s2 in m2)
+                                    {
+                                        ScalarString ss2 = new ScalarString(s2);
+                                        largeSub.Add(ss2);
+                                    }
+
                                     sb.WriteLine("SMALL " + G.GetListWithCommas(m1));
                                     sb.WriteLine("FULL  " + G.GetListWithCommas(m2));
                                 }
+                                small.Add(smallSub);
+                                large.Add(largeSub);
                             }
                         }
+
                     }
+                    smallSuper.Add(small);
+                    largeSuper.Add(large);
+
+                    List smallTemp = new List();
+                    List largeTemp = new List();
+
+
+
                 }
                 sb.Flush();
                 sb.Close();
+
+                Program.databanks.GetFirst().Clear();
+                Program.databanks.GetFirst().AddIVariable("#small", smallSuper);
+                Program.databanks.GetFirst().AddIVariable("#large", largeSuper);
+                WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
+
             }
 
 

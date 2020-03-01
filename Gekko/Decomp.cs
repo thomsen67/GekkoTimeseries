@@ -378,9 +378,9 @@ namespace Gekko
 
                     //consider this: 
                     //1 x1 + 2 x2 + 3 x3 + 4 x4 + 5 x5 = 0 
-                    //2 x1 + 3 x2 + 4 x3 + 5 x4 + 6 x5= 0
+                    //2 x1 + 3 x2 + 4 x3 + 5 x4 + 6 x5 = 0
 
-                    //now if x2 is exo, we skip these in Jacobi, getting:
+                    //now if x2, x4, x5 are exo, we skip these in Jacobi, getting:
                     //
                     // [1 3] [x1]  +  [2 4 5] [x2]   =   0
                     // [2 4] [x3]     [3 5 6] [x4]     
