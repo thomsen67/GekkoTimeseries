@@ -125,6 +125,7 @@ namespace Gekko
         public string tBase = "tBase";
         public bool checkIfVariableIsASet = false;
         public bool replaceSuitableIntInLastPositionWithFixedYear = false;
+        public GekkoDictionary<string, List<int>> lagsLeads = new GekkoDictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
     }
 
     public class GekkoAction
@@ -17522,18 +17523,55 @@ namespace Gekko
                     string s = Python();
                     G.Writeln2(s);
                 }
-                else
+                else if (text.StartsWith("find"))
                 {
-                    List m1 = Program.databanks.GetFirst().GetIVariable("#large") as List;
-                    foreach (List m2 in m1.list)
+                    string name = text.Substring("find ".Length).Trim();
+                    List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
+                    foreach (List m2 in m1.list)  //foreach GAMS equation
                     {
-                        foreach (List m3 in m2.list)
-                        {
+                        string eqName = null;
+                        bool first = true;
+                        List<List<string>> results = new List<List<string>>();
 
+                        foreach (IVariable m3 in m2.list) //foreach sub-eq (first item is name)
+                        {
+                            if (first)
+                            {
+                                eqName = (m3 as ScalarString).string2;
+                            }
+                            else
+                            {
+                                bool found = false;
+                                foreach (ScalarString ss in (m3 as List).list) //foreach sub-eq (first item is name)
+                                {
+                                    
+                                    if (G.Equal(name, ss.string2))
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (found)
+                                {
+                                    results.Add(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList());                                    
+                                }
+                            }
+                            first = false;
+                        }
+
+                        if (results.Count > 0)
+                        {
+                            //string ss = G.GetListWithCommas(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()));
+                            G.Writeln2("--------------------------------------------------------------------");
+                            G.Writeln("Eqname: " + eqName);
+                            foreach (List<string> x in results)
+                            {
+                                G.Writeln("        " + G.GetListWithCommas(x));
+                            }
                         }
                     }
-                }
-                return;
+                }                
             }
 
             if (nocr) G.Write(text);
@@ -19014,10 +19052,13 @@ namespace Gekko
             //-      but sqr() becomes sqrt()
             //- sum() function has # put in on sets
             //- parameter t is removed, and lags/leads like t-1 are transformed into [-1] etc. So x(a, t) --> x[#a], and x(t) --> x not x().
+            //- tBase handled
             //- strings have quotes removed, x['a'] --> x[a]
             //- stuff like a.val becomes #a.val(), whereas t.val is ignored for now
             //- sameas(i,j) and sameas(i,'a') become #i==#j and #i=='a'
             //- single '=' becomes '=='
+            //
+            //- all t or t+1 or t-1 etc. are recorded, together with any tBase
 
             if (node.HasNoChildren())
             {
@@ -19026,6 +19067,9 @@ namespace Gekko
                 {
                     //an IDENT-type leaf node, not symbols etc.
                     //patterns like "log(" or "exp(" or "sum(" are skipped, also stuff like "*(" is avoided
+
+                    string word = node.s;
+
                     TokenHelper nextNode = node.Offset(1);
                     if (nextNode != null && nextNode.HasChildren() && nextNode.SubnodesType() == "(" && nextNode.subnodes[0].leftblanks == 0)
                     {
@@ -19653,156 +19697,29 @@ namespace Gekko
             if (true && Globals.runningOnTTComputer)
             {
                 //qwerty
-                
-                DateTime dt = DateTime.Now;
-                double ms1 = 0;
-                double ms2 = 0;
-                List<string> sletmig = new List<string>();
-                int counterA = 0;
-                int counterError1 = 0;
-                int counterError2 = 0;
 
-                foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
-                {
-                    if (counterA > 30) break;
-                    if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
+                //Sniff();
+                Sniff2();
 
-                    counterA++;
-                    ModelGamsEquation eq = kvp.Value[0];
-
-                    eq.expressionVariables = new List<List<string>>();
-                    eq.expressionVariablesWithSets = new List<List<string>>();
-
-                    string rhs = eq.rhs.Trim();
-                    string lhs = eq.lhs.Trim();
-                    string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-
-                    if (eq.expressions == null || eq.expressions.Count == 0)
-                    {
-                        Globals.expressions = null;  //maybe not necessary
-
-                        try
-                        {
-                            DateTime dt1 = DateTime.Now;
-                            CallEval(eq.conditionals, s1);                           
-                            ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
-                        }
-                        catch (Exception e)
-                        {
-                            counterError1++;
-                            if (e.Message.Contains("System.OutOfMemoryException"))
-                            {
-                                G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
-                            }
-                            else
-                            {
-                                G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
-                            }                            
-                            continue;
-                        }
-                        eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-
-                        DateTime dt2 = DateTime.Now;
-                        foreach (var expression in Globals.expressions)
-                        {
-                            //Function call start --------------
-                            //O.AdjustSmplForDecomp(smpl, 0);
-                            //TODO: can be deleted, #p24234oi32      
-                            Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                            try
-                            {
-                                
-                                Globals.mem = 0;
-                                foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();                                                                
-                                int mem1 = Globals.mem;
-
-                                IVariable iv = expression(new GekkoSmpl());
-
-                                Globals.mem = 0;
-                                foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();                                
-                                int mem2 = Globals.mem;
-
-                                if (mem2 - mem1 > 0)
-                                {
-                                    G.Writeln2("+++ MEM: " + (mem2 - mem1));
-                                }
-
-                                iv = null;
-                                List<string> m1 = new List<string>();
-                                List<string> m2 = new List<string>();
-                                foreach (string s in Globals.precedents.Keys)
-                                {
-                                    string ss1 = G.Chop_RemoveBank(s);
-                                    ss1 = G.Chop_RemoveFreq(ss1);
-                                    if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
-                                    {
-                                        m1.Add(ss1);
-                                    }
-                                    string ss2 = G.Chop_RemoveBank(s);
-                                    ss2 = G.Chop_RemoveIndex(ss2);                                    
-                                    ss2 = G.Chop_RemoveFreq(ss2);
-                                    if (!m2.Contains(ss2, StringComparer.OrdinalIgnoreCase))
-                                    {
-                                        m2.Add(ss2);
-                                    }
-                                }
-                                eq.expressionVariablesWithSets.Add(m1);
-                                eq.expressionVariables.Add(m2);
-                            }
-                            catch (Exception e)
-                            {
-                                counterError2++;
-                                eq.expressionVariablesWithSets.Add(null); //keep alignment
-                                eq.expressionVariables.Add(null); //keep alignment
-                                if (e.Message.Contains("System.OutOfMemoryException"))
-                                {
-                                    G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
-                                }
-                                else
-                                {
-                                    G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
-                                }
-                                break;
-                            }
-                            finally
-                            {
-                                Globals.precedents = null;
-                            }
-                            //O.AdjustSmplForDecomp(smpl, 1);
-                            //Function call end   --------------
-                        }
-                        ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
-                        Globals.expressions = null;  //maybe not necessary
-                    }
-
-                    //kvp.Value.Clear();  //qwerty
-
-                }
-                G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
-
-
-                List smallSuper = new List();
-                List largeSuper = new List();
+                List mm1 = new List();
 
                 StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
                 foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
                 {
                     ModelGamsEquation eq = kvp.Value[0];
 
+                    List mm2 = new List();
+                    mm2.Add(new ScalarString(eq.nameGams));
+
                     //List: idea is to have a list m0 in this format:
                     //m0 is a list of (list) m1
                     //each m1 corresponds to a GAMS-eq. First element of m1 is the name, the rest are sub-equations (lists) m2
                     //each m2 is a list of strings (variable names)
 
-                    smallSuper.Add(new ScalarString(eq.nameGams));
-                    largeSuper.Add(new ScalarString(eq.nameGams));
-                    List small = new List();  //for each equation
-                    List large = new List();
-                    
                     sb.WriteLine();
                     sb.WriteLine("-----------------------------------------------------------");
                     sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
-                    sb.WriteLine("$condition: "+eq.conditionals);
+                    sb.WriteLine("$condition: " + eq.conditionals);
                     sb.WriteLine(eq.lhs + " = " + eq.rhs);
                     if (eq.expressionVariables == null)
                     {
@@ -19822,8 +19739,7 @@ namespace Gekko
                             {
                                 //for each sub-equation
 
-                                List smallSub = new List();  //for each sub-equation
-                                List largeSub = new List();
+                                List mm3 = new List();
 
                                 List<string> m1 = eq.expressionVariables[i];
                                 List<string> m2 = eq.expressionVariablesWithSets[i];
@@ -19835,48 +19751,307 @@ namespace Gekko
                                 else
                                 {
 
-                                    foreach (string s1 in m1)
-                                    {
-                                        ScalarString ss1 = new ScalarString(s1);
-                                        smallSub.Add(ss1);
-                                    }
-
                                     foreach (string s2 in m2)
                                     {
                                         ScalarString ss2 = new ScalarString(s2);
-                                        largeSub.Add(ss2);
+                                        mm3.Add(ss2);
                                     }
 
                                     sb.WriteLine("SMALL " + G.GetListWithCommas(m1));
                                     sb.WriteLine("FULL  " + G.GetListWithCommas(m2));
                                 }
-                                small.Add(smallSub);
-                                large.Add(largeSub);
+                                mm2.Add(mm3);
                             }
                         }
-
                     }
-                    smallSuper.Add(small);
-                    largeSuper.Add(large);
-
-                    List smallTemp = new List();
-                    List largeTemp = new List();
-
-
-
+                    mm1.Add(mm2);
                 }
                 sb.Flush();
                 sb.Close();
 
                 Program.databanks.GetFirst().Clear();
-                Program.databanks.GetFirst().AddIVariable("#small", smallSuper);
-                Program.databanks.GetFirst().AddIVariable("#large", largeSuper);
+                Program.databanks.GetFirst().AddIVariable("#m", mm1);
                 WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
 
             }
+        }
 
+        private static void Sniff()
+        {
+            DateTime dt = DateTime.Now;
+            double ms1 = 0;
+            double ms2 = 0;
+            List<string> sletmig = new List<string>();
+            int counterA = 0;
+            int counterError1 = 0;
+            int counterError2 = 0;
 
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
+            {
+                //if (counterA > 30) break;
+                if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
+                counterA++;
+                ModelGamsEquation eq = kvp.Value[0];
+
+                eq.expressionVariables = new List<List<string>>();
+                eq.expressionVariablesWithSets = new List<List<string>>();
+
+                string rhs = eq.rhs.Trim();
+                string lhs = eq.lhs.Trim();
+                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+
+                if (eq.expressions == null || eq.expressions.Count == 0)
+                {
+                    Globals.expressions = null;  //maybe not necessary
+
+                    try
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        CallEval(eq.conditionals, s1);
+                        ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
+                    }
+                    catch (Exception e)
+                    {
+                        counterError1++;
+                        if (e.Message.Contains("System.OutOfMemoryException"))
+                        {
+                            G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
+                        }
+                        else
+                        {
+                            G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
+                        }
+                        continue;
+                    }
+                    eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+
+                    DateTime dt2 = DateTime.Now;
+                    foreach (var expression in Globals.expressions)
+                    {
+                        //Function call start --------------
+                        //O.AdjustSmplForDecomp(smpl, 0);
+                        //TODO: can be deleted, #p24234oi32      
+                        Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                        try
+                        {
+
+                            Globals.mem = 0;
+                            foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();
+                            int mem1 = Globals.mem;
+
+                            IVariable iv = expression(new GekkoSmpl());
+
+                            Globals.mem = 0;
+                            foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();
+                            int mem2 = Globals.mem;
+
+                            if (mem2 - mem1 > 0)
+                            {
+                                G.Writeln2("+++ MEM: " + (mem2 - mem1));
+                            }
+
+                            iv = null;
+                            List<string> m1 = new List<string>();
+                            List<string> m2 = new List<string>();
+                            foreach (string s in Globals.precedents.Keys)
+                            {
+                                string ss1 = G.Chop_RemoveBank(s);
+                                ss1 = G.Chop_RemoveFreq(ss1);
+                                if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    m1.Add(ss1);
+                                }
+                                string ss2 = G.Chop_RemoveBank(s);
+                                ss2 = G.Chop_RemoveIndex(ss2);
+                                ss2 = G.Chop_RemoveFreq(ss2);
+                                if (!m2.Contains(ss2, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    m2.Add(ss2);
+                                }
+                            }
+                            eq.expressionVariablesWithSets.Add(m1);
+                            eq.expressionVariables.Add(m2);
+                        }
+                        catch (Exception e)
+                        {
+                            counterError2++;
+                            eq.expressionVariablesWithSets.Add(null); //keep alignment
+                            eq.expressionVariables.Add(null); //keep alignment
+                            if (e.Message.Contains("System.OutOfMemoryException"))
+                            {
+                                G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
+                            }
+                            else
+                            {
+                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                            }
+                            break;
+                        }
+                        finally
+                        {
+                            Globals.precedents = null;
+                        }
+                        //O.AdjustSmplForDecomp(smpl, 1);
+                        //Function call end   --------------
+                    }
+                    ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
+                    Globals.expressions = null;  //maybe not necessary
+                }
+
+                //kvp.Value.Clear();  //qwerty
+
+            }
+            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
+        }
+
+        private static void Sniff2()
+        {
+            DateTime dt = DateTime.Now;
+            double ms1 = 0;
+            double ms2 = 0;
+            List<string> sletmig = new List<string>();
+            int counterA = 0;
+            int counterError1 = 0;
+            int counterError2 = 0;
+
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
+            {
+                //if (counterA > 30) break;
+                if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
+
+                counterA++;
+                ModelGamsEquation eq = kvp.Value[0];
+
+                eq.expressionVariables = new List<List<string>>();
+                eq.expressionVariablesWithSets = new List<List<string>>();
+
+                string rhs = eq.rhs.Trim();
+                string lhs = eq.lhs.Trim();
+                string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
+
+                if (eq.expressions == null || eq.expressions.Count == 0)
+                {
+                    Globals.expressions = null;  //maybe not necessary
+
+                    try
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        CallEval(eq.conditionals, s1);
+                        ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
+                    }
+                    catch (Exception e)
+                    {
+                        counterError1++;
+                        if (e.Message.Contains("System.OutOfMemoryException"))
+                        {
+                            G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
+                        }
+                        else
+                        {
+                            G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
+                        }
+                        continue;
+                    }
+                    eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
+                                       
+                    /*
+                    int jj = -1;
+                    foreach (Func<GekkoSmpl, IVariable> expression in link.expressions)  //for each uncontrolled #i in x[#i]
+                    {
+                        jj++;
+                        DecompData dd = Decomp.DecompLowLevel(per1, per2, expression, DecompBanks(operator1), residualName, ref funcCounter);
+
+                    */
+
+                    DateTime dt2 = DateTime.Now;
+                    foreach (Func<GekkoSmpl, IVariable> expression in Globals.expressions)
+                    {
+
+                        if (true)
+                        {
+                            string op = "d";
+                            GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);
+                            GekkoTime per2 = new GekkoTime(EFreq.A, 2020, 1);
+                            string residualName = "residual___";
+                            int funcCounter = 0;
+                            DecompData dd = Gekko.Decomp.DecompLowLevel(per1, per2, expression, Gekko.Decomp.DecompBanks(op), residualName, ref funcCounter);
+                        }
+
+                        //Function call start --------------
+                        //O.AdjustSmplForDecomp(smpl, 0);
+                        //TODO: can be deleted, #p24234oi32      
+                        Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                        try
+                        {
+
+                            Globals.mem = 0;
+                            foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();
+                            int mem1 = Globals.mem;
+
+                            IVariable iv = expression(new GekkoSmpl());
+
+                            Globals.mem = 0;
+                            foreach (KeyValuePair<string, IVariable> kvp2 in Program.databanks.GetFirst().storage) kvp2.Value.DeepTrim();
+                            int mem2 = Globals.mem;
+
+                            if (mem2 - mem1 > 0)
+                            {
+                                G.Writeln2("+++ MEM: " + (mem2 - mem1));
+                            }
+
+                            iv = null;
+                            List<string> m1 = new List<string>();
+                            List<string> m2 = new List<string>();
+                            foreach (string s in Globals.precedents.Keys)
+                            {
+                                string ss1 = G.Chop_RemoveBank(s);
+                                ss1 = G.Chop_RemoveFreq(ss1);
+                                if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    m1.Add(ss1);
+                                }
+                                string ss2 = G.Chop_RemoveBank(s);
+                                ss2 = G.Chop_RemoveIndex(ss2);
+                                ss2 = G.Chop_RemoveFreq(ss2);
+                                if (!m2.Contains(ss2, StringComparer.OrdinalIgnoreCase))
+                                {
+                                    m2.Add(ss2);
+                                }
+                            }
+                            eq.expressionVariablesWithSets.Add(m1);
+                            eq.expressionVariables.Add(m2);
+                        }
+                        catch (Exception e)
+                        {
+                            counterError2++;
+                            eq.expressionVariablesWithSets.Add(null); //keep alignment
+                            eq.expressionVariables.Add(null); //keep alignment
+                            if (e.Message.Contains("System.OutOfMemoryException"))
+                            {
+                                G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
+                            }
+                            else
+                            {
+                                G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
+                            }
+                            break;
+                        }
+                        finally
+                        {
+                            Globals.precedents = null;
+                        }
+                        //O.AdjustSmplForDecomp(smpl, 1);
+                        //Function call end   --------------
+                    }
+                    ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
+                    Globals.expressions = null;  //maybe not necessary
+                }
+
+                //kvp.Value.Clear();  //qwerty
+
+            }
+            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
         }
 
         public static void CallEval(string conditionals, string statement)
@@ -20119,8 +20294,12 @@ namespace Gekko
 
             WalkTokensHandleParentheses(lhsTokensGekko); //changes '[' and '{' into '('
             WalkTokensHandleParentheses(rhsTokensGekko); //changes '[' and '{' into '('
-            WalkTokens(lhsTokensGekko, new WalkTokensHelper());
-            WalkTokens(rhsTokensGekko, new WalkTokensHelper());
+
+            WalkTokensHelper wt1 = new WalkTokensHelper();
+            WalkTokens(lhsTokensGekko, wt1);
+
+            WalkTokensHelper wt2 = new WalkTokensHelper();
+            WalkTokens(rhsTokensGekko, wt2);
 
             //sb.Append(lhsTokensGekko.ToStringTrim() + " = " + rhsTokensGekko.ToStringTrim() + ";" + G.NL);
 

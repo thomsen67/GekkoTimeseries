@@ -1178,10 +1178,8 @@ namespace Gekko
 
                     int iVar = -1;
 
-
                     foreach (DecompPrecedent dp in decompPrecedents)
                     {
-
                         iVar++;
 
                         Series xRef_series = null;
