@@ -410,8 +410,7 @@ namespace Gekko
         public TokenHelper rhsTokensGams = null;
 
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
-        public List<List<string>> expressionVariablesWithSets = null;  //for each expression in .expressions: contains the list of variables in the eq
-        public List<List<string>> expressionVariables = null;  //same as above, but with no sets
+        public List<List<string>> expressionVariablesWithSets = null;  //for each expression in .expressions: contains the list of variables in the eq        
 
     }
 }

@@ -2768,7 +2768,7 @@ namespace Gekko
             {                
                 foreach (KeyValuePair<MapMultidimItem, IVariable> kvp in this.dimensionsStorage.storage)
                 {
-                    Globals.mem++;
+                    //Globals.mem++;
                     kvp.Value.DeepTrim();
                 }
             }
