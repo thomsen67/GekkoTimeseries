@@ -17530,8 +17530,10 @@ namespace Gekko
                     Globals.itemHandler = new ItemHandler();
 
                     string firstText = null;
+                    List<string> firstList = new List<string>();
 
                     bool firstFirst = true;
+
                     string name = text.Substring("find ".Length).Trim();
                     List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
                     foreach (List m2 in m1.list)  //foreach GAMS equation
@@ -17551,7 +17553,7 @@ namespace Gekko
                             else
                             {
                                 bool found = false;
-                                foreach (ScalarString ss in (m3 as List).list) //foreach sub-eq (first item is name)
+                                foreach (ScalarString ss in (m3 as List).list) //foreach variable (first item is name)
                                 {
                                     string[] ss2 = ss.string2.Split('¤');
                                     string ss3 = ss2[0];
@@ -17559,13 +17561,7 @@ namespace Gekko
                                     {
                                         if (G.Equal(name, ss3))
                                         {
-                                            found = true;
-                                            if (firstFirst)
-                                            {
-                                                List<ModelGamsEquation> xx = Program.modelGams.equationsByEqname[eqName];
-                                                firstText = xx[0].lhs + " = " + xx[0].rhs;
-                                            }
-                                            firstFirst = false;
+                                            found = true;                                            
                                             break;
                                         }
                                     }
@@ -17577,6 +17573,15 @@ namespace Gekko
                                     string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
                                     Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, false, false, "t0", xx, "Black"));
 
+                                    if (firstFirst)
+                                    {
+                                        List<ModelGamsEquation> xx2 = Program.modelGams.equationsByEqname[eqName];
+                                        firstText = xx2[0].lhs + " = " + xx2[0].rhs;
+                                        firstList.AddRange(yy);
+                                    }
+                                    firstFirst = false;
+
+                                    
                                 }
                             }
                             first = false;
@@ -17599,22 +17604,43 @@ namespace Gekko
                     WindowEquationBrowser eb = new WindowEquationBrowser();
 
                     eb.windowEquationBrowserText.Inlines.Clear();
-                    eb.windowEquationBrowserText.Inlines.Add("Some text ");
-                    System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
-                    {
-                        NavigateUri = new Uri("http://www.t-t.dk/gekko")
-                    };
-                    hyperLink.Inlines.Add("some site");
-                    hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;                    
+                    eb.windowEquationBrowserText.Inlines.Add("Variables: ");
+
+
+                    eb.windowEquationBrowserText.Inlines.Clear();                    
+
+                    //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
+                    //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
+
+                    string txt0 = "Equation: qY[lan] from E_vY";
+                    eb.windowEquationBrowserText.Inlines.Add(txt0 + G.NL);
+
+
+                    eb.windowEquationBrowserText.Inlines.Add("Variables: ");
                     Random r = new Random();
-                    System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
+                    foreach (string s in firstList)
+                    {
+                        System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
+                        {
+                            NavigateUri = new Uri("http://www.t-t.dk/gekko")
+                        };
+                        if (s == "residual___") continue;
+                        hyperLink.Inlines.Add(s.Replace("¤[0]", "").Replace("¤", ""));
+                        hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
+                        System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
+                        //Convert.ToByte(r.Next(0, 255)),
+                        //Convert.ToByte(r.Next(0, 255)),
+                        //Convert.ToByte(r.Next(0, 255)));
                         Convert.ToByte(r.Next(0, 255)),
-                        Convert.ToByte(r.Next(0, 255)),
-                        Convert.ToByte(r.Next(0, 255)));
-                    hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
-                    eb.windowEquationBrowserText.Inlines.Add(hyperLink);
-                    eb.windowEquationBrowserText.Inlines.Add(" Some more text");
-                    string txt = "Equation: " + "E_vY";
+                        Convert.ToByte(0),
+                        Convert.ToByte(0));
+                        hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
+                        eb.windowEquationBrowserText.Inlines.Add(hyperLink);
+                        eb.windowEquationBrowserText.Inlines.Add(", ");
+                    }
+                    eb.windowEquationBrowserText.Inlines.Add(G.NL);                                        
+                    
+                    string txt = null;
                     txt += G.NL;
                     txt += firstText;
                     eb.windowEquationBrowserText.Inlines.Add(txt);
