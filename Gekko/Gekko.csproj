@@ -371,6 +371,9 @@
     <Compile Include="WindowDecompSortEtc.xaml.cs">
       <DependentUpon>WindowDecompSortEtc.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WindowEquationBrowser.xaml.cs">
+      <DependentUpon>WindowEquationBrowser.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowIntellisense.xaml.cs">
       <DependentUpon>WindowIntellisense.xaml</DependentUpon>
     </Compile>
@@ -513,6 +516,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="WindowDecompSortEtc.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowEquationBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

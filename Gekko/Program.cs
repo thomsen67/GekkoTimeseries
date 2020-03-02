@@ -17518,6 +17518,10 @@ namespace Gekko
         {            
             if (Globals.runningOnTTComputer)
             {
+                WindowEquationBrowser eb = new WindowEquationBrowser();
+                eb.ShowDialog();
+                eb.Close();
+                
                 if (text == "python")
                 {
                     string s = Python();

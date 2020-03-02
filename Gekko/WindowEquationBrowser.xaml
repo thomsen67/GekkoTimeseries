@@ -1,0 +1,27 @@
+﻿<Window x:Class="Gekko.WindowEquationBrowser"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Gekko"
+        Title="MainWindow" Height="350" Width="525">
+
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <Style x:Key="ListViewStyle" TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <ListView Margin="10" ItemsSource="{Binding Items}" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="320" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Matches" Width="80" DisplayMemberBinding="{Binding Matches}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
