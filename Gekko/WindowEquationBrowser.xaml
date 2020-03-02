@@ -15,6 +15,11 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <ListView Margin="10" ItemsSource="{Binding Items}" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">
             <ListView.View>
                 <GridView>
@@ -28,5 +33,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
+        <TextBlock Name="windowEquationBrowserText" Grid.Row="2" FontSize="12" FontFamily="Courier New" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="10" TextWrapping="WrapWithOverflow"></TextBlock>
+
     </Grid>
 </Window>

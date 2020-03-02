@@ -10180,7 +10180,7 @@ namespace Gekko
                 wh.statusField = ss2;
                 Globals.workerThread.gekkoGui.Invoke(Globals.workerThread.gekkoGui.threadDelegateSetTitle, wh);
             }
-             
+
             int i = 0;
             foreach (Graph g in Globals.windowsGraph)
             {
@@ -17529,6 +17529,9 @@ namespace Gekko
                 {
                     Globals.itemHandler = new ItemHandler();
 
+                    string firstText = null;
+
+                    bool firstFirst = true;
                     string name = text.Substring("find ".Length).Trim();
                     List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
                     foreach (List m2 in m1.list)  //foreach GAMS equation
@@ -17537,11 +17540,13 @@ namespace Gekko
                         bool first = true;
                         List<List<string>> results = new List<List<string>>();
 
+                        int counter = 0;
                         foreach (IVariable m3 in m2.list) //foreach sub-eq (first item is name)
                         {
+                            counter++;
                             if (first)
                             {
-                                eqName = (m3 as ScalarString).string2;
+                                eqName = (m3 as ScalarString).string2;                                
                             }
                             else
                             {
@@ -17555,6 +17560,12 @@ namespace Gekko
                                         if (G.Equal(name, ss3))
                                         {
                                             found = true;
+                                            if (firstFirst)
+                                            {
+                                                List<ModelGamsEquation> xx = Program.modelGams.equationsByEqname[eqName];
+                                                firstText = xx[0].lhs + " = " + xx[0].rhs;
+                                            }
+                                            firstFirst = false;
                                             break;
                                         }
                                     }
@@ -17562,7 +17573,10 @@ namespace Gekko
 
                                 if (found)
                                 {
-                                    results.Add(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList());
+                                    List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
+                                    string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+                                    Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, false, false, "t0", xx, "Black"));
+
                                 }
                             }
                             first = false;
@@ -17575,15 +17589,36 @@ namespace Gekko
                             G.Writeln("Eqname: " + eqName);
                             foreach (List<string> x in results)
                             {
-                                string xx = G.GetListWithCommas(x).Replace("¤[0]", "").Replace("¤", "");
-                                G.Writeln("        " + xx);
-                                Globals.itemHandler.Add(new EquationListItem(eqName, "2 of 34", "yes", true, "t0", xx));
+                                //string xx = G.GetListWithCommas(x).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+                                //G.Writeln("        " + xx);
+                                //Globals.itemHandler.Add(new EquationListItem(eqName, "2 of 34", "yes", true, "t0", xx));
                             }
                         }
                     }
                     
                     WindowEquationBrowser eb = new WindowEquationBrowser();
-                    
+
+                    eb.windowEquationBrowserText.Inlines.Clear();
+                    eb.windowEquationBrowserText.Inlines.Add("Some text ");
+                    System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
+                    {
+                        NavigateUri = new Uri("http://www.t-t.dk/gekko")
+                    };
+                    hyperLink.Inlines.Add("some site");
+                    hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;                    
+                    Random r = new Random();
+                    System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
+                        Convert.ToByte(r.Next(0, 255)),
+                        Convert.ToByte(r.Next(0, 255)),
+                        Convert.ToByte(r.Next(0, 255)));
+                    hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
+                    eb.windowEquationBrowserText.Inlines.Add(hyperLink);
+                    eb.windowEquationBrowserText.Inlines.Add(" Some more text");
+                    string txt = "Equation: " + "E_vY";
+                    txt += G.NL;
+                    txt += firstText;
+                    eb.windowEquationBrowserText.Inlines.Add(txt);
+
                     eb.ShowDialog();
                     eb.Close();
 
@@ -17592,7 +17627,9 @@ namespace Gekko
 
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
-        }       
+        }
+
+        
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
@@ -19511,7 +19548,7 @@ namespace Gekko
             Program.modelGams = new ModelGams();
             //Program.modelGams.equations = eqLines;
 
-            Dictionary<string, List<ModelGamsEquation>> xx = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, List<ModelGamsEquation>> xx = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
             bool first = true;
             foreach (List<string> line in eqLines)
@@ -19596,8 +19633,8 @@ namespace Gekko
             var tags4 = new List<string>() { "*" };
 
             TokenHelper tokens2 = StringTokenizer2.GetTokensWithLeftBlanksRecursive(txt, tags1, tags2, tags3, tags4);
-            Dictionary<string, List<ModelGamsEquation>> equationsByVarname = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-            Dictionary<string, List<ModelGamsEquation>> equationsByEqname = new Dictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+            GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
 
             GekkoDictionary<string, string> dependents = null;
             IVariable lhsList = o.opt_dep;
@@ -19710,7 +19747,7 @@ namespace Gekko
                 }
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {    
                 Sniff2();
                 Sneeze();

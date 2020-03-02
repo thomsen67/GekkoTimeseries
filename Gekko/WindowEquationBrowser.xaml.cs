@@ -26,11 +26,16 @@ namespace Gekko
         {            
             InitializeComponent();
         }
+
+        public void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Uri.ToString());
+        }
     }
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, string dep, bool lhs, string per, string vars)
+        public EquationListItem(string name, string sub, bool dep, bool lhs, string per, string vars, string lineColor)
         {
             Name = name;
             Sub = sub;
@@ -38,19 +43,22 @@ namespace Gekko
             Lhs = lhs;
             Per = per;
             Vars = vars;
+            LineColor = lineColor;
         }
 
         public string Name { get; set; }
 
         public string Sub { get; set; }
 
-        public string Dep { get; set; }
+        public bool Dep { get; set; }
         
         public bool Lhs { get; set; }
 
         public string Per { get; set; }
 
         public string Vars { get; set; }
+
+        public string LineColor { get; set; }
     }
 
     public class ItemHandler

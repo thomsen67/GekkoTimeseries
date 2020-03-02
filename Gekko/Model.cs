@@ -387,8 +387,8 @@ namespace Gekko
 
     public class ModelGams
     {
-        public Dictionary<string, List<ModelGamsEquation>> equationsByVarname = null;
-        public Dictionary<string, List<ModelGamsEquation>> equationsByEqname = null;  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = null;
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = null;  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname
     }
 
     public class ModelGamsEquation
