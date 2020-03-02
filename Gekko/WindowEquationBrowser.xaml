@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Gekko"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Equations" Height="350" Width="525">
 
     <Window.DataContext>
         <local:MainWindowViewModel/>
@@ -15,11 +15,16 @@
     </Window.Resources>
 
     <Grid>
-        <ListView Margin="10" ItemsSource="{Binding Items}" HorizontalAlignment="Left" HorizontalContentAlignment="Left">
+        <ListView Margin="10" ItemsSource="{Binding Items}" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Name="windowEquationBrowserListView">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="320" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Matches" Width="80" DisplayMemberBinding="{Binding Matches}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Name" Width="50" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Sub" Width="50" DisplayMemberBinding="{Binding Sub}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Dep" Width="30" DisplayMemberBinding="{Binding Dep}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Lhs" Width="30" DisplayMemberBinding="{Binding Lhs}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Per" Width="50" DisplayMemberBinding="{Binding Per}" />
+                    <GridViewColumn HeaderContainerStyle="{StaticResource ListViewStyle}" Header="Vars" Width="300" DisplayMemberBinding="{Binding Vars}" />
+                    
                 </GridView>
             </ListView.View>
         </ListView>

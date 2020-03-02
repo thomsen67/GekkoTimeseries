@@ -17,36 +17,52 @@ namespace Gekko
     /// <summary>
     /// Interaction logic for WindowEquationBrowser.xaml
     /// </summary>
+        
+
     public partial class WindowEquationBrowser
     {
+        
         public WindowEquationBrowser()
-        {
+        {            
             InitializeComponent();
         }
     }
 
-    public class Item
+    public class EquationListItem
     {
-        public Item(string name, string matches)
+        public EquationListItem(string name, string sub, string dep, bool lhs, string per, string vars)
         {
             Name = name;
-            Matches = matches;
+            Sub = sub;
+            Dep = dep;
+            Lhs = lhs;
+            Per = per;
+            Vars = vars;
         }
 
         public string Name { get; set; }
-        public string Matches { get; set; }
+
+        public string Sub { get; set; }
+
+        public string Dep { get; set; }
+        
+        public bool Lhs { get; set; }
+
+        public string Per { get; set; }
+
+        public string Vars { get; set; }
     }
 
     public class ItemHandler
     {
         public ItemHandler()
         {
-            Items = new List<Item>();
+            Items = new List<EquationListItem>();
         }
 
-        public List<Item> Items { get; private set; }
+        public List<EquationListItem> Items { get; private set; }
 
-        public void Add(Item item)
+        public void Add(EquationListItem item)
         {
             Items.Add(item);
         }
@@ -58,13 +74,13 @@ namespace Gekko
 
         public MainWindowViewModel()
         {
-            _itemHandler = new ItemHandler();
-            _itemHandler.Add(new Item("John Doe", "12"));
-            _itemHandler.Add(new Item("Jane Doe", "133"));
-            _itemHandler.Add(new Item("Sammy Doe", "45"));
+            //_itemHandler=WindowEquationBrowser.ite
+
+            _itemHandler = Globals.itemHandler;            
+
         }
 
-        public List<Item> Items
+        public List<EquationListItem> Items
         {
             get { return _itemHandler.Items; }
         }

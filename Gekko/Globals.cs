@@ -49,6 +49,8 @@ namespace Gekko
         public static bool oldcontrol = true;
         public static bool oldcontrol2 = false;
 
+        public static ItemHandler itemHandler = null;  //hack
+
         public static bool decompSubstitute = false;
 
         public static StreamWriter sw = null; 

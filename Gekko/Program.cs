@@ -17518,10 +17518,8 @@ namespace Gekko
         {            
             if (Globals.runningOnTTComputer)
             {
-                WindowEquationBrowser eb = new WindowEquationBrowser();
-                eb.ShowDialog();
-                eb.Close();
-                
+
+
                 if (text == "python")
                 {
                     string s = Python();
@@ -17529,6 +17527,8 @@ namespace Gekko
                 }
                 else if (text.StartsWith("find"))
                 {
+                    Globals.itemHandler = new ItemHandler();
+
                     string name = text.Substring("find ".Length).Trim();
                     List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
                     foreach (List m2 in m1.list)  //foreach GAMS equation
@@ -17562,7 +17562,7 @@ namespace Gekko
 
                                 if (found)
                                 {
-                                    results.Add(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList());                                    
+                                    results.Add(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList());
                                 }
                             }
                             first = false;
@@ -17575,10 +17575,18 @@ namespace Gekko
                             G.Writeln("Eqname: " + eqName);
                             foreach (List<string> x in results)
                             {
-                                G.Writeln("        " + G.GetListWithCommas(x).Replace("¤[0]", "").Replace("¤", ""));
+                                string xx = G.GetListWithCommas(x).Replace("¤[0]", "").Replace("¤", "");
+                                G.Writeln("        " + xx);
+                                Globals.itemHandler.Add(new EquationListItem(eqName, "2 of 34", "yes", true, "t0", xx));
                             }
                         }
                     }
+                    
+                    WindowEquationBrowser eb = new WindowEquationBrowser();
+                    
+                    eb.ShowDialog();
+                    eb.Close();
+
                 }                
             }
 
