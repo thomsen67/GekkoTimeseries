@@ -82,7 +82,7 @@ namespace Gekko
 
     public class EquationListItem
     {
-        public EquationListItem(string name, string sub, bool dep, bool lhs, string per, string vars, string lineColor)
+        public EquationListItem(string name, string sub, string dep, string lhs, string per, string vars, string lineColor)
         {
             Name = name;
             Sub = sub;
@@ -97,9 +97,9 @@ namespace Gekko
 
         public string Sub { get; set; }
 
-        public bool Dep { get; set; }
+        public string Dep { get; set; }
         
-        public bool Lhs { get; set; }
+        public string Lhs { get; set; }
 
         public string Per { get; set; }
 

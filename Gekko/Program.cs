@@ -17571,7 +17571,25 @@ namespace Gekko
                                 {
                                     List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
                                     string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
-                                    Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, false, false, "t0", xx, "Black"));
+
+                                    string bool1 = "";
+                                    string bool2 = "";
+                                    string tt = "tx0";
+                                    if (eqName == "E_qY_tot")
+                                    {
+                                        bool1 = Globals.protectSymbol;
+                                        bool2 = Globals.protectSymbol;
+                                    }
+                                    else if (eqName == "E_vCalvo")
+                                    {
+                                        tt = "tx0e";
+                                    }
+                                    else if (eqName == "E_vCalvo_tEnd")
+                                    {
+                                        tt = "tend";
+                                    }                                    
+
+                                    Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, bool1, bool2, tt, xx, "Black"));
 
                                     if (firstFirst)
                                     {
