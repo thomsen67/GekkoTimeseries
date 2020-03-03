@@ -3362,18 +3362,23 @@ namespace Gekko
                             //IMPORTANT
                             //IMPORTANT see #70324327984
                             //IMPORTANT
-                                                        
+
                             serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
-                            serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                            serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                            serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                            serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                            serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                            serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                            serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                            serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                            serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                            serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+
+                            //qwerty
+                            if (false)
+                            {
+                                serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                                serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                                serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                                serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                                serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                                serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                                serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                                serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                                serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                                serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                            }
                             
                         }
 
@@ -19928,119 +19933,7 @@ namespace Gekko
             Program.databanks.GetFirst().AddIVariable("#m", mm1);
             WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
         }
-
-        //private static void Sniff()
-        //{
-        //    DateTime dt = DateTime.Now;
-        //    double ms1 = 0;
-        //    double ms2 = 0;
-        //    List<string> sletmig = new List<string>();
-        //    int counterA = 0;
-        //    int counterError1 = 0;
-        //    int counterError2 = 0;
-
-        //    foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
-        //    {
-        //        //if (counterA > 30) break;
-        //        if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
-
-        //        counterA++;
-        //        ModelGamsEquation eq = kvp.Value[0];
-                                
-        //        eq.expressionVariablesWithSets = new List<List<string>>();
-
-        //        string rhs = eq.rhs.Trim();
-        //        string lhs = eq.lhs.Trim();
-        //        string s1 = EquationLhsRhs(lhs, rhs, true) + ";";
-
-        //        if (eq.expressions == null || eq.expressions.Count == 0)
-        //        {
-        //            Globals.expressions = null;  //maybe not necessary
-
-        //            try
-        //            {
-        //                DateTime dt1 = DateTime.Now;
-        //                CallEval(eq.conditionals, s1);
-        //                ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                counterError1++;
-        //                if (e.Message.Contains("System.OutOfMemoryException"))
-        //                {
-        //                    G.Writeln2("+++ ERROR: MEMORY in equation (type 2): " + eq.nameGams);
-        //                }
-        //                else
-        //                {
-        //                    G.Writeln2("+++ ERROR: in equation  (type 2): " + eq.nameGams);
-        //                }
-        //                continue;
-        //            }
-        //            eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
-
-        //            DateTime dt2 = DateTime.Now;
-        //            foreach (var expression in Globals.expressions)
-        //            {
-        //                //Function call start --------------
-        //                //O.AdjustSmplForDecomp(smpl, 0);
-        //                //TODO: can be deleted, #p24234oi32      
-        //                Globals.precedents = new GekkoDictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        //                try
-        //                {                        
-
-        //                    IVariable iv = expression(new GekkoSmpl());                          
-                                                        
-        //                    iv = null;
-        //                    List<string> m1 = new List<string>();
-        //                    List<string> m2 = new List<string>();
-        //                    foreach (string s in Globals.precedents.Keys)
-        //                    {
-        //                        string ss1 = G.Chop_RemoveBank(s);
-        //                        ss1 = G.Chop_RemoveFreq(ss1);
-        //                        if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
-        //                        {
-        //                            m1.Add(ss1);
-        //                        }
-        //                        string ss2 = G.Chop_RemoveBank(s);
-        //                        ss2 = G.Chop_RemoveIndex(ss2);
-        //                        ss2 = G.Chop_RemoveFreq(ss2);
-        //                        if (!m2.Contains(ss2, StringComparer.OrdinalIgnoreCase))
-        //                        {
-        //                            m2.Add(ss2);
-        //                        }
-        //                    }
-        //                    eq.expressionVariablesWithSets.Add(m1);
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                    counterError2++;
-        //                    eq.expressionVariablesWithSets.Add(null); //keep alignment                            
-        //                    if (e.Message.Contains("System.OutOfMemoryException"))
-        //                    {
-        //                        G.Writeln2("+++ ERROR: MEMORY in equation: " + eq.nameGams);
-        //                    }
-        //                    else
-        //                    {
-        //                        G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
-        //                    }
-        //                    break;
-        //                }
-        //                finally
-        //                {
-        //                    Globals.precedents = null;
-        //                }
-        //                //O.AdjustSmplForDecomp(smpl, 1);
-        //                //Function call end   --------------
-        //            }
-        //            ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
-        //            Globals.expressions = null;  //maybe not necessary
-        //        }
-
-        //        //kvp.Value.Clear();  //qwerty
-
-        //    }
-        //    G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
-        //}
+        
 
         private static void Sniff2()
         {
@@ -25471,17 +25364,21 @@ namespace Gekko
                             //IMPORTANT
                             RuntimeTypeModel serializer = TypeModel.Create();
                             serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
-                            serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                            serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                            serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                            serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                            serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                            serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                            serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                            serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                            serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                            serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
                             
+                            //qwerty
+                            if (false)
+                            {
+                                serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
+                                serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
+                                serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
+                                serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
+                                serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
+                                serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
+                                serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
+                                serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
+                                serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
+                                serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
+                            }                            
 
                             try
                             {
@@ -25490,6 +25387,9 @@ namespace Gekko
                             }
                             catch (Exception e)
                             {
+                                //qwerty
+                                MessageBox.Show(e.Message + " ........ " + " ....... " + e.InnerException + " ...... " + e.StackTrace);
+
                                 G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
                                 G.Writeln("           Message: " + e.Message, Color.Red);
                                 throw new GekkoException();
@@ -25523,8 +25423,11 @@ namespace Gekko
             }
 
             DateTime dt0 = DateTime.Now;
-            WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
 
+            //qwerty
+            MessageBox.Show("call 7z .. " + tempTsdxPath + " .. " + pathAndFileNameResultingFile);
+            WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
+            
             if (!Globals.setPrintMute)
             {
                 G.Writeln();
@@ -25852,6 +25755,7 @@ namespace Gekko
                         {
                             sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
                         }
+
                         SevenZipExtractor.SetLibraryPath(sevenzPath);
                         SevenZipCompressor tmp = new SevenZipCompressor();
                         tmp.ArchiveFormat = OutArchiveFormat.Zip;
@@ -25902,6 +25806,10 @@ namespace Gekko
                     {
                         sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
                     }
+
+                    //qwerty
+                    MessageBox.Show("path " + sevenzPath);
+
                     SevenZipExtractor.SetLibraryPath(sevenzPath);
                     SevenZipCompressor tmp = new SevenZipCompressor();
                     tmp.ArchiveFormat = OutArchiveFormat.Zip;
