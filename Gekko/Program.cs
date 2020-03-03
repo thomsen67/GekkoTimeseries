@@ -17602,49 +17602,7 @@ namespace Gekko
                     }
 
                     WindowEquationBrowser eb = new WindowEquationBrowser();
-
-                    eb.windowEquationBrowserText.Inlines.Clear();
-                    eb.windowEquationBrowserText.Inlines.Add("Variables: ");
-
-                    eb.windowEquationBrowserText.Inlines.Clear();
-
-                    //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
-                    //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
-
-                    string txt0 = "Equation: qY[lan] from E_vY";
-                    eb.windowEquationBrowserText.Inlines.Add(txt0 + G.NL);
-
-                    eb.windowEquationBrowserText.Inlines.Add("Variables: ");
-                    Random r = new Random();
-                    foreach (string s in firstList)
-                    {
-                        System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
-                        {
-                            NavigateUri = new Uri("http://www.t-t.dk/gekko")
-                        };
-                        if (s == "residual___") continue;
-                        hyperLink.Inlines.Add(s.Replace("¤[0]", "").Replace("¤", ""));
-                        hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
-                        hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
-                        hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
-                        System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
-                        //Convert.ToByte(r.Next(0, 255)),
-                        //Convert.ToByte(r.Next(0, 255)),
-                        //Convert.ToByte(r.Next(0, 255)));
-                        Convert.ToByte(r.Next(0, 255)),
-                        Convert.ToByte(0),
-                        Convert.ToByte(0));
-                        hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
-                        eb.windowEquationBrowserText.Inlines.Add(hyperLink);
-                        eb.windowEquationBrowserText.Inlines.Add(", ");
-                    }
-                    eb.windowEquationBrowserText.Inlines.Add(G.NL);
-
-                    string txt = null;
-                    txt += G.NL;
-                    txt += firstText;
-                    eb.windowEquationBrowserText.Inlines.Add(txt);
-
+                    EquationBrowserSetEquationText(firstText, firstList, eb);
                     EquationBrowserSetLabel(variableName, eb);
 
                     eb.ShowDialog();
@@ -17655,6 +17613,51 @@ namespace Gekko
 
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
+        }
+
+        public static void EquationBrowserSetEquationText(string firstText, List<string> firstList, WindowEquationBrowser eb)
+        {
+            eb.windowEquationBrowserText.Inlines.Clear();
+            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
+
+            eb.windowEquationBrowserText.Inlines.Clear();
+
+            //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
+            //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
+
+            string txt0 = "Equation: qY[lan] from E_vY";
+            eb.windowEquationBrowserText.Inlines.Add(txt0 + G.NL);
+
+            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
+            Random r = new Random();
+            foreach (string s in firstList)
+            {
+                System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
+                {
+                    NavigateUri = new Uri("http://www.t-t.dk/gekko")
+                };
+                if (s == "residual___") continue;
+                hyperLink.Inlines.Add(s.Replace("¤[0]", "").Replace("¤", ""));
+                hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
+                hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
+                hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
+                System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
+                //Convert.ToByte(r.Next(0, 255)),
+                //Convert.ToByte(r.Next(0, 255)),
+                //Convert.ToByte(r.Next(0, 255)));
+                Convert.ToByte(r.Next(0, 255)),
+                Convert.ToByte(0),
+                Convert.ToByte(0));
+                hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
+                eb.windowEquationBrowserText.Inlines.Add(hyperLink);
+                eb.windowEquationBrowserText.Inlines.Add(", ");
+            }
+            eb.windowEquationBrowserText.Inlines.Add(G.NL);
+
+            string txt = null;
+            txt += G.NL;
+            txt += firstText;
+            eb.windowEquationBrowserText.Inlines.Add(txt);
         }
 
         public static void EquationBrowserSetLabel(string variableName, WindowEquationBrowser eb)

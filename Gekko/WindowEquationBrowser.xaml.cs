@@ -49,6 +49,28 @@ namespace Gekko
             EquationListItem item = e.AddedItems[0] as EquationListItem;
             windowEquationBrowserText.Inlines.Clear();
             windowEquationBrowserText.Inlines.Add(item.Name);
+
+            List<ModelGamsEquation> xx2 = Program.modelGams.equationsByEqname[item.Name];
+            string s = xx2[0].lhs + " = " + xx2[0].rhs;
+
+            List m = Program.databanks.GetFirst().GetIVariable("#m") as List;
+            List m3 = null;
+            foreach (List m1 in m.list)
+            {
+                if (G.Equal((m1.list[0] as ScalarString).string2, item.Name))
+                {
+                    m3 = m1.list[1] as List;
+                }
+            }
+            if (m3 != null)
+            {
+                List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
+                //string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+                Program.EquationBrowserSetEquationText(s, yy, this);
+            }
+            
+            //windowEquationBrowserText.Inlines.Add(s);
+            //firstList.AddRange(yy);          
         }
     }
 
