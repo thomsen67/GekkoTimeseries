@@ -3215,9 +3215,15 @@ namespace Gekko
             }
             string unzippedFile = Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
 
+            //qwerty
+            MessageBox.Show("before zip");
+
             DateTime dt2 = DateTime.Now;
             string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
             G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
+
+            //qwerty
+            MessageBox.Show("after zip");
 
             //both protobuffers and tsd files
 
@@ -3382,7 +3388,14 @@ namespace Gekko
                             
                         }
 
+                        //qwerty
+                        MessageBox.Show("before proto");
+
                         deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
+
+                        //qwerty
+                        MessageBox.Show("after proto");
+
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {                            
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
@@ -8211,7 +8224,10 @@ namespace Gekko
                     p.lastFileSentToANTLR = fileName;
                     p.SetLastFileSentToANTLR(fileName);
 
+                    //qwerty
+                    MessageBox.Show("starting to parse");
                     ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, p);
+                    MessageBox.Show("ended parse");
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 }
                 catch (Exception e)

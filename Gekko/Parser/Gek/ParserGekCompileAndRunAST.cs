@@ -63,8 +63,8 @@ namespace Gekko.Parser.Gek
                 //code = code;  //just so it is easy to see here                                                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
                 
-
-                if (Globals.excelDna)
+                //qwerty
+                if (false && Globals.excelDna)
                 {
                     //Roslyn is basically better than Mono (who now uses Roslyn)
                     //hint here??: https://www.codeproject.com/Questions/1030521/How-Can-I-Display-Range-In-Excel-Dna
@@ -153,9 +153,12 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
+                    //qwerty
+                    MessageBox.Show("Start invoke");
                     Assembly assembly = compilerResults.CompiledAssembly;
                     Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
                     tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method    
+                    MessageBox.Show("End invoke");
                 }
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
             }
