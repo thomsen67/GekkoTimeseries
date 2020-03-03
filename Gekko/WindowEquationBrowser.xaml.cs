@@ -31,6 +31,25 @@ namespace Gekko
         {
             System.Diagnostics.Process.Start(e.Uri.ToString());
         }
+
+        public void OnHyperlinkMouseEnter(object sender, MouseEventArgs e)
+        {
+            Hyperlink link = sender as Hyperlink;            
+            Program.EquationBrowserSetLabel((link.Inlines.FirstInline as Run).Text, this);            
+        }
+
+        public void OnHyperlinkMouseLeave(object sender, MouseEventArgs e)
+        {            
+            //windowEquationBrowserLabel.Inlines.Clear();
+            //windowEquationBrowserLabel.Inlines.Add("Leave");
+        }
+
+        private void ActiveCasesView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EquationListItem item = e.AddedItems[0] as EquationListItem;
+            windowEquationBrowserText.Inlines.Clear();
+            windowEquationBrowserText.Inlines.Add(item.Name);
+        }
     }
 
     public class EquationListItem

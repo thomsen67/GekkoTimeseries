@@ -17534,7 +17534,7 @@ namespace Gekko
 
                     bool firstFirst = true;
 
-                    string name = text.Substring("find ".Length).Trim();
+                    string variableName = text.Substring("find ".Length).Trim();
                     List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
                     foreach (List m2 in m1.list)  //foreach GAMS equation
                     {
@@ -17548,7 +17548,7 @@ namespace Gekko
                             counter++;
                             if (first)
                             {
-                                eqName = (m3 as ScalarString).string2;                                
+                                eqName = (m3 as ScalarString).string2;
                             }
                             else
                             {
@@ -17559,9 +17559,9 @@ namespace Gekko
                                     string ss3 = ss2[0];
                                     if (ss2.Length > 1 && ss2[1] == "[0]")
                                     {
-                                        if (G.Equal(name, ss3))
+                                        if (G.Equal(variableName, ss3))
                                         {
-                                            found = true;                                            
+                                            found = true;
                                             break;
                                         }
                                     }
@@ -17581,7 +17581,7 @@ namespace Gekko
                                     }
                                     firstFirst = false;
 
-                                    
+
                                 }
                             }
                             first = false;
@@ -17600,21 +17600,19 @@ namespace Gekko
                             }
                         }
                     }
-                    
+
                     WindowEquationBrowser eb = new WindowEquationBrowser();
 
                     eb.windowEquationBrowserText.Inlines.Clear();
                     eb.windowEquationBrowserText.Inlines.Add("Variables: ");
 
-
-                    eb.windowEquationBrowserText.Inlines.Clear();                    
+                    eb.windowEquationBrowserText.Inlines.Clear();
 
                     //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
                     //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
 
                     string txt0 = "Equation: qY[lan] from E_vY";
                     eb.windowEquationBrowserText.Inlines.Add(txt0 + G.NL);
-
 
                     eb.windowEquationBrowserText.Inlines.Add("Variables: ");
                     Random r = new Random();
@@ -17627,6 +17625,8 @@ namespace Gekko
                         if (s == "residual___") continue;
                         hyperLink.Inlines.Add(s.Replace("¤[0]", "").Replace("¤", ""));
                         hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
+                        hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
+                        hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
                         System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
                         //Convert.ToByte(r.Next(0, 255)),
                         //Convert.ToByte(r.Next(0, 255)),
@@ -17638,24 +17638,87 @@ namespace Gekko
                         eb.windowEquationBrowserText.Inlines.Add(hyperLink);
                         eb.windowEquationBrowserText.Inlines.Add(", ");
                     }
-                    eb.windowEquationBrowserText.Inlines.Add(G.NL);                                        
-                    
+                    eb.windowEquationBrowserText.Inlines.Add(G.NL);
+
                     string txt = null;
                     txt += G.NL;
                     txt += firstText;
                     eb.windowEquationBrowserText.Inlines.Add(txt);
 
+                    EquationBrowserSetLabel(variableName, eb);
+
                     eb.ShowDialog();
                     eb.Close();
 
-                }                
+                }
             }
 
             if (nocr) G.Write(text);
             else G.Writeln(text);                              
         }
 
-        
+        public static void EquationBrowserSetLabel(string variableName, WindowEquationBrowser eb)
+        {
+            IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
+            eb.windowEquationBrowserLabel.Inlines.Clear();
+            eb.windowEquationBrowserLabel.Inlines.Add("Name: " + variableName + G.NL);
+
+            if (iv != null)
+            {
+                Series ts = iv as Series;
+                if (ts != null)
+                {
+                    if (ts.type == ESeriesType.Normal)
+                    {
+                        if (!G.NullOrBlanks(ts.meta.label))
+                        {
+                            eb.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.meta.label + G.NL);
+                        }
+                        else
+                        {
+                            if (ts.mmi.parent != null)
+                            {
+                                if (!G.NullOrBlanks(ts.mmi.parent.meta.label))
+                                {
+                                    eb.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.mmi.parent.meta.label + G.NL);
+                                }
+                            }
+                        }
+                    }
+
+                    GekkoTime tStart = new GekkoTime(EFreq.A, 2015, 1);
+                    GekkoTime tEnd = new GekkoTime(EFreq.A, 2025, 1);
+
+                    eb.windowEquationBrowserLabel.Inlines.Add("------------------------------------------------------------------------------------------" + G.NL);
+                    eb.windowEquationBrowserLabel.Inlines.Add("Period        value        %" + G.NL);
+
+                    int counter = 0;
+
+                    //must be able to handle TIME where freq does not match the series freq
+                    foreach (GekkoTime gt in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
+                    {
+                        counter++;
+                        eb.windowEquationBrowserLabel.Inlines.Add(gt.ToString() + " ");
+
+                        double n1 = ts.GetDataSimple(gt);
+                        double n0 = ts.GetDataSimple(gt.Add(-1));
+
+                        double level1 = n1;
+                        double pch1 = ((n1 / n0 - 1) * 100d);
+
+                        if (n1 == n0) pch1 = 0d;
+
+                        string levelFormatted;
+                        string pchFormatted;
+                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
+
+                        eb.windowEquationBrowserLabel.Inlines.Add(levelFormatted + " " + pchFormatted + " ");
+                        eb.windowEquationBrowserLabel.Inlines.Add(G.NL);
+                    }
+                }
+            }
+        }
+
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
