@@ -32,16 +32,26 @@ namespace Gekko
             System.Diagnostics.Process.Start(e.Uri.ToString());
         }
 
+        public void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            Hyperlink link = sender as Hyperlink;
+            string s = (link.Inlines.FirstInline as Run).Text;
+            Program.Tell("find " + s, false);
+        }
+
         public void OnHyperlinkMouseEnter(object sender, MouseEventArgs e)
         {
-            Hyperlink link = sender as Hyperlink;            
+            Hyperlink link = sender as Hyperlink;
+            link.TextDecorations = TextDecorations.Underline;
             Program.EquationBrowserSetLabel((link.Inlines.FirstInline as Run).Text, this);            
         }
 
         public void OnHyperlinkMouseLeave(object sender, MouseEventArgs e)
-        {            
+        {
             //windowEquationBrowserLabel.Inlines.Clear();
             //windowEquationBrowserLabel.Inlines.Add("Leave");
+            Hyperlink link = sender as Hyperlink;
+            link.TextDecorations = null;
         }
 
         private void ActiveCasesView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -64,13 +74,9 @@ namespace Gekko
             }
             if (m3 != null)
             {
-                List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
-                //string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+                List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();                
                 Program.EquationBrowserSetEquationText(s, yy, this);
-            }
-            
-            //windowEquationBrowserText.Inlines.Add(s);
-            //firstList.AddRange(yy);          
+            }            
         }
     }
 

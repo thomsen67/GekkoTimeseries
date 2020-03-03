@@ -17602,6 +17602,7 @@ namespace Gekko
                     }
 
                     WindowEquationBrowser eb = new WindowEquationBrowser();
+                    eb.Title = variableName + " - " + "Gekko equations";
                     EquationBrowserSetEquationText(firstText, firstList, eb);
                     EquationBrowserSetLabel(variableName, eb);
 
@@ -17616,31 +17617,27 @@ namespace Gekko
         }
 
         public static void EquationBrowserSetEquationText(string firstText, List<string> firstList, WindowEquationBrowser eb)
-        {
-            eb.windowEquationBrowserText.Inlines.Clear();
-            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
-
+        {            
             eb.windowEquationBrowserText.Inlines.Clear();
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
 
-            string txt0 = "Equation: qY[lan] from E_vY";
-            eb.windowEquationBrowserText.Inlines.Add(txt0 + G.NL);
-
             eb.windowEquationBrowserText.Inlines.Add("Variables: ");
             Random r = new Random();
             foreach (string s in firstList)
             {
-                System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink()
-                {
-                    NavigateUri = new Uri("http://www.t-t.dk/gekko")
-                };
                 if (s == "residual___") continue;
-                hyperLink.Inlines.Add(s.Replace("¤[0]", "").Replace("¤", ""));
-                hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
+                string ss5 = s.Replace("¤[0]", "").Replace("¤", "");
+                System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink(); 
+                hyperLink.Inlines.Add(ss5);
+                hyperLink.Click+= eb.Hyperlink_Click;
+                //hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
                 hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
                 hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
+                hyperLink.TextDecorations = null;
+                hyperLink.Background = System.Windows.Media.Brushes.WhiteSmoke;                
+                //hyperLink.FontWeight = System.Windows.FontWeights.Bold;
                 System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
                 //Convert.ToByte(r.Next(0, 255)),
                 //Convert.ToByte(r.Next(0, 255)),
@@ -17652,9 +17649,10 @@ namespace Gekko
                 eb.windowEquationBrowserText.Inlines.Add(hyperLink);
                 eb.windowEquationBrowserText.Inlines.Add(", ");
             }
-            eb.windowEquationBrowserText.Inlines.Add(G.NL);
+            eb.windowEquationBrowserText.Inlines.Add(G.NL + G.NL);
 
             string txt = null;
+            txt += "--------------------------------------------------------------------------------------------------------------" + G.NL;
             txt += G.NL;
             txt += firstText;
             eb.windowEquationBrowserText.Inlines.Add(txt);
@@ -17692,7 +17690,7 @@ namespace Gekko
                     GekkoTime tStart = new GekkoTime(EFreq.A, 2015, 1);
                     GekkoTime tEnd = new GekkoTime(EFreq.A, 2025, 1);
 
-                    eb.windowEquationBrowserLabel.Inlines.Add("------------------------------------------------------------------------------------------" + G.NL);
+                    eb.windowEquationBrowserLabel.Inlines.Add("--------------------------------------------------------------------------------------------------------------" + G.NL);
                     eb.windowEquationBrowserLabel.Inlines.Add("Period        value        %" + G.NL);
 
                     int counter = 0;
