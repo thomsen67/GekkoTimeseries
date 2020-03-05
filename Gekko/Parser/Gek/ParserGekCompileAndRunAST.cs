@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Text.RegularExpressions;
-using ExcelDna.Integration;
 using System.Diagnostics;
 using System.Linq;
 
@@ -62,6 +61,32 @@ namespace Gekko.Parser.Gek
 
                 //code = code;  //just so it is easy to see here                                                
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN START");
+
+                if (false)
+                {
+
+                    //
+                    // ROSLYN
+                    //
+                    //using (var ms = new MemoryStream())
+                    //{
+                    //    string assemblyFileName = "gen" + Guid.NewGuid().ToString().Replace("-", "") + ".dll";
+
+                    //    CSharpCompilation compilation = CSharpCompilation.Create(assemblyFileName,
+                    //        new[] { CSharpSyntaxTree.ParseText(fooSource) },
+                    //        new[]
+                    //        {
+                    //    new MetadataFileReference(typeof (object).Assembly.Location)
+                    //        },
+                    //        new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    //        );
+
+                    //    compilation.Emit(ms);
+                    //    Assembly assembly = Assembly.Load(ms.GetBuffer());
+                    //    return assembly;
+                    //}
+
+                }
                 
                 //qwerty
                 if (false && Globals.excelDna)

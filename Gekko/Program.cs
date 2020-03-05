@@ -19857,7 +19857,7 @@ namespace Gekko
                 }
             }
 
-            if (false && Globals.runningOnTTComputer)
+            if (true && Globals.runningOnTTComputer)
             {    
                 Sniff2();
                 Sneeze();
@@ -19944,7 +19944,7 @@ namespace Gekko
 
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
             {
-                //if (counterA > 30) break;
+                if (counterA > 200) break;
                 if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
                 counterA++;
