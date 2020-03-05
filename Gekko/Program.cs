@@ -3214,17 +3214,11 @@ namespace Gekko
                 //in the very rare case, any files here will be overwritten
             }
             string unzippedFile = Path.GetFileNameWithoutExtension(originalFilePath) + ".tsd";
-
-            //qwerty
-            MessageBox.Show("before zip");
-
+                        
             DateTime dt2 = DateTime.Now;
             string foundTsdFile = WaitForZipRead_TSDX(tempTsdxPath, file, unzippedFile, originalFilePath);
             G.WritelnGray("Unzipping took: " + G.Seconds(dt2));
-
-            //qwerty
-            MessageBox.Show("after zip");
-
+            
             //both protobuffers and tsd files
 
             tsdxFile = file;
@@ -3361,41 +3355,10 @@ namespace Gekko
                     {
                         DateTime dt3 = DateTime.Now;
                         
-                        RuntimeTypeModel serializer = TypeModel.Create();
-
-                        if (Globals.excelDna)
-                        {
-                            //IMPORTANT
-                            //IMPORTANT see #70324327984
-                            //IMPORTANT
-
-                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
-
-                            //qwerty
-                            if (false)
-                            {
-                                serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                                serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                                serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                                serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                                serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                                serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                                serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                                serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                                serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                                serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
-                            }
-                            
-                        }
-
-                        //qwerty
-                        MessageBox.Show("before proto");
-
-                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;
-
-                        //qwerty
-                        MessageBox.Show("after proto");
-
+                        RuntimeTypeModel serializer = TypeModel.Create();                        
+                        
+                        deserializedDatabank = serializer.Deserialize(fs, null, typeof(Databank)) as Databank;                        
+                        
                         foreach (IVariable iv in deserializedDatabank.storage.Values)
                         {                            
                             iv.DeepCleanup();  //fixes maps and lists with 0 elements, also binds MapMultiDim.parent
@@ -3405,15 +3368,18 @@ namespace Gekko
                     }
                     catch (Exception e)
                     {
-                        G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version 1.1 format (protobuffers)");
-                        G.Writeln("           Message: " + e.Message, Color.Red);
-                        G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
-                        throw new GekkoException();
+                        if (Globals.excelDna)
+                        {
+                            MessageBox.Show(e.Message);
+                        }
+                        else
+                        {
+                            G.Writeln2("*** ERROR: Unexpected technical error when reading " + Globals.extensionDatabank + " databank in version " + Globals.currentGbkVersion + " format (protobuffers)");
+                            G.Writeln("           Message: " + e.Message, Color.Red);
+                            G.Writeln("           Troubleshooting, try this page: " + Globals.databankformatUrl, Color.Red);
+                        }
+                        throw;
                     }
-
-
-                    //int emptyWarnings = 0;
-
 
                 }  //end of using
 
@@ -8223,11 +8189,9 @@ namespace Gekko
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse start: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                     p.lastFileSentToANTLR = fileName;
                     p.SetLastFileSentToANTLR(fileName);
-
-                    //qwerty
-                    MessageBox.Show("starting to parse");
+                                        
                     ch = Gekko.Parser.Gek.ParserGekCreateAST.CreateAST(ph, p);
-                    MessageBox.Show("ended parse");
+                    
                     if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("Parse end: " + G.SecondsFormat((DateTime.Now - p.startingTime).TotalMilliseconds), Color.LightBlue);
                 }
                 catch (Exception e)
@@ -17608,7 +17572,7 @@ namespace Gekko
                                     else if (eqName == "E_vCalvo_tEnd")
                                     {
                                         tt = "tend";
-                                    }                                    
+                                    }
 
                                     Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, bool1, bool2, tt, xx, "Black"));
 
@@ -17648,6 +17612,23 @@ namespace Gekko
                     eb.ShowDialog();
                     eb.Close();
 
+                }
+                else if (text.StartsWith("sha"))
+                {
+                    string filePath = @"c:\tools\sha";
+
+                    string[] files = Directory.GetFiles(filePath);
+
+                    G.Writeln("");
+                    foreach (string file in files)
+                    {
+                        using (FileStream fs = File.OpenRead(file))
+                        {
+                            SHA1 sha = new SHA1Managed();
+                            G.Writeln(Path.GetFileName(file) + " = " + BitConverter.ToString(sha.ComputeHash(fs)).Replace("-", "").ToLower());
+                        }
+
+                    }
                 }
             }
 
@@ -25370,66 +25351,28 @@ namespace Gekko
 
                 using (FileStream fs = WaitForFileStream(pathAndFilename2, GekkoFileReadOrWrite.Write))
                 {
-
-                    if (Globals.excelDna)
+                    
+                    try
+                    {
+                        RuntimeTypeModel serializer = TypeModel.Create();
+                        serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+                        serializer.Serialize(fs, databank);
+                        count = databank.storage.Count;
+                    }
+                    catch (Exception e)
                     {
                         if (Globals.excelDna)
                         {
-                            //IMPORTANT
-                            //IMPORTANT see #70324327984
-                            //IMPORTANT
-                            RuntimeTypeModel serializer = TypeModel.Create();
-                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.                            
-                            
-                            //qwerty
-                            if (false)
-                            {
-                                serializer.Add(typeof(IVariable), true).AddSubType(1, typeof(Series));
-                                serializer.Add(typeof(IVariable), true).AddSubType(2, typeof(ScalarVal));
-                                serializer.Add(typeof(IVariable), true).AddSubType(3, typeof(ScalarDate));
-                                serializer.Add(typeof(IVariable), true).AddSubType(4, typeof(ScalarString));
-                                serializer.Add(typeof(IVariable), true).AddSubType(5, typeof(Map));
-                                serializer.Add(typeof(IVariable), true).AddSubType(6, typeof(Matrix));
-                                serializer.Add(typeof(IVariable), true).AddSubType(7, typeof(List));
-                                serializer.Add(typeof(IVariable), true).AddSubType(8, typeof(Range));
-                                serializer.Add(typeof(IVariable), true).AddSubType(9, typeof(GekkoNull));
-                                serializer.Add(typeof(IVariable), true).AddSubType(10, typeof(DataFrame));
-                            }                            
-
-                            try
-                            {
-                                serializer.Serialize(fs, databank);
-                                count = databank.storage.Count;
-                            }
-                            catch (Exception e)
-                            {
-                                //qwerty
-                                MessageBox.Show(e.Message + " ........ " + " ....... " + e.InnerException + " ...... " + e.StackTrace);
-
-                                G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
-                                G.Writeln("           Message: " + e.Message, Color.Red);
-                                throw new GekkoException();
-                            }
+                            MessageBox.Show(e.Message);
                         }
-
-                    }
-                    else
-                    {
-
-                        try
-                        {
-                            RuntimeTypeModel serializer = TypeModel.Create();
-                            serializer.UseImplicitZeroDefaults = false; //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
-                            serializer.Serialize(fs, databank);                            
-                            count = databank.storage.Count;
-                        }
-                        catch (Exception e)
+                        else
                         {
                             G.Writeln2("*** ERROR: Technical problem while writing databank to " + Globals.extensionDatabank + " (protobuffers)");
                             G.Writeln("           Message: " + e.Message, Color.Red);
-                            throw new GekkoException();
                         }
+                        throw;
                     }
+
                 }
             }
             finally
@@ -25439,9 +25382,7 @@ namespace Gekko
             }
 
             DateTime dt0 = DateTime.Now;
-
-            //qwerty
-            MessageBox.Show("call 7z .. " + tempTsdxPath + " .. " + pathAndFileNameResultingFile);
+                        
             WaitForZipWrite(tempTsdxPath, pathAndFileNameResultingFile);
             
             if (!Globals.setPrintMute)
@@ -25822,10 +25763,7 @@ namespace Gekko
                     {
                         sevenzPath = Application.StartupPath + "\\zip\\7z.dll";
                     }
-
-                    //qwerty
-                    MessageBox.Show("path " + sevenzPath);
-
+                                        
                     SevenZipExtractor.SetLibraryPath(sevenzPath);
                     SevenZipCompressor tmp = new SevenZipCompressor();
                     tmp.ArchiveFormat = OutArchiveFormat.Zip;

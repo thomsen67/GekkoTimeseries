@@ -153,12 +153,9 @@ namespace Gekko.Parser.Gek
                 }
                 else
                 {
-                    //qwerty
-                    MessageBox.Show("Start invoke");
                     Assembly assembly = compilerResults.CompiledAssembly;
                     Type tpe = assembly.GetType("Gekko.TranslatedCode");  //the class                       
-                    tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method    
-                    MessageBox.Show("End invoke");
+                    tpe.InvokeMember("CodeLines", BindingFlags.InvokeMethod, null, null, args);  //the method                     
                 }
                 if (Globals.runningOnTTComputer && Globals.showTimings) G.Writeln("RUN END");
             }
@@ -199,23 +196,6 @@ namespace Gekko.Parser.Gek
                 //compilerParams.ReferencedAssemblies.Add(Path.Combine(Globals.excelDnaPath, "gekko.exe"));
                 //compilerParams.ReferencedAssemblies.Add(Path.Combine(@"c:\Thomas\Gekko\GekkoCS\Gekko\bin\Debug", "gekko.exe"));
                 compilerParams.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().CodeBase.Replace("file:///", "").Replace("/", "\\"));
-
-                string s = Environment.StackTrace;
-                Assembly asm1 = Assembly.GetExecutingAssembly();
-                Assembly asm2 = Assembly.GetAssembly(typeof(Program));
-                Assembly asm3 = Assembly.GetCallingAssembly();
-                Assembly asm4 = Assembly.GetEntryAssembly();
-                string ss = ExcelDnaUtil.XllPath;
-
-                Assembly xx = typeof(Program).Assembly;
-                
-                StackFrame[] frames = new StackTrace().GetFrames();
-                string initialAssembly = (from f in frames
-                                          select f.GetMethod().ReflectedType.AssemblyQualifiedName
-                                         ).Distinct().Last();
-                //MÅske er løsningen her:
-                //https://groups.google.com/forum/#!topic/exceldna/x1hjPCFwmFQ
-
             }
             else if (G.IsUnitTesting())
             {

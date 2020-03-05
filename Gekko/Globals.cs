@@ -168,6 +168,9 @@ namespace Gekko
         public static string extensionDatabank = "gbk";
         public static string extensionTable = "gtb";
 
+        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
+        public static string currentGbkVersion = "1.2";
+
         public static string serviceMessage = "[service message]";
         public static string serviceMessageTruncated = "[further service messages truncated]";
 
@@ -654,8 +657,6 @@ namespace Gekko
 
         public static O.HandleEndoHelper2 endo = null;
         public static O.HandleEndoHelper2 exo = null;
-        
-        public static List<string> tsdxVersions = new List<string> { "1.0", "1.1", "1.2" };  //1.0 = zipped tsd, 1.1 = protobuffers, 1.2 = Gekko 3.0 protobuffers.
 
         public static string expressionText = null;
         public static Func<GekkoSmpl, IVariable> expression = null;  //old equations
