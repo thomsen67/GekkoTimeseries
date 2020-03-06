@@ -17510,6 +17510,31 @@ namespace Gekko
                     string s = Python();
                     G.Writeln2(s);
                 }
+                else if (text == "speed")
+                {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                }
                 else if (text.StartsWith("find"))
                 {
                     Globals.itemHandler = new ItemHandler();
@@ -17637,45 +17662,70 @@ namespace Gekko
         }
 
         public static void EquationBrowserSetEquationText(string firstText, List<string> firstList, WindowEquationBrowser eb)
-        {            
+        {
             eb.windowEquationBrowserText.Inlines.Clear();
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
             //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
 
-            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
-            Random r = new Random();
-            foreach (string s in firstList)
-            {
-                if (s == "residual___") continue;
-                string ss5 = s.Replace("¤[0]", "").Replace("¤", "");
-                System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink(); 
-                hyperLink.Inlines.Add(ss5);
-                hyperLink.Click+= eb.Hyperlink_Click;
-                //hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
-                hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
-                hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
-                hyperLink.TextDecorations = null;
-                hyperLink.Background = System.Windows.Media.Brushes.WhiteSmoke;                
-                //hyperLink.FontWeight = System.Windows.FontWeights.Bold;
-                System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
-                //Convert.ToByte(r.Next(0, 255)),
-                //Convert.ToByte(r.Next(0, 255)),
-                //Convert.ToByte(r.Next(0, 255)));
-                Convert.ToByte(r.Next(0, 255)),
-                Convert.ToByte(0),
-                Convert.ToByte(0));
-                hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
-                eb.windowEquationBrowserText.Inlines.Add(hyperLink);
-                eb.windowEquationBrowserText.Inlines.Add(", ");
-            }
-            eb.windowEquationBrowserText.Inlines.Add(G.NL + G.NL);
-
             string txt = null;
+            txt += firstText + G.NL + G.NL;
             txt += "--------------------------------------------------------------------------------------------------------------" + G.NL;
             txt += G.NL;
-            txt += firstText;
+
             eb.windowEquationBrowserText.Inlines.Add(txt);
+            eb.windowEquationBrowserText.LineHeight = 12d;
+            eb.windowEquationBrowserText.LineStackingStrategy = System.Windows.LineStackingStrategy.BlockLineHeight;
+
+            Random r = new Random();
+            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
+
+            for (int i = 0; i < 200; i++) {
+                foreach (string s in firstList)
+                {
+                    if (s == "residual___") continue;
+                    string ss5 = s.Replace("¤[0]", "").Replace("¤", "");
+
+                    if (false)
+                    {
+                        System.Windows.Controls.Button b = new System.Windows.Controls.Button();
+                        b.Content = ss5;
+                        var cStyle = new System.Windows.Style(typeof(System.Windows.Controls.Border));
+                        cStyle.Setters.Add(new System.Windows.Setter(System.Windows.Controls.Border.CornerRadiusProperty, new System.Windows.CornerRadius(3.0)));
+                        b.Resources.Add(typeof(System.Windows.Controls.Border), cStyle);
+                        b.Padding = new System.Windows.Thickness(2);
+                        b.BorderThickness = new System.Windows.Thickness(0);
+                        eb.windowEquationBrowserText.Inlines.Add(b);
+                        eb.windowEquationBrowserText.Inlines.Add(" ");
+                    }
+                    else
+                    {
+
+                        System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink();
+                        hyperLink.Inlines.Add(ss5);
+                        hyperLink.Click += eb.Hyperlink_Click;
+                        //hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
+                        hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
+                        hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
+                        hyperLink.TextDecorations = null;
+                        hyperLink.Background = System.Windows.Media.Brushes.WhiteSmoke;
+
+                        //hyperLink.FontWeight = System.Windows.FontWeights.Bold;
+                        System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
+                        //Convert.ToByte(r.Next(0, 255)),
+                        //Convert.ToByte(r.Next(0, 255)),
+                        //Convert.ToByte(r.Next(0, 255)));
+                        Convert.ToByte(r.Next(0, 255)),
+                        Convert.ToByte(0),
+                        Convert.ToByte(0));
+                        hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
+                        eb.windowEquationBrowserText.Inlines.Add(hyperLink);
+                        eb.windowEquationBrowserText.Inlines.Add(", ");
+                    }
+                }
+
+            }
+            eb.windowEquationBrowserText.Inlines.Add(G.NL + G.NL);
         }
 
         public static void EquationBrowserSetLabel(string variableName, WindowEquationBrowser eb)
@@ -19857,7 +19907,7 @@ namespace Gekko
                 }
             }
 
-            if (true && Globals.runningOnTTComputer)
+            if (false && Globals.runningOnTTComputer)
             {    
                 Sniff2();
                 Sneeze();
@@ -19937,6 +19987,9 @@ namespace Gekko
             DateTime dt = DateTime.Now;
             double ms1 = 0;
             double ms2 = 0;
+            int n1 = 0;
+            int n2 = 0;
+            int n3 = 0;
             List<string> sletmig = new List<string>();
             int counterA = 0;
             int counterError1 = 0;
@@ -19944,7 +19997,7 @@ namespace Gekko
 
             foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
             {
-                if (counterA > 200) break;
+                if (counterA > 100) break;
                 if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
                 counterA++;
@@ -19965,6 +20018,7 @@ namespace Gekko
                         DateTime dt1 = DateTime.Now;
                         CallEval(eq.conditionals, s1);
                         ms1 += (dt1 - DateTime.Now).TotalMilliseconds;
+                        n1++;
                     }
                     catch (Exception e)
                     {
@@ -20027,13 +20081,16 @@ namespace Gekko
                                 G.Writeln2("+++ ERROR: in equation: " + eq.nameGams);
                             }
                             break;
-                        }                        
+                        }
+                        n2++;
                     }
                     ms2 += (dt2 - DateTime.Now).TotalMilliseconds;
+                    n3++;
                     Globals.expressions = null;  //maybe not necessary
                 }
             }
-            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + ms1 + " " + ms2);
+            G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + (-ms1 / 1000d) + " " + (-ms2 / 1000d));
+            G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
         }
 
         public static void CallEval(string conditionals, string statement)
