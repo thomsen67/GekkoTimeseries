@@ -17541,6 +17541,7 @@ namespace Gekko
 
                     string firstText = null;
                     List<string> firstList = new List<string>();
+                    string firstEqName = null;
 
                     bool firstFirst = true;
 
@@ -17606,6 +17607,7 @@ namespace Gekko
                                         List<ModelGamsEquation> xx2 = Program.modelGams.equationsByEqname[eqName];
                                         firstText = xx2[0].lhs + " = " + xx2[0].rhs;
                                         firstList.AddRange(yy);
+                                        firstEqName = eqName;
                                     }
                                     firstFirst = false;
 
@@ -17613,26 +17615,13 @@ namespace Gekko
                                 }
                             }
                             first = false;
-                        }
-
-                        if (results.Count > 0)
-                        {
-                            //string ss = G.GetListWithCommas(Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()));
-                            G.Writeln2("--------------------------------------------------------------------");
-                            G.Writeln("Eqname: " + eqName);
-                            foreach (List<string> x in results)
-                            {
-                                //string xx = G.GetListWithCommas(x).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
-                                //G.Writeln("        " + xx);
-                                //Globals.itemHandler.Add(new EquationListItem(eqName, "2 of 34", "yes", true, "t0", xx));
-                            }
-                        }
+                        }                       
                     }
 
                     WindowEquationBrowser eb = new WindowEquationBrowser();
                     eb.Title = variableName + " - " + "Gekko equations";
-                    EquationBrowserSetEquationText(firstText, firstList, eb);
-                    EquationBrowserSetLabel(variableName, eb);
+                    eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+                    eb.EquationBrowserSetLabel(variableName);
 
                     eb.ShowDialog();
                     eb.Close();
@@ -17661,135 +17650,8 @@ namespace Gekko
             else G.Writeln(text);                              
         }
 
-        public static void EquationBrowserSetEquationText(string firstText, List<string> firstList, WindowEquationBrowser eb)
-        {
-            eb.windowEquationBrowserText.Inlines.Clear();
-
-            //TODO: pooling a sum of ages into x[18..100] with the right aggregate color
-            //TODO: do the coloring in parallel, so the colored list is shown when it is finished (shown all gray first)
-
-            string txt = null;
-            txt += firstText + G.NL + G.NL;
-            txt += "--------------------------------------------------------------------------------------------------------------" + G.NL;
-            txt += G.NL;
-
-            eb.windowEquationBrowserText.Inlines.Add(txt);
-            eb.windowEquationBrowserText.LineHeight = 12d;
-            eb.windowEquationBrowserText.LineStackingStrategy = System.Windows.LineStackingStrategy.BlockLineHeight;
-
-            Random r = new Random();
-            eb.windowEquationBrowserText.Inlines.Add("Variables: ");
-
-            for (int i = 0; i < 200; i++) {
-                foreach (string s in firstList)
-                {
-                    if (s == "residual___") continue;
-                    string ss5 = s.Replace("¤[0]", "").Replace("¤", "");
-
-                    if (false)
-                    {
-                        System.Windows.Controls.Button b = new System.Windows.Controls.Button();
-                        b.Content = ss5;
-                        var cStyle = new System.Windows.Style(typeof(System.Windows.Controls.Border));
-                        cStyle.Setters.Add(new System.Windows.Setter(System.Windows.Controls.Border.CornerRadiusProperty, new System.Windows.CornerRadius(3.0)));
-                        b.Resources.Add(typeof(System.Windows.Controls.Border), cStyle);
-                        b.Padding = new System.Windows.Thickness(2);
-                        b.BorderThickness = new System.Windows.Thickness(0);
-                        eb.windowEquationBrowserText.Inlines.Add(b);
-                        eb.windowEquationBrowserText.Inlines.Add(" ");
-                    }
-                    else
-                    {
-
-                        System.Windows.Documents.Hyperlink hyperLink = new System.Windows.Documents.Hyperlink();
-                        hyperLink.Inlines.Add(ss5);
-                        hyperLink.Click += eb.Hyperlink_Click;
-                        //hyperLink.RequestNavigate += eb.Hyperlink_RequestNavigate;
-                        hyperLink.MouseEnter += eb.OnHyperlinkMouseEnter;
-                        hyperLink.MouseLeave += eb.OnHyperlinkMouseLeave;
-                        hyperLink.TextDecorations = null;
-                        hyperLink.Background = System.Windows.Media.Brushes.WhiteSmoke;
-
-                        //hyperLink.FontWeight = System.Windows.FontWeights.Bold;
-                        System.Windows.Media.Color newColor = System.Windows.Media.Color.FromRgb(
-                        //Convert.ToByte(r.Next(0, 255)),
-                        //Convert.ToByte(r.Next(0, 255)),
-                        //Convert.ToByte(r.Next(0, 255)));
-                        Convert.ToByte(r.Next(0, 255)),
-                        Convert.ToByte(0),
-                        Convert.ToByte(0));
-                        hyperLink.Foreground = new System.Windows.Media.SolidColorBrush(newColor);
-                        eb.windowEquationBrowserText.Inlines.Add(hyperLink);
-                        eb.windowEquationBrowserText.Inlines.Add(", ");
-                    }
-                }
-
-            }
-            eb.windowEquationBrowserText.Inlines.Add(G.NL + G.NL);
-        }
-
-        public static void EquationBrowserSetLabel(string variableName, WindowEquationBrowser eb)
-        {
-            IVariable iv = O.GetIVariableFromString(variableName, O.ECreatePossibilities.NoneReturnNull, false);
-            eb.windowEquationBrowserLabel.Inlines.Clear();
-            eb.windowEquationBrowserLabel.Inlines.Add("Name: " + variableName + G.NL);
-
-            if (iv != null)
-            {
-                Series ts = iv as Series;
-                if (ts != null)
-                {
-                    if (ts.type == ESeriesType.Normal)
-                    {
-                        if (!G.NullOrBlanks(ts.meta.label))
-                        {
-                            eb.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.meta.label + G.NL);
-                        }
-                        else
-                        {
-                            if (ts.mmi.parent != null)
-                            {
-                                if (!G.NullOrBlanks(ts.mmi.parent.meta.label))
-                                {
-                                    eb.windowEquationBrowserLabel.Inlines.Add("Label: " + ts.mmi.parent.meta.label + G.NL);
-                                }
-                            }
-                        }
-                    }
-
-                    GekkoTime tStart = new GekkoTime(EFreq.A, 2015, 1);
-                    GekkoTime tEnd = new GekkoTime(EFreq.A, 2025, 1);
-
-                    eb.windowEquationBrowserLabel.Inlines.Add("--------------------------------------------------------------------------------------------------------------" + G.NL);
-                    eb.windowEquationBrowserLabel.Inlines.Add("Period        value        %" + G.NL);
-
-                    int counter = 0;
-
-                    //must be able to handle TIME where freq does not match the series freq
-                    foreach (GekkoTime gt in new GekkoTimeIterator(ConvertFreqs(tStart, tEnd, ts.freq)))
-                    {
-                        counter++;
-                        eb.windowEquationBrowserLabel.Inlines.Add(gt.ToString() + " ");
-
-                        double n1 = ts.GetDataSimple(gt);
-                        double n0 = ts.GetDataSimple(gt.Add(-1));
-
-                        double level1 = n1;
-                        double pch1 = ((n1 / n0 - 1) * 100d);
-
-                        if (n1 == n0) pch1 = 0d;
-
-                        string levelFormatted;
-                        string pchFormatted;
-                        Program.ConvertToPrintFormat(level1, pch1, out levelFormatted, out pchFormatted);
-
-                        eb.windowEquationBrowserLabel.Inlines.Add(levelFormatted + " " + pchFormatted + " ");
-                        eb.windowEquationBrowserLabel.Inlines.Add(G.NL);
-                    }
-                }
-            }
-        }
-
+        
+        
 
         private static IEnumerable<T> Concat<T>(this T firstElement, IEnumerable<T> secondSequence)
         {
@@ -20036,7 +19898,7 @@ namespace Gekko
                     eq.expressions = new List<Func<GekkoSmpl, IVariable>>(Globals.expressions);  //probably needs cloning/copying as it is done here
                     
                     DateTime dt2 = DateTime.Now;
-                    foreach (Func<GekkoSmpl, IVariable> expression in Globals.expressions)
+                    foreach (Func<GekkoSmpl, IVariable> expression in eq.expressions)
                     {
 
                         //Function call start --------------
@@ -20056,15 +19918,11 @@ namespace Gekko
                             List<string> m2 = new List<string>();
                             foreach (string s in dd.cellsContribD.storage.Keys)
                             {
-                                string[] ss = s.Split('¤');
-                                string ss1 = G.Chop_RemoveBank(ss[0]);
-                                //ss1 = G.Chop_RemoveFreq(ss1);
-                                string ss5 = ss1;
-                                if (ss.Length > 1) ss5 = ss1 + "¤" + ss[1];
-                                if (!m1.Contains(ss1, StringComparer.OrdinalIgnoreCase))
+                                string ss5 = DecompGetNameFromContrib(s);
+                                if (!m1.Contains(ss5, StringComparer.OrdinalIgnoreCase))
                                 {
                                     m1.Add(ss5);
-                                }                                
+                                }
                             }
                             eq.expressionVariablesWithSets.Add(m1);                            
                         }
@@ -20091,6 +19949,15 @@ namespace Gekko
             }
             G.Writeln2("EVAL on " + counterA + " eqs, errors in " + counterError1 + "/" + counterError2 + " of these, " + (dt - DateTime.Now).TotalMilliseconds / 1000d + " " + (-ms1 / 1000d) + " " + (-ms2 / 1000d));
             G.Writeln2("n1 " + n1 + " n2 " + n2 + " n3 " + n3);
+        }
+
+        public static string DecompGetNameFromContrib(string s)
+        {
+            string[] ss = s.Split('¤');
+            string ss1 = G.Chop_RemoveBank(ss[0]);
+            string ss5 = ss1;
+            if (ss.Length > 1) ss5 = ss1 + "¤" + ss[1];
+            return ss5;
         }
 
         public static void CallEval(string conditionals, string statement)
