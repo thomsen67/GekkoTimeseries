@@ -79,7 +79,7 @@ namespace Gekko
 
         private static string GetEquationText(string name)
         {
-            List<ModelGamsEquation> xx2 = Program.modelGams.equationsByEqname[name];
+            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[name];
             string s = xx2[0].lhs + " = " + xx2[0].rhs;
             return s;
         }
@@ -152,7 +152,7 @@ namespace Gekko
             this._activeEquation = eqName;
             this.windowEquationBrowserLabel.Inlines.Clear();
 
-            List<ModelGamsEquation> equations = Program.modelGams.equationsByEqname[eqName];
+            List<ModelGamsEquation> equations = Program.model.modelGams.equationsByEqname[eqName];
             ModelGamsEquation equation = equations[0]; //always only 1
 
             //TODO: pooling a sum of ages into x[18..100] with the right aggregate color

@@ -1075,7 +1075,7 @@ namespace Gekko
         /// </summary>
         public static Model model = null;
 
-        public static ModelGams modelGams = null;
+        //public static ModelGams modelGams = null;
 
         //these should be cleared with closeall
         /// <summary>
@@ -7068,7 +7068,7 @@ namespace Gekko
         {
             //if (modelGams == null) return null;
             int r = -12345;
-            if (Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
+            if (Program.model?.modelGekko?.fromVariableToEquationNumber != null && Program.model.modelGekko.fromVariableToEquationNumber.TryGetValue(lhsName + Globals.lagIndicator + "0", out r))
             {
                 //r will get a value
             }
@@ -12723,14 +12723,14 @@ namespace Gekko
                 decompOptions.expressionOld = null;
                 decompOptions.expression = null;
 
-                if (Program.modelGams != null)
+                if (Program.model.modelGams != null)
                 {
-                    if (Program.modelGams == null)
+                    if (Program.model.modelGams == null)
                     {
                         G.Writeln2("*** ERROR: DECOMP: A GAMS model is not loaded, cf. the MODEL command.");
                         throw new GekkoException();
                     }
-                    if (Program.modelGams.equationsByVarname != null)
+                    if (Program.model.modelGams.equationsByVarname != null)
                     {
                         ModelGamsEquation found = DecompEvalGams(null, decompOptions.variable);
                         decompOptions.expression = found.expressions[0];
@@ -12966,23 +12966,23 @@ namespace Gekko
 
         private static List<ModelGamsEquation> GetGamsEquationsByVarname(string variable)
         {
-            if (Program.modelGams.equationsByVarname == null || Program.modelGams.equationsByVarname.Count == 0)
+            if (Program.model.modelGams.equationsByVarname == null || Program.model.modelGams.equationsByVarname.Count == 0)
             {
                 G.Writeln2("*** ERROR: No GAMS equations found");
                 throw new GekkoException();
             }
-            List<ModelGamsEquation> eqs = null; Program.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
+            List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByVarname.TryGetValue(variable, out eqs);
             return eqs;
         }
 
         private static List<ModelGamsEquation> GetGamsEquationsByEqname(string variable)
         {
-            if (Program.modelGams.equationsByEqname == null || Program.modelGams.equationsByEqname.Count == 0)
+            if (Program.model.modelGams.equationsByEqname == null || Program.model.modelGams.equationsByEqname.Count == 0)
             {
                 G.Writeln2("*** ERROR: No GAMS equations found");
                 throw new GekkoException();
             }
-            List<ModelGamsEquation> eqs = null; Program.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
+            List<ModelGamsEquation> eqs = null; Program.model.modelGams.equationsByEqname.TryGetValue(variable, out eqs);
             return eqs;
         }
 
@@ -13836,6 +13836,19 @@ namespace Gekko
             }
             string s2 = sb.ToString();
             return s2;
+        }
+
+        public static string HandleModelFilesGams(string input)
+        {            
+            List<string> lines = G.ExtractLinesFromText(input);
+            return GetModelHashGams(lines);
+        }
+
+        private static string GetModelHashGams(List<string> lines)
+        {
+            string trueHash = Program.GetMD5Hash(G.ExtractTextFromLines(lines).ToString()); //Pretty unlikely that two different gams files could produce the same hash.
+            trueHash = trueHash.Trim();  //probably not necessary
+            return trueHash;
         }
 
         private static void GetModelHashAndXml(List<string> linesNew, ModelCommentsHelper modelCommentsHelper)
@@ -16767,7 +16780,7 @@ namespace Gekko
                 }
                 else
                 {
-                    if (Program.modelGams?.equationsByVarname != null)
+                    if (Program.model.modelGams?.equationsByVarname != null)
                     {
                         note = "+++ NOTE: There is a GAMS model loaded, perhaps you should use 'OPTION model type = gams;'?";
                     }
@@ -16792,7 +16805,7 @@ namespace Gekko
         private static void DispHelperShowNormalEquation(bool showDetailed, string varnameWithoutFreq)
         {
             List<string> d4 = new List<string>();
-            if (Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
+            if (Program.model?.modelGekko?.dependents !=null && Program.model.modelGekko.dependents.ContainsKey(varnameWithoutFreq))
             {
                 Dictionary<string, string> d2 = Program.model.modelGekko.dependents[varnameWithoutFreq].storage;
                 if (d2 != null)
@@ -16944,9 +16957,9 @@ namespace Gekko
 
             bool eqsPrinted = false;
 
-            if (Program.modelGams != null)
+            if (Program.model.modelGams != null)
             {
-                if (Program.modelGams.equationsByVarname != null)
+                if (Program.model.modelGams.equationsByVarname != null)
                 {
                     eqsPrinted = DispHelperShowGamsEquations(showDetailed, clickedLink, gamsToGekko, var, varnameWithoutFreq, eqsPrinted);
                 }
@@ -16976,7 +16989,7 @@ namespace Gekko
         public static bool HasGamsEquation(string var)
         {
             if (var == null) return false;
-            return Program.modelGams?.equationsByVarname != null && Program.modelGams.equationsByVarname.ContainsKey(var);
+            return Program.model.modelGams?.equationsByVarname != null && Program.model.modelGams.equationsByVarname.ContainsKey(var);
         }
 
         private static bool DispHelperShowGamsEquations(bool showDetailed, bool clickedLink, bool gamsToGekko, string var, string varnameWithoutFreq, bool eqsPrinted)
@@ -16984,7 +16997,7 @@ namespace Gekko
             string varnameWithoutFreqAndIndex = G.Chop_RemoveIndex(varnameWithoutFreq);
 
             GekkoDictionary<string, string> dependents = new GekkoDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.modelGams.equationsByVarname)
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> e4 in Program.model.modelGams.equationsByVarname)
             {
                 foreach (ModelGamsEquation e5 in e4.Value)
                 {
@@ -17471,11 +17484,11 @@ namespace Gekko
             {
                 //checks if left-hand var in model. So this ignores exo/endo commands.
                 //so the E and X only describes the model equations as they are
-                if (Program.model.modelGekko.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(var))
+                if (Program.model.modelGekko?.endogenousOriginallyInModel != null && Program.model.modelGekko.endogenousOriginallyInModel.ContainsKey(var))
                 {
                     type = EEndoOrExo.Endo;
                 }
-                else if (Program.model.modelGekko.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var))
+                else if (Program.model?.modelGekko?.varsAType != null && Program.model.modelGekko.varsAType.ContainsKey(var))
                 {
                     type = EEndoOrExo.Exo;
                 }
@@ -17509,118 +17522,175 @@ namespace Gekko
                 {
                     string s = Python();
                     G.Writeln2(s);
-                }
-                else if (text == "speed")
-                {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                }
+                }                
                 else if (text.StartsWith("find"))
                 {
+                    string variableName = text.Substring("find ".Length).Trim();
+
                     Globals.itemHandler = new ItemHandler();
 
-                    string firstText = null;
-                    List<string> firstList = new List<string>();
-                    string firstEqName = null;
-
-                    bool firstFirst = true;
-
-                    string variableName = text.Substring("find ".Length).Trim();
-                    List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
-                    foreach (List m2 in m1.list)  //foreach GAMS equation
+                    if (false)
                     {
-                        string eqName = null;
-                        bool first = true;
-                        List<List<string>> results = new List<List<string>>();
 
-                        int counter = 0;
-                        foreach (IVariable m3 in m2.list) //foreach sub-eq (first item is name)
+                        string firstText = null;
+                        List<string> firstList = new List<string>();
+                        string firstEqName = null;
+
+                        bool firstFirst = true;
+
+                        variableName = text.Substring("find ".Length).Trim();
+                        List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
+                        foreach (List m2 in m1.list)  //foreach GAMS equation
                         {
-                            counter++;
-                            if (first)
+                            string eqName = null;
+                            bool first = true;
+                            List<List<string>> results = new List<List<string>>();
+
+                            int counter = 0;
+                            foreach (IVariable m3 in m2.list) //foreach sub-eq (first item is name)
                             {
-                                eqName = (m3 as ScalarString).string2;
-                            }
-                            else
-                            {
-                                bool found = false;
-                                foreach (ScalarString ss in (m3 as List).list) //foreach variable (first item is name)
+                                counter++;
+                                if (first)
                                 {
-                                    string[] ss2 = ss.string2.Split('¤');
-                                    string ss3 = ss2[0];
-                                    if (ss2.Length > 1 && ss2[1] == "[0]")
+                                    eqName = (m3 as ScalarString).string2;
+                                }
+                                else
+                                {
+                                    bool found = false;
+                                    foreach (ScalarString ss in (m3 as List).list) //foreach variable (first item is name)
                                     {
-                                        if (G.Equal(variableName, ss3))
+                                        string[] ss2 = ss.string2.Split('¤');
+                                        string ss3 = ss2[0];
+                                        if (ss2.Length > 1 && ss2[1] == "[0]")
                                         {
-                                            found = true;
-                                            break;
+                                            if (G.Equal(variableName, ss3))
+                                            {
+                                                found = true;
+                                                break;
+                                            }
                                         }
                                     }
+
+                                    if (found)
+                                    {
+                                        List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
+                                        string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+
+                                        string bool1 = "";
+                                        string bool2 = "";
+                                        string tt = "tx0";
+                                        if (eqName == "E_qY_tot")
+                                        {
+                                            bool1 = Globals.protectSymbol;
+                                            bool2 = Globals.protectSymbol;
+                                        }
+                                        else if (eqName == "E_vCalvo")
+                                        {
+                                            tt = "tx0e";
+                                        }
+                                        else if (eqName == "E_vCalvo_tEnd")
+                                        {
+                                            tt = "tend";
+                                        }
+
+                                        Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, bool1, bool2, tt, xx, "Black"));
+
+                                        if (firstFirst)
+                                        {
+                                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
+                                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
+                                            firstList.AddRange(yy);
+                                            firstEqName = eqName;
+                                        }
+                                        firstFirst = false;
+
+
+                                    }
                                 }
-
-                                if (found)
-                                {
-                                    List<string> yy = Program.GetListOfStringsFromListOfIvariables((m3 as List).list.ToArray()).ToList();
-                                    string xx = G.GetListWithCommas(yy).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
-
-                                    string bool1 = "";
-                                    string bool2 = "";
-                                    string tt = "tx0";
-                                    if (eqName == "E_qY_tot")
-                                    {
-                                        bool1 = Globals.protectSymbol;
-                                        bool2 = Globals.protectSymbol;
-                                    }
-                                    else if (eqName == "E_vCalvo")
-                                    {
-                                        tt = "tx0e";
-                                    }
-                                    else if (eqName == "E_vCalvo_tEnd")
-                                    {
-                                        tt = "tend";
-                                    }
-
-                                    Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + m2.list.Count, bool1, bool2, tt, xx, "Black"));
-
-                                    if (firstFirst)
-                                    {
-                                        List<ModelGamsEquation> xx2 = Program.modelGams.equationsByEqname[eqName];
-                                        firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                        firstList.AddRange(yy);
-                                        firstEqName = eqName;
-                                    }
-                                    firstFirst = false;
-
-
-                                }
+                                first = false;
                             }
-                            first = false;
-                        }                       
+                        }
+                    }
+                    else
+                    {
+                        string firstText = null;
+                        List<string> firstList = new List<string>();
+                        string firstEqName = null;
+
+                        bool firstFirst = true;
+                                                
+                        //List m1 = Program.databanks.GetFirst().GetIVariable("#m") as List;
+                        foreach (KeyValuePair<string, List<ModelGamsEquation>>kvp in Program.model.modelGams.equationsByEqname)
+                        {
+                            string eqName = kvp.Value[0].nameGams;
+                            
+                            List<List<string>> results = new List<List<string>>();
+
+                            int counter = 0;
+                            foreach (List<string> m3 in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
+                            {
+                                if (m3 == null) continue;
+                                counter++;                                
+                                {
+                                    bool found = false;
+                                    foreach (string ss in m3) //foreach variable (first item is name)
+                                    {
+                                        string[] ss2 = ss.Split('¤');
+                                        string ss3 = ss2[0];
+                                        if (ss2.Length > 1 && ss2[1] == "[0]")
+                                        {
+                                            if (G.Equal(variableName, ss3))
+                                            {
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (found)
+                                    {
+                                        //List<string> yy = m3;
+                                        string xx = G.GetListWithCommas(m3).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+
+                                        string bool1 = "";
+                                        string bool2 = "";
+                                        string tt = "tx0";
+                                        if (eqName == "E_qY_tot")
+                                        {
+                                            bool1 = Globals.protectSymbol;
+                                            bool2 = Globals.protectSymbol;
+                                        }
+                                        else if (eqName == "E_vCalvo")
+                                        {
+                                            tt = "tx0e";
+                                        }
+                                        else if (eqName == "E_vCalvo_tEnd")
+                                        {
+                                            tt = "tend";
+                                        }
+
+                                        Globals.itemHandler.Add(new EquationListItem(eqName, counter + " of " + kvp.Value[0].expressionVariablesWithSets.Count, bool1, bool2, tt, xx, "Black"));
+
+                                        if (firstFirst)
+                                        {
+                                            List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
+                                            firstText = xx2[0].lhs + " = " + xx2[0].rhs;
+                                            firstList.AddRange(m3);
+                                            firstEqName = eqName;
+                                        }
+                                        firstFirst = false;
+
+
+                                    }
+                                }
+                                
+                            }
+                        }
                     }
 
                     WindowEquationBrowser eb = new WindowEquationBrowser();
                     eb.Title = variableName + " - " + "Gekko equations";
-                    eb.EquationBrowserSetEquationButtons(firstEqName, firstText, firstList);
+                    eb.EquationBrowserSetEquationButtons("eqname", "a1", new List<string>() { "b1", "b2" });
                     eb.EquationBrowserSetLabel(variableName);
 
                     eb.ShowDialog();
@@ -19536,6 +19606,7 @@ namespace Gekko
 
         private static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
+
             if (G.Equal(Path.GetExtension(fileName), ".csv"))
             {
                 G.Writeln2("*** ERROR: The former .csv reader for GAMS models is obsolete");
@@ -19548,6 +19619,86 @@ namespace Gekko
         }
 
         private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
+        {
+            //these objects typically get overridden soon
+            Program.model = new Model();
+            Program.model.modelGams = new ModelGams();
+
+            string modelHash = Program.HandleModelFilesGams(textInputRaw);
+
+            string mdlFileNameAndPath = Globals.localTempFilesLocation + "\\" + Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+
+            if (Program.options.model_cache == true)
+            {
+                if (File.Exists(mdlFileNameAndPath))
+                {
+                    try
+                    {
+                        DateTime dt1 = DateTime.Now;
+                        using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
+                        {
+                            Program.model.modelGams = Serializer.Deserialize<ModelGams>(fs);
+                            Program.model.modelGams.modelInfo.loadedFromMdlFile = true;
+                        }
+                        G.WritelnGray("Loaded known model from cache in: " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                    }
+                    catch (Exception e)
+                    {
+                        if (G.IsUnitTesting())
+                        {
+                            throw;
+                        }
+                        else
+                        {
+                            //do nothing, we then have to parse the file
+                            Program.model.modelGams.modelInfo.loadedFromMdlFile = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Program.model.modelGams.modelInfo.loadedFromMdlFile = false;
+            }
+
+            if (Program.model.modelGams.modelInfo.loadedFromMdlFile)
+            {
+                //do nothing, also no writing of .mdl file of course
+            }
+            else
+            {
+                ReadGamsModelHelper(textInputRaw, fileName, o);
+                Sniff2();
+                //Sneeze();
+
+                DateTime t1 = DateTime.Now;
+
+                try //not the end of world if it fails (should never be done if model is read from zipped protobuffer (would be waste of time))
+                {
+                    DateTime dt1 = DateTime.Now;
+                    
+                    //May take a little time to create: so use static serializer if doing serialize on a lot of small objects
+                    RuntimeTypeModel serializer = TypeModel.Create();
+                    serializer.UseImplicitZeroDefaults = false;  //otherwise an int that has default constructor value -12345 but is set to 0 will reappear as a -12345 (instead of 0). For int, 0 is default, false for bools etc.
+
+                    // ----- SERIALIZE                    
+                    string protobufFileName = Globals.gekkoVersion + "_" + "gams" + "_" + modelHash + ".mdl";
+                    string pathAndFilename = Globals.localTempFilesLocation + "\\" + protobufFileName;
+                    using (FileStream fs = WaitForFileStream(pathAndFilename, GekkoFileReadOrWrite.Write))
+                    {                        
+                        serializer.Serialize(fs, Program.model.modelGams);
+                    }                    
+                    G.WritelnGray("Created model cache file in " + G.SecondsFormat((DateTime.Now - dt1).TotalMilliseconds));
+                }
+                catch (Exception e)
+                {
+                    //do nothing, not the end of the world if it fails
+                }
+            }            
+            
+        }
+
+        private static void ReadGamsModelHelper(string textInputRaw, string fileName, O.Model o)
         {
             StringBuilder sb1 = new StringBuilder();
             sb1.AppendLine();
@@ -19653,9 +19804,10 @@ namespace Gekko
                     }
                 }
             }
-            Program.modelGams = new ModelGams();
-            Program.modelGams.equationsByVarname = equationsByVarname;
-            Program.modelGams.equationsByEqname = equationsByEqname;
+            Program.model.modelGams = new ModelGams();
+            Program.model.modelGams.equationsByVarname = equationsByVarname;
+            Program.model.modelGams.equationsByEqname = equationsByEqname;
+            Program.model.modelGams.modelInfo = new ModelInfoGams();
 
             G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
             G.Writeln("Read " + counter + " lines from " + fileName);
@@ -19680,80 +19832,74 @@ namespace Gekko
                     sw.Write(sb2);
                 }
             }
-
-            if (false && Globals.runningOnTTComputer)
-            {    
-                Sniff2();
-                Sneeze();
-            }
         }
 
-        private static void Sneeze()
-        {
-            List mm1 = new List();
+        //private static void Sneeze()
+        //{
+        //    List mm1 = new List();
 
-            StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
-            {
-                ModelGamsEquation eq = kvp.Value[0];
+        //    StreamWriter sb = new StreamWriter(@"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\eqsunfold.txt");
+        //    foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
+        //    {
+        //        ModelGamsEquation eq = kvp.Value[0];
 
-                List mm2 = new List();
-                mm2.Add(new ScalarString(eq.nameGams));
+        //        List mm2 = new List();
+        //        mm2.Add(new ScalarString(eq.nameGams));
 
-                //List: idea is to have a list m0 in this format:
-                //m0 is a list of (list) m1
-                //each m1 corresponds to a GAMS-eq. First element of m1 is the name, the rest are sub-equations (lists) m2
-                //each m2 is a list of strings (variable names)
+        //        //List: idea is to have a list m0 in this format:
+        //        //m0 is a list of (list) m1
+        //        //each m1 corresponds to a GAMS-eq. First element of m1 is the name, the rest are sub-equations (lists) m2
+        //        //each m2 is a list of strings (variable names)
 
-                sb.WriteLine();
-                sb.WriteLine("-----------------------------------------------------------");
-                sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
-                sb.WriteLine("$condition: " + eq.conditionals);
-                sb.WriteLine(eq.lhs + " = " + eq.rhs);
-                if (eq.expressionVariablesWithSets == null)
-                {
-                    sb.WriteLine("FULL  ditto");
-                }
-                else
-                {
-                    if (eq.expressionVariablesWithSets.Count == 0)
-                    {
-                        sb.WriteLine("FULL  ditto, eqcount0");
-                    }
-                    else
-                    {
-                        for (int i = 0; i < eq.expressionVariablesWithSets.Count; i++)
-                        {
-                            //for each sub-equation
+        //        sb.WriteLine();
+        //        sb.WriteLine("-----------------------------------------------------------");
+        //        sb.WriteLine(eq.nameGams + ", #subeqs: " + eq.expressions.Count);
+        //        sb.WriteLine("$condition: " + eq.conditionals);
+        //        sb.WriteLine(eq.lhs + " = " + eq.rhs);
+        //        if (eq.expressionVariablesWithSets == null)
+        //        {
+        //            sb.WriteLine("FULL  ditto");
+        //        }
+        //        else
+        //        {
+        //            if (eq.expressionVariablesWithSets.Count == 0)
+        //            {
+        //                sb.WriteLine("FULL  ditto, eqcount0");
+        //            }
+        //            else
+        //            {
+        //                for (int i = 0; i < eq.expressionVariablesWithSets.Count; i++)
+        //                {
+        //                    //for each sub-equation
 
-                            List mm3 = new List();
+        //                    List mm3 = new List();
 
-                            List<string> m2 = eq.expressionVariablesWithSets[i];
+        //                    List<string> m2 = eq.expressionVariablesWithSets[i];
 
-                            if (m2 != null)
-                            {
-                                foreach (string s2 in m2)
-                                {
-                                    ScalarString ss2 = new ScalarString(s2);
-                                    mm3.Add(ss2);
-                                }
-                            }
+        //                    if (m2 != null)
+        //                    {
+        //                        foreach (string s2 in m2)
+        //                        {
+        //                            ScalarString ss2 = new ScalarString(s2);
+        //                            mm3.Add(ss2);
+        //                        }
+        //                    }
 
-                            sb.WriteLine("FULL  " + G.GetListWithCommas(m2));
+        //                    sb.WriteLine("FULL  " + G.GetListWithCommas(m2));
 
-                            mm2.Add(mm3);
-                        }
-                    }
-                }
-                mm1.Add(mm2);
-            }
-            sb.Flush();
-            sb.Close();
+        //                    mm2.Add(mm3);
+        //                }
+        //            }
+        //        }
+        //        mm1.Add(mm2);
+        //    }
+        //    sb.Flush();
+        //    sb.Close();
 
-            Program.databanks.GetFirst().Clear();
-            Program.databanks.GetFirst().AddIVariable("#m", mm1);
-            WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
-        }
+        //    Program.databanks.GetFirst().Clear();
+        //    Program.databanks.GetFirst().AddIVariable("#m", mm1);
+        //    WriteGbk(Program.databanks.GetFirst(), GekkoTime.tNull, GekkoTime.tNull, @"c:\Thomas\Gekko\regres\Models\Decomp\UADAM\take2\model.gbk", false, null, null, true, false);
+        //}
         
 
         private static void Sniff2()
@@ -19764,14 +19910,14 @@ namespace Gekko
             int n1 = 0;
             int n2 = 0;
             int n3 = 0;
-            List<string> sletmig = new List<string>();
+            
             int counterA = 0;
             int counterError1 = 0;
             int counterError2 = 0;
-
-            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.modelGams.equationsByEqname)
+            
+            foreach (KeyValuePair<string, List<ModelGamsEquation>> kvp in Program.model.modelGams.equationsByEqname)
             {
-                if (counterA > 100) break;
+                if (counterA > 6) break;
                 if (counterA % 50 == 0) G.Writeln2("--> " + counterA);
 
                 counterA++;
@@ -20293,7 +20439,7 @@ namespace Gekko
             {
                 GetLhsVariable(lhsTokensGams2, ref lhs);
             }
-            else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
+            else if (G.Equal(Program.options.model_gams_dep_method, "vy[lan]"))
             {
                 if (eqnameGams.Contains("__"))
                 {
@@ -26769,12 +26915,12 @@ namespace Gekko
 
             Globals.printCs = new Dictionary<int, Func<GraphHelper, string>>();
 
-            Program.model = null; Program.unfoldedVariableList = null;
+            Program.model = new Model();
+            Program.unfoldedVariableList = null;
+
             Globals.modelFileName = "";
             GuiSetModelName();
-
-            Program.modelGams = null;
-
+            
             string workingFolder = Program.options.folder_working;
             Program.options = new Options();  //resetting these, but letting working folder live on.
 

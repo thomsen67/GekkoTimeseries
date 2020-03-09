@@ -865,7 +865,7 @@ namespace Gekko
             foreach (Link link in decompOptions.link)
             {
                 count++;
-                if (Program.modelGams != null)
+                if (Program.model.modelGams != null)
                 {
                     if (link.expressions.Count == 1 && link.expressions[0] == null)
                     {

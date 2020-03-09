@@ -99,12 +99,11 @@ namespace Gekko
         //public Type assemblyEigen = null;        
         
     }
-
-    [ProtoContract]
+        
     public class Model
     {
-        public ModelGekko modelGekko;
-        public ModelGams modelGams;
+        public ModelGekko modelGekko = null;
+        public ModelGams modelGams = null;
     }
 
     [ProtoContract]
@@ -392,32 +391,62 @@ namespace Gekko
         }
     }
 
+    [ProtoContract]
     public class ModelGams
     {
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = null;
-        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = null;  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname
+        [ProtoMember(1)]
+        public ModelInfoGams modelInfo = new ModelInfoGams();
+        [ProtoMember(2)]
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByVarname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
+        [ProtoMember(3)]
+        public GekkoDictionary<string, List<ModelGamsEquation>> equationsByEqname = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);  //The value is always a list with 1 element. Just easier that it is similar to equationsByVarname        
     }
 
+    [ProtoContract]
+    public class ModelInfoGams
+    {
+        public bool loadedFromMdlFile = false;  //do not protobuf
+    }
+
+    [ProtoContract]
     public class ModelGamsEquation
     {
+        [ProtoMember(1)]
         public string nameGams = null;
+
+        [ProtoMember(2)]
         public string setsGams = null;
+
+        [ProtoMember(3)]
         public List<string> setsGamsList = null;  //list of uncontrolled sets, no #-indicator
+
+        [ProtoMember(4)]
         public string conditionalsGams = null;
+
+        [ProtoMember(5)]
         public string lhsGams = null;
+
+        [ProtoMember(6)]
         public string rhsGams = null;
 
-        public string name = null;
-        public string sets = null;
+        // Gekko variant ----------------------------------
+
+        [ProtoMember(7)]
         public string conditionals = null;
+
+        [ProtoMember(8)]
         public string lhs = null;
+
+        [ProtoMember(9)]
         public string rhs = null;
 
         public TokenHelper lhsTokensGams = null;
         public TokenHelper rhsTokensGams = null;
 
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
-        public List<List<string>> expressionVariablesWithSets = null;  //for each expression in .expressions: contains the list of variables in the eq        
+
+        [ProtoMember(10)]
+        public List<List<string>> expressionVariablesWithSets = new List<List<string>>(); //for each expression in .expressions: contains the list of variables in the eq        
 
     }
 }
