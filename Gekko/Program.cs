@@ -16953,7 +16953,7 @@ namespace Gekko
             }
             else
             {
-                if (Program.model.modelGekko?.equations != null)
+                if (Program.model?.modelGekko?.equations != null)
                 {
                     note = "+++ NOTE: There is a normal model loaded, perhaps you should use 'OPTION model type = default;'?";
                 }
@@ -18995,6 +18995,7 @@ namespace Gekko
         private static void ReadGekkoModel(string fileName, DateTime dt0, string textInputRaw)
         {
             //TODO: keep the old version, so model command can be undone (like undo sim)
+            Program.model = new Model();
             Program.model.modelGekko = new ModelGekko();
             Program.model.modelGekko.modelInfo.fileName = fileName;
             //this also creates Program.model.modelGekko.varlist if there is a varlist
@@ -19020,7 +19021,7 @@ namespace Gekko
                         //WaitForZipRead(outputPath, mdlFileNameAndPath);
                         using (FileStream fs = WaitForFileStream(mdlFileNameAndPath, GekkoFileReadOrWrite.Read))
                         {
-                            Program.model = Serializer.Deserialize<Model>(fs);
+                            Program.model.modelGekko = Serializer.Deserialize<ModelGekko>(fs);
                         }
 
                         GetListsFromModelListHelper();
