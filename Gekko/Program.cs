@@ -19536,104 +19536,15 @@ namespace Gekko
 
         private static void ReadGamsModel(string textInputRaw, string fileName, O.Model o)
         {
-            if (!G.Equal(Path.GetExtension(fileName), ".csv"))
+            if (G.Equal(Path.GetExtension(fileName), ".csv"))
             {
-                ReadGamsModelNormal(textInputRaw, fileName, o);
+                G.Writeln2("*** ERROR: The former .csv reader for GAMS models is obsolete");
+                throw new GekkoException();
             }
             else
             {
-                ReadGamsModelCsv(textInputRaw, fileName);
+                ReadGamsModelNormal(textInputRaw, fileName, o);
             }
-        }
-
-        private static void ReadGamsModelCsv(string textInputRaw, string fileName)
-        {
-            TokenList tokens = StringTokenizer2.GetTokensWithLeftBlanks(textInputRaw);
-            List<List<string>> eqLines = new List<List<string>>();
-            List<string> temp = new List<string>();
-            foreach (TokenHelper token in tokens.storage)
-            {
-                if (token.type == ETokenType.EOL)
-                {
-                    eqLines.Add(temp);
-                    temp = new List<string>();
-                }
-                else if (token.s == ",")
-                {
-                    //do nothing
-                }
-                else
-                {
-                    temp.Add(token.s);
-                }
-            }            
-
-            Program.modelGams = new ModelGams();
-            //Program.modelGams.equations = eqLines;
-
-            GekkoDictionary<string, List<ModelGamsEquation>> xx = new GekkoDictionary<string, List<ModelGamsEquation>>(StringComparer.OrdinalIgnoreCase);
-
-            bool first = true;
-            foreach (List<string> line in eqLines)
-            {
-                if (first)
-                {
-                    first = false;
-                    continue;
-                }
-                ModelGamsEquation e = new ModelGamsEquation();
-                if (line.Count == null || line.Count == 0) continue;  //probably will not happen
-                if (line.Count < 5)
-                {
-                    G.Writeln2("*** ERROR: Expected 5 cols per line");
-                    throw new GekkoException();
-                }
-
-                e.nameGams = G.StripQuotes2(line[0]);
-                e.setsGams = G.StripQuotes2(line[1]);
-                e.conditionalsGams = G.StripQuotes2(line[2]);
-                e.lhsGams = G.StripQuotes2(line[3]);
-                e.rhsGams = G.StripQuotes2(line[4]);
-
-                e.name = G.StripQuotes2(line[0]);
-                e.sets = G.StripQuotes2(line[1]);
-                e.conditionals = G.StripQuotes2(line[2]);
-                e.lhs = G.StripQuotes2(line[3]);
-                e.rhs = G.StripQuotes2(line[4]);
-
-                TokenList fields = StringTokenizer2.GetTokensWithLeftBlanks(e.lhsGams);
-                string varName = null;
-                foreach (TokenHelper t in fields.storage)
-                {
-                    if (t.type == ETokenType.Word)
-                    {
-                        if (G.Equal(t.s, "log") || G.Equal(t.s, "exp")) continue;  //this logic could be improved... how to distinguish functions log(x) and sets y(t) ??
-                        varName = t.s;
-                        break;
-                    }
-                }
-                if (varName == null)
-                {
-                    G.Writeln2("*** ERROR: Could not find variable name in: " + fields[0].s);
-                    throw new GekkoException();
-                }
-
-                if (xx.ContainsKey(varName))
-                {
-                    xx[varName].Add(e);  //can have more than one eq with same lhs variable
-                }
-                else
-                {
-                    List<ModelGamsEquation> e2 = new List<ModelGamsEquation>();
-                    e2.Add(e);
-                    xx.Add(varName, e2);
-                }
-            }
-            Program.modelGams.equationsByVarname = xx;
-            
-            G.Writeln2("MODEL: " + Path.GetFileNameWithoutExtension(fileName));
-            G.Writeln("Read " + eqLines.Count + " lines from " + fileName);
-            G.Writeln("Found " + xx.Count + " distinct equations (use DISP to display them)");
         }
 
         private static void ReadGamsModelNormal(string textInputRaw, string fileName, O.Model o)
