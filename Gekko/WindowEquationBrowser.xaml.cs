@@ -198,7 +198,7 @@ namespace Gekko
                 _buttons.Add(ss5, b);
             }
 
-            if (true)
+            if (false)
             {
                 string op = "d";
                 GekkoTime per1 = new GekkoTime(EFreq.A, 2020, 1);                

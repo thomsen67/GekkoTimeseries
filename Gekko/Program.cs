@@ -17627,13 +17627,13 @@ namespace Gekko
                             List<List<string>> results = new List<List<string>>();
 
                             int counter = 0;
-                            foreach (List<string> m3 in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
+                            foreach (EquationVariablesGams m3 in kvp.Value[0].expressionVariablesWithSets) //foreach sub-eq
                             {
                                 if (m3 == null) continue;
                                 counter++;                                
                                 {
                                     bool found = false;
-                                    foreach (string ss in m3) //foreach variable (first item is name)
+                                    foreach (string ss in m3.equationVariables) //foreach variable (first item is name)
                                     {
                                         string[] ss2 = ss.Split('¤');
                                         string ss3 = ss2[0];
@@ -17650,7 +17650,7 @@ namespace Gekko
                                     if (found)
                                     {
                                         //List<string> yy = m3;
-                                        string xx = G.GetListWithCommas(m3).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
+                                        string xx = G.GetListWithCommas(m3.equationVariables).Replace("¤[0]", "").Replace("¤", "").Replace(", residual___", "");
 
                                         string bool1 = "";
                                         string bool2 = "";
@@ -17675,7 +17675,7 @@ namespace Gekko
                                         {
                                             List<ModelGamsEquation> xx2 = Program.model.modelGams.equationsByEqname[eqName];
                                             firstText = xx2[0].lhs + " = " + xx2[0].rhs;
-                                            firstList.AddRange(m3);
+                                            firstList.AddRange(m3.equationVariables);
                                             firstEqName = eqName;
                                         }
                                         firstFirst = false;
@@ -17690,7 +17690,7 @@ namespace Gekko
 
                     WindowEquationBrowser eb = new WindowEquationBrowser();
                     eb.Title = variableName + " - " + "Gekko equations";
-                    eb.EquationBrowserSetEquationButtons("eqname", "a1", new List<string>() { "b1", "b2" });
+                    eb.EquationBrowserSetEquationButtons("E_Vy", "a1", new List<string>() { "b1", "b2" });
                     eb.EquationBrowserSetLabel(variableName);
 
                     eb.ShowDialog();
@@ -19922,8 +19922,8 @@ namespace Gekko
 
                 counterA++;
                 ModelGamsEquation eq = kvp.Value[0];
-                                
-                eq.expressionVariablesWithSets = new List<List<string>>();
+
+                eq.expressionVariablesWithSets = new List<EquationVariablesGams>();
 
                 string rhs = eq.rhs.Trim();
                 string lhs = eq.lhs.Trim();
@@ -19982,7 +19982,9 @@ namespace Gekko
                                     m1.Add(ss5);
                                 }
                             }
-                            eq.expressionVariablesWithSets.Add(m1);                            
+                            EquationVariablesGams temp = new EquationVariablesGams();
+                            temp.equationVariables = m1;
+                            eq.expressionVariablesWithSets.Add(temp);
                         }
                         catch (Exception e)
                         {
@@ -20439,7 +20441,7 @@ namespace Gekko
             {
                 GetLhsVariable(lhsTokensGams2, ref lhs);
             }
-            else if (G.Equal(Program.options.model_gams_dep_method, "vy[lan]"))
+            else if (G.Equal(Program.options.model_gams_dep_method, "eqname"))
             {
                 if (eqnameGams.Contains("__"))
                 {

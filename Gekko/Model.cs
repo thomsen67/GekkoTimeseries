@@ -446,7 +446,14 @@ namespace Gekko
         public List<Func<GekkoSmpl, IVariable>> expressions = new List<Func<GekkoSmpl, IVariable>>();
 
         [ProtoMember(10)]
-        public List<List<string>> expressionVariablesWithSets = new List<List<string>>(); //for each expression in .expressions: contains the list of variables in the eq        
+        public List<EquationVariablesGams> expressionVariablesWithSets = new List<EquationVariablesGams>(); //for each expression in .expressions: contains the list of variables in the eq        
 
+    }
+
+    [ProtoContract]
+    public class EquationVariablesGams
+    {
+        [ProtoMember(1)]
+        public List<string> equationVariables = new List<string>();
     }
 }
